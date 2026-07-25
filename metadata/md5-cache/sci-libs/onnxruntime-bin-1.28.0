@@ -1,0 +1,11 @@
+DEFINED_PHASES=install unpack
+DESCRIPTION=Cross-platform, high performance ML inferencing and training accelerator
+EAPI=8
+HOMEPAGE=https://onnxruntime.ai https://github.com/microsoft/onnxruntime
+KEYWORDS=~amd64
+LICENSE=MIT
+RDEPEND=sys-devel/gcc:*
+RESTRICT=strip
+SLOT=0
+SRC_URI=amd64? ( https://github.com/microsoft/onnxruntime/releases/download/v1.28.0/onnxruntime-linux-x64-1.28.0.tgz )
+_md5_=300515e5b2a707a60638e738357048b4

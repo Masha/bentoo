@@ -10,19 +10,22 @@ HOMEPAGE="
 	https://onnxruntime.ai
 	https://github.com/microsoft/onnxruntime
 "
+# Upstream broke the aarch64 release asset in 1.28.0: the versioned tarball
+# (${MY_PN}-linux-aarch64-${PV}.tgz) was not published, and the unversioned
+# ${MY_PN}-linux-aarch64.zip that replaced it is a 358K archive carrying only
+# _manifest/spdx_2.2/ SBOM files -- no lib/ and no include/.  There is no
+# usable arm64 binary for this version, so restore ~arm64 once upstream ships
+# a complete aarch64 asset again.
 SRC_URI="
 	amd64? (
 		https://github.com/microsoft/onnxruntime/releases/download/v${PV}/${MY_PN}-linux-x64-${PV}.tgz
-	)
-	arm64? (
-		https://github.com/microsoft/onnxruntime/releases/download/v${PV}/${MY_PN}-linux-aarch64-${PV}.tgz
 	)
 "
 S="${WORKDIR}/${P}"
 
 LICENSE="MIT"
 SLOT="0"
-KEYWORDS="~amd64 ~arm64"
+KEYWORDS="~amd64"
 
 # Verified with `readelf -d` on 1.27.1 (both x64 and aarch64): the DT_NEEDED
 # set is libdl, librt, libpthread, libstdc++, libm, libgcc_s, libc, ld-linux.
