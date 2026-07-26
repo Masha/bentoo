@@ -12,15 +12,18 @@ inherit cmake cuda rocm linux-info
 # series sci-ml/llama-cpp pins to.  The package is therefore pinned to a dated
 # commit snapshot, following sys-kernel/linux-firmware and app-editors/zed.
 #
-# Pinned commit 9d07d8681ece159a89fb4e16a1f9c9f3a5fac20f, committed
-# 2026-07-18 -- the date stamp in ${PV} is that committer date.  Bump by
-# picking a new HEAD, setting MY_COMMIT and moving ${PV} to its committer date.
-MY_COMMIT="9d07d8681ece159a89fb4e16a1f9c9f3a5fac20f"
+# Pinned commit de55d9e2f6c24d3f0c8a8a2a296e486b2ccf80b2, committed
+# 2026-07-25 -- the date stamp in ${PV} is that committer date.  The variable is
+# named GIT_COMMIT because that is one of the names bentoolkit's commit applier
+# rewrites (EGIT_COMMIT/GIT_COMMIT/BUILD_ID/COMMIT); under any other name the
+# autoupdate bumps ${PV} and leaves the SHA stale, which silently ships the old
+# tree under the new date stamp.
+GIT_COMMIT="0a4e10c7fb65d2dd5a4afb78339c7d373a8cdfaa"
 
 DESCRIPTION="llama.cpp fork with additional SOTA quants and improved performance"
 HOMEPAGE="https://github.com/ikawrakow/ik_llama.cpp"
-SRC_URI="https://github.com/ikawrakow/ik_llama.cpp/archive/${MY_COMMIT}.tar.gz -> ${P}.tar.gz"
-S="${WORKDIR}/ik_llama.cpp-${MY_COMMIT}"
+SRC_URI="https://github.com/ikawrakow/ik_llama.cpp/archive/${GIT_COMMIT}.tar.gz -> ${P}.tar.gz"
+S="${WORKDIR}/ik_llama.cpp-${GIT_COMMIT}"
 
 LICENSE="MIT"
 SLOT="0"
@@ -96,7 +99,7 @@ src_prepare() {
 	# they were built from rather than "build 0 (unknown)".
 	sed -i \
 		-e "s/^set(BUILD_NUMBER 0)$/set(BUILD_NUMBER ${PV#0_pre})/" \
-		-e "s/^set(BUILD_COMMIT \"unknown\")$/set(BUILD_COMMIT \"${MY_COMMIT:0:7}\")/" \
+		-e "s/^set(BUILD_COMMIT \"unknown\")$/set(BUILD_COMMIT \"${GIT_COMMIT:0:7}\")/" \
 		cmake/build-info.cmake || die
 }
 

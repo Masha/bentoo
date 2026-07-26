@@ -7,7 +7,7 @@
 # ebuild (Gentoo version rules: prefixes v/release-/ver-/version- stripped;
 # regex returns capture group 1 of the FIRST match on the raw body).
 #
-# 314 records — all live-verified. 88 disabled (enabled = false), 4 held
+# 318 records — all live-verified. 90 disabled (enabled = false), 2 held
 # (hold = true), 0 skipped.
 #
 # NOTE: BEGIN/END markers below are comments only. Do NOT use bare [BEGIN]/[END]
@@ -2270,15 +2270,23 @@ revision = 600
 # --- ollama source: same upstream repo as sci-ml/ollama-bin ---
 
 ["sci-ml/ollama"]
-hold = true
+enabled = false
 url = "https://api.github.com/repos/ollama/ollama/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 # ollama source — same repo as ollama-bin; tag "vX.Y.Z" (leading v stripped).
-# hold = true (NOT enabled = false, which the overlay reconciliation would revert
-# since the ebuild IS present): the llama.cpp FetchContent rearch needs manual
-# patchset/distfile work per bump, so this is a deliberate maintainer hold.
+# enabled = false since 2026-07-26: the source ebuilds were removed from the
+# overlay (only sci-ml/ollama-bin remains), so this is ordinary bookkeeping and
+# reconciliation will flip it back if an ebuild reappears. It carried hold = true
+# before that, for the llama.cpp rearch that makes every bump manual.
+#
+# Whoever revives it: the llama.cpp tag is NOT free-form. It is read from
+# LLAMA_CPP_VERSION, a one-line file at the repo root, by llama/server/
+# CMakeLists.txt — so the value for a given release is
+# raw.githubusercontent.com/ollama/ollama/v<PV>/LLAMA_CPP_VERSION (v0.32.4 ->
+# b10091). The removed 0.32.3 ebuild carried LLAMA_CPP_tag=b10069 while its own
+# release asked for b10091; do not copy that value forward.
 
 # ============================================================================
 # Added 2026-07-08 — overlay packages that were untracked (probe gap audit).
@@ -2466,6 +2474,11 @@ headers = { "User-Agent" = "bentoo-autoupdate" }
 # transform is load-bearing: without it the applier renames the package to a
 # bare "782", destroying the snapshot versioning (observed 2026-07-19).
 #
+# That bare PV survived in the overlay until 2026-07-26 and was silently fatal
+# to the probe: Gentoo orders 0_pre783 BELOW 782, so every later build compared
+# as older and the package answered "up to date" forever.  Reverted to
+# 0_pre782; if a bare PV ever shows up here again, that is the symptom.
+#
 # NOT SAFE TO AUTO-APPLY.  A real bump needs TWO pinned values updated together
 # — MY_COMMIT (the tag's short hash) and GGML_COMMIT (the leejet/ggml submodule
 # gitlink at that tag) — and the applier syncs neither.  When upstream cuts a
@@ -2480,11 +2493,12 @@ headers = { "User-Agent" = "bentoo-autoupdate" }
 # (commit ba706dc8 flipped it back). hold is never auto-flipped.
 
 ["sci-ml/ik_llama-cpp"]
-hold = true
+track = "commit"
 url = "https://api.github.com/repos/ikawrakow/ik_llama.cpp/commits/main"
 parser = "json"
 path = "commit.committer.date"
-transform = [['T.*', ""], ['-', ""], ['^(\d+)$', "0_pre$1"]]
+transform = [['T.*', ""], ['-', ""]]
+commit_sha_path = "sha"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 # ik_llama-cpp — upstream publishes no usable release series.  Verified
 # 2026-07-19: the repo has exactly ONE tag, "t0002" (prerelease, 2025-07-22),
@@ -2494,13 +2508,15 @@ headers = { "User-Agent" = "bentoo-autoupdate" }
 # tracks the default branch's committer date instead, which IS the ebuild's
 # versioning scheme (0_pre<YYYYMMDD>).
 #
-# NOT SAFE TO AUTO-APPLY.  SRC_URI pins a full 40-hex commit SHA that must move
-# with PV; --apply bumping the date alone yields a 404. Bump BY HAND: pick the
-# new HEAD commit, use its COMMITTER date (not author date) as PV, and update
-# SRC_URI and S together.
-#
-# Hence hold = true — `enabled = false` does NOT stick; see the note on
-# stable-diffusion-cpp.
+# track = "commit" is what makes this auto-appliable, and it replaced hold = true
+# on 2026-07-26.  Two things had to be true for that, and neither was before:
+#   - the ebuild's SHA must live in a variable the commit applier rewrites, so
+#     MY_COMMIT was renamed to GIT_COMMIT.  Under the old name --apply moved the
+#     date and left the SHA behind: 0_pre20260725 shipped the 2026-07-18 tree
+#     under a renamed distfile — no 404, no error, just the wrong source.
+#   - the "0_pre" prefix must come from the snapshot suffix the checker carries
+#     over from the current PV, NOT from a transform.  A third transform rule
+#     ('^(\d+)$' -> "0_pre$1") would compose with it and yield "0_pre0_pre<date>".
 
 
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  END PACKAGES  <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<

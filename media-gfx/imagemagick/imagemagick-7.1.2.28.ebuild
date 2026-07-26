@@ -15,18 +15,13 @@ if [[ ${PV} == 9999 ]] ; then
 	inherit git-r3
 	MY_P="imagemagick-9999"
 else
-	VERIFY_SIG_OPENPGP_KEY_PATH=/usr/share/openpgp-keys/imagemagick.asc
-	inherit verify-sig
-
 	MY_PV="$(ver_rs 3 '-')"
 	MY_P="ImageMagick-${MY_PV}"
-	SRC_URI="
-		https://download.imagemagick.org/archive/${MY_P}.tar.xz
-		verify-sig? ( https://download.imagemagick.org/archive/${MY_P}.tar.xz.asc )
-	"
+	# Upstream only publishes the signed tarball for the latest release on
+	# download.imagemagick.org; use the (permanent) release tag from GitHub.
+	SRC_URI="https://github.com/ImageMagick/ImageMagick/archive/refs/tags/${MY_PV}.tar.gz -> ${MY_P}.tar.gz"
 
 	KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~loong ~m68k ~mips ~ppc ~ppc64 ~riscv ~s390 ~sparc ~x86 ~arm64-macos ~x64-macos ~x64-solaris"
-	BDEPEND="verify-sig? ( sec-keys/openpgp-keys-imagemagick )"
 fi
 
 S="${WORKDIR}/${MY_P}"
