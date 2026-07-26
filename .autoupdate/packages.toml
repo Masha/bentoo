@@ -2252,20 +2252,20 @@ parser = "regex"
 pattern = 'webkitgtk-(2\.52\.[0-9]+)\.tar\.xz'
 select = "max"
 revision = 410
-# revision = 410 is the SLOT's BASE revision, not the current ebuild's. The
-# overlay is at -r411 (a revbump WITHIN 2.52.4); a PV change resets it, exactly
-# as ::gentoo bumps webkit-gtk-2.52.3-r411 to webkit-gtk-2.52.5-r410.
+# revision is the SLOT's BASE revision, not whatever the current ebuild carries.
+# -r411 is a revbump WITHIN a PV; a PV change resets it to the base, exactly as
+# ::gentoo bumps webkit-gtk-2.52.3-r411 to webkit-gtk-2.52.5-r410.
 
 ["net-libs/webkit-gtk:6"]
 url = "https://www.webkitgtk.org/releases/"
 parser = "regex"
 pattern = 'webkitgtk-(2\.52\.[0-9]+)\.tar\.xz'
 select = "max"
-# NO revision on purpose: this overlay's SLOT 6 ebuild is webkit-gtk-2.52.5.ebuild
-# with a bare PV, diverging from ::gentoo's -r600 convention. Setting revision = 600
-# here would write webkit-gtk-<pv>-r600.ebuild and leave the bare-PV ebuild behind
-# as a stale sibling. If the SLOT 6 ebuild is ever renamed to -r600 to match
-# ::gentoo, add revision = 600 in the same commit.
+revision = 600
+# 600 is the base for this SLOT (::gentoo ships -r600 for every PV and -r601 as
+# the revbump), and the overlay now follows it: the ebuild is
+# webkit-gtk-2.52.5-r601.ebuild. It used to be a bare webkit-gtk-2.52.5.ebuild,
+# which is why this entry carried no revision until 2026-07-26.
 
 # --- ollama source: same upstream repo as sci-ml/ollama-bin ---
 
