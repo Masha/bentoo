@@ -2170,11 +2170,15 @@ transform = [['-', "."]]
 
 # ============================================================================
 # Gentoo mirrors / series-pinned (added 2026-06-20) — bentoo tracks these AHEAD
-# of Gentoo but bumps them BY HAND (rust patchset+LLVM_COMPAT, webkit dual-slot,
-# audacity 3.7.x pin, ghc bootstrap compiler, ollama llama.cpp rearch), so the
-# cron must not auto-bump. Records whose ebuild is PRESENT in the overlay use
-# hold = true (reconciliation would revert enabled = false); the rest stay
-# enabled = false. The source is still correct: `--check <pkg> --force` to probe.
+# of Gentoo but bumps them BY HAND (rust patchset+LLVM_COMPAT, audacity 3.7.x
+# pin, ghc bootstrap compiler, ollama llama.cpp rearch), so the cron must not
+# auto-bump. Records whose ebuild is PRESENT in the overlay use hold = true
+# (reconciliation would revert enabled = false); the rest stay enabled = false.
+# The source is still correct: `--check <pkg> --force` to probe.
+#
+# webkit-gtk LEFT this group on 2026-07-26: its only reason to be here was the
+# dual-slot layout, which bentoolkit now models directly via ":slot" keys plus
+# `revision` (see the entry below).
 # ============================================================================
 
 # --- rust: source, -bin and -common share ONE stable Rust version (channel toml) ---
@@ -2230,18 +2234,39 @@ headers = { "User-Agent" = "bentoo-autoupdate" }
 # matches. Audacity-4.0.0-{alpha,beta} tags exist upstream but don't compile and are
 # excluded by the 3\.7\. series anchor. group1 has no prefix (normalizer no-op).
 
-# --- webkit-gtk: pinned to stable 2.52.x (both slots -r411/-r601 share PV) ---
+# --- webkit-gtk: pinned to stable 2.52.x, one entry per SLOT ---
 
-["net-libs/webkit-gtk"]
-hold = true
+# Both slots live in ONE directory and share the PV series, so a single entry
+# cannot express them: the highest version in the directory is whichever slot is
+# ahead, so that slot would be bumped forever and the other never. The ":slot"
+# suffix gives each its own entry, its own pending record and its own cache
+# record; the current version is resolved by reading each ebuild's SLOT=.
+#
+# webkitgtk.org HTML listing (ascending) -> select=max over the 2.52.x series;
+# ignores dev 2.53.x and the 2.48 LTS / 2.50 lines.
+
+["net-libs/webkit-gtk:4.1"]
+enabled = false
 url = "https://www.webkitgtk.org/releases/"
 parser = "regex"
 pattern = 'webkitgtk-(2\.52\.[0-9]+)\.tar\.xz'
 select = "max"
-# webkitgtk.org HTML listing (ascending) -> select=max over the 2.52.x series; ignores
-# dev 2.53.x and the 2.48 LTS / 2.50 lines. One entry covers both slots (share PV 2.52.4).
-# hold = true (NOT enabled = false, which reconciliation would revert since both
-# ebuilds ARE present): the dual-slot pin (-r411/-r601) is bumped by hand.
+revision = 410
+# revision = 410 is the SLOT's BASE revision, not the current ebuild's. The
+# overlay is at -r411 (a revbump WITHIN 2.52.4); a PV change resets it, exactly
+# as ::gentoo bumps webkit-gtk-2.52.3-r411 to webkit-gtk-2.52.5-r410.
+
+["net-libs/webkit-gtk:6"]
+enabled = false
+url = "https://www.webkitgtk.org/releases/"
+parser = "regex"
+pattern = 'webkitgtk-(2\.52\.[0-9]+)\.tar\.xz'
+select = "max"
+# NO revision on purpose: this overlay's SLOT 6 ebuild is webkit-gtk-2.52.5.ebuild
+# with a bare PV, diverging from ::gentoo's -r600 convention. Setting revision = 600
+# here would write webkit-gtk-<pv>-r600.ebuild and leave the bare-PV ebuild behind
+# as a stale sibling. If the SLOT 6 ebuild is ever renamed to -r600 to match
+# ::gentoo, add revision = 600 in the same commit.
 
 # --- ollama source: same upstream repo as sci-ml/ollama-bin ---
 
