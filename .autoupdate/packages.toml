@@ -400,6 +400,7 @@ binary = true
 # uv (uv-bin) — tag bare "X.Y.Z".
 
 ["dev-ruby/erb"]
+enabled = false
 url = "https://api.github.com/repos/ruby/erb/tags"
 parser = "json"
 path = "[0].name"
