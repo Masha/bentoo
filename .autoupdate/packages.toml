@@ -2246,7 +2246,6 @@ headers = { "User-Agent" = "bentoo-autoupdate" }
 # ignores dev 2.53.x and the 2.48 LTS / 2.50 lines.
 
 ["net-libs/webkit-gtk:4.1"]
-enabled = false
 url = "https://www.webkitgtk.org/releases/"
 parser = "regex"
 pattern = 'webkitgtk-(2\.52\.[0-9]+)\.tar\.xz'
@@ -2257,7 +2256,6 @@ revision = 410
 # as ::gentoo bumps webkit-gtk-2.52.3-r411 to webkit-gtk-2.52.5-r410.
 
 ["net-libs/webkit-gtk:6"]
-enabled = false
 url = "https://www.webkitgtk.org/releases/"
 parser = "regex"
 pattern = 'webkitgtk-(2\.52\.[0-9]+)\.tar\.xz'
