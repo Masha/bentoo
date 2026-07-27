@@ -16,8 +16,8 @@ HOMEPAGE="
 "
 SRC_URI="
 	https://github.com/microsoft/onnxruntime/archive/refs/tags/v${PV}.tar.gz -> ${P}.tar.gz
-	https://gitlab.com/libeigen/eigen/-/archive/${EIGEN_COMMIT}/eigen-${EIGEN_COMMIT}.tar.bz2 ->
-		eigen-3.4.0_p20250216.tar.bz2
+	https://github.com/eigen-mirror/eigen/archive/${EIGEN_COMMIT}.tar.gz ->
+		eigen-3.4.0_p20250216.tar.gz
 "
 
 LICENSE="MIT"
@@ -73,7 +73,7 @@ BDEPEND="
 PATCHES=(
 	"${FILESDIR}/${PN}-1.22.2-relax-the-dependency-on-flatbuffers.patch"
 	"${FILESDIR}/${PN}-1.24.4-no-werror.patch"
-	"${FILESDIR}/${PN}-1.27.0-use-system-libraries.patch"
+	"${FILESDIR}/${PN}-1.28.0-use-system-libraries.patch"
 )
 
 CMAKE_USE_DIR="${S}/cmake"
@@ -94,7 +94,10 @@ src_configure() {
 		-Donnxruntime_BUILD_UNIT_TESTS=$(usex test)
 		-Donnxruntime_ENABLE_PYTHON=$(usex python)
 
-		# Use the vendored Eigen at a specific 3.4-branch commit (2025-02-15).
+		# Use the vendored Eigen at a specific 3.4-branch commit (2025-02-15),
+		# fetched from the github eigen-mirror that upstream's own
+		# `cmake/deps.txt` points at: gitlab.com now serves a Cloudflare 403 to
+		# portage's wget, and the renamed archive is not on the gentoo mirrors.
 		# ::gentoo's dev-cpp/eigen-3.4.0-r3 (Aug 2021) lacks 3+ years of fixes
 		# onnxruntime depends on; eigen-3.4.9999 (live) would work but a live
 		# ebuild as a build dependency is fragile. Eigen 5.0.1 (released 2026)
