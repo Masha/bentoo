@@ -1,0 +1,25 @@
+From 7f45a3969279c3d3ad59819507f831759e343b44 Mon Sep 17 00:00:00 2001
+From: Paul Zander <negril.nx+gentoo@gmail.com>
+Date: Fri, 24 Oct 2025 15:09:38 +0200
+Subject: EventTarget gcc16
+
+See-also: https://bugs.gentoo.org/970412
+
+Refreshed against 2.52.5 (bentoo, 2026-07-26). The original carried a second
+hunk adding #include <WebCore/EventTargetInlines.h> to
+Source/WebKit/WebProcess/InjectedBundle/API/gtk/DOM/WebKitDOMEvent.cpp; that
+include is present upstream since 2.52.5, and eapply's `patch -f` would have
+forced a duplicate copy of it rather than skipping the hunk. Dropped. The
+remaining hunk still applies: the redundant forward declaration it removes is
+still in EventTarget.h.
+
+--- a/Source/WebCore/dom/EventTarget.h
++++ b/Source/WebCore/dom/EventTarget.h
+@@ -56,7 +56,6 @@
+ 
+ enum class EventTargetInterfaceType : uint8_t;
+ class DOMWrapperWorld;
+-class EventTarget;
+ class JSEventListener;
+ 
+ struct EventTargetData {

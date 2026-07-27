@@ -126,7 +126,7 @@ PATCHES=(
 	"${FILESDIR}"/2.48.3-fix-ftbfs-riscv64.patch
 	"${FILESDIR}"/2.50.4-disable-native-simd-on-riscv.patch
 	"${FILESDIR}"/2.50.4-prefer-pthread.patch
-	"${FILESDIR}"/2.50.5-EventTarget-gcc16.patch
+	"${FILESDIR}"/2.52.5-EventTarget-gcc16.patch
 	"${FILESDIR}"/2.52.1-documentloader-eventloop-h.patch
 	"${FILESDIR}"/2.52.4-disable-nvidia-dmabuf.patch
 )
