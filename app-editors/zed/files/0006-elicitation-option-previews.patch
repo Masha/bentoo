@@ -89,21 +89,23 @@ index 55bb938..e225a86 100644
  }
  
  enum ElicitationFieldState {
-@@ -29,6 +36,8 @@ enum ElicitationFieldState {
+@@ -29,7 +36,9 @@ enum ElicitationFieldState {
  pub(crate) struct ElicitationFormState {
      fields: HashMap<String, ElicitationFieldState>,
      field_errors: HashMap<String, SharedString>,
 +    expanded_previews: HashSet<(String, String)>,
 +    preview_markdown: HashMap<(String, String), Entity<Markdown>>,
+     is_submitting: bool,
  }
  
  impl ElicitationFormState {
-@@ -100,6 +109,8 @@ impl ElicitationFormState {
+@@ -100,7 +109,9 @@ impl ElicitationFormState {
          Self {
              fields,
              field_errors: HashMap::default(),
 +            expanded_previews: HashSet::default(),
 +            preview_markdown: HashMap::default(),
+             is_submitting: false,
          }
      }
  
