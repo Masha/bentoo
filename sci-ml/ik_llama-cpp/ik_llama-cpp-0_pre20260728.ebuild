@@ -18,7 +18,7 @@ inherit cmake cuda rocm linux-info
 # rewrites (EGIT_COMMIT/GIT_COMMIT/BUILD_ID/COMMIT); under any other name the
 # autoupdate bumps ${PV} and leaves the SHA stale, which silently ships the old
 # tree under the new date stamp.
-GIT_COMMIT="5f063b7bbae8f9a34dfc5c704aa77939e76494a9"
+GIT_COMMIT="b054a8b983827c01aec59d4dc273a27c492c51c4"
 
 DESCRIPTION="llama.cpp fork with additional SOTA quants and improved performance"
 HOMEPAGE="https://github.com/ikawrakow/ik_llama.cpp"

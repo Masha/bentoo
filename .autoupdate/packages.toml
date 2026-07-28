@@ -1991,11 +1991,14 @@ select = "max"
 # highest (was SKIP: assumed git-only, but the mirror does host versioned tarballs).
 
 ["app-office/libreoffice"]
-url = "https://download.documentfoundation.org/libreoffice/src/"
-parser = "script"
-script = "@libreoffice.js"
-# libreoffice — src/ index lists 3-segment dirs ascending; the JS picks the newest
-# dir and reads the 4-segment tarball version inside it.
+url = "https://downloadarchive.documentfoundation.org/libreoffice/old/"
+parser = "regex"
+pattern = 'href="([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)/"'
+select = "max"
+# libreoffice — the src/ index grew to ~590 KB and the headless browser now times
+# out on it (ERR_TIMED_OUT). old/ lists full 4-segment release dirs directly, so a
+# plain regex + select=max replaces the JS probe; -alpha/-beta dirs carry a suffix
+# and never match the 4-group pattern.
 
 ["app-office/libreoffice-l10n"]
 url = "https://download.documentfoundation.org/libreoffice/src/"
