@@ -17,10 +17,15 @@ if [[ ${PV} == *9999* ]]; then
 	EGIT_REPO_URI="https://github.com/ggml-org/llama.cpp.git"
 else
 	MY_PV="b${PV#0_pre}"
+	# Upstream's Release workflow failed for b10156, so that tag carries the
+	# source but no release assets at all -- the prebuilt webui dist among them.
+	# b10155 is the closest tag that published one, and the only commit in
+	# between (91f8c9c "Disable -ffast-math on HIP") does not touch tools/ui.
+	MY_UI_PV="b10155"
 	SRC_URI="
 		https://github.com/ggml-org/llama.cpp/archive/refs/tags/${MY_PV}.tar.gz -> ${P}.tar.gz
 		webui? (
-			https://github.com/ggml-org/llama.cpp/releases/download/${MY_PV}/llama-${MY_PV}-ui.tar.gz -> ${P}-ui.tar.gz
+			https://github.com/ggml-org/llama.cpp/releases/download/${MY_UI_PV}/llama-${MY_UI_PV}-ui.tar.gz -> ${PN}-${MY_UI_PV}-ui.tar.gz
 		)
 	"
 	S="${WORKDIR}/llama.cpp-${MY_PV}"
@@ -143,7 +148,7 @@ src_unpack() {
 			# entry, so use one of those instead.
 			die "USE=webui is unsupported on a live ebuild: the webui dist has no verifiable source"
 		else
-			ln -s "${WORKDIR}/llama-${MY_PV}" "${S}/tools/ui/dist" || die
+			ln -s "${WORKDIR}/llama-${MY_UI_PV}" "${S}/tools/ui/dist" || die
 		fi
 	fi
 }
