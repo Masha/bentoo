@@ -107,17 +107,32 @@ src_install() {
 	dosym ../../opt/duplicati-bin/duplicati-cli /usr/bin/duplicati-cli
 	dosym ../../opt/duplicati-bin/duplicati-server /usr/bin/duplicati-server
 
-	# The bundle ships no application icon or .desktop file; synthesize both.
-	# The bundle carries only tiny web favicons and a rectangular wordmark SVG,
-	# so use the official 512x512 Duplicati logo vendored in files/ instead.
+	# The bundle ships no application icon or .desktop file; provide both.
+	# Use the official 512x512 Duplicati logo vendored in files/ (the bundle
+	# carries only tiny web favicons and a rectangular wordmark SVG).
 	newicon -s 512 "${FILESDIR}"/duplicati.png duplicati.png
 
-	make_desktop_entry \
-		"/opt/duplicati-bin/duplicati %U" \
-		"Duplicati" \
-		"duplicati" \
-		"System;Utility;Archiving;" \
-		"StartupNotify=true\nTryExec=/opt/duplicati-bin/duplicati\nComment=Backup client / duplicated backups made easy"
+	# Write the .desktop by hand. Do NOT pass TryExec/Comment through
+	# make_desktop_entry's 5th "fields" arg: the eclass already emits those
+	# keys, so the file ends up with duplicate Comment=/TryExec= keys. That is
+	# an invalid .desktop (desktop-file-validate errors out), and KDE's
+	# kbuildsycoca then drops the entry, so it never shows in the menu.
+	cat > "${T}"/duplicati.desktop <<-EOF || die
+		[Desktop Entry]
+		Type=Application
+		Name=Duplicati
+		GenericName=Backup Tool
+		Comment=Store encrypted, incremental, deduplicated backups online
+		Exec=/opt/duplicati-bin/duplicati
+		TryExec=/opt/duplicati-bin/duplicati
+		Icon=duplicati
+		Terminal=false
+		Categories=Utility;Archiving;
+		Keywords=backup;restore;encryption;cloud;
+		StartupNotify=true
+		StartupWMClass=Duplicati
+	EOF
+	domenu "${T}"/duplicati.desktop
 
 	dodoc changelog.txt licenses/license.txt
 }
