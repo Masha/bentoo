@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>otakugeekx@gmail.com</email>
+		<name>Lucas Couto</name>
+	</maintainer>
+	<longdescription lang="en">
+		Duplicati is a free, open-source backup client that securely stores
+		encrypted, incremental, compressed and deduplicated backups on cloud
+		storage services and remote file servers (S3, Google Drive, OneDrive,
+		Backblaze B2, WebDAV, SSH/SFTP, FTP and many others). All data is
+		encrypted with AES-256 (or GPG) before it leaves the machine. This is
+		the pre-built, self-contained GUI bundle: it embeds its own .NET
+		runtime and ships the Avalonia tray icon, the local web UI, the
+		command-line client and the headless server. Installs a desktop entry
+		and application icons.
+	</longdescription>
+	<upstream>
+		<remote-id type="github">duplicati/duplicati</remote-id>
+		<bugs-to>https://github.com/duplicati/duplicati/issues</bugs-to>
+		<doc lang="en">https://docs.duplicati.com/</doc>
+	</upstream>
+</pkgmetadata>
