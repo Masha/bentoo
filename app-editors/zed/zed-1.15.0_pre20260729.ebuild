@@ -1317,7 +1317,6 @@ CRATES="
 	wasm-metadata@0.227.1
 	wasm-metadata@0.244.0
 	wasm-streams@0.4.2
-	wasm_thread@0.3.3
 	wasmparser@0.201.0
 	wasmparser@0.227.1
 	wasmparser@0.236.1
@@ -1610,6 +1609,7 @@ declare -A GIT_CRATES=(
 	[tree-sitter-md]='https://github.com/zed-industries/tree-sitter-markdown;b596e737286780d7bfa9fcddceaeeb754574b352;tree-sitter-markdown-%commit%'
 	[tree-sitter-typescript]='https://github.com/zed-industries/tree-sitter-typescript;e2c53597d6a5d9cf7bbe8dccde576fe1e46c5899;tree-sitter-typescript-%commit%'
 	[tree-sitter-yaml]='https://github.com/zed-industries/tree-sitter-yaml;baff0b51c64ef6a1fb1f8390f3ad6015b83ec13a;tree-sitter-yaml-%commit%'
+	[wasm_thread]='https://github.com/zed-industries/wasm_thread;0cf96c7708dfb97ccf3da50347e25edcf75d6937;wasm_thread-%commit%'
 	[webrtc-sys-build]='https://github.com/zed-industries/livekit-rust-sdks;d0e27be0cdad89eadab3e36207cda0a2b6e359ee;livekit-rust-sdks-%commit%/webrtc-sys/build'
 	[webrtc-sys]='https://github.com/zed-industries/livekit-rust-sdks;d0e27be0cdad89eadab3e36207cda0a2b6e359ee;livekit-rust-sdks-%commit%/webrtc-sys'
 	[windows-capture]='https://github.com/zed-industries/windows-capture;f0d6c1b6691db75461b732f6d5ff56eed002eeb9;windows-capture-%commit%'
@@ -1623,7 +1623,7 @@ declare -A GIT_CRATES=(
 	[zed-xim]='https://github.com/zed-industries/xim-rs;16f35a2c881b815a2b6cdfd6687988e84f8447d8;xim-rs-%commit%'
 )
 
-EGIT_COMMIT="12a19dccef81f85fa2ca07aee37499f659ed0942"
+EGIT_COMMIT="259297035a3fd64be4fb36042c229f59f074e38b"
 LLVM_COMPAT=( 22 )
 RUST_MIN_VER="1.96.0"
 RUST_NEEDS_LLVM=1
