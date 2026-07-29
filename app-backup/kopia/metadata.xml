@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>otakugeekx@gmail.com</email>
+		<name>Lucas Couto</name>
+	</maintainer>
+	<longdescription lang="en">
+		Kopia is a fast and secure open-source backup and restore tool. It
+		creates encrypted, deduplicated and compressed snapshots of files and
+		directories and uploads them to cloud or network storage of your
+		choice (S3, Google Cloud Storage, Azure, Backblaze B2, WebDAV, SFTP,
+		rclone-backed remotes or a local/attached filesystem). All encryption
+		is end-to-end: data is encrypted before it leaves the machine and the
+		server never has access to the plaintext or the keys. Kopia ships both
+		a command-line client and an optional embedded web UI server.
+	</longdescription>
+	<use>
+		<flag name="webui">Embed the kopia server HTML web UI. Disable for
+			headless, container or edge deployments that only need the CLI or
+			the server API (smaller binary via the upstream nohtmlui build
+			tag).</flag>
+	</use>
+	<upstream>
+		<bugs-to>https://github.com/kopia/kopia/issues</bugs-to>
+		<doc>https://kopia.io/docs/</doc>
+		<remote-id type="github">kopia/kopia</remote-id>
+	</upstream>
+</pkgmetadata>
