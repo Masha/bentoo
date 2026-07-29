@@ -291,6 +291,15 @@ binary = true
 # GitHub API  (releases/latest -> tag_name, or /tags -> [0].name; UA required)
 # ============================================================================
 
+["app-backup/kopia"]
+url = "https://api.github.com/repos/kopia/kopia/releases/latest"
+parser = "json"
+path = "tag_name"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+# kopia — tag "vX.Y.Z" ("v" stripped by normalizer); releases/latest skips the
+# frequent prereleases. Built from source (go-module), no upstream vendor tarball,
+# so a --compile test fetches Go modules and needs network (RESTRICT=network-sandbox).
+
 ["net-p2p/qbittorrent"]
 url = "https://api.github.com/repos/qbittorrent/qBittorrent/releases/latest"
 parser = "json"
