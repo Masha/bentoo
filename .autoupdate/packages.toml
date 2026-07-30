@@ -2299,7 +2299,7 @@ revision = 600
 # --- ollama source: same upstream repo as sci-ml/ollama-bin ---
 
 ["sci-ml/ollama"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/ollama/ollama/releases/latest"
 parser = "json"
 path = "tag_name"
