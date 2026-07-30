@@ -1942,12 +1942,14 @@ path = "[0].name"
 # the 3.4 line. [0].name is newest "vX.Y.Z" ("v" stripped).
 
 ["net-misc/nxplayer"]
-url = "https://download.nomachine.com/download/?id=1&platform=linux"
+url = "https://download.nomachine.com/download/?id=43&platform=linux"
 parser = "regex"
-pattern = 'nomachine_([0-9]+\.[0-9]+\.[0-9]+)_[0-9]+_amd64\.deb'
+pattern = 'nomachine-personal-edition_([0-9]+\.[0-9]+\.[0-9]+)_[0-9]+_amd64\.deb'
 binary = true
 # nxplayer — NoMachine download page is SSR; regex on the .deb filename gives the
 # current version (single version on page → deterministic first match).
+# v10 renomeou o produto gratuito para "Personal Edition": id=1 virou 301 para a
+# raiz e o .deb passou a ser nomachine-personal-edition_*; id=43 é o sucessor.
 
 ["app-office/freeoffice"]
 url = "https://www.freeoffice.com/en/download/applications"
