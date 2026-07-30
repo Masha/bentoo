@@ -10,8 +10,12 @@ inherit cmake multilib
 # so the dependency tree is shipped as a separate distfile generated from this
 # release's src/web-app/package-lock.json with:
 #   npm ci --ignore-scripts --no-audit --no-fund
-#   tar caf lemonade-webapp-node_modules-${PV}.tar.xz node_modules
-WEBAPP_NODE_MODULES="${PN}-webapp-node_modules-${PV}.tar.xz"
+#   tar caf lemonade-webapp-node_modules-${WEBAPP_NODE_MODULES_PV}.tar.xz node_modules
+# The bundle is only regenerated when src/web-app/package-lock.json changes, so
+# it is pinned to the release it was built from instead of following ${PV}.
+# 11.5.1 ships the exact same lockfile as 11.5.0.
+WEBAPP_NODE_MODULES_PV="11.5.0"
+WEBAPP_NODE_MODULES="${PN}-webapp-node_modules-${WEBAPP_NODE_MODULES_PV}.tar.xz"
 
 DESCRIPTION="Local LLM server with GPU and NPU acceleration"
 HOMEPAGE="https://lemonade-server.ai/ https://github.com/lemonade-sdk/lemonade"
@@ -64,7 +68,9 @@ BDEPEND="
 "
 
 PATCHES=(
-	"${FILESDIR}"/${P}-webapp-prebuilt-node-modules.patch
+	# src/web-app/BuildWebApp.cmake is unchanged since 11.5.0, so the patch is
+	# shared rather than duplicated under a new name.
+	"${FILESDIR}"/${PN}-11.5.0-webapp-prebuilt-node-modules.patch
 )
 
 src_unpack() {
