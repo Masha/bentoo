@@ -14,7 +14,7 @@ app-editors/vim:racket - Enable support for Scheme using dev-scheme/racket
 app-editors/vim:terminal - Enable terminal emulation support
 app-editors/vim:vim-pager - Install vimpager and vimmanpager links
 app-editors/zed:X - Enable X11 display server support
-app-editors/zed:claude-agent-acp-plus - Force-enable Zed's claude-agent-acp-plus feature flag, making it advertise ACP elicitation form/url support (and unlock other claude-agent-acp-plus-gated betas) via a source patch
+app-editors/zed:claude-agent-acp-plus - Install the claude-agent-acp-plus ACP agent and apply source patches that force-enable Zed's acp-beta feature flag (advertising ACP elicitation form/url support) plus agent panel UI improvements: multiline elicitation fields, collapsible markdown option previews, a manual-mode badge, clickable file mentions in replayed messages, and adoption of the agent's config-option response
 app-editors/zed:claude-agent-acp-tui - Install the claude-agent-acp-tui ACP bridge to run the Claude Code TUI in Zed's agent panel
 app-editors/zed:claude-code-ide - Native Claude Code CLI editor integration (unofficial reverse-engineered IDE protocol, WebSocket MCP server) via a source patch
 app-editors/zed:collab - Build the collaboration server

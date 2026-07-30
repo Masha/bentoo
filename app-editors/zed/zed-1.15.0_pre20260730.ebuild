@@ -1656,7 +1656,12 @@ LICENSE+="
 	Unicode-3.0 ZLIB BZIP2
 "
 SLOT="0"
-KEYWORDS="~amd64 ~arm64"
+# Somente ~amd64: os agentes Claude ligados por padrao
+# (dev-util/claude-agent-acp-{plus,tui}) embutem binarios x86-64 e sao
+# KEYWORDS="-* ~amd64", entao o pacote nao e instalavel em arm64 com as USE
+# flags default. O suporte a arm64 no SRC_URI/src_configure foi mantido para
+# facilitar um re-keyword futuro.
+KEYWORDS="~amd64"
 IUSE="+X +claude-agent-acp-plus +claude-agent-acp-tui +claude-code-ide collab extensions-cli +mimalloc neovim +pulseaudio screen-capture tracy +wayland"
 REQUIRED_USE="|| ( X wayland )"
 CHECKREQS_DISK_BUILD="18G"
