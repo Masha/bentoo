@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@protonmail.com</email>
+		<name>Lucas Couto</name>
+	</maintainer>
+	<longdescription lang="en">
+		Playwright automates Chromium, Firefox and WebKit browsers with a single
+		API. This is the upstream Node.js package from the npm registry: it
+		installs the "playwright" command line tool and the JavaScript/TypeScript
+		library (playwright plus playwright-core) under Node.js, and it is the
+		reference implementation the language bindings are built on. Only
+		JavaScript, a WASM image codec and data files are installed, so nothing
+		here is architecture specific. The browser binaries themselves are not
+		part of the package: they are downloaded at runtime with
+		"playwright install".
+	</longdescription>
+	<upstream>
+		<remote-id type="github">microsoft/playwright</remote-id>
+		<remote-id type="npm">playwright</remote-id>
+	</upstream>
+</pkgmetadata>

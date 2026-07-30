@@ -86,6 +86,15 @@ parser = "json"
 path = "dist-tags.latest"
 # claude-code — npm @anthropic-ai/claude-code; dist-tags.latest is the stable channel.
 
+["dev-util/playwright"]
+url = "https://registry.npmjs.org/playwright"
+parser = "json"
+path = "dist-tags.latest"
+# playwright — npm "playwright" (the JS package, replacing the retired
+# dev-python/playwright-bin wheel). dist-tags.latest is clean X.Y.Z. A bump must
+# also update the second SRC_URI tarball: playwright-core carries the same
+# version and is fetched separately because npm resolves it offline from DISTDIR.
+
 ["sys-apps/pnpm"]
 url = "https://registry.npmjs.org/pnpm"
 parser = "json"
@@ -2129,10 +2138,14 @@ headers = { "User-Agent" = "bentoo-autoupdate" }
 # --- PyPI (parser=json, path=info.version) ---
 
 ["dev-python/playwright-bin"]
+enabled = false
 url = "https://pypi.org/pypi/playwright/json"
 parser = "json"
 path = "info.version"
 # PyPI dist "playwright" (MY_PN=playwright); info.version is clean X.Y.Z, no prefix. Live=1.60.0 > ebuild 1.58.0.
+# Removed from the overlay on 2026-07-30, replaced by dev-util/playwright (the
+# upstream npm package). The probe stays recorded, verified, so a future return
+# of the Python binding needs no re-verification.
 
 ["dev-python/pyee"]
 url = "https://pypi.org/pypi/pyee/json"
