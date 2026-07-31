@@ -7,7 +7,11 @@ EAPI=8
 # PV == LO_VER, so `bentoo overlay autoupdate` can follow the upstream source.
 # The "libreoffice26.8" paths use the LO series (major.minor); if upstream moves
 # to a new series, bump those paths accordingly.
-LO_VER="${PV}"
+#
+# _pre marks the LibreOffice testing line (26.8 is testing while 26.2 is stable)
+# and is stripped here: upstream's archive path carries the bare version, exactly
+# as app-office/libreoffice does with MY_PV.
+LO_VER="${PV/_pre/}"
 
 MYSPELL_DICT=(
 	"opt/libreoffice26.8/share/extensions/dict-hu/hu_HU.aff"
