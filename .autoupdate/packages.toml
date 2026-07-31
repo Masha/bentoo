@@ -765,6 +765,7 @@ pattern = 'blender-([0-9]+\.[0-9]+\.[0-9]+)'
 # blender — download page; anchored to "blender-X.Y.Z".
 
 ["media-libs/libffado"]
+enabled = false
 url = "http://www.ffado.org/"
 parser = "regex"
 pattern = '[Vv]ersion ([0-9]+\.[0-9]+\.[0-9]+)'
@@ -1945,11 +1946,17 @@ path = "[0].name"
 url = "https://download.nomachine.com/download/?id=43&platform=linux"
 parser = "regex"
 pattern = 'nomachine-personal-edition_([0-9]+\.[0-9]+\.[0-9]+)_[0-9]+_amd64\.deb'
+aux_var = "MY_BUILD"
+aux_pattern = 'nomachine-personal-edition_[0-9.]+_([0-9]+)_amd64\.deb'
 binary = true
 # nxplayer — NoMachine download page is SSR; regex on the .deb filename gives the
 # current version (single version on page → deterministic first match).
 # v10 renomeou o produto gratuito para "Personal Edition": id=1 virou 301 para a
 # raiz e o .deb passou a ser nomachine-personal-edition_*; id=43 é o sucessor.
+# O build number (o _N do nome) NÃO deriva do PV e muda entre releases (10.0.57
+# saiu como _2); por isso vai em MY_BUILD via aux_var. Sem isso o bump troca só o
+# PV, a URL não existe, e web9001 responde 200 + homepage HTML em vez de 404 —
+# o fetch "passa" e o unpack morre com "file format not recognized".
 
 ["app-office/freeoffice"]
 url = "https://www.freeoffice.com/en/download/applications"
@@ -2299,7 +2306,7 @@ revision = 600
 # --- ollama source: same upstream repo as sci-ml/ollama-bin ---
 
 ["sci-ml/ollama"]
-enabled = true
+enabled = false
 url = "https://api.github.com/repos/ollama/ollama/releases/latest"
 parser = "json"
 path = "tag_name"
