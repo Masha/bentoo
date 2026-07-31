@@ -2446,20 +2446,20 @@ transform = [['-', "_p"]]
 # Live=152.0.5-1.
 
 ["www-client/librewolf-bin"]
-url = "https://codeberg.org/api/v1/packages/librewolf?type=generic&q=librewolf&limit=50"
-parser = "regex"
-pattern = '"type":"generic","name":"librewolf","version":"([0-9]+\.[0-9]+(?:\.[0-9]+)?-[0-9]+)"'
+url = "https://codeberg.org/api/v1/repos/librewolf/bsys6/releases?page=1&limit=1"
+parser = "json"
+path = "[0].tag_name"
 transform = [['-', "_p"]]
 binary = true
 # LibreWolf (bin) — NÃO usar as tags do repo "source": o upstream tagueia o
 # source antes de publicar os binários, e o -bin morre com 404 no pkgdev
 # manifest (visto em 2026-07-28: source=153.0.1-1, binário mais novo=153.0-3).
-# Fonte correta = registro generic packages do Codeberg, pacote "librewolf".
-# O prefixo '"type":"generic","name":"librewolf","version":' ancora o match e
-# descarta as entradas "librewolf-source", que aparecem antes na resposta.
+# O registro generic packages (/api/v1/packages/librewolf) passou a estourar o
+# timeout de 30s (2026-07-31) — trocado pelo repo do build system "bsys6", que
+# só publica release DEPOIS que o binário sobe (o corpo cita o workflow).
+# newest-first, então [0].tag_name é a release binária mais recente.
 # A minor version é opcional (153.0-3 é válido). "153.0-3" -> PV "153.0_p3".
-# Endpoint responde 200 em ~2s (a nota antiga de "times out" era falsa).
-# Live=153.0-3.
+# Live=153.0.1-1 (asset x86_64 confirmado 200).
 
 
 # --- story 002: AI stack foundation (added 2026-07-19) ---
