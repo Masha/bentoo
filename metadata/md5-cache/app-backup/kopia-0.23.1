@@ -1,13 +1,14 @@
-BDEPEND=>=dev-lang/go-1.24 >=dev-lang/go-1.24.11:= app-arch/unzip
+BDEPEND=>=dev-lang/go-1.25 >=dev-lang/go-1.24.11:= app-arch/unzip
 DEFINED_PHASES=compile install unpack
-DESCRIPTION=A SAST tool for detecting and preventing hardcoded secrets in git repos
+DESCRIPTION=Fast and secure open-source backup tool with end-to-end encryption
 EAPI=8
-HOMEPAGE=https://github.com/gitleaks/gitleaks
+HOMEPAGE=https://kopia.io/ https://github.com/kopia/kopia
 INHERIT=go-module shell-completion
+IUSE=+webui
 KEYWORDS=~amd64 ~arm64
-LICENSE=MIT Apache-2.0 BSD BSD-2 ISC MPL-2.0
+LICENSE=Apache-2.0 Apache-2.0 BSD BSD-2 CC0-1.0 ISC MIT MPL-2.0
 RESTRICT=network-sandbox test
 SLOT=0
-SRC_URI=https://github.com/gitleaks/gitleaks/archive/refs/tags/v8.30.1.tar.gz -> gitleaks-8.30.1.tar.gz
+SRC_URI=https://github.com/kopia/kopia/archive/refs/tags/v0.23.1.tar.gz -> kopia-0.23.1.tar.gz
 _eclasses_=flag-o-matic	fd3558f73f6503093adee69adf41020d	go-env	fca4e820393c2eac25a944be8bdf6a3a	go-module	3d4b6f3f29b3ebdeb708785b3cb1743b	multiprocessing	45d0620f25c2f063ad6276ecd9ed9399	shell-completion	63a62de3ca49c798ee6e89f190e45d0e	sysroot	4c36abaf94ebd3ab32f8abea9a444121	toolchain-funcs	58a918e3a42d0156f010dcfd43725be5
-_md5_=6e551c47d344e65ad0498b7117db27b9
+_md5_=d5a994f51a5b32bdce0048e0b87f53ed
