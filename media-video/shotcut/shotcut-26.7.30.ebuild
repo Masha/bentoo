@@ -26,7 +26,7 @@ BDEPEND="
 	virtual/pkgconfig
 "
 DEPEND="
-	dev-qt/qtbase:6[concurrent,dbus,gui,network,opengl,sql,widgets,xml]
+	dev-qt/qtbase:6[concurrent,dbus,gui,network,opengl,sql,vulkan,widgets,xml]
 	dev-qt/qtdeclarative:6[widgets]
 	dev-qt/qtmultimedia:6
 	dev-qt/qtcharts:6

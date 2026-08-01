@@ -11,7 +11,7 @@ HOMEPAGE="https://gstreamer.freedesktop.org/"
 
 LICENSE="LGPL-2.1+"
 SLOT="1.0"
-KEYWORDS="amd64 ~arm64 ~riscv x86"
+KEYWORDS="~amd64 ~arm64 ~riscv ~x86"
 
 RDEPEND="
 	!!media-plugins/gst-plugins-vaapi

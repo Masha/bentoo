@@ -1,4 +1,5 @@
 ["dev-util/claude-code"]
+enabled = false
 url = "https://registry.npmjs.org/@anthropic-ai/claude-code"
 parser = "json"
 path = "dist-tags.latest"
@@ -1032,14 +1033,43 @@ the applier rewrites.
 """
 # END
 
-["app-editors/zed-bin"]
+["app-editors/zed-bin@stable"]
 url = "https://api.github.com/repos/zed-industries/zed/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 binary = true
+series = '^[0-9.]+$'
 comments = """
-zed-bin — binary repack; same upstream releases.
+zed-bin (stable channel) — releases/latest is the stable release by definition
+(prerelease=false); upstream tags it "vX.Y.Z" and the preview "vX.Y.Z-pre".
+
+series matches on the ABSENCE of a suffix rather than on a version prefix,
+because here the channels are told apart by the marker, not by the series
+number: the stable line advances 1.13 -> 1.15 -> … and a numeric pin would
+freeze this entry on one of them. Nothing to maintain as upstream moves.
+
+Without it this entry was broken: the overlay also holds zed-bin-1.14.1_pre, the
+scan returned that as "current", and every stable release below 1.14.1 compared
+older and reported "up to date" — the stable line silently stopped updating.
+"""
+# END
+
+["app-editors/zed-bin@preview"]
+url = "https://api.github.com/repos/zed-industries/zed/releases?per_page=20"
+parser = "regex"
+pattern = '"tag_name":\s*"v([0-9.]+-pre)"'
+transform = [['-pre$', "_pre"]]
+select = "max"
+series = '_pre$'
+headers = { "User-Agent" = "bentoo-autoupdate" }
+binary = true
+comments = """
+zed-bin (preview channel) — releases/latest never returns a prerelease, so the
+preview needs the full list: the pattern takes only "vX.Y.Z-pre" tags and the
+transform maps upstream's "-pre" to Gentoo's "_pre" (no suffix field needed —
+the marker is already in the tag). select=max guards against the list not being
+strictly ordered, and series keeps this entry off the stable ebuild.
 """
 # END
 
@@ -1097,9 +1127,10 @@ parser = "json"
 path = "[0].commit.committer.date"
 transform = [['T.*', ""], ['-', ""]]
 commit_sha_path = "[0].sha"
-commit_message_path = "commit.message"
-commit_version_pattern = 'vulkan-sdk-([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)'
 headers = { "User-Agent" = "bentoo-autoupdate" }
+base_from = "tag"
+base_url = "https://api.github.com/repos/KhronosGroup/glslang/git/refs/tags"
+base_tag_pattern = '^vulkan-sdk-([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)$'
 comments = """
 glslang — commit-tracked on main; scans titles for vulkan-sdk-X.Y.Z.W to detect base bump.
 """
@@ -1112,9 +1143,10 @@ parser = "json"
 path = "[0].commit.committer.date"
 transform = [['T.*', ""], ['-', ""]]
 commit_sha_path = "[0].sha"
-commit_message_path = "commit.message"
-commit_version_pattern = 'vulkan-sdk-([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)'
 headers = { "User-Agent" = "bentoo-autoupdate" }
+base_from = "tag"
+base_url = "https://api.github.com/repos/KhronosGroup/SPIRV-Headers/git/refs/tags"
+base_tag_pattern = '^vulkan-sdk-([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)$'
 comments = """
 spirv-headers — commit-tracked on main; scans titles for vulkan-sdk-X.Y.Z.W to detect base bump.
 """
@@ -1127,9 +1159,10 @@ parser = "json"
 path = "[0].commit.committer.date"
 transform = [['T.*', ""], ['-', ""]]
 commit_sha_path = "[0].sha"
-commit_message_path = "commit.message"
-commit_version_pattern = 'vulkan-sdk-([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)'
 headers = { "User-Agent" = "bentoo-autoupdate" }
+base_from = "tag"
+base_url = "https://api.github.com/repos/KhronosGroup/SPIRV-Tools/git/refs/tags"
+base_tag_pattern = '^vulkan-sdk-([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)$'
 comments = """
 spirv-tools — commit-tracked on main; scans titles for vulkan-sdk-X.Y.Z.W to detect base bump.
 """
@@ -1142,9 +1175,10 @@ parser = "json"
 path = "[0].commit.committer.date"
 transform = [['T.*', ""], ['-', ""]]
 commit_sha_path = "[0].sha"
-commit_message_path = "commit.message"
-commit_version_pattern = 'Update for Vulkan-Docs ([0-9]+\.[0-9]+\.[0-9]+)'
 headers = { "User-Agent" = "bentoo-autoupdate" }
+base_from = "tag"
+base_url = "https://api.github.com/repos/KhronosGroup/Vulkan-Headers/git/refs/tags"
+base_tag_pattern = '^v([0-9]+\.[0-9]+\.[0-9]+)$'
 comments = """
 vulkan-headers — commit-tracked on main; scans titles "Update for Vulkan-Docs X.Y.Z" to detect base bump.
 """
@@ -1157,9 +1191,10 @@ parser = "json"
 path = "[0].commit.committer.date"
 transform = [['T.*', ""], ['-', ""]]
 commit_sha_path = "[0].sha"
-commit_message_path = "commit.message"
-commit_version_pattern = 'Update for Vulkan-Docs ([0-9]+\.[0-9]+\.[0-9]+)'
 headers = { "User-Agent" = "bentoo-autoupdate" }
+base_from = "file"
+base_url = "https://raw.githubusercontent.com/KhronosGroup/Vulkan-Tools/main/CMakeLists.txt"
+base_pattern = '(?m)^project\([A-Za-z_-]+ VERSION ([0-9][0-9.]*)'
 comments = """
 vulkan-tools — commit-tracked on main; scans titles "Update for Vulkan-Docs X.Y.Z" to detect base bump.
 """
@@ -1182,9 +1217,10 @@ parser = "json"
 path = "[0].commit.committer.date"
 transform = [['T.*', ""], ['-', ""]]
 commit_sha_path = "[0].sha"
-commit_message_path = "commit.message"
-commit_version_pattern = 'Update for Vulkan-Docs ([0-9]+\.[0-9]+\.[0-9]+)'
 headers = { "User-Agent" = "bentoo-autoupdate" }
+base_from = "file"
+base_url = "https://raw.githubusercontent.com/KhronosGroup/Vulkan-ValidationLayers/main/CMakeLists.txt"
+base_pattern = '(?m)^project\([A-Za-z_-]+ VERSION ([0-9][0-9.]*)'
 comments = """
 vulkan-layers — commit-tracked on main (Vulkan-ValidationLayers); scans for "Update for Vulkan-Docs X.Y.Z".
 """
@@ -1197,9 +1233,10 @@ parser = "json"
 path = "[0].commit.committer.date"
 transform = [['T.*', ""], ['-', ""]]
 commit_sha_path = "[0].sha"
-commit_message_path = "commit.message"
-commit_version_pattern = 'Update for Vulkan-Docs ([0-9]+\.[0-9]+\.[0-9]+)'
 headers = { "User-Agent" = "bentoo-autoupdate" }
+base_from = "file"
+base_url = "https://raw.githubusercontent.com/KhronosGroup/Vulkan-Loader/main/CMakeLists.txt"
+base_pattern = '(?m)^project\([A-Za-z_-]+ VERSION ([0-9][0-9.]*)'
 comments = """
 vulkan-loader — commit-tracked on main; scans for "Update for Vulkan-Docs X.Y.Z" to detect base bump.
 """
@@ -2131,768 +2168,2553 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 """
 # END
 
-["media-libs/gst-plugins-bad"]
+["media-libs/gst-plugins-bad@stable"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
 comments = """
-gst-plugins-bad — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-libs/gst-plugins-bad — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
 """
 # END
 
-["media-libs/gst-plugins-base"]
+["media-libs/gst-plugins-bad@dev"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
 comments = """
-gst-plugins-base — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-libs/gst-plugins-bad — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
 """
 # END
 
-["media-libs/gst-plugins-good"]
+["media-libs/gst-plugins-base@stable"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
 comments = """
-gst-plugins-good — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-libs/gst-plugins-base — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
 """
 # END
 
-["media-libs/gst-plugins-ugly"]
+["media-libs/gst-plugins-base@dev"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
 comments = """
-gst-plugins-ugly — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-libs/gst-plugins-base — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
 """
 # END
 
-["media-libs/gst-rtsp-server"]
+["media-libs/gst-plugins-good@stable"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
 comments = """
-gst-rtsp-server — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-libs/gst-plugins-good — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
 """
 # END
 
-["media-libs/gstreamer"]
+["media-libs/gst-plugins-good@dev"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
 comments = """
-gstreamer — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-libs/gst-plugins-good — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
 """
 # END
 
-["media-libs/gstreamer-editing-services"]
+["media-libs/gst-plugins-ugly@stable"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
 comments = """
-gstreamer-editing-services — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-libs/gst-plugins-ugly — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
 """
 # END
 
-["dev-python/gst-python"]
+["media-libs/gst-plugins-ugly@dev"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
 comments = """
-gst-python — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-libs/gst-plugins-ugly — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
 """
 # END
 
-["media-plugins/gst-plugins-a52dec"]
+["media-libs/gst-rtsp-server@stable"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
 comments = """
-gst-plugins-a52dec — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-libs/gst-rtsp-server — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
 """
 # END
 
-["media-plugins/gst-plugins-adaptivedemux2"]
+["media-libs/gst-rtsp-server@dev"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
 comments = """
-gst-plugins-adaptivedemux2 — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-libs/gst-rtsp-server — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
 """
 # END
 
-["media-plugins/gst-plugins-amr"]
+["media-libs/gstreamer@stable"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
 comments = """
-gst-plugins-amr — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-libs/gstreamer — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
 """
 # END
 
-["media-plugins/gst-plugins-aom"]
+["media-libs/gstreamer@dev"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
 comments = """
-gst-plugins-aom — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-libs/gstreamer — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
 """
 # END
 
-["media-plugins/gst-plugins-assrender"]
+["media-libs/gstreamer-editing-services@stable"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
 comments = """
-gst-plugins-assrender — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-libs/gstreamer-editing-services — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
 """
 # END
 
-["media-plugins/gst-plugins-bluez"]
+["media-libs/gstreamer-editing-services@dev"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
 comments = """
-gst-plugins-bluez — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-libs/gstreamer-editing-services — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
 """
 # END
 
-["media-plugins/gst-plugins-bs2b"]
+["dev-python/gst-python@stable"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
 comments = """
-gst-plugins-bs2b — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+dev-python/gst-python — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
 """
 # END
 
-["media-plugins/gst-plugins-cairo"]
+["dev-python/gst-python@dev"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
 comments = """
-gst-plugins-cairo — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+dev-python/gst-python — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
 """
 # END
 
-["media-plugins/gst-plugins-cdio"]
+["media-plugins/gst-plugins-a52dec@stable"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
 comments = """
-gst-plugins-cdio — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-plugins/gst-plugins-a52dec — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
 """
 # END
 
-["media-plugins/gst-plugins-cdparanoia"]
+["media-plugins/gst-plugins-a52dec@dev"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
 comments = """
-gst-plugins-cdparanoia — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-plugins/gst-plugins-a52dec — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
 """
 # END
 
-["media-plugins/gst-plugins-chromaprint"]
+["media-plugins/gst-plugins-adaptivedemux2@stable"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
 comments = """
-gst-plugins-chromaprint — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-plugins/gst-plugins-adaptivedemux2 — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
 """
 # END
 
-["media-plugins/gst-plugins-colormanagement"]
+["media-plugins/gst-plugins-adaptivedemux2@dev"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
 comments = """
-gst-plugins-colormanagement — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-plugins/gst-plugins-adaptivedemux2 — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
 """
 # END
 
-["media-plugins/gst-plugins-dash"]
+["media-plugins/gst-plugins-amr@stable"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
 comments = """
-gst-plugins-dash — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-plugins/gst-plugins-amr — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
 """
 # END
 
-["media-plugins/gst-plugins-dtls"]
+["media-plugins/gst-plugins-amr@dev"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
 comments = """
-gst-plugins-dtls — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-plugins/gst-plugins-amr — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
 """
 # END
 
-["media-plugins/gst-plugins-dts"]
+["media-plugins/gst-plugins-aom@stable"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
 comments = """
-gst-plugins-dts — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-plugins/gst-plugins-aom — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
 """
 # END
 
-["media-plugins/gst-plugins-dv"]
+["media-plugins/gst-plugins-aom@dev"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
 comments = """
-gst-plugins-dv — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-plugins/gst-plugins-aom — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
 """
 # END
 
-["media-plugins/gst-plugins-dvb"]
+["media-plugins/gst-plugins-assrender@stable"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
 comments = """
-gst-plugins-dvb — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-plugins/gst-plugins-assrender — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
 """
 # END
 
-["media-plugins/gst-plugins-dvdread"]
+["media-plugins/gst-plugins-assrender@dev"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
 comments = """
-gst-plugins-dvdread — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-plugins/gst-plugins-assrender — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
 """
 # END
 
-["media-plugins/gst-plugins-faac"]
+["media-plugins/gst-plugins-bluez@stable"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
 comments = """
-gst-plugins-faac — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-plugins/gst-plugins-bluez — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
 """
 # END
 
-["media-plugins/gst-plugins-faad"]
+["media-plugins/gst-plugins-bluez@dev"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
 comments = """
-gst-plugins-faad — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-plugins/gst-plugins-bluez — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
 """
 # END
 
-["media-plugins/gst-plugins-flac"]
+["media-plugins/gst-plugins-bs2b@stable"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
 comments = """
-gst-plugins-flac — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-plugins/gst-plugins-bs2b — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
 """
 # END
 
-["media-plugins/gst-plugins-gdkpixbuf"]
+["media-plugins/gst-plugins-bs2b@dev"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
 comments = """
-gst-plugins-gdkpixbuf — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-plugins/gst-plugins-bs2b — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
 """
 # END
 
-["media-plugins/gst-plugins-gtk"]
+["media-plugins/gst-plugins-cairo@stable"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
 comments = """
-gst-plugins-gtk — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-plugins/gst-plugins-cairo — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
 """
 # END
 
-["media-plugins/gst-plugins-hls"]
+["media-plugins/gst-plugins-cairo@dev"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
 comments = """
-gst-plugins-hls — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-plugins/gst-plugins-cairo — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
 """
 # END
 
-["media-plugins/gst-plugins-jack"]
+["media-plugins/gst-plugins-cdio@stable"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
 comments = """
-gst-plugins-jack — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-plugins/gst-plugins-cdio — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
 """
 # END
 
-["media-plugins/gst-plugins-jpeg"]
+["media-plugins/gst-plugins-cdio@dev"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
 comments = """
-gst-plugins-jpeg — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-plugins/gst-plugins-cdio — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
 """
 # END
 
-["media-plugins/gst-plugins-ladspa"]
+["media-plugins/gst-plugins-cdparanoia@stable"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
 comments = """
-gst-plugins-ladspa — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-plugins/gst-plugins-cdparanoia — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
 """
 # END
 
-["media-plugins/gst-plugins-lame"]
+["media-plugins/gst-plugins-cdparanoia@dev"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
 comments = """
-gst-plugins-lame — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-plugins/gst-plugins-cdparanoia — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
 """
 # END
 
-["media-plugins/gst-plugins-ldac"]
+["media-plugins/gst-plugins-chromaprint@stable"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
 comments = """
-gst-plugins-ldac — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-plugins/gst-plugins-chromaprint — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
 """
 # END
 
-["media-plugins/gst-plugins-libav"]
+["media-plugins/gst-plugins-chromaprint@dev"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
 comments = """
-gst-plugins-libav — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-plugins/gst-plugins-chromaprint — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
 """
 # END
 
-["media-plugins/gst-plugins-libde265"]
+["media-plugins/gst-plugins-colormanagement@stable"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
 comments = """
-gst-plugins-libde265 — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-plugins/gst-plugins-colormanagement — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
 """
 # END
 
-["media-plugins/gst-plugins-libpng"]
+["media-plugins/gst-plugins-colormanagement@dev"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
 comments = """
-gst-plugins-libpng — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-plugins/gst-plugins-colormanagement — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
 """
 # END
 
-["media-plugins/gst-plugins-libvisual"]
+["media-plugins/gst-plugins-dash@stable"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
 comments = """
-gst-plugins-libvisual — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-plugins/gst-plugins-dash — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
 """
 # END
 
-["media-plugins/gst-plugins-lv2"]
+["media-plugins/gst-plugins-dash@dev"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
 comments = """
-gst-plugins-lv2 — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-plugins/gst-plugins-dash — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
 """
 # END
 
-["media-plugins/gst-plugins-meta"]
+["media-plugins/gst-plugins-dtls@stable"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
 comments = """
-gst-plugins-meta — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-plugins/gst-plugins-dtls — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
 """
 # END
 
-["media-plugins/gst-plugins-modplug"]
+["media-plugins/gst-plugins-dtls@dev"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
 comments = """
-gst-plugins-modplug — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-plugins/gst-plugins-dtls — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
 """
 # END
 
-["media-plugins/gst-plugins-mpeg2dec"]
+["media-plugins/gst-plugins-dts@stable"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
 comments = """
-gst-plugins-mpeg2dec — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-plugins/gst-plugins-dts — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
 """
 # END
 
-["media-plugins/gst-plugins-mpeg2enc"]
+["media-plugins/gst-plugins-dts@dev"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
 comments = """
-gst-plugins-mpeg2enc — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-plugins/gst-plugins-dts — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
 """
 # END
 
-["media-plugins/gst-plugins-mpg123"]
+["media-plugins/gst-plugins-dv@stable"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
 comments = """
-gst-plugins-mpg123 — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-plugins/gst-plugins-dv — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
 """
 # END
 
-["media-plugins/gst-plugins-mplex"]
+["media-plugins/gst-plugins-dv@dev"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
 comments = """
-gst-plugins-mplex — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-plugins/gst-plugins-dv — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
 """
 # END
 
-["media-plugins/gst-plugins-neon"]
+["media-plugins/gst-plugins-dvb@stable"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
 comments = """
-gst-plugins-neon — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-plugins/gst-plugins-dvb — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
 """
 # END
 
-["media-plugins/gst-plugins-nvcodec"]
+["media-plugins/gst-plugins-dvb@dev"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
 comments = """
-gst-plugins-nvcodec — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-plugins/gst-plugins-dvb — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
 """
 # END
 
-["media-plugins/gst-plugins-openaptx"]
+["media-plugins/gst-plugins-dvdread@stable"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
 comments = """
-gst-plugins-openaptx — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-plugins/gst-plugins-dvdread — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
 """
 # END
 
-["media-plugins/gst-plugins-opencv"]
+["media-plugins/gst-plugins-dvdread@dev"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
 comments = """
-gst-plugins-opencv — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-plugins/gst-plugins-dvdread — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
 """
 # END
 
-["media-plugins/gst-plugins-openh264"]
+["media-plugins/gst-plugins-faac@stable"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
 comments = """
-gst-plugins-openh264 — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-plugins/gst-plugins-faac — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
 """
 # END
 
-["media-plugins/gst-plugins-opus"]
-url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=1"
+["media-plugins/gst-plugins-faac@dev"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
+comments = """
+media-plugins/gst-plugins-faac — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
+"""
+# END
+
+["media-plugins/gst-plugins-faad@stable"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
+comments = """
+media-plugins/gst-plugins-faad — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
+"""
+# END
+
+["media-plugins/gst-plugins-faad@dev"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
+comments = """
+media-plugins/gst-plugins-faad — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
+"""
+# END
+
+["media-plugins/gst-plugins-flac@stable"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
+comments = """
+media-plugins/gst-plugins-flac — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
+"""
+# END
+
+["media-plugins/gst-plugins-flac@dev"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
+comments = """
+media-plugins/gst-plugins-flac — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
+"""
+# END
+
+["media-plugins/gst-plugins-gdkpixbuf@stable"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
+comments = """
+media-plugins/gst-plugins-gdkpixbuf — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
+"""
+# END
+
+["media-plugins/gst-plugins-gdkpixbuf@dev"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
+comments = """
+media-plugins/gst-plugins-gdkpixbuf — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
+"""
+# END
+
+["media-plugins/gst-plugins-gtk@stable"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
+comments = """
+media-plugins/gst-plugins-gtk — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
+"""
+# END
+
+["media-plugins/gst-plugins-gtk@dev"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
+comments = """
+media-plugins/gst-plugins-gtk — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
+"""
+# END
+
+["media-plugins/gst-plugins-hls@stable"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
+comments = """
+media-plugins/gst-plugins-hls — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
+"""
+# END
+
+["media-plugins/gst-plugins-hls@dev"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
+comments = """
+media-plugins/gst-plugins-hls — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
+"""
+# END
+
+["media-plugins/gst-plugins-jack@stable"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
+comments = """
+media-plugins/gst-plugins-jack — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
+"""
+# END
+
+["media-plugins/gst-plugins-jack@dev"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
+comments = """
+media-plugins/gst-plugins-jack — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
+"""
+# END
+
+["media-plugins/gst-plugins-jpeg@stable"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
+comments = """
+media-plugins/gst-plugins-jpeg — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
+"""
+# END
+
+["media-plugins/gst-plugins-jpeg@dev"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
+comments = """
+media-plugins/gst-plugins-jpeg — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
+"""
+# END
+
+["media-plugins/gst-plugins-ladspa@stable"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
+comments = """
+media-plugins/gst-plugins-ladspa — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
+"""
+# END
+
+["media-plugins/gst-plugins-ladspa@dev"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
+comments = """
+media-plugins/gst-plugins-ladspa — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
+"""
+# END
+
+["media-plugins/gst-plugins-lame@stable"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
+comments = """
+media-plugins/gst-plugins-lame — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
+"""
+# END
+
+["media-plugins/gst-plugins-lame@dev"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
+comments = """
+media-plugins/gst-plugins-lame — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
+"""
+# END
+
+["media-plugins/gst-plugins-ldac@stable"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
+comments = """
+media-plugins/gst-plugins-ldac — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
+"""
+# END
+
+["media-plugins/gst-plugins-ldac@dev"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
+comments = """
+media-plugins/gst-plugins-ldac — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
+"""
+# END
+
+["media-plugins/gst-plugins-libav@stable"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
+comments = """
+media-plugins/gst-plugins-libav — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
+"""
+# END
+
+["media-plugins/gst-plugins-libav@dev"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
+comments = """
+media-plugins/gst-plugins-libav — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
+"""
+# END
+
+["media-plugins/gst-plugins-libde265@stable"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
+comments = """
+media-plugins/gst-plugins-libde265 — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
+"""
+# END
+
+["media-plugins/gst-plugins-libde265@dev"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
+comments = """
+media-plugins/gst-plugins-libde265 — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
+"""
+# END
+
+["media-plugins/gst-plugins-libpng@stable"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
+comments = """
+media-plugins/gst-plugins-libpng — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
+"""
+# END
+
+["media-plugins/gst-plugins-libpng@dev"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
+comments = """
+media-plugins/gst-plugins-libpng — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
+"""
+# END
+
+["media-plugins/gst-plugins-libvisual@stable"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
+comments = """
+media-plugins/gst-plugins-libvisual — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
+"""
+# END
+
+["media-plugins/gst-plugins-libvisual@dev"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
+comments = """
+media-plugins/gst-plugins-libvisual — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
+"""
+# END
+
+["media-plugins/gst-plugins-lv2@stable"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
+comments = """
+media-plugins/gst-plugins-lv2 — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
+"""
+# END
+
+["media-plugins/gst-plugins-lv2@dev"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
+comments = """
+media-plugins/gst-plugins-lv2 — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
+"""
+# END
+
+["media-plugins/gst-plugins-meta@stable"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
+comments = """
+media-plugins/gst-plugins-meta — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
+"""
+# END
+
+["media-plugins/gst-plugins-meta@dev"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
+comments = """
+media-plugins/gst-plugins-meta — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
+"""
+# END
+
+["media-plugins/gst-plugins-modplug@stable"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
+comments = """
+media-plugins/gst-plugins-modplug — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
+"""
+# END
+
+["media-plugins/gst-plugins-modplug@dev"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
+comments = """
+media-plugins/gst-plugins-modplug — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
+"""
+# END
+
+["media-plugins/gst-plugins-mpeg2dec@stable"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
+comments = """
+media-plugins/gst-plugins-mpeg2dec — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
+"""
+# END
+
+["media-plugins/gst-plugins-mpeg2dec@dev"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
+comments = """
+media-plugins/gst-plugins-mpeg2dec — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
+"""
+# END
+
+["media-plugins/gst-plugins-mpeg2enc@stable"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
+comments = """
+media-plugins/gst-plugins-mpeg2enc — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
+"""
+# END
+
+["media-plugins/gst-plugins-mpeg2enc@dev"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
+comments = """
+media-plugins/gst-plugins-mpeg2enc — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
+"""
+# END
+
+["media-plugins/gst-plugins-mpg123@stable"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
+comments = """
+media-plugins/gst-plugins-mpg123 — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
+"""
+# END
+
+["media-plugins/gst-plugins-mpg123@dev"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
+comments = """
+media-plugins/gst-plugins-mpg123 — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
+"""
+# END
+
+["media-plugins/gst-plugins-mplex@stable"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
+comments = """
+media-plugins/gst-plugins-mplex — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
+"""
+# END
+
+["media-plugins/gst-plugins-mplex@dev"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
+comments = """
+media-plugins/gst-plugins-mplex — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
+"""
+# END
+
+["media-plugins/gst-plugins-neon@stable"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
+comments = """
+media-plugins/gst-plugins-neon — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
+"""
+# END
+
+["media-plugins/gst-plugins-neon@dev"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
+comments = """
+media-plugins/gst-plugins-neon — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
+"""
+# END
+
+["media-plugins/gst-plugins-nvcodec@stable"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
+comments = """
+media-plugins/gst-plugins-nvcodec — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
+"""
+# END
+
+["media-plugins/gst-plugins-nvcodec@dev"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
+comments = """
+media-plugins/gst-plugins-nvcodec — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
+"""
+# END
+
+["media-plugins/gst-plugins-openaptx@stable"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
+comments = """
+media-plugins/gst-plugins-openaptx — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
+"""
+# END
+
+["media-plugins/gst-plugins-openaptx@dev"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
+comments = """
+media-plugins/gst-plugins-openaptx — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
+"""
+# END
+
+["media-plugins/gst-plugins-opencv@stable"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
+comments = """
+media-plugins/gst-plugins-opencv — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
+"""
+# END
+
+["media-plugins/gst-plugins-opencv@dev"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
+comments = """
+media-plugins/gst-plugins-opencv — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
+"""
+# END
+
+["media-plugins/gst-plugins-openh264@stable"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
+comments = """
+media-plugins/gst-plugins-openh264 — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
+"""
+# END
+
+["media-plugins/gst-plugins-openh264@dev"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
+comments = """
+media-plugins/gst-plugins-openh264 — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
+"""
+# END
+
+["media-plugins/gst-plugins-opus@stable"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
+comments = """
+media-plugins/gst-plugins-opus — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
+"""
+# END
+
+["media-plugins/gst-plugins-opus@dev"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
+comments = """
+media-plugins/gst-plugins-opus — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
+"""
+# END
+
+["media-plugins/gst-plugins-oss@stable"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
+comments = """
+media-plugins/gst-plugins-oss — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
+"""
+# END
+
+["media-plugins/gst-plugins-oss@dev"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
+comments = """
+media-plugins/gst-plugins-oss — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
+"""
+# END
+
+["media-plugins/gst-plugins-pulse@stable"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
+comments = """
+media-plugins/gst-plugins-pulse — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
+"""
+# END
+
+["media-plugins/gst-plugins-pulse@dev"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
+comments = """
+media-plugins/gst-plugins-pulse — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
+"""
+# END
+
+["media-plugins/gst-plugins-qt6@stable"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
+comments = """
+media-plugins/gst-plugins-qt6 — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
+"""
+# END
+
+["media-plugins/gst-plugins-qt6@dev"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
+comments = """
+media-plugins/gst-plugins-qt6 — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
+"""
+# END
+
+["media-plugins/gst-plugins-raw1394@stable"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
+comments = """
+media-plugins/gst-plugins-raw1394 — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
+"""
+# END
+
+["media-plugins/gst-plugins-raw1394@dev"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
+comments = """
+media-plugins/gst-plugins-raw1394 — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
+"""
+# END
+
+["media-plugins/gst-plugins-resindvd@stable"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
+comments = """
+media-plugins/gst-plugins-resindvd — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
+"""
+# END
+
+["media-plugins/gst-plugins-resindvd@dev"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
+comments = """
+media-plugins/gst-plugins-resindvd — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
+"""
+# END
+
+["media-plugins/gst-plugins-rtmp@stable"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
+comments = """
+media-plugins/gst-plugins-rtmp — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
+"""
+# END
+
+["media-plugins/gst-plugins-rtmp@dev"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
+comments = """
+media-plugins/gst-plugins-rtmp — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
+"""
+# END
+
+["media-plugins/gst-plugins-sbc@stable"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
+comments = """
+media-plugins/gst-plugins-sbc — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
+"""
+# END
+
+["media-plugins/gst-plugins-sbc@dev"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
+comments = """
+media-plugins/gst-plugins-sbc — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
+"""
+# END
+
+["media-plugins/gst-plugins-sctp@stable"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
+comments = """
+media-plugins/gst-plugins-sctp — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
+"""
+# END
+
+["media-plugins/gst-plugins-sctp@dev"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
+comments = """
+media-plugins/gst-plugins-sctp — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
+"""
+# END
+
+["media-plugins/gst-plugins-shout2@stable"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
+comments = """
+media-plugins/gst-plugins-shout2 — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
+"""
+# END
+
+["media-plugins/gst-plugins-shout2@dev"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
+comments = """
+media-plugins/gst-plugins-shout2 — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
+"""
+# END
+
+["media-plugins/gst-plugins-sidplay@stable"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
+comments = """
+media-plugins/gst-plugins-sidplay — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
+"""
+# END
+
+["media-plugins/gst-plugins-sidplay@dev"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
+comments = """
+media-plugins/gst-plugins-sidplay — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
+"""
+# END
+
+["media-plugins/gst-plugins-smoothstreaming@stable"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
+comments = """
+media-plugins/gst-plugins-smoothstreaming — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
+"""
+# END
+
+["media-plugins/gst-plugins-smoothstreaming@dev"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
+comments = """
+media-plugins/gst-plugins-smoothstreaming — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
+"""
+# END
+
+["media-plugins/gst-plugins-soundtouch@stable"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
+comments = """
+media-plugins/gst-plugins-soundtouch — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
+"""
+# END
+
+["media-plugins/gst-plugins-soundtouch@dev"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
+comments = """
+media-plugins/gst-plugins-soundtouch — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
+"""
+# END
+
+["media-plugins/gst-plugins-soup@stable"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
+comments = """
+media-plugins/gst-plugins-soup — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
+"""
+# END
+
+["media-plugins/gst-plugins-soup@dev"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
+comments = """
+media-plugins/gst-plugins-soup — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
+"""
+# END
+
+["media-plugins/gst-plugins-speex@stable"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
+comments = """
+media-plugins/gst-plugins-speex — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
+"""
+# END
+
+["media-plugins/gst-plugins-speex@dev"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
+comments = """
+media-plugins/gst-plugins-speex — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
+"""
+# END
+
+["media-plugins/gst-plugins-srt@stable"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
+comments = """
+media-plugins/gst-plugins-srt — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
+"""
+# END
+
+["media-plugins/gst-plugins-srt@dev"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
+comments = """
+media-plugins/gst-plugins-srt — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
+"""
+# END
+
+["media-plugins/gst-plugins-srtp@stable"]
+url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
 comments = """
-gst-plugins-opus — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-plugins/gst-plugins-srtp — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
 """
 # END
 
-["media-plugins/gst-plugins-oss"]
+["media-plugins/gst-plugins-srtp@dev"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
 comments = """
-gst-plugins-oss — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-plugins/gst-plugins-srtp — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
 """
 # END
 
-["media-plugins/gst-plugins-pulse"]
+["media-plugins/gst-plugins-taglib@stable"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
 comments = """
-gst-plugins-pulse — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-plugins/gst-plugins-taglib — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
 """
 # END
 
-["media-plugins/gst-plugins-qt6"]
+["media-plugins/gst-plugins-taglib@dev"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
 comments = """
-gst-plugins-qt6 — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-plugins/gst-plugins-taglib — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
 """
 # END
 
-["media-plugins/gst-plugins-raw1394"]
+["media-plugins/gst-plugins-twolame@stable"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
 comments = """
-gst-plugins-raw1394 — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-plugins/gst-plugins-twolame — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
 """
 # END
 
-["media-plugins/gst-plugins-resindvd"]
+["media-plugins/gst-plugins-twolame@dev"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
 comments = """
-gst-plugins-resindvd — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-plugins/gst-plugins-twolame — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
 """
 # END
 
-["media-plugins/gst-plugins-rtmp"]
+["media-plugins/gst-plugins-uvch264@stable"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
 comments = """
-gst-plugins-rtmp — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-plugins/gst-plugins-uvch264 — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
 """
 # END
 
-["media-plugins/gst-plugins-sbc"]
+["media-plugins/gst-plugins-uvch264@dev"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
 comments = """
-gst-plugins-sbc — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-plugins/gst-plugins-uvch264 — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
 """
 # END
 
-["media-plugins/gst-plugins-sctp"]
+["media-plugins/gst-plugins-v4l2@stable"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
 comments = """
-gst-plugins-sctp — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-plugins/gst-plugins-v4l2 — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
 """
 # END
 
-["media-plugins/gst-plugins-shout2"]
+["media-plugins/gst-plugins-v4l2@dev"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
 comments = """
-gst-plugins-shout2 — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-plugins/gst-plugins-v4l2 — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
 """
 # END
 
-["media-plugins/gst-plugins-sidplay"]
+["media-plugins/gst-plugins-va@stable"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
 comments = """
-gst-plugins-sidplay — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-plugins/gst-plugins-va — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
 """
 # END
 
-["media-plugins/gst-plugins-smoothstreaming"]
+["media-plugins/gst-plugins-va@dev"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
 comments = """
-gst-plugins-smoothstreaming — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-plugins/gst-plugins-va — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
 """
 # END
 
-["media-plugins/gst-plugins-soundtouch"]
+["media-plugins/gst-plugins-voaacenc@stable"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
 comments = """
-gst-plugins-soundtouch — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-plugins/gst-plugins-voaacenc — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
 """
 # END
 
-["media-plugins/gst-plugins-soup"]
+["media-plugins/gst-plugins-voaacenc@dev"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
 comments = """
-gst-plugins-soup — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-plugins/gst-plugins-voaacenc — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
 """
 # END
 
-["media-plugins/gst-plugins-speex"]
+["media-plugins/gst-plugins-voamrwbenc@stable"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
 comments = """
-gst-plugins-speex — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-plugins/gst-plugins-voamrwbenc — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
 """
 # END
 
-["media-plugins/gst-plugins-srt"]
+["media-plugins/gst-plugins-voamrwbenc@dev"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
 comments = """
-gst-plugins-srt — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-plugins/gst-plugins-voamrwbenc — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
 """
 # END
 
-["media-plugins/gst-plugins-srtp"]
+["media-plugins/gst-plugins-vpx@stable"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
 comments = """
-gst-plugins-srtp — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-plugins/gst-plugins-vpx — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
 """
 # END
 
-["media-plugins/gst-plugins-taglib"]
+["media-plugins/gst-plugins-vpx@dev"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
 comments = """
-gst-plugins-taglib — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-plugins/gst-plugins-vpx — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
 """
 # END
 
-["media-plugins/gst-plugins-twolame"]
+["media-plugins/gst-plugins-wavpack@stable"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
 comments = """
-gst-plugins-twolame — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-plugins/gst-plugins-wavpack — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
 """
 # END
 
-["media-plugins/gst-plugins-uvch264"]
+["media-plugins/gst-plugins-wavpack@dev"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
 comments = """
-gst-plugins-uvch264 — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-plugins/gst-plugins-wavpack — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
 """
 # END
 
-["media-plugins/gst-plugins-v4l2"]
+["media-plugins/gst-plugins-webp@stable"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
 comments = """
-gst-plugins-v4l2 — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-plugins/gst-plugins-webp — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
 """
 # END
 
-["media-plugins/gst-plugins-va"]
+["media-plugins/gst-plugins-webp@dev"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
 comments = """
-gst-plugins-va — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-plugins/gst-plugins-webp — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
 """
 # END
 
-["media-plugins/gst-plugins-voaacenc"]
+["media-plugins/gst-plugins-webrtc@stable"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
 comments = """
-gst-plugins-voaacenc — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-plugins/gst-plugins-webrtc — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
 """
 # END
 
-["media-plugins/gst-plugins-voamrwbenc"]
+["media-plugins/gst-plugins-webrtc@dev"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
 comments = """
-gst-plugins-voamrwbenc — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-plugins/gst-plugins-webrtc — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
 """
 # END
 
-["media-plugins/gst-plugins-vpx"]
+["media-plugins/gst-plugins-x264@stable"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
 comments = """
-gst-plugins-vpx — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-plugins/gst-plugins-x264 — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
 """
 # END
 
-["media-plugins/gst-plugins-wavpack"]
+["media-plugins/gst-plugins-x264@dev"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
 comments = """
-gst-plugins-wavpack — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-plugins/gst-plugins-x264 — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
 """
 # END
 
-["media-plugins/gst-plugins-webp"]
+["media-plugins/gst-plugins-x265@stable"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
 comments = """
-gst-plugins-webp — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-plugins/gst-plugins-x265 — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
 """
 # END
 
-["media-plugins/gst-plugins-webrtc"]
+["media-plugins/gst-plugins-x265@dev"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
 comments = """
-gst-plugins-webrtc — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-plugins/gst-plugins-x265 — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
 """
 # END
 
-["media-plugins/gst-plugins-x264"]
+["media-plugins/gst-plugins-ximagesrc@stable"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
 comments = """
-gst-plugins-x264 — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-plugins/gst-plugins-ximagesrc — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
 """
 # END
 
-["media-plugins/gst-plugins-x265"]
+["media-plugins/gst-plugins-ximagesrc@dev"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
 comments = """
-gst-plugins-x265 — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-plugins/gst-plugins-ximagesrc — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
 """
 # END
 
-["media-plugins/gst-plugins-ximagesrc"]
+["media-plugins/gst-plugins-zbar@stable"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[02468]\.'
 comments = """
-gst-plugins-ximagesrc — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-plugins/gst-plugins-zbar — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
+GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
+ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
+nunca mais seria atualizada, reportando "up to date" para sempre.
 """
 # END
 
-["media-plugins/gst-plugins-zbar"]
+["media-plugins/gst-plugins-zbar@dev"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+series = '^[0-9]+\.[0-9]*[13579]\.'
 comments = """
-gst-plugins-zbar — GStreamer family (85) — same release (1.28.3), one shared freedesktop source.
+media-plugins/gst-plugins-zbar — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
+que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
+(1.29.2_pre ainda ordena acima de 1.28.5) e ainda obrigaria cada ebuild a remove-lo ao
+montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
+1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
+Ver a entrada @stable irma.
 """
 # END
 
@@ -3002,42 +4824,78 @@ highest (was SKIP: assumed git-only, but the mirror does host versioned tarballs
 """
 # END
 
-["app-office/libreoffice"]
+["app-office/libreoffice@stable"]
+url = "https://downloadarchive.documentfoundation.org/libreoffice/old/"
+parser = "regex"
+pattern = 'href="([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)/"'
+select = "max"
+series = '^26\.2\.'
+comments = """
+libreoffice (stable line) — old/ lists every 4-segment release directory of both
+release lines, so series pins this entry to 26.2.x and select=max takes the
+newest within it. The testing line has its own entry (@testing) and its own
+pending/cache record.
+
+WHEN THE STABLE LINE MOVES ON (26.8 promoted, a 27.2 opening): repoint series
+here and in @testing together. A stale series is not silent — a version outside
+it fails the check loudly instead of bumping the wrong line.
+"""
+# END
+
+["app-office/libreoffice@testing"]
 url = "https://downloadarchive.documentfoundation.org/libreoffice/old/"
 parser = "regex"
 pattern = 'href="([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)/"'
 select = "max"
 suffix = "_pre"
-suffix_when = '^26\.8\.'
+series = '^26\.8\.'
 comments = """
-libreoffice — the src/ index grew to ~590 KB and the headless browser now times
-out on it (ERR_TIMED_OUT). old/ lists full 4-segment release dirs directly, so a
-plain regex + select=max replaces the JS probe; -alpha/-beta dirs carry a suffix
-and never match the 4-group pattern.
+libreoffice (testing line) — same index as @stable, pinned to 26.8.x. Upstream
+numbers a testing release exactly like a final one (download.documentfoundation
+.org/libreoffice/stable/ stops at 26.2.5 while testing/ carries 26.8.0), so
+suffix marks it _pre: Gentoo sorts _pre below the bare version, which keeps the
+ebuild honest AND makes the bump fire the moment upstream promotes the release.
+The ebuild strips the marker for SRC_URI via MY_PV="${MY_PV/_pre/}".
 
-CHANNEL: old/ lists the stable line (26.2.x) and the testing one (26.8.x)
-together, and select=max always returns the latter — download.documentfoundation
-.org/libreoffice/stable/ stops at 26.2.5, testing/ carries 26.8.0. Upstream
-numbers the testing release like a final one, so without suffix_when the bump
-wrote libreoffice-26.8.0.1.ebuild over the _pre the ebuild carried and reported
-an update that was not one. The ebuild strips the marker back out for SRC_URI
-via MY_PV="${MY_PV/_pre/}". WHEN 26.8 IS PROMOTED TO STABLE: drop suffix_when,
-or point it at the next development line — leaving it stale keeps labelling a
-finished release as a pre-release.
+No suffix_when is needed here: series already delimits the line.
 """
 # END
 
-["app-office/libreoffice-l10n"]
-url = "https://download.documentfoundation.org/libreoffice/src/"
-parser = "script"
-script = "@libreoffice.js"
-suffix = "_pre"
-suffix_when = '^26\.8\.'
+["app-office/libreoffice-l10n@stable"]
+url = "https://downloadarchive.documentfoundation.org/libreoffice/old/"
+parser = "regex"
+pattern = 'href="([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)/"'
+select = "max"
+series = '^26\.2\.'
 comments = """
-libreoffice-l10n — follows the LibreOffice core release (same probe), including
-its channel: 26.8 is the testing line, so it carries the same _pre marker as
-app-office/libreoffice and must be promoted at the same time. The ebuild strips
-it for SRC_URI via MY_PV="${MY_PV/_pre/}".
+libreoffice-l10n (stable line) — follows the core release, so it reads the same
+archive index rather than the headless src/ probe: that probe returns whatever
+is newest overall, which is the testing line, and a stable entry must not see
+it. Promote together with app-office/libreoffice@stable.
+"""
+# END
+
+["app-office/libreoffice-l10n@testing"]
+url = "https://downloadarchive.documentfoundation.org/libreoffice/old/"
+parser = "regex"
+pattern = 'href="([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)/"'
+select = "max"
+suffix = "_pre"
+series = '^26\.8\.'
+comments = """
+libreoffice-l10n (testing line) — reads the same archive index as
+app-office/libreoffice@testing, and for the same reason: it follows the core
+release, so both must see one and the same version.
+
+Was the headless src//@libreoffice.js probe until 2026-08-01; dropped because
+that index carries every release since 2012 (~590 KB, ~16 s just to transfer)
+and the script then fetches a per-release dir on top of it, so the browser page
+load kept dying on ERR_TIMED_OUT. The archive index is ~97 KB, lists the
+4-segment version directly, and needs no browser at all.
+
+series asserts this really is the 26.8 line, so the day upstream moves on the
+check fails loudly instead of bumping the wrong ebuild. Same _pre marker and
+same promotion moment as app-office/libreoffice@testing.
 """
 # END
 
@@ -3047,17 +4905,18 @@ parser = "regex"
 pattern = 'href="([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)/"'
 select = "max"
 suffix = "_pre"
-suffix_when = '^26\.8\.'
+series = '^26\.8\.'
 comments = """
-myspell-hu — PV=LO_VER; the hu langpack ships in the archive tree the ebuild's
-SRC_URI pulls from. old/ lists full 4-segment release dirs, so a plain regex
-(anchored on the trailing "/" to skip alpha/beta/rc dirs; select=max) recovers
-the newest stable version deterministically, without the headless src/ probe.
+myspell-hu — PV=LO_VER; the hu langpack ships in the LibreOffice archive tree the
+ebuild's SRC_URI pulls from, so it reads the same index and follows the same
+release line. Only one line is packaged here (no @stable counterpart), but series
+still pins it: without it select=max would silently follow whichever line is
+numerically ahead, and the resulting bump would target a langpack the ebuild's
+paths ("libreoffice26.8/...") do not match.
 
-CHANNEL: same index and same trap as app-office/libreoffice — old/ mixes the
-stable 26.2 line with the testing 26.8 one, so suffix_when marks the latter
-_pre. The ebuild strips the marker with LO_VER="${PV/_pre/}" before building
-SRC_URI; promote it together with the two libreoffice records.
+suffix marks 26.8 as the testing line, exactly as for app-office/libreoffice. The
+ebuild strips the marker with LO_VER="${PV/_pre/}" before building SRC_URI, so
+the distfile name is unchanged. Promote together with the two libreoffice records.
 """
 # END
 
@@ -3550,15 +5409,18 @@ usually passes but a check can transiently fail. Live=v1.91.3.
 # END
 
 ["www-client/librewolf"]
-url = "https://codeberg.org/api/v1/repos/librewolf/source/tags?page=1&limit=1"
-parser = "regex"
-pattern = '"name":"([0-9]+\.[0-9]+(?:\.[0-9]+)?-[0-9]+)"'
+url = "https://codeberg.org/api/v1/repos/librewolf/source/releases?page=1&limit=1"
+parser = "json"
+path = "[0].tag_name"
 transform = [['-', "_p"]]
 comments = """
-LibreWolf — Codeberg repo tags API (source), newest-first "name" field.
-The generic packages endpoint times out; tags API is fast and reliable.
-Version "152.0.4-1" maps to ebuild PV "152.0.4_p1" (transform "-"->"_p").
-Live=152.0.5-1.
+LibreWolf — Codeberg releases API do repo "source", newest-first tag_name.
+O endpoint generic packages estoura o timeout, e o /tags passou a dar TLS
+handshake timeout (2026-07-31); /releases responde rápido e só existe DEPOIS
+que o workflow publica o tarball (assets librewolf-<ver>.source.tar.gz*), então
+nunca aponta para uma tag sem distfile — a tag é criada antes do upload.
+Version "153.0.1-1" maps to ebuild PV "153.0.1_p1" (transform "-"->"_p").
+Live=153.0.1-1 (tarball generic confirmado 200).
 """
 # END
 
