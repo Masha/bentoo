@@ -372,9 +372,11 @@ dxvk-nvapi — tag "vX.Y.Z".
 url = "https://api.github.com/repos/obentoo/bentoolkit/releases/latest"
 parser = "json"
 path = "tag_name"
+transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
 comments = """
-bentoolkit — tag "vX.Y.Z".
+bentoolkit — releases/latest devolve tag_name "vX.Y.Z"; o transform tira o "v",
+senao o bump gera um PV invalido (bentoolkit-v0.17.0).
 """
 # END
 
