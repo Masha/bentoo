@@ -1,0 +1,16 @@
+--- a/tools/metrics/BUILD.gn
++++ b/tools/metrics/BUILD.gn
+@@ -45,7 +45,12 @@
+   # for non-git checkouts.
+   # TODO(crbug.com/329080012): Remove this once dirmd works in non-git
+   # checkouts.
+-  if (generate_location_tags) {
++  #
++  # Gentoo: generate_location_tags comes from the generated gclient_args.gni
++  # and stays true in release tarballs, but the histograms_xml target above is
++  # only declared when //.git exists. Mirror that guard so the dependency
++  # resolves instead of failing gn gen with "Unresolved dependencies".
++  if (generate_location_tags && path_exists("//.git")) {
+     deps += [ ":histograms_xml" ]
+   }
+ }

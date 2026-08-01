@@ -503,11 +503,51 @@ src_prepare() {
 	# Calling this here supports resumption via FEATURES=keepwork
 	python_setup
 
+	# chromium-patches-151 is tagged against the 151.0.7872.0 dev drop; several of
+	# its patches no longer match the 151.0.7922.71 release tarball. Reconcile the
+	# patchset before eapply walks the directories.
+	local cr_patchset_dir="${WORKDIR}/chromium-patches-${PATCH_V}"
+
+	# Merged upstream in 151.0.7922.x - applying them now fails or duplicates code:
+	#   cr150-module-sysroot         build/modules/BUILD.gn already guards --sysroot
+	#                                with `if (defined(sysroot) && sysroot != "")`
+	#   cr117-material-color-include tones.cc already includes <cmath> and the
+	#                                bare `round()` call it fixed is gone
+	#   cr150-ar-unbundle            gcc_toolchain.gni already guards `ar` with
+	#                                `ar != "" && get_path_info(ar, "file") != ar`
+	local obsolete_patch
+	for obsolete_patch in \
+		common/cr150-module-sysroot.patch \
+		toolchain/cr117-material-color-include.patch \
+		toolchain/cr150-ar-unbundle.patch
+	do
+		rm "${cr_patchset_dir}/${obsolete_patch}" ||
+			die "Failed to drop obsolete patch ${obsolete_patch}"
+	done
+
+	# Still needed, but stale against 151.0.7922.71. Replaced in place so that the
+	# alphabetical apply order within each category directory is preserved.
+	#   fdiagnostics-show-inlining-chain  upstream wrapped the flag in `if (!is_wasm)`;
+	#                                     taken verbatim from chromium-patches 151-1
+	#   mold-unbundle                     build/config/compiler/compiler.gni hunk
+	#                                     rebased onto the new use_mold declare_args()
+	cp "${FILESDIR}/chromium-151.0.7922-fdiagnostics-show-inlining-chain.patch" \
+		"${cr_patchset_dir}/llvm/lt-23/cr149-fdiagnostics-show-inlining-chain.patch" ||
+		die "Failed to install rebased fdiagnostics patch"
+	cp "${FILESDIR}/chromium-151.0.7922-mold-unbundle.patch" \
+		"${cr_patchset_dir}/toolchain/cr151-mold-unbundle.patch" ||
+		die "Failed to install rebased mold patch"
+
 	# We'll fill this in as we go. Patches go in chromium-patches.
 	local PATCHES=()
 
 	PATCHES+=(
-		"${WORKDIR}/chromium-patches-${PATCH_V}/common/"
+		"${cr_patchset_dir}/common/"
+		# gn gen: "//tools/metrics:metrics_metadata needs
+		# //tools/metrics:histograms_xml". The target is only declared when
+		# //.git exists, which is never true for a release tarball, but the
+		# dependency on it is gated on generate_location_tags instead.
+		"${FILESDIR}/chromium-151.0.7922-metrics-histograms-no-git.patch"
 	)
 
 	# https://issues.chromium.org/issues/442698344
@@ -780,11 +820,23 @@ src_prepare() {
 		third_party/farmhash
 		third_party/fast_float
 		third_party/fdlibm
-		third_party/federated_compute/chromium/fcp/confidentialcompute
-		third_party/federated_compute/src/fcp/base
-		third_party/federated_compute/src/fcp/confidentialcompute
-		third_party/federated_compute/src/fcp/protos/confidentialcompute
-		third_party/federated_compute/src/fcp/protos/federatedcompute
+		# Whole tree, not the five subdirectories ::gentoo keeps: 151.0.7922.x wires
+		# the full federated compute client into the chrome target (fcp/client with
+		# its http/, opstats/ and engine/ subtrees, more fcp/protos, and the vendored
+		# googleapis, protodatastore-cpp and tensorflow-federated under its own
+		# third_party/). Cross-checking `ninja -t inputs chrome chromedriver
+		# chrome_sandbox` against the pruned tree showed 57 missing sources, all of
+		# them here. None of these has a system counterpart in ::gentoo, so there is
+		# nothing to unbundle - keeping the subtree is the only option.
+		third_party/federated_compute
+		# The three below are NOT redundant with the line above.
+		# remove_bundled_libraries.py deliberately drops an exclusion when the file
+		# sits under a nested third_party/ and the exclusion is contained in the part
+		# before it ("Require precise exclusions"), so a nested third_party has to be
+		# named in full or its files get deleted anyway.
+		third_party/federated_compute/third_party/googleapis
+		third_party/federated_compute/third_party/protodatastore-cpp
+		third_party/federated_compute/third_party/tensorflow-federated
 		third_party/ffmpeg
 		third_party/fft2d
 		third_party/flatbuffers
@@ -1176,7 +1228,16 @@ chromium_configure() {
 				"linker_path=\"${EPREFIX}/usr/bin/mold\""
 			)
 		else
-			myconf_gn+=( "use_lld=true" )
+			# use_mold has to be turned off explicitly: M151 made it default-on for
+			# non-official Linux builds (build/config/compiler/compiler.gni), and
+			# leaving it alone points linker_path at
+			# //buildtools/third_party/mold/cipd/mold - a CIPD binary that release
+			# tarballs do not ship, so ninja dies with "missing and no known rule
+			# to make it". Setting use_lld=true alone does not clear it.
+			myconf_gn+=(
+				"use_lld=true"
+				"use_mold=false"
+			)
 		fi
 
 		if [[ ${LLVM_SLOT} -lt 23 ]]; then
