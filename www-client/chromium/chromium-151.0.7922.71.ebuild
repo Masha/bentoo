@@ -39,7 +39,11 @@ CHROMIUM_LANGS="af am ar bg bn ca cs da de el en-GB es es-419 et fa fi fil fr gu
 	hi hr hu id it ja kn ko lt lv ml mr ms nb nl pl pt-BR pt-PT ro ru sk sl sr
 	sv sw ta te th tr uk ur vi zh-CN zh-TW"
 
-LLVM_COMPAT=( 21 )
+# bentoo: slot 22 enabled downstream (::gentoo ships 21 only). The only
+# version-gated patches are chromium-patches' llvm/lt-23/, which 22 shares
+# with 21, and every other slot reference is dynamic (${LLVM_SLOT}).
+# Re-check on every bump; drop if upstream Gentoo adds it.
+LLVM_COMPAT=( 21 22 )
 PYTHON_COMPAT=( python3_{11..14} )
 PYTHON_REQ_USE="xml(+)"
 RUST_MIN_VER=1.91.0
