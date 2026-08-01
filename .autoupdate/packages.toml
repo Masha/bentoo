@@ -985,6 +985,9 @@ parser = "json"
 path = "[0].committed_date"
 transform = [['T.*', ""], ['-', ""]]
 commit_sha_path = "[0].id"
+base_from = "file"
+base_url = "https://gitlab.freedesktop.org/mesa/mesa/-/raw/main/VERSION"
+base_pattern = '^([0-9][0-9.]*)-devel'
 comments = """
 mesa — commit-tracked on main; _pre suffix preserved from current ebuild.
 
@@ -999,6 +1002,9 @@ parser = "json"
 path = "[0].committed_date"
 transform = [['T.*', ""], ['-', ""]]
 commit_sha_path = "[0].id"
+base_from = "file"
+base_url = "https://gitlab.freedesktop.org/mesa/mesa/-/raw/main/VERSION"
+base_pattern = '^([0-9][0-9.]*)-devel'
 comments = """
 mesa_clc — part of the mesa tree; same source/rule as media-libs/mesa.
 """
@@ -1012,6 +1018,9 @@ path = "[0].commit.committer.date"
 transform = [['T.*', ""], ['-', ""]]
 commit_sha_path = "[0].sha"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+base_from = "file"
+base_url = "https://raw.githubusercontent.com/zed-industries/zed/main/crates/zed/Cargo.toml"
+base_pattern = '(?m)^version = "([0-9][0-9.]*)"'
 comments = """
 zed — commit-tracked on main; _pre suffix preserved from current ebuild.
 """
@@ -1081,6 +1090,9 @@ path = "[0].commit.committer.date"
 transform = [['T.*', ""], ['-', ""]]
 commit_sha_path = "[0].sha"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+base_from = "file"
+base_url = "https://raw.githubusercontent.com/sqlitebrowser/sqlitebrowser/master/CMakeLists.txt"
+base_pattern = '(?m)^\s+VERSION ([0-9][0-9.]*)'
 comments = """
 sqlitebrowser — commit-tracked on master (uses COMMIT= without quotes); date YYYYMMDD becomes _pDATE suffix.
 """
@@ -1093,6 +1105,9 @@ parser = "json"
 path = "[0].committed_date"
 transform = [['T.*', ""], ['-', ""]]
 commit_sha_path = "[0].id"
+base_from = "file"
+base_url = "https://gitlab.freedesktop.org/mobile-broadband/libqmi/-/raw/main/meson.build"
+base_pattern = "(?m)^  version: '([0-9][0-9.]*)'"
 comments = """
 libqmi — commit-tracked on main; _pre suffix preserved from current ebuild.
 """
@@ -1105,6 +1120,9 @@ parser = "json"
 path = "[0].committed_date"
 transform = [['T.*', ""], ['-', ""]]
 commit_sha_path = "[0].id"
+base_from = "file"
+base_url = "https://gitlab.freedesktop.org/mobile-broadband/ModemManager/-/raw/main/meson.build"
+base_pattern = "(?m)^  version: '([0-9][0-9.]*)'"
 comments = """
 modemmanager — commit-tracked on main (GitLab); date YYYYMMDD becomes _pDATE suffix.
 """
@@ -4950,9 +4968,33 @@ transform = [['-', "."]]
 comments = """
 Warsaw — banking security blob. The download URL is version-less
 (warsaw_setup64.run), but the .run is a ZIP whose embedded Debian package name
-"warsaw_<ver>-<rev>_amd64.deb" appears in plaintext ~590 KB in (well under the
-10 MiB body cap), so a regex over the raw body recovers it. transform turns the
-"X.Y.Z-R" deb revision into the ebuild's 4-segment PV (2.21.5-1 -> 2.21.5.1).
+"warsaw_<ver>-<rev>_amd64.deb" appears in plaintext ~590 KB in, so a regex over
+the raw body recovers it. transform turns the "X.Y.Z-R" deb revision into the
+ebuild's 4-segment PV (2.21.5-1 -> 2.21.5.1).
+
+COST: this is the heaviest check in the file. The whole ~8.2 MB .run is pulled
+every run and it intermittently blows the per-request deadline ("failed to read
+response body: context deadline exceeded", hit twice on 2026-08-01). Two cheaper
+routes were tried and BOTH are dead ends, so do not re-try them:
+  - Range header: the host is S3 and does advertise "accept-ranges: bytes", and
+    a 2 MiB partial GET does return the name in under a second -- but the
+    fetcher treats anything but 200 as failure ("HTTP request returned status
+    206"). This becomes viable the day the fetcher accepts 2xx instead of 200.
+  - A lighter sibling URL: the bucket does not list (200 with an empty body) and
+    403s every probe -- .sha256, .md5, version.txt, latest.txt, and even the
+    versioned warsaw_<ver>_amd64.deb itself. Only warsaw_setup64.run is public.
+So the only lever left is the clock: autoupdate.http_timeout in
+~/.config/bentoo/config.yaml, raised from the 30 s default to cover this one
+package. Do not shrink it back without re-checking warsaw.
+
+The Range header is load-bearing, not an optimization: the full .run is ~8.2 MB
+and reading all of it routinely blew the 30 s per-request deadline ("failed to
+read response body: context deadline exceeded"). The host is S3 and advertises
+"accept-ranges: bytes", so a 2 MiB partial GET returns 206 in under a second —
+still a ~3.5x margin over the ~590 KB where the name sits, which is the ZIP's
+local file header (the copy at EOF is the central directory, unreachable from
+the head and not what we match). If upstream ever reorders the archive and the
+name lands past 2 MiB, the check fails loudly rather than reading a stale value.
 """
 # END
 
