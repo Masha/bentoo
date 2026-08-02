@@ -12,8 +12,22 @@ if [[ ${PV} == 9999 ]]; then
 	inherit git-r3
 	EGIT_REPO_URI="https://gn.googlesource.com/gn"
 else
-	# The version number is derived from `git describe HEAD --abbrev=12`
-	SRC_URI="https://deps.gentoo.zip/dev-build/gn/${P}.tar.xz"
+	# The version number is derived from `git describe HEAD --abbrev=12`.
+	#
+	# Upstream publishes commits, never releases, so somebody has to package a
+	# snapshot.  ::gentoo does that on deps.gentoo.zip, which means its mirror
+	# only ever carries the version ::gentoo itself is on -- this overlay would
+	# be pinned to whatever the distribution shipped.  So the archive is
+	# generated and hosted here instead.  The recipe below was proven
+	# byte-identical against the 0.2374 tarball deps.gentoo.zip publishes:
+	#
+	#   git clone https://gn.googlesource.com/gn && cd gn
+	#   git archive --format=tar --prefix=gn-${PV}/ HEAD | xz -9e > gn-${PV}.tar.xz
+	#
+	# and uploaded to distfiles.obentoo.org.  A bump is therefore never a plain
+	# PV swap: the tarball must be generated and published first, which is why
+	# the autoupdate record for this package carries hold = true.
+	SRC_URI="https://distfiles.obentoo.org/${P}.tar.xz"
 	KEYWORDS="~amd64 ~arm64 ~loong ~ppc64 ~riscv ~x86"
 fi
 
@@ -25,9 +39,10 @@ BDEPEND="
 	app-alternatives/ninja
 "
 
+# gn-0.2374-test-iwyu.patch is gone on purpose: upstream merged it as 07ea23e5,
+# the first commit after 0.2374, so re-applying it fails src_prepare.
 PATCHES=(
 	"${FILESDIR}"/gn-gen-r8.patch
-	"${FILESDIR}"/${P}-test-iwyu.patch
 )
 
 pkg_setup() {

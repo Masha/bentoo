@@ -5031,6 +5031,7 @@ Gentoo form (-stable→bare, -beta→_beta, -rc→_rc, -dev→_alpha).
 # END
 
 ["dev-build/gn"]
+hold = true
 url = "https://deps.gentoo.zip/dev-build/gn/"
 parser = "regex"
 pattern = 'gn-([0-9][0-9.]*)\.tar\.xz'
@@ -5038,6 +5039,16 @@ select = "max"
 comments = """
 gn — deps.gentoo.zip lists tarballs in ascending order; select=max picks the
 highest (was SKIP: assumed git-only, but the mirror does host versioned tarballs).
+
+hold = true ON PURPOSE, and the probe now means the OPPOSITE of a bump signal.
+Upstream publishes commits, never releases, so PV is 0.<count> from
+`git describe HEAD --abbrev=12 --match initial-commit` and somebody must package
+the snapshot. This overlay generates and hosts its own (SRC_URI points at
+distfiles.obentoo.org; the recipe is in the ebuild), so a bump is never a plain
+PV swap — the tarball has to be built and uploaded FIRST, and an auto-bump would
+commit an ebuild whose SRC_URI 404s. What this URL still answers is when
+::gentoo catches up: once it reports a version >= ours, the self-hosting can be
+retired and SRC_URI pointed back at deps.gentoo.zip.
 """
 # END
 
