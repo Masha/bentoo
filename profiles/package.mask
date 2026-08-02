@@ -1,2 +1,32 @@
 # Erro with another packages
 >=dev-libs/nettle-4.0
+
+# Lucas Couto <lucascs@protonmail.com> (2026-08-02)
+# This overlay slots net-libs/nodejs by major version, giving each slot its
+# own prefix under /usr/lib*/node-<major>. ::gentoo keeps the package
+# unslotted at SLOT=0, installed into the shared /usr, so the two layouts
+# own the same paths (/usr/bin/node, /usr/include/node) and cannot coexist.
+# The unslotted one is excluded here rather than left to lose on version:
+# the day ::gentoo ships a release newer than this overlay's, an unmasked :0
+# would be preferred again and the collision would come back. Upstream will
+# not slot it -- bug #580698 is RESOLVED WONTFIX since 2020-11-09, "highly
+# non-trivial to slot NodeJS", and still maintainer-needed -- so expect this
+# mask to be long-lived.
+#
+# The :0 is what retires this entry: it stops matching the moment a repository
+# ships a slotted nodejs, so a future ::gentoo that slots the package is not
+# masked. A bare net-libs/nodejs::gentoo would keep masking even then, forever.
+# Remove this entry when ::gentoo slots the package itself.
+#
+# The ::gentoo is not a second axis, it is what makes the mask reach anything at
+# all. Portage rewrites every repo-level mask atom as "<atom>::bentoo", so an
+# unqualified :0 would mask only this overlay's own ebuilds -- measured: with it,
+# emerge still picked net-libs/nodejs-26.3.0:0/26::gentoo over bentoo's :26.
+# It requires profile-formats = profile-repo-deps in metadata/layout.conf, and
+# profiles/eapi = 5, without which a slot dep here is rejected outright
+# ("Slot deps are not allowed in EAPI 0") and the whole entry is inert.
+#
+# Accepted consequence: while :0 is masked, a major this overlay does not
+# ship has no source here -- notably Node 22, in Maintenance until
+# 2027-04-30. See the nodejs-slotted news item.
+net-libs/nodejs:0::gentoo

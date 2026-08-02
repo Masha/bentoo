@@ -1,0 +1,149 @@
+Title: net-libs/nodejs is now slotted
+Author: Lucas Couto <lucascs@protonmail.com>
+Posted: 2026-08-02
+Revision: 1
+News-Item-Format: 2.0
+Display-If-Installed: net-libs/nodejs
+
+net-libs/nodejs is now installed into a versioned slot, one slot per
+Node.js major release. Node 24 and Node 26 are available today. The
+old unslotted package, net-libs/nodejs:0, is masked in this overlay
+and can no longer be installed.
+
+The upgrade will not happen on its own. Every slot carries a strong
+blocker against the unslotted package, so an ordinary world update
+stops and asks you to act rather than silently replacing it.
+
+
+What you have to do
+===================
+
+1) Sync, so the mask and the new slots reach your tree:
+
+       emerge --sync
+
+2) Look at what portage intends to do. The conflict is reported here,
+   during dependency resolution, before anything is written to disk:
+
+       emerge --pretend --verbose net-libs/nodejs
+
+   A line blocking net-libs/nodejs:0 appears, resolved by unmerging
+   the unslotted package you currently have installed.
+
+3) Migrate with a SINGLE emerge invocation:
+
+       emerge --oneshot net-libs/nodejs
+
+   One command, not two. Portage unmerges net-libs/nodejs:0 and merges
+   the new slot within the same run, and between those two points the
+   system has no /usr/bin/node at all - the new slot only restores it
+   in pkg_postinst, after it has finished installing. Splitting the
+   step, for instance `emerge --unmerge net-libs/nodejs` followed by a
+   separate emerge, leaves the machine without node for the entire
+   duration of the rebuild. That is not a short window, and anything
+   that shells out to node in the meantime will fail.
+
+   (--oneshot concerns the world file, not the number of commands: it
+   means the package is not added to @world, leaving the entry you
+   already have alone. The "single invocation" point above is about
+   running one emerge. The two are unrelated.)
+
+4) Check the result:
+
+       eselect nodejs list
+
+   The active slot is marked in the list. `eselect nodejs show` prints
+   its name alone, and `eselect nodejs set node24` switches to another
+   installed slot.
+
+
+What changed
+============
+
+Everything version-specific now lives under a slot prefix,
+/usr/lib64/node-<major>/ (or whichever libdir your profile uses),
+rather than being spread across /usr/bin, /usr/include, /usr/lib64
+and /usr/share.
+
+/usr/bin/node, /usr/bin/npm and /usr/bin/npx are no longer owned by
+net-libs/nodejs. They are symlinks owned by app-eselect/eselect-nodejs
+and are repointed by `eselect nodejs set`. Each slot additionally
+installs its own versioned entry points - node26, npm26, npx26 - which
+always run that slot, whichever one happens to be active.
+
+Globally installed npm packages are no longer shared between slots.
+`npm root -g` now resolves inside the active slot, under
+/usr/lib64/node-<major>/lib/node_modules, so a package installed
+globally while one slot was active is not visible from another.
+Install it once per slot you actually use.
+
+A slot built with USE="-npm" ships neither npm nor npx. eselect skips
+those links instead of leaving them pointing at nothing.
+
+
+Your npm configuration is not lost
+==================================
+
+/etc/npm and /etc/env.d/50npm have moved from net-libs/nodejs to
+app-eselect/eselect-nodejs. NPM_CONFIG_GLOBALCONFIG still points at
+the same single /etc/npm/npmrc, shared by every slot, with the same
+contents as before. Nothing needs to be copied or re-entered.
+
+That move is also why app-eselect/eselect-nodejs itself blocks
+net-libs/nodejs:0: the unslotted package still lists /etc/env.d/50npm
+in its CONTENTS, and with FEATURES="protect-owned" a merge that
+touched a file another package owns would be aborted.
+
+npm's manpages did move: they now live inside the slot prefix and are
+reached through MANPATH in /etc/env.d/50nodejs. As a result `man
+npm-install` documents the slot that is currently active. That
+variable only reaches a shell which has read the regenerated
+environment, so after your first switch either open a new shell or
+run:
+
+       source /etc/profile
+
+
+If you need Node 22
+===================
+
+This overlay ships Node 24 and Node 26 only. With net-libs/nodejs:0
+masked there is no source of Node 22 here, even though upstream keeps
+that branch in Maintenance until 2027-04-30. This is a known gap on
+day one, not an oversight, and it will close when a 22.x slot is
+added.
+
+Unmasking net-libs/nodejs:0 is not a way around it: that package is
+the unslotted one, and it blocks both the slots and eselect-nodejs, so
+it cannot coexist with anything described above. Until a 22.x slot
+exists, either move the workload to Node 24 - which is the closest
+supported slot shipped here - or obtain Node 22 from outside portage
+and keep it out of /usr.
+
+
+Why this overlay carries it
+===========================
+
+Slotting Node.js was proposed to Gentoo in bug #580698 and closed
+RESOLVED WONTFIX on 2020-11-09, as "highly non-trivial to slot
+NodeJS"; the package is maintainer-needed there. bentoo therefore
+becomes the sole provider of net-libs/nodejs for anyone using this
+overlay, and takes on security tracking for every slot it hosts.
+
+    https://bugs.gentoo.org/580698
+
+
+eselect nodejs reference
+========================
+
+    list      show every installed slot, marking the active one
+    show      print the active slot name, or nothing when none is
+              active
+    set       activate a slot, by name (node26) or by list number
+    update    activate the highest installed slot
+    cleanup   drop links left dangling by an unmerged slot, then
+              re-point at whatever is still installed
+
+You can switch slots at any time. The ebuilds call these actions
+themselves on merge and unmerge, so a normal install never requires
+running them by hand.
