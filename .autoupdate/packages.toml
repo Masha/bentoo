@@ -5471,6 +5471,32 @@ the highest uploaded release; if a bump seems missing, verify against .releases.
 """
 # END
 
+["app-admin/ansible-core"]
+url = "https://api.github.com/repos/ansible/ansible/releases/latest"
+parser = "json"
+path = "tag_name"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+comments = """
+ansible-core — GitHub releases/latest tag "vX.Y.Z" (v stripped). Verified
+2026-08-02: rc prereleases live on the same repo (v2.21.2rc1) but are
+correctly flagged prerelease and skipped by releases/latest, and the old
+maintenance branches (2.20.x/2.19.x) that batch-release alongside do not win
+over the newest stable branch — so no tags-based probe is needed; ranking
+raw tags WOULD surface 2.22 alphas/rcs, and this record must never report a
+prerelease. Live=v2.21.2.
+
+Ebuild is a verbatim copy of ::gentoo's ansible-core-2.21.1 bumped to
+2.21.2 — no divergence beyond the version bump; files/os-release-fix.patch
+was NOT copied (only 2.19.3-r1/2.20.0-r1/2.20.3 use it). SRC_URI is the
+pypi.eclass sdist (ansible_core-${PV}.tar.gz), so PV alone drives the fetch
+and the bump is mechanical. bentoo carries this package only while ahead of
+::gentoo (pair of app-admin/ansible, whose RDEPEND pins <2.22.0); when
+::gentoo catches up, delete the ebuild and flip this record to
+enabled = false — the 2.21.1 cycle did exactly that removal (2e845fbf) but
+predates this record, hence its late creation.
+"""
+# END
+
 ["media-sound/audacity-bin"]
 url = "https://api.github.com/repos/audacity/audacity/releases?per_page=15"
 parser = "regex"
