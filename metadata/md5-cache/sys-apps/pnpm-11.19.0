@@ -7,5 +7,5 @@ KEYWORDS=~amd64 ~arm64
 LICENSE=MIT
 RDEPEND=net-libs/nodejs
 SLOT=0
-SRC_URI=https://registry.npmjs.org/pnpm/-/pnpm-11.18.0.tgz
+SRC_URI=https://registry.npmjs.org/pnpm/-/pnpm-11.19.0.tgz
 _md5_=871a148ec9f40f60004647c3857fb712
