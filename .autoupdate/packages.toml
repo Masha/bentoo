@@ -101,12 +101,67 @@ Postman — official version API; clean {"version":"..."}.
 """
 # END
 
-["net-libs/nodejs"]
-url = "https://nodejs.org/dist/index.json"
-parser = "json"
-path = "[0].version"
+["net-libs/nodejs:24"]
+url = "https://nodejs.org/dist/latest-v24.x/SHASUMS256.txt"
+parser = "regex"
+pattern = 'node-v(24\.[0-9]+\.[0-9]+)\.tar\.xz'
+select = "max"
 comments = """
-Node.js — official dist index, sorted newest-first; [0].version (normalizer strips "v").
+Node.js SLOT 24 — the previous LTS line.
+
+--- nodejs: one entry per major, since 2026-08 ---
+There used to be a single bare "net-libs/nodejs" entry reading path "[0].version"
+from https://nodejs.org/dist/index.json. That key returns the newest release of
+ANY major, so the moment the overlay grew a second slot the entry became
+actively wrong: it would have aimed SLOT 24 at a 26.x version, i.e. bumped
+nodejs-24.18.1 to nodejs-26.x. The bare key is GONE rather than
+enabled = false, and that is not a violation of the usual convention: the
+package still exists, under the two ":slot" keys. enabled = false is
+bookkeeping the checker flips when an ebuild vanishes from the overlay, which
+is not what happened — the key was replaced, not orphaned. Each entry resolves
+its own current version by reading every ebuild's SLOT= and considering only
+its own slot; the ebuilds set SLOT="$(ver_cut 1)", so they land on 24 and 26.
+Same mechanism as net-libs/webkit-gtk:4.1 and :6.
+
+--- why latest-vN.x/SHASUMS256.txt and not dist/index.json ---
+The entry needs two properties and this endpoint is the only one with both:
+1. Major-scoped. The URL names the major, so nothing a neighbouring series
+   publishes can reach this entry at all — the anchoring is structural, not
+   just a matter of getting the regex right.
+2. Publication-gated. The index announces a release as soon as it is tagged;
+   SHASUMS256.txt is generated FROM the artifacts, so a version appears here
+   only once its tarballs are actually on the CDN. The entry therefore cannot
+   report a version whose distfile 404s at manifest time.
+The pattern is anchored on the source tarball line — "node-vX.Y.Z.tar.xz" with
+nothing between version and extension, the exact filename SRC_URI fetches. The
+platform builds (-linux-x64, -darwin-arm64, -headers, .msi/.pkg/.zip) and the
+win-x64/ lines cannot match it. Group 1 comes out bare, with no leading "v", so
+unlike the index.json entry it replaces this one needs no transform and does
+not lean on the normalizer.
+
+No "revision" field, deliberately. webkit-gtk needs one because its slots are
+told apart by -r410/-r600; these ebuilds carry no -rN suffix, so the field is
+omitted and the plain PV is written.
+"""
+# END
+
+["net-libs/nodejs:26"]
+url = "https://nodejs.org/dist/latest-v26.x/SHASUMS256.txt"
+parser = "regex"
+pattern = 'node-v(26\.[0-9]+\.[0-9]+)\.tar\.xz'
+select = "max"
+comments = """
+Node.js SLOT 26 — the current line.
+Identical in shape to net-libs/nodejs:24 above, which carries the shared
+rationale; only the major in the URL and in the pattern differ. Keep the two in
+sync, and when a new major opens add a third entry rather than re-pointing this
+one — re-pointing is exactly the failure the per-slot split exists to prevent.
+
+One caveat for whoever adds a live ebuild: the ${PV} == *9999 branch sets
+SLOT="0", not $(ver_cut 1), so a 9999 ebuild belongs to neither entry and the
+SLOT= lookup will simply not see it. That is the right outcome here — a live
+ebuild has no upstream version to compare against — but it means the slot must
+be fixed there before any entry could ever track it.
 """
 # END
 
