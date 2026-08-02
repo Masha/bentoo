@@ -724,6 +724,21 @@ src_prepare() {
 		fi
 	done
 
+	# Same class of problem as the restore list above, but no host binary can
+	# stand in. third_party/dawn/tools/generate-sources-gn.py regenerates 26
+	# Tint sources with a Go toolchain DEPS pulls from CIPD into
+	# third_party/dawn/tools/golang/<platform>/bin/go, which release tarballs
+	# do not ship; ninja dies with FileNotFoundError on it. A system Go is no
+	# substitute either: dawn's go.mod needs ~70 external modules and there is
+	# no vendor/ directory, so the generator would want network access.
+	# It does not have to run: all 26 files are already checked into the
+	# tarball under third_party/dawn/src/tint/, verified byte-identical to the
+	# generator's own output bar the copyright year. Swap in a script that
+	# copies them, keeping the GN action's interface untouched.
+	cp "${FILESDIR}/chromium-151.0.7922-dawn-tint-generated-sources.py" \
+		"${S}/third_party/dawn/tools/generate-sources-gn.py" ||
+		die "Failed to install Tint generated-sources shim"
+
 	# adjust python interpreter version
 	sed -i -e "s|\(^script_executable = \).*|\1\"${EPYTHON}\"|g" .gn || die
 
