@@ -302,7 +302,6 @@ net-firewall/ufw:ipv6 - IPv6 support for iptables
 net-libs/bun-bin:cpu_flags_x86_avx2 - Select the AVX2-optimized binary on amd64 (default on modern CPUs).
 net-libs/libqmi:mbim - Support QMI over Mobile Broadband Interface Model (MBIM)
 net-libs/libqmi:qrtr - Support QMI over IPC Router bus (QRTR)
-net-libs/nodejs:corepack - Enable the experimental corepack package management tool
 net-libs/nodejs:inspector - Enable V8 inspector
 net-libs/nodejs:npm - Enable NPM package manager
 net-libs/nodejs:pax-kernel - Enable building under a PaX enabled kernel
