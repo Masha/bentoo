@@ -496,6 +496,34 @@ Pods — tag "vX.Y.Z".
 """
 # END
 
+["app-containers/runc"]
+url = "https://api.github.com/repos/opencontainers/runc/releases/latest"
+parser = "json"
+path = "tag_name"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+comments = """
+runc — releases/latest tag "vX.Y.Z" ("v" stripped). Never rank refs/tags here:
+the tag space interleaves "-rc.N" prereleases (v1.5.0-rc.1..3) and upstream has
+announced a 1.6.0 cycle for late Oct 2026 whose first tags will be rcs. Date-
+ordering /releases is unsafe too — v1.4.3 and v1.3.6 were published in the same
+minute. api.github.com answers 403 without a User-Agent.
+PORTED FROM ::gentoo, which carries 1.4.3; bentoo runs ahead at 1.5.1 because
+upstream demoted 1.4.z to security/"significant" fixes only when 1.5.0 shipped.
+DIVERGENCE from the ::gentoo base: exactly one — BDEPEND gains
+">=dev-lang/go-1.25.0", because upstream go.mod moved 1.24.0 -> 1.25.0 in 1.5.0
+while go-module.eclass floors only 1.24.11. Everything else (KEYWORDS, IUSE,
+DEPEND/RDEPEND, every phase function, metadata.xml) is unchanged from the
+::gentoo 1.4.3 base; there is no files/ dir and no patch to rebase.
+HAND-EDITED ON EVERY BUMP: RUNC_COMMIT, baked into `runc --version`. The release
+tags are ANNOTATED, so git/ref/tags/vX.Y.Z returns the TAG object — dereference
+it through git/tags/<sha> and take .object.sha, or the version string is wrong.
+The ebuild also overrides BUILDTAGS wholesale, which keeps upstream's new
+default "libpathrs" tag off; drop that override only alongside a libpathrs dep.
+RETIRE when ::gentoo reaches >=1.5.1: delete the overlay copy and let the
+checker flip this record to enabled = false on its own (never delete it).
+"""
+# END
+
 ["app-editors/trilium"]
 url = "https://api.github.com/repos/TriliumNext/Trilium/releases/latest"
 parser = "json"
