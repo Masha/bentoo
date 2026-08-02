@@ -1,0 +1,9 @@
+DEFINED_PHASES=install
+DESCRIPTION=Node.js eselect module
+EAPI=8
+HOMEPAGE=https://wiki.gentoo.org/wiki/No_homepage
+KEYWORDS=~amd64 ~arm ~arm64 ~loong ~ppc64 ~riscv ~x86
+LICENSE=GPL-2
+RDEPEND=app-admin/eselect !!net-libs/nodejs:0
+SLOT=0
+_md5_=5275bff5ed350465b9943ae46af793ae
