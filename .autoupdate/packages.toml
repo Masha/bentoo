@@ -5040,15 +5040,32 @@ comments = """
 gn — deps.gentoo.zip lists tarballs in ascending order; select=max picks the
 highest (was SKIP: assumed git-only, but the mirror does host versioned tarballs).
 
-hold = true ON PURPOSE, and the probe now means the OPPOSITE of a bump signal.
+hold = true ON PURPOSE, and the probe means the OPPOSITE of a bump signal.
 Upstream publishes commits, never releases, so PV is 0.<count> from
-`git describe HEAD --abbrev=12 --match initial-commit` and somebody must package
-the snapshot. This overlay generates and hosts its own (SRC_URI points at
-distfiles.obentoo.org; the recipe is in the ebuild), so a bump is never a plain
-PV swap — the tarball has to be built and uploaded FIRST, and an auto-bump would
-commit an ebuild whose SRC_URI 404s. What this URL still answers is when
-::gentoo catches up: once it reports a version >= ours, the self-hosting can be
-retired and SRC_URI pointed back at deps.gentoo.zip.
+`git describe ${GN_COMMIT} --abbrev=12 --match initial-commit` and somebody must
+package the snapshot. This overlay generates and hosts its own (SRC_URI points at
+distfiles.obentoo.org; the recipe and the pinned commit are in the ebuild), so a
+bump is never a plain PV swap — the tarball has to be built and uploaded FIRST,
+and an auto-bump would commit an ebuild whose SRC_URI 404s. Do not remove hold.
+
+THE RETIRE CHECK IS MANUAL. Say plainly what hold costs, because the previous
+wording promised a signal that cannot fire: a held record is SKIPPED by bulk
+`--check`, so nothing here ever reaches the pending queue on its own. The one
+invocation that would fire it, `--check dev-build/gn --force`, is unsafe on this
+host — it enqueues into ~/.config/bentoo/autoupdate/pending.json, which an
+external timer applies to the working tree, so the check would mutate the tree
+it is checking. Reproduce the record's own fetch instead:
+
+  curl -sS "https://deps.gentoo.zip/dev-build/gn/" \\
+    | grep -oE 'gn-[0-9][0-9.]*\\.tar\\.xz' | sort -V | tail -1
+
+WHEN: at every dev-build/gn bump (you are already in this package), and whenever
+a chromium/dawn build needs a gn newer than the one hosted here.
+WHAT IT MEANS: while that number is BELOW our PV, ::gentoo is still behind and
+the self-hosting stays. Once it reaches or passes our PV, the self-hosting can be
+retired — drop GN_COMMIT and the recipe, point SRC_URI back at deps.gentoo.zip,
+and this record goes back to being an ordinary bump signal with hold removed.
+LAST OBSERVED 2026-08-03: 0.2374 against our 0.2501 — vercmp = -1, still behind.
 """
 # END
 
