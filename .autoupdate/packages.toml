@@ -141,7 +141,25 @@ url = "https://registry.npmjs.org/pnpm"
 parser = "json"
 path = "dist-tags.latest"
 comments = """
-pnpm — npm package, stable channel.
+pnpm — npm package, stable channel. dist-tags.latest is the RIGHT endpoint and
+must stay: pnpm promotes through next-<major> first, and that channel carries
+pre-releases (next-12 was 12.0.0-beta.3 on 2026-08-03), so probing next-11 would
+eventually report a beta as current.
+
+THE OVERLAY RUNS AHEAD OF THIS ENDPOINT, ON PURPOSE. The ebuild is at 11.19.0
+while dist-tags.latest still answers 11.18.0 — 11.19.0 lives on next-11, not yet
+promoted. Recorded because a silent record is a blind one: while latest is behind
+our own PV the checker reports nothing (it only fires on strictly-newer), so this
+package produces no signal at all until latest passes 11.19.0.
+
+WHY THE BUMP WAS TAKEN ANYWAY, both re-verified 2026-08-03:
+  - the GitHub release v11.19.0 is prerelease=false, draft=false (2026-07-31)
+  - the registry tarball's sha512 equals the published dist.integrity,
+    sha512-eIHz7VkNRyxKlV4riLISF5ERYGbcyIy8o4SeybYPG7qm0syyIfqR2k4cZb7yvL43k2Wup6xTnHv4be3DobItzg==
+
+RE-CHECK: once `curl -sS https://registry.npmjs.org/pnpm | jq -r '."dist-tags".latest'`
+reports >= 11.19.0, the lag is over and this paragraph can go — the record is an
+ordinary bump signal again. Do not "fix" the silence by repointing the url.
 """
 # END
 
