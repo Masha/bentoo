@@ -7,8 +7,14 @@
 # ebuild (Gentoo version rules: prefixes v/release-/ver-/version- stripped;
 # regex returns capture group 1 of the FIRST match on the raw body).
 #
-# 410 records — 226 regex, 181 json, 3 script. 92 disabled (enabled = false),
-# 2 held (hold = true).
+# 411 records — 226 regex, 182 json, 3 script. 92 disabled (enabled = false),
+# 3 held (hold = true): dev-build/gn, dev-lang/ghc, sci-ml/stable-diffusion-cpp.
+#
+# Recount with tomllib, never with grep: `grep -c 'enabled = false'` also matches
+# that phrase inside comments prose (98 unanchored, 95 anchored, 92 real).
+#
+# A package whose upstream is unreachable or gone gets NO record here — a record
+# promises an endpoint that answers. Those are listed in dead-upstreams.md.
 #
 # NOTE: BEGIN/END markers below are comments only. Do NOT use bare [BEGIN]/[END]
 # table syntax here — TOML would parse them as phantom packages.
