@@ -12,17 +12,25 @@ if [[ ${PV} == 9999 ]]; then
 	inherit git-r3
 	EGIT_REPO_URI="https://gn.googlesource.com/gn"
 else
-	# The version number is derived from `git describe HEAD --abbrev=12`.
-	#
+	# The exact commit the published tarball was generated from.  This is the
+	# pin, and it is not decoration: `HEAD` moves, so a recipe written in terms
+	# of it yields different bytes under the same filename on a different day.
+	# ${PV} is itself derived from this commit --
+	# `git describe ${GN_COMMIT} --abbrev=12 --match initial-commit` gives
+	# initial-commit-2501-g3fd3b0624d8c, hence 0.2501.
+	GN_COMMIT="3fd3b0624d8cba16927853600130b2c33d4e7928"
+
 	# Upstream publishes commits, never releases, so somebody has to package a
 	# snapshot.  ::gentoo does that on deps.gentoo.zip, which means its mirror
 	# only ever carries the version ::gentoo itself is on -- this overlay would
 	# be pinned to whatever the distribution shipped.  So the archive is
 	# generated and hosted here instead.  The recipe below was proven
-	# byte-identical against the 0.2374 tarball deps.gentoo.zip publishes:
+	# byte-identical against the 0.2374 tarball deps.gentoo.zip publishes, and
+	# again against the 0.2501 tarball this overlay itself publishes:
 	#
 	#   git clone https://gn.googlesource.com/gn && cd gn
-	#   git archive --format=tar --prefix=gn-${PV}/ HEAD | xz -9e > gn-${PV}.tar.xz
+	#   git archive --format=tar --prefix=gn-${PV}/ ${GN_COMMIT} \
+	#     | xz -9e > gn-${PV}.tar.xz
 	#
 	# and uploaded to distfiles.obentoo.org.  A bump is therefore never a plain
 	# PV swap: the tarball must be generated and published first, which is why
@@ -55,11 +63,18 @@ src_configure() {
 	unset CFLAGS
 	set -- ${EPYTHON} build/gen.py --no-last-commit-position --no-strip --no-static-libstdc++ --allow-warnings
 	edo "$@"
+	# build/gen.py writes this header from `git describe`, which needs a .git
+	# dir the tarball does not carry -- hence --no-last-commit-position above
+	# and this hand-rolled copy.  Match the string upstream actually emits:
+	# build/gen.py formats it as "<num> (<sha12>)", not as the ebuild's PV.
+	# This is also what keeps GN_COMMIT load-bearing rather than decorative --
+	# a stale pin is visible in `gn --version`, not silent.
+	local commit_id=${GN_COMMIT:-UNKNOWN}
 	cat >out/last_commit_position.h <<-EOF || die
 	#ifndef OUT_LAST_COMMIT_POSITION_H_
 	#define OUT_LAST_COMMIT_POSITION_H_
 	#define LAST_COMMIT_POSITION_NUM ${PV##0.}
-	#define LAST_COMMIT_POSITION "${PV}"
+	#define LAST_COMMIT_POSITION "${PV##0.} (${commit_id:0:12})"
 	#endif  // OUT_LAST_COMMIT_POSITION_H_
 	EOF
 }
