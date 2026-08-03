@@ -6,7 +6,7 @@ inherit config multilib
 
 DESCRIPTION="Manage the active Node.js slot"
 MAINTAINER="Lucas Couto <lucascs@protonmail.com>"
-VERSION="1"
+VERSION="2"
 
 # find_targets
 #
@@ -55,21 +55,60 @@ find_targets() {
 	printf '%s\n' "${targets[@]}" | sort -V -u
 }
 
-# Every unversioned path this module owns (R3.2), as "<link>|<target>" pairs.
-# <link> is relative to ${EROOT}; <target> is relative to the slot prefix it
-# must point at. remove_symlinks() and create_symlinks() both read this one
-# list, so the set of managed paths cannot drift between them.
+# The executable entry points, as "<path>|<target>" pairs. These are written as
+# small exec wrappers, NOT as symlinks - which is the one shape decision in this
+# module that is not cosmetic.
+#
+# A symlink at /usr/bin/node makes `readlink -f /usr/bin/node` report the slot's
+# real path rather than /usr/bin/node itself, because -f canonicalises the whole
+# chain. Consumers that create their own link to /usr/bin/node and then verify it
+# with `readlink -f` therefore compare two different strings and fail. That is not
+# hypothetical: www-client/chromium does exactly this in src_prepare (the
+# restore_list loop that swaps the bundled node for the system one), and it dies
+# with "Symlink verification failed". The check is inherited from ::gentoo and is
+# present in nine of its chromium ebuilds, so patching one ebuild fixes one
+# package and leaves the class open.
+#
+# A regular file resolves to itself under `readlink -f`, so every such consumer
+# passes with no change on their side. What a wrapper costs is measured and
+# small: `exec` replaces the process image, so /proc/self/exe - and therefore
+# process.execPath - is still the slot's real interpreter, which is what keeps
+# npm's global prefix (dirname(dirname(execPath))) isolated per slot. Timed at
+# 200 invocations, wrapper and direct binary are within noise of each other, and
+# a shebang pointing at a wrapper works because Linux resolves interpreter chains
+# up to four levels deep.
+#
+# What it does break: a consumer testing `[[ -L /usr/bin/node ]]`. Nothing in
+# ::gentoo or this overlay does, and the two other packages that hardcode
+# /usr/bin/node (app-misc/anki, www-apps/kibana-bin) only pass the path along.
+NODEJS_WRAPPERS=(
+	"/usr/bin/node|bin/node"
+	"/usr/bin/npm|bin/npm"
+	"/usr/bin/npx|bin/npx"
+)
+
+# The non-executable unversioned paths this module owns (R3.2), as
+# "<link>|<target>" pairs. <link> is relative to ${EROOT}; <target> is relative
+# to the slot prefix it must point at. These stay symlinks: /usr/include/node is
+# a directory, and neither it nor the completion file is ever exec'd, so the
+# readlink -f hazard above does not apply to them.
+#
+# remove_symlinks() and create_symlinks() both read these two lists, so the set
+# of managed paths cannot drift between them.
 #
 # The node manpage is deliberately not in here: it is the one managed path
 # whose file name is not fixed, so it is handled by the name-agnostic globs
 # below. Everything else has a stable name on both ends.
 NODEJS_LINKS=(
-	"/usr/bin/node|bin/node"
-	"/usr/bin/npm|bin/npm"
-	"/usr/bin/npx|bin/npx"
 	"/usr/include/node|include/node"
 	"/usr/share/bash-completion/completions/npm|share/bash-completion/completions/npm"
 )
+
+# The marker line every generated wrapper carries. get_active_slot() reads the
+# selection back out of it, which is why it is a fixed, anchored format and not
+# a comment someone may reword: with a symlink the selection was recoverable
+# from the link target, and a wrapper has to state it explicitly instead.
+NODEJS_WRAPPER_MARK="# eselect-nodejs: slot="
 
 # PORTAGE_COMPRESS may leave the manpage as node.1, node.1.gz, node.1.bz2 or
 # node.1.zst, and man only decompresses when the *link* carries the same
@@ -192,7 +231,7 @@ remove_managed_path() {
 #
 remove_symlinks() {
 	local entry link
-	for entry in "${NODEJS_LINKS[@]}"; do
+	for entry in "${NODEJS_WRAPPERS[@]}" "${NODEJS_LINKS[@]}"; do
 		link=${entry%%|*}
 		remove_managed_path "${EROOT}${link}" "${link}"
 	done
@@ -244,10 +283,53 @@ write_env_file() {
 		"${EPREFIX}${slotdir}/share/man"
 }
 
+# write_wrapper <path> <exec target> <slot name>
+#
+# Write one exec wrapper. Three details are load-bearing:
+#
+#   - The exec target is absolute and ${EPREFIX}-based, never ${EROOT}-based and
+#     never relative. A wrapper is read at run time by /bin/sh with an arbitrary
+#     working directory, so a relative path would resolve against the caller's
+#     cwd rather than against the wrapper. With ROOT set for an offline install,
+#     the path that has to be baked in is the one the *target* system will see,
+#     which is exactly the choice write_env_file() makes for MANPATH.
+#
+#   - "$@" is quoted, so arguments carrying spaces or globs reach node intact.
+#
+#   - The file is written to a temporary name and moved into place. A consumer
+#     executing /usr/bin/node while it is being rewritten would otherwise read a
+#     half-written script; rename is atomic within a filesystem.
+#
+write_wrapper() {
+	local path=$1 exec_target=$2 slot=$3
+
+	[[ ${exec_target} == /* ]] \
+		|| die -q "write_wrapper: refusing a relative exec target \"${exec_target}\""
+
+	local dir=${path%/*}
+	[[ -d ${dir} ]] || mkdir -p -- "${dir}" \
+		|| die -q "Failed to create directory ${dir}"
+
+	local tmp="${path}.eselect-nodejs.tmp"
+
+	{
+		printf '#!/bin/sh\n'
+		printf '%s%s\n' "${NODEJS_WRAPPER_MARK}" "${slot}"
+		printf '# Generated by "eselect nodejs set". Edits are lost on the next switch.\n'
+		printf 'exec %s "$@"\n' "${exec_target}"
+	} > "${tmp}" || die -q "Failed to write ${tmp}"
+
+	chmod 0755 -- "${tmp}" || die -q "Failed to set permissions on ${tmp}"
+	mv -f -- "${tmp}" "${path}" || die -q "Failed to install wrapper ${path}"
+}
+
 # create_symlinks <target>
 #
 # Point every unversioned path at <target> (a slot name as find_targets prints
 # it, e.g. node26) and record that slot's man root in /etc/env.d/50nodejs.
+#
+# The executable entry points become exec wrappers and everything else becomes a
+# symlink; see the NODEJS_WRAPPERS comment for why the two shapes differ.
 #
 # Callers run remove_symlinks() first: this function only ever adds.
 #
@@ -267,6 +349,19 @@ create_symlinks() {
 	local slotdir="/usr/${libdir}/node-${major}"
 
 	local entry link rel src dir
+	for entry in "${NODEJS_WRAPPERS[@]}"; do
+		link=${entry%%|*}
+		rel=${entry#*|}
+		src="${EROOT}${slotdir}/${rel}"
+
+		# A slot built with USE=-npm ships neither npm nor npx. Skipping what
+		# the slot does not have is what keeps a switch from leaving a wrapper
+		# pointing at a path that was never installed.
+		[[ -e ${src} || -L ${src} ]] || continue
+
+		write_wrapper "${EROOT}${link}" "${EPREFIX}${slotdir}/${rel}" "${target}"
+	done
+
 	for entry in "${NODEJS_LINKS[@]}"; do
 		link=${entry%%|*}
 		rel=${entry#*|}
@@ -314,29 +409,83 @@ create_symlinks() {
 	write_env_file "${slotdir}"
 }
 
+# wrapper_exec_target <path>
+#
+# The path a generated wrapper execs, read back out of the file.
+#
+# Anchored on the exact line this module writes, so an unrelated /usr/bin/node -
+# a hand-rolled script, or some other package's - cannot be mistaken for one of
+# ours and silently reported as an active slot.
+#
+# OUTPUT: the absolute exec target, or nothing and a non-zero status.
+#
+wrapper_exec_target() {
+	local path=$1 line
+
+	[[ -f ${path} && ! -L ${path} ]] || return 1
+
+	# head -n1 rather than reading the whole file: these wrappers are four lines
+	# long, and refusing to slurp an arbitrary /usr/bin/node keeps a large or
+	# binary file at that path from being read into memory.
+	line=$(sed -n '1,8{/^exec \//p}' "${path}" 2>/dev/null | head -n1) || return 1
+	[[ -n ${line} ]] || return 1
+
+	line=${line#exec }
+	line=${line% \"\$@\"}
+	[[ ${line} == /* ]] || return 1
+
+	echo "${line}"
+}
+
 # get_active_slot
 #
-# Which slot /usr/bin/node currently resolves to, named the way find_targets
-# prints it (node26).
+# Which slot /usr/bin/node currently runs, named the way find_targets prints it
+# (node26).
+#
+# Read from the marker line inside the wrapper. With a symlink the selection was
+# recoverable from the link target; a wrapper is a regular file, so it has to
+# carry the answer itself. The legacy symlink shape is still recognised, because
+# a system switched with the previous version of this module has one in place
+# until the next `set`, and reporting "nothing active" there would make
+# pkg_postinst of an unrelated slot silently take over the selection.
 #
 # Three states deliberately report *nothing*, because none of them is a slot a
-# user can actually run: no /usr/bin/node at all; a /usr/bin/node that is not a
-# symlink (the leftover of an unslotted net-libs/nodejs:0); and a symlink whose
-# slot has been unmerged. Reporting the last two as "active" is what would stop
-# the repair paths - do_set from pkg_postinst, do_cleanup from pkg_postrm -
-# from ever running.
+# user can actually run: no /usr/bin/node at all; a /usr/bin/node that is neither
+# one of our wrappers nor a slot symlink (the leftover of an unslotted
+# net-libs/nodejs:0); and a selection whose slot has since been unmerged.
+# Reporting any of them as "active" is what would stop the repair paths - do_set
+# from pkg_postinst, do_cleanup from pkg_postrm - from ever running.
 #
 # OUTPUT: the active slot name, or nothing at all. Always exits 0: see
 # describe_show for why the *output*, not the exit status, is the contract.
 #
 get_active_slot() {
-	local link="${EROOT}/usr/bin/node" resolved
+	local path="${EROOT}/usr/bin/node" marked target resolved major
 
+	if [[ -f ${path} && ! -L ${path} ]]; then
+		marked=$(sed -n "s|^${NODEJS_WRAPPER_MARK}\(node[0-9][0-9]*\)\$|\1|p" \
+			"${path}" 2>/dev/null | head -n1)
+		[[ -n ${marked} ]] || return 0
+
+		# The marker records what was selected, not what is still installed.
+		# A slot unmerged while active leaves the wrapper behind with a stale
+		# name, and that has to read as "nothing active" so cleanup runs.
+		target=$(wrapper_exec_target "${path}") || return 0
+		[[ -x ${EROOT}${target#"${EPREFIX}"} ]] || return 0
+
+		major=${marked#node}
+		slot_libdir "${major}" >/dev/null 2>&1 || return 0
+
+		echo "${marked}"
+		return 0
+	fi
+
+	# Legacy shape, written by module version 1.
 	# -e follows the symlink, so this pair is the standard "exists and is not
 	# dangling" test.
-	[[ -L ${link} && -e ${link} ]] || return 0
+	[[ -L ${path} && -e ${path} ]] || return 0
 
-	resolved=$(canonicalise "${link}" 2>/dev/null) || return 0
+	resolved=$(canonicalise "${path}" 2>/dev/null) || return 0
 
 	# Only a link landing inside a slot prefix counts. Anything else is some
 	# other package's /usr/bin/node and not this module's to report on.
@@ -401,15 +550,38 @@ valid_targets_hint() {
 
 # find_dangling_links
 #
-# Every managed path that is a symlink pointing at something that no longer
-# exists (R3.4) - the state a slot leaves behind when it is unmerged while
-# active. A dangling /usr/bin/node is worse than a missing one: `command -v
-# node` still succeeds and the failure only surfaces at exec time.
+# Every managed path that still exists but no longer leads anywhere (R3.4) - the
+# state a slot leaves behind when it is unmerged while active. A dangling
+# /usr/bin/node is worse than a missing one: `command -v node` still succeeds and
+# the failure only surfaces at exec time.
+#
+# A wrapper cannot dangle the way a symlink does - it is a regular file and the
+# kernel is perfectly happy to run it - so the dead-ness has to be established
+# one level in, by testing the path it execs. Skipping that check would make the
+# wrapper shape strictly worse than the symlink it replaced: `node` would fail
+# with a bare "No such file or directory" from sh, and cleanup would report the
+# tree as healthy.
 #
 # OUTPUT: absolute paths, one per line; nothing when the tree is healthy.
 #
 find_dangling_links() {
-	local entry link path
+	local entry link path target
+	for entry in "${NODEJS_WRAPPERS[@]}"; do
+		link=${entry%%|*}
+		path="${EROOT}${link}"
+
+		# A leftover symlink from module version 1 is still checked the old way,
+		# so cleanup repairs a tree that has not been switched since the upgrade.
+		if [[ -L ${path} ]]; then
+			[[ ! -e ${path} ]] && echo "${path}"
+			continue
+		fi
+
+		[[ -f ${path} ]] || continue
+		target=$(wrapper_exec_target "${path}") || continue
+		[[ -x ${EROOT}${target#"${EPREFIX}"} ]] || echo "${path}"
+	done
+
 	for entry in "${NODEJS_LINKS[@]}"; do
 		link=${entry%%|*}
 		path="${EROOT}${link}"

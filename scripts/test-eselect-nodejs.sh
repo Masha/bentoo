@@ -91,7 +91,7 @@ REPO_ROOT=$(cd -- "${SCRIPT_DIR}/.." && pwd -P)
 
 # Located relative to this script, never by absolute path, so the test runs
 # from any checkout.
-MODULE=${ESELECT_NODEJS_MODULE:-${REPO_ROOT}/app-eselect/eselect-nodejs/files/nodejs.eselect-1}
+MODULE=${ESELECT_NODEJS_MODULE:-${REPO_ROOT}/app-eselect/eselect-nodejs/files/nodejs.eselect-2}
 
 if ! command -v eselect >/dev/null 2>&1; then
 	printf 'precondition failed: eselect is not installed\n' >&2
@@ -135,9 +135,12 @@ cp -- "${MODULE}" "${FAKE_HOME}/.eselect/modules/nodejs.eselect"
 
 ### the managed paths, restated ####################################
 #
-# Deliberately a second, independent copy of the module's NODEJS_LINKS list:
-# if the module ever drops a managed path, the harness still looks for it and
-# the assertion goes red. Relative to the fabricated root.
+# Deliberately a second, independent copy of the module's managed-path lists
+# (NODEJS_WRAPPERS plus NODEJS_LINKS): if the module ever drops a managed path,
+# the harness still looks for it and the assertion goes red. Flattened into one
+# list on purpose - the harness asserts on the *shape* each path ends up with
+# (wrapper vs symlink), so it must not inherit the module's own split.
+# Relative to the fabricated root.
 MANAGED_RELPATHS=(
 	"usr/bin/node"
 	"usr/bin/npm"
@@ -292,10 +295,34 @@ dir_entries() {
 	printf '%s' "${names:-(empty)}"
 }
 
+# wrapper_target <path>
+# The path an exec wrapper runs, parsed straight out of the file.
+#
+# Deliberately parsed here rather than reused from the module: the harness has to
+# be able to disagree with the implementation. The pattern matches the shape a
+# wrapper must have to work at all - an absolute exec target with "$@" forwarded -
+# so a wrapper that dropped its arguments would fail to match and show up as a
+# bare "regular file" rather than quietly passing.
+#
+# OUTPUT: the absolute exec target, or nothing and a non-zero status.
+wrapper_target() {
+	local path=$1 line
+	line=$(sed -n 's|^exec \(/[^ ]*\) "\$@"$|\1|p' "${path}" 2>/dev/null | head -n1)
+	[[ -n ${line} ]] || return 1
+	printf '%s' "${line}"
+}
+
 # path_state <path>
-# What actually sits at a managed path, in one line. The whole point of (c) is
-# that the two interesting shapes - "symlink into the slot" and "real directory
-# with a link buried inside it" - must be told apart, so both are spelled out.
+# What actually sits at a managed path, in one line. The point of (c) is that the
+# interesting shapes must be told apart rather than collapsed into "exists":
+# "symlink into the slot", "real directory with a link buried inside it", and
+# "exec wrapper" are each spelled out, live or dangling.
+#
+# A wrapper cannot dangle the way a symlink does - it is a regular file the
+# kernel will happily run - so its liveness is judged one level in, on the path
+# it execs. The exec target is ${EPREFIX}-based (the module writes the path the
+# target system will see, not the one the harness writes through), so it is
+# re-rooted into the fabricated tree before testing.
 path_state() {
 	local path=$1 target resolved
 
@@ -308,6 +335,12 @@ path_state() {
 		fi
 	elif [[ -d ${path} ]]; then
 		printf 'REAL DIRECTORY containing: %s' "$(dir_entries "${path}")"
+	elif [[ -f ${path} ]] && target=$(wrapper_target "${path}"); then
+		if [[ -x ${ROOTFS}${target} ]]; then
+			printf 'wrapper => %s' "${target}"
+		else
+			printf 'DANGLING wrapper => %s' "${target}"
+		fi
 	elif [[ -e ${path} ]]; then
 		printf 'regular file'
 	else
@@ -319,10 +352,19 @@ path_state() {
 # Managed paths that are symlinks to something that no longer exists.
 dangling_summary() {
 	local -a found=()
-	local rel path
+	local rel path target
 
 	for rel in "${MANAGED_RELPATHS[@]}"; do
 		path="${ROOTFS}/${rel}"
+
+		# A wrapper whose exec target is gone is dangling in every sense that
+		# matters to a user - `node` still resolves and still fails - so it is
+		# counted here alongside the broken symlinks.
+		if [[ -f ${path} && ! -L ${path} ]] && target=$(wrapper_target "${path}"); then
+			[[ -x ${ROOTFS}${target} ]] || found+=( "/${rel}" )
+			continue
+		fi
+
 		[[ -L ${path} && ! -e ${path} ]] && found+=( "/${rel}" )
 	done
 	for path in "${ROOTFS}/usr/share/man/man1"/node.1*; do
@@ -472,8 +514,8 @@ phase_set() {
 	local set_rc=${MODULE_RC}
 	ASSERT_CONTEXT=$(module_context)
 	assert_eq b \
-		"set node26 points /usr/bin/node at the node-26 slot" \
-		"rc=0; symlink ../lib64/node-26/bin/node => /usr/lib64/node-26/bin/node" \
+		"set node26 makes /usr/bin/node an exec wrapper into the node-26 slot" \
+		"rc=0; wrapper => /usr/lib64/node-26/bin/node" \
 		"rc=${set_rc}; $(path_state "${ROOTFS}/usr/bin/node")"
 
 	run_module show
@@ -546,7 +588,7 @@ phase_update() {
 	ASSERT_CONTEXT=$(module_context)
 	assert_eq g \
 		"update activates the highest slot (node26), which a lexicographic sort would miss" \
-		"rc=0; symlink ../lib64/node-26/bin/node => /usr/lib64/node-26/bin/node" \
+		"rc=0; wrapper => /usr/lib64/node-26/bin/node" \
 		"rc=${MODULE_RC}; $(path_state "${ROOTFS}/usr/bin/node")"
 }
 
@@ -593,7 +635,7 @@ phase_cleanup() {
 	ASSERT_CONTEXT="set: ${set_ctx} / cleanup: $(module_context)"
 	assert_eq d \
 		"cleanup drops the dangling links and re-points at the highest remaining slot" \
-		"rc=0; dangling=none; repaired=yes; symlink ../lib64/node-10/bin/node => /usr/lib64/node-10/bin/node" \
+		"rc=0; dangling=none; repaired=yes; wrapper => /usr/lib64/node-10/bin/node" \
 		"rc=${MODULE_RC}; dangling=$(dangling_summary); repaired=${repaired}; $(path_state "${ROOTFS}/usr/bin/node")"
 
 	# ... and the last slot going away must take the whole managed set with it.

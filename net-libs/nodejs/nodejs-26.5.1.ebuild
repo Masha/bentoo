@@ -98,8 +98,15 @@ DEPEND="${COMMON_DEPEND}"
 # !! blocker is *not* ignored against a package in the parent's own slot
 # (depgraph.py checks `not blocker.atom.blocker.overlap.forbid`, false for !!),
 # so that branch would need its own SLOT before this atom is correct for it.
+# >=eselect-nodejs-2 is a correctness bound, not hygiene: module version 1 made
+# /usr/bin/node a symlink, and `readlink -f` on a symlink reports the slot's real
+# path rather than /usr/bin/node itself. Consumers that link to /usr/bin/node and
+# then verify with `readlink -f` compare two different strings and die -
+# www-client/chromium does exactly that in src_prepare. Version 2 writes an exec
+# wrapper, which resolves to itself. Pinning the floor here keeps a downgrade of
+# the module from silently reintroducing that failure in every such consumer.
 RDEPEND="${COMMON_DEPEND}
-	app-eselect/eselect-nodejs
+	>=app-eselect/eselect-nodejs-2
 	!!net-libs/nodejs:0"
 PDEPEND="pnpm? ( sys-apps/pnpm )"
 
