@@ -119,7 +119,6 @@
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  BEGIN PACKAGES  <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 ["dev-util/claude-code"]
-enabled = true
 url = "https://registry.npmjs.org/@anthropic-ai/claude-code"
 parser = "json"
 path = "dist-tags.latest"
@@ -196,9 +195,9 @@ Kiro — kiro.dev SPA metadata endpoint (found via DevTools); "currentRelease" i
 url = "https://claude.ai/api/desktop/linux/x64/deb/latest"
 parser = "json"
 path = "version"
+headers = { "User-Agent" = "Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0" }
 aux_var = "BUILD_ID"
 aux_pattern = 'Claude-([0-9a-f]{40})\.deb'
-headers = { "User-Agent" = "Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0" }
 comments = """
 Claude Desktop — official download API behind the claude.ai/download button
 ({"version","url"}). claude.ai sits behind Cloudflare: a plain curl/wget UA gets
@@ -233,7 +232,7 @@ Dart — official stable channel VERSION manifest.
 url = "https://dl.pstmn.io/api/version/latest?platform=linux64&channel=stable"
 parser = "json"
 path = "version"
-binary = true
+type = "bin"
 comments = """
 Postman — official version API; clean {"version":"..."}.
 """
@@ -327,7 +326,7 @@ mail-client/betterbird-bin's MY_BUILD. Update it by hand on every bump.
 url = "https://proton.me/download/mail/linux/version.json"
 parser = "json"
 path = "Releases[0].Version"
-binary = true
+type = "bin"
 comments = """
 Proton Mail (desktop) — proton.me version.json; Releases[0] is the EarlyAccess/beta
 channel that matches the ebuild's *-beta.rpm (GitHub inbox-desktop is stale).
@@ -404,7 +403,7 @@ transform rewrites underscores to dots. First match in the body is the newest st
 url = "https://www.openoffice.org/"
 parser = "regex"
 pattern = 'Apache OpenOffice ([0-9]+\.[0-9]+\.[0-9]+)'
-binary = true
+type = "bin"
 comments = """
 Apache OpenOffice — homepage states "Apache OpenOffice X.Y.Z" as current.
 """
@@ -415,7 +414,7 @@ url = "https://api.github.com/repos/PixiEditor/PixiEditor/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-binary = true
+type = "bin"
 comments = """
 PixiEditor — GitHub releases (tag is 4-part bare version, e.g. 2.1.1.5).
 """
@@ -447,9 +446,8 @@ url = "https://filezillapro.com/filezilla-pro-version-history/"
 parser = "regex"
 pattern = 'Latest:\s*([0-9]+\.[0-9]+\.[0-9]+)'
 headers = { "User-Agent" = "Mozilla/5.0" }
-binary = true
-type = "bin"
 meta = { fetch_method = "post", fetch_url = "https://filezilla-project.org/prodownload.php?beta=0", fetch_serial_env = "FILEZILLA_PRO_KEY", fetch_serial_field = "key", fetch_filename = "FileZilla_Pro_{version}_x86_64-linux-gnu.tar.xz", fetch_form = "mail=&number=&platform=linux&platform_cli=win&platform_cli_nonpro=win&platform_fzpes=win&download_program=Start download of FileZilla Pro" }
+type = "bin"
 comments = """
 FileZilla Pro — version-history page's "Latest: X.Y.Z" is the current stable
 release (the h3 changelog list also includes -betaN, so anchor on "Latest:").
@@ -467,7 +465,7 @@ url = "https://www.codeweavers.com/crossover/changelog"
 parser = "regex"
 pattern = '<a name="([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
-binary = true
+type = "bin"
 comments = """
 CrossOver — changelog page lists each release as `<a name="X.Y.Z">`, newest first;
 present in the raw HTML (not JS-only). Download is the .deb under media.codeweavers.com
@@ -666,7 +664,7 @@ url = "https://api.github.com/repos/astral-sh/uv/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-binary = true
+type = "bin"
 comments = """
 uv (uv-bin) — tag bare "X.Y.Z".
 """
@@ -698,7 +696,7 @@ url = "https://api.github.com/repos/openai/codex/releases/latest"
 parser = "regex"
 pattern = '"tag_name":\s*"rust-v([0-9]+\.[0-9]+\.[0-9]+)"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-binary = true
+type = "bin"
 comments = """
 codex-bin — same upstream tag "rust-vX.Y.Z"; regex on tag_name.
 """
@@ -790,7 +788,7 @@ url = "https://api.github.com/repos/oven-sh/bun/releases/latest"
 parser = "regex"
 pattern = '"tag_name":\s*"bun-v([0-9]+\.[0-9]+\.[0-9]+)'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-binary = true
+type = "bin"
 comments = """
 bun (bun-bin) — tag "bun-vX.Y.Z"; regex on tag_name.
 """
@@ -811,7 +809,7 @@ url = "https://api.github.com/repos/rustdesk/rustdesk/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-binary = true
+type = "bin"
 comments = """
 rustdesk-bin — same upstream repo.
 """
@@ -822,7 +820,7 @@ url = "https://api.github.com/repos/bisq-network/bisq/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-binary = true
+type = "bin"
 comments = """
 bisq (bisq-bin) — tag "vX.Y.Z".
 """
@@ -833,7 +831,7 @@ url = "https://api.github.com/repos/bisq-network/bisq2/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-binary = true
+type = "bin"
 comments = """
 bisq2 (bisq2-bin) — tag "vX.Y.Z".
 """
@@ -844,7 +842,7 @@ url = "https://api.github.com/repos/ollama/ollama/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-binary = true
+type = "bin"
 comments = """
 ollama-bin — same upstream repo.
 """
@@ -1240,10 +1238,10 @@ parser = "json"
 path = "[0].commit.committer.date"
 transform = [['T.*', ""], ['-', ""]]
 commit_sha_path = "[0].sha"
-headers = { "User-Agent" = "bentoo-autoupdate" }
 base_from = "file"
 base_url = "https://raw.githubusercontent.com/zed-industries/zed/main/crates/zed/Cargo.toml"
 base_pattern = '(?m)^version = "([0-9][0-9.]*)"'
+headers = { "User-Agent" = "bentoo-autoupdate" }
 comments = """
 zed — commit-tracked on main; _pre suffix preserved from current ebuild.
 """
@@ -1270,7 +1268,7 @@ url = "https://api.github.com/repos/zed-industries/zed/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-binary = true
+type = "bin"
 series = '^[0-9.]+$'
 comments = """
 zed-bin (stable channel) — releases/latest is the stable release by definition
@@ -1293,9 +1291,9 @@ parser = "regex"
 pattern = '"tag_name":\s*"v([0-9.]+-pre)"'
 transform = [['-pre$', "_pre"]]
 select = "max"
-series = '_pre$'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-binary = true
+type = "bin"
+series = '_pre$'
 comments = """
 zed-bin (preview channel) — releases/latest never returns a prerelease, so the
 preview needs the full list: the pattern takes only "vX.Y.Z-pre" tags and the
@@ -1312,10 +1310,10 @@ parser = "json"
 path = "[0].commit.committer.date"
 transform = [['T.*', ""], ['-', ""]]
 commit_sha_path = "[0].sha"
-headers = { "User-Agent" = "bentoo-autoupdate" }
 base_from = "file"
 base_url = "https://raw.githubusercontent.com/sqlitebrowser/sqlitebrowser/master/CMakeLists.txt"
 base_pattern = '(?m)^\s+VERSION ([0-9][0-9.]*)'
+headers = { "User-Agent" = "bentoo-autoupdate" }
 comments = """
 sqlitebrowser — commit-tracked on master (uses COMMIT= without quotes); date YYYYMMDD becomes _pDATE suffix.
 """
@@ -1368,10 +1366,10 @@ parser = "json"
 path = "[0].commit.committer.date"
 transform = [['T.*', ""], ['-', ""]]
 commit_sha_path = "[0].sha"
-headers = { "User-Agent" = "bentoo-autoupdate" }
 base_from = "tag"
 base_url = "https://api.github.com/repos/KhronosGroup/glslang/git/refs/tags"
 base_tag_pattern = '^vulkan-sdk-([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)$'
+headers = { "User-Agent" = "bentoo-autoupdate" }
 comments = """
 glslang — commit-tracked on main; scans titles for vulkan-sdk-X.Y.Z.W to detect base bump.
 """
@@ -1384,10 +1382,10 @@ parser = "json"
 path = "[0].commit.committer.date"
 transform = [['T.*', ""], ['-', ""]]
 commit_sha_path = "[0].sha"
-headers = { "User-Agent" = "bentoo-autoupdate" }
 base_from = "tag"
 base_url = "https://api.github.com/repos/KhronosGroup/SPIRV-Headers/git/refs/tags"
 base_tag_pattern = '^vulkan-sdk-([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)$'
+headers = { "User-Agent" = "bentoo-autoupdate" }
 comments = """
 spirv-headers — commit-tracked on main; scans titles for vulkan-sdk-X.Y.Z.W to detect base bump.
 """
@@ -1400,10 +1398,10 @@ parser = "json"
 path = "[0].commit.committer.date"
 transform = [['T.*', ""], ['-', ""]]
 commit_sha_path = "[0].sha"
-headers = { "User-Agent" = "bentoo-autoupdate" }
 base_from = "tag"
 base_url = "https://api.github.com/repos/KhronosGroup/SPIRV-Tools/git/refs/tags"
 base_tag_pattern = '^vulkan-sdk-([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)$'
+headers = { "User-Agent" = "bentoo-autoupdate" }
 comments = """
 spirv-tools — commit-tracked on main; scans titles for vulkan-sdk-X.Y.Z.W to detect base bump.
 """
@@ -1416,10 +1414,10 @@ parser = "json"
 path = "[0].commit.committer.date"
 transform = [['T.*', ""], ['-', ""]]
 commit_sha_path = "[0].sha"
-headers = { "User-Agent" = "bentoo-autoupdate" }
 base_from = "tag"
 base_url = "https://api.github.com/repos/KhronosGroup/Vulkan-Headers/git/refs/tags"
 base_tag_pattern = '^v([0-9]+\.[0-9]+\.[0-9]+)$'
+headers = { "User-Agent" = "bentoo-autoupdate" }
 comments = """
 vulkan-headers — commit-tracked on main; scans titles "Update for Vulkan-Docs X.Y.Z" to detect base bump.
 """
@@ -1432,10 +1430,10 @@ parser = "json"
 path = "[0].commit.committer.date"
 transform = [['T.*', ""], ['-', ""]]
 commit_sha_path = "[0].sha"
-headers = { "User-Agent" = "bentoo-autoupdate" }
 base_from = "file"
 base_url = "https://raw.githubusercontent.com/KhronosGroup/Vulkan-Tools/main/CMakeLists.txt"
 base_pattern = '(?m)^project\([A-Za-z_-]+ VERSION ([0-9][0-9.]*)'
+headers = { "User-Agent" = "bentoo-autoupdate" }
 comments = """
 vulkan-tools — commit-tracked on main; scans titles "Update for Vulkan-Docs X.Y.Z" to detect base bump.
 """
@@ -1448,10 +1446,10 @@ parser = "json"
 path = "[0].commit.committer.date"
 transform = [['T.*', ""], ['-', ""]]
 commit_sha_path = "[0].sha"
-headers = { "User-Agent" = "bentoo-autoupdate" }
 base_from = "tag"
 base_url = "https://api.github.com/repos/KhronosGroup/Vulkan-Utility-Libraries/git/refs/tags"
 base_tag_pattern = '^v([0-9]+\.[0-9]+\.[0-9]+)$'
+headers = { "User-Agent" = "bentoo-autoupdate" }
 comments = """
 vulkan-utility-libraries — commit-tracked on main, same shape as vulkan-headers.
 
@@ -1473,10 +1471,10 @@ parser = "json"
 path = "[0].commit.committer.date"
 transform = [['T.*', ""], ['-', ""]]
 commit_sha_path = "[0].sha"
-headers = { "User-Agent" = "bentoo-autoupdate" }
 base_from = "file"
 base_url = "https://raw.githubusercontent.com/KhronosGroup/Vulkan-ValidationLayers/main/CMakeLists.txt"
 base_pattern = '(?m)^project\([A-Za-z_-]+ VERSION ([0-9][0-9.]*)'
+headers = { "User-Agent" = "bentoo-autoupdate" }
 comments = """
 vulkan-layers — commit-tracked on main (Vulkan-ValidationLayers); scans for "Update for Vulkan-Docs X.Y.Z".
 """
@@ -1489,10 +1487,10 @@ parser = "json"
 path = "[0].commit.committer.date"
 transform = [['T.*', ""], ['-', ""]]
 commit_sha_path = "[0].sha"
-headers = { "User-Agent" = "bentoo-autoupdate" }
 base_from = "file"
 base_url = "https://raw.githubusercontent.com/KhronosGroup/Vulkan-Loader/main/CMakeLists.txt"
 base_pattern = '(?m)^project\([A-Za-z_-]+ VERSION ([0-9][0-9.]*)'
+headers = { "User-Agent" = "bentoo-autoupdate" }
 comments = """
 vulkan-loader — commit-tracked on main; scans for "Update for Vulkan-Docs X.Y.Z" to detect base bump.
 """
@@ -4991,9 +4989,9 @@ Recovered (2nd pass) — sources found via Codeberg/SSR/meta.json/DevTools
 url = "https://download.nomachine.com/download/?id=43&platform=linux"
 parser = "regex"
 pattern = 'nomachine-personal-edition_([0-9]+\.[0-9]+\.[0-9]+)_[0-9]+_amd64\.deb'
+type = "bin"
 aux_var = "MY_BUILD"
 aux_pattern = 'nomachine-personal-edition_[0-9.]+_([0-9]+)_amd64\.deb'
-binary = true
 comments = """
 nxplayer — NoMachine download page is SSR; regex on the .deb filename gives the
 current version (single version on page → deterministic first match).
@@ -5010,7 +5008,7 @@ o fetch "passa" e o unpack morre com "file format not recognized".
 url = "https://www.freeoffice.com/en/download/applications"
 parser = "regex"
 pattern = 'Revision ([0-9]+)'
-binary = true
+type = "bin"
 comments = """
 freeoffice — download page states "Revision NNNN | date" (the ebuild's PV); SSR.
 """
@@ -5020,7 +5018,7 @@ freeoffice — download page states "Revision NNNN | date" (the ebuild's PV); SS
 url = "https://download.foldingathome.org/releases/public/fah-client/meta.json"
 parser = "regex"
 pattern = 'fah-client_([0-9]+\.[0-9]+\.[0-9]+)'
-binary = true
+type = "bin"
 comments = """
 foldingathome — fah-client meta.json lists only the current release set; every
 filename carries the same version, so the first regex match is the current one.
@@ -5031,7 +5029,7 @@ filename carries the same version, so the first regex match is the current one.
 url = "https://developer.nvidia.com/cuda-downloads?target_os=Linux&target_arch=x86_64&Distribution=Fedora&target_version=44&target_type=runfile_local"
 parser = "regex"
 pattern = 'cuda_([0-9]+\.[0-9]+\.[0-9]+)_'
-binary = true
+type = "bin"
 comments = """
 nvidia-cuda-toolkit — the cuda-downloads page is SSR; the runfile link
 "cuda_X.Y.Z_<driver>_linux.run" carries the current toolkit version (distro in
@@ -5515,7 +5513,6 @@ excluded by the 3\\.7\\. series anchor. group1 has no prefix (normalizer no-op).
 # END
 
 ["net-libs/webkit-gtk:4.1"]
-enabled = true
 url = "https://www.webkitgtk.org/releases/"
 parser = "regex"
 pattern = 'webkitgtk-(2\.52\.[0-9]+)\.tar\.xz'
@@ -5539,7 +5536,6 @@ ignores dev 2.53.x and the 2.48 LTS / 2.50 lines.
 # END
 
 ["net-libs/webkit-gtk:6"]
-enabled = true
 url = "https://www.webkitgtk.org/releases/"
 parser = "regex"
 pattern = 'webkitgtk-(2\.52\.[0-9]+)\.tar\.xz'
@@ -5605,7 +5601,7 @@ url = "https://api.github.com/repos/opengrep/opengrep/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-binary = true
+type = "bin"
 comments = """
 Opengrep (LGPL fork of Semgrep CE) — GitHub releases/latest tag "vX.Y.Z"
 (v stripped). SRC_URI pulls the bare per-arch/libc release binaries
@@ -5712,7 +5708,7 @@ parser = "regex"
 pattern = '"tag_name":"Audacity-([0-9]+\.[0-9]+\.[0-9]+-beta-[0-9]+)"'
 transform = [['-beta-', "_beta"]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-binary = true
+type = "bin"
 comments = """
 Audacity (AppImage) — tracks the 4.x BETA line, not stable. releases/latest
 would return the newest STABLE (3.7.x), so read the full /releases list and
@@ -5766,7 +5762,7 @@ url = "https://codeberg.org/api/v1/repos/librewolf/bsys6/releases?page=1&limit=1
 parser = "json"
 path = "[0].tag_name"
 transform = [['-', "_p"]]
-binary = true
+type = "bin"
 comments = """
 LibreWolf (bin) — NÃO usar as tags do repo "source": o upstream tagueia o
 source antes de publicar os binários, e o -bin morre com 404 no pkgdev
@@ -5810,7 +5806,7 @@ url = "https://api.github.com/repos/microsoft/onnxruntime/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-binary = true
+type = "bin"
 comments = """
 onnxruntime-bin — same upstream repo as the source package; must stay
 version-aligned with it.
