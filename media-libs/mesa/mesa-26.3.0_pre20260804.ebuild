@@ -46,6 +46,22 @@ SRC_URI+="
 	${CARGO_CRATE_URIS}
 "
 
+# Since 26.3 the Venus protocol headers live out of tree and are pulled in as a
+# [wrap-git] meson subproject (subprojects/venus-protocol.wrap), which the
+# sandbox cannot clone (--wrap-mode nodownload).  It cannot become a system
+# dependency either: upstream installs nothing and ships no pkg-config file,
+# it only *generates* headers at build time, so the subproject fallback is the
+# only consumable form.  Keep VENUS_PROTOCOL_COMMIT in sync with the
+# "revision" field of that wrap file on every bump.
+VENUS_PROTOCOL_COMMIT="027b9aca5c480d02bea6ef1b15406f5fd15cd7d7"
+VENUS_PROTOCOL_P="venus-protocol-${VENUS_PROTOCOL_COMMIT}"
+# Only the virtio Vulkan driver needs it (with_virtio_vk in meson.build).
+SRC_URI+="
+	vulkan? ( video_cards_virgl? (
+		https://gitlab.freedesktop.org/virgl/venus-protocol/-/archive/${VENUS_PROTOCOL_COMMIT}/${VENUS_PROTOCOL_P}.tar.gz
+	) )
+"
+
 S="${WORKDIR}/${PN}-${GIT_COMMIT}"
 EGIT_CHECKOUT_DIR=${S}
 
@@ -189,6 +205,14 @@ src_unpack() {
 		git-r3_src_unpack
 	else
 		unpack ${MY_P}.tar.gz
+	fi
+
+	if use vulkan && use video_cards_virgl; then
+		unpack "${VENUS_PROTOCOL_P}.tar.gz"
+		# The name is the "directory" field of subprojects/venus-protocol.wrap;
+		# meson resolves the wrap from disk instead of cloning when it exists.
+		mv "${WORKDIR}/${VENUS_PROTOCOL_P}" \
+			"${S}/subprojects/venus-protocol-1.0" || die
 	fi
 
 	# We need this because we cannot tell meson to use DISTDIR yet
