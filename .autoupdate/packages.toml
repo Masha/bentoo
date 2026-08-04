@@ -303,7 +303,6 @@ be fixed there before any entry could ever track it.
 # END
 
 ["mail-client/thunderbird"]
-enabled = true
 url = "https://product-details.mozilla.org/1.0/thunderbird_versions.json"
 parser = "json"
 path = "LATEST_THUNDERBIRD_VERSION"
@@ -1499,7 +1498,6 @@ vulkan-loader — commit-tracked on main; scans for "Update for Vulkan-Docs X.Y.
 # END
 
 ["kde-plasma/aurorae"]
-enabled = true
 url = "https://api.github.com/repos/KDE/aurorae/tags"
 parser = "json"
 path = "[0].name"
@@ -1513,7 +1511,6 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/bluedevil"]
-enabled = true
 url = "https://api.github.com/repos/KDE/bluedevil/tags"
 parser = "json"
 path = "[0].name"
@@ -1527,7 +1524,6 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/breeze"]
-enabled = true
 url = "https://api.github.com/repos/KDE/breeze/tags"
 parser = "json"
 path = "[0].name"
@@ -1541,7 +1537,6 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/breeze-grub"]
-enabled = true
 url = "https://api.github.com/repos/KDE/breeze-grub/tags"
 parser = "json"
 path = "[0].name"
@@ -1555,7 +1550,6 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/breeze-gtk"]
-enabled = true
 url = "https://api.github.com/repos/KDE/breeze-gtk/tags"
 parser = "json"
 path = "[0].name"
@@ -1569,7 +1563,6 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/breeze-plymouth"]
-enabled = true
 url = "https://api.github.com/repos/KDE/breeze-plymouth/tags"
 parser = "json"
 path = "[0].name"
@@ -1583,7 +1576,6 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/discover"]
-enabled = true
 url = "https://api.github.com/repos/KDE/discover/tags"
 parser = "json"
 path = "[0].name"
@@ -1597,7 +1589,6 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/drkonqi"]
-enabled = true
 url = "https://api.github.com/repos/KDE/drkonqi/tags"
 parser = "json"
 path = "[0].name"
@@ -1611,7 +1602,6 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/flatpak-kcm"]
-enabled = true
 url = "https://api.github.com/repos/KDE/flatpak-kcm/tags"
 parser = "json"
 path = "[0].name"
@@ -1625,7 +1615,6 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/kactivitymanagerd"]
-enabled = true
 url = "https://api.github.com/repos/KDE/kactivitymanagerd/tags"
 parser = "json"
 path = "[0].name"
@@ -1649,7 +1638,6 @@ kameleon-qmk-helper -> KDE/plasma-workspace (anchor: overlay versions it as Plas
 # END
 
 ["kde-plasma/kde-cli-tools"]
-enabled = true
 url = "https://api.github.com/repos/KDE/kde-cli-tools/tags"
 parser = "json"
 path = "[0].name"
@@ -1663,7 +1651,6 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/kde-cli-tools-common"]
-enabled = true
 url = "https://api.github.com/repos/KDE/kde-cli-tools/tags"
 parser = "json"
 path = "[0].name"
@@ -1675,7 +1662,6 @@ kde-cli-tools-common -> KDE/kde-cli-tools (anchor: overlay versions it as Plasma
 # END
 
 ["kde-plasma/kde-gtk-config"]
-enabled = true
 url = "https://api.github.com/repos/KDE/kde-gtk-config/tags"
 parser = "json"
 path = "[0].name"
@@ -1689,7 +1675,6 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/kdecoration"]
-enabled = true
 url = "https://api.github.com/repos/KDE/kdecoration/tags"
 parser = "json"
 path = "[0].name"
@@ -1715,7 +1700,6 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/kdesu-gui"]
-enabled = true
 url = "https://api.github.com/repos/KDE/kde-cli-tools/tags"
 parser = "json"
 path = "[0].name"
@@ -1727,7 +1711,6 @@ kdesu-gui -> KDE/kde-cli-tools (anchor: overlay versions it as Plasma)
 # END
 
 ["kde-plasma/keditfiletype"]
-enabled = true
 url = "https://api.github.com/repos/KDE/plasma-workspace/tags"
 parser = "json"
 path = "[0].name"
@@ -1739,7 +1722,6 @@ keditfiletype -> KDE/plasma-workspace (anchor: overlay versions it as Plasma)
 # END
 
 ["kde-plasma/kgamma"]
-enabled = true
 url = "https://api.github.com/repos/KDE/plasma-workspace/tags"
 parser = "json"
 path = "[0].name"
@@ -1751,7 +1733,6 @@ kgamma -> KDE/plasma-workspace (anchor: overlay versions it as Plasma)
 # END
 
 ["kde-plasma/kglobalacceld"]
-enabled = true
 url = "https://api.github.com/repos/KDE/kglobalacceld/tags"
 parser = "json"
 path = "[0].name"
@@ -1765,7 +1746,6 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/kinfocenter"]
-enabled = true
 url = "https://api.github.com/repos/KDE/kinfocenter/tags"
 parser = "json"
 path = "[0].name"
@@ -1779,7 +1759,6 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/kmenuedit"]
-enabled = true
 url = "https://api.github.com/repos/KDE/kmenuedit/tags"
 parser = "json"
 path = "[0].name"
@@ -1793,7 +1772,6 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/knighttime"]
-enabled = true
 url = "https://api.github.com/repos/KDE/knighttime/tags"
 parser = "json"
 path = "[0].name"
@@ -1807,7 +1785,6 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/kpipewire"]
-enabled = true
 url = "https://api.github.com/repos/KDE/kpipewire/tags"
 parser = "json"
 path = "[0].name"
@@ -1821,7 +1798,6 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/krdp"]
-enabled = true
 url = "https://api.github.com/repos/KDE/krdp/tags"
 parser = "json"
 path = "[0].name"
@@ -1835,7 +1811,6 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/kscreen"]
-enabled = true
 url = "https://api.github.com/repos/KDE/kscreen/tags"
 parser = "json"
 path = "[0].name"
@@ -1849,7 +1824,6 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/kscreenlocker"]
-enabled = true
 url = "https://api.github.com/repos/KDE/kscreenlocker/tags"
 parser = "json"
 path = "[0].name"
@@ -1863,7 +1837,6 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/ksshaskpass"]
-enabled = true
 url = "https://api.github.com/repos/KDE/ksshaskpass/tags"
 parser = "json"
 path = "[0].name"
@@ -1877,7 +1850,6 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/ksystemstats"]
-enabled = true
 url = "https://api.github.com/repos/KDE/ksystemstats/tags"
 parser = "json"
 path = "[0].name"
@@ -1891,7 +1863,6 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/kwallet-pam"]
-enabled = true
 url = "https://api.github.com/repos/KDE/kwallet-pam/tags"
 parser = "json"
 path = "[0].name"
@@ -1905,7 +1876,6 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/kwayland"]
-enabled = true
 url = "https://api.github.com/repos/KDE/kwayland/tags"
 parser = "json"
 path = "[0].name"
@@ -1919,7 +1889,6 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/kwin"]
-enabled = true
 url = "https://api.github.com/repos/KDE/kwin/tags"
 parser = "json"
 path = "[0].name"
@@ -1933,7 +1902,6 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/kwin-x11"]
-enabled = true
 url = "https://api.github.com/repos/KDE/kwin-x11/tags"
 parser = "json"
 path = "[0].name"
@@ -1947,7 +1915,6 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/kwrited"]
-enabled = true
 url = "https://api.github.com/repos/KDE/kwrited/tags"
 parser = "json"
 path = "[0].name"
@@ -1961,7 +1928,6 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/layer-shell-qt"]
-enabled = true
 url = "https://api.github.com/repos/KDE/layer-shell-qt/tags"
 parser = "json"
 path = "[0].name"
@@ -1975,7 +1941,6 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/libkscreen"]
-enabled = true
 url = "https://api.github.com/repos/KDE/libkscreen/tags"
 parser = "json"
 path = "[0].name"
@@ -1989,7 +1954,6 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/libksysguard"]
-enabled = true
 url = "https://api.github.com/repos/KDE/libksysguard/tags"
 parser = "json"
 path = "[0].name"
@@ -2003,7 +1967,6 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/libplasma"]
-enabled = true
 url = "https://api.github.com/repos/KDE/libplasma/tags"
 parser = "json"
 path = "[0].name"
@@ -2017,7 +1980,6 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/milou"]
-enabled = true
 url = "https://api.github.com/repos/KDE/milou/tags"
 parser = "json"
 path = "[0].name"
@@ -2031,7 +1993,6 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/ocean-sound-theme"]
-enabled = true
 url = "https://api.github.com/repos/KDE/ocean-sound-theme/tags"
 parser = "json"
 path = "[0].name"
@@ -2045,7 +2006,6 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/oxygen"]
-enabled = true
 url = "https://api.github.com/repos/KDE/oxygen/tags"
 parser = "json"
 path = "[0].name"
@@ -2059,7 +2019,6 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/oxygen-sounds"]
-enabled = true
 url = "https://api.github.com/repos/KDE/oxygen-sounds/tags"
 parser = "json"
 path = "[0].name"
@@ -2073,7 +2032,6 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/plasma-activities"]
-enabled = true
 url = "https://api.github.com/repos/KDE/plasma-activities/tags"
 parser = "json"
 path = "[0].name"
@@ -2087,7 +2045,6 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/plasma-activities-stats"]
-enabled = true
 url = "https://api.github.com/repos/KDE/plasma-activities-stats/tags"
 parser = "json"
 path = "[0].name"
@@ -2101,7 +2058,6 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/plasma-browser-integration"]
-enabled = true
 url = "https://api.github.com/repos/KDE/plasma-browser-integration/tags"
 parser = "json"
 path = "[0].name"
@@ -2115,7 +2071,6 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/plasma-desktop"]
-enabled = true
 url = "https://api.github.com/repos/KDE/plasma-desktop/tags"
 parser = "json"
 path = "[0].name"
@@ -2129,7 +2084,6 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/plasma-disks"]
-enabled = true
 url = "https://api.github.com/repos/KDE/plasma-disks/tags"
 parser = "json"
 path = "[0].name"
@@ -2143,7 +2097,6 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/plasma-firewall"]
-enabled = true
 url = "https://api.github.com/repos/KDE/plasma-firewall/tags"
 parser = "json"
 path = "[0].name"
@@ -2157,7 +2110,6 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/plasma-integration"]
-enabled = true
 url = "https://api.github.com/repos/KDE/plasma-integration/tags"
 parser = "json"
 path = "[0].name"
@@ -2171,7 +2123,6 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/plasma-keyboard"]
-enabled = true
 url = "https://api.github.com/repos/KDE/plasma-keyboard/tags"
 parser = "json"
 path = "[0].name"
@@ -2185,7 +2136,6 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/plasma-login-manager"]
-enabled = true
 url = "https://api.github.com/repos/KDE/plasma-login-manager/tags"
 parser = "json"
 path = "[0].name"
@@ -2199,7 +2149,6 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/plasma-login-sessions"]
-enabled = true
 url = "https://api.github.com/repos/KDE/plasma-workspace/tags"
 parser = "json"
 path = "[0].name"
@@ -2211,7 +2160,6 @@ plasma-login-sessions -> KDE/plasma-workspace (anchor: overlay versions it as Pl
 # END
 
 ["kde-plasma/plasma-meta"]
-enabled = true
 url = "https://api.github.com/repos/KDE/plasma-workspace/tags"
 parser = "json"
 path = "[0].name"
@@ -2223,7 +2171,6 @@ plasma-meta -> KDE/plasma-workspace (anchor: overlay versions it as Plasma)
 # END
 
 ["kde-plasma/plasma-nm"]
-enabled = true
 url = "https://api.github.com/repos/KDE/plasma-nm/tags"
 parser = "json"
 path = "[0].name"
@@ -2237,7 +2184,6 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/plasma-pa"]
-enabled = true
 url = "https://api.github.com/repos/KDE/plasma-pa/tags"
 parser = "json"
 path = "[0].name"
@@ -2251,7 +2197,6 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/plasma-sdk"]
-enabled = true
 url = "https://api.github.com/repos/KDE/plasma-sdk/tags"
 parser = "json"
 path = "[0].name"
@@ -2265,7 +2210,6 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/plasma-systemmonitor"]
-enabled = true
 url = "https://api.github.com/repos/KDE/plasma-systemmonitor/tags"
 parser = "json"
 path = "[0].name"
@@ -2279,7 +2223,6 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/plasma-thunderbolt"]
-enabled = true
 url = "https://api.github.com/repos/KDE/plasma-thunderbolt/tags"
 parser = "json"
 path = "[0].name"
@@ -2293,7 +2236,6 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/plasma-vault"]
-enabled = true
 url = "https://api.github.com/repos/KDE/plasma-vault/tags"
 parser = "json"
 path = "[0].name"
@@ -2307,7 +2249,6 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/plasma-welcome"]
-enabled = true
 url = "https://api.github.com/repos/KDE/plasma-welcome/tags"
 parser = "json"
 path = "[0].name"
@@ -2321,7 +2262,6 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/plasma-workspace"]
-enabled = true
 url = "https://api.github.com/repos/KDE/plasma-workspace/tags"
 parser = "json"
 path = "[0].name"
@@ -2335,7 +2275,6 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/plasma-workspace-wallpapers"]
-enabled = true
 url = "https://api.github.com/repos/KDE/plasma-workspace-wallpapers/tags"
 parser = "json"
 path = "[0].name"
@@ -2349,7 +2288,6 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/plasma5support"]
-enabled = true
 url = "https://api.github.com/repos/KDE/plasma5support/tags"
 parser = "json"
 path = "[0].name"
@@ -2363,7 +2301,6 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/plymouth-kcm"]
-enabled = true
 url = "https://api.github.com/repos/KDE/plymouth-kcm/tags"
 parser = "json"
 path = "[0].name"
@@ -2377,7 +2314,6 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/polkit-kde-agent"]
-enabled = true
 url = "https://api.github.com/repos/KDE/polkit-kde-agent-1/tags"
 parser = "json"
 path = "[0].name"
@@ -2389,7 +2325,6 @@ polkit-kde-agent -> KDE/polkit-kde-agent-1 (anchor: overlay versions it as Plasm
 # END
 
 ["kde-plasma/powerdevil"]
-enabled = true
 url = "https://api.github.com/repos/KDE/powerdevil/tags"
 parser = "json"
 path = "[0].name"
@@ -2403,7 +2338,6 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/print-manager"]
-enabled = true
 url = "https://api.github.com/repos/KDE/plasma-workspace/tags"
 parser = "json"
 path = "[0].name"
@@ -2415,7 +2349,6 @@ print-manager -> KDE/plasma-workspace (anchor: overlay versions it as Plasma)
 # END
 
 ["kde-plasma/qqc2-breeze-style"]
-enabled = true
 url = "https://api.github.com/repos/KDE/qqc2-breeze-style/tags"
 parser = "json"
 path = "[0].name"
@@ -2429,7 +2362,6 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/sddm-kcm"]
-enabled = true
 url = "https://api.github.com/repos/KDE/sddm-kcm/tags"
 parser = "json"
 path = "[0].name"
@@ -2453,7 +2385,6 @@ spectacle -> KDE/plasma-workspace (anchor: overlay versions it as Plasma)
 # END
 
 ["kde-plasma/systemsettings"]
-enabled = true
 url = "https://api.github.com/repos/KDE/systemsettings/tags"
 parser = "json"
 path = "[0].name"
@@ -2467,7 +2398,6 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/wacomtablet"]
-enabled = true
 url = "https://api.github.com/repos/KDE/wacomtablet/tags"
 parser = "json"
 path = "[0].name"
@@ -2481,7 +2411,6 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/xdg-desktop-portal-kde"]
-enabled = true
 url = "https://api.github.com/repos/KDE/xdg-desktop-portal-kde/tags"
 parser = "json"
 path = "[0].name"
