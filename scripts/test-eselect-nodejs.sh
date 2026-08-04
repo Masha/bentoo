@@ -610,6 +610,44 @@ phase_optional_npm() {
 		"rc=${first_rc}; rc=${MODULE_RC}; dangling=$(dangling_summary); npm=$(path_state "${ROOTFS}/usr/bin/npm")"
 }
 
+# phase_upgrade_from_v1
+#
+# The regression this phase exists for happened in production, not in review.
+#
+# Module version 1 wrote symlinks; version 2 writes exec wrappers. The entry
+# points are runtime state no package records in its CONTENTS, so merging the new
+# module regenerates nothing: on the box this was reported from, /usr/bin/node
+# was written at 09:57 by an unrelated nodejs merge and the new module landed at
+# 10:03, leaving a version-1 symlink in place and www-client/chromium failing its
+# readlink -f check exactly as before, with nothing in the merge output
+# explaining why.
+#
+# The fix is pkg_postinst re-applying the active selection, which only works if
+# `show` can still read a version-1 symlink. Both halves are pinned here: the
+# selection has to survive the re-write, and the shape has to actually change.
+phase_upgrade_from_v1() {
+	section "Phase 8 - upgrading over a module-v1 symlink"
+	build_root 24 26
+
+	# Exactly what version 1 left behind: a relative symlink into the slot.
+	ln -s ../lib64/node-24/bin/node "${ROOTFS}/usr/bin/node"
+
+	run_module -b show
+	ASSERT_CONTEXT=$(module_context)
+	assert_eq p \
+		"show still reads a version-1 symlink, so the selection is not lost on upgrade" \
+		"rc=0; stdout=node24" \
+		"rc=${MODULE_RC}; stdout=${MODULE_OUT}"
+
+	# What pkg_postinst does: re-apply whatever is active, unchanged.
+	run_module set node24
+	ASSERT_CONTEXT=$(module_context)
+	assert_eq q \
+		"re-applying converts the legacy symlink to a wrapper and keeps the same slot" \
+		"rc=0; wrapper => /usr/lib64/node-24/bin/node" \
+		"rc=${MODULE_RC}; $(path_state "${ROOTFS}/usr/bin/node")"
+}
+
 phase_cleanup() {
 	section "Phase 7 - cleanup after an unmerged slot (R3.4)"
 	build_root 10 26
@@ -664,8 +702,9 @@ phase_repoint
 phase_update
 phase_optional_npm
 phase_cleanup
+phase_upgrade_from_v1
 
-section "Phase 8 - host safety"
+section "Phase 9 - host safety"
 HOST_ETC_AFTER=$(host_etc_fingerprint)
 ASSERT_CONTEXT="a difference here means eselect's env_update() reached the real /etc - see PACKAGE_MANAGER=paludis in this script's header"
 assert_eq n \
