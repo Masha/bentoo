@@ -854,6 +854,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^b(\d+)$', "0_pre$1"]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "0_pre10265"
 comments = """
 llama-cpp — upstream tags builds "bNNNN" (no semver); the ebuild carries them as
 the 0_pre<build> snapshot scheme and bridges back with MY_PV="b${PV#0_pre}", so
@@ -5764,6 +5765,7 @@ parser = "json"
 path = "[0].tag_name"
 transform = [['-', "_p"]]
 type = "bin"
+version = "153.0.3_p1"
 comments = """
 LibreWolf (bin) — NÃO usar as tags do repo "source": o upstream tagueia o
 source antes de publicar os binários, e o -bin morre com 404 no pkgdev
