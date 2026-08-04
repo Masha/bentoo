@@ -303,10 +303,11 @@ be fixed there before any entry could ever track it.
 # END
 
 ["mail-client/thunderbird"]
-enabled = false
+enabled = true
 url = "https://product-details.mozilla.org/1.0/thunderbird_versions.json"
 parser = "json"
 path = "LATEST_THUNDERBIRD_VERSION"
+version = "153.0.2"
 comments = """
 Thunderbird — Mozilla's authoritative product-details endpoint. Use the
 LATEST_THUNDERBIRD_VERSION key (rapid/release channel, matching SLOT=0/stable):
@@ -1049,11 +1050,12 @@ sane-backends — releases endpoint, [0].tag_name plain semver.
 # END
 
 ["net-proxy/snowflake"]
-url = "https://gitlab.torproject.org/api/v4/projects/tpo%2Fanti-censorship%2Fpluggable-transports%2Fsnowflake/repository/tags"
+url = "https://proxy.golang.org/gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/v2/@latest"
 parser = "json"
-path = "[0].name"
+path = "Version"
 comments = """
-snowflake — default (commit-recency) order puts the real release first.
+snowflake — gitlab.torproject.org recusa conexão do checker; o Go module proxy
+espelha as mesmas tags (Version = "vX.Y.Z") e é sempre alcançável.
 """
 # END
 
@@ -1497,11 +1499,12 @@ vulkan-loader — commit-tracked on main; scans for "Update for Vulkan-Docs X.Y.
 # END
 
 ["kde-plasma/aurorae"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/KDE/aurorae/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 aurorae — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
 Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
@@ -1510,11 +1513,12 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/bluedevil"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/KDE/bluedevil/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 bluedevil — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
 Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
@@ -1523,11 +1527,12 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/breeze"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/KDE/breeze/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 breeze — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
 Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
@@ -1536,11 +1541,12 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/breeze-grub"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/KDE/breeze-grub/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 breeze-grub — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
 Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
@@ -1549,11 +1555,12 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/breeze-gtk"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/KDE/breeze-gtk/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 breeze-gtk — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
 Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
@@ -1562,11 +1569,12 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/breeze-plymouth"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/KDE/breeze-plymouth/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 breeze-plymouth — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
 Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
@@ -1575,11 +1583,12 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/discover"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/KDE/discover/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 discover — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
 Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
@@ -1588,11 +1597,12 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/drkonqi"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/KDE/drkonqi/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 drkonqi — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
 Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
@@ -1601,11 +1611,12 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/flatpak-kcm"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/KDE/flatpak-kcm/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 flatpak-kcm — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
 Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
@@ -1614,11 +1625,12 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/kactivitymanagerd"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/KDE/kactivitymanagerd/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 kactivitymanagerd — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
 Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
@@ -1637,11 +1649,12 @@ kameleon-qmk-helper -> KDE/plasma-workspace (anchor: overlay versions it as Plas
 # END
 
 ["kde-plasma/kde-cli-tools"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/KDE/kde-cli-tools/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 kde-cli-tools — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
 Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
@@ -1650,22 +1663,24 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/kde-cli-tools-common"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/KDE/kde-cli-tools/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 kde-cli-tools-common -> KDE/kde-cli-tools (anchor: overlay versions it as Plasma)
 """
 # END
 
 ["kde-plasma/kde-gtk-config"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/KDE/kde-gtk-config/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 kde-gtk-config — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
 Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
@@ -1674,11 +1689,12 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/kdecoration"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/KDE/kdecoration/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 kdecoration — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
 Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
@@ -1699,44 +1715,48 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/kdesu-gui"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/KDE/kde-cli-tools/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 kdesu-gui -> KDE/kde-cli-tools (anchor: overlay versions it as Plasma)
 """
 # END
 
 ["kde-plasma/keditfiletype"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/KDE/plasma-workspace/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 keditfiletype -> KDE/plasma-workspace (anchor: overlay versions it as Plasma)
 """
 # END
 
 ["kde-plasma/kgamma"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/KDE/plasma-workspace/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 kgamma -> KDE/plasma-workspace (anchor: overlay versions it as Plasma)
 """
 # END
 
 ["kde-plasma/kglobalacceld"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/KDE/kglobalacceld/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 kglobalacceld — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
 Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
@@ -1745,11 +1765,12 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/kinfocenter"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/KDE/kinfocenter/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 kinfocenter — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
 Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
@@ -1758,11 +1779,12 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/kmenuedit"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/KDE/kmenuedit/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 kmenuedit — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
 Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
@@ -1771,11 +1793,12 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/knighttime"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/KDE/knighttime/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 knighttime — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
 Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
@@ -1784,11 +1807,12 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/kpipewire"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/KDE/kpipewire/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 kpipewire — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
 Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
@@ -1797,11 +1821,12 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/krdp"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/KDE/krdp/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 krdp — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
 Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
@@ -1810,11 +1835,12 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/kscreen"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/KDE/kscreen/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 kscreen — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
 Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
@@ -1823,11 +1849,12 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/kscreenlocker"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/KDE/kscreenlocker/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 kscreenlocker — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
 Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
@@ -1836,11 +1863,12 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/ksshaskpass"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/KDE/ksshaskpass/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 ksshaskpass — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
 Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
@@ -1849,11 +1877,12 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/ksystemstats"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/KDE/ksystemstats/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 ksystemstats — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
 Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
@@ -1862,11 +1891,12 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/kwallet-pam"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/KDE/kwallet-pam/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 kwallet-pam — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
 Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
@@ -1875,11 +1905,12 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/kwayland"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/KDE/kwayland/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 kwayland — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
 Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
@@ -1888,11 +1919,12 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/kwin"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/KDE/kwin/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 kwin — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
 Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
@@ -1901,11 +1933,12 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/kwin-x11"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/KDE/kwin-x11/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 kwin-x11 — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
 Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
@@ -1914,11 +1947,12 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/kwrited"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/KDE/kwrited/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 kwrited — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
 Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
@@ -1927,11 +1961,12 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/layer-shell-qt"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/KDE/layer-shell-qt/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 layer-shell-qt — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
 Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
@@ -1940,11 +1975,12 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/libkscreen"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/KDE/libkscreen/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 libkscreen — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
 Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
@@ -1953,11 +1989,12 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/libksysguard"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/KDE/libksysguard/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 libksysguard — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
 Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
@@ -1966,11 +2003,12 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/libplasma"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/KDE/libplasma/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 libplasma — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
 Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
@@ -1979,11 +2017,12 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/milou"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/KDE/milou/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 milou — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
 Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
@@ -1992,11 +2031,12 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/ocean-sound-theme"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/KDE/ocean-sound-theme/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 ocean-sound-theme — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
 Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
@@ -2005,11 +2045,12 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/oxygen"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/KDE/oxygen/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 oxygen — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
 Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
@@ -2018,11 +2059,12 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/oxygen-sounds"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/KDE/oxygen-sounds/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 oxygen-sounds — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
 Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
@@ -2031,11 +2073,12 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/plasma-activities"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/KDE/plasma-activities/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 plasma-activities — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
 Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
@@ -2044,11 +2087,12 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/plasma-activities-stats"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/KDE/plasma-activities-stats/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 plasma-activities-stats — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
 Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
@@ -2057,11 +2101,12 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/plasma-browser-integration"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/KDE/plasma-browser-integration/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 plasma-browser-integration — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
 Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
@@ -2070,11 +2115,12 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/plasma-desktop"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/KDE/plasma-desktop/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 plasma-desktop — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
 Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
@@ -2083,11 +2129,12 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/plasma-disks"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/KDE/plasma-disks/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 plasma-disks — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
 Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
@@ -2096,11 +2143,12 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/plasma-firewall"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/KDE/plasma-firewall/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 plasma-firewall — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
 Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
@@ -2109,11 +2157,12 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/plasma-integration"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/KDE/plasma-integration/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 plasma-integration — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
 Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
@@ -2122,11 +2171,12 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/plasma-keyboard"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/KDE/plasma-keyboard/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 plasma-keyboard — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
 Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
@@ -2135,11 +2185,12 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/plasma-login-manager"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/KDE/plasma-login-manager/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 plasma-login-manager — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
 Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
@@ -2148,33 +2199,36 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/plasma-login-sessions"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/KDE/plasma-workspace/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 plasma-login-sessions -> KDE/plasma-workspace (anchor: overlay versions it as Plasma)
 """
 # END
 
 ["kde-plasma/plasma-meta"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/KDE/plasma-workspace/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 plasma-meta -> KDE/plasma-workspace (anchor: overlay versions it as Plasma)
 """
 # END
 
 ["kde-plasma/plasma-nm"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/KDE/plasma-nm/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 plasma-nm — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
 Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
@@ -2183,11 +2237,12 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/plasma-pa"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/KDE/plasma-pa/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 plasma-pa — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
 Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
@@ -2196,11 +2251,12 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/plasma-sdk"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/KDE/plasma-sdk/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 plasma-sdk — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
 Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
@@ -2209,11 +2265,12 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/plasma-systemmonitor"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/KDE/plasma-systemmonitor/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 plasma-systemmonitor — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
 Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
@@ -2222,11 +2279,12 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/plasma-thunderbolt"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/KDE/plasma-thunderbolt/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 plasma-thunderbolt — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
 Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
@@ -2235,11 +2293,12 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/plasma-vault"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/KDE/plasma-vault/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 plasma-vault — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
 Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
@@ -2248,11 +2307,12 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/plasma-welcome"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/KDE/plasma-welcome/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 plasma-welcome — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
 Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
@@ -2261,11 +2321,12 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/plasma-workspace"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/KDE/plasma-workspace/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 plasma-workspace — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
 Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
@@ -2274,11 +2335,12 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/plasma-workspace-wallpapers"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/KDE/plasma-workspace-wallpapers/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 plasma-workspace-wallpapers — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
 Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
@@ -2287,11 +2349,12 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/plasma5support"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/KDE/plasma5support/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 plasma5support — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
 Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
@@ -2300,11 +2363,12 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/plymouth-kcm"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/KDE/plymouth-kcm/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 plymouth-kcm — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
 Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
@@ -2313,22 +2377,24 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/polkit-kde-agent"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/KDE/polkit-kde-agent-1/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 polkit-kde-agent -> KDE/polkit-kde-agent-1 (anchor: overlay versions it as Plasma)
 """
 # END
 
 ["kde-plasma/powerdevil"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/KDE/powerdevil/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 powerdevil — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
 Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
@@ -2337,22 +2403,24 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/print-manager"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/KDE/plasma-workspace/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 print-manager -> KDE/plasma-workspace (anchor: overlay versions it as Plasma)
 """
 # END
 
 ["kde-plasma/qqc2-breeze-style"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/KDE/qqc2-breeze-style/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 qqc2-breeze-style — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
 Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
@@ -2361,11 +2429,12 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/sddm-kcm"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/KDE/sddm-kcm/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 sddm-kcm — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
 Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
@@ -2384,11 +2453,12 @@ spectacle -> KDE/plasma-workspace (anchor: overlay versions it as Plasma)
 # END
 
 ["kde-plasma/systemsettings"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/KDE/systemsettings/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 systemsettings — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
 Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
@@ -2397,11 +2467,12 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/wacomtablet"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/KDE/wacomtablet/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 wacomtablet — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
 Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
@@ -2410,11 +2481,12 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/xdg-desktop-portal-kde"]
-enabled = false
+enabled = true
 url = "https://api.github.com/repos/KDE/xdg-desktop-portal-kde/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 xdg-desktop-portal-kde — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
 Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
