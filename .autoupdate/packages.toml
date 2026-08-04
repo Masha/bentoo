@@ -1442,12 +1442,27 @@ vulkan-tools — commit-tracked on main; scans titles "Update for Vulkan-Docs X.
 # END
 
 ["dev-util/vulkan-utility-libraries"]
-url = "https://api.github.com/repos/KhronosGroup/Vulkan-Utility-Libraries/tags?per_page=100"
-parser = "regex"
-pattern = '"name":"v(1\.4\.[0-9]+)"'
+track = "commit"
+url = "https://api.github.com/repos/KhronosGroup/Vulkan-Utility-Libraries/commits?sha=main&per_page=50"
+parser = "json"
+path = "[0].commit.committer.date"
+transform = [['T.*', ""], ['-', ""]]
+commit_sha_path = "[0].sha"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+base_from = "tag"
+base_url = "https://api.github.com/repos/KhronosGroup/Vulkan-Utility-Libraries/git/refs/tags"
+base_tag_pattern = '^v([0-9]+\.[0-9]+\.[0-9]+)$'
 comments = """
-vulkan-utility-libraries — per-update tags "vX.Y.Z".
+vulkan-utility-libraries — commit-tracked on main, same shape as vulkan-headers.
+
+It was tag-tracked ("vX.Y.Z") until 2026-08-03 and that is what broke the build:
+include/vulkan/utility/vk_struct_helper.hpp is code-gen'd from vk.xml, and the four
+sibling packages (headers, loader, tools, layers) all track main. Pinned to the last
+tag, this one fell behind them — v1.4.358 (c0e15b2c) predates VK_EXT_image_tiling_control
+entering the registry, so vulkan-layers-1.4.358_p20260803 hit
+"GetSType() is being used with an unsupported Type! Is the code-gen up to date?"
+for VkPhysicalDeviceImageTilingControlFeaturesEXT. A tag lag here is not cosmetic:
+the generated table must be at least as new as the headers the layers compile against.
 """
 # END
 
