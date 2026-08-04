@@ -122,6 +122,7 @@
 url = "https://registry.npmjs.org/@anthropic-ai/claude-code"
 parser = "json"
 path = "dist-tags.latest"
+version = "2.1.221"
 comments = """
 claude-code — npm @anthropic-ai/claude-code; dist-tags.latest is the stable channel.
 
@@ -130,12 +131,15 @@ npm registry  (parser=json, path=dist-tags.latest)
 # END
 
 ["dev-util/playwright"]
-url = "https://registry.npmjs.org/playwright"
+url = "https://registry.npmjs.org/playwright/latest"
 parser = "json"
-path = "dist-tags.latest"
+path = "version"
+version = "1.62.1"
 comments = """
 playwright — npm "playwright" (the JS package, replacing the retired
-dev-python/playwright-bin wheel). dist-tags.latest is clean X.Y.Z. A bump must
+dev-python/playwright-bin wheel). The full packument (/playwright) now exceeds
+the 10 MiB fetch limit, so use the /latest endpoint (~3 KiB): its top-level
+"version" is the same clean X.Y.Z that dist-tags.latest carried. A bump must
 also update the second SRC_URI tarball: playwright-core carries the same
 version and is fetched separately because npm resolves it offline from DISTDIR.
 """
@@ -145,6 +149,7 @@ version and is fetched separately because npm resolves it offline from DISTDIR.
 url = "https://registry.npmjs.org/pnpm"
 parser = "json"
 path = "dist-tags.latest"
+version = "11.20.0"
 comments = """
 pnpm — npm package, stable channel. dist-tags.latest is the RIGHT endpoint and
 must stay: pnpm promotes through next-<major> first, and that channel carries
@@ -173,6 +178,7 @@ url = "https://api2.cursor.sh/updates/api/download/stable/linux-x64/cursor"
 parser = "json"
 path = "version"
 commit_sha_path = "commitSha"
+version = "3.14.7"
 comments = """
 Cursor — official download API; "version" is the full version. commitSha is the
 per-release BUILD_ID embedded in SRC_URI; the applier substitutes it into the
@@ -186,6 +192,7 @@ Vendor JSON API  (per-vendor endpoint)
 url = "https://prod.download.desktop.kiro.dev/stable/metadata-linux-x64-stable.json"
 parser = "json"
 path = "currentRelease"
+version = "1.0.242"
 comments = """
 Kiro — kiro.dev SPA metadata endpoint (found via DevTools); "currentRelease" is authoritative.
 """
@@ -198,6 +205,7 @@ path = "version"
 headers = { "User-Agent" = "Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0" }
 aux_var = "BUILD_ID"
 aux_pattern = 'Claude-([0-9a-f]{40})\.deb'
+version = "1.24012.11"
 comments = """
 Claude Desktop — official download API behind the claude.ai/download button
 ({"version","url"}). claude.ai sits behind Cloudflare: a plain curl/wget UA gets
@@ -214,6 +222,7 @@ itself has no Cloudflare challenge, so SRC_URI fetches fine under portage's wget
 url = "https://raw.githubusercontent.com/obsidianmd/obsidian-releases/HEAD/desktop-releases.json"
 parser = "json"
 path = "latestVersion"
+version = "1.13.4"
 comments = """
 Obsidian — official release manifest consumed by the updater.
 """
@@ -223,6 +232,7 @@ Obsidian — official release manifest consumed by the updater.
 url = "https://storage.googleapis.com/dart-archive/channels/stable/release/latest/VERSION"
 parser = "json"
 path = "version"
+version = "3.12.2"
 comments = """
 Dart — official stable channel VERSION manifest.
 """
@@ -233,6 +243,7 @@ url = "https://dl.pstmn.io/api/version/latest?platform=linux64&channel=stable"
 parser = "json"
 path = "version"
 type = "bin"
+version = "12.22.2"
 comments = """
 Postman — official version API; clean {"version":"..."}.
 """
@@ -243,6 +254,7 @@ url = "https://nodejs.org/dist/latest-v24.x/SHASUMS256.txt"
 parser = "regex"
 pattern = 'node-v(24\.[0-9]+\.[0-9]+)\.tar\.xz'
 select = "max"
+version = "24.19.0"
 comments = """
 Node.js SLOT 24 — the previous LTS line.
 
@@ -287,6 +299,7 @@ url = "https://nodejs.org/dist/latest-v26.x/SHASUMS256.txt"
 parser = "regex"
 pattern = 'node-v(26\.[0-9]+\.[0-9]+)\.tar\.xz'
 select = "max"
+version = "26.6.0"
 comments = """
 Node.js SLOT 26 — the current line.
 Identical in shape to net-libs/nodejs:24 above, which carries the shared
@@ -327,6 +340,7 @@ url = "https://proton.me/download/mail/linux/version.json"
 parser = "json"
 path = "Releases[0].Version"
 type = "bin"
+version = "1.13.4"
 comments = """
 Proton Mail (desktop) — proton.me version.json; Releases[0] is the EarlyAccess/beta
 channel that matches the ebuild's *-beta.rpm (GitHub inbox-desktop is stale).
@@ -338,6 +352,7 @@ url = "https://api.github.com/repos/ProtonMail/proton-bridge/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "3.25.0"
 comments = """
 Proton Mail Bridge — GitHub release tag "vX.Y.Z" ("v" stripped).
 """
@@ -359,6 +374,7 @@ transform strips the "go" prefix to match PV. Live=1.26.5.
 url = "https://windsurf-stable.codeiumdata.com/wVxQEIWkwPUEAGf3/apt/dists/stable/main/binary-amd64/Packages"
 parser = "regex"
 pattern = 'Package: devin-desktop\nVersion: ([0-9]+\.[0-9]+\.[0-9]+)'
+version = "3.6.27"
 comments = """
 Windsurf — rebranded to "Devin Desktop". The docs.devin.ai changelog is a
 client-rendered SPA that stalls headless rendering; read the APT index of the
@@ -374,6 +390,7 @@ Vendor HTML / regex scraping
 url = "https://www.betterbird.eu/downloads/"
 parser = "regex"
 pattern = 'Current version:\s*Betterbird\s*([0-9]+\.[0-9]+\.[0-9]+)esr-bb[0-9]+'
+version = "140.13.0"
 comments = """
 Betterbird — anchor on the "Current version: Betterbird <ver>esr-bbNN" label
 (not a bare "esr-bb" match): the page also lists "Previous/" archive links, so
@@ -392,6 +409,7 @@ parser = "regex"
 pattern = '"name":"INKSCAPE_([0-9]+_[0-9]+_[0-9]+)"'
 transform = [['_', "."]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "1.4.4-r1"
 comments = """
 Inkscape — inkscape.org/release/ now 502s sitewide; read tags off the GitLab API.
 Tags are "INKSCAPE_X_Y_Z" (the trailing quote skips _RC/_BETA pre-releases); the
@@ -404,6 +422,7 @@ url = "https://www.openoffice.org/"
 parser = "regex"
 pattern = 'Apache OpenOffice ([0-9]+\.[0-9]+\.[0-9]+)'
 type = "bin"
+version = "4.1.16"
 comments = """
 Apache OpenOffice — homepage states "Apache OpenOffice X.Y.Z" as current.
 """
@@ -415,6 +434,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
+version = "2.1.2.1"
 comments = """
 PixiEditor — GitHub releases (tag is 4-part bare version, e.g. 2.1.1.5).
 """
@@ -424,6 +444,7 @@ PixiEditor — GitHub releases (tag is 4-part bare version, e.g. 2.1.1.5).
 url = "https://support.gitkraken.com/release-notes/current"
 parser = "script"
 script = "@gitkraken.js"
+version = "12.3.1"
 comments = """
 GitKraken — release notes moved to a client-rendered SPA at support.gitkraken.com
 (www.gitkraken.com/release-notes 301-redirects there). Raw HTML leads with an
@@ -448,6 +469,7 @@ pattern = 'Latest:\s*([0-9]+\.[0-9]+\.[0-9]+)'
 headers = { "User-Agent" = "Mozilla/5.0" }
 meta = { fetch_method = "post", fetch_url = "https://filezilla-project.org/prodownload.php?beta=0", fetch_serial_env = "FILEZILLA_PRO_KEY", fetch_serial_field = "key", fetch_filename = "FileZilla_Pro_{version}_x86_64-linux-gnu.tar.xz", fetch_form = "mail=&number=&platform=linux&platform_cli=win&platform_cli_nonpro=win&platform_fzpes=win&download_program=Start download of FileZilla Pro" }
 type = "bin"
+version = "3.70.5"
 comments = """
 FileZilla Pro — version-history page's "Latest: X.Y.Z" is the current stable
 release (the h3 changelog list also includes -betaN, so anchor on "Latest:").
@@ -466,6 +488,7 @@ parser = "regex"
 pattern = '<a name="([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 type = "bin"
+version = "26.3.0"
 comments = """
 CrossOver — changelog page lists each release as `<a name="X.Y.Z">`, newest first;
 present in the raw HTML (not JS-only). Download is the .deb under media.codeweavers.com
@@ -478,6 +501,7 @@ url = "https://api.github.com/repos/kopia/kopia/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "0.23.1"
 comments = """
 kopia — tag "vX.Y.Z" ("v" stripped by normalizer); releases/latest skips the
 frequent prereleases. Built from source (go-module), no upstream vendor tarball,
@@ -492,6 +516,7 @@ url = "https://api.github.com/repos/qbittorrent/qBittorrent/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "5.2.3"
 comments = """
 qBittorrent — tag "release-X.Y.Z" ("release-" stripped).
 """
@@ -513,6 +538,7 @@ url = "https://api.github.com/repos/marhkb/pods/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "3.1.1"
 comments = """
 Pods — tag "vX.Y.Z".
 """
@@ -523,6 +549,7 @@ url = "https://api.github.com/repos/opencontainers/runc/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "1.5.1"
 comments = """
 runc — releases/latest tag "vX.Y.Z" ("v" stripped). Never rank refs/tags here:
 the tag space interleaves "-rc.N" prereleases (v1.5.0-rc.1..3) and upstream has
@@ -551,6 +578,7 @@ url = "https://api.github.com/repos/TriliumNext/Trilium/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "0.104.1"
 comments = """
 Trilium — releases/latest tag "vX.Y.Z" (tags[0] is a separate web-clipper line).
 """
@@ -561,6 +589,7 @@ url = "https://api.github.com/repos/canonical/cloud-utils/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "0.34"
 comments = """
 cloud-utils — tag is a bare "X.YZ" (e.g. 0.34), no prefix to strip. The
 ubuntu/* packaging tags in /tags are not releases; use releases/latest.
@@ -572,6 +601,7 @@ url = "https://api.github.com/repos/WinterSnowfall/d7vk/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "2.0"
 comments = """
 d7vk — releases/latest "vX.Y" is the published line (tags[0] is unreleased).
 """
@@ -582,6 +612,7 @@ url = "https://api.github.com/repos/jp7677/dxvk-nvapi/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "0.9.2"
 comments = """
 dxvk-nvapi — tag "vX.Y.Z".
 """
@@ -593,6 +624,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "0.19.0"
 comments = """
 bentoolkit — releases/latest devolve tag_name "vX.Y.Z"; o transform tira o "v",
 senao o bump gera um PV invalido (bentoolkit-v0.17.0).
@@ -604,6 +636,7 @@ url = "https://api.github.com/repos/sqlcipher/sqlcipher/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "4.17.0"
 comments = """
 SQLCipher — tag "vX.Y.Z".
 """
@@ -614,6 +647,7 @@ url = "https://api.github.com/repos/AcademySoftwareFoundation/Imath/releases/lat
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "3.2.2"
 comments = """
 Imath — tag "vX.Y.Z".
 """
@@ -624,6 +658,7 @@ url = "https://api.github.com/repos/AyatanaIndicators/libayatana-appindicator-gl
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "2.0.3"
 comments = """
 libayatana-appindicator-glib — no releases (404); tags[0] is bare "X.Y.Z".
 """
@@ -634,6 +669,7 @@ url = "https://api.github.com/repos/getsentry/sentry-native/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "0.16.1"
 comments = """
 sentry-native — tag bare "X.Y.Z".
 """
@@ -644,6 +680,7 @@ url = "https://api.github.com/repos/tsyrogit/zxcvbn-c/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "2.6-r1"
 comments = """
 zxcvbn-c — tag "vX.Y".
 """
@@ -654,6 +691,7 @@ url = "https://api.github.com/repos/conda/conda/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "26.7.0"
 comments = """
 conda — tag bare "X.Y.Z".
 """
@@ -665,6 +703,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
+version = "0.12.1"
 comments = """
 uv (uv-bin) — tag bare "X.Y.Z".
 """
@@ -686,6 +725,7 @@ url = "https://api.github.com/repos/openai/codex/releases/latest"
 parser = "regex"
 pattern = '"tag_name":\s*"rust-v([0-9]+\.[0-9]+\.[0-9]+)"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "0.146.0"
 comments = """
 codex — tag "rust-vX.Y.Z" ("rust-" not strippable); regex extracts X.Y.Z from tag_name.
 """
@@ -697,6 +737,7 @@ parser = "regex"
 pattern = '"tag_name":\s*"rust-v([0-9]+\.[0-9]+\.[0-9]+)"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
+version = "0.146.0"
 comments = """
 codex-bin — same upstream tag "rust-vX.Y.Z"; regex on tag_name.
 """
@@ -707,6 +748,7 @@ url = "https://api.github.com/repos/nektos/act/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "0.2.89"
 comments = """
 act — GitHub release tag "vX.Y.Z" ("v" stripped by normalizer). Bentoo mirrors ahead
 of Gentoo (Gentoo max 0.2.64); no vendor-deps tarball, build fetches Go modules.
@@ -718,6 +760,7 @@ url = "https://api.github.com/repos/shiftkey/desktop/releases/latest"
 parser = "regex"
 pattern = '"tag_name":\s*"release-([0-9]+\.[0-9]+\.[0-9]+)'
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "3.4.13"
 comments = """
 github-desktop — tag "release-X.Y.Z-linuxN"; regex extracts clean X.Y.Z.
 """
@@ -728,6 +771,7 @@ url = "https://api.github.com/repos/FreeCAD/FreeCAD/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "1.1.3"
 comments = """
 FreeCAD — releases/latest bare "X.Y.Z" (avoids weekly-* snapshot tags).
 """
@@ -738,6 +782,7 @@ url = "https://api.github.com/repos/harfbuzz/harfbuzz/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "14.3.0"
 comments = """
 harfbuzz — release tag bare semver.
 """
@@ -748,6 +793,7 @@ url = "https://api.github.com/repos/v-novaltd/LCEVCdec/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "4.2.0"
 comments = """
 lcevc_dec — release tag bare semver.
 """
@@ -758,6 +804,7 @@ url = "https://api.github.com/repos/opencv/opencv/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "5.0.0"
 comments = """
 opencv — releases/latest bare semver (excludes 5.0.0-alpha prereleases).
 """
@@ -768,6 +815,7 @@ url = "https://api.github.com/repos/mltframework/shotcut/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "26.8.1"
 comments = """
 shotcut — tag "vX.Y.Z" ("v" stripped; releases/latest skips prereleases).
 """
@@ -778,6 +826,7 @@ url = "https://api.github.com/repos/netdata/netdata/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "2.10.4"
 comments = """
 netdata — tag "vX.Y.Z".
 """
@@ -789,6 +838,7 @@ parser = "regex"
 pattern = '"tag_name":\s*"bun-v([0-9]+\.[0-9]+\.[0-9]+)'
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
+version = "1.3.14"
 comments = """
 bun (bun-bin) — tag "bun-vX.Y.Z"; regex on tag_name.
 """
@@ -799,6 +849,7 @@ url = "https://api.github.com/repos/rustdesk/rustdesk/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "1.4.9"
 comments = """
 rustdesk — release tag bare semver.
 """
@@ -810,6 +861,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
+version = "1.4.9"
 comments = """
 rustdesk-bin — same upstream repo.
 """
@@ -821,6 +873,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
+version = "1.10.4"
 comments = """
 bisq (bisq-bin) — tag "vX.Y.Z".
 """
@@ -832,6 +885,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
+version = "2.1.11"
 comments = """
 bisq2 (bisq2-bin) — tag "vX.Y.Z".
 """
@@ -843,6 +897,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
+version = "0.32.5"
 comments = """
 ollama-bin — same upstream repo.
 """
@@ -871,6 +926,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "11.5.1"
 comments = """
 lemonade — GitHub release tag "vX.Y.Z" ("v" stripped). Built from source
 (CMake); the webapp node_modules distfile on distfiles.obentoo.org is NOT
@@ -885,6 +941,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "11.5.1"
 comments = """
 lemonade-bin — same upstream as sci-ml/lemonade, prebuilt "embeddable"
 tarball plus arch-independent data from the .deb.
@@ -896,6 +953,7 @@ url = "https://api.github.com/repos/bleachbit/bleachbit/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.0.2"
 comments = """
 bleachbit — tag "vX.Y.Z".
 """
@@ -906,6 +964,7 @@ url = "https://api.github.com/repos/flatpak/flatpak/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "1.18.0"
 comments = """
 flatpak — releases/latest is older stable; tags[0] tracks the newer line.
 """
@@ -916,6 +975,7 @@ url = "https://api.github.com/repos/fwupd/fwupd/releases/latest"
 parser = "regex"
 pattern = '"tag_name":\s*"([0-9]+\.[0-9]+\.[0-9]+)'
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "2.1.7"
 comments = """
 fwupd — tags alternate between "X.Y.Z" and "X.Y.Z-N" (re-release); regex captures X.Y.Z.
 Ebuild SRC_URI uses ${PV} (clean tag). A re-release (-N) needs a manual MY_PV in the ebuild.
@@ -927,6 +987,7 @@ url = "https://api.github.com/repos/flatpak/xdg-desktop-portal/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "1.22.1"
 comments = """
 xdg-desktop-portal — releases/latest older; tags[0] tracks the newer line.
 """
@@ -948,6 +1009,7 @@ url = "https://api.github.com/repos/brave/brave-browser/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "1.93.129"
 comments = """
 brave-browser — releases/latest is the stable channel (tag "vX.Y.Z").
 """
@@ -958,6 +1020,7 @@ url = "https://api.github.com/repos/vim/vim/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "9.2.0907"
 comments = """
 vim — no releases (404); tags[0] "vX.Y.ZZZZ".
 """
@@ -968,6 +1031,7 @@ url = "https://api.github.com/repos/vim/vim/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "9.2.0907"
 comments = """
 vim-core — same upstream repo as vim.
 """
@@ -977,6 +1041,7 @@ vim-core — same upstream repo as vim.
 url = "https://gitlab.com/api/v4/projects/ixion%2Fixion/repository/tags"
 parser = "json"
 path = "[0].name"
+version = "0.20.0-r1"
 comments = """
 libixion — default tag order ([0]=current); version sort is poisoned by a stray tag.
 
@@ -988,6 +1053,7 @@ GitLab / git-forge API  (/repository/tags -> [0].name, or regex when prefixed)
 url = "https://gitlab.com/api/v4/projects/orcus%2Forcus/repository/tags"
 parser = "json"
 path = "[0].name"
+version = "0.21.0"
 comments = """
 liborcus — default tag order ([0]=current); same stray-tag caveat as libixion.
 """
@@ -997,6 +1063,7 @@ liborcus — default tag order ([0]=current); same stray-tag caveat as libixion.
 url = "https://gitlab.com/api/v4/projects/mdds%2Fmdds/repository/tags"
 parser = "json"
 path = "[0].name"
+version = "3.2.1"
 comments = """
 mdds — default tag order; clean semver.
 """
@@ -1006,6 +1073,7 @@ mdds — default tag order; clean semver.
 url = "https://gitlab.gnome.org/api/v4/projects/GNOME%2FNetworkManager-openvpn/repository/tags"
 parser = "json"
 path = "[0].name"
+version = "1.12.5"
 comments = """
 networkmanager-openvpn — default (commit-recency) order; version sort returns ancient tags.
 """
@@ -1015,6 +1083,7 @@ networkmanager-openvpn — default (commit-recency) order; version sort returns 
 url = "https://code.videolan.org/api/v4/projects/videolan%2Fdav1d/repository/tags?order_by=version&sort=desc"
 parser = "json"
 path = "[0].name"
+version = "1.5.4"
 comments = """
 dav1d — version sort (semver limpo, sem prefixo); tarball oficial em
 downloads.videolan.org/pub/videolan/dav1d/<PV>/. Checar SONAME
@@ -1026,6 +1095,7 @@ downloads.videolan.org/pub/videolan/dav1d/<PV>/. Checar SONAME
 url = "https://code.videolan.org/api/v4/projects/videolan%2Fdav2d/repository/tags"
 parser = "json"
 path = "[0].name"
+version = "0.0.1"
 comments = """
 dav2d — default tag order (new project).
 """
@@ -1035,6 +1105,7 @@ dav2d — default tag order (new project).
 url = "https://gitlab.isc.org/api/v4/projects/isc-projects%2Fbind9/repository/tags?search=v9.20&order_by=version&sort=desc"
 parser = "json"
 path = "[0].name"
+version = "9.20.26"
 comments = """
 bind-tools — pinned to the 9.20 stable branch via search; "v" stripped.
 """
@@ -1044,6 +1115,7 @@ bind-tools — pinned to the 9.20 stable branch via search; "v" stripped.
 url = "https://gitlab.com/api/v4/projects/sane-project%2Fbackends/releases"
 parser = "json"
 path = "[0].tag_name"
+version = "1.4.0"
 comments = """
 sane-backends — releases endpoint, [0].tag_name plain semver.
 """
@@ -1053,6 +1125,7 @@ sane-backends — releases endpoint, [0].tag_name plain semver.
 url = "https://proxy.golang.org/gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/v2/@latest"
 parser = "json"
 path = "Version"
+version = "2.14.1"
 comments = """
 snowflake — gitlab.torproject.org recusa conexão do checker; o Go module proxy
 espelha as mesmas tags (Version = "vX.Y.Z") e é sempre alcançável.
@@ -1063,6 +1136,7 @@ espelha as mesmas tags (Version = "vX.Y.Z") e é sempre alcançável.
 url = "https://salsa.debian.org/api/v4/projects/debian-ayatana-team%2Fcmake-extras/repository/tags"
 parser = "regex"
 pattern = 'upstream/([0-9][0-9.]*)"'
+version = "1.10"
 comments = """
 cmake-extras — Debian repo interleaves debian/* and upstream/*; regex grabs upstream/.
 """
@@ -1072,6 +1146,7 @@ cmake-extras — Debian repo interleaves debian/* and upstream/*; regex grabs up
 url = "https://gitlab.freedesktop.org/api/v4/projects/xorg%2Fdriver%2Fxf86-video-qxl/repository/tags"
 parser = "regex"
 pattern = 'xf86-video-qxl-([0-9][0-9.]*)"'
+version = "0.1.6-r1"
 comments = """
 xf86-video-qxl — tags carry "xf86-video-qxl-" prefix; regex extracts the version.
 """
@@ -1081,6 +1156,7 @@ xf86-video-qxl — tags carry "xf86-video-qxl-" prefix; regex extracts the versi
 url = "https://gitlab.freedesktop.org/api/v4/projects/NetworkManager%2FNetworkManager/repository/tags?order_by=version&sort=desc&per_page=40"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
+version = "1.58.0"
 comments = """
 networkmanager — version sort + per_page=40; regex skips *-dev/*-rc, first stable X.Y.Z.
 """
@@ -1113,6 +1189,7 @@ Same rule/caveat as dev-libs/wayland. Live=1.26.0 > ebuild 1.25.91.
 url = "https://www.lua.org/download.html"
 parser = "regex"
 pattern = 'lua-([0-9]+\.[0-9]+\.[0-9]+)'
+version = "5.5.1"
 comments = """
 lua — download.html leads with the current "lua-X.Y.Z" link.
 
@@ -1124,6 +1201,7 @@ Project site / FTP / SourceForge / Launchpad
 url = "https://ftp.gnu.org/gnu/nettle/?C=M;O=D"
 parser = "regex"
 pattern = 'nettle-([0-9.]+)\.tar\.gz'
+version = "4.0"
 comments = """
 nettle — GNU FTP release dir sorted newest-first; file "nettle-X.Y.Z.tar.gz".
 """
@@ -1148,6 +1226,7 @@ subprojects"). Re-enable once download.qemu.org/qemu-<ver>.tar.xz is published.
 url = "https://www.blender.org/download/"
 parser = "regex"
 pattern = 'blender-([0-9]+\.[0-9]+\.[0-9]+)'
+version = "5.2.0"
 comments = """
 blender — download page; anchored to "blender-X.Y.Z".
 """
@@ -1167,6 +1246,7 @@ libffado — homepage leads with the current "FFADO / version X.Y.Z" (HTTP only)
 url = "https://gitlab.freedesktop.org/api/v4/projects/camera%2Flibcamera/repository/tags?per_page=5"
 parser = "regex"
 pattern = '"name":"v([0-9]+\.[0-9]+\.[0-9]+)"'
+version = "0.7.2"
 comments = """
 libcamera — gitlab.freedesktop.org tags (newest "vX.Y.Z" first); Anubis may need a retry.
 """
@@ -1176,6 +1256,7 @@ libcamera — gitlab.freedesktop.org tags (newest "vX.Y.Z" first); Anubis may ne
 url = "https://api.launchpad.net/1.0/ufw/0.36/releases"
 parser = "json"
 path = "entries[0].version"
+version = "0.36.2-r1"
 comments = """
 ufw — Launchpad "0.36" series releases API, newest-first.
 """
@@ -1196,6 +1277,7 @@ url = "https://api.github.com/repos/LibreOffice/libetonyek/tags?per_page=5"
 parser = "regex"
 pattern = 'libetonyek-([0-9]+\.[0-9]+\.[0-9]+)'
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "0.1.13-r1"
 comments = """
 libetonyek — GitHub mirror tags (newest-first); "libetonyek-X.Y.Z".
 """
@@ -1211,6 +1293,7 @@ commit_sha_path = "[0].id"
 base_from = "file"
 base_url = "https://gitlab.freedesktop.org/mesa/mesa/-/raw/main/VERSION"
 base_pattern = '^([0-9][0-9.]*)-devel'
+version = "26.3.0_pre20260804"
 comments = """
 mesa — commit-tracked on main; _pre suffix preserved from current ebuild.
 
@@ -1228,6 +1311,7 @@ commit_sha_path = "[0].id"
 base_from = "file"
 base_url = "https://gitlab.freedesktop.org/mesa/mesa/-/raw/main/VERSION"
 base_pattern = '^([0-9][0-9.]*)-devel'
+version = "26.3.0_pre20260804"
 comments = """
 mesa_clc — part of the mesa tree; same source/rule as media-libs/mesa.
 """
@@ -1244,6 +1328,7 @@ base_from = "file"
 base_url = "https://raw.githubusercontent.com/zed-industries/zed/main/crates/zed/Cargo.toml"
 base_pattern = '(?m)^version = "([0-9][0-9.]*)"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "1.15.0_pre20260804"
 comments = """
 zed — commit-tracked on main; _pre suffix preserved from current ebuild.
 """
@@ -1256,12 +1341,16 @@ parser = "json"
 path = "[0].commit.committer.date"
 transform = [['T.*', ""], ['-', ""]]
 commit_sha_path = "[0].sha"
+base_from = "none"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "0_p20260711"
 comments = """
 asus-ec-sensors — the single upstream tag (v0.1.0) is stale and board support
-lands as plain commits on master, so track master. PV base stays "0"; the _p
-suffix carries the commit date. The 40-hex COMMIT="..." in the ebuild is what
-the applier rewrites.
+lands as plain commits on master, so track master. base_from = "none" says
+there is no version to read anywhere: the Makefile derives one from
+`git describe`, falling back to a VERSION file the repo does not contain. PV
+base stays "0"; the _p suffix carries the commit date. The 40-hex COMMIT="..."
+in the ebuild is what the applier rewrites.
 """
 # END
 
@@ -1272,6 +1361,7 @@ path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
 series = '^[0-9.]+$'
+version = "1.13.2"
 comments = """
 zed-bin (stable channel) — releases/latest is the stable release by definition
 (prerelease=false); upstream tags it "vX.Y.Z" and the preview "vX.Y.Z-pre".
@@ -1296,6 +1386,7 @@ select = "max"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
 series = '_pre$'
+version = "1.14.2_pre"
 comments = """
 zed-bin (preview channel) — releases/latest never returns a prerelease, so the
 preview needs the full list: the pattern takes only "vX.Y.Z-pre" tags and the
@@ -1316,6 +1407,7 @@ base_from = "file"
 base_url = "https://raw.githubusercontent.com/sqlitebrowser/sqlitebrowser/master/CMakeLists.txt"
 base_pattern = '(?m)^\s+VERSION ([0-9][0-9.]*)'
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "3.13.99_p20260802"
 comments = """
 sqlitebrowser — commit-tracked on master (uses COMMIT= without quotes); date YYYYMMDD becomes _pDATE suffix.
 """
@@ -1331,6 +1423,7 @@ commit_sha_path = "[0].id"
 base_from = "file"
 base_url = "https://gitlab.freedesktop.org/mobile-broadband/libqmi/-/raw/main/meson.build"
 base_pattern = "(?m)^  version: '([0-9][0-9.]*)'"
+version = "1.39.1_pre20260728"
 comments = """
 libqmi — commit-tracked on main; _pre suffix preserved from current ebuild.
 """
@@ -1346,6 +1439,7 @@ commit_sha_path = "[0].id"
 base_from = "file"
 base_url = "https://gitlab.freedesktop.org/mobile-broadband/ModemManager/-/raw/main/meson.build"
 base_pattern = "(?m)^  version: '([0-9][0-9.]*)'"
+version = "1.25.95_p20260721"
 comments = """
 modemmanager — commit-tracked on main (GitLab); date YYYYMMDD becomes _pDATE suffix.
 """
@@ -1356,6 +1450,7 @@ url = "https://api.github.com/repos/google/breakpad/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"v([0-9]{4}\.[0-9]{2}\.[0-9]{2})"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "2024.02.16-r1"
 comments = """
 breakpad — upstream google/breakpad uses date tags "vYYYY.MM.DD".
 """
@@ -1372,6 +1467,7 @@ base_from = "tag"
 base_url = "https://api.github.com/repos/KhronosGroup/glslang/git/refs/tags"
 base_tag_pattern = '^vulkan-sdk-([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)$'
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "1.4.357.0_p20260803"
 comments = """
 glslang — commit-tracked on main; scans titles for vulkan-sdk-X.Y.Z.W to detect base bump.
 """
@@ -1388,6 +1484,7 @@ base_from = "tag"
 base_url = "https://api.github.com/repos/KhronosGroup/SPIRV-Headers/git/refs/tags"
 base_tag_pattern = '^vulkan-sdk-([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)$'
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "1.4.357.0_p20260729"
 comments = """
 spirv-headers — commit-tracked on main; scans titles for vulkan-sdk-X.Y.Z.W to detect base bump.
 """
@@ -1404,6 +1501,7 @@ base_from = "tag"
 base_url = "https://api.github.com/repos/KhronosGroup/SPIRV-Tools/git/refs/tags"
 base_tag_pattern = '^vulkan-sdk-([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)$'
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "1.4.357.0_p20260803"
 comments = """
 spirv-tools — commit-tracked on main; scans titles for vulkan-sdk-X.Y.Z.W to detect base bump.
 """
@@ -1420,6 +1518,7 @@ base_from = "tag"
 base_url = "https://api.github.com/repos/KhronosGroup/Vulkan-Headers/git/refs/tags"
 base_tag_pattern = '^v([0-9]+\.[0-9]+\.[0-9]+)$'
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "1.4.358_p20260731"
 comments = """
 vulkan-headers — commit-tracked on main; scans titles "Update for Vulkan-Docs X.Y.Z" to detect base bump.
 """
@@ -1436,6 +1535,7 @@ base_from = "file"
 base_url = "https://raw.githubusercontent.com/KhronosGroup/Vulkan-Tools/main/CMakeLists.txt"
 base_pattern = '(?m)^project\([A-Za-z_-]+ VERSION ([0-9][0-9.]*)'
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "1.4.357_p20260804"
 comments = """
 vulkan-tools — commit-tracked on main; scans titles "Update for Vulkan-Docs X.Y.Z" to detect base bump.
 """
@@ -1452,6 +1552,7 @@ base_from = "tag"
 base_url = "https://api.github.com/repos/KhronosGroup/Vulkan-Utility-Libraries/git/refs/tags"
 base_tag_pattern = '^v([0-9]+\.[0-9]+\.[0-9]+)$'
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "1.4.358_p20260803"
 comments = """
 vulkan-utility-libraries — commit-tracked on main, same shape as vulkan-headers.
 
@@ -1477,6 +1578,7 @@ base_from = "file"
 base_url = "https://raw.githubusercontent.com/KhronosGroup/Vulkan-ValidationLayers/main/CMakeLists.txt"
 base_pattern = '(?m)^project\([A-Za-z_-]+ VERSION ([0-9][0-9.]*)'
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "1.4.358_p20260804"
 comments = """
 vulkan-layers — commit-tracked on main (Vulkan-ValidationLayers); scans for "Update for Vulkan-Docs X.Y.Z".
 """
@@ -1493,6 +1595,7 @@ base_from = "file"
 base_url = "https://raw.githubusercontent.com/KhronosGroup/Vulkan-Loader/main/CMakeLists.txt"
 base_pattern = '(?m)^project\([A-Za-z_-]+ VERSION ([0-9][0-9.]*)'
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "1.4.358_p20260804"
 comments = """
 vulkan-loader — commit-tracked on main; scans for "Update for Vulkan-Docs X.Y.Z" to detect base bump.
 """
@@ -1633,6 +1736,7 @@ url = "https://api.github.com/repos/KDE/plasma-workspace/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 kameleon-qmk-helper -> KDE/plasma-workspace (anchor: overlay versions it as Plasma)
 """
@@ -1693,6 +1797,7 @@ url = "https://api.github.com/repos/KDE/kdeplasma-addons/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 kdeplasma-addons — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
 Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
@@ -2380,6 +2485,7 @@ url = "https://api.github.com/repos/KDE/plasma-workspace/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "6.7.4"
 comments = """
 spectacle -> KDE/plasma-workspace (anchor: overlay versions it as Plasma)
 """
@@ -2430,6 +2536,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-libs/gst-plugins-bad — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -2444,6 +2551,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-libs/gst-plugins-bad — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -2460,6 +2568,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-libs/gst-plugins-base — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -2474,6 +2583,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-libs/gst-plugins-base — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -2490,6 +2600,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-libs/gst-plugins-good — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -2504,6 +2615,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-libs/gst-plugins-good — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -2520,6 +2632,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-libs/gst-plugins-ugly — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -2534,6 +2647,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-libs/gst-plugins-ugly — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -2550,6 +2664,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-libs/gst-rtsp-server — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -2564,6 +2679,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-libs/gst-rtsp-server — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -2580,6 +2696,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-libs/gstreamer — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -2594,6 +2711,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-libs/gstreamer — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -2610,6 +2728,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-libs/gstreamer-editing-services — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -2624,6 +2743,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-libs/gstreamer-editing-services — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -2640,6 +2760,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 dev-python/gst-python — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -2654,6 +2775,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 dev-python/gst-python — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -2670,6 +2792,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-a52dec — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -2684,6 +2807,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-a52dec — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -2700,6 +2824,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-adaptivedemux2 — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -2714,6 +2839,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-adaptivedemux2 — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -2730,6 +2856,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-amr — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -2744,6 +2871,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-amr — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -2760,6 +2888,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-aom — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -2774,6 +2903,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-aom — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -2790,6 +2920,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-assrender — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -2804,6 +2935,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-assrender — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -2820,6 +2952,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-bluez — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -2834,6 +2967,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-bluez — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -2850,6 +2984,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-bs2b — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -2864,6 +2999,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-bs2b — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -2880,6 +3016,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-cairo — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -2894,6 +3031,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-cairo — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -2910,6 +3048,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-cdio — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -2924,6 +3063,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-cdio — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -2940,6 +3080,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-cdparanoia — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -2954,6 +3095,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-cdparanoia — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -2970,6 +3112,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-chromaprint — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -2984,6 +3127,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-chromaprint — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -3000,6 +3144,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-colormanagement — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -3014,6 +3159,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-colormanagement — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -3030,6 +3176,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-dash — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -3044,6 +3191,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-dash — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -3060,6 +3208,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-dtls — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -3074,6 +3223,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-dtls — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -3090,6 +3240,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-dts — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -3104,6 +3255,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-dts — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -3120,6 +3272,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-dv — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -3134,6 +3287,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-dv — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -3150,6 +3304,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-dvb — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -3164,6 +3319,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-dvb — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -3180,6 +3336,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-dvdread — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -3194,6 +3351,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-dvdread — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -3210,6 +3368,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-faac — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -3224,6 +3383,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-faac — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -3240,6 +3400,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-faad — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -3254,6 +3415,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-faad — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -3270,6 +3432,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-flac — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -3284,6 +3447,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-flac — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -3300,6 +3464,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-gdkpixbuf — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -3314,6 +3479,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-gdkpixbuf — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -3330,6 +3496,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-gtk — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -3344,6 +3511,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-gtk — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -3360,6 +3528,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-hls — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -3374,6 +3543,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-hls — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -3390,6 +3560,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-jack — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -3404,6 +3575,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-jack — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -3420,6 +3592,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-jpeg — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -3434,6 +3607,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-jpeg — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -3450,6 +3624,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-ladspa — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -3464,6 +3639,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-ladspa — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -3480,6 +3656,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-lame — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -3494,6 +3671,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-lame — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -3510,6 +3688,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-ldac — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -3524,6 +3703,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-ldac — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -3540,6 +3720,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-libav — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -3554,6 +3735,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-libav — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -3570,6 +3752,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-libde265 — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -3584,6 +3767,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-libde265 — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -3600,6 +3784,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-libpng — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -3614,6 +3799,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-libpng — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -3630,6 +3816,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-libvisual — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -3644,6 +3831,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-libvisual — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -3660,6 +3848,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-lv2 — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -3674,6 +3863,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-lv2 — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -3690,6 +3880,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-meta — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -3704,6 +3895,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-meta — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -3720,6 +3912,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-modplug — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -3734,6 +3927,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-modplug — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -3750,6 +3944,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-mpeg2dec — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -3764,6 +3959,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-mpeg2dec — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -3780,6 +3976,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-mpeg2enc — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -3794,6 +3991,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-mpeg2enc — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -3810,6 +4008,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-mpg123 — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -3824,6 +4023,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-mpg123 — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -3840,6 +4040,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-mplex — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -3854,6 +4055,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-mplex — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -3870,6 +4072,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-neon — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -3884,6 +4087,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-neon — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -3900,6 +4104,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-nvcodec — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -3914,6 +4119,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-nvcodec — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -3930,6 +4136,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-openaptx — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -3944,6 +4151,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-openaptx — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -3960,6 +4168,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-opencv — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -3974,6 +4183,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-opencv — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -3990,6 +4200,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-openh264 — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -4004,6 +4215,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-openh264 — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -4020,6 +4232,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-opus — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -4034,6 +4247,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-opus — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -4050,6 +4264,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-oss — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -4064,6 +4279,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-oss — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -4080,6 +4296,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-pulse — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -4094,6 +4311,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-pulse — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -4110,6 +4328,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-qt6 — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -4124,6 +4343,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-qt6 — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -4140,6 +4360,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-raw1394 — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -4154,6 +4375,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-raw1394 — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -4170,6 +4392,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-resindvd — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -4184,6 +4407,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-resindvd — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -4200,6 +4424,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-rtmp — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -4214,6 +4439,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-rtmp — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -4230,6 +4456,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-sbc — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -4244,6 +4471,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-sbc — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -4260,6 +4488,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-sctp — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -4274,6 +4503,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-sctp — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -4290,6 +4520,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-shout2 — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -4304,6 +4535,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-shout2 — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -4320,6 +4552,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-sidplay — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -4334,6 +4567,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-sidplay — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -4350,6 +4584,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-smoothstreaming — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -4364,6 +4599,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-smoothstreaming — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -4380,6 +4616,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-soundtouch — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -4394,6 +4631,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-soundtouch — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -4410,6 +4648,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-soup — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -4424,6 +4663,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-soup — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -4440,6 +4680,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-speex — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -4454,6 +4695,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-speex — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -4470,6 +4712,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-srt — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -4484,6 +4727,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-srt — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -4500,6 +4744,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-srtp — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -4514,6 +4759,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-srtp — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -4530,6 +4776,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-taglib — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -4544,6 +4791,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-taglib — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -4560,6 +4808,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-twolame — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -4574,6 +4823,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-twolame — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -4590,6 +4840,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-uvch264 — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -4604,6 +4855,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-uvch264 — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -4620,6 +4872,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-v4l2 — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -4634,6 +4887,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-v4l2 — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -4650,6 +4904,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-va — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -4664,6 +4919,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-va — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -4680,6 +4936,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-voaacenc — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -4694,6 +4951,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-voaacenc — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -4710,6 +4968,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-voamrwbenc — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -4724,6 +4983,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-voamrwbenc — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -4740,6 +5000,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-vpx — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -4754,6 +5015,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-vpx — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -4770,6 +5032,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-wavpack — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -4784,6 +5047,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-wavpack — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -4800,6 +5064,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-webp — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -4814,6 +5079,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-webp — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -4830,6 +5096,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-webrtc — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -4844,6 +5111,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-webrtc — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -4860,6 +5128,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-x264 — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -4874,6 +5143,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-x264 — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -4890,6 +5160,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-x265 — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -4904,6 +5175,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-x265 — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -4920,6 +5192,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-ximagesrc — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -4934,6 +5207,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-ximagesrc — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -4950,6 +5224,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
+version = "1.28.5"
 comments = """
 media-plugins/gst-plugins-zbar — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -4964,6 +5239,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
+version = "1.29.2"
 comments = """
 media-plugins/gst-plugins-zbar — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -4994,6 +5270,7 @@ pattern = 'nomachine-personal-edition_([0-9]+\.[0-9]+\.[0-9]+)_[0-9]+_amd64\.deb
 type = "bin"
 aux_var = "MY_BUILD"
 aux_pattern = 'nomachine-personal-edition_[0-9.]+_([0-9]+)_amd64\.deb'
+version = "10.0.57"
 comments = """
 nxplayer — NoMachine download page is SSR; regex on the .deb filename gives the
 current version (single version on page → deterministic first match).
@@ -5011,6 +5288,7 @@ url = "https://www.freeoffice.com/en/download/applications"
 parser = "regex"
 pattern = 'Revision ([0-9]+)'
 type = "bin"
+version = "1234"
 comments = """
 freeoffice — download page states "Revision NNNN | date" (the ebuild's PV); SSR.
 """
@@ -5021,6 +5299,7 @@ url = "https://download.foldingathome.org/releases/public/fah-client/meta.json"
 parser = "regex"
 pattern = 'fah-client_([0-9]+\.[0-9]+\.[0-9]+)'
 type = "bin"
+version = "8.5.6"
 comments = """
 foldingathome — fah-client meta.json lists only the current release set; every
 filename carries the same version, so the first regex match is the current one.
@@ -5032,6 +5311,7 @@ url = "https://developer.nvidia.com/cuda-downloads?target_os=Linux&target_arch=x
 parser = "regex"
 pattern = 'cuda_([0-9]+\.[0-9]+\.[0-9]+)_'
 type = "bin"
+version = "13.3.1"
 comments = """
 nvidia-cuda-toolkit — the cuda-downloads page is SSR; the runfile link
 "cuda_X.Y.Z_<driver>_linux.run" carries the current toolkit version (distro in
@@ -5045,6 +5325,7 @@ parser = "json"
 path = "[0].name"
 transform = [['-', "."]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "7.1.2.29"
 comments = """
 imagemagick — GitHub tags newest-first ("7.1.2-24"); transform hyphen→dot so it
 compares against the ebuild "7.1.2.24" (was SKIP: "not comparable").
@@ -5063,6 +5344,7 @@ url = "https://godotengine.org/download/archive/"
 parser = "regex"
 pattern = '(\d+\.\d+(?:\.\d+)?-(?:stable|beta\d*|rc\d*|dev\d*))'
 transform = [['-stable', ""], ['-beta', "_beta"], ['-rc', "_rc"], ['-dev', "_alpha"]]
+version = "4.8_alpha2"
 comments = """
 godot — download archive lists newest first; transform the upstream suffix to
 Gentoo form (-stable→bare, -beta→_beta, -rc→_rc, -dev→_alpha).
@@ -5114,6 +5396,7 @@ parser = "regex"
 pattern = 'href="([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)/"'
 select = "max"
 series = '^26\.2\.'
+version = "26.2.5.2"
 comments = """
 libreoffice (stable line) — old/ lists every 4-segment release directory of both
 release lines, so series pins this entry to 26.2.x and select=max takes the
@@ -5133,6 +5416,7 @@ pattern = 'href="([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)/"'
 select = "max"
 suffix = "_pre"
 series = '^26\.8\.'
+version = "26.8.0.1_pre"
 comments = """
 libreoffice (testing line) — same index as @stable, pinned to 26.8.x. Upstream
 numbers a testing release exactly like a final one (download.documentfoundation
@@ -5151,6 +5435,7 @@ parser = "regex"
 pattern = 'href="([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)/"'
 select = "max"
 series = '^26\.2\.'
+version = "26.2.5.1"
 comments = """
 libreoffice-l10n (stable line) — follows the core release, so it reads the same
 archive index rather than the headless src/ probe: that probe returns whatever
@@ -5166,6 +5451,7 @@ pattern = 'href="([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)/"'
 select = "max"
 suffix = "_pre"
 series = '^26\.8\.'
+version = "26.8.0.1_pre"
 comments = """
 libreoffice-l10n (testing line) — reads the same archive index as
 app-office/libreoffice@testing, and for the same reason: it follows the core
@@ -5190,6 +5476,7 @@ pattern = 'href="([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)/"'
 select = "max"
 suffix = "_pre"
 series = '^26\.8\.'
+version = "26.8.0.1_pre"
 comments = """
 myspell-hu — PV=LO_VER; the hu langpack ships in the LibreOffice archive tree the
 ebuild's SRC_URI pulls from, so it reads the same index and follows the same
@@ -5208,6 +5495,7 @@ the distfile name is unchanged. Promote together with the two libreoffice record
 url = "https://antigravity.google/download"
 parser = "script"
 script = "@antigravity.js"
+version = "2.1.1.6123990880747520"
 comments = """
 Antigravity IDE — the original VS Code fork (NOT "Antigravity 2.0", the separate
 desktop hub). /download is an Angular SPA (empty raw HTML); the script renders it
@@ -5219,6 +5507,7 @@ and reads the IDE's edgedl link, returning PV "X.Y.Z.BUILD" (e.g. 2.0.3.62425964
 url = "https://antigravity.google/download"
 parser = "script"
 script = "@antigravity-hub.js"
+version = "2.5.0.5471848641724416"
 comments = """
 Antigravity 2.0 — the standalone desktop hub (agent orchestration), a separate
 product from the IDE above. Same Angular SPA page; the script reads the GCS
@@ -5232,6 +5521,7 @@ parser = "regex"
 pattern = 'warsaw_([0-9.]+-[0-9]+)_amd64\.deb'
 transform = [['-', "."]]
 headers = { "Range" = "bytes=0-2097151" }
+version = "2.21.5.1"
 comments = """
 Warsaw — banking security blob. The download URL is version-less
 (warsaw_setup64.run), but the .run is a ZIP whose embedded Debian package name
@@ -5272,6 +5562,7 @@ url = "https://github.com/pendulum-project/ntpd-rs/releases.atom"
 parser = "regex"
 pattern = 'Repository/[0-9]+/v([0-9]+\.[0-9]+\.[0-9]+)</id>'
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "1.9.0"
 comments = """
 ntpd-rs — pendulum-project/ntpd-rs. CANNOT use releases/latest: upstream mismarks the
 "v2.0.0-alpha.*" pre-release as non-prerelease, so /latest returns the alpha. api.github.com
@@ -5290,6 +5581,7 @@ url = "https://api.github.com/repos/servo/servo/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "0.4.0"
 comments = """
 servo — GitHub release tag "vX.Y.Z" ("v" stripped). SRC_URI pulls the src-vendored tarball
 from the same release. Live=0.3.0. (A bump must re-check the mozjs/xargs build gotchas.)
@@ -5301,6 +5593,7 @@ url = "https://api.github.com/repos/redis/redis/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "8.10.0"
 comments = """
 redis/redis official Releases; tag is bare X.Y.Z (no "v"), matching the SRC_URI
 archive tag and PV. Live latest=8.8.0 (prerelease=false) — the 8.x line, not a Valkey fork.
@@ -5312,6 +5605,7 @@ url = "https://api.github.com/repos/lucascouts/claude-agent-tui/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "0.8.0"
 comments = """
 Renamed from dev-util/claude-agent-tui (commit e8a05fdc: del old ebuild + add
 claude-agent-acp-tui, same upstream repo lucascouts/claude-agent-tui, same PV).
@@ -5337,6 +5631,7 @@ url = "https://api.github.com/repos/dyne/frei0r/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "3.2.3"
 comments = """
 dyne/frei0r; SRC_URI pulls archive/refs/tags/v${PV}.tar.gz, so track git tags (newest=[0]).
 Leading "v" stripped. Use /tags not releases/latest: the latter lags (reports 3.2.1 while
@@ -5352,6 +5647,7 @@ parser = "json"
 path = "[0].name"
 transform = [['^v', ""], ['-[0-9]+$', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "2.13"
 comments = """
 mt7927-dkms — jetm/mediatek-mt7927-dkms tags "vMAJOR.MINOR-N"; transform strips "v" and the
 trailing "-N" (the ebuild carries N via MY_PV="${PV}-1"). Live [0]=v2.13-1 -> 2.13 > ebuild 2.11.
@@ -5378,6 +5674,7 @@ of the Python binding needs no re-verification.
 url = "https://pypi.org/pypi/pyee/json"
 parser = "json"
 path = "info.version"
+version = "13.0.1"
 comments = """
 inherit pypi; PyPI info.version is canonical. Live=13.0.1 == current PV (no prefix to strip).
 """
@@ -5387,6 +5684,7 @@ inherit pypi; PyPI info.version is canonical. Live=13.0.1 == current PV (no pref
 url = "https://pypi.org/pypi/toml/json"
 parser = "json"
 path = "info.version"
+version = "0.10.2"
 comments = """
 toml — MUST use PyPI, not GitHub: uiri/toml has no releases and its /tags [0] is v0.6.5
 (non-semver order, project dead since 0.10.2/2020). info.version is canonical. Live=0.10.2.
@@ -5398,6 +5696,7 @@ url = "https://crates.io/api/v1/crates/cargo-deny"
 parser = "json"
 path = "crate.max_stable_version"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "0.20.2"
 comments = """
 crates.io max_stable_version returns bare X.Y.Z (no prefix), matching PV/tag exactly.
 Live=0.19.9 > ebuild 0.19.8 (crates.io rejects default UA — header required). A real bump
@@ -5425,6 +5724,7 @@ url = "https://sources.debian.org/api/src/xorg-server/"
 parser = "regex"
 pattern = '"version":\s*"2:([0-9]+\.[0-9]+\.[0-9]+-[0-9]+)"'
 transform = [['-', "."]]
+version = "21.1.23.1"
 comments = """
 xvfb-run PV = xorg-server X.Y.Z plus the Debian diff revision W => X.Y.Z.W; SRC_URI fetches
 mirror://debian .../xorg-server_X.Y.Z-W.diff.gz. The Debian sources API JSON lists versions
@@ -5520,6 +5820,7 @@ parser = "regex"
 pattern = 'webkitgtk-(2\.52\.[0-9]+)\.tar\.xz'
 select = "max"
 revision = 410
+version = "2.52.5-r411"
 comments = """
 revision is the SLOT's BASE revision, not whatever the current ebuild carries.
 -r411 is a revbump WITHIN a PV; a PV change resets it to the base, exactly as
@@ -5543,6 +5844,7 @@ parser = "regex"
 pattern = 'webkitgtk-(2\.52\.[0-9]+)\.tar\.xz'
 select = "max"
 revision = 600
+version = "2.52.5-r601"
 comments = """
 600 is the base for this SLOT (::gentoo ships -r600 for every PV and -r601 as
 the revbump), and the overlay now follows it: the ebuild is
@@ -5580,6 +5882,7 @@ url = "https://api.github.com/repos/aquasecurity/trivy/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "0.73.0"
 comments = """
 Trivy — GitHub releases/latest tag "vX.Y.Z" (leading v stripped). Live=v0.72.0.
 
@@ -5593,6 +5896,7 @@ url = "https://api.github.com/repos/google/osv-scanner/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "2.4.0"
 comments = """
 OSV-Scanner — GitHub releases/latest tag "vX.Y.Z" (v stripped). Live=v2.4.0.
 """
@@ -5604,6 +5908,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
+version = "1.26.0"
 comments = """
 Opengrep (LGPL fork of Semgrep CE) — GitHub releases/latest tag "vX.Y.Z"
 (v stripped). SRC_URI pulls the bare per-arch/libc release binaries
@@ -5616,6 +5921,7 @@ url = "https://api.github.com/repos/gitleaks/gitleaks/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "8.30.1"
 comments = """
 gitleaks — GitHub releases/latest tag "vX.Y.Z" (v stripped). Ebuild inherits
 git-r3 for deps but PV is a concrete tag. Live=v8.30.1.
@@ -5639,6 +5945,7 @@ url = "https://api.github.com/repos/lucascouts/claude-agent-acp-plus/releases/la
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "0.5.0"
 comments = """
 claude-agent-acp-plus — GitHub releases/latest tag "vX.Y.Z" (v stripped).
 SRC_URI releases/download/v${PV}/${P}-bundle.tar.gz. Live=v0.2.0.
@@ -5650,6 +5957,7 @@ url = "https://api.github.com/repos/telegramdesktop/tdesktop/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "7.0.8"
 comments = """
 Telegram Desktop — GitHub releases/latest tag "vX.Y.Z" (v stripped). Verified
 2026-07-24: releases/latest correctly skips the beta prereleases upstream also
@@ -5671,6 +5979,7 @@ dry-run the PATCHES array against the new tarball after an auto-bump.
 url = "https://pypi.org/pypi/ansible/json"
 parser = "json"
 path = "info.version"
+version = "14.2.0"
 comments = """
 Ansible — PyPI info.version (community package); check resolves 14.1.0 = ebuild.
 NOTE: PyPI's info.version for the ansible community package can occasionally lag
@@ -5683,6 +5992,7 @@ url = "https://api.github.com/repos/ansible/ansible/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "2.21.2"
 comments = """
 ansible-core — GitHub releases/latest tag "vX.Y.Z" (v stripped). Verified
 2026-08-02: rc prereleases live on the same repo (v2.21.2rc1) but are
@@ -5711,6 +6021,7 @@ pattern = '"tag_name":"Audacity-([0-9]+\.[0-9]+\.[0-9]+-beta-[0-9]+)"'
 transform = [['-beta-', "_beta"]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
+version = "4.0.0_beta2"
 comments = """
 Audacity (AppImage) — tracks the 4.x BETA line, not stable. releases/latest
 would return the newest STABLE (3.7.x), so read the full /releases list and
@@ -5723,6 +6034,7 @@ stable/alpha entries); transform "-beta-"->"_beta" yields PV=4.0.0_beta2.
 url = "https://storage.googleapis.com/flutter_infra_release/releases/releases_linux.json"
 parser = "regex"
 pattern = '"channel": "stable",\s+"version": "([0-9]+\.[0-9]+\.[0-9]+)"'
+version = "3.44.8"
 comments = """
 Flutter — official releases_linux.json (pretty-printed, newest-first). The
 current_release.stable is a hash, not a version, so anchor the regex on the
@@ -5748,6 +6060,7 @@ url = "https://codeberg.org/api/v1/repos/librewolf/source/releases?page=1&limit=
 parser = "json"
 path = "[0].tag_name"
 transform = [['-', "_p"]]
+version = "153.0.3_p1"
 comments = """
 LibreWolf — Codeberg releases API do repo "source", newest-first tag_name.
 O endpoint generic packages estoura o timeout, e o /tags passou a dar TLS
@@ -5784,6 +6097,7 @@ url = "https://api.github.com/repos/ggml-org/whisper.cpp/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "1.9.1"
 comments = """
 whisper-cpp — tag "vX.Y.Z"; the leading v is stripped by the normalizer.
 
@@ -5798,6 +6112,7 @@ url = "https://api.github.com/repos/microsoft/onnxruntime/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "1.28.0"
 comments = """
 onnxruntime — tag "vX.Y.Z". Verified 2026-07-19: releases/latest is v1.27.1
 and is not flagged prerelease, so latest tracks the stable line.
@@ -5810,6 +6125,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
+version = "1.28.0"
 comments = """
 onnxruntime-bin — same upstream repo as the source package; must stay
 version-aligned with it.
@@ -5821,6 +6137,7 @@ url = "https://api.github.com/repos/dcleblanc/SafeInt/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "3.0.28a"
 comments = """
 safeint — tag is a bare "3.0.28a" with NO v prefix, and carries a trailing
 letter. Pulled in as a hard dependency of sci-libs/onnxruntime.
@@ -5832,6 +6149,7 @@ url = "https://api.github.com/repos/dmlc/dlpack/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "1.3"
 comments = """
 dlpack — tag "vX.Y". Pulled in as a hard dependency of sci-libs/onnxruntime.
 """
@@ -5877,15 +6195,18 @@ parser = "json"
 path = "commit.committer.date"
 transform = [['T.*', ""], ['-', ""]]
 commit_sha_path = "sha"
+base_from = "none"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "0_pre20260804"
 comments = """
-ik_llama-cpp — upstream publishes no usable release series.  Verified
-2026-07-19: the repo has exactly ONE tag, "t0002" (prerelease, 2025-07-22),
-roughly a year behind an actively developed HEAD, and releases/latest 404s
-because that lone release is flagged prerelease.  A tags-based probe reports
-`"t0002" not comparable to current 0_pre20260718` on every run, so this
-tracks the default branch's committer date instead, which IS the ebuild's
-versioning scheme (0_pre<YYYYMMDD>).
+ik_llama-cpp — base_from = "none": upstream publishes no usable release
+series.  Verified 2026-07-19 and again 2026-08-04: the repo has exactly ONE
+tag, "t0002" (prerelease, 2025-07-22), roughly a year behind an actively
+developed HEAD, and releases/latest 404s because that lone release is flagged
+prerelease.  CMakeLists declares project() with no VERSION either.  A
+tags-based probe reports `"t0002" not comparable to current 0_pre20260718` on
+every run, so this tracks the default branch's committer date instead, which
+IS the ebuild's versioning scheme (0_pre<YYYYMMDD>).
 
 track = "commit" is what makes this auto-appliable, and it replaced hold = true
 on 2026-07-26.  Two things had to be true for that, and neither was before:
