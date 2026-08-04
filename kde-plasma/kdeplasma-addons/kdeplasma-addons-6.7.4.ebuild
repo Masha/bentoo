@@ -19,7 +19,10 @@ RESTRICT="test" # bug 727846, +missing selenium-webdriver-at-spi
 
 REQUIRED_USE="qmk? ( amd64 )" # kameleon-qmk-helper only keyworded on amd64
 
-PATCHES=( "${FILESDIR}"/${P}-optional-corrosion.patch )
+# Deliberately ${PN}, not ${P}: this patch has been byte-identical since 6.6.90
+# and a version in its name only means every bump must rename the file by hand.
+# 6.7.4 shipped without that rename and died in src_prepare.
+PATCHES=( "${FILESDIR}"/${PN}-optional-corrosion.patch )
 
 DEPEND="
 	>=dev-qt/qtbase-${QTMIN}:6[dbus,gui,network,widgets]

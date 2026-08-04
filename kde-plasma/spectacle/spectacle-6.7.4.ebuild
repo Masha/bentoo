@@ -66,7 +66,10 @@ BDEPEND="
 	virtual/pkgconfig
 "
 
-PATCHES=( "${FILESDIR}/${P}-opencv5.patch" )
+# Deliberately ${PN}, not ${P}: this patch has been byte-identical since 6.7.1
+# and a version in its name only means every bump must rename the file by hand.
+# 6.7.4 shipped without that rename and would die in src_prepare.
+PATCHES=( "${FILESDIR}/${PN}-opencv5.patch" )
 
 src_configure() {
 	local mycmakeargs=(
