@@ -38,7 +38,9 @@ RUST_MIN_VER="1.95.0"
 
 # Tag of the crate tarball published by the crate-dist fork
 # (gentoo-zh-drafts/codex); it tracks the upstream release for this version.
-MY_CRATES_TAG="rust-v${PV}"
+# No tarball was published for rust-v0.146.1; its Cargo.lock is identical to
+# rust-v0.146.0, so we reuse that one.
+MY_CRATES_TAG="rust-v0.146.0"
 
 # python3 .github/scripts/rusty_v8_bazel.py resolved-v8-crate-version
 RUSTY_V8_TAG="147.4.0"
