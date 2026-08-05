@@ -1361,6 +1361,7 @@ CRATES="
 	weezl@0.1.10
 	wgpu-core-deps-apple@29.0.4
 	wgpu-core-deps-emscripten@29.0.4
+	wgpu-core-deps-wasm@29.0.4
 	wgpu-core-deps-windows-linux-android@29.0.4
 	wgpu-core@29.0.4
 	wgpu-hal@29.0.4
