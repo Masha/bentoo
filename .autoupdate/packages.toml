@@ -178,7 +178,7 @@ url = "https://api2.cursor.sh/updates/api/download/stable/linux-x64/cursor"
 parser = "json"
 path = "version"
 commit_sha_path = "commitSha"
-version = "3.14.7"
+version = "3.14.27"
 comments = """
 Cursor — official download API; "version" is the full version. commitSha is the
 per-release BUILD_ID embedded in SRC_URI; the applier substitutes it into the
@@ -897,7 +897,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "0.32.5"
+version = "0.32.6"
 comments = """
 ollama-bin — same upstream repo.
 """
@@ -909,7 +909,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^b(\d+)$', "0_pre$1"]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0_pre10288"
+version = "0_pre10289"
 comments = """
 llama-cpp — upstream tags builds "bNNNN" (no semver); the ebuild carries them as
 the 0_pre<build> snapshot scheme and bridges back with MY_PV="b${PV#0_pre}", so
@@ -926,7 +926,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "11.5.1"
+version = "11.5.2"
 comments = """
 lemonade — GitHub release tag "vX.Y.Z" ("v" stripped). Built from source
 (CMake); the webapp node_modules distfile on distfiles.obentoo.org is NOT
@@ -941,7 +941,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "11.5.1"
+version = "11.5.2"
 comments = """
 lemonade-bin — same upstream as sci-ml/lemonade, prebuilt "embeddable"
 tarball plus arch-independent data from the .deb.
@@ -1009,7 +1009,7 @@ url = "https://api.github.com/repos/brave/brave-browser/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.93.129"
+version = "1.93.132"
 comments = """
 brave-browser — releases/latest is the stable channel (tag "vX.Y.Z").
 """
@@ -5725,7 +5725,7 @@ url = "https://sources.debian.org/api/src/xorg-server/"
 parser = "regex"
 pattern = '"version":\s*"2:([0-9]+\.[0-9]+\.[0-9]+-[0-9]+)"'
 transform = [['-', "."]]
-version = "21.1.23.1"
+version = "21.1.24.1"
 comments = """
 xvfb-run PV = xorg-server X.Y.Z plus the Debian diff revision W => X.Y.Z.W; SRC_URI fetches
 mirror://debian .../xorg-server_X.Y.Z-W.diff.gz. The Debian sources API JSON lists versions
@@ -5947,7 +5947,7 @@ url = "https://api.github.com/repos/lucascouts/claude-agent-acp-plus/releases/la
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.5.0"
+version = "0.5.1"
 comments = """
 claude-agent-acp-plus — GitHub releases/latest tag "vX.Y.Z" (v stripped).
 SRC_URI releases/download/v${PV}/${P}-bundle.tar.gz. Live=v0.2.0.
