@@ -30,12 +30,18 @@
 #
 # Exit status:
 #   0  the sweep found nothing to act on, or every self-test assertion passed
-#   1  a divergence needing action was found, or a self-test assertion failed
+#   1  an ALIGN or UNDOCUMENTED divergence was found, or a self-test assertion
+#      failed. JUSTIFIED and REDUNDANT do not fail the run: the first is a
+#      decision already recorded, the second is remediation tracked elsewhere
 #   2  a precondition or a usage error - nothing was compared
-#   3  the pipeline is still a skeleton; some stage is not implemented yet.
-#      Temporary, and gone once the last stage below is filled in.
 
 set -euo pipefail
+
+# Every glob below is a listing of a package directory or a cache directory. An
+# unmatched pattern must expand to nothing rather than to itself: a directory
+# holding no .ebuild is precisely how a non-package is recognised, and the
+# literal string "…/*.ebuild" would be counted as one ebuild instead of none.
+shopt -s nullglob
 
 ### where things live ################################################
 
@@ -150,20 +156,91 @@ check_preconditions() {
 	done
 }
 
+### versions #########################################################
+#
+# Everything the baseline selector needs to know about a version string, and
+# nothing else. A version here is always the part of PF after "<pn>-", so it
+# carries the revision too: 2.46.1-r1, not 2.46.1.
+
+# version_is_live <version>
+# Whether the version marks a VCS ebuild rather than a release.
+#
+# This is the single most consequential predicate in the script. Live versions
+# sort above every real one, and a first pass that let them into the version
+# sort reported 34 packages as behind ::gentoo when none are (design.md).
+#
+# It matches more than the bare 9999 and 99999999 that R2.4 names, because
+# ::gentoo also ships per-branch live ebuilds - sys-devel/binutils-2.46.9999
+# and media-gfx/blender-{4.5,5.0}.9999 are in the shared set today - and those
+# are live by exactly the same convention. Measured 2026-08-06: matching the
+# two literal forms only would hand blender-5.2.0 the baseline 5.0.9999 and
+# binutils-2.47 the baseline 2.46.9999, so two ebuilds would be compared
+# against a git checkout's metadata. Widening the rule changes those two
+# baselines to 5.0.0 and 2.46.1-r1 and moves no other row: the exact /
+# same-series / cross-series split is 76 / 33 / 210 either way.
+version_is_live() {
+	# Read as: an optional dotted prefix, then a component of nothing but 9s,
+	# then an optional revision, then end. So 9999, 99999999, 9999-r1 and
+	# 2.46.9999 are live and 2.46.1-r1 is not.
+	[[ $1 =~ ^([0-9._]+\.)?9{4,}(-r[0-9]+)?$ ]]
+}
+
+# version_series <version>
+# The major.minor series the version belongs to, in VERSION_SERIES.
+#
+# Only the leading numeric run counts, so 1.16.0_pre20260806 is series 1.16 and
+# 0_pre10291 is series 0. A version with a single component is its own series.
+#
+# Assigns rather than prints: it is called for every ::gentoo candidate of every
+# ebuild that has no exact match, and a command substitution there costs a fork
+# each time - some 2400 of them on a full sweep.
+VERSION_SERIES=""
+version_series() {
+	local version=$1 numeric major rest
+
+	# Cut at the first character that is neither a digit nor a dot: that drops
+	# _pre20260806, -r1 and anything else Gentoo suffixes a version with.
+	numeric=${version%%[!0-9.]*}
+	numeric=${numeric%.}
+
+	if [[ -z ${numeric} ]]; then
+		VERSION_SERIES=${version}
+		return 0
+	fi
+
+	major=${numeric%%.*}
+	rest=${numeric#*.}
+
+	if [[ ${rest} == "${numeric}" ]]; then
+		VERSION_SERIES=${major}
+	else
+		VERSION_SERIES="${major}.${rest%%.*}"
+	fi
+}
+
+# highest_version <version>...
+# The greatest of the versions given, by sort -V.
+#
+# KNOWN GAP, stated where it is used rather than discovered later: sort -V is
+# GNU version sort, not Gentoo's ver_test. They disagree on suffixed versions -
+# Gentoo orders 1.0_rc1 BELOW 1.0, sort -V puts it above. Measured 2026-08-06:
+# three shared packages carry a suffixed ::gentoo version and in none of them
+# does the disagreement change the version picked, so the sweep is unaffected
+# today. design.md specifies sort -V; a package where it starts to matter shows
+# up as a baseline that looks wrong for a reason this comment explains.
+highest_version() {
+	printf '%s\n' "$@" | sort -V | tail -n1
+}
+
 ### pipeline #########################################################
 #
-# One function per stage, in execution order, each an obvious seam. Every stage
-# is declared here and implemented later; until then it registers itself as
-# pending so that an incomplete run can never be mistaken for a clean one.
-
-PENDING_STAGES=()
-
-# stage_pending <stage name>
-stage_pending() {
-	local stage=$1
-	printf '  [PENDING] %s\n' "${stage}"
-	PENDING_STAGES+=( "${stage}" )
-}
+# One function per stage, in execution order, each an obvious seam.
+#
+# While the stages were being filled in one at a time, each unimplemented one
+# registered itself as pending and the sweep exited 3 rather than 0, so that a
+# skeleton run could never be mistaken for a clean tree. All seven are
+# implemented now, so that scaffolding is gone and the exit contract in
+# sweep_exit_code is the real one.
 
 ### what the stages publish ##########################################
 #
@@ -173,17 +250,29 @@ stage_pending() {
 # still be green with every stage below deleted, and would be testing coreutils
 # instead of this script.
 #
-# All of it is empty until the stage named beside each one is implemented,
-# which is precisely why all eleven assertions are red today.
+# Each one stays empty until the stage named beside it is implemented, which is
+# why an assertion reading it is red until then. Stages 1 to 3 are filled in;
+# the six assertions that read stages 4 to 6 are still red, and correctly so.
 
 PARITY_SHARED_PACKAGES=()  # <category>/<pn> present in both trees      - stage 1
 PARITY_SCOPE_EBUILDS=()    # <category>/<pf>, overlay side, in scope    - stage 1
+PARITY_EXCLUDED=()         # <category>/<pn> TAB <why it is not compared>
+                           #                                           - stage 1
 PARITY_BASELINES=()        # <category>/<pf> TAB <baseline PV> TAB <distance>
                            #                                           - stage 2
 PARITY_BEHIND=()           # <category>/<pn> whose overlay PV trails    - stage 2
 PARITY_MD5_COVERED=()      # <category>/<pf> cached on BOTH sides       - stage 3
 PARITY_IDENTICAL=()        # <category>/<pf> byte-identical to baseline - stage 6
 PARITY_ROWS=()             # one divergence row per (ebuild, axis)      - stages 4-6
+PARITY_ECLASS_DEFINITIONAL=()
+                           # <eclass> TAB <why it is not a finding>     - stage 5
+
+# <category>/<pf> -> <pn>, for every ebuild in scope. Published by stage 1 and
+# read by every stage after it, because PN cannot be recovered from PF alone:
+# net-libs/webkit-gtk-2.52.5-r411 splits at the second hyphen, not the first,
+# and only the directory the ebuild was found in says so. Stage 1 knows it for
+# free; anything downstream would have to guess.
+declare -A PARITY_EBUILD_PN=()
 
 # A PARITY_ROWS entry carries the columns parity-data.tsv carries, tab
 # separated, in this order (design.md -> sub-task 6.1):
@@ -209,52 +298,1957 @@ PARITY_ROWS=()             # one divergence row per (ebuild, axis)      - stages
 # the entire seam.
 declare -A PARITY_TAG_SOURCE=()
 
+# filter_selects <category/pn>
+# Whether the package survives FILTER. An empty filter selects everything, a
+# filter with no slash names a whole category, one with a slash names a single
+# package. Shape was already validated by validate_filter.
+filter_selects() {
+	local key=$1 scope
+
+	if [[ -z ${FILTER} ]]; then
+		return 0
+	fi
+
+	if [[ ${FILTER} == */* ]]; then
+		scope=${key}
+	else
+		scope=${key%%/*}
+	fi
+
+	[[ ${scope} == "${FILTER}" ]]
+}
+
 # Stage 1. Enumerate the overlay's packages, honouring FILTER, and split them
 # into those ::gentoo also carries and those it does not. Must fail loudly when
 # a filter matches zero packages.
-# Publishes: PARITY_SHARED_PACKAGES, PARITY_SCOPE_EBUILDS.
+# Publishes: PARITY_SHARED_PACKAGES, PARITY_SCOPE_EBUILDS, PARITY_EXCLUDED,
+# PARITY_EBUILD_PN.
 build_package_sets() {
-	stage_pending 'build package sets'
+	local pkg_dir category pn key ebuild pf
+	local -a overlay_ebuilds=() gentoo_ebuilds=()
+	local matched=0
+
+	for pkg_dir in "${OVERLAY_ROOT}"/*/*/; do
+		pkg_dir=${pkg_dir%/}
+		pn=${pkg_dir##*/}
+		category=${pkg_dir%/*}
+		category=${category##*/}
+		key="${category}/${pn}"
+
+		# The whole definition of "package": a directory holding at least one
+		# ebuild. One structural rule, no list of directory names to keep in
+		# sync - metadata/, profiles/, eclass/, licenses/ and scripts/ are
+		# excluded because none of them holds an ebuild, not because they are
+		# named here. .autoupdate/ and .git/ never even reach this loop, the
+		# glob not matching a leading dot.
+		overlay_ebuilds=( "${pkg_dir}"/*.ebuild )
+		if (( ${#overlay_ebuilds[@]} == 0 )); then
+			continue
+		fi
+
+		if ! filter_selects "${key}"; then
+			continue
+		fi
+		matched=$(( matched + 1 ))
+
+		# Overlay-only packages are recorded with the reason rather than
+		# dropped: 82 of 314 have no ::gentoo counterpart at all, and a
+		# package that silently vanishes between the tree and the report is
+		# indistinguishable from one that was compared and found clean.
+		gentoo_ebuilds=( "${GENTOO_REPO}/${key}"/*.ebuild )
+		if (( ${#gentoo_ebuilds[@]} == 0 )); then
+			PARITY_EXCLUDED+=( "${key}"$'\t'"overlay-only: ::gentoo carries no ${key}" )
+			continue
+		fi
+
+		PARITY_SHARED_PACKAGES+=( "${key}" )
+
+		for ebuild in "${overlay_ebuilds[@]}"; do
+			pf=${ebuild##*/}
+			pf=${pf%.ebuild}
+			PARITY_SCOPE_EBUILDS+=( "${category}/${pf}" )
+			PARITY_EBUILD_PN["${category}/${pf}"]=${pn}
+		done
+	done
+
+	if (( matched == 0 )); then
+		if [[ -n ${FILTER} ]]; then
+			printf 'filter %s matched no package under %s\n' \
+				"${FILTER}" "${OVERLAY_ROOT}" >&2
+		else
+			printf 'no directory under %s holds an ebuild\n' "${OVERLAY_ROOT}" >&2
+		fi
+		printf 'nothing would be compared, and an empty report reads exactly like\n' >&2
+		printf 'a clean one\n' >&2
+		return 2
+	fi
+
+	if (( ${#PARITY_SHARED_PACKAGES[@]} == 0 )); then
+		printf '%d package(s) matched %s, but ::gentoo carries none of them\n' \
+			"${matched}" "${FILTER:-the overlay}" >&2
+		printf 'there is nothing to compare against, and an empty report reads\n' >&2
+		printf 'exactly like a clean one\n' >&2
+		return 2
+	fi
+
+	# R5.3's first count, established here because this is where it is known.
+	printf '  [scope]    %d package(s) shared with ::gentoo, %d overlay-only (excluded), %d ebuild(s) in scope\n' \
+		"${#PARITY_SHARED_PACKAGES[@]}" "${#PARITY_EXCLUDED[@]}" \
+		"${#PARITY_SCOPE_EBUILDS[@]}"
+}
+
+# gentoo_candidates <category/pn> <pn>
+# Every non-live ::gentoo version of the package, ascending, space separated.
+# Empty when ::gentoo carries nothing but live ebuilds.
+#
+# Sorted once here rather than at each use, which is what lets the selector
+# take the highest of any subset as its last element instead of forking a sort
+# per ebuild.
+gentoo_candidates() {
+	local key=$1 pn=$2 ebuild version
+	local -a versions=()
+
+	for ebuild in "${GENTOO_REPO}/${key}"/*.ebuild; do
+		version=${ebuild##*/}
+		version=${version%.ebuild}
+		version=${version#"${pn}-"}
+
+		if version_is_live "${version}"; then
+			continue
+		fi
+		versions+=( "${version}" )
+	done
+
+	if (( ${#versions[@]} == 0 )); then
+		return 0
+	fi
+
+	printf '%s\n' "${versions[@]}" | sort -V | tr '\n' ' '
 }
 
 # Stage 2. For each shared package, pick the ::gentoo version to compare
 # against - the baseline the overlay copy is drifting from.
+#
+# Three distances, tried in this order (R2.1 -> R2.2 -> R2.3), and the one that
+# hits is recorded on the row because it says how much the row is worth: at
+# exact distance a dependency delta is real drift, at cross-series it is mostly
+# the version having moved.
+#
+# Live ::gentoo ebuilds are out of the candidate pool entirely, which is R2.4
+# read literally - "exclude them from baseline selection", not "exclude them
+# from the sort at the end". A live OVERLAY ebuild is therefore never matched
+# exactly and never shares a series with anything (9999 is its own series), so
+# it falls through to cross-series against the highest real ::gentoo version
+# and still gets a baseline row rather than disappearing. The overlay carries
+# no live ebuild in a shared package today (measured 2026-08-06); this says
+# what happens when it does.
+#
 # Publishes: PARITY_BASELINES, PARITY_BEHIND.
 select_baseline() {
-	stage_pending 'select baseline'
+	local entry category pf pn key version candidate baseline distance wanted
+	local overlay_top gentoo_top
+	local -A candidates=() overlay_versions=()
+	local -a pool=() in_series=() overlay_pool=()
+	local exact=0 same=0 cross=0 unbaselined=0
+
+	for entry in "${PARITY_SCOPE_EBUILDS[@]}"; do
+		category=${entry%%/*}
+		pf=${entry#*/}
+		pn=${PARITY_EBUILD_PN[${entry}]}
+		key="${category}/${pn}"
+		version=${pf#"${pn}-"}
+
+		# One directory listing and one sort per package, not per ebuild.
+		if [[ -z ${candidates[${key}]+set} ]]; then
+			candidates[${key}]=$(gentoo_candidates "${key}" "${pn}")
+		fi
+		read -r -a pool <<<"${candidates[${key}]}"
+
+		if [[ -z ${overlay_versions[${key}]+set} ]]; then
+			overlay_versions[${key}]=""
+		fi
+		if ! version_is_live "${version}"; then
+			overlay_versions[${key}]+="${version} "
+		fi
+
+		if (( ${#pool[@]} == 0 )); then
+			# Nothing non-live to compare against. Reported rather than
+			# silently skipped: it leaves this ebuild out of PARITY_BASELINES,
+			# which is a count the self-test pins.
+			printf '  [NOTE]     %s: ::gentoo has only live ebuilds, so there is no baseline\n' \
+				"${entry}"
+			unbaselined=$(( unbaselined + 1 ))
+			continue
+		fi
+
+		baseline=""
+		distance=""
+
+		# R2.1 - ::gentoo carries this very version. Matched on the whole
+		# version string, revision included, which is what design.md's 76
+		# was measured as ("filename match"). Ignoring the revision would
+		# call 85 ebuilds exact instead, and the nine it adds are exactly
+		# the ones where the revision IS the divergence: bentoo's
+		# webkit-gtk-2.52.5-r411 is ::gentoo's -r410 plus a downstream
+		# webdriver USE flag, and calling that pair exact would rank the
+		# difference as unexplained drift at a distance that trusts every
+		# axis.
+		for candidate in "${pool[@]}"; do
+			if [[ ${candidate} == "${version}" ]]; then
+				baseline=${candidate}
+				distance=exact
+				break
+			fi
+		done
+
+		# R2.2 - highest ::gentoo version sharing major.minor.
+		if [[ -z ${distance} ]]; then
+			version_series "${version}"
+			wanted=${VERSION_SERIES}
+			in_series=()
+			for candidate in "${pool[@]}"; do
+				version_series "${candidate}"
+				if [[ ${VERSION_SERIES} == "${wanted}" ]]; then
+					in_series+=( "${candidate}" )
+				fi
+			done
+			if (( ${#in_series[@]} )); then
+				baseline=${in_series[-1]}
+				distance='same-series'
+			fi
+		fi
+
+		# R2.3 - the highest non-live version there is.
+		if [[ -z ${distance} ]]; then
+			baseline=${pool[-1]}
+			distance='cross-series'
+		fi
+
+		# R2.5 - the baseline PV travels with every row from here on.
+		PARITY_BASELINES+=( "${entry}"$'\t'"${baseline}"$'\t'"${distance}" )
+
+		case ${distance} in
+		exact)        exact=$(( exact + 1 )) ;;
+		same-series)  same=$(( same + 1 )) ;;
+		cross-series) cross=$(( cross + 1 )) ;;
+		esac
+	done
+
+	# Which packages the overlay is actually behind on. Live versions are out
+	# of both lists - that exclusion is the whole point: with 9999 left in, a
+	# first pass reported 34 packages as behind ::gentoo when none are.
+	for key in "${PARITY_SHARED_PACKAGES[@]}"; do
+		read -r -a overlay_pool <<<"${overlay_versions[${key}]:-}"
+		read -r -a pool <<<"${candidates[${key}]:-}"
+		if (( ${#overlay_pool[@]} == 0 || ${#pool[@]} == 0 )); then
+			continue
+		fi
+
+		overlay_top=$(highest_version "${overlay_pool[@]}")
+		gentoo_top=${pool[-1]}
+
+		if [[ ${overlay_top} != "${gentoo_top}" ]] &&
+			[[ $(highest_version "${overlay_top}" "${gentoo_top}") == "${gentoo_top}" ]]; then
+			PARITY_BEHIND+=( "${key}" )
+		fi
+	done
+
+	printf '  [baseline] %d exact, %d same-series, %d cross-series' \
+		"${exact}" "${same}" "${cross}"
+	if (( unbaselined )); then
+		printf ', %d without a baseline' "${unbaselined}"
+	fi
+	printf '; %d package(s) behind ::gentoo\n' "${#PARITY_BEHIND[@]}"
 }
 
-# Stage 3. Confirm each side's md5-cache entry actually describes the ebuild on
-# disk. Comparing a stale cache entry reports drift that does not exist, and
-# hides drift that does.
+# Stage 3. Confirm both sides of every pair actually have the md5-cache entry
+# the comparison is about to read.
+#
+# WHAT IT CHECKS AND WHAT IT DOES NOT. Presence, per pair: the overlay's entry
+# for the overlay PF, and ::gentoo's entry for the baseline PF stage 2 picked.
+# It does NOT check that an entry is up to date with its ebuild - measured
+# 2026-08-06, all 319 overlay entries match their ebuild's md5, so the gap is
+# real but currently empty, and it is named here rather than left to be
+# discovered from a report that looked fine.
+#
+# Presence is the one that cannot be skipped. Every axis this script compares
+# is read from md5-cache, so an absent entry yields an empty value on every
+# axis at once, which compares equal to nothing and reads as "no divergence
+# anywhere" - the most dangerous false negative the guard can produce.
+#
+# It is measured over PARITY_BASELINES rather than PARITY_SCOPE_EBUILDS on
+# purpose: an ebuild stage 2 could not baseline has no ::gentoo entry to look
+# for, and must not be counted as covered. The self-test's denominator is the
+# full scope, so that shortfall surfaces there instead of being defined away.
+#
 # Publishes: PARITY_MD5_COVERED.
 verify_md5_cache() {
-	stage_pending 'verify md5-cache'
+	local line entry baseline category pf pn overlay_cache gentoo_cache
+	local -a missing=()
+
+	for line in "${PARITY_BASELINES[@]}"; do
+		entry=${line%%$'\t'*}
+		baseline=${line#*$'\t'}
+		baseline=${baseline%%$'\t'*}
+
+		category=${entry%%/*}
+		pf=${entry#*/}
+		pn=${PARITY_EBUILD_PN[${entry}]}
+
+		overlay_cache="${OVERLAY_ROOT}/metadata/md5-cache/${category}/${pf}"
+		gentoo_cache="${GENTOO_REPO}/metadata/md5-cache/${category}/${pn}-${baseline}"
+
+		if [[ ! -f ${overlay_cache} ]]; then
+			missing+=( "${entry}: no overlay entry at ${overlay_cache}" )
+			continue
+		fi
+		if [[ ! -f ${gentoo_cache} ]]; then
+			missing+=( "${entry}: no ::gentoo entry at ${gentoo_cache}" )
+			continue
+		fi
+
+		PARITY_MD5_COVERED+=( "${entry}" )
+	done
+
+	printf '  [md5cache] %d/%d ebuild(s) in scope have a cache entry on both sides\n' \
+		"${#PARITY_MD5_COVERED[@]}" "${#PARITY_SCOPE_EBUILDS[@]}"
+
+	if (( ${#missing[@]} == 0 )); then
+		return 0
+	fi
+
+	printf '%d md5-cache entr(ies) are missing, so those ebuilds cannot be compared:\n' \
+		"${#missing[@]}" >&2
+	for line in "${missing[@]}"; do
+		printf '  - %s\n' "${line}" >&2
+	done
+	printf 'comparing without them would report every axis as identical, which is\n' >&2
+	printf 'indistinguishable from finding no drift at all\n' >&2
+	printf 'regenerate the overlay side with: egencache --update --repo bentoo\n' >&2
+	printf 'and the ::gentoo side with: emaint sync -r gentoo\n' >&2
+	return 2
+}
+
+### reading an md5-cache entry #######################################
+#
+# Every axis stage 4 compares comes out of one md5-cache file per side, so each
+# file is read ONCE into an associative array and queried per axis afterwards.
+# The obvious alternative - a grep per axis - is a dozen processes per file and
+# some 7600 across a sweep, for work one read has already done.
+
+# The pair of entries currently being compared, both sides in one array under
+# the keys "overlay:<AXIS>" and "gentoo:<AXIS>". One array rather than two
+# because the alternative is passing an array name into the reader, and a
+# nameref is a variable shellcheck cannot follow.
+declare -A MD5_FIELDS=()
+
+# read_md5_cache <file> <side>
+#
+# Read one md5-cache entry into MD5_FIELDS under "<side>:<AXIS>". It ADDS to
+# the array rather than clearing it, so that one side does not evict the other;
+# the caller empties MD5_FIELDS once per pair.
+#
+# An md5-cache entry is one KEY=value per line and a value is never wrapped
+# (checked across all 599 overlay entries, 2026-08-06). The split is at the
+# FIRST = on the line, because values are full of them - the atom
+# >=dev-qt/qtbase-6.10.1:6=[gui,wayland] carries two.
+read_md5_cache() {
+	local file=$1 side=$2
+	local -a lines=()
+	local line key
+
+	mapfile -t lines <"${file}"
+
+	for line in "${lines[@]}"; do
+		key=${line%%=*}
+		# A line with no = cannot be attributed to an axis. None exists
+		# today; ignoring one is safer than guessing what it meant.
+		[[ ${key} != "${line}" ]] || continue
+		MD5_FIELDS["${side}:${key}"]=${line#*=}
+	done
+}
+
+### comparing values #################################################
+#
+# One set difference and four normalisations. Each normalisation exists because
+# comparing the raw strings would report something that is not drift.
+#
+# They all assign to a global instead of printing. Every one of them runs once
+# per axis per side per ebuild - upwards of ten thousand calls on a sweep - and
+# a command substitution would cost a fork each time.
+
+SET_ONLY_A=""
+SET_ONLY_B=""
+
+# set_difference <space separated A> <space separated B>
+# What each side has that the other has not, into SET_ONLY_A and SET_ONLY_B.
+# Both empty means the two sets are equal.
+#
+# Each side keeps its own original order rather than being sorted. That is
+# deterministic - portage writes md5-cache from the ebuild, in a fixed order -
+# and it costs no fork. Nothing downstream depends on the order either: the
+# self-test sorts before it compares.
+set_difference() {
+	local -a a=() b=()
+	local -A in_a=() in_b=() seen=()
+	local token
+
+	read -r -a a <<<"$1"
+	read -r -a b <<<"$2"
+
+	for token in "${a[@]}"; do
+		in_a["${token}"]=1
+	done
+	for token in "${b[@]}"; do
+		in_b["${token}"]=1
+	done
+
+	SET_ONLY_A=""
+	for token in "${a[@]}"; do
+		[[ -z ${in_b[${token}]+set} && -z ${seen[${token}]+set} ]] || continue
+		seen["${token}"]=1
+		SET_ONLY_A+="${token} "
+	done
+
+	seen=()
+	SET_ONLY_B=""
+	for token in "${b[@]}"; do
+		[[ -z ${in_a[${token}]+set} && -z ${seen[${token}]+set} ]] || continue
+		seen["${token}"]=1
+		SET_ONLY_B+="${token} "
+	done
+
+	SET_ONLY_A=${SET_ONLY_A% }
+	SET_ONLY_B=${SET_ONLY_B% }
+}
+
+SET_INTERSECTION=""
+
+# set_intersection <space separated A> <space separated B>
+# What both sides have, in A's order, into SET_INTERSECTION.
+set_intersection() {
+	local -a a=() b=()
+	local -A in_b=() seen=()
+	local token
+
+	read -r -a a <<<"$1"
+	read -r -a b <<<"$2"
+
+	for token in "${b[@]}"; do
+		in_b["${token}"]=1
+	done
+
+	SET_INTERSECTION=""
+	for token in "${a[@]}"; do
+		[[ -n ${in_b[${token}]+set} && -z ${seen[${token}]+set} ]] || continue
+		seen["${token}"]=1
+		SET_INTERSECTION+="${token} "
+	done
+	SET_INTERSECTION=${SET_INTERSECTION% }
+}
+
+COLLAPSED=""
+
+# collapse_whitespace <string>
+# The string with runs of whitespace squeezed to one space and the ends
+# trimmed, into COLLAPSED. Splitting on IFS and rejoining on it does both.
+collapse_whitespace() {
+	local -a words=()
+
+	read -r -a words <<<"$1"
+	COLLAPSED="${words[*]}"
+}
+
+ARCH_MEMBERSHIP=""
+
+# arch_membership <KEYWORDS value>
+# The keyword list as a bare arch set - the ~ prefix dropped, order kept,
+# duplicates removed - into ARCH_MEMBERSHIP.
+#
+# This is R1.3, and it is not cosmetic. ::gentoo stabilises and the overlay
+# never does, so comparing the raw strings would emit a KEYWORDS row for
+# essentially every one of the 232 shared packages and not one of them would
+# say anything. What survives the stripping is real: media-libs/mesa keeps
+# ~amd64-linux and ~x86-linux, which ::gentoo does not carry at all.
+#
+# -* and -<arch> are left alone. They are "deliberately not keyworded" markers
+# rather than arches, and one appearing on only one side IS a divergence.
+#
+# The self-test carries its own copy of this normalisation (arch_set) instead of
+# calling in here, on purpose: a harness that reuses the code under test agrees
+# with it by construction, including when both are wrong.
+arch_membership() {
+	local -a keywords=()
+	local -A seen=()
+	local keyword
+
+	read -r -a keywords <<<"$1"
+
+	ARCH_MEMBERSHIP=""
+	for keyword in "${keywords[@]}"; do
+		keyword=${keyword#\~}
+		[[ -n ${keyword} && -z ${seen[${keyword}]+set} ]] || continue
+		seen["${keyword}"]=1
+		ARCH_MEMBERSHIP+="${keyword} "
+	done
+	ARCH_MEMBERSHIP=${ARCH_MEMBERSHIP% }
+}
+
+IUSE_SPLIT_FLAGS=""
+IUSE_SPLIT_DEFAULTS=""
+
+# iuse_split <IUSE value>
+# The flag list split in two: IUSE_SPLIT_FLAGS is membership with the +/-
+# default prefix removed, IUSE_SPLIT_DEFAULTS the names that carried a +.
+#
+# Two axes rather than one because they are two different findings. "the overlay
+# added a flag" and "both carry the flag, but only the overlay turns it on by
+# default" call for different actions, and a single row mixing them has to be
+# read twice to tell which happened.
+iuse_split() {
+	local -a flags=()
+	local -A seen=()
+	local flag name
+
+	read -r -a flags <<<"$1"
+
+	IUSE_SPLIT_FLAGS=""
+	IUSE_SPLIT_DEFAULTS=""
+	for flag in "${flags[@]}"; do
+		name=${flag#[+-]}
+		[[ -n ${name} && -z ${seen[${name}]+set} ]] || continue
+		seen["${name}"]=1
+		IUSE_SPLIT_FLAGS+="${name} "
+		if [[ ${flag} == '+'* ]]; then
+			IUSE_SPLIT_DEFAULTS+="${name} "
+		fi
+	done
+	IUSE_SPLIT_FLAGS=${IUSE_SPLIT_FLAGS% }
+	IUSE_SPLIT_DEFAULTS=${IUSE_SPLIT_DEFAULTS% }
+}
+
+ATOM_SET=""
+
+# atom_set <dependency string> <keep bounds: 0 or 1>
+# The dependency string as a comparable set of atoms, into ATOM_SET.
+#
+# Grouping tokens - || ( ) and every use? conditional opener - are dropped:
+# they say WHEN an atom applies, not WHICH atom it is. A dependency moving
+# between an unconditional position and a use? block therefore reads as no
+# change. That is a deliberate simplification; the alternative is a full
+# dependency-spec parser to compare two strings with.
+#
+# With <keep bounds> 0 an atom is reduced to [!]category/pn - version bound,
+# slot and USE dependency all come off. That is R1.4's atom set, and the reason
+# for it is that a newer overlay version legitimately raises a minimum:
+# >=foo-2 against >=foo-1 is the version having moved, not drift worth a row.
+# The blocker ! is KEPT, because !foo/bar and foo/bar are opposite statements
+# about the same package and must not collapse into one another.
+#
+# With <keep bounds> 1 the atom is kept whole. Used only at exact distance,
+# where both sides are the same version and a bound that differs can only be a
+# downstream change.
+atom_set() {
+	local keep_bounds=$2
+	local -a tokens=()
+	local -A seen=()
+	local token atom blocker version
+
+	read -r -a tokens <<<"$1"
+
+	ATOM_SET=""
+	for token in "${tokens[@]}"; do
+		case ${token} in
+		'('|')'|'||'|*'?') continue ;;
+		esac
+
+		atom=${token}
+
+		if (( ! keep_bounds )); then
+			blocker=""
+			while [[ ${atom} == '!'* ]]; do
+				blocker+='!'
+				atom=${atom#'!'}
+			done
+
+			atom=${atom%%\[*}   # USE dependency
+			atom=${atom%%:*}    # slot, sub-slot, slot operator
+
+			# A version is only ever present behind an operator
+			# (PMS 8.3.1), so this is exact rather than a guess at
+			# where the name ends: net-libs/webkit-gtk keeps its
+			# hyphen, >=net-libs/webkit-gtk-2.52.5-r410 loses both
+			# trailing components and keeps it too.
+			case ${atom} in
+			[\<\>=~]*)
+				atom=${atom#[\<\>~]}
+				atom=${atom#=}
+				version=${atom##*-}
+				atom=${atom%-*}
+				if [[ ${version} =~ ^r[0-9]+$ ]]; then
+					atom=${atom%-*}
+				fi
+				;;
+			esac
+
+			atom="${blocker}${atom}"
+		fi
+
+		[[ -n ${atom} && -z ${seen[${atom}]+set} ]] || continue
+		seen["${atom}"]=1
+		ATOM_SET+="${atom} "
+	done
+	ATOM_SET=${ATOM_SET% }
+}
+
+# parity_row <category/pn> <overlay PV> <baseline PV> <distance> <axis> <overlay value> <::gentoo value>
+# Append one divergence row in the eight-column shape declared above.
+#
+# Column 8, the verdict, is left EMPTY: stage 6 owns it, and a stage that
+# guessed at it would be inventing the answer the report exists to give.
+#
+# Two things are enforced here rather than at each of the dozen call sites.
+# Tabs and newlines are flattened out of both values, because the format has no
+# escaping and a row that splits is a row nobody notices is wrong. And an empty
+# value becomes (none), because a tab is IFS whitespace: bash collapses two
+# adjacent tabs into one delimiter, so an empty column in the MIDDLE of a row
+# silently shifts every column after it when the row is read back.
+parity_row() {
+	local pkg=$1 opv=$2 bpv=$3 distance=$4 axis=$5 overlay=$6 gentoo=$7
+
+	overlay=${overlay//[$'\t\n']/ }
+	gentoo=${gentoo//[$'\t\n']/ }
+
+	PARITY_ROWS+=( "${pkg}"$'\t'"${opv}"$'\t'"${bpv}"$'\t'"${distance}"$'\t'"${axis}"$'\t'"${overlay:-(none)}"$'\t'"${gentoo:-(none)}"$'\t' )
+}
+
+# The four columns every row of the ebuild currently being compared shares, set
+# once per pair by compare_ebuild_axes - and by stage 5's PATCHES comparison,
+# which is per ebuild for the same reason and reuses compare_as_sets. Context
+# rather than arguments so that each of the dozen comparisons below reads as
+# what it compares - compare_as_sets KEYWORDS "${overlay}" "${gentoo}" - instead
+# of restating the same four values a dozen times over.
+ROW_PKG=""
+ROW_OPV=""
+ROW_BPV=""
+ROW_DISTANCE=""
+
+# compare_values <axis> <overlay value> <::gentoo value>
+# Emit a row when the two values differ as strings, each carried whole. For the
+# single-valued axes, where the value IS the finding.
+compare_values() {
+	if [[ $2 != "$3" ]]; then
+		parity_row "${ROW_PKG}" "${ROW_OPV}" "${ROW_BPV}" "${ROW_DISTANCE}" \
+			"$1" "$2" "$3"
+	fi
+}
+
+# compare_as_sets <axis> <overlay value> <::gentoo value>
+# Emit a row when the two space separated values differ as sets.
+#
+# Each side carries its SURPLUS rather than its whole value: on INHERIT the
+# finding is "::gentoo also inherits cargo and flag-o-matic", and repeating the
+# six eclasses both sides share would bury it.
+compare_as_sets() {
+	if [[ $2 == "$3" ]]; then
+		return 0
+	fi
+
+	set_difference "$2" "$3"
+	if [[ -n ${SET_ONLY_A} || -n ${SET_ONLY_B} ]]; then
+		parity_row "${ROW_PKG}" "${ROW_OPV}" "${ROW_BPV}" "${ROW_DISTANCE}" \
+			"$1" "${SET_ONLY_A}" "${SET_ONLY_B}"
+	fi
+}
+
+# axis_raw_differs <axis>
+# Whether the two sides declare the axis differently before any normalisation.
+#
+# Every normalisation above is deterministic, so identical inputs cannot yield a
+# divergent row - and normalising is the expensive half of the sweep. Asking
+# this first collapses every axis a package copies from ::gentoo verbatim, which
+# is most axes of most packages, into a single string comparison.
+axis_raw_differs() {
+	[[ ${MD5_FIELDS[overlay:$1]-} != "${MD5_FIELDS[gentoo:$1]-}" ]]
+}
+
+# compare_ebuild_axes <category/pn> <overlay PV> <baseline PV> <distance>
+# Compare one pair of md5-cache entries - already read into MD5_FIELDS - and
+# append a row per axis on which they differ.
+#
+# WHICH AXES, AND WHY EACH IS COMPARED THE WAY IT IS (design.md's axis table):
+#
+#   EAPI SLOT HOMEPAGE   exact string: one value, no ordering to normalise away
+#   INHERIT              set - which eclasses are inherited is structural, the
+#                        order portage happened to emit them in is not
+#   DEFINED_PHASES       set
+#   LICENSE              set
+#   REQUIRED_USE         string, whitespace collapsed
+#   IUSE                 membership as a set, + defaults as a second set
+#   KEYWORDS             arch set, ~ stripped (R1.3)
+#   DEPEND RDEPEND BDEPEND
+#                        atom set reduced to category/pn, with bounds, slots and
+#                        USE dependencies compared only at exact distance (R1.4)
+#
+# NOT COMPARED, ON PURPOSE - stated here so a later reader does not "fix" the
+# omission (R1.5):
+#
+#   SRC_URI     differs by construction whenever the version does, and the
+#               overlay legitimately fetches snapshots from hosts ::gentoo never
+#               uses. Every row it produced would be noise hiding the rows that
+#               are not.
+#   DESCRIPTION cosmetic. A reworded one-line summary is not drift to act on.
+#   _md5_       the hash OF the entry rather than an axis of it: it differs
+#               whenever anything else does, and says nothing extra.
+#   _eclasses_  a real axis and a real finding, but sub-task 4.3's, in stage 5.
+#               It is about eclass VERSIONS; which eclasses are inherited is
+#               INHERIT, above.
+#   IDEPEND PDEPEND RESTRICT PROPERTIES
+#               outside the list R1.2 fixes. Named here so their absence reads
+#               as a decision and not as an oversight.
+compare_ebuild_axes() {
+	local axis overlay gentoo keep_bounds=0
+	local overlay_flags overlay_defaults gentoo_flags gentoo_defaults
+
+	ROW_PKG=$1
+	ROW_OPV=$2
+	ROW_BPV=$3
+	ROW_DISTANCE=$4
+
+	if [[ ${ROW_DISTANCE} == exact ]]; then
+		keep_bounds=1
+	fi
+
+	# Single-valued axes. One absent from BOTH entries is two empty strings,
+	# which compare equal and emit nothing - correctly, since neither side
+	# declares it.
+	for axis in EAPI SLOT HOMEPAGE; do
+		compare_values "${axis}" "${MD5_FIELDS[overlay:${axis}]-}" \
+			"${MD5_FIELDS[gentoo:${axis}]-}"
+	done
+
+	# Set-valued axes: the order portage happened to emit them in is not
+	# meaning, so it must not read as divergence.
+	for axis in INHERIT DEFINED_PHASES LICENSE; do
+		compare_as_sets "${axis}" "${MD5_FIELDS[overlay:${axis}]-}" \
+			"${MD5_FIELDS[gentoo:${axis}]-}"
+	done
+
+	# REQUIRED_USE is a nested expression, so it is compared as a string and
+	# not as a set: ^^ ( a b ) and ^^ ( b a ) mean the same thing but || ( a
+	# b ) and ^^ ( a b ) do not, and a set comparison cannot tell those two
+	# facts apart. Whitespace is collapsed so that reindentation alone never
+	# reads as a divergence.
+	if axis_raw_differs REQUIRED_USE; then
+		collapse_whitespace "${MD5_FIELDS[overlay:REQUIRED_USE]-}"
+		overlay=${COLLAPSED}
+		collapse_whitespace "${MD5_FIELDS[gentoo:REQUIRED_USE]-}"
+		gentoo=${COLLAPSED}
+		compare_values REQUIRED_USE "${overlay}" "${gentoo}"
+	fi
+
+	# KEYWORDS, normalised to arch membership first - see arch_membership.
+	if axis_raw_differs KEYWORDS; then
+		arch_membership "${MD5_FIELDS[overlay:KEYWORDS]-}"
+		overlay=${ARCH_MEMBERSHIP}
+		arch_membership "${MD5_FIELDS[gentoo:KEYWORDS]-}"
+		gentoo=${ARCH_MEMBERSHIP}
+		compare_as_sets KEYWORDS "${overlay}" "${gentoo}"
+	fi
+
+	# IUSE, as membership and then defaults.
+	if axis_raw_differs IUSE; then
+		iuse_split "${MD5_FIELDS[overlay:IUSE]-}"
+		overlay_flags=${IUSE_SPLIT_FLAGS}
+		overlay_defaults=${IUSE_SPLIT_DEFAULTS}
+		iuse_split "${MD5_FIELDS[gentoo:IUSE]-}"
+		gentoo_flags=${IUSE_SPLIT_FLAGS}
+		gentoo_defaults=${IUSE_SPLIT_DEFAULTS}
+
+		compare_as_sets IUSE "${overlay_flags}" "${gentoo_flags}"
+
+		# Defaults are compared only over the flags BOTH sides declare.
+		# A flag that exists on one side alone has already been reported
+		# once, as membership; counting its default as a second finding
+		# would say the same thing twice and inflate every total.
+		set_intersection "${overlay_defaults}" "${gentoo_flags}"
+		overlay=${SET_INTERSECTION}
+		set_intersection "${gentoo_defaults}" "${overlay_flags}"
+		gentoo=${SET_INTERSECTION}
+		compare_as_sets IUSE_DEFAULTS "${overlay}" "${gentoo}"
+	fi
+
+	# The three dependency variables, at the granularity the distance earns.
+	# At exact distance the two sides are the SAME version, so a differing
+	# bound, slot operator or USE dependency can only be a downstream change
+	# and the whole atom is compared. Anywhere else only category/pn is,
+	# because a raised minimum there is the version having moved.
+	for axis in DEPEND RDEPEND BDEPEND; do
+		if ! axis_raw_differs "${axis}"; then
+			continue
+		fi
+
+		atom_set "${MD5_FIELDS[overlay:${axis}]-}" "${keep_bounds}"
+		overlay=${ATOM_SET}
+		atom_set "${MD5_FIELDS[gentoo:${axis}]-}" "${keep_bounds}"
+		gentoo=${ATOM_SET}
+
+		compare_as_sets "${axis}" "${overlay}" "${gentoo}"
+	done
 }
 
 # Stage 4. Compare the metadata axes of overlay and baseline.
 # Publishes: PARITY_ROWS (appends; column 8 left to stage 6).
 compare_axes() {
-	stage_pending 'compare axes'
+	local line entry baseline distance category pf pn key opv
+	local -A covered=()
+	local before rows_before=${#PARITY_ROWS[@]}
+	local compared=0 diverged=0
+
+	for entry in "${PARITY_MD5_COVERED[@]}"; do
+		covered["${entry}"]=1
+	done
+
+	for line in "${PARITY_BASELINES[@]}"; do
+		entry=${line%%$'\t'*}
+
+		# Stage 3 established which pairs have an entry on both sides. A
+		# pair that has not is skipped rather than read anyway: a missing
+		# file yields an empty value on every axis at once, which
+		# compares equal to nothing and reads as "no divergence
+		# anywhere" - the most dangerous false negative there is.
+		[[ -n ${covered[${entry}]+set} ]] || continue
+
+		baseline=${line#*$'\t'}
+		distance=${baseline#*$'\t'}
+		baseline=${baseline%%$'\t'*}
+
+		category=${entry%%/*}
+		pf=${entry#*/}
+		pn=${PARITY_EBUILD_PN[${entry}]}
+		key="${category}/${pn}"
+		opv=${pf#"${pn}-"}
+
+		# Emptied here, once per pair: the reader adds to MD5_FIELDS so
+		# that the two sides can share it, so a stale axis from the
+		# previous ebuild would otherwise be compared against this one.
+		MD5_FIELDS=()
+		read_md5_cache "${OVERLAY_ROOT}/metadata/md5-cache/${category}/${pf}" \
+			overlay
+		read_md5_cache "${GENTOO_REPO}/metadata/md5-cache/${category}/${pn}-${baseline}" \
+			gentoo
+
+		before=${#PARITY_ROWS[@]}
+		compare_ebuild_axes "${key}" "${opv}" "${baseline}" "${distance}"
+		compared=$(( compared + 1 ))
+		if (( ${#PARITY_ROWS[@]} > before )); then
+			diverged=$(( diverged + 1 ))
+		fi
+	done
+
+	printf '  [axes]     %d metadata row(s); %d of %d ebuild(s) compared diverge on some axis\n' \
+		"$(( ${#PARITY_ROWS[@]} - rows_before ))" "${diverged}" "${compared}"
 }
 
-# Stage 5. Compare what md5-cache does not carry: patches under files/,
-# metadata.xml, and the tags read from the ebuild text.
-# Publishes: PARITY_ROWS (appends; column 8 left to stage 6).
+### the axes md5-cache does not carry #################################
+#
+# Stage 4 compared what egencache wrote down. Three things it never writes down
+# still decide whether two copies of a package behave the same: the metadata.xml
+# beside the ebuild, whatever sits under files/, and the PATCHES array in the
+# ebuild text. Parity claimed on md5-cache alone is parity claimed on one file
+# per package.
+#
+# A fourth, _eclasses_, IS in md5-cache but is not about the ebuild: it records
+# which eclass CONTENT the entry was generated against, so it reads a
+# repository-wide fact off a per-package entry (R4.3). Stage 4's header says it
+# was left for here; this is here.
+
+# The two positional columns a package-level row has no version to put in.
+# metadata.xml and files/ belong to the package DIRECTORY, not to any one of the
+# ebuilds in it, so there is no overlay PV and no baseline PV to name. They
+# cannot simply be left empty: a tab is IFS whitespace, so an empty column in the
+# middle of a row is swallowed and shifts every column after it when the row is
+# read back. The distance column gets its own value rather than borrowing one of
+# stage 2's three, because "exact" on a row that compares no versions would be a
+# claim the row is not making.
+PACKAGE_ROW_PV='(package)'
+PACKAGE_ROW_DISTANCE='package'
+
+# THE TWO AXES WITH NO JUSTIFICATION MECHANISM (R4.4)
+#
+# Every axis stage 4 emits lives in an ebuild, so a divergence on it can be
+# justified where it is: sub-task 5.2's parser reads a "# BENTOO-DIVERGENCE:
+# <axis>" comment out of the ebuild that carries the divergence. metadata.xml
+# and files/ have no such ebuild. The difference is in a file holding no bash,
+# sitting beside N ebuilds none of which owns it, so there is nowhere to put the
+# tag and no rule that would pick which of the N should carry it.
+#
+# Decided at the Phase 1 gate and deliberately NOT worked around here: this
+# inventory measures the volume first. If it is low no mechanism is needed, and
+# if it is high the shape of the data decides what the mechanism should be -
+# rather than a guess made before the data existed.
+#
+# The consequence is that every row on these axes reaches the report as ALIGN
+# and can never be anything else. R3.1 requires exactly one of the four verdicts
+# on every divergence, so "no verdict" was never available; what these axes lack
+# is the EVIDENCE that promotes one. ALIGN there therefore means something
+# weaker than ALIGN elsewhere - not "no reason was recorded" but "no reason
+# COULD be recorded" - and nothing in the row itself distinguishes the two. So
+# the report says which it is, and it says it IN PLACE.
+#
+# HOW SUB-TASK 6.2 CONSUMES THIS. parity-report.md groups rows by axis. For each
+# section whose axis appears in PARITY_UNJUSTIFIABLE_AXES, print
+# PARITY_UNJUSTIFIABLE_NOTE directly under that section's heading - not once at
+# the foot of the report. The reader this is for is the one who skims to the
+# files/ section and stops there; a footnote is read by whoever already knew.
+# Sub-task 5.2 wants the same list for the opposite reason: a row on one of
+# these axes must not be promoted to UNDOCUMENTED for lacking a tag it cannot
+# carry. Both consume the array, so neither has to restate the list of axes.
+PARITY_UNJUSTIFIABLE_AXES=(
+	'metadata.xml'
+	'files/overlay-only'
+	'files/gentoo-only'
+	'files/content'
+)
+PARITY_UNJUSTIFIABLE_NOTE='no justification mechanism on this axis: the difference is in a file that holds no ebuild code, so it cannot carry a # BENTOO-DIVERGENCE: tag. Rows here are ALIGN because no reason COULD be recorded, not because none was found - and they are never promoted to UNDOCUMENTED or JUSTIFIED.'
+
+OVERLAY_EBUILD=""
+
+# resolve_overlay_ebuild <category/pf> <pn>
+# Which file to read the overlay ebuild's TEXT from, into OVERLAY_EBUILD.
+#
+# PARITY_TAG_SOURCE first, the tracked ebuild second. That order is the seam
+# described where the map is declared: the self-test tags a COPY under $TMPDIR
+# because R7 forbids editing a tracked ebuild even to test the parser that reads
+# it. Sub-task 5.2's tag parser resolves through this same function - one
+# lookup, so there is one place to get it wrong instead of two.
+resolve_overlay_ebuild() {
+	local entry=$1 pn=$2
+	local category=${entry%%/*} pf=${entry#*/}
+
+	if [[ -n ${PARITY_TAG_SOURCE[${entry}]-} ]]; then
+		OVERLAY_EBUILD=${PARITY_TAG_SOURCE[${entry}]}
+		return 0
+	fi
+
+	OVERLAY_EBUILD="${OVERLAY_ROOT}/${category}/${pn}/${pf}.ebuild"
+}
+
+FILE_TEXT=""
+
+# read_file_text <path>
+# The whole file in FILE_TEXT, or the empty string when there is no such file.
+#
+# read -d '' stops at the first NUL - which none of these files contains - and
+# returns 1 having read everything, because it never found its delimiter. That
+# is the normal case here, not a failure. Comparing two whole strings is exact
+# where joining two mapfile arrays is not: two files differing only in where the
+# newlines fall would join to the same string.
+read_file_text() {
+	FILE_TEXT=""
+	[[ -f $1 ]] || return 0
+	IFS= read -r -d '' FILE_TEXT <"$1" || true
+}
+
+ONE_LINE=""
+
+# one_line <text> <maximum length>
+# The text as one line of at most that many characters, into ONE_LINE. A summary
+# column that grows to the size of what it summarises is not a summary.
+one_line() {
+	collapse_whitespace "$1"
+
+	if (( ${#COLLAPSED} > $2 )); then
+		ONE_LINE="${COLLAPSED:0:$2}..."
+	else
+		ONE_LINE=${COLLAPSED}
+	fi
+}
+
+DIFF_ONLY_OVERLAY=""
+DIFF_ONLY_GENTOO=""
+
+# summarise_diff <overlay file> <::gentoo file>
+# A textual diff reduced to one line per side, into DIFF_ONLY_OVERLAY and
+# DIFF_ONLY_GENTOO: how many lines only that side has, and the first of them.
+#
+# Sub-task 4.1 asks for a summary rather than the diff, and the row format is
+# the reason. parity-data.tsv has one row per divergence and no escaping, so a
+# diff pasted into a value column would be either flattened into an unreadable
+# run or split across rows. The count says how much diverged and the excerpt
+# says what, which is enough to decide whether to go and look.
+#
+# Only "< " and "> " lines are read. diff's hunk headers start with a digit and
+# its separator with a dash, so neither can be mistaken for content; a blank
+# line in the file arrives as "< " and survives as the empty string it is.
+summarise_diff() {
+	local line text
+	local -a only_overlay=() only_gentoo=()
+
+	while IFS= read -r line; do
+		case ${line} in
+		'<'*)
+			text=${line#<}
+			only_overlay+=( "${text# }" )
+			;;
+		'>'*)
+			text=${line#>}
+			only_gentoo+=( "${text# }" )
+			;;
+		esac
+	done < <(diff -- "$1" "$2" || true)
+
+	DIFF_ONLY_OVERLAY=""
+	DIFF_ONLY_GENTOO=""
+
+	if (( ${#only_overlay[@]} )); then
+		one_line "${only_overlay[0]}" 90
+		DIFF_ONLY_OVERLAY="${#only_overlay[@]} line(s) only here: ${ONE_LINE}"
+	fi
+	if (( ${#only_gentoo[@]} )); then
+		one_line "${only_gentoo[0]}" 90
+		DIFF_ONLY_GENTOO="${#only_gentoo[@]} line(s) only here: ${ONE_LINE}"
+	fi
+}
+
+# Sub-task 4.1. metadata.xml, for every shared package.
+#
+# R4.1 says every shared package, and an absent file is therefore a finding and
+# not a licence to skip: a package with a metadata.xml on one side only has
+# nothing to diff, which is the loudest divergence there is rather than the
+# quietest. Measured 2026-08-06: all 232 have one on both sides, so the branch
+# below is empty today and says so in the count rather than being left out.
+compare_metadata_xml() {
+	local key overlay_file gentoo_file overlay_text overlay_state gentoo_state
+	local diverged=0 incomplete=0
+
+	for key in "${PARITY_SHARED_PACKAGES[@]}"; do
+		overlay_file="${OVERLAY_ROOT}/${key}/metadata.xml"
+		gentoo_file="${GENTOO_REPO}/${key}/metadata.xml"
+
+		if [[ ! -f ${overlay_file} || ! -f ${gentoo_file} ]]; then
+			incomplete=$(( incomplete + 1 ))
+			overlay_state='no metadata.xml'
+			gentoo_state='no metadata.xml'
+			if [[ -f ${overlay_file} ]]; then
+				overlay_state='present'
+			fi
+			if [[ -f ${gentoo_file} ]]; then
+				gentoo_state='present'
+			fi
+			parity_row "${key}" "${PACKAGE_ROW_PV}" "${PACKAGE_ROW_PV}" \
+				"${PACKAGE_ROW_DISTANCE}" 'metadata.xml' \
+				"${overlay_state}" "${gentoo_state}"
+			continue
+		fi
+
+		read_file_text "${overlay_file}"
+		overlay_text=${FILE_TEXT}
+		read_file_text "${gentoo_file}"
+		if [[ ${overlay_text} == "${FILE_TEXT}" ]]; then
+			continue
+		fi
+
+		diverged=$(( diverged + 1 ))
+		summarise_diff "${overlay_file}" "${gentoo_file}"
+		parity_row "${key}" "${PACKAGE_ROW_PV}" "${PACKAGE_ROW_PV}" \
+			"${PACKAGE_ROW_DISTANCE}" 'metadata.xml' \
+			"${DIFF_ONLY_OVERLAY}" "${DIFF_ONLY_GENTOO}"
+	done
+
+	printf '  [metadata] %d of %d shared package(s) diverge on metadata.xml; %d examined without one on a side\n' \
+		"${diverged}" "${#PARITY_SHARED_PACKAGES[@]}" "${incomplete}"
+}
+
+# Every regular file under one files/ directory, keyed "<side>:<name relative to
+# it>" with its SHA256. One array for both sides, for the reason MD5_FIELDS
+# gives: the alternative is passing an array name in, and a nameref is a
+# variable shellcheck cannot follow.
+declare -A FILE_DIGESTS=()
+
+DIGEST_NAMES=""
+
+# digest_tree <directory> <side>
+# Fill FILE_DIGESTS for that side, and leave the relative names, sorted and
+# space separated, in DIGEST_NAMES. A directory that does not exist is not an
+# error - it is the empty set, which is what the comparison needs it to be.
+#
+# Recursive, and that is not incidental. files/ is not flat: binutils keeps a
+# whole patchset under files/patches-1/, thunderbird an icon/ subdirectory, and
+# ::gentoo's lua a per-slot 5.1/. A comparison that listed only the top level
+# would call two entirely different patchsets identical because both are "one
+# directory named patches-1".
+#
+# One find and one batched sha256sum per side, not a fork per file: 560 files
+# across the 80 shared packages that have a files/ directory on either side
+# (measured 2026-08-06). sha256sum escapes a name containing a backslash or a
+# newline and flags the line with a leading backslash; neither tree has such a
+# name, and a newline in one would corrupt the read loop rather than be
+# reported, which is stated here because it cannot be detected after the fact.
+digest_tree() {
+	local dir=$1 side=$2
+	local line digest path rel
+
+	DIGEST_NAMES=""
+	[[ -d ${dir} ]] || return 0
+
+	while IFS= read -r line; do
+		digest=${line%% *}
+		digest=${digest#\\}
+		path=${line#* }
+		path=${path# }
+		rel=${path#"${dir}/"}
+
+		FILE_DIGESTS["${side}:${rel}"]=${digest}
+		DIGEST_NAMES+="${rel} "
+	done < <(find "${dir}" -type f -exec sha256sum -- {} + 2>/dev/null | sort -k2)
+
+	DIGEST_NAMES=${DIGEST_NAMES% }
+}
+
+# Sub-task 4.2. files/ as a set of names and SHA256 digests (R4.2).
+#
+# THREE CASES, THREE AXES, ON PURPOSE. A file only the overlay has is a
+# downstream patch. A file only ::gentoo has is a fix the overlay may be
+# missing. A file BOTH have under the same name with different content is the
+# one that breaks a bump silently: the ebuild applies ${FILESDIR}/x.patch, both
+# trees have an x.patch, and nothing anywhere says they are not the same patch.
+# Folding the three into one row would make the third indistinguishable from the
+# other two at a glance, which is the glance it has to survive. Task 3 set the
+# precedent when it split IUSE into IUSE and IUSE_DEFAULTS: separate findings
+# need separate names.
+#
+# HONEST CAVEAT, because the ::gentoo-only count is the big one. ::gentoo's
+# files/ serves every version ::gentoo carries, and it carries versions the
+# overlay does not - dev-lang/ghc's directory holds patches for 9.0.2 and 9.2.7.
+# So a ::gentoo-only file is often a patch for an ebuild the overlay never had,
+# not a fix it is missing. The overlay-only and same-name-different-content
+# cases do not have this problem.
+compare_files_dirs() {
+	local key overlay_dir gentoo_dir name
+	local overlay_list gentoo_list only_overlay only_gentoo
+	local content_overlay content_gentoo
+	local -a surplus=() shared_names=()
+	local packages=0 n_overlay=0 n_gentoo=0 n_content=0
+
+	for key in "${PARITY_SHARED_PACKAGES[@]}"; do
+		overlay_dir="${OVERLAY_ROOT}/${key}/files"
+		gentoo_dir="${GENTOO_REPO}/${key}/files"
+		if [[ ! -d ${overlay_dir} && ! -d ${gentoo_dir} ]]; then
+			continue
+		fi
+		packages=$(( packages + 1 ))
+
+		# Emptied per package rather than per side: digest_tree adds, so
+		# that the two sides can share one array, and a name left over
+		# from the previous package would be compared against this one.
+		FILE_DIGESTS=()
+		digest_tree "${overlay_dir}" overlay
+		overlay_list=${DIGEST_NAMES}
+		digest_tree "${gentoo_dir}" gentoo
+		gentoo_list=${DIGEST_NAMES}
+
+		set_difference "${overlay_list}" "${gentoo_list}"
+		only_overlay=${SET_ONLY_A}
+		only_gentoo=${SET_ONLY_B}
+
+		content_overlay=""
+		content_gentoo=""
+		set_intersection "${overlay_list}" "${gentoo_list}"
+		read -r -a shared_names <<<"${SET_INTERSECTION}"
+		for name in "${shared_names[@]}"; do
+			if [[ ${FILE_DIGESTS[overlay:${name}]} == "${FILE_DIGESTS[gentoo:${name}]}" ]]; then
+				continue
+			fi
+			# Each side carries the digest it actually has, cut to
+			# twelve characters: the row has to SAY they differ, and
+			# a name repeated in both columns would only say they
+			# are both there.
+			content_overlay+="${name}:${FILE_DIGESTS[overlay:${name}]:0:12} "
+			content_gentoo+="${name}:${FILE_DIGESTS[gentoo:${name}]:0:12} "
+			n_content=$(( n_content + 1 ))
+		done
+
+		if [[ -n ${only_overlay} ]]; then
+			read -r -a surplus <<<"${only_overlay}"
+			n_overlay=$(( n_overlay + ${#surplus[@]} ))
+			parity_row "${key}" "${PACKAGE_ROW_PV}" "${PACKAGE_ROW_PV}" \
+				"${PACKAGE_ROW_DISTANCE}" 'files/overlay-only' \
+				"${only_overlay}" ''
+		fi
+		if [[ -n ${only_gentoo} ]]; then
+			read -r -a surplus <<<"${only_gentoo}"
+			n_gentoo=$(( n_gentoo + ${#surplus[@]} ))
+			parity_row "${key}" "${PACKAGE_ROW_PV}" "${PACKAGE_ROW_PV}" \
+				"${PACKAGE_ROW_DISTANCE}" 'files/gentoo-only' \
+				'' "${only_gentoo}"
+		fi
+		if [[ -n ${content_overlay} ]]; then
+			parity_row "${key}" "${PACKAGE_ROW_PV}" "${PACKAGE_ROW_PV}" \
+				"${PACKAGE_ROW_DISTANCE}" 'files/content' \
+				"${content_overlay% }" "${content_gentoo% }"
+		fi
+	done
+
+	printf '  [files]    %d package(s) with a files/ directory on some side: %d file(s) overlay-only, %d ::gentoo-only, %d same name and different content\n' \
+		"${packages}" "${n_overlay}" "${n_gentoo}" "${n_content}"
+}
+
+ECLASSES_FIELD=""
+
+# eclasses_field <md5-cache file>
+# The entry's _eclasses_ value, into ECLASSES_FIELD. Empty when the entry has no
+# such line, which is an ebuild that inherits nothing.
+eclasses_field() {
+	local -a lines=()
+	local line
+
+	ECLASSES_FIELD=""
+	mapfile -t lines <"$1"
+
+	for line in "${lines[@]}"; do
+		if [[ ${line} == '_eclasses_='* ]]; then
+			ECLASSES_FIELD=${line#_eclasses_=}
+			return 0
+		fi
+	done
+}
+
+# The eclass hashes of the pair being compared, keyed "<side>:<eclass>". One
+# array for both sides, as above.
+declare -A ECLASS_HASH=()
+
+ECLASS_NAMES=""
+
+# read_eclass_hashes <_eclasses_ value> <side>
+# Fill ECLASS_HASH for that side and leave the eclass names, in the order the
+# entry lists them, in ECLASS_NAMES.
+#
+# The field is one flat TAB separated list alternating name and hash -
+# "ecm<TAB>03a0...<TAB>xdg<TAB>3ef4..." - and it is the TRANSITIVE closure, so
+# an eclass no ebuild ever names is in it because something it inherits is.
+read_eclass_hashes() {
+	local side=$2 i
+	local -a fields=()
+
+	ECLASS_NAMES=""
+	IFS=$'\t' read -r -a fields <<<"$1"
+
+	for (( i = 0; i + 1 < ${#fields[@]}; i += 2 )); do
+		ECLASS_HASH["${side}:${fields[i]}"]=${fields[i + 1]}
+		ECLASS_NAMES+="${fields[i]} "
+	done
+
+	ECLASS_NAMES=${ECLASS_NAMES% }
+}
+
+# Sub-task 4.3. Eclasses whose recorded hash differs between the two trees.
+#
+# R1.6, AND WHY THE LOCAL LIST IS READ FROM A DIRECTORY. An eclass the overlay
+# ships is resolved from the overlay for every overlay ebuild that inherits it,
+# so the hash in the overlay's md5-cache is the hash of the OVERLAY's copy and
+# differs from ::gentoo's by construction. Reporting that would be reporting the
+# decision to ship a copy, not a consequence of it, so those are recorded as
+# definitionally divergent in PARITY_ECLASS_DEFINITIONAL instead.
+#
+# The list comes from eclass/*.eclass rather than from three names written here,
+# and the difference is not cosmetic. Two of the three - gstreamer-meson and rpm
+# - shadow a ::gentoo eclass and would be findable from the data. brave has no
+# ::gentoo counterpart at all AND is inherited only by www-client/brave-browser,
+# which ::gentoo does not carry, so it is not in the shared set and never
+# reaches this comparison. Built from observations it would silently not be
+# recorded; built from the directory it is recorded, with its inheritor count
+# reading 0 and saying exactly why.
+#
+# Membership is not compared here. An eclass present on one side only is the
+# INHERIT axis's finding when it is inherited directly, and the mechanical
+# consequence of a hash that already has its own row when it is transitive.
+# R4.3 is about an eclass whose CONTENT differs, which is the intersection.
+compare_eclass_hashes() {
+	local line entry baseline distance category pf pn key opv name
+	local eclass overlay_hash gentoo_hash overlay_value gentoo_value note
+	local -A covered=() is_local=() inheritors=()
+	local -a names=()
+	local path rows=0 compared=0
+
+	for path in "${OVERLAY_ROOT}"/eclass/*.eclass; do
+		eclass=${path##*/}
+		eclass=${eclass%.eclass}
+		is_local["${eclass}"]=1
+		inheritors["${eclass}"]=0
+	done
+
+	for entry in "${PARITY_MD5_COVERED[@]}"; do
+		covered["${entry}"]=1
+	done
+
+	for line in "${PARITY_BASELINES[@]}"; do
+		entry=${line%%$'\t'*}
+		[[ -n ${covered[${entry}]+set} ]] || continue
+
+		baseline=${line#*$'\t'}
+		distance=${baseline#*$'\t'}
+		baseline=${baseline%%$'\t'*}
+
+		category=${entry%%/*}
+		pf=${entry#*/}
+		pn=${PARITY_EBUILD_PN[${entry}]}
+		key="${category}/${pn}"
+		opv=${pf#"${pn}-"}
+
+		ECLASS_HASH=()
+		eclasses_field "${OVERLAY_ROOT}/metadata/md5-cache/${category}/${pf}"
+		read_eclass_hashes "${ECLASSES_FIELD}" overlay
+		names=()
+		read -r -a names <<<"${ECLASS_NAMES}"
+		eclasses_field "${GENTOO_REPO}/metadata/md5-cache/${category}/${pn}-${baseline}"
+		read_eclass_hashes "${ECLASSES_FIELD}" gentoo
+		compared=$(( compared + 1 ))
+
+		overlay_value=""
+		gentoo_value=""
+		for name in "${names[@]}"; do
+			if [[ -n ${is_local[${name}]+set} ]]; then
+				inheritors["${name}"]=$(( inheritors["${name}"] + 1 ))
+				continue
+			fi
+
+			gentoo_hash=${ECLASS_HASH[gentoo:${name}]-}
+			[[ -n ${gentoo_hash} ]] || continue
+			overlay_hash=${ECLASS_HASH[overlay:${name}]}
+			[[ ${overlay_hash} != "${gentoo_hash}" ]] || continue
+
+			overlay_value+="${name}:${overlay_hash:0:12} "
+			gentoo_value+="${name}:${gentoo_hash:0:12} "
+		done
+
+		if [[ -n ${overlay_value} ]]; then
+			rows=$(( rows + 1 ))
+			parity_row "${key}" "${opv}" "${baseline}" "${distance}" \
+				'_eclasses_' "${overlay_value% }" "${gentoo_value% }"
+		fi
+	done
+
+	for eclass in "${!is_local[@]}"; do
+		if [[ -f ${GENTOO_REPO}/eclass/${eclass}.eclass ]]; then
+			note="overlay ships its own ${eclass}.eclass, which shadows ::gentoo's"
+		else
+			note="overlay ships ${eclass}.eclass and ::gentoo has none"
+		fi
+		note+="; inherited by ${inheritors[${eclass}]} in-scope ebuild(s)"
+		PARITY_ECLASS_DEFINITIONAL+=( "${eclass}"$'\t'"${note}" )
+	done
+
+	printf '  [eclass]   %d overlay-local eclass(es) recorded as definitional, not as findings; %d of %d pair(s) differ on some other eclass\n' \
+		"${#PARITY_ECLASS_DEFINITIONAL[@]}" "${rows}" "${compared}"
+}
+
+NORMALISED_PATCH=""
+
+# normalise_patch <array element> <pn> <PV> <PVR>
+# One PATCHES element as a comparable patch name, into NORMALISED_PATCH.
+#
+# WHAT IS NORMALISED, AND WHY EACH ONE HAS TO BE. Two ebuilds can name the same
+# patch in different words, and every one of those differences would otherwise
+# read as drift:
+#
+#   quotes        "${FILESDIR}/x.patch" and "${FILESDIR}"/x.patch are the same
+#                 element written by two people
+#   ${FILESDIR}   says WHERE the patch is, not WHICH patch it is, and both trees
+#                 mean the same directory by it
+#   ${PN}         expands to the same string on both sides - it is the same
+#                 package - so ${PN}-x.patch and spectacle-x.patch are one name
+#   ${P} ${PV}    expand to DIFFERENT strings on the two sides whenever the
+#   ${PF} ${PVR}  versions differ, which is most pairs. Mapped to a placeholder
+#                 rather than expanded, so that the same patch carried across a
+#                 bump is one name and not two
+#
+# All four version variables collapse to the SAME placeholder. ${PF} and ${PVR}
+# differ from ${P} and ${PV} only by the revision, which is a downstream counter
+# rather than a different patch, and keeping them apart would make one ebuild's
+# ${P}-x.patch differ from another's ${PF}-x.patch when both resolve to the same
+# file.
+#
+# WHAT IS NOT NORMALISED, stated so the gaps are not rediscovered as bugs.
+#
+# A version SPELLED OUT in the element is left alone, and that is a measurement
+# rather than an omission. Rewriting it looks obviously right - it would make
+# libixion-0.20.0-boost-m4.patch match itself across a revision bump - and it is
+# wrong: app-editors/vim-core carries the literal
+# vim-core-9.1.1652-r1-unbundle-xxd.patch on BOTH sides, and ::gentoo happens to
+# sit at 9.1.1652, so replacing each side's own version turns two references to
+# one file into a divergence (measured 2026-08-06). A literal in a filename is
+# part of the filename.
+#
+# ${MY_P}, ${WORKDIR}, ${S} and any ebuild-local variable - chromium's
+# "${cr_patchset_dir}/common/" - are left exactly as written. They cannot be
+# resolved without executing the ebuild, they are rare, and an element that
+# differs only because one side used a private variable is a divergence worth
+# looking at anyway.
+normalise_patch() {
+	local elem=$1 pn=$2
+
+	elem=${elem//\"/}
+	elem=${elem//\'/}
+
+	# The patterns below are LITERAL variable names, not expansions: "\$" is
+	# a dollar sign that this script must not expand and the ebuild has not
+	# expanded either. Written with a backslash rather than in single
+	# quotes because '${PN}' is exactly the shape SC2016 warns about, and
+	# the bar here is a shellcheck run with no suppressions in it.
+	elem=${elem//"\${FILESDIR}"/}
+	elem=${elem//"\$FILESDIR"/}
+	elem=${elem#/}
+
+	elem=${elem//"\${PF}"/${pn}-<PV>}
+	elem=${elem//"\${PVR}"/<PV>}
+	elem=${elem//"\${PN}"/${pn}}
+	elem=${elem//"\${PV}"/<PV>}
+	elem=${elem//"\${P}"/${pn}-<PV>}
+
+	# Unbraced, longest name first: $PN starts with $P, so replacing $P
+	# first would turn $PN into <pn>-<PV>N.
+	elem=${elem//"\$PF"/${pn}-<PV>}
+	elem=${elem//"\$PVR"/<PV>}
+	elem=${elem//"\$PN"/${pn}}
+	elem=${elem//"\$PV"/<PV>}
+	elem=${elem//"\$P"/${pn}-<PV>}
+
+	NORMALISED_PATCH=${elem}
+}
+
+PATCH_SET=""
+
+# patches_of <ebuild path> <pn>
+# The ebuild's PATCHES array as a comparable set of names, into PATCH_SET.
+#
+# No version is passed: every version variable normalises to one placeholder, so
+# what each side is actually at never enters the comparison.
+#
+# EVERY assignment in the file contributes, and their union is the answer. A
+# conditional PATCHES+=( ... ) inside an if or behind a use flag therefore reads
+# as "this patch is in the set", which over-approximates on purpose: the
+# question this axis answers is which patches the ebuild can apply, and deciding
+# which branch is taken would mean evaluating the ebuild.
+#
+# ONE LIMITATION, measured rather than assumed. The assignment has to be the
+# first thing on its line, optionally after "local". chromium has one that is
+# not - [[ ${#category_patches[@]} -gt 0 ]] && PATCHES+=( "${category}" ) - and
+# it is the only such line in either tree's shared packages (2026-08-06). Its
+# element is an ebuild-local variable, so it would be unresolvable even if it
+# were read. Matching PATCHES+=( anywhere on a line instead would pick the
+# string out of prose in a comment, which is the worse trade.
+patches_of() {
+	local file=$1 pn=$2
+	local -a lines=() tokens=()
+	local -A seen=()
+	local line token inside=0
+	local opener='^[[:space:]]*(local[[:space:]]+)?PATCHES\+?=\((.*)$'
+
+	PATCH_SET=""
+
+	mapfile -t lines <"${file}"
+
+	for line in "${lines[@]}"; do
+		if (( ! inside )); then
+			[[ ${line} =~ ${opener} ]] || continue
+			line=${BASH_REMATCH[2]}
+			inside=1
+		fi
+
+		read -r -a tokens <<<"${line}"
+		for token in "${tokens[@]}"; do
+			# A word starting with # comments out the rest of the
+			# line, which is how the arrays in chromium and the
+			# kde-plasma ebuilds explain themselves.
+			if [[ ${token} == '#'* ]]; then
+				break
+			fi
+
+			if [[ ${token} == *')' ]]; then
+				token=${token%)}
+				inside=0
+			fi
+
+			if [[ -n ${token} ]]; then
+				normalise_patch "${token}" "${pn}"
+				if [[ -n ${NORMALISED_PATCH} && -z ${seen[${NORMALISED_PATCH}]+set} ]]; then
+					seen["${NORMALISED_PATCH}"]=1
+					PATCH_SET+="${NORMALISED_PATCH} "
+				fi
+			fi
+
+			if (( ! inside )); then
+				break
+			fi
+		done
+	done
+
+	PATCH_SET=${PATCH_SET% }
+}
+
+# Sub-task 4.5. The PATCHES axis.
+#
+# WHY IT IS HERE AND NOT IN STAGE 4. Every other ebuild-level axis is read from
+# md5-cache, which does not record PATCHES at all - it is a plain bash array
+# consumed by src_prepare, not metadata. So it is read from the ebuild TEXT, and
+# reading ebuild text is this stage's business.
+#
+# WHY IT IS AN EBUILD-LEVEL AXIS AT ALL, given that files/ covers the same
+# ground. The two answer different questions and only one of them can be
+# answered. files/ says which patch FILES exist and whether their content
+# matches; PATCHES says which of them the ebuild actually applies - and, because
+# it lives in the ebuild, it is a divergence a # BENTOO-DIVERGENCE: comment can
+# sit next to. kde-plasma/spectacle is exactly that case: the overlay applies
+# ${PN}-opencv5.patch and ::gentoo applies nothing, and the ebuild already
+# explains why in prose that no parser reads.
+compare_patch_sets() {
+	local line entry baseline distance category pf pn key opv
+	local overlay_patches gentoo_patches gentoo_ebuild
+	local before compared=0 diverged=0
+
+	for line in "${PARITY_BASELINES[@]}"; do
+		entry=${line%%$'\t'*}
+		baseline=${line#*$'\t'}
+		distance=${baseline#*$'\t'}
+		baseline=${baseline%%$'\t'*}
+
+		category=${entry%%/*}
+		pf=${entry#*/}
+		pn=${PARITY_EBUILD_PN[${entry}]}
+		key="${category}/${pn}"
+		opv=${pf#"${pn}-"}
+
+		resolve_overlay_ebuild "${entry}" "${pn}"
+		gentoo_ebuild="${GENTOO_REPO}/${key}/${pn}-${baseline}.ebuild"
+		if [[ ! -f ${OVERLAY_EBUILD} || ! -f ${gentoo_ebuild} ]]; then
+			continue
+		fi
+
+		patches_of "${OVERLAY_EBUILD}" "${pn}"
+		overlay_patches=${PATCH_SET}
+		patches_of "${gentoo_ebuild}" "${pn}"
+		gentoo_patches=${PATCH_SET}
+		compared=$(( compared + 1 ))
+
+		ROW_PKG=${key}
+		ROW_OPV=${opv}
+		ROW_BPV=${baseline}
+		ROW_DISTANCE=${distance}
+
+		before=${#PARITY_ROWS[@]}
+		compare_as_sets PATCHES "${overlay_patches}" "${gentoo_patches}"
+		if (( ${#PARITY_ROWS[@]} > before )); then
+			diverged=$(( diverged + 1 ))
+		fi
+	done
+
+	printf '  [patches]  %d of %d ebuild pair(s) compared differ on PATCHES\n' \
+		"${diverged}" "${compared}"
+}
+
+# Stage 5. Compare what md5-cache does not carry: metadata.xml, whatever is
+# under files/, the eclasses the recorded hashes refer to, and the PATCHES array
+# read from the ebuild text.
+# Publishes: PARITY_ROWS (appends; column 8 left to stage 6),
+# PARITY_ECLASS_DEFINITIONAL.
 compare_auxiliary_files() {
-	stage_pending 'compare auxiliary files'
+	local axis axes=""
+
+	compare_metadata_xml
+	compare_files_dirs
+	compare_eclass_hashes
+	compare_patch_sets
+
+	# R4.4, said here as well as in the report. A sweep that printed four
+	# counts and left the reader to work out that two of those axes can
+	# never be justified would be leaving the most misreadable part of its
+	# own output unexplained.
+	for axis in "${PARITY_UNJUSTIFIABLE_AXES[@]}"; do
+		axes+="${axis}, "
+	done
+	printf '  [aux]      %s%s\n' "${axes%, }" ':'
+	printf '  [aux]      %s\n' "${PARITY_UNJUSTIFIABLE_NOTE}"
+}
+
+# The axes whose row carries each side's WHOLE value rather than its surplus.
+# Everything else is set-valued, where (none) on a side means "this side adds
+# nothing" - which is what the UNDOCUMENTED rule below reads.
+PARITY_SINGLE_VALUED_AXES=(
+	'EAPI'
+	'SLOT'
+	'HOMEPAGE'
+	'REQUIRED_USE'
+)
+
+# axis_in <axis> <axis name>...
+# Membership test shared by the two axis lists, so a new axis is added in one
+# place rather than in two loops that must not drift apart. The list arrives
+# expanded rather than by name: an indirect expansion would leave shellcheck
+# unable to see either array being read, and the bar here is a clean run with no
+# suppressions in it.
+axis_in() {
+	local axis=$1 known
+	shift
+
+	for known in "$@"; do
+		if [[ ${axis} == "${known}" ]]; then
+			return 0
+		fi
+	done
+	return 1
+}
+
+# Which (ebuild, axis) pairs carry a # BENTOO-DIVERGENCE: tag naming that axis.
+# Keyed "<category>/<pf>|<axis>".
+declare -A PARITY_TAGGED_AXES=()
+
+# collect_tags <category/pf> <pn>
+# Read one overlay ebuild's tags into PARITY_TAGGED_AXES.
+#
+# THE MATCHER IS DELIBERATELY TIGHT. R3.3 justifies an axis only when a tag
+# NAMES it, and 5.2's risk is the opposite: a matcher loose enough to read any
+# comment as a justification hides exactly the drift this script exists to find.
+# So the axis token is captured immediately after the colon and must equal the
+# divergent axis; the reason after it is free text and is not parsed.
+#
+# The separator between the axis and the reason is NOT matched at all. design.md
+# writes the tag with an em-dash and the self-test writes it with a plain
+# hyphen; a matcher that enumerated separators would be one punctuation mark
+# away from silently failing to justify a correctly-tagged divergence.
+collect_tags() {
+	local entry=$1 pn=$2
+	local line axis
+
+	resolve_overlay_ebuild "${entry}" "${pn}"
+	if [[ ! -f ${OVERLAY_EBUILD} ]]; then
+		return 0
+	fi
+
+	while IFS= read -r line; do
+		if [[ ${line} =~ ^[[:space:]]*#[[:space:]]*BENTOO-DIVERGENCE:[[:space:]]*([^[:space:]]+) ]]; then
+			axis=${BASH_REMATCH[1]}
+			PARITY_TAGGED_AXES["${entry}|${axis}"]=1
+		fi
+	done <"${OVERLAY_EBUILD}"
 }
 
 # Stage 6. Turn the raw differences into a verdict per package.
 # Publishes: PARITY_IDENTICAL, and column 8 of every PARITY_ROWS entry. Reads
 # PARITY_TAG_SOURCE before the tracked ebuild when looking for a tag.
+#
+# THE FOUR VERDICTS AND THE EVIDENCE EACH ONE NEEDS.
+#
+# R3.2 makes ALIGN the default and R3.5 forbids inferring intent, so every row
+# starts at ALIGN and is promoted only by something the script can point at:
+#
+#   REDUNDANT     the whole ebuild is byte-identical to its exact baseline
+#   JUSTIFIED     a tag in the overlay ebuild names THIS axis
+#   UNDOCUMENTED  the overlay carries something on this axis that ::gentoo does
+#                 not, and no tag explains it
+#   ALIGN         everything else
+#
+# THE UNDOCUMENTED RULE, STATED MECHANICALLY, because R3.5 forbids the other
+# kind. A set-valued row carries each side's SURPLUS. An overlay surplus of
+# (none) means the overlay adds nothing and is merely BEHIND - residue, which is
+# ALIGN. An overlay surplus that is NOT (none) means somebody wrote that into
+# the overlay ebuild: the divergence is an addition rather than a residue, and
+# an addition with no tag is precisely what a human has to decide about.
+#
+# It is a criterion a reader can check, not a guess about why. It reproduces all
+# four hand-inspected calibration cases in design.md:
+#
+#   kwin PYTHON_COMPAT        overlay surplus (none)     -> ALIGN
+#   kdeplasma-addons INHERIT  overlay surplus (none)     -> ALIGN
+#   plasma-desktop qtbase[X]  overlay surplus present    -> UNDOCUMENTED
+#   spectacle PATCHES         overlay surplus present    -> UNDOCUMENTED untagged,
+#                                                           JUSTIFIED once tagged
+#
+# Single-valued axes are EXCLUDED from the rule rather than fitted to it. Both
+# sides always carry a value there, so "the overlay carries something ::gentoo
+# does not" is true of every single one of them and separates nothing. They stay
+# ALIGN - the honest default - instead of being promoted by a test that does not
+# discriminate.
+#
+# Byte-identity is read from the TRACKED ebuild, never through
+# resolve_overlay_ebuild. The self-test's scratch copy has a tag appended, so
+# resolving through it would make a byte-identical ebuild look modified and
+# quietly move the count off 67.
 assign_verdicts() {
-	stage_pending 'assign verdicts'
+	local line entry baseline distance category pn pf
+	local row pkg opv bpv axis overlay gentoo verdict key
+	local overlay_ebuild gentoo_ebuild
+	local -A identical=()
+	local -A counts=( [ALIGN]=0 [JUSTIFIED]=0 [UNDOCUMENTED]=0 [REDUNDANT]=0 )
+	local -a kept=()
+
+	# --- 5.1 byte-identity, and the tags, one pass over the pairs ------
+
+	for line in "${PARITY_BASELINES[@]}"; do
+		entry=${line%%$'\t'*}
+		baseline=${line#*$'\t'}
+		distance=${baseline#*$'\t'}
+		baseline=${baseline%%$'\t'*}
+
+		category=${entry%%/*}
+		pf=${entry#*/}
+		pn=${PARITY_EBUILD_PN[${entry}]}
+
+		collect_tags "${entry}" "${pn}"
+
+		if [[ ${distance} != exact ]]; then
+			continue
+		fi
+
+		overlay_ebuild="${OVERLAY_ROOT}/${category}/${pn}/${pf}.ebuild"
+		gentoo_ebuild="${GENTOO_REPO}/${category}/${pn}/${pn}-${baseline}.ebuild"
+
+		if [[ -f ${overlay_ebuild} && -f ${gentoo_ebuild} ]] &&
+			cmp -s -- "${overlay_ebuild}" "${gentoo_ebuild}"; then
+			PARITY_IDENTICAL+=( "${entry}" )
+			identical["${entry}"]=1
+		fi
+	done
+
+	# --- 5.3 verdict per surviving row, 5.1 suppression on the rest ----
+
+	for row in "${PARITY_ROWS[@]}"; do
+		IFS=$'\t' read -r pkg opv bpv distance axis overlay gentoo _ <<<"${row}"
+
+		# R3.4: one REDUNDANT row for the ebuild replaces every
+		# per-axis row it would otherwise emit. 67 ebuilds each
+		# reporting zero-difference axes would bury the real findings.
+		key="${pkg}-${opv}"
+		if [[ -n ${identical[${key}]-} ]]; then
+			continue
+		fi
+
+		verdict=ALIGN
+
+		if [[ -n ${PARITY_TAGGED_AXES["${key}|${axis}"]-} ]]; then
+			verdict=JUSTIFIED
+		elif ! axis_in "${axis}" "${PARITY_UNJUSTIFIABLE_AXES[@]}" &&
+			! axis_in "${axis}" "${PARITY_SINGLE_VALUED_AXES[@]}" &&
+			[[ ${overlay} != '(none)' ]]; then
+			verdict=UNDOCUMENTED
+		fi
+
+		counts["${verdict}"]=$(( counts["${verdict}"] + 1 ))
+		kept+=( "${pkg}"$'\t'"${opv}"$'\t'"${bpv}"$'\t'"${distance}"$'\t'"${axis}"$'\t'"${overlay}"$'\t'"${gentoo}"$'\t'"${verdict}" )
+	done
+
+	# --- 5.1 the REDUNDANT rows themselves -----------------------------
+
+	for entry in "${PARITY_IDENTICAL[@]}"; do
+		category=${entry%%/*}
+		pf=${entry#*/}
+		pn=${PARITY_EBUILD_PN[${entry}]}
+		opv=${pf#"${pn}-"}
+
+		counts[REDUNDANT]=$(( counts[REDUNDANT] + 1 ))
+		kept+=( "${category}/${pn}"$'\t'"${opv}"$'\t'"${opv}"$'\t'"exact"$'\t'"(ebuild)"$'\t'"${pf}.ebuild"$'\t'"${pf}.ebuild"$'\t'"REDUNDANT" )
+	done
+
+	PARITY_ROWS=( "${kept[@]}" )
+
+	printf '  [verdicts] %d row(s): %d ALIGN, %d JUSTIFIED, %d UNDOCUMENTED, %d REDUNDANT\n' \
+		"${#PARITY_ROWS[@]}" "${counts[ALIGN]}" "${counts[JUSTIFIED]}" \
+		"${counts[UNDOCUMENTED]}" "${counts[REDUNDANT]}"
+}
+
+# gentoo_sync_stamp
+# When the ::gentoo tree being compared against was last synced, into
+# GENTOO_SYNC_STAMP. R5 wants the snapshot dated: ::gentoo moves daily, so a
+# report that does not say WHICH ::gentoo it read is a report nobody can
+# reproduce or argue with six weeks later.
+GENTOO_SYNC_STAMP=""
+gentoo_sync_stamp() {
+	local stamp="${GENTOO_REPO}/metadata/timestamp.chk"
+
+	GENTOO_SYNC_STAMP='(unknown - no metadata/timestamp.chk)'
+	if [[ -f ${stamp} ]]; then
+		IFS= read -r GENTOO_SYNC_STAMP <"${stamp}" || true
+	fi
+}
+
+# Sub-task 6.1. One row per divergence, processable without parsing prose.
+# Columns as declared at the top of the file, tab separated, following story
+# 006's sweep-data.tsv convention.
+write_parity_data() {
+	local row
+
+	{
+		printf 'package\toverlay_pv\tbaseline_pv\tdistance\taxis\toverlay_value\tgentoo_value\tverdict\n'
+		if (( ${#PARITY_ROWS[@]} )); then
+			printf '%s\n' "${PARITY_ROWS[@]}"
+		fi
+	} >"${PARITY_DATA}"
+}
+
+# Sub-task 6.2. The readable report: grouped by verdict, broken down per
+# category, and dated.
+#
+# WHY EVERY PERCENTAGE IS ACCOMPANIED BY ITS PER-CATEGORY BREAKDOWN (R5.4).
+# kde-plasma is 72 of the 232 shared packages and media-plugins is 76 - 64%
+# between them. A single "N% of packages diverge" is therefore a statement about
+# those two categories wearing the whole overlay's name, and a reader who acted
+# on it would be acting on the wrong thing.
+write_parity_report() {
+	local row pkg opv bpv distance axis overlay gentoo verdict category
+	local -A cat_packages=() cat_diverging=() axis_rows=() verdict_rows=()
+	local -A cat_verdict=() package_diverges=()
+	local -a categories=() axes=()
+	local key name diverging=0 clean=0
+
+	for pkg in "${PARITY_SHARED_PACKAGES[@]}"; do
+		category=${pkg%%/*}
+		cat_packages["${category}"]=$(( ${cat_packages["${category}"]-0} + 1 ))
+	done
+
+	for row in "${PARITY_ROWS[@]}"; do
+		IFS=$'\t' read -r pkg opv bpv distance axis overlay gentoo verdict <<<"${row}"
+		category=${pkg%%/*}
+
+		verdict_rows["${verdict}"]=$(( ${verdict_rows["${verdict}"]-0} + 1 ))
+		axis_rows["${axis}"]=$(( ${axis_rows["${axis}"]-0} + 1 ))
+		cat_verdict["${category}|${verdict}"]=$(( ${cat_verdict["${category}|${verdict}"]-0} + 1 ))
+
+		if [[ -z ${package_diverges[${pkg}]-} ]]; then
+			package_diverges["${pkg}"]=1
+			cat_diverging["${category}"]=$(( ${cat_diverging["${category}"]-0} + 1 ))
+		fi
+	done
+
+	diverging=${#package_diverges[@]}
+	clean=$(( ${#PARITY_SHARED_PACKAGES[@]} - diverging ))
+
+	mapfile -t categories < <(printf '%s\n' "${!cat_packages[@]}" | sort)
+	mapfile -t axes < <(printf '%s\n' "${!axis_rows[@]}" | sort)
+
+	{
+		printf '# Gentoo parity report\n\n'
+		printf "Structural comparison of this overlay against \`::gentoo\`.\n"
+		printf 'It reports where the two differ; it changes nothing.\n\n'
+
+		printf '| | |\n|---|---|\n'
+		printf "| overlay | \`%s\` |\n" "${OVERLAY_ROOT}"
+		printf "| \`::gentoo\` | \`%s\` |\n" "${GENTOO_REPO}"
+		printf "| \`::gentoo\` synced | %s |\n" "${GENTOO_SYNC_STAMP}"
+		printf '| filter | %s |\n\n' "${FILTER:-(none - full sweep)}"
+
+		printf '## Scope\n\n'
+		printf -- "- **%d shared packages** examined - every overlay package \`::gentoo\` also carries.\n" \
+			"${#PARITY_SHARED_PACKAGES[@]}"
+		printf -- '- **%d overlay-only packages** excluded: there is no baseline to compare them against.\n' \
+			"${#PARITY_EXCLUDED[@]}"
+		printf -- '- **%d ebuilds** in scope, **%d** with an md5-cache entry on both sides.\n' \
+			"${#PARITY_SCOPE_EBUILDS[@]}" "${#PARITY_MD5_COVERED[@]}"
+		printf -- "- **%d packages behind \`::gentoo\`** once live ebuilds leave the version sort.\n\n" \
+			"${#PARITY_BEHIND[@]}"
+
+		printf '## Result\n\n'
+		printf -- '- **%d of %d packages diverge** on at least one axis.\n' \
+			"${diverging}" "${#PARITY_SHARED_PACKAGES[@]}"
+		printf -- '- **%d packages show no divergence** on any axis compared.\n' "${clean}"
+		printf -- '- **%d divergence rows** in total.\n\n' "${#PARITY_ROWS[@]}"
+
+		printf 'That headline figure is dominated by two categories and is broken\n'
+		printf 'down per category below rather than reported alone.\n\n'
+
+		printf '### By verdict\n\n'
+		printf '| Verdict | Rows | Meaning |\n|---|---:|---|\n'
+		printf "| \`ALIGN\` | %d | Converge to \`::gentoo\` - divergence with no declared reason |\n" \
+			"${verdict_rows[ALIGN]-0}"
+		printf "| \`JUSTIFIED\` | %d | Keep - a \`# BENTOO-DIVERGENCE:\` tag names this axis |\n" \
+			"${verdict_rows[JUSTIFIED]-0}"
+		printf "| \`UNDOCUMENTED\` | %d | Maintainer decides - the overlay adds something, with no tag |\n" \
+			"${verdict_rows[UNDOCUMENTED]-0}"
+		printf "| \`REDUNDANT\` | %d | The overlay shadows \`::gentoo\` byte-for-byte, for nothing |\n\n" \
+			"${verdict_rows[REDUNDANT]-0}"
+
+		printf '### By category\n\n'
+		printf "| Category | Packages | Diverging | \`ALIGN\` | \`JUSTIFIED\` | \`UNDOCUMENTED\` | \`REDUNDANT\` |\n"
+		printf '|---|---:|---:|---:|---:|---:|---:|\n'
+		for name in "${categories[@]}"; do
+			printf '| %s | %d | %d | %d | %d | %d | %d |\n' \
+				"${name}" \
+				"${cat_packages[${name}]}" \
+				"${cat_diverging[${name}]-0}" \
+				"${cat_verdict[${name}|ALIGN]-0}" \
+				"${cat_verdict[${name}|JUSTIFIED]-0}" \
+				"${cat_verdict[${name}|UNDOCUMENTED]-0}" \
+				"${cat_verdict[${name}|REDUNDANT]-0}"
+		done
+		printf '\n'
+
+		printf '### By axis\n\n'
+		for name in "${axes[@]}"; do
+			printf "#### \`%s\` - %d row(s)\n\n" "${name}" "${axis_rows[${name}]}"
+			# R4.4, printed HERE rather than in a footnote: the reader
+			# this is for is the one who skims to this section and
+			# stops. A footnote is read by whoever already knew.
+			if axis_in "${name}" "${PARITY_UNJUSTIFIABLE_AXES[@]}"; then
+				printf '> **%s**\n\n' "${PARITY_UNJUSTIFIABLE_NOTE}"
+			fi
+		done
+
+		printf '## Definitionally divergent eclasses\n\n'
+		printf "These are overlay-local: \`::gentoo\` has no counterpart to compare\n"
+		printf 'against, so they are recorded rather than reported as findings (R1.6).\n\n'
+		if (( ${#PARITY_ECLASS_DEFINITIONAL[@]} )); then
+			for name in "${PARITY_ECLASS_DEFINITIONAL[@]}"; do
+				printf -- "- \`%s\`\n" "${name}"
+			done
+		else
+			printf -- '- none\n'
+		fi
+		printf '\n'
+
+		printf '## What this report does not cover\n\n'
+		printf -- "- \`SRC_URI\` and \`DESCRIPTION\` are excluded by design: the first differs\n"
+		printf '  by construction whenever the version differs, the second is cosmetic.\n'
+		printf -- "- Dependency version bounds are compared only at \`exact\` distance. A newer\n"
+		printf '  overlay version legitimately raises a minimum.\n'
+		printf -- "- The %d overlay-only packages have no \`::gentoo\` baseline and are out of\n" \
+			"${#PARITY_EXCLUDED[@]}"
+		printf '  scope; auditing them against the devmanual is separate work.\n'
+	} >"${PARITY_REPORT}"
 }
 
 # Stage 7. Write the machine-readable table and the human-readable report.
 write_reports() {
-	stage_pending "write reports (${PARITY_DATA}, ${PARITY_REPORT})"
+	# .epic/ is gitignored, so the report directory is not tracked and may
+	# not exist on a fresh checkout.
+	mkdir -p -- "${REPORT_DIR}"
+
+	gentoo_sync_stamp
+	write_parity_data
+	write_parity_report
+
+	printf '  [reports]  %s\n' "${PARITY_DATA}"
+	printf '  [reports]  %s\n' "${PARITY_REPORT}"
+}
+
+# Sub-task 6.3. The exit contract, so the script can gate a future workflow.
+#
+# Non-zero when at least one ALIGN or UNDOCUMENTED divergence exists: both are
+# open questions, one with a default answer and one needing a human.
+#
+# JUSTIFIED and REDUNDANT do NOT fail the run. The first is a decision already
+# recorded in the ebuild - failing on it would mean the guard never goes green
+# and stops being run. The second is remediation tracked elsewhere: the 67
+# byte-identical ebuilds are a known, pre-approved cleanup, and a gate that
+# stayed red until they were removed would block every unrelated change.
+sweep_exit_code() {
+	local row verdict
+
+	for row in "${PARITY_ROWS[@]}"; do
+		verdict=${row##*$'\t'}
+		if [[ ${verdict} == ALIGN || ${verdict} == UNDOCUMENTED ]]; then
+			return 1
+		fi
+	done
+	return 0
 }
 
 run_sweep() {
@@ -266,28 +2260,20 @@ run_sweep() {
 	printf 'reports  : %s\n' "${REPORT_DIR}"
 	printf '\n'
 
-	build_package_sets
+	# A stage that cannot establish what the next one reads stops the sweep
+	# here, with its own status and having named what is missing. Carrying on
+	# would produce a report covering part of the tree in a format that says
+	# nothing about which part.
+	build_package_sets || return $?
 	select_baseline
-	verify_md5_cache
+	verify_md5_cache || return $?
 	compare_axes
 	compare_auxiliary_files
 	assign_verdicts
 	write_reports
 
-	if (( ${#PENDING_STAGES[@]} )); then
-		printf '\n%d pipeline stage(s) are not implemented yet:\n' \
-			"${#PENDING_STAGES[@]}" >&2
-		local stage
-		for stage in "${PENDING_STAGES[@]}"; do
-			printf '  - %s\n' "${stage}" >&2
-		done
-		printf 'nothing was compared and no report was written: an empty report\n' >&2
-		printf 'would read as "no divergences found"\n' >&2
-		return 3
-	fi
-
 	# The verdict lands here: non-zero when any package needs action.
-	return 0
+	sweep_exit_code
 }
 
 ### self-test ########################################################
@@ -491,9 +2477,13 @@ self_test_pipeline() {
 		return 0
 	fi
 
-	build_package_sets
+	# The opposite of the sweep's rule, for the reason assert_eq gives: a stage
+	# that fails must leave its arrays short and let the assertion that reads
+	# them report it. Aborting here would hide the other ten reds, which is the
+	# one thing this harness exists not to do.
+	build_package_sets || true
 	select_baseline
-	verify_md5_cache
+	verify_md5_cache || true
 	compare_axes
 	compare_auxiliary_files
 	assign_verdicts

@@ -7,8 +7,16 @@
 # ebuild (Gentoo version rules: prefixes v/release-/ver-/version- stripped;
 # regex returns capture group 1 of the FIRST match on the raw body).
 #
-# 411 records — 226 regex, 182 json, 3 script. 92 disabled (enabled = false),
+# 411 records — 228 regex, 183 json. 20 disabled (enabled = false),
 # 3 held (hold = true): dev-build/gn, dev-lang/ghc, sci-ml/stable-diffusion-cpp.
+#
+# No record uses parser = "script" any more: the three that did (antigravity-bin,
+# antigravity-hub-bin, gitkraken) were migrated to regex on 2026-08-06 because
+# their headless-Chrome route had started failing. The .autoupdate/scripts/
+# directory was deleted with them. Note that the LLM registry fixer which
+# performs such a migration cannot remove a file — it may only add or edit one —
+# so a future parser change away from "script" will again leave the .js behind
+# for someone to delete by hand.
 #
 # Recount with tomllib, never with grep: `grep -c 'enabled = false'` also matches
 # that phrase inside comments prose (98 unanchored, 95 anchored, 92 real).
@@ -243,7 +251,7 @@ url = "https://dl.pstmn.io/api/version/latest?platform=linux64&channel=stable"
 parser = "json"
 path = "version"
 type = "bin"
-version = "12.22.3"
+version = "12.22.6"
 comments = """
 Postman — official version API; clean {"version":"..."}.
 """
@@ -912,7 +920,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^b(\d+)$', "0_pre$1"]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0_pre10291"
+version = "0_pre10293"
 comments = """
 llama-cpp — upstream tags builds "bNNNN" (no semver); the ebuild carries them as
 the 0_pre<build> snapshot scheme and bridges back with MY_PV="b${PV#0_pre}", so
@@ -1581,7 +1589,7 @@ base_from = "file"
 base_url = "https://raw.githubusercontent.com/KhronosGroup/Vulkan-ValidationLayers/main/CMakeLists.txt"
 base_pattern = '(?m)^project\([A-Za-z_-]+ VERSION ([0-9][0-9.]*)'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.358_p20260805"
+version = "1.4.358_p20260806"
 comments = """
 vulkan-layers — commit-tracked on main (Vulkan-ValidationLayers); scans for "Update for Vulkan-Docs X.Y.Z".
 """
