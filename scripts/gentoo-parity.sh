@@ -27,6 +27,9 @@
 #
 #   GENTOO_REPO=<path>   the ::gentoo tree to compare against
 #                        (default /var/db/repos/gentoo)
+#   PARITY_REPORT_DIR=<path>
+#                        where the two reports are written
+#                        (default .epic/stories/007-gentoo-parity-baseline)
 #
 # Exit status:
 #   0  the sweep found nothing to act on, or every self-test assertion passed
@@ -55,7 +58,12 @@ GENTOO_REPO=${GENTOO_REPO:-/var/db/repos/gentoo}
 # Both reports live with the story that produced them. .epic/ is gitignored,
 # which is exactly why the script itself lives in scripts/ instead: the report
 # is a snapshot, the guard that regenerates it has to outlive the story.
-REPORT_DIR="${OVERLAY_ROOT}/.epic/stories/007-gentoo-parity-baseline"
+#
+# Overridable for the reason GENTOO_REPO is, and for one of its own: A12 runs a
+# whole sweep in a subprocess to prove that a run finding nothing still writes a
+# complete report. Without somewhere else to put it, --self-test would publish
+# over the real report on every invocation - a guard editing what it measures.
+REPORT_DIR=${PARITY_REPORT_DIR:-"${OVERLAY_ROOT}/.epic/stories/007-gentoo-parity-baseline"}
 PARITY_DATA="${REPORT_DIR}/parity-data.tsv"
 PARITY_REPORT="${REPORT_DIR}/parity-report.md"
 
@@ -177,7 +185,10 @@ check_preconditions() {
 # binutils-2.47 the baseline 2.46.9999, so two ebuilds would be compared
 # against a git checkout's metadata. Widening the rule changes those two
 # baselines to 5.0.0 and 2.46.1-r1 and moves no other row: the exact /
-# same-series / cross-series split is 76 / 33 / 210 either way.
+# same-series / cross-series split is the same either way. That split was
+# 76 / 33 / 210 when it was first measured and is 76 / 33 / 212 now, the two
+# extra ebuilds being the ones 05b58fec5 added to the shared set (see A01) -
+# neither of them live, and neither of them a counter-example.
 version_is_live() {
 	# Read as: an optional dotted prefix, then a component of nothing but 9s,
 	# then an optional revision, then end. So 9999, 99999999, 9999-r1 and
@@ -2122,8 +2133,23 @@ write_parity_report() {
 	diverging=${#package_diverges[@]}
 	clean=$(( ${#PARITY_SHARED_PACKAGES[@]} - diverging ))
 
-	mapfile -t categories < <(printf '%s\n' "${!cat_packages[@]}" | sort)
-	mapfile -t axes < <(printf '%s\n' "${!axis_rows[@]}" | sort)
+	# GUARDED BECAUSE AN EMPTY ASSOCIATIVE ARRAY IS NOT AN EMPTY LIST. printf
+	# over "${!map[@]}" with no keys still emits one blank line, so mapfile
+	# hands back a ONE-element array holding "", and the loops below then
+	# index ${map[""]} - a bad array subscript, fatal under set -e.
+	#
+	# axis_rows is empty exactly when the scope holds no divergence, which is
+	# the state this guard exists to reward: the run died writing the very
+	# report that says the work is done (A12 pins it). cat_packages cannot be
+	# empty today - an empty shared set stops the sweep at exit 2 long before
+	# here - but the defect is the idiom, not the array, so both sites are
+	# guarded rather than only the reachable one.
+	if (( ${#cat_packages[@]} )); then
+		mapfile -t categories < <(printf '%s\n' "${!cat_packages[@]}" | sort)
+	fi
+	if (( ${#axis_rows[@]} )); then
+		mapfile -t axes < <(printf '%s\n' "${!axis_rows[@]}" | sort)
+	fi
 
 	{
 		printf '# Gentoo parity report\n\n'
@@ -2196,8 +2222,12 @@ write_parity_report() {
 		printf "These are overlay-local: \`::gentoo\` has no counterpart to compare\n"
 		printf 'against, so they are recorded rather than reported as findings (R1.6).\n\n'
 		if (( ${#PARITY_ECLASS_DEFINITIONAL[@]} )); then
+			# An entry is <eclass> TAB <why it is not a finding>, so it needs
+			# splitting before it is rendered: printing the whole tuple through
+			# one %s put the tab INSIDE the code span, and the reason came out
+			# looking like part of the eclass name.
 			for name in "${PARITY_ECLASS_DEFINITIONAL[@]}"; do
-				printf -- "- \`%s\`\n" "${name}"
+				printf -- "- \`%s\` - %s\n" "${name%%$'\t'*}" "${name#*$'\t'}"
 			done
 		else
 			printf -- '- none\n'
@@ -2290,6 +2320,16 @@ FAILURES=()
 # moved on is a stale assertion to re-measure, not a lookup to make dynamic.
 SELF_TEST_TAGGED_PKG='kde-plasma/spectacle'
 SELF_TEST_TAGGED_PV='6.7.4'
+
+# The filter A12 drives a whole sweep through. Pinned for the same reason: it
+# names a category the overlay shares with ::gentoo and diverges from on
+# nothing, which is the state a run has to survive and used not to.
+#
+# If a bump ever gives app-dicts a divergence this assertion goes red as a stale
+# measurement - repin it on another clean category, never loosen it to accept a
+# non-zero exit. A guard that cannot go green once remediation succeeds is a
+# guard nobody re-runs.
+SELF_TEST_CLEAN_FILTER='app-dicts'
 
 # q <value>
 # Render a value for a report line: newlines flattened, empty made visible. On
@@ -2422,6 +2462,49 @@ keywords_false_positives() {
 	printf '%d' "${count}"
 }
 
+# zero_divergence_run <scratch dir>
+# Drive a real sweep over a scope that holds no divergence, and report what came
+# back as "exit=<rc> report=<state>".
+#
+# A SUBPROCESS, not a call into run_sweep. What is under test is the whole path
+# from the stages through write_reports to the exit code, and an in-process run
+# would inherit this shell's already-populated arrays - the one state in which
+# the empty case cannot happen.
+#
+# PARITY_REPORT_DIR sends both files to the scratch directory. GENTOO_REPO is
+# passed explicitly because it is a shell variable here, not an exported one,
+# and a subprocess falling back to the default would compare a different tree
+# from the one the other eleven assertions just measured.
+#
+# report=<state> is three-valued on purpose: "missing" (write_reports never
+# ran), "truncated" (it died partway and left a fragment) and "complete" are
+# three different defects, and a boolean would collapse them into one red.
+zero_divergence_run() {
+	local scratch=$1
+	local dir="${scratch}/zero-divergence"
+	local report="${dir}/parity-report.md"
+	local rc=0 state
+
+	mkdir -p -- "${dir}"
+
+	GENTOO_REPO="${GENTOO_REPO}" PARITY_REPORT_DIR="${dir}" \
+		bash -- "${BASH_SOURCE[0]}" "${SELF_TEST_CLEAN_FILTER}" \
+		>/dev/null 2>&1 || rc=$?
+
+	# The last heading write_parity_report emits. Reached only by walking the
+	# per-axis loop that used to be fatal here, so its presence is what
+	# separates a complete report from one cut off at "### By axis".
+	if [[ ! -f ${report} ]]; then
+		state=missing
+	elif grep -q '^## What this report does not cover$' -- "${report}"; then
+		state=complete
+	else
+		state=truncated
+	fi
+
+	printf 'exit=%d report=%s' "${rc}" "${state}"
+}
+
 ### driving the pipeline for the self-test ############################
 
 # prepare_tag_scratch <scratch dir>
@@ -2464,10 +2547,10 @@ prepare_tag_scratch() {
 # not called: the self-test proves the numbers, it does not publish them.
 #
 # check_preconditions is probed rather than enforced. --self-test must stay
-# runnable with no ::gentoo checkout, but the eleven facts below are
+# runnable with no ::gentoo checkout, but the twelve facts below are
 # measurements of two real trees and cannot be confirmed without one. A missing
 # tree therefore says so and skips the stages, leaving every measurement empty
-# and failing. Staying silent would be worse: eleven reds that look like the
+# and failing. Staying silent would be worse: twelve reds that look like the
 # script disagreeing with the numbers, when it never got to look.
 self_test_pipeline() {
 	if ! check_preconditions 2>/dev/null; then
@@ -2489,19 +2572,24 @@ self_test_pipeline() {
 	assign_verdicts
 }
 
-### the eleven assertions #############################################
+### the twelve assertions #############################################
 #
 # design.md's Testing Strategy table, executable. The numbers were measured by
-# hand on 2026-08-05 and re-measured on 2026-08-06. A run that does not
-# reproduce them is wrong, or the measurement is stale and gets RE-MEASURED and
-# recorded - never loosened until it agrees.
+# hand on 2026-08-05, re-measured on 2026-08-06, and four of them re-measured
+# again later the same day after 05b58fec5 added three packages (see A01). A run
+# that does not reproduce them is wrong, or the measurement is stale and gets
+# RE-MEASURED and recorded - never loosened until it agrees.
+#
+# The overlay is bumped daily, so a scope count going stale is expected and is
+# not a defect. What must never happen is a stale count being met by widening
+# the assertion instead of explaining the delta.
 #
 # Each one increments ASSERT_TOTAL and appends to FAILURES on failure, so the
 # verdict below stays as written:
 #
 #   assert_eq <id> <description> <expected> <actual>
 #
-# Two rules hold for all eleven:
+# Two rules hold for all twelve:
 #
 #   READ THE PIPELINE, NOT THE TREES. Every observed value comes from what a
 #   stage published. An assertion that counted the ebuilds itself would be
@@ -2528,23 +2616,29 @@ self_test_assertions() {
 
 	# --- what is being compared at all --------------------------------
 
+	# RE-MEASURED 2026-08-06, from 232 / 319 / 82. The overlay gained three
+	# packages that afternoon in 05b58fec5: sys-apps/fakeroot and
+	# sys-apps/uutils-coreutils, both of which ::gentoo also carries, and
+	# sys-apps/uutils-coreutils-bin, which it does not. So 232 + 2 = 234 shared,
+	# 319 + 2 = 321 ebuilds and 82 + 1 = 83 overlay-only - every delta accounted
+	# for by one commit, with 76 / 67 / 67 unmoved.
+	#
+	# Recorded rather than adjusted quietly, and never the other way round: an
+	# assertion that disagrees with the tree is stale until the difference is
+	# EXPLAINED, and only then re-measured. Loosening one to make it agree
+	# retires the only thing that would notice the overlay moving under it.
 	assert_eq A01 \
 		'shared packages: the overlay packages ::gentoo also carries' \
-		'232' "${#PARITY_SHARED_PACKAGES[@]}"
+		'234' "${#PARITY_SHARED_PACKAGES[@]}"
 
-	# 319 is design.md's figure. An independent count on 2026-08-06 using the
-	# same definition - every .ebuild inside a shared package - returned 321,
-	# while 232 / 82 / 76 / 67 all reproduced exactly. Encoded as designed and
-	# flagged rather than quietly adjusted: sub-task 7.1 re-measures and
-	# records which is right. Two ebuilds is a bump, not a rounding error.
 	assert_eq A02 \
 		'ebuilds in scope: every overlay ebuild inside a shared package' \
-		'319' "${#PARITY_SCOPE_EBUILDS[@]}"
+		'321' "${#PARITY_SCOPE_EBUILDS[@]}"
 
-	# Paired with its denominator: 0/0 and 319/319 must not read alike.
+	# Paired with its denominator: 0/0 and 321/321 must not read alike.
 	assert_eq A07 \
 		'md5-cache coverage: an entry exists on both sides for every ebuild in scope' \
-		'319/319' "${#PARITY_MD5_COVERED[@]}/${#PARITY_SCOPE_EBUILDS[@]}"
+		'321/321' "${#PARITY_MD5_COVERED[@]}/${#PARITY_SCOPE_EBUILDS[@]}"
 
 	# --- what each ebuild is compared against -------------------------
 
@@ -2558,7 +2652,7 @@ self_test_assertions() {
 	# selected is the bug looking exactly like the fix.
 	assert_eq A06 \
 		'packages behind ::gentoo: none, once live ebuilds leave the version sort' \
-		'behind=0 baselines=319' \
+		'behind=0 baselines=321' \
 		"behind=${#PARITY_BEHIND[@]} baselines=${#PARITY_BASELINES[@]}"
 
 	# --- what the comparison concluded --------------------------------
@@ -2610,6 +2704,23 @@ self_test_assertions() {
 		'kdeplasma-addons-6.7.4 INHERIT divergence is detected: ::gentoo has cargo and flag-o-matic, the overlay neither' \
 		'INHERIT' \
 		"$(select_rows kde-plasma/kdeplasma-addons 6.7.4 INHERIT cargo axis)"
+
+	# --- what the guard does when it finds nothing --------------------
+
+	# The state the guard exists to reward, and the one it used to die in. Its
+	# commonest use is checking the single package just bumped; that scope holds
+	# no divergence the moment remediation succeeds, and until this assertion
+	# existed such a run exited non-zero on a fatal bad array subscript, having
+	# written a report truncated at "### By axis". So the guard could never go
+	# green - it reported failure precisely when the work was done.
+	#
+	# Both halves are asserted because either alone passes on the wrong thing: a
+	# report can be complete after a non-zero exit, and an exit of 0 says
+	# nothing about whether write_reports finished.
+	assert_eq A12 \
+		'a scope with no divergence exits 0 and still writes a complete report' \
+		'exit=0 report=complete' \
+		"$(zero_divergence_run "${scratch}")"
 
 	rm -rf -- "${scratch}"
 }
