@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@protonmail.com</email>
+		<name>Lucas Couto</name>
+	</maintainer>
+	<longdescription lang="en">
+		fakeroot runs a command in an environment where it appears to have root
+		privileges for file manipulation: it intercepts the libc calls that
+		read and change file ownership and permissions, keeping the pretend
+		values in a database instead of touching the real filesystem.  That is
+		what lets an unprivileged user build packages whose contents have to be
+		owned by root.
+
+		This is a temporary mirror of the ::gentoo package.  ::gentoo carries
+		1.33 (2025); fakeroot is developed in Debian, which moved to the 2.x
+		series in July 2026.  Remove this package once ::gentoo catches up.
+	</longdescription>
+	<upstream>
+		<bugs-to>https://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=fakeroot</bugs-to>
+	</upstream>
+</pkgmetadata>

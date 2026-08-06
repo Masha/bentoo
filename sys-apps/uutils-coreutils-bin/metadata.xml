@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@protonmail.com</email>
+		<name>Lucas Couto</name>
+	</maintainer>
+	<longdescription lang="en">
+		uutils coreutils is a cross-platform reimplementation of the GNU file,
+		text and shell utilities (ls, cp, dd, sort, head, whoami, ...) in Rust.
+		Release 0.10.0 passes 645 of the GNU test suite cases.
+
+		This package installs the prebuilt binaries published by upstream for
+		each release instead of compiling roughly four hundred crates locally,
+		so it needs neither a Rust toolchain nor a long build.  The installed
+		layout is identical to the from-source sys-apps/uutils-coreutils: a
+		multicall binary at /usr/bin/uu-coreutils with one uu- prefixed symlink
+		per applet, so nothing shadows GNU sys-apps/coreutils and the two
+		packages block each other.
+
+		amd64 and x86 use upstream's glibc build; arm64 and riscv use the
+		statically linked musl build, which is the only one upstream provides
+		for those architectures.  A musl build resolves accounts from
+		/etc/passwd and /etc/group alone and ignores NSS modules such as LDAP
+		or SSSD, which matters for uu-ls -l, uu-id and uu-chown on hosts with
+		networked accounts.
+
+		The stdbuf applet is absent: it requires a helper library that the
+		release tarballs do not carry.  Build the package from source if it is
+		needed.
+	</longdescription>
+	<use>
+		<flag name="l10n_fr">Install the French translations, which are shipped
+			in the source tree rather than in the binary tarballs and therefore
+			require fetching an extra archive.  English is compiled into the
+			binary and always available.</flag>
+	</use>
+	<upstream>
+		<remote-id type="github">uutils/coreutils</remote-id>
+		<bugs-to>https://github.com/uutils/coreutils/issues</bugs-to>
+		<doc>https://uutils.github.io/coreutils/docs/</doc>
+	</upstream>
+</pkgmetadata>

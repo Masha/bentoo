@@ -19,7 +19,10 @@
 # for someone to delete by hand.
 #
 # Recount with tomllib, never with grep: `grep -c 'enabled = false'` also matches
-# that phrase inside comments prose (98 unanchored, 95 anchored, 92 real).
+# that phrase inside comment prose, so it overcounts, and anchoring the pattern
+# only reduces the error instead of removing it. When this was first measured the
+# three answers were 98 unanchored, 95 anchored and 92 real. Parse the file:
+#   python3 -c "import tomllib,collections as c;d=tomllib.load(open('.autoupdate/packages.toml','rb'));p={k:v for k,v in d.items() if isinstance(v,dict) and 'url' in v};print(len(p),dict(c.Counter(v.get('parser') for v in p.values())),sum(1 for v in p.values() if v.get('enabled') is False))"
 #
 # A package whose upstream is unreachable or gone gets NO record here — a record
 # promises an endpoint that answers. Those are listed in dead-upstreams.md.
@@ -6240,5 +6243,69 @@ on 2026-07-26.  Two things had to be true for that, and neither was before:
   - the "0_pre" prefix must come from the snapshot suffix the checker carries
     over from the current PV, NOT from a transform.  A third transform rule
     ('^(\\d+)$' -> "0_pre$1") would compose with it and yield "0_pre0_pre<date>".
+"""
+# END
+
+["sys-apps/fakeroot"]
+url = "https://sources.debian.org/api/src/fakeroot/"
+parser = "json"
+path = "versions[0].version"
+transform = [["-[0-9.]+$", ""]]
+version = "2.1.4"
+comments = """
+fakeroot — developed inside Debian, with no upstream release page of its own.
+Do NOT probe the pool listing (deb.debian.org/debian/pool/main/f/fakeroot/): it
+is sorted alphabetically, so 1.37.1.1 appears before 2.1.4 and a first-match
+regex would report the OLDER version as the newest.  sources.debian.org orders
+versions newest first, versions[0] being sid/forky.  The transform strips the
+Debian revision ("2.1.4-1" -> "2.1.4"), which is how the .orig.tar.xz in
+SRC_URI is named.
+
+This record is temporary, like the package: bentoo carries fakeroot only
+because ::gentoo is stuck on 1.33 (2025).  Drop both once ::gentoo ships 2.x.
+"""
+# END
+
+["sys-apps/uutils-coreutils"]
+url = "https://api.github.com/repos/uutils/coreutils/releases/latest"
+parser = "json"
+path = "tag_name"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "0.10.0"
+comments = """
+uutils coreutils — tags are bare "X.Y.Z", no prefix to strip.  releases/latest
+rather than /tags: the repo also carries a rolling "latest-commit" tag that
+ranks unpredictably against real releases.
+
+Temporary mirror of ::gentoo, which had not picked up 0.10.0 when this was
+added.  It differs from the ::gentoo ebuild in ONE way that matters to a bump:
+the ~400 crates are listed inline in CRATES instead of coming from the
+consolidated tarball at github.com/gentoo-crate-dist/coreutils.  So a version
+bump here is NOT just a PV change — regenerate the block, or the build dies
+offline on a stale crate:
+  pycargoebuild -d /var/cache/distfiles -o out.ebuild <unpacked source>
+(crates.io rejects wget's default User-Agent; export a WGETRC with a browser
+one first.)  Drop the package once ::gentoo catches up.
+"""
+# END
+
+["sys-apps/uutils-coreutils-bin"]
+url = "https://api.github.com/repos/uutils/coreutils/releases/latest"
+parser = "json"
+path = "tag_name"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+type = "bin"
+version = "0.10.0"
+comments = """
+uutils coreutils, upstream's prebuilt binaries.  Same endpoint as the
+from-source package; unlike it, this one is NOT a mirror — ::gentoo ships no
+binary variant, so it stays after the source package is dropped.
+
+Bump checklist beyond PV: upstream publishes one tarball per target plus a
+shared docs.tar.zst, and the ebuild picks glibc builds on amd64/x86 and musl
+on arm64/riscv.  Re-check the glibc floor of the -gnu tarballs on a bump
+(objdump -T | grep GLIBC_); 0.10.0 was 2.39 on x86_64 and 2.18 on i686.  If a
+floor ever passes the oldest glibc in ::gentoo, move that arch to its musl
+tarball.
 """
 # END

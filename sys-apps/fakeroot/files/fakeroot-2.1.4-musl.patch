@@ -1,0 +1,60 @@
+Rebased for 2.1.4 from the 1.32.2 patch carried by ::gentoo, itself taken from
+https://github.com/void-linux/void-packages/tree/master/srcpkgs/fakeroot/patches
+
+The libfakeroot.c half of the original patch (the SEND_GET_XATTR macro) was
+merged upstream and is dropped here.  What remains is the printf/scanf format
+strings: the values are cast to uint64_t, but the format uses %ll*, which is
+only correct where uint64_t is unsigned long long.  On musl (and any LP64
+target where uint64_t is unsigned long) that is a format mismatch, so use the
+PRI*/SCN* macros from inttypes.h instead.
+--- a/faked.c
++++ b/faked.c
+@@ -123,6 +123,7 @@
+ #include <stdlib.h>
+ #include <string.h>
+ #include <signal.h>
++#include <inttypes.h>
+ #ifdef HAVE_STDINT_H
+ # include <stdint.h>
+ #endif
+@@ -613,11 +614,11 @@
+ 
+ #ifdef FAKEROOT_DB_PATH
+     if (find_path(i->buf.dev, i->buf.ino, roots, path))
+-      fprintf(f,"mode=%llo,uid=%llu,gid=%llu,nlink=%llu,rdev=%llu %s\n",
++      fprintf(f,"mode=%"PRIo64",uid=%"PRIu64",gid=%"PRIu64",nlink=%"PRIu64",rdev=%"PRIu64" %s\n",
+               (uint64_t) i->buf.mode,(uint64_t) i->buf.uid,(uint64_t) i->buf.gid,
+               (uint64_t) i->buf.nlink,(uint64_t) i->buf.rdev,path);
+ #else
+-    fprintf(f,"dev=%llx,ino=%llu,mode=%llo,uid=%llu,gid=%llu,nlink=%llu,rdev=%llu\n",
++    fprintf(f,"dev=%"PRIx64",ino=%"PRIu64",mode=%"PRIo64",uid=%"PRIu64",gid=%"PRIu64",nlink=%"PRIu64",rdev=%"PRIu64"\n",
+             (uint64_t) i->buf.dev,(uint64_t) i->buf.ino,(uint64_t) i->buf.mode,
+             (uint64_t) i->buf.uid,(uint64_t) i->buf.gid,(uint64_t) i->buf.nlink,
+             (uint64_t) i->buf.rdev);
+@@ -643,7 +644,7 @@
+ 
+   while(1){
+ #ifdef FAKEROOT_DB_PATH
+-    r=scanf("mode=%llo,uid=%llu,gid=%llu,nlink=%llu,rdev=%llu "DB_PATH_SCAN"\n",
++    r=scanf("mode=%"SCNo64",uid=%"SCNu64",gid=%"SCNu64",nlink=%"SCNu64",rdev=%"SCNu64" "DB_PATH_SCAN"\n",
+             &stmode, &stuid, &stgid, &stnlink, &strdev, &path);
+     if (r != 6)
+       break;
+@@ -658,7 +659,7 @@
+     stdev = path_st.st_dev;
+     stino = path_st.st_ino;
+ #else
+-    r=scanf("dev=%llx,ino=%llu,mode=%llo,uid=%llu,gid=%llu,nlink=%llu,rdev=%llu\n",
++    r=scanf("dev=%"SCNx64",ino=%"SCNu64",mode=%"SCNo64",uid=%"SCNu64",gid=%"SCNu64",nlink=%"SCNu64",rdev=%"SCNu64"\n",
+             &stdev, &stino, &stmode, &stuid, &stgid, &stnlink, &strdev);
+     if (r != 7)
+       break;
+@@ -685,7 +686,7 @@
+ /*                               */
+ /*********************************/
+ void debug_stat(const struct fakestat *st){
+-  fprintf(stderr,"dev:ino=(%llx:%lli), mode=0%lo, own=(%li,%li), nlink=%li, rdev=%lli\n",
++  fprintf(stderr,"dev:ino=(%"PRIx64":%"PRIu64"), mode=0%lo, own=(%li,%li), nlink=%li, rdev=%"PRIu64"\n",
+ 	  st->dev,
+ 	  st->ino,
+ 	  (long)st->mode,

@@ -1,0 +1,15 @@
+BDEPEND=app-arch/zstd
+DEFINED_PHASES=install postinst unpack
+DESCRIPTION=GNU coreutils rewritten in Rust (prebuilt upstream binaries)
+EAPI=8
+HOMEPAGE=https://uutils.github.io/coreutils/ https://github.com/uutils/coreutils
+INHERIT=bash-completion-r1 optfeature unpacker
+IUSE=l10n_fr
+KEYWORDS=-* ~amd64 ~arm64 ~riscv ~x86
+LICENSE=MIT Apache-2.0 BSD-2 BSD CC0-1.0 ISC MIT MPL-2.0 Unicode-3.0 ZLIB
+RDEPEND=!sys-apps/uutils-coreutils
+RESTRICT=strip
+SLOT=0
+SRC_URI=amd64? ( elibc_glibc? ( https://github.com/uutils/coreutils/releases/download/0.10.0/coreutils-0.10.0-x86_64-unknown-linux-gnu.tar.gz ) elibc_musl? ( https://github.com/uutils/coreutils/releases/download/0.10.0/coreutils-0.10.0-x86_64-unknown-linux-musl.tar.gz ) ) arm64? ( https://github.com/uutils/coreutils/releases/download/0.10.0/coreutils-0.10.0-aarch64-unknown-linux-musl.tar.gz ) riscv? ( https://github.com/uutils/coreutils/releases/download/0.10.0/coreutils-0.10.0-riscv64gc-unknown-linux-musl.tar.gz ) x86? ( elibc_glibc? ( https://github.com/uutils/coreutils/releases/download/0.10.0/coreutils-0.10.0-i686-unknown-linux-gnu.tar.gz ) elibc_musl? ( https://github.com/uutils/coreutils/releases/download/0.10.0/coreutils-0.10.0-i686-unknown-linux-musl.tar.gz ) ) https://github.com/uutils/coreutils/releases/download/0.10.0/docs.tar.zst -> uutils-coreutils-0.10.0-docs.tar.zst l10n_fr? ( https://github.com/uutils/coreutils/archive/refs/tags/0.10.0.tar.gz -> uutils-coreutils-0.10.0.tar.gz )
+_eclasses_=toolchain-funcs	58a918e3a42d0156f010dcfd43725be5	shell-completion	63a62de3ca49c798ee6e89f190e45d0e	bash-completion-r1	4386cfb12ede6cd8f0c1987d2e88da5f	optfeature	58cc13bdc4e9a204077e1e7c9a1d7988	eapi9-pipestatus	d2c134036ac31c3085aebc9147f572bd	multiprocessing	45d0620f25c2f063ad6276ecd9ed9399	unpacker	a89c769f7dcf68bd2a6d23da9ede2ad2
+_md5_=17a5043132278c8e4b785c89da273a06
