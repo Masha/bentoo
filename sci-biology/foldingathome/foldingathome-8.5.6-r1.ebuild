@@ -2,9 +2,9 @@
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
-PYTHON_COMPAT=( python3_{12..14} )
+PYTHON_COMPAT=( python3_{12..15} )
 
-inherit desktop multilib python-single-r1 systemd unpacker xdg
+inherit desktop python-single-r1 systemd unpacker xdg
 
 DESCRIPTION="Folding@Home distributed computing client for protein folding research"
 HOMEPAGE="https://foldingathome.org/"
@@ -19,7 +19,13 @@ S="${WORKDIR}"
 LICENSE="GPL-3"
 SLOT="0"
 KEYWORDS="-* ~amd64 ~arm64"
-IUSE="elogind systemd"
+# elogind is default-on so the package still merges out of the box on a plain
+# OpenRC profile. Neither flag is default there -- elogind comes from the
+# desktop target and systemd from systemd profiles -- so without this default
+# REQUIRED_USE refuses the merge on every headless/server amd64 profile. On a
+# systemd profile elogind is USE-masked, so the default is overridden there and
+# the exactly-one-of constraint still resolves.
+IUSE="+elogind systemd"
 REQUIRED_USE="^^ ( elogind systemd ) ${PYTHON_REQUIRED_USE}"
 RESTRICT="bindist mirror strip"
 
