@@ -5956,6 +5956,24 @@ git-r3 for deps but PV is a concrete tag. Live=v8.30.1.
 """
 # END
 
+["dev-go/staticcheck"]
+url = "https://api.github.com/repos/dominikh/go-tools/releases/latest"
+parser = "json"
+path = "name"
+transform = [['^.*\(v', ""], ['\)$', ""]]
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "0.7.0"
+comments = """
+staticcheck — upstream dominikh/go-tools carries TWO version axes: the CalVer tag
+("2026.1") and the SemVer the ebuild uses ("0.7.0"). tag_name yields the CalVer, so
+this record reads "name" ("Staticcheck 2026.1 (v0.7.0)") and transforms away
+everything but the SemVer in parentheses; that naming has held for every release
+back to 2023.1. releases/latest is also what keeps release candidates out — the tag
+space carries them (2026.2rc1 = v0.8.0-rc.1) and ranking refs/tags would pick one.
+Live=v0.7.0.
+"""
+# END
+
 ["sys-apps/openrazer"]
 enabled = false
 url = "https://api.github.com/repos/openrazer/openrazer/releases/latest"

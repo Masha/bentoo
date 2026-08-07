@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@protonmail.com</email>
+		<name>Lucas Couto</name>
+	</maintainer>
+	<upstream>
+		<remote-id type="github">dominikh/go-tools</remote-id>
+		<bugs-to>https://github.com/dominikh/go-tools/issues</bugs-to>
+		<doc>https://staticcheck.dev/docs/</doc>
+		<changelog>https://staticcheck.dev/changes/</changelog>
+	</upstream>
+	<longdescription lang="en">
+		Staticcheck is a state-of-the-art linter for the Go programming
+		language.  It uses static analysis to find bugs and performance issues,
+		offer simplifications and enforce style rules.  Beyond the staticcheck
+		command itself, this package installs the structlayout family of tools,
+		which display and optimise the in-memory layout of Go structs:
+		structlayout, structlayout-optimize and structlayout-pretty.
+	</longdescription>
+</pkgmetadata>
