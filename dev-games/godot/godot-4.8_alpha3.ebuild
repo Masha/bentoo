@@ -96,6 +96,7 @@ BDEPEND="
 
 PATCHES=(
 	"${FILESDIR}"/${PN}-4.5-scons.patch
+	"${FILESDIR}"/${PN}-4.8-system-pcre2.patch
 )
 
 src_prepare() {

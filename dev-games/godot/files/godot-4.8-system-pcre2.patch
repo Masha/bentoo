@@ -1,0 +1,36 @@
+Use the system pcre2 header instead of the hardcoded bundled path.
+
+Godot 4.8 moved the RegEx implementation out of modules/regex/ into
+core/string/regex.cpp and, while converting the tree to IWYU-style includes
+(paths relative to the repository root), hardcoded the bundled copy:
+
+    #include <thirdparty/pcre2/src/pcre2.h>
+
+That path is only reachable through core/SCsub, which prepends
+"#thirdparty/pcre2/src/" to CPPPATH exclusively under `if env["builtin_pcre2"]`
+(and only for env_thirdparty at that).  With builtin_pcre2=no,
+platform/linuxbsd/detect.py resolves pcre2 via `pkg-config libpcre2-32`, which
+on Gentoo emits just -lpcre2-32 and no -I, since the header is installed as
+/usr/include/pcre2.h.  Compiling core/string/regex.cpp then fails with:
+
+    fatal error: thirdparty/pcre2/src/pcre2.h: No such file or directory
+
+regex.cpp already defines PCRE2_STATIC and PCRE2_CODE_UNIT_WIDTH 32 just above
+the include, so pointing at the system header is all that is needed
+(PCRE2_STATIC is inert on ELF platforms, it only drives __declspec on Windows).
+
+This unconditional rewrite is safe here because the ebuild always unbundles
+pcre2 (thirdparty/pcre2 is deleted in src_prepare and builtin_pcre2=no is
+passed to scons), so the bundled path is never valid in this build.
+
+--- a/core/string/regex.cpp
++++ b/core/string/regex.cpp
+@@ -42,7 +42,7 @@
+ #define PCRE2_CODE_UNIT_WIDTH 32
+ #endif
+ 
+-#include <thirdparty/pcre2/src/pcre2.h>
++#include <pcre2.h>
+ 
+ static void *_regex_malloc(PCRE2_SIZE p_size, void *p_user) {
+ 	return memalloc(p_size);
