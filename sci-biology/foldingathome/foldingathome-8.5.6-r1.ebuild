@@ -2,8 +2,9 @@
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
+PYTHON_COMPAT=( python3_{12..14} )
 
-inherit desktop multilib systemd unpacker xdg
+inherit desktop multilib python-single-r1 systemd unpacker xdg
 
 DESCRIPTION="Folding@Home distributed computing client for protein folding research"
 HOMEPAGE="https://foldingathome.org/"
@@ -19,7 +20,7 @@ LICENSE="GPL-3"
 SLOT="0"
 KEYWORDS="-* ~amd64 ~arm64"
 IUSE="elogind systemd"
-REQUIRED_USE="^^ ( elogind systemd )"
+REQUIRED_USE="^^ ( elogind systemd ) ${PYTHON_REQUIRED_USE}"
 RESTRICT="bindist mirror strip"
 
 # The prebuilt fah-client has a DT_NEEDED on libsystemd.so.0 and is BIND_NOW,
@@ -27,7 +28,15 @@ RESTRICT="bindist mirror strip"
 # the two providers may be depended on: sys-auth/elogind carries an explicit
 # !sys-apps/systemd blocker, so an unconditional dep would make the package
 # unemergeable for every systemd user.
+#
+# fahctl is a python3 script. It carries PEP 723 inline metadata declaring
+# websocket-client, and the import is mandatory: the ImportError branch only
+# prints a hint and exits 1, so without it the command is dead on arrival.
 RDEPEND="
+	${PYTHON_DEPS}
+	$(python_gen_cond_dep '
+		dev-python/websocket-client[${PYTHON_USEDEP}]
+	')
 	acct-group/foldingathome
 	acct-user/foldingathome
 	dev-libs/openssl:=
@@ -51,6 +60,12 @@ src_install() {
 		dosym "../../../usr/$(get_libdir)/libelogind.so.0" /opt/foldingathome/lib/libsystemd.so.0
 		patchelf --set-rpath "${EPREFIX}/opt/foldingathome/lib" usr/bin/fah-client || die
 	fi
+
+	# Rewrite the upstream "#!/usr/bin/env python3" to the interpreter this
+	# build selected, so fahctl runs on the exact implementation that
+	# dev-python/websocket-client was installed for. Like the patchelf call
+	# above, this edits the payload in ${S} before it is copied into the image.
+	python_fix_shebang usr/bin/fahctl
 
 	exeinto /opt/foldingathome
 	doexe usr/bin/fah-client
