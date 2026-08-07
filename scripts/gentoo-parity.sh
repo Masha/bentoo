@@ -278,6 +278,26 @@ PARITY_ROWS=()             # one divergence row per (ebuild, axis)      - stages
 PARITY_ECLASS_DEFINITIONAL=()
                            # <eclass> TAB <why it is not a finding>     - stage 5
 
+# Story 008 adds two more, and both are OUTPUT SURFACE rather than internals for
+# the same reason as everything above: an assertion has to read what a stage
+# concluded, not re-derive it.
+#
+# They are declared empty here rather than beside the logic that fills them so
+# that the assertions reading them can be authored FIRST and fail by observing
+# nothing recorded. Under set -u an assertion reading an undeclared array aborts
+# the harness instead - which is a broken test, not a red one, and would prove
+# nothing about the rule being absent.
+
+PARITY_SLOT_SUPPRESSED=()  # <category>/<pn>-<PV> TAB <overlay SLOT> TAB
+                           # <::gentoo SLOT> TAB <why it was suppressed>
+                           # R1.5: a suppression nobody can audit is
+                           # indistinguishable from a comparison that broke
+PARITY_STALE_CACHE=()      # <category>/<pn> TAB <PV> TAB <eclass> TAB <note>
+                           # R2.1-R2.2: an _eclasses_ hash difference for an
+                           # eclass the overlay does not ship. Instrument error,
+                           # reported outside the four verdicts and outside the
+                           # divergence row count
+
 # <category>/<pf> -> <pn>, for every ebuild in scope. Published by stage 1 and
 # read by every stage after it, because PN cannot be recovered from PF alone:
 # net-libs/webkit-gtk-2.52.5-r411 splits at the second hyphen, not the first,
@@ -972,6 +992,107 @@ compare_as_sets() {
 	fi
 }
 
+# slot_component_derivable <slot component> <PV>
+# Sub-task 3.1. Whether one slot component is that side's own version.
+#
+# THE BOUNDARY IS THE WHOLE POINT. A component derives from a PV when the PV -
+# revision stripped - either IS it, or begins with it followed by a dot. The
+# second half is what makes sys-devel/binutils work: ::gentoo sits at 2.46.1-r1
+# and calls its slot 2.46, so nothing but a component-prefix match recognises it.
+#
+# And the dot is what stops that half from swallowing real slots. "2.4" is a
+# prefix of the string "2.46.1", but it stops in the MIDDLE of a component and
+# is not a version this package ever had; accepting it would fold genuinely
+# different slots together. dev-libs/imath is the case that would go first - its
+# 3/30 against 3/29 is an ABI counter, and 30 must not derive from 3.2.2.
+#
+# The revision is stripped because it is a downstream counter, not a version:
+# net-libs/webkit-gtk carries -r411 against ::gentoo's -r600 at the same PV, and
+# a slot never encodes one.
+slot_component_derivable() {
+	local component=$1 pv=$2
+
+	[[ -n ${component} ]] || return 1
+
+	if [[ ${pv} =~ ^(.+)-r[0-9]+$ ]]; then
+		pv=${BASH_REMATCH[1]}
+	fi
+
+	[[ ${pv} == "${component}" || ${pv} == "${component}."* ]]
+}
+
+# compare_slot <overlay SLOT> <::gentoo SLOT>
+# Sub-tasks 3.2 and 3.3, and story 008's R1. Emit a SLOT row only where the slot
+# STRUCTURE differs, never where the two sides merely sit at different versions.
+#
+# WHY THIS AXIS NEEDED ITS OWN COMPARATOR. Ten of the sixteen SLOT rows story
+# 007 produced differ only because the package encodes its version in the slot
+# or the subslot - dev-db/redis at 0/8.10 against 0/8.8, dev-lang/lua at 5.5
+# against 5.4. That is the same artifact story 007's own R1.4 already gates
+# dependency bounds against; SLOT was simply never given the same treatment, and
+# an inventory whose rows are mostly artifacts trains its reader to skim.
+#
+# THE COUNT IS COMPARED FIRST, AND THE ORDER IS LOAD-BEARING. net-libs/nodejs
+# declares SLOT="24" where ::gentoo declares "0/24": the overlay drops the
+# subslot entirely, so a := dependency on it cannot trigger a rebuild when the
+# ABI changes. It is the most valuable single finding the 007 sweep produced.
+# Both sides normalise to a placeholder-bearing form, so comparing the
+# normalised forms without checking the component count first calls them
+# identical and deletes the finding while looking like a success.
+#
+# ONLY DIFFERING COMPONENTS ARE TESTED FOR DERIVABILITY, which is R1.4 read
+# literally ("either side's DIFFERING component"). Normalising the equal ones
+# too would be the obvious reading of R1.1 and is subtly wrong: derivability is
+# evaluated against each side's OWN PV, so a component identical on both sides
+# can still be derivable on one side only and not on the other - and replacing
+# it on that side alone manufactures a difference out of two equal strings.
+# dev-libs/liborcus is the live near-miss: its slot 0 is the ordinary slot 0,
+# and it is derivable from PV 0.21.0 purely by coincidence.
+compare_slot() {
+	local overlay=$1 gentoo=$2
+	local -a o_parts=() g_parts=()
+	local i reason=""
+
+	if [[ ${overlay} == "${gentoo}" ]]; then
+		return 0
+	fi
+
+	IFS=/ read -r -a o_parts <<<"${overlay}"
+	IFS=/ read -r -a g_parts <<<"${gentoo}"
+
+	# 3.2. A different number of components is a structural difference by
+	# itself and is reported without normalising anything. This is nodejs.
+	if (( ${#o_parts[@]} != ${#g_parts[@]} )); then
+		parity_row "${ROW_PKG}" "${ROW_OPV}" "${ROW_BPV}" "${ROW_DISTANCE}" \
+			SLOT "${overlay}" "${gentoo}"
+		return 0
+	fi
+
+	# 3.3. Every component that differs must be its own side's version on
+	# BOTH sides. One that is not - www-client/chromium's stable against
+	# unstable, dev-util/glslang's soname 16.1 against 16.3 - is the finding.
+	for (( i = 0; i < ${#o_parts[@]}; i++ )); do
+		if [[ ${o_parts[i]} == "${g_parts[i]}" ]]; then
+			continue
+		fi
+
+		if ! slot_component_derivable "${o_parts[i]}" "${ROW_OPV}" ||
+			! slot_component_derivable "${g_parts[i]}" "${ROW_BPV}"; then
+			parity_row "${ROW_PKG}" "${ROW_OPV}" "${ROW_BPV}" \
+				"${ROW_DISTANCE}" SLOT "${overlay}" "${gentoo}"
+			return 0
+		fi
+
+		reason+="component $(( i + 1 )) is each side's own version"
+		reason+=" (${o_parts[i]} from ${ROW_OPV}, ${g_parts[i]} from ${ROW_BPV}); "
+	done
+
+	# R1.5. Recorded rather than dropped: a suppression nobody can audit is
+	# indistinguishable from a comparison that silently broke, and this axis
+	# now loses ten of its sixteen rows to exactly that mechanism.
+	PARITY_SLOT_SUPPRESSED+=( "${ROW_PKG}-${ROW_OPV}"$'\t'"${overlay}"$'\t'"${gentoo}"$'\t'"${reason%; }" )
+}
+
 # axis_raw_differs <axis>
 # Whether the two sides declare the axis differently before any normalisation.
 #
@@ -989,7 +1110,10 @@ axis_raw_differs() {
 #
 # WHICH AXES, AND WHY EACH IS COMPARED THE WAY IT IS (design.md's axis table):
 #
-#   EAPI SLOT HOMEPAGE   exact string: one value, no ordering to normalise away
+#   EAPI HOMEPAGE        exact string: one value, no ordering to normalise away
+#   SLOT                 component count first, then per-component derivability
+#                        against each side's own PV (story 008's R1) - see
+#                        compare_slot
 #   INHERIT              set - which eclasses are inherited is structural, the
 #                        order portage happened to emit them in is not
 #   DEFINED_PHASES       set
@@ -1033,10 +1157,16 @@ compare_ebuild_axes() {
 	# Single-valued axes. One absent from BOTH entries is two empty strings,
 	# which compare equal and emit nothing - correctly, since neither side
 	# declares it.
-	for axis in EAPI SLOT HOMEPAGE; do
+	#
+	# SLOT used to be compared here, exactly, alongside these two. Story 008
+	# moved it out: ten of its sixteen rows reported nothing but the two
+	# sides sitting at different versions. See compare_slot.
+	for axis in EAPI HOMEPAGE; do
 		compare_values "${axis}" "${MD5_FIELDS[overlay:${axis}]-}" \
 			"${MD5_FIELDS[gentoo:${axis}]-}"
 	done
+
+	compare_slot "${MD5_FIELDS[overlay:SLOT]-}" "${MD5_FIELDS[gentoo:SLOT]-}"
 
 	# Set-valued axes: the order portage happened to emit them in is not
 	# meaning, so it must not read as divergence.
@@ -1159,6 +1289,11 @@ compare_axes() {
 
 	printf '  [axes]     %d metadata row(s); %d of %d ebuild(s) compared diverge on some axis\n' \
 		"$(( ${#PARITY_ROWS[@]} - rows_before ))" "${diverged}" "${compared}"
+
+	# R1.5, on stdout as well as in the report: the count a reader needs in
+	# order to notice that a suppression rule has started swallowing the tree.
+	printf '  [slot]     %d SLOT row(s) suppressed as version artifacts, each recorded with its reason\n' \
+		"${#PARITY_SLOT_SUPPRESSED[@]}"
 }
 
 ### the axes md5-cache does not carry #################################
@@ -1575,12 +1710,32 @@ read_eclass_hashes() {
 # INHERIT axis's finding when it is inherited directly, and the mechanical
 # consequence of a hash that already has its own row when it is transitive.
 # R4.3 is about an eclass whose CONTENT differs, which is the intersection.
+#
+# STORY 008: THIS AXIS NO LONGER EMITS A DIVERGENCE ROW, AND THAT IS EXHAUSTIVE
+# RATHER THAN A LOSS. Every differing hash falls into one of exactly two cases,
+# and neither is drift in the tree:
+#
+#   the overlay SHIPS the eclass    the two trees hashed two different files,
+#                                   so they differ by construction. Story 007's
+#                                   R1.6 already recorded these as definitional
+#
+#   the overlay does NOT ship it    then BOTH trees resolved the same ::gentoo
+#                                   file, so the hashes cannot describe
+#                                   different content - only different moments.
+#                                   The overlay's md5-cache is out of date.
+#                                   Story 008's R2.1: a stale cache
+#
+# There is no third case, which is why the row-emitting path was removed rather
+# than left unreachable. Story 008's R2.5 - "keep reporting a real finding where
+# the overlay does carry the eclass" - is met by the first branch below keeping
+# those definitional exactly as before, never by this axis reporting them as
+# divergence, which story 007 had already decided against.
 compare_eclass_hashes() {
 	local line entry baseline distance category pf pn key opv name
-	local eclass overlay_hash gentoo_hash overlay_value gentoo_value note
+	local eclass overlay_hash gentoo_hash note
 	local -A covered=() is_local=() inheritors=()
 	local -a names=()
-	local path rows=0 compared=0
+	local path stale=0 compared=0
 
 	for path in "${OVERLAY_ROOT}"/eclass/*.eclass; do
 		eclass=${path##*/}
@@ -1616,12 +1771,9 @@ compare_eclass_hashes() {
 		read_eclass_hashes "${ECLASSES_FIELD}" gentoo
 		compared=$(( compared + 1 ))
 
-		overlay_value=""
-		gentoo_value=""
 		for name in "${names[@]}"; do
 			if [[ -n ${is_local[${name}]+set} ]]; then
 				inheritors["${name}"]=$(( inheritors["${name}"] + 1 ))
-				continue
 			fi
 
 			gentoo_hash=${ECLASS_HASH[gentoo:${name}]-}
@@ -1629,15 +1781,35 @@ compare_eclass_hashes() {
 			overlay_hash=${ECLASS_HASH[overlay:${name}]}
 			[[ ${overlay_hash} != "${gentoo_hash}" ]] || continue
 
-			overlay_value+="${name}:${overlay_hash:0:12} "
-			gentoo_value+="${name}:${gentoo_hash:0:12} "
-		done
+			# THE DISCRIMINATOR, sub-task 4.1, and it is asked of
+			# is_local - which was built by listing eclass/ at the top
+			# of this function, not from any name written here. A
+			# fourth overlay-local eclass added later is covered
+			# without an edit, and would be misfiled as a stale cache
+			# by a check written against the three that exist today.
+			if [[ -n ${is_local[${name}]+set} ]]; then
+				# Story 007's R1.6. The overlay ships this eclass,
+				# so every overlay ebuild that inherits it resolves
+				# it from the overlay: the hash differs BY
+				# CONSTRUCTION. That is the decision to ship a copy,
+				# recorded as definitional below, not a finding.
+				continue
+			fi
 
-		if [[ -n ${overlay_value} ]]; then
-			rows=$(( rows + 1 ))
-			parity_row "${key}" "${opv}" "${baseline}" "${distance}" \
-				'_eclasses_' "${overlay_value% }" "${gentoo_value% }"
-		fi
+			# Story 008's R2.1. The overlay does not ship this eclass,
+			# so BOTH trees resolved it from the same ::gentoo file and
+			# the two hashes cannot describe different content. They can
+			# only have been recorded at different times - the overlay's
+			# md5-cache entry was generated against an older ::gentoo
+			# eclass and never regenerated.
+			#
+			# So this is the instrument reporting itself, not the tree
+			# drifting. Left as a divergence row it is classified
+			# UNDOCUMENTED, which asks a human to decide about a
+			# measurement error the guard made.
+			stale=$(( stale + 1 ))
+			PARITY_STALE_CACHE+=( "${key}"$'\t'"${opv}"$'\t'"${name}"$'\t'"overlay md5-cache records ${overlay_hash:0:12}, ::gentoo's ${gentoo_hash:0:12}, for an eclass the overlay does not ship" )
+		done
 	done
 
 	for eclass in "${!is_local[@]}"; do
@@ -1650,8 +1822,8 @@ compare_eclass_hashes() {
 		PARITY_ECLASS_DEFINITIONAL+=( "${eclass}"$'\t'"${note}" )
 	done
 
-	printf '  [eclass]   %d overlay-local eclass(es) recorded as definitional, not as findings; %d of %d pair(s) differ on some other eclass\n' \
-		"${#PARITY_ECLASS_DEFINITIONAL[@]}" "${rows}" "${compared}"
+	printf '  [eclass]   %d overlay-local eclass(es) recorded as definitional, not as findings; %d of %d pair(s) carry a stale md5-cache entry\n' \
+		"${#PARITY_ECLASS_DEFINITIONAL[@]}" "${stale}" "${compared}"
 }
 
 NORMALISED_PATCH=""
@@ -2234,6 +2406,52 @@ write_parity_report() {
 		fi
 		printf '\n'
 
+		# R1.5. The rows this run decided NOT to show, and why it decided
+		# that. Without this the reader cannot tell a working suppression
+		# from a comparison that silently stopped comparing - and ten of
+		# this axis's sixteen rows now go through it.
+		printf "## Suppressed \`SLOT\` rows\n\n"
+		printf 'The two sides differ here only because they sit at different\n'
+		printf -- 'versions and the package encodes its version in the slot. Listed\n'
+		printf -- 'rather than dropped: a suppression nobody can audit is\n'
+		printf -- 'indistinguishable from a comparison that broke (story 008, R1.5).\n\n'
+		if (( ${#PARITY_SLOT_SUPPRESSED[@]} )); then
+			printf "| Package | overlay | \`::gentoo\` | Why it was suppressed |\n"
+			printf '|---|---|---|---|\n'
+			for name in "${PARITY_SLOT_SUPPRESSED[@]}"; do
+				IFS=$'\t' read -r key overlay gentoo verdict <<<"${name}"
+				printf -- "| \`%s\` | \`%s\` | \`%s\` | %s |\n" \
+					"${key}" "${overlay}" "${gentoo}" "${verdict}"
+			done
+		else
+			printf -- '- none\n'
+		fi
+		printf '\n'
+
+		# R2.2 and R2.3. Its own section, outside the four verdicts and
+		# outside the row count above: this is the guard reporting a fault
+		# in its own measurement, not a divergence for a human to judge.
+		printf "## Stale \`md5-cache\` entries\n\n"
+		printf "An \`_eclasses_\` hash differs for an eclass the overlay does not\n"
+		printf -- 'ship. Both trees resolved the same file, so the two hashes cannot\n'
+		printf -- 'describe different content - only different moments. The overlay\n'
+		printf -- 'cache is out of date; the tree is not divergent (story 008, R2).\n\n'
+		printf -- 'These are **not** counted among the divergence rows above and do\n'
+		printf -- 'not affect the exit code.\n\n'
+		if (( ${#PARITY_STALE_CACHE[@]} )); then
+			printf "| Package | \`PV\` | Eclass | Observation |\n"
+			printf '|---|---|---|---|\n'
+			for name in "${PARITY_STALE_CACHE[@]}"; do
+				IFS=$'\t' read -r key overlay gentoo verdict <<<"${name}"
+				printf -- "| \`%s\` | \`%s\` | \`%s\` | %s |\n" \
+					"${key}" "${overlay}" "${gentoo}" "${verdict}"
+			done
+			printf '\n'
+			printf -- "Remediation: \`egencache --update --repo bentoo\`\n\n"
+		else
+			printf -- '- none\n\n'
+		fi
+
 		printf '## What this report does not cover\n\n'
 		printf -- "- \`SRC_URI\` and \`DESCRIPTION\` are excluded by design: the first differs\n"
 		printf '  by construction whenever the version differs, the second is cosmetic.\n'
@@ -2330,6 +2548,18 @@ SELF_TEST_TAGGED_PV='6.7.4'
 # non-zero exit. A guard that cannot go green once remediation succeeds is a
 # guard nobody re-runs.
 SELF_TEST_CLEAN_FILTER='app-dicts'
+
+# The scope A21 drives a whole sweep through, for story 008's R2.4. Pinned for
+# the same reason as the two above: dev-ruby/erb is the tree's ONLY stale
+# md5-cache entry (measured 2026-08-06, story 008's Task 1), so it is the one
+# filter that produces a scope whose only observation is a stale cache and whose
+# divergence row count is zero. That is the exact state R2.4 is about - the run
+# must exit 0 having still reported something.
+#
+# If erb is ever regenerated with egencache the assertion goes red as a stale
+# measurement: repin it on whichever entry is stale then, or retire it with the
+# reason recorded. Never loosen it to accept a non-zero exit.
+SELF_TEST_STALE_FILTER='dev-ruby/erb'
 
 # q <value>
 # Render a value for a report line: newlines flattened, empty made visible. On
@@ -2460,6 +2690,234 @@ keywords_false_positives() {
 		fi
 	done
 	printf '%d' "${count}"
+}
+
+### story 008: querying the two new rules #############################
+
+# in_md5_scope <category/pn> <PV>
+# Whether stage 3 put this exact ebuild in the compared set.
+#
+# THE DENOMINATOR EVERY SUPPRESSION ASSERTION IS PAIRED WITH. "redis reports no
+# SLOT row" is trivially true of a redis that left the overlay, or that ::gentoo
+# stopped carrying, or that lost its md5-cache entry - and that is the one way a
+# suppression assertion goes green having suppressed nothing.
+in_md5_scope() {
+	local wanted="$1-$2" entry
+
+	for entry in "${PARITY_MD5_COVERED[@]}"; do
+		if [[ ${entry} == "${wanted}" ]]; then
+			printf 'yes'
+			return 0
+		fi
+	done
+	printf 'no'
+}
+
+# slot_outcome <category/pn> <PV>
+# What the SLOT axis concluded for one ebuild, with its denominator attached.
+slot_outcome() {
+	local verdict
+
+	verdict=$(select_rows "$1" "$2" SLOT '' verdict)
+	if [[ ${verdict} == '(no matching divergence row)' ]]; then
+		verdict=none
+	fi
+	printf 'compared=%s slot=%s' "$(in_md5_scope "$1" "$2")" "${verdict}"
+}
+
+# slot_survivors
+# Every package still reporting a SLOT row, named and sorted, with the row count
+# beside it.
+#
+# NAMED RATHER THAN COUNTED, and the distinction is the whole assertion. The
+# rule findings.md proposed also suppresses nine of the sixteen - while hiding
+# imath and glslang, whose subslots are real, and leaving lua, blender and
+# binutils standing, whose slots are versions. A count assertion is green for
+# both rules. The count is carried anyway because nodejs contributes two of the
+# six rows under one name, and losing one of them must not read as unchanged.
+slot_survivors() {
+	local row pkg axis out rows=0
+	local -a hits=()
+
+	for row in "${PARITY_ROWS[@]}"; do
+		IFS=$'\t' read -r pkg _ _ _ axis _ _ _ <<<"${row}"
+		[[ ${axis} == SLOT ]] || continue
+		rows=$(( rows + 1 ))
+		hits+=( "${pkg}" )
+	done
+
+	if (( rows == 0 )); then
+		printf 'rows=0 packages=(none)'
+		return 0
+	fi
+
+	out=$(printf '%s\n' "${hits[@]}" | sort -u | tr '\n' ' ')
+	printf 'rows=%d packages=%s' "${rows}" "${out% }"
+}
+
+# slot_survivors_count
+# Just the surviving SLOT row count, for the assertions that need it as a
+# denominator beside something else.
+slot_survivors_count() {
+	local row axis count=0
+
+	for row in "${PARITY_ROWS[@]}"; do
+		IFS=$'\t' read -r _ _ _ _ axis _ _ _ <<<"${row}"
+		if [[ ${axis} == SLOT ]]; then
+			count=$(( count + 1 ))
+		fi
+	done
+	printf '%d' "${count}"
+}
+
+# eclass_row_verdict <category/pn> <PV>
+# The verdict on this ebuild's _eclasses_ divergence row, or "none" when it has
+# none. select_rows' own placeholder is spelled out for a reader of the report
+# line; here the assertion is about presence, so it reads better as none.
+eclass_row_verdict() {
+	local verdict
+
+	verdict=$(select_rows "$1" "$2" '_eclasses_' '' verdict)
+	if [[ ${verdict} == '(no matching divergence row)' ]]; then
+		verdict=none
+	fi
+	printf '%s' "${verdict}"
+}
+
+# slot_suppression_record
+# R1.5, read back: how many suppressions were recorded and how many carry a
+# reason. Paired with the surviving row count, because "0 recorded, 0 with a
+# reason" is what a script that never suppressed anything also reports.
+slot_suppression_record() {
+	local entry recorded=0 with_reason=0 reason
+
+	for entry in "${PARITY_SLOT_SUPPRESSED[@]}"; do
+		recorded=$(( recorded + 1 ))
+		reason=${entry##*$'\t'}
+		if [[ -n ${reason} && ${entry} == *$'\t'* ]]; then
+			with_reason=$(( with_reason + 1 ))
+		fi
+	done
+
+	printf 'recorded=%d with-reason=%d' "${recorded}" "${with_reason}"
+}
+
+# stale_cache_for <category/pn>
+# Which eclass the run recorded as a stale cache entry for this package.
+stale_cache_for() {
+	local wanted=$1 entry rest
+
+	for entry in "${PARITY_STALE_CACHE[@]}"; do
+		[[ ${entry%%$'\t'*} == "${wanted}" ]] || continue
+		rest=${entry#*$'\t'}     # drop the package
+		rest=${rest#*$'\t'}      # drop the PV
+		printf '%s' "${rest%%$'\t'*}"
+		return 0
+	done
+	printf '(none recorded)'
+}
+
+# local_eclasses_in_stale
+# How many of the eclasses the overlay actually SHIPS were filed as a stale
+# cache. Must be zero: an overlay-local eclass is a deliberate override, and
+# calling one a stale cache is the blanket-suppression failure this rule is most
+# likely to have. Read from eclass/ at run time for the reason sub-task 4.1
+# gives - a fourth local eclass added later must be covered without an edit.
+local_eclasses_in_stale() {
+	local path eclass entry rest count=0
+
+	for path in "${OVERLAY_ROOT}"/eclass/*.eclass; do
+		eclass=${path##*/}
+		eclass=${eclass%.eclass}
+		for entry in "${PARITY_STALE_CACHE[@]}"; do
+			rest=${entry#*$'\t'}
+			rest=${rest#*$'\t'}
+			if [[ ${rest%%$'\t'*} == "${eclass}" ]]; then
+				count=$(( count + 1 ))
+			fi
+		done
+	done
+	printf '%d' "${count}"
+}
+
+# definitional_eclasses
+# The overlay-local eclasses stage 5 recorded, named and sorted. The other half
+# of the converse: they must still be recorded as definitional, not moved into
+# the stale-cache bucket.
+definitional_eclasses() {
+	local entry out
+	local -a names=()
+
+	for entry in "${PARITY_ECLASS_DEFINITIONAL[@]}"; do
+		names+=( "${entry%%$'\t'*}" )
+	done
+
+	if (( ${#names[@]} == 0 )); then
+		printf '(none)'
+		return 0
+	fi
+	out=$(printf '%s\n' "${names[@]}" | sort -u | tr '\n' ' ')
+	printf '%s' "${out% }"
+}
+
+# row_arithmetic
+# R2.2, read back: the divergence row total, the sum of the four verdicts, and
+# the stale-cache observations recorded outside both.
+#
+# The four verdicts must still SUM to the row total. That is what "reported in a
+# section of their own, excluded from the row count" has to mean operationally,
+# and it is the invariant a fifth verdict would break.
+row_arithmetic() {
+	local sum
+
+	sum=$(( $(verdict_count ALIGN) + $(verdict_count JUSTIFIED) +
+		$(verdict_count UNDOCUMENTED) + $(verdict_count REDUNDANT) ))
+
+	printf 'rows=%d verdict-sum=%d stale=%d' \
+		"${#PARITY_ROWS[@]}" "${sum}" "${#PARITY_STALE_CACHE[@]}"
+}
+
+# stale_cache_run <scratch dir>
+# Drive a real sweep over a scope whose ONLY finding is the stale cache, and
+# report "exit=<rc> rows=<n> stale=<state>".
+#
+# A SUBPROCESS for the reason zero_divergence_run is one: what is under test is
+# the whole path through write_reports to the exit code, and an in-process run
+# would inherit this shell's already-populated arrays.
+#
+# All three halves are needed, which is what Task 2.3 asks the assertion to
+# distinguish. exit=0 alone is also what a scope with nothing in it returns;
+# rows=0 alone says nothing about whether the observation was kept; and
+# stale=present alone says nothing about the exit contract. rows=-1 is a fourth
+# state - the data file was never written - kept distinct from rows=0 so a run
+# that died before publishing cannot read as a clean one.
+stale_cache_run() {
+	local scratch=$1
+	local dir="${scratch}/stale-cache"
+	local report="${dir}/parity-report.md"
+	local data="${dir}/parity-data.tsv"
+	local rc=0 rows=-1 stale=absent lines
+
+	mkdir -p -- "${dir}"
+
+	GENTOO_REPO="${GENTOO_REPO}" PARITY_REPORT_DIR="${dir}" \
+		bash -- "${BASH_SOURCE[0]}" "${SELF_TEST_STALE_FILTER}" \
+		>/dev/null 2>&1 || rc=$?
+
+	if [[ -f ${data} ]]; then
+		lines=$(wc -l <"${data}")
+		rows=$(( lines - 1 ))
+	fi
+
+	# The remediation string R2.3 requires beside the observation. Emitted
+	# only when there IS one, so grepping for it is exactly "at least one
+	# stale-cache entry was reported" and needs no prose parsing.
+	if [[ -f ${report} ]] &&
+		grep -qF -- 'egencache --update --repo bentoo' "${report}"; then
+		stale=present
+	fi
+
+	printf 'exit=%d rows=%d stale=%s' "${rc}" "${rows}" "${stale}"
 }
 
 # zero_divergence_run <scratch dir>
@@ -2631,6 +3089,21 @@ self_test_assertions() {
 		'shared packages: the overlay packages ::gentoo also carries' \
 		'234' "${#PARITY_SHARED_PACKAGES[@]}"
 
+	# RE-MEASURED TWICE during story 008, and left where it started - which is
+	# worth recording, because the second measurement is the one that says
+	# what this count is really made of.
+	#
+	# Mid-story it read 322: a concurrent session in this repository had added
+	# app-editors/zed-1.16.0_pre20260806-r1 while leaving the unrevised ebuild
+	# in place, and eight divergence rows came with it. Minutes later the same
+	# session removed the unrevised one - a same-day revision REPLACING its
+	# predecessor rather than joining it - and the count returned to 321.
+	#
+	# So this assertion, and A06, A07 and A20 with it, will flap for anyone
+	# running the guard against a working tree another session is bumping.
+	# That is the tree moving, not a defect, and the answer is the one story
+	# 007 set: re-measure and record the cause. Never widen it to a range so
+	# that it stops noticing.
 	assert_eq A02 \
 		'ebuilds in scope: every overlay ebuild inside a shared package' \
 		'321' "${#PARITY_SCOPE_EBUILDS[@]}"
@@ -2721,6 +3194,126 @@ self_test_assertions() {
 		'a scope with no divergence exits 0 and still writes a complete report' \
 		'exit=0 report=complete' \
 		"$(zero_divergence_run "${scratch}")"
+
+	# --- story 008: SLOT free of version artifacts --------------------
+	#
+	# Measured 2026-08-06 from parity-data.tsv, by hand and independently of
+	# this script (.epic/stories/008-.../measurement.md). Ten of the sixteen
+	# SLOT rows differ only because the two sides sit at different versions
+	# and the package puts its version in the slot or the subslot. Six are
+	# structural and must survive.
+	#
+	# findings.md called it 14 and 2. It was wrong in both directions,
+	# because it looked only past the "/": it counted imath and glslang as
+	# noise when their subslots are real, and missed lua, blender and
+	# binutils, which put the version in the slot itself.
+
+	# The outcome as a whole, pinned by NAME. A13 alone would go green for a
+	# rule that suppressed ten WRONG rows if it happened to name the right
+	# survivors - which is why the four below pin the shapes individually.
+	assert_eq A13 \
+		'SLOT: only the six structural rows survive, each named' \
+		'rows=6 packages=dev-libs/imath dev-util/glslang net-libs/nodejs net-libs/webkit-gtk www-client/chromium' \
+		"$(slot_survivors)"
+
+	# THE ONE THAT MATTERS MOST, and the reason the component COUNT is
+	# compared before derivability. The overlay drops nodejs's subslot
+	# entirely, so a := dependency cannot rebuild on an ABI change - the most
+	# valuable single finding the 007 sweep produced. "24" and "0/24" both
+	# normalise to a placeholder-bearing form, so a rule that compares the
+	# normalised forms without checking the count first calls them equal and
+	# deletes the finding while looking like a success.
+	#
+	# Paired with redis, whose shape it must NOT be confused with: same axis,
+	# same kind of value, opposite answer.
+	assert_eq A14 \
+		'SLOT: nodejs keeps its missing subslot where redis loses its version-only one' \
+		'nodejs@24[compared=yes slot=ALIGN] nodejs@26[compared=yes slot=ALIGN] redis[compared=yes slot=none]' \
+		"nodejs@24[$(slot_outcome net-libs/nodejs 24.19.0)] nodejs@26[$(slot_outcome net-libs/nodejs 26.7.0)] redis[$(slot_outcome dev-db/redis 8.10.0)]"
+
+	# The shape findings.md's rule walks straight past: the version is the
+	# SLOT, not the subslot. Paired with the two slots that are not versions
+	# at all - a release channel and a genuinely different API generation -
+	# because a rule aggressive enough to fold 5.5 into 5.4 must still not
+	# fold stable into unstable.
+	assert_eq A15 \
+		'SLOT: a version in the slot itself goes; a named slot and a different slot stay' \
+		'lua[compared=yes slot=none] blender[compared=yes slot=none] chromium[compared=yes slot=ALIGN] webkit-gtk[compared=yes slot=ALIGN]' \
+		"lua[$(slot_outcome dev-lang/lua 5.5.1)] blender[$(slot_outcome media-gfx/blender 5.2.0)] chromium[$(slot_outcome www-client/chromium 151.0.7922.71)] webkit-gtk[$(slot_outcome net-libs/webkit-gtk 2.52.5-r411)]"
+
+	# R1.2's revision case. ::gentoo carries binutils at PV 2.46.1-r1 and
+	# its slot reads 2.46: derivability has to strip the -r1 and then accept
+	# a component PREFIX, but only at a component boundary.
+	#
+	# Paired with the two subslots that merely LOOK like versions. imath's 30
+	# and 29 are an ABI counter and glslang's 16.1 and 16.3 are a library
+	# soname; neither derives from its own PV, and a rule that suppressed
+	# them would hide that the overlay is BEHIND ::gentoo on glslang's
+	# soname while ahead of it on the version.
+	assert_eq A16 \
+		'SLOT: a revision in the PV does not defeat derivability, and an ABI counter is not a version' \
+		'binutils[compared=yes slot=none] binutils-libs[compared=yes slot=none] imath[compared=yes slot=ALIGN] glslang[compared=yes slot=ALIGN]' \
+		"binutils[$(slot_outcome sys-devel/binutils 2.47)] binutils-libs[$(slot_outcome sys-libs/binutils-libs 2.47)] imath[$(slot_outcome dev-libs/imath 3.2.2)] glslang[$(slot_outcome dev-util/glslang 1.4.357.0_p20260806)]"
+
+	# R1.5. A suppression nobody can audit is indistinguishable from a
+	# comparison that silently broke, and telling those two apart is the
+	# entire value of this axis now.
+	#
+	# Carried with the surviving row count, because "0 recorded, 0 with a
+	# reason" is exactly what a script that never suppressed anything also
+	# reports.
+	assert_eq A17 \
+		'SLOT: every suppressed row is recorded with a reason' \
+		'recorded=10 with-reason=10 survivors=6' \
+		"$(slot_suppression_record) survivors=$(slot_survivors_count)"
+
+	# --- story 008: instrument error is not divergence ----------------
+
+	# dev-ruby/erb reports a differing ruby-fakegem hash, and the overlay's
+	# eclass/ holds no ruby-fakegem at all - there is no overlay copy that
+	# COULD differ. The overlay's md5-cache entry was generated against an
+	# older ::gentoo eclass. It is the instrument reporting itself, and it is
+	# classified UNDOCUMENTED today, which asks a human to decide about a
+	# measurement error.
+	assert_eq A18 \
+		'_eclasses_: erb is reported as a stale cache, not as a divergence' \
+		'compared=yes row=none stale=ruby-fakegem' \
+		"compared=$(in_md5_scope dev-ruby/erb 6.0.7) row=$(eclass_row_verdict dev-ruby/erb 6.0.7) stale=$(stale_cache_for dev-ruby/erb)"
+
+	# THE CONVERSE, so the rule cannot be a blanket suppression of the axis.
+	# The overlay ships three eclasses of its own; those are deliberate
+	# overrides, recorded as definitionally divergent by story 007's R1.6,
+	# and not one of them may be filed as a stale cache. Calling an override
+	# a measurement error is the failure mode that would hide a real one.
+	assert_eq A19 \
+		'_eclasses_: an eclass the overlay ships stays an override, never a stale cache' \
+		'definitional=brave gstreamer-meson rpm local-in-stale=0 stale=1' \
+		"definitional=$(definitional_eclasses) local-in-stale=$(local_eclasses_in_stale) stale=${#PARITY_STALE_CACHE[@]}"
+
+	# R2.2, as arithmetic. 472 rows less the ten SLOT artifacts less the one
+	# reclassified _eclasses_ row is 461, and the four verdicts must still
+	# sum to it: "a section of their own, excluded from the row count" means
+	# the observation left the total rather than becoming a fifth verdict.
+	#
+	# This is the assertion most sensitive to the flap A02 describes: a single
+	# ebuild arriving mid-bump moved it by eight. When it goes red, check the
+	# two subtractions before the total - the ten and the one are what this
+	# story changed, and an ebuild that moves the total moves neither.
+	assert_eq A20 \
+		'the four verdicts still sum to the row total, with the stale cache outside both' \
+		'rows=461 verdict-sum=461 stale=1' \
+		"$(row_arithmetic)"
+
+	# --- story 008: what a stale cache does to the exit code ----------
+
+	# R2.4. A scope whose only observation is the stale cache must exit 0:
+	# there is nothing for a human to decide, and a guard that fails on its
+	# own measurement error is a guard nobody re-runs. Today erb is
+	# UNDOCUMENTED, so this scope exits 1.
+	assert_eq A21 \
+		'a scope whose only observation is a stale cache exits 0 and still reports it' \
+		'exit=0 rows=0 stale=present' \
+		"$(stale_cache_run "${scratch}")"
 
 	rm -rf -- "${scratch}"
 }
