@@ -31,8 +31,17 @@ CONFIG_CHECK="~HWMON ~ACPI ~DMI"
 MODULES_KERNEL_MIN="5.15"
 
 src_compile() {
-	# kbuild prefers the repo's Kbuild (obj-m := asus-ec-sensors.o) over its
-	# Makefile, so the DKMS/standalone wrapper in the latter is bypassed.
+	# linux-mod-r1 runs emake *inside* ${S}, and make only ever looks for
+	# GNUmakefile/makefile/Makefile -- never Kbuild. So the repo's Makefile
+	# wins, and it resolves the kernel from the running one:
+	#   KVER ?= $(shell uname -r); KDIR ?= /lib/modules/$(KVER)
+	# That builds against whatever is booted rather than the selected sources,
+	# which only shows up once the two diverge (module vermagic mismatch, and
+	# a silently wrong module when the ABI happens to match).
+	# Drive the kernel's own kbuild instead: it does prefer Kbuild over
+	# Makefile, and takes KERNELRELEASE from the tree actually being built
+	# against, so this stays correct for any kernel the user selects.
+	local modargs=( -C "${KV_OUT_DIR}" M="${S}" )
 	local modlist=( asus-ec-sensors=updates )
 	linux-mod-r1_src_compile
 }
