@@ -19,28 +19,30 @@ EAPI=8
 CRATES="
 "
 
+# Mirrors every "source = git+..." entry in codex-rs/Cargo.lock. Diff this block
+# against that file on every bump: a stale rev makes cargo die with
+# "can't checkout <repo>#<rev>", and an entry the lock no longer references only
+# costs a pointless fetch. Upstream moved crossterm from nornagon to
+# openai-oss-forks in 0.147.0 and dropped its ratatui fork back to crates.io.
 declare -A GIT_CRATES=(
-	[crossterm]='https://github.com/nornagon/crossterm;87db8bfa6dc99427fd3b071681b07fc31c6ce995;crossterm-%commit%'
-	[libwebrtc]='https://github.com/juberti-oai/rust-sdks;e2d1d1d230c6fc9df171ccb181423f957bb3c1f0;rust-sdks-%commit%/libwebrtc'
-	[livekit-protocol]='https://github.com/juberti-oai/rust-sdks;e2d1d1d230c6fc9df171ccb181423f957bb3c1f0;rust-sdks-%commit%/livekit-protocol'
-	[livekit-runtime]='https://github.com/juberti-oai/rust-sdks;e2d1d1d230c6fc9df171ccb181423f957bb3c1f0;rust-sdks-%commit%/livekit-runtime'
+	[crossterm]='https://github.com/openai-oss-forks/crossterm;f69a4a0499f2fdc7d5d222df32373ffffe9ba3f5;crossterm-%commit%'
 	[nucleo-matcher]='https://github.com/helix-editor/nucleo;4253de9faabb4e5c6d81d946a5e35a90f87347ee;nucleo-%commit%/matcher'
 	[nucleo]='https://github.com/helix-editor/nucleo;4253de9faabb4e5c6d81d946a5e35a90f87347ee;nucleo-%commit%'
-	[ratatui]='https://github.com/nornagon/ratatui;9b2ad1298408c45918ee9f8241a6f95498cdbed2;ratatui-%commit%'
 	[runfiles]='https://github.com/dzbarsky/rules_rust;b56cbaa8465e74127f1ea216f813cd377295ad81;rules_rust-%commit%/rust/runfiles'
 	[tokio-tungstenite]='https://github.com/openai-oss-forks/tokio-tungstenite;0e5b2d73aa18dd9f0a50ee9ff199d5aef7594186;tokio-tungstenite-%commit%'
 	[tungstenite]='https://github.com/openai-oss-forks/tungstenite-rs;4fffad30fe373adbdcffab9545e9e9bf4f2fc19f;tungstenite-rs-%commit%'
-	[webrtc-sys-build]='https://github.com/juberti-oai/rust-sdks;e2d1d1d230c6fc9df171ccb181423f957bb3c1f0;rust-sdks-%commit%/webrtc-sys/build'
-	[webrtc-sys]='https://github.com/juberti-oai/rust-sdks;e2d1d1d230c6fc9df171ccb181423f957bb3c1f0;rust-sdks-%commit%/webrtc-sys'
 )
 
 RUST_MIN_VER="1.95.0"
 
 # Tag of the crate tarball published by the crate-dist fork
 # (gentoo-zh-drafts/codex); it tracks the upstream release for this version.
-# No tarball was published for rust-v0.146.1; its Cargo.lock is identical to
-# rust-v0.146.0, so we reuse that one.
-MY_CRATES_TAG="rust-v0.146.0"
+# It MUST be bumped alongside PV whenever a tarball exists for the new tag:
+# leaving it behind vendors the previous release's crates and cargo then dies on
+# whichever dependency moved ("failed to select a version for the requirement").
+# Only pin it to an older tag when upstream published no tarball AND the two
+# Cargo.lock files are byte-identical.
+MY_CRATES_TAG="rust-v${PV}"
 
 # python3 .github/scripts/rusty_v8_bazel.py resolved-v8-crate-version
 RUSTY_V8_TAG="147.4.0"
@@ -118,7 +120,6 @@ src_prepare() {
 
 	[patch.crates-io]
 	crossterm = { path = "$(gen_git_crate_dir crossterm)" }
-	ratatui = { path = "$(gen_git_crate_dir ratatui)" }
 	tokio-tungstenite = { path = "$(gen_git_crate_dir tokio-tungstenite)" }
 	tungstenite = { path = "$(gen_git_crate_dir tungstenite)" }
 	EOF

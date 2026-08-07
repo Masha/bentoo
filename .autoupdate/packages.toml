@@ -1343,11 +1343,14 @@ base_from = "file"
 base_url = "https://raw.githubusercontent.com/zed-industries/zed/main/crates/zed/Cargo.toml"
 base_pattern = '(?m)^version = "([0-9][0-9.]*)"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.16.0_pre20260807"
+version = "1.16.0_pre20260807-r1"
 comments = """
 zed — commit-tracked on main; _pre suffix preserved from current ebuild.
 2026-08-06: 2 commits landed same UTC day (d61e80b -> 6b2aa1c), so the date
 component alone did not change; bumped as -r1 (same-day revision) instead.
+2026-08-07: same again (cc053a4 -> 38ca910), so -r1 once more. Manual bump; the
+base version stayed 1.16.0 and only 5 crates moved (ctor, link-section,
+linktime-proc-macro, pathfinder_simd).
 """
 # END
 
