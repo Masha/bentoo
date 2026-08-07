@@ -3,7 +3,7 @@
 
 EAPI=8
 
-inherit desktop systemd unpacker xdg
+inherit desktop multilib systemd unpacker xdg
 
 DESCRIPTION="Folding@Home distributed computing client for protein folding research"
 HOMEPAGE="https://foldingathome.org/"
@@ -18,19 +18,40 @@ S="${WORKDIR}"
 LICENSE="GPL-3"
 SLOT="0"
 KEYWORDS="-* ~amd64 ~arm64"
+IUSE="elogind systemd"
+REQUIRED_USE="^^ ( elogind systemd )"
 RESTRICT="bindist mirror strip"
 
+# The prebuilt fah-client has a DT_NEEDED on libsystemd.so.0 and is BIND_NOW,
+# so the loader aborts before main() unless that SONAME resolves. Only one of
+# the two providers may be depended on: sys-auth/elogind carries an explicit
+# !sys-apps/systemd blocker, so an unconditional dep would make the package
+# unemergeable for every systemd user.
 RDEPEND="
 	acct-group/foldingathome
 	acct-user/foldingathome
 	dev-libs/openssl:=
 	sys-libs/glibc
 	sys-libs/zlib:=
+	elogind? ( sys-auth/elogind )
+	systemd? ( sys-apps/systemd )
 "
+BDEPEND="elogind? ( dev-util/patchelf )"
 
 QA_PREBUILT="*"
 
 src_install() {
+	if use elogind; then
+		# elogind ships libelogind.so.0 with the LIBSYSTEMD_<n> version nodes
+		# and all seven sd_bus_* symbols fah-client imports, so this symlink
+		# satisfies the loader's version check for real. A private RUNPATH
+		# (not RPATH) keeps the override local to this binary and needs no
+		# environment variable from the caller.
+		dodir /opt/foldingathome/lib
+		dosym "../../../usr/$(get_libdir)/libelogind.so.0" /opt/foldingathome/lib/libsystemd.so.0
+		patchelf --set-rpath "${EPREFIX}/opt/foldingathome/lib" usr/bin/fah-client || die
+	fi
+
 	exeinto /opt/foldingathome
 	doexe usr/bin/fah-client
 	doexe usr/bin/fahctl
