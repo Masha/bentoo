@@ -254,7 +254,7 @@ url = "https://dl.pstmn.io/api/version/latest?platform=linux64&channel=stable"
 parser = "json"
 path = "version"
 type = "bin"
-version = "12.22.6"
+version = "12.22.8"
 comments = """
 Postman — official version API; clean {"version":"..."}.
 """
@@ -683,7 +683,7 @@ url = "https://api.github.com/repos/getsentry/sentry-native/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.16.1"
+version = "0.16.2"
 comments = """
 sentry-native — tag bare "X.Y.Z".
 """
@@ -923,7 +923,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^b(\d+)$', "0_pre$1"]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0_pre10303"
+version = "0_pre10312"
 comments = """
 llama-cpp — upstream tags builds "bNNNN" (no semver); the ebuild carries them as
 the 0_pre<build> snapshot scheme and bridges back with MY_PV="b${PV#0_pre}", so
@@ -1023,7 +1023,7 @@ url = "https://api.github.com/repos/brave/brave-browser/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.93.132"
+version = "1.93.134"
 comments = """
 brave-browser — releases/latest is the stable channel (tag "vX.Y.Z").
 """
@@ -1200,12 +1200,13 @@ Same rule/caveat as dev-libs/wayland. Live=1.26.0 > ebuild 1.25.91.
 # END
 
 ["dev-lang/lua"]
-url = "https://www.lua.org/download.html"
-parser = "regex"
-pattern = 'lua-([0-9]+\.[0-9]+\.[0-9]+)'
+url = "https://api.github.com/repos/lua/lua/releases/latest"
+parser = "json"
+path = "tag_name"
+headers = { "User-Agent" = "bentoo-autoupdate" }
 version = "5.5.1"
 comments = """
-lua — download.html leads with the current "lua-X.Y.Z" link.
+lua — www.lua.org não responde (timeout); official mirror lua/lua, tag_name "vX.Y.Z".
 
 Project site / FTP / SourceForge / Launchpad
 """
