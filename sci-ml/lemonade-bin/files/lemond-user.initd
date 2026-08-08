@@ -1,0 +1,45 @@
+#!/sbin/openrc-run
+# Copyright 1999-2026 Gentoo Authors
+# Distributed under the terms of the GNU General Public License v2
+
+# USER-SCOPE service: this file belongs in /etc/user/init.d, not /etc/init.d,
+# and is started per login session by openrc-user.  It is the OpenRC
+# counterpart of upstream's usr/lib/systemd/user/lemond.service, which the
+# ebuild installs with systemd_douserunit.  The SYSTEM service is a separate
+# file (lemond.initd) driving the same binary under acct-user/lemonade; do not
+# merge the two -- a user-scope unit deliberately runs as the logged-in user
+# with its models under $HOME.
+#
+# newinitd has no user-scope variant, which is why the ebuild installs this
+# with `exeinto /etc/user/init.d` + `newexe`, following the one precedent in
+# this overlay, sys-apps/xdg-desktop-portal.
+#
+# WHAT THIS TRANSLATION LOSES.  The user unit carries six hardening directives.
+# Exactly one of them has an OpenRC counterpart -- NoNewPrivileges=yes, mapped
+# to no_new_privs below.  The other five (PrivateTmp, ProtectSystem=full,
+# RestrictRealtime, RestrictNamespaces, LockPersonality) have nothing in OpenRC
+# to map onto: it has no sandboxing layer.  An OpenRC user running this service
+# is therefore less confined than a systemd user is.  That difference is
+# recorded rather than papered over, and it is NOT emulated with ad-hoc
+# ulimit/namespace tricks here.
+
+description="Lemonade Server (user session)"
+
+command="/usr/bin/lemond"
+command_args="${LEMOND_OPTS}"
+# WorkingDirectory=%h
+directory="${HOME}"
+supervisor="supervise-daemon"
+
+# Restart=on-failure, RestartSec=5s
+respawn_delay=5
+
+# KillSignal=SIGINT -- lemond shuts down cleanly on SIGINT, not on SIGTERM.
+retry="INT/30/KILL/5"
+
+# NoNewPrivileges=yes
+no_new_privs="yes"
+
+# No depend() on purpose.  The unit's After=network-online.target has no
+# user-scope counterpart: OpenRC user services live in their own tree and
+# cannot order themselves against system services such as net.

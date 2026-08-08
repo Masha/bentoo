@@ -1,0 +1,20 @@
+# Configuration for the ntpd-rs service.
+#
+# Everything about how ntpd-rs synchronises time -- sources, step thresholds,
+# the observation socket, the log level -- lives in /etc/ntpd-rs/ntp.toml, not
+# here.  This file holds only what belongs to the SERVICE.
+
+# Extra command-line arguments for ntp-daemon, for example "-l debug" or
+# "-c /etc/ntpd-rs/other.toml".
+NTPD_RS_OPTS=""
+
+# The systemd unit upstream ships sets Restart=no.  supervise-daemon has no
+# equivalent: it respawns a crashed daemon up to respawn_max times (default
+# 10), which is the better behaviour for a time daemon that died unexpectedly.
+#
+# It is the WRONG behaviour if you enable accumulated-threshold in ntp.toml.
+# That option makes ntp-daemon exit deliberately once it has stepped the clock
+# too far in aggregate, and respawning it throws the protection away.  Uncomment
+# the line below in that case: supervise-daemon then respawns at most once and
+# gives up.
+#respawn_max=1

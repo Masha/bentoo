@@ -30,3 +30,12 @@ Consequências práticas, válidas para toda decisão de empacotamento:
 - Autoupdate configurado em `.autoupdate/packages.toml`
 - Pacote removido do overlay vira `enabled = false` no `packages.toml`; nunca
   se apaga a entrada (preserva o probe já verificado)
+- Todo pacote que instala uma unit systemd instala também um init script
+  OpenRC do mesmo escopo — sistema em `/etc/init.d`, usuário em
+  `/etc/user/init.d`; a assimetria é deliberada: a unit é gateada por
+  `USE=systemd`, o init script **nunca** é, porque ele não custa nada a quem
+  usa systemd e é a única forma de rodar o daemon para quem não usa. Decorre
+  de "cubra casos de uso de terceiros" acima: um serviço systemd-only é o init
+  system do mantenedor confundido com o do público. Conferido por
+  `scripts/check-openrc-coverage.sh`, que classifica o overlay inteiro e sai 1
+  ao achar lacuna

@@ -1,0 +1,48 @@
+#!/sbin/openrc-run
+# Copyright 1999-2026 Gentoo Authors
+# Distributed under the terms of the GNU General Public License v2
+
+# USER-SCOPE service: this file belongs in /etc/user/init.d, not /etc/init.d,
+# and is started per login session by openrc-user.  It is the OpenRC
+# counterpart of files/proton-mail-bridge.service-r1, which the ebuild installs
+# with systemd_newuserunit.  This package ships NO system service, by design:
+# the bridge holds one user's Proton credentials in that user's keyring and
+# serves IMAP/SMTP on their loopback -- there is nothing system-wide to run.
+#
+# newinitd has no user-scope variant, which is why the ebuild installs this
+# with `exeinto /etc/user/init.d` + `newexe`, following the one precedent in
+# this overlay, sys-apps/xdg-desktop-portal.
+#
+# THIS TRANSLATION IS A SECURITY DOWNGRADE, AND THAT IS THE POINT OF THIS NOTE.
+# The unit carries five sandboxing directives.  Exactly one of them has an
+# OpenRC counterpart:
+#
+#   NoNewPrivileges=true          -> no_new_privs below
+#   ProtectSystem=full            -> no equivalent
+#   PrivateTmp=true               -> no equivalent
+#   SystemCallArchitectures=native-> no equivalent
+#   MemoryDenyWriteExecute=true   -> no equivalent
+#
+# OpenRC has no sandboxing layer to map the other four onto, so a user running
+# this service under OpenRC gets strictly weaker confinement than a systemd
+# user does.  That is recorded here rather than absorbed silently.  It is
+# deliberately NOT emulated with ad-hoc ulimit or namespace tricks: inventing a
+# confinement mechanism inside an init script would be a worse outcome than a
+# documented gap.
+
+description="Proton Mail IMAP/SMTP bridge (user session)"
+
+command="/usr/bin/proton-mail-bridge"
+command_args="--noninteractive ${PROTON_MAIL_BRIDGE_OPTS}"
+supervisor="supervise-daemon"
+
+# Restart=on-failure
+respawn_delay=5
+
+# NoNewPrivileges=true -- the one directive above that does map.
+no_new_privs="yes"
+
+# No depend() on purpose.  The unit declares no ordering either, and an OpenRC
+# user service lives in its own tree: it cannot order itself against system
+# services.  The bridge retries its Proton connection, so starting before the
+# network is up is not a failure.

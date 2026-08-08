@@ -363,7 +363,7 @@ url = "https://api.github.com/repos/ProtonMail/proton-bridge/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "3.25.0"
+version = "3.25.0-r1"
 comments = """
 Proton Mail Bridge — GitHub release tag "vX.Y.Z" ("v" stripped).
 """
@@ -863,7 +863,7 @@ url = "https://api.github.com/repos/rustdesk/rustdesk/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.9"
+version = "1.4.9-r1"
 comments = """
 rustdesk — release tag bare semver.
 """
@@ -875,7 +875,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "1.4.9"
+version = "1.4.9-r1"
 comments = """
 rustdesk-bin — same upstream repo.
 """
@@ -955,7 +955,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "11.5.2"
+version = "11.5.2-r1"
 comments = """
 lemonade-bin — same upstream as sci-ml/lemonade, prebuilt "embeddable"
 tarball plus arch-independent data from the .deb.
@@ -5592,7 +5592,7 @@ url = "https://github.com/pendulum-project/ntpd-rs/releases.atom"
 parser = "regex"
 pattern = 'Repository/[0-9]+/v([0-9]+\.[0-9]+\.[0-9]+)</id>'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.9.0"
+version = "1.9.0-r1"
 comments = """
 ntpd-rs — pendulum-project/ntpd-rs. CANNOT use releases/latest: upstream mismarks the
 "v2.0.0-alpha.*" pre-release as non-prerelease, so /latest returns the alpha. api.github.com

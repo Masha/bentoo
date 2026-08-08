@@ -16,7 +16,9 @@ S="${WORKDIR}"/${MY_P}
 LICENSE="GPL-3+ Apache-2.0 BSD BSD-2 ISC LGPL-3+ MIT MPL-2.0 Unlicense"
 SLOT="0"
 KEYWORDS="~amd64"
-IUSE="gui"
+# `systemd` gates the user unit ONLY. The OpenRC user script is installed
+# unconditionally -- see src_install.
+IUSE="gui systemd"
 
 # Tests require Internet access and we need network access for Go modules
 PROPERTIES="test_network"
@@ -156,7 +158,21 @@ src_install() {
 		newmenu {dist/${MY_PN},${PN}}.desktop
 	fi
 
-	systemd_newuserunit "${FILESDIR}"/${PN}.service-r1 ${PN}.service
+	# The only service this package ships is user-scope, so both files below
+	# are user-scope too. The OpenRC script is installed unconditionally: it
+	# costs a systemd user nothing, while gating it would leave an OpenRC user
+	# with no supervised way to run the bridge at all.
+	#
+	# newinitd has no user-scope variant, so the script goes in as a plain
+	# executable, following sys-apps/xdg-desktop-portal. Note that the OpenRC
+	# script cannot reproduce the unit's sandboxing directives -- see the
+	# comment at the top of the file.
+	exeinto /etc/user/init.d
+	newexe "${FILESDIR}"/${PN}.initd ${PN}
+
+	if use systemd; then
+		systemd_newuserunit "${FILESDIR}"/${PN}.service-r1 ${PN}.service
+	fi
 
 	einstalldocs
 }

@@ -136,10 +136,32 @@ src_install() {
 	doman usr/share/man/man1/lemonade.1
 	doman usr/share/man/man1/lemond.1
 
+	# --- service files -----------------------------------------------------
+	# One service per scope, mirroring the two units upstream ships.  Both are
+	# installed UNCONDITIONALLY: an init script costs a systemd user nothing,
+	# while gating it would leave an OpenRC user with no way to run the daemon.
+	# Only the units are gated by USE=systemd.
+	#
+	# The system pair is byte-identical to sci-ml/lemonade's -- same
+	# /usr/bin/lemond, same acct-user/lemonade -- because FILESDIR is
+	# per-package and the file cannot be shared.  Keep them in sync.
+	#
+	# An earlier revision claimed no OpenRC service was possible here because
+	# the units use StateDirectory and AmbientCapabilities.  That was wrong on
+	# both counts: StateDirectory/RuntimeDirectory map onto `checkpath -d` in
+	# start_pre(), which lemond.initd already does, and OpenRC does have a
+	# `capabilities` variable (supervise-daemon --capabilities).  CAP_SYS_RESOURCE
+	# is deliberately NOT set here, to keep this file identical to the sibling's;
+	# adding it is a change to both packages, not a gap this revision closes.
+	newinitd "${FILESDIR}"/lemond.initd lemond
+	newconfd "${FILESDIR}"/lemond.confd lemond
+
+	# User scope. newinitd has no user-scope variant, so the script is installed
+	# as a plain executable, following sys-apps/xdg-desktop-portal.
+	exeinto /etc/user/init.d
+	newexe "${FILESDIR}"/lemond-user.initd lemond
+
 	# --- systemd units -----------------------------------------------------
-	# USE=systemd gates only the unit files: upstream ships no OpenRC service
-	# and the units rely on systemd-only directives (StateDirectory,
-	# AmbientCapabilities=CAP_SYS_RESOURCE), so they are dead weight elsewhere.
 	# acct-user/acct-group stay unconditional -- the daemon is meant to run
 	# under a dedicated account however it is started.
 	if use systemd; then
@@ -157,14 +179,17 @@ src_install() {
 }
 
 pkg_postinst() {
-	elog "Start the system-wide server with:"
+	elog "Start the system-wide server with one of:"
+	elog "    rc-service lemond start"
 	elog "    systemctl enable --now lemond.service"
 	elog
 	elog "Or run it as your own user (models land in ~/.cache/lemonade):"
+	elog "    rc-service --user lemond start"
 	elog "    systemctl --user enable --now lemond.service"
 	elog
 	elog "The web UI is served at http://localhost:13305/ once lemond is up."
-	elog "API keys and HF_TOKEN belong in /etc/lemonade/conf.d/zz-secrets.conf."
+	elog "API keys and HF_TOKEN belong in /etc/lemonade/conf.d/zz-secrets.conf"
+	elog "for the systemd unit, or in /etc/conf.d/lemond for the OpenRC service."
 	elog
 	elog "Inference backends (llama.cpp, ROCm, vLLM, ...) are downloaded by"
 	elog "lemond at runtime into its cache directory; they are not packaged."

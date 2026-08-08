@@ -732,19 +732,573 @@ print_report() {
 }
 
 ### self test ########################################################
+#
+# design.md's Testing Strategy, executable: numbered assertions with PINNED
+# expected values, each pin carrying a comment saying what to do when it goes
+# stale. This is what proves the classifier is right - above all on the classes
+# that fail SILENTLY, where a wrong answer still prints a plausible row and
+# nobody looks twice:
+#
+#   * the init script or unit that arrives in the UPSTREAM PAYLOAD instead of
+#     from FILESDIR - www-misc/warsaw has no files/ directory at all (A01)
+#   * the unit a build system writes from a directory argument, with no install
+#     call ever naming it - net-misc/networkmanager, sys-apps/xdg-desktop-portal
+#     (A02, A03)
+#   * the .service file that is inert because of WHERE it lands, not what it is
+#     called - app-backup/duplicati-bin (A04)
+#   * the package that installs an init script and no unit, whose verdict is
+#     character-for-character identical to a package that installs neither -
+#     sci-ml/lemonade (A05)
+#
+# Two rules hold for every assertion below. Both are borrowed from
+# scripts/gentoo-parity.sh, which learned them the hard way:
+#
+#   READ THE CLASSIFIER, NOT THE TREE. Every observed value comes from a real
+#   sweep() over the real overlay, or from a real subprocess run of this script.
+#   An assertion that grepped the ebuild itself would stay green with the whole
+#   classifier deleted, which is worse than having no assertion at all.
+#
+#   NEVER PASS ON NOTHING. Every package pin leads with rows=1, so a package
+#   that was renamed or dropped reads as rows=0 rather than silently comparing
+#   two empty strings. And every verdict pin carries the EVIDENCE beside it,
+#   because "system=n/a user=n/a" is what a package installing nothing prints
+#   AND what sci-ml/lemonade - an init script and no unit - prints. The verdicts
+#   are identical; only the evidence separates them.
+#
+# The overlay is bumped daily, so a pin going stale is expected and is not a
+# defect. What must never happen is a stale pin met by WIDENING the assertion
+# instead of explaining the delta. Five pins below are expected to move during
+# this story and say so; a pin that moves without its comment predicting it is a
+# regression, and that is the rule Task 5.1 applies.
+#
+# Measured against the tree on 2026-08-07.
+
+ASSERT_TOTAL=0
+FAILURES=()
+
+# This script by absolute path. Three assertions re-invoke it as a subprocess
+# and one of them copies it; both break if BASH_SOURCE is whatever relative path
+# the caller happened to type.
+SELF_TEST_SCRIPT="${SCRIPT_DIR}/${BASH_SOURCE[0]##*/}"
+
+# The filter A13 drives a whole run through. Deliberately unspellable as a real
+# category: an absent filter has to STAY absent for the assertion to mean
+# anything, and a plausible name (net-misc/foo) is one `git add` away from
+# existing and turning the assertion green for the wrong reason.
+SELF_TEST_ABSENT_FILTER='zz-no-such-category/zz-no-such-package'
+
+# Everything --self-test writes: one copy of this script and the captured output
+# of three subprocess runs, all under $TMPDIR. Nothing anywhere near the overlay
+# - the guard is read-only with respect to the tree it measures, and a self-test
+# that edited an ebuild to exercise a branch would break that in the one place
+# nobody reviews.
+SELF_TEST_SCRATCH=""
+
+# Removed on the way out whatever happens. `set -e` means an unexpected non-zero
+# leaves the harness early, and a scratch directory removed only on the happy
+# path is a scratch directory that accumulates.
+cleanup_scratch() {
+	if [[ -n ${SELF_TEST_SCRATCH} && -d ${SELF_TEST_SCRATCH} ]]; then
+		rm -rf -- "${SELF_TEST_SCRATCH}"
+	fi
+	return 0
+}
+
+# q <value>
+# Render a value for a report line: newlines flattened, empty made visible. A
+# line that prints nothing is least readable exactly when the observed value IS
+# the empty string, which is the commonest way for a pin to go wrong.
+q() {
+	local s=${1//$'\n'/ \\n }
+	printf '%s' "${s:-(empty)}"
+}
+
+# assert_eq <id> <description> <expected> <actual>
+# Never aborts. The value of this harness is the whole picture of what the
+# classifier gets right and wrong; stopping at the first red hides the other
+# thirteen. It is the same rule R3.5 puts on the sweep itself.
+assert_eq() {
+	local id=$1 desc=$2 expected=$3 actual=$4
+
+	ASSERT_TOTAL=$(( ASSERT_TOTAL + 1 ))
+
+	if [[ ${actual} == "${expected}" ]]; then
+		printf '  [PASS] (%s) %s\n' "${id}" "${desc}"
+		return 0
+	fi
+
+	printf '  [FAIL] (%s) %s\n' "${id}" "${desc}"
+	printf '         expected: %s\n' "$(q "${expected}")"
+	printf '         observed: %s\n' "$(q "${actual}")"
+	FAILURES+=( "(${id}) ${desc} | expected: $(q "${expected}") | observed: $(q "${actual}")" )
+	return 0
+}
+
+### querying the classifier ###########################################
+
+# sweep_reset
+# Put the sweep's accumulators back to their starting values, so the next
+# sweep_one measures one package rather than that package plus every package
+# measured before it.
+sweep_reset() {
+	REPORT_ROWS=()
+	ALLOW_ROWS=()
+	SCANNED=0
+	UNIT_PACKAGES=0
+	FINDING_ROWS=0
+	SYS_FAIL=0
+	USER_WARN=0
+	SYS_PASS=0
+	USER_PASS=0
+	NO_EBUILD_DIRS=0
+}
+
+# sweep_one <category/pn>
+# Run the REAL sweep scoped to one package, leaving its record in REPORT_ROWS.
+#
+# In-process on purpose: what is under test here is the classifier, and a
+# subprocess would add a fork per assertion while proving nothing extra. The
+# exit code is dropped because it is asserted separately and end to end
+# (A12/A13/A14); what this helper publishes is the row.
+#
+# stderr goes to /dev/null so that a pin naming a package which no longer exists
+# reports as rows=0 - one red line - instead of a paragraph of sweep prose
+# interleaved with the assertion output.
+sweep_one() {
+	FILTER=$1
+	sweep_reset
+	sweep 2>/dev/null || true
+}
+
+# evidence_token <evidence field>
+# The detector that fired, with its line number dropped, or "-" for none.
+#
+# The line number is deliberately NOT pinned. It moves on any bump that adds a
+# line above the install call, which would put eleven assertions red over a
+# change that altered no behaviour. The TOKEN is the thing under test: it is the
+# whole difference between "the unit came from an install call" and "the unit
+# came from a directory handed to meson", and between an init script that came
+# from FILESDIR and one that came from the upstream payload.
+evidence_token() {
+	local e=${1#*: }
+	printf '%s' "${e:--}"
+}
+
+# pkg_state <category/pn>
+# Everything the classifier decided about one package, on one line:
+#
+#   rows=<n> system=<verdict> user=<verdict> \
+#   sys-unit=<token> sys-initd=<token> user-unit=<token> user-initd=<token>
+#
+# rows= comes first so a package that vanished from the tree goes red on a fact
+# rather than on two empty strings that happen to differ. An allowlisted package
+# also reads rows=0, because the sweep files it under ALLOW_ROWS - correct, and
+# worth knowing if one is ever added here.
+pkg_state() {
+	local key sys user file su uu si ui
+
+	sweep_one "$1"
+
+	if (( ${#REPORT_ROWS[@]} != 1 )); then
+		printf 'rows=%d' "${#REPORT_ROWS[@]}"
+		return 0
+	fi
+
+	IFS=${FS} read -r key sys user file su uu si ui <<<"${REPORT_ROWS[0]}"
+
+	printf 'rows=1 system=%s user=%s sys-unit=%s sys-initd=%s user-unit=%s user-initd=%s' \
+		"${sys}" "${user}" \
+		"$(evidence_token "${su}")" "$(evidence_token "${si}")" \
+		"$(evidence_token "${uu}")" "$(evidence_token "${ui}")"
+}
+
+# pkg_selection <category/pn>
+# How many rows the package produced, and which ebuild spoke for it. The only
+# helper that publishes a VERSION, because R3.11 is precisely the question of
+# which of several versions gets picked - and the answer has to be wrong-able.
+pkg_selection() {
+	local key sys user file rest
+
+	sweep_one "$1"
+
+	if (( ${#REPORT_ROWS[@]} != 1 )); then
+		printf 'rows=%d ebuild=-' "${#REPORT_ROWS[@]}"
+		return 0
+	fi
+
+	IFS=${FS} read -r key sys user file rest <<<"${REPORT_ROWS[0]}"
+	printf 'rows=1 ebuild=%s' "${file}"
+}
+
+### driving whole runs ################################################
+#
+# These three are SUBPROCESSES and have to be. What they assert is the exit CODE
+# of a complete invocation, and a function called in this shell has no exit code
+# of its own to observe - main() is the unit under test, not sweep(). They are
+# also the only three assertions that exercise the script end to end.
+
+# full_run <scratch dir>
+# A whole unfiltered sweep, reported as
+# "exit=<rc> rows=<n> findings=<n> allowlisted=<n>".
+#
+# All four parts are needed. exit=1 alone says a gap was found but not how many,
+# and R3.5 is exactly the claim that the sweep keeps going instead of stopping
+# at the first. rows and findings are different numbers on purpose -
+# sci-ml/lemonade-bin is one row carrying two - so pinning either alone lets the
+# other drift. allowlisted is here because a finding can always be made to
+# disappear by ALLOWLISTING it, and a finding count that can be met by
+# suppression is not a count.
+full_run() {
+	local out="${1}/full-run.txt"
+	local rc=0 rows findings allowed
+
+	bash -- "${SELF_TEST_SCRIPT}" >"${out}" 2>&1 || rc=$?
+
+	rows=$(awk '/^  rows with a finding/ { print $NF }' "${out}")
+	findings=$(awk '/^  findings / { print $2 }' "${out}")
+	allowed=$(awk '/^  allowlisted/ { print $NF }' "${out}")
+
+	printf 'exit=%d rows=%s findings=%s allowlisted=%s' \
+		"${rc}" "${rows:--}" "${findings:--}" "${allowed:--}"
+}
+
+# no_match_run <scratch dir>
+# A filter that selects nothing, reported as "exit=<rc> explained=<yes|no>".
+#
+# R3.8. Both halves are needed and the second one is the point: exit 2 with a
+# silent stdout is still a run whose report is empty, and the sentence "filter X
+# matched no package" is the only thing that separates an empty report from a
+# clean one. An assertion on the code alone would stay green the day someone
+# drops the explanation.
+no_match_run() {
+	local out="${1}/no-match.txt"
+	local rc=0 explained=no
+
+	bash -- "${SELF_TEST_SCRIPT}" "${SELF_TEST_ABSENT_FILTER}" >"${out}" 2>&1 || rc=$?
+
+	if grep -qF -- 'matched no package under' "${out}"; then
+		explained=yes
+	fi
+
+	printf 'exit=%d explained=%s' "${rc}" "${explained}"
+}
+
+# absent_root_run <scratch dir>
+# The script run from somewhere that is not a package tree, reported as
+# "exit=<rc> explained=<yes|no>".
+#
+# R3.3, and the only assertion that needs a fixture. OVERLAY_ROOT is derived
+# from the script's own location, so the way to hand it a missing overlay is to
+# put a COPY of the script where nothing sits beside it - no profiles/repo_name,
+# no categories. The copy lives under $TMPDIR and dies with the scratch
+# directory; the real tree is only ever read.
+#
+# This is the failure mode with no symptom of its own. A root with no packages
+# in it classifies nothing, finds no gap, and would print RESULT PASS over an
+# empty set - the exact confusion exit 2 exists to prevent. Only the
+# precondition catches it, and only this assertion proves the precondition is
+# still there.
+#
+# "Missing" and not "unreadable": chmod 000 is the other half of R3.3's wording
+# and it is not testable here, because a self-test run as root would sail
+# through it and report a green that means nothing.
+absent_root_run() {
+	local scratch=$1
+	local root="${scratch}/not-a-package-tree"
+	local copy="${root}/scripts/${SELF_TEST_SCRIPT##*/}"
+	local out="${scratch}/absent-root.txt"
+	local rc=0 explained=no
+
+	mkdir -p -- "${root}/scripts"
+	cp -- "${SELF_TEST_SCRIPT}" "${copy}"
+
+	bash -- "${copy}" >"${out}" 2>&1 || rc=$?
+
+	if grep -qF -- 'has no profiles/repo_name' "${out}"; then
+		explained=yes
+	fi
+
+	printf 'exit=%d explained=%s' "${rc}" "${explained}"
+}
+
+### the fourteen assertions ###########################################
+
+self_test_assertions() {
+	SELF_TEST_SCRATCH=$(mktemp -d "${TMPDIR:-/tmp}/openrc-coverage-selftest.XXXXXX")
+	trap cleanup_scratch EXIT
+
+	printf 'openrc-coverage  --self-test\n'
+	printf 'overlay          %s\n' "${OVERLAY_ROOT}"
+	printf 'scratch          %s\n' "${SELF_TEST_SCRATCH}"
+	printf '\n'
+
+	# Probed, not enforced. Every pin below is a measurement of this overlay and
+	# cannot be confirmed without it, so a broken root has to SAY so: fourteen
+	# reds otherwise look like the classifier disagreeing with the numbers, when
+	# in fact it never got to read anything.
+	if ! check_preconditions 2>/dev/null; then
+		printf '  [NOTE] %s is not a usable package tree\n' "${OVERLAY_ROOT}"
+		printf '         every package pin below reads rows=0 and fails: that is a\n'
+		printf '         missing precondition, not a disagreement with the numbers\n'
+		printf '\n'
+	fi
+
+	printf 'assertions\n'
+
+	# --- the classes that fail silently -------------------------------
+
+	# R3.6, the payload class. www-misc/warsaw has NO files/ directory at all:
+	# both halves of the pair arrive inside the upstream tarball and are
+	# installed straight out of it, `systemd_dounit lib/systemd/system/
+	# warsaw.service` and `doinitd etc/init.d/warsaw`. A classifier that looked
+	# for an init script under FILESDIR - which is where every other package in
+	# this tree keeps one - would call warsaw a FAIL and send someone to write a
+	# script that already ships.
+	#
+	# WHEN IT GOES STALE: read the new ebuild before touching the pin. If a bump
+	# drops either file from the payload this is a REAL finding, not a stale
+	# measurement - the package genuinely lost half its pair. If upstream merely
+	# moves the script into FILESDIR, repin sys-initd on newinitd and record
+	# that the payload class then has no example left in this tree, which makes
+	# the whole class untested rather than fixed.
+	assert_eq A01 \
+		'www-misc/warsaw: unit AND init script recognised from the upstream payload (R3.6)' \
+		'rows=1 system=PASS user=n/a sys-unit=systemd_dounit sys-initd=doinitd user-unit=- user-initd=-' \
+		"$(pkg_state www-misc/warsaw)"
+
+	# R3.10, the build-system class. No install call in networkmanager's ebuild
+	# ever names a .service: meson is handed a unit directory and writes the
+	# units itself, so the only textual trace is the argument. Pass 1 cannot see
+	# this package at all, and a guard without pass 2 would report the tree
+	# four-fifths clean.
+	#
+	# WHEN IT GOES STALE: if the token changes (upstream renaming the meson
+	# option, or the ebuild switching to systemd_dounit) repin it on whatever
+	# the new evidence says AND check SYS_UNITDIR_TOKENS still covers the
+	# spelling. A rename that nobody adds to that list turns this package
+	# silently into system=n/a, which reads exactly like a package with no unit.
+	assert_eq A02 \
+		'net-misc/networkmanager: unit seen through the meson unit-dir argument, initd through newinitd (R3.10)' \
+		'rows=1 system=PASS user=n/a sys-unit=systemd_get_systemunitdir sys-initd=newinitd user-unit=- user-initd=-' \
+		"$(pkg_state net-misc/networkmanager)"
+
+	# R3.9, the user-scope pair, and the only one in the tree. The unit comes
+	# from a meson argument and the OpenRC side is not an init-script helper at
+	# all - it is `exeinto /etc/user/init.d` followed by newexe, two lines apart,
+	# which means the SCOPE lives on one line and the install on another. This
+	# is the single package that proves the two are correlated rather than
+	# counted separately.
+	#
+	# WHEN IT GOES STALE: if xdg-desktop-portal stops shipping the user script,
+	# this class loses its only example. Do not delete the assertion - repin it
+	# on whichever package carries the pattern then (sci-ml/lemonade-bin after
+	# Task 3.1, mail-mta/proton-mail-bridge after Task 3.2), or the exeinto
+	# detector becomes untested code.
+	assert_eq A03 \
+		'sys-apps/xdg-desktop-portal: user unit paired with an exeinto /etc/user/init.d script (R3.9)' \
+		'rows=1 system=n/a user=PASS sys-unit=- sys-initd=- user-unit=systemd-user-unit-dir user-initd=exeinto /etc/user/init.d + newexe' \
+		"$(pkg_state sys-apps/xdg-desktop-portal)"
+
+	# R3.12, classification on the DESTINATION PATH. duplicati-bin's payload
+	# contains a .service file, and it is inert: it lands under /opt, where
+	# systemd never looks. Matching "*.service" as a filename would count it and
+	# invent a gap in a package that has none - and would do the same to
+	# media-sound/audacity-bin and mail-client/betterbird-bin.
+	#
+	# This pin's expected value is all dashes, which is the weakest kind of
+	# assertion, so read it together with A05: the two differ in exactly one
+	# field, and that field is the whole of what "classify on the destination"
+	# buys. Neither one means much alone.
+	#
+	# WHEN IT GOES STALE: if this ever reads system=FAIL, a filename matcher has
+	# crept back in - fix the detector, never the pin. If duplicati-bin starts
+	# installing a real unit, the row becomes a genuine finding and the pin
+	# moves to another /opt package carrying a .service.
+	assert_eq A04 \
+		'app-backup/duplicati-bin: a .service under /opt is not a unit (R3.12)' \
+		'rows=1 system=n/a user=n/a sys-unit=- sys-initd=- user-unit=- user-initd=-' \
+		"$(pkg_state app-backup/duplicati-bin)"
+
+	# The one-directional criterion, made visible. sci-ml/lemonade installs an
+	# init script and NO unit, so its verdict is n/a and not PASS: the question
+	# the guard asks is "a unit without its counterpart", and a package with no
+	# unit has nothing to answer. That is correct and it is also indistinguishable
+	# from A04 on the verdicts alone - both print system=n/a user=n/a. Only
+	# sys-initd=newinitd separates "installs an init script" from "installs
+	# nothing", which is why the evidence is pinned and not just the verdict.
+	#
+	# WHEN IT GOES STALE: if lemonade ever gains a unit this flips to PASS
+	# (evidence unchanged) and that is the package improving, not a defect -
+	# repin. If sys-initd ever reads "-" while the ebuild still has a newinitd,
+	# the detector broke, and it broke in the silent direction.
+	assert_eq A05 \
+		'sci-ml/lemonade: an init script and no unit is n/a, not PASS - and not the same as installing nothing' \
+		'rows=1 system=n/a user=n/a sys-unit=- sys-initd=newinitd user-unit=- user-initd=-' \
+		"$(pkg_state sci-ml/lemonade)"
+
+	# R3.11, one row per PACKAGE. app-editors/zed-bin deliberately keeps two
+	# ebuilds side by side - a stable and a _pre - and a per-EBUILD sweep reports
+	# it twice. The version is pinned as well as the count because picking the
+	# wrong one of the two still yields exactly one row: only the basename shows
+	# that _pre outranks 1.14.2, which a raw `sort -V` gets backwards (it ranks
+	# "1.15.0_pre" above "1.15.0"). version_sort_key exists for that, and this
+	# is the only assertion that can catch it regressing.
+	#
+	# WHEN IT GOES STALE: expected, and often - zed-bin is bumped weekly and the
+	# _pre becomes a release. Repin on the new highest version. Before doing so,
+	# confirm the newly-expected basename really IS the higher of the two by
+	# Gentoo's ordering; a pin updated by copying the observed value is a pin
+	# that would have accepted the wrong answer.
+	assert_eq A06 \
+		'app-editors/zed-bin: two ebuilds, one row, and the _pre outranks the release (R3.11)' \
+		'rows=1 ebuild=zed-bin-1.15.0_pre.ebuild' \
+		"$(pkg_selection app-editors/zed-bin)"
+
+	# --- the five pins this story is about to move --------------------
+
+	# The dual-verdict format itself: ONE row carrying TWO findings.
+	# sci-ml/lemonade-bin is the only package in the tree missing both scopes at
+	# once, so it is the only one that can catch a report which collapses rows
+	# into findings - a collapse that would either list it twice or lose its
+	# second finding entirely.
+	#
+	# PIN ABOUT TO MOVE, by design. Tasks 2.3 and 3.1 add the system and the
+	# user script, after which the observed value becomes
+	#   rows=1 system=PASS user=PASS sys-unit=systemd_dounit sys-initd=newinitd
+	#   user-unit=systemd_douserunit user-initd=exeinto /etc/user/init.d + newexe
+	# and the pin is UPDATED to exactly that, this comment kept. Any OTHER move
+	# - a detector that stopped firing, a verdict that changed with no ebuild
+	# changing - is a regression. Task 5.1 tells the two apart by whether this
+	# comment predicted it.
+	assert_eq A07 \
+		'sci-ml/lemonade-bin: one row, two findings - the dual-verdict format' \
+		'rows=1 system=FAIL user=WARN sys-unit=systemd_dounit sys-initd=- user-unit=systemd_douserunit user-initd=-' \
+		"$(pkg_state sci-ml/lemonade-bin)"
+
+	# PIN ABOUT TO MOVE: Task 2.1 adds the init scripts, after which this reads
+	# system=PASS with sys-initd=newinitd. Nothing else about the row changes.
+	#
+	# CAUTION for whoever repins it: system=PASS here does NOT prove R1.1. The
+	# guard asks whether ntpd-rs has AN init script, not whether it has the TWO
+	# its two daemons need - a single newinitd flips the verdict. R1.1 is proven
+	# by Task 2.1's own build assertion and by nothing here.
+	assert_eq A08 \
+		'net-misc/ntpd-rs: a system unit with no init script is a FAIL' \
+		'rows=1 system=FAIL user=n/a sys-unit=systemd_dounit sys-initd=- user-unit=- user-initd=-' \
+		"$(pkg_state net-misc/ntpd-rs)"
+
+	# PIN ABOUT TO MOVE: Task 2.2 adds the init script, after which system=PASS
+	# with sys-initd=newinitd.
+	assert_eq A09 \
+		'net-misc/rustdesk: a system unit with no init script is a FAIL' \
+		'rows=1 system=FAIL user=n/a sys-unit=systemd_dounit sys-initd=- user-unit=- user-initd=-' \
+		"$(pkg_state net-misc/rustdesk)"
+
+	# PIN ABOUT TO MOVE: Task 2.2 covers this package too, with the same script
+	# as its source sibling - after which system=PASS, sys-initd=newinitd.
+	#
+	# Worth keeping separate from A09 rather than folding into it. rustdesk-bin
+	# is the package the allowlist comment holds up as the counter-example: its
+	# payload carries a .service under usr/share/rustdesk/files/systemd/ that
+	# does NOT count, while the unit it really installs goes through an explicit
+	# systemd_dounit that DOES. sys-unit=systemd_dounit is the assertion that
+	# the classifier saw the second one and not the first.
+	assert_eq A10 \
+		'net-misc/rustdesk-bin: the installed unit counts, the one buried in the payload does not' \
+		'rows=1 system=FAIL user=n/a sys-unit=systemd_dounit sys-initd=- user-unit=- user-initd=-' \
+		"$(pkg_state net-misc/rustdesk-bin)"
+
+	# R3.9's severity half: a user-scope gap is a WARN and leaves the exit code
+	# alone. This package is the reason the exit contract has that asymmetry -
+	# the user-scope pattern has one precedent in this tree and none in
+	# ::gentoo, so failing a build over it would assert a convention that does
+	# not exist yet. A12 pins the other half: this WARN is counted among the six
+	# findings and the run still exits 1 only because of the four FAILs.
+	#
+	# PIN ABOUT TO MOVE: Task 3.2 adds the user-scope script on a revbump, after
+	# which user=PASS and user-initd=exeinto /etc/user/init.d + newexe.
+	assert_eq A11 \
+		'mail-mta/proton-mail-bridge: a user unit with no user-scope script is a WARN, not a FAIL' \
+		'rows=1 system=n/a user=WARN sys-unit=- sys-initd=- user-unit=systemd_newuserunit user-initd=-' \
+		"$(pkg_state mail-mta/proton-mail-bridge)"
+
+	# --- what a whole run does ----------------------------------------
+
+	# R3.5: the sweep does not stop at the first gap. Five rows and six findings
+	# is the whole tree's current state (Task 1.3's Red evidence), and the two
+	# numbers differ because A07's package carries two findings on one row.
+	#
+	# PIN ABOUT TO MOVE: once Tasks 2 and 3 land, this becomes
+	# exit=0 rows=0 findings=0 allowlisted=1 - and allowlisted MUST still be 1.
+	# A remediation that reached zero findings by growing the allowlist has
+	# hidden the gaps rather than closed them, and that is the one way this
+	# assertion can be met dishonestly.
+	#
+	# WHEN IT GOES STALE OTHERWISE: a new package landing with a unit and no
+	# init script makes this red. That is the guard WORKING, not a bad pin -
+	# fix the package, then repin. Never widen it.
+	assert_eq A12 \
+		'a whole run reports every finding rather than stopping at the first (R3.5)' \
+		'exit=1 rows=5 findings=6 allowlisted=1' \
+		"$(full_run "${SELF_TEST_SCRATCH}")"
+
+	# --- exit 2: nothing was compared ---------------------------------
+	#
+	# The two below are the only assertions in this story that observe exit 2,
+	# and it is the code design.md calls the important one: an empty report reads
+	# exactly like a clean one, so every path that compares NOTHING has to be
+	# louder than a path that compared everything and found nothing wrong.
+
+	# R3.8. A typo in a category name must not come back as a spotless overlay.
+	#
+	# WHEN IT GOES STALE: if this ever reads exit=0, someone made the empty
+	# selection succeed - that is the defect, not the pin. If explained=no, the
+	# code is right and the sentence that makes it actionable was dropped.
+	assert_eq A13 \
+		'a filter matching no package exits 2 and says so (R3.8)' \
+		'exit=2 explained=yes' \
+		"$(no_match_run "${SELF_TEST_SCRATCH}")"
+
+	# R3.3. The same failure from the other end: not an empty selection but an
+	# empty tree. Exercised on a COPY of this script under $TMPDIR, because
+	# OVERLAY_ROOT is derived from the script's location and there is no other
+	# way to give it a root without touching the real one.
+	#
+	# WHEN IT GOES STALE: exit=0 here means the precondition was removed or its
+	# marker file changed name, and the guard will happily report RESULT PASS
+	# over a tree it never read. Repin on the new marker; do not delete the
+	# check.
+	assert_eq A14 \
+		'a root that is not a package tree exits 2 and says so (R3.3)' \
+		'exit=2 explained=yes' \
+		"$(absent_root_run "${SELF_TEST_SCRATCH}")"
+}
 
 # self_test
-# Sub-task 1.2 authors the assertions. The flag and the dispatch exist now so
-# the interface design.md publishes is real from the first commit rather than
-# appearing later.
-#
-# It returns 0 while asserting nothing, which is exactly the silent pass this
-# script exists to prevent - so it says so, loudly, on stderr.
+# The harness verdict. Exits 0 only when every assertion passed AND at least one
+# ran: "0 assertions, all passed" is the single most misleading line a guard can
+# print, and every way of reaching it - assertions not written yet, a helper that
+# returned early - is a defect worth an exit code.
 self_test() {
-	printf 'self-test: NO ASSERTIONS YET.\n' >&2
-	printf 'self-test: the harness is authored by sub-task 1.2; this exit 0 proves\n' >&2
-	printf 'self-test: nothing about the classifier.\n' >&2
-	return 0
+	local failure
+
+	self_test_assertions
+
+	if (( ASSERT_TOTAL == 0 )); then
+		printf '\nthe self-test ran no assertions, so it proved nothing\n' >&2
+		return 1
+	fi
+
+	if (( ${#FAILURES[@]} == 0 )); then
+		printf '\n%d assertions, all passed\n' "${ASSERT_TOTAL}"
+		return 0
+	fi
+
+	printf '\n%d assertions, %d FAILED:\n' "${ASSERT_TOTAL}" "${#FAILURES[@]}"
+	for failure in "${FAILURES[@]}"; do
+		printf '  - %s\n' "${failure}"
+	done
+	return 1
 }
 
 ### main #############################################################

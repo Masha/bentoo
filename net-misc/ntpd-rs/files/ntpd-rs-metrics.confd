@@ -1,0 +1,14 @@
+# Configuration for the ntpd-rs metrics exporter service.
+#
+# The listen address and the observation socket path both come from
+# /etc/ntpd-rs/ntp.toml -- [observability] metrics-exporter-listen and
+# observation-path -- and not from this file.  ntp.toml must actually enable
+# the observation socket, or the exporter has nothing to read.
+
+# Extra command-line arguments for ntp-metrics-exporter, for example
+# "-c /etc/ntpd-rs/other.toml".
+NTPD_RS_METRICS_OPTS=""
+
+# The unit declares Restart=always, which the init script maps to unlimited
+# respawns.  Set a number here to bound them instead.
+#NTPD_RS_METRICS_RESPAWN_MAX=10

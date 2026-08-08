@@ -284,6 +284,9 @@ LICENSE="|| ( Apache-2.0 MIT )"
 LICENSE+=" Apache-2.0 BSD BSD-2 Boost-1.0 CDLA-Permissive-2.0 ISC MIT MPL-2.0 Unicode-3.0 ZLIB"
 SLOT="0"
 KEYWORDS="~amd64 ~arm64"
+# The flag gates the systemd units ONLY. The OpenRC init scripts are installed
+# unconditionally -- see src_install.
+IUSE="systemd"
 # NTS (RFC 8915) is always built in via rustls with the aws-lc-rs backend,
 # which also enables post-quantum key exchange (prefer-post-quantum) for NTS-KE.
 DEPEND="
@@ -324,12 +327,27 @@ src_install() {
 	insinto /etc/ntpd-rs
 	newins docs/examples/conf/ntp.toml.default ntp.toml
 
-	# systemd units (systemd-only service integration).
-	systemd_dounit docs/examples/conf/ntpd-rs.service
-	systemd_dounit docs/examples/conf/ntpd-rs-metrics.service
+	# OpenRC services, one per daemon the package installs: ntp-daemon and
+	# the ntp-metrics-exporter, which run under different service accounts.
+	# Installed unconditionally -- they cost a systemd user nothing, while
+	# gating them would leave an OpenRC user with no way to run this package.
+	newinitd "${FILESDIR}"/ntpd-rs.initd ntpd-rs
+	newconfd "${FILESDIR}"/ntpd-rs.confd ntpd-rs
+	newinitd "${FILESDIR}"/ntpd-rs-metrics.initd ntpd-rs-metrics
+	newconfd "${FILESDIR}"/ntpd-rs-metrics.confd ntpd-rs-metrics
 
-	insinto /usr/lib/systemd/system-preset
-	newins docs/examples/conf/ntpd-rs.preset 50-ntpd-rs.preset
+	# systemd units (systemd-only service integration).
+	#
+	# The preset lives inside the guard rather than being translated: OpenRC
+	# has no preset concept, because enabling a service there is
+	# `rc-update add`, an admin action rather than a packaging one.
+	if use systemd; then
+		systemd_dounit docs/examples/conf/ntpd-rs.service
+		systemd_dounit docs/examples/conf/ntpd-rs-metrics.service
+
+		insinto /usr/lib/systemd/system-preset
+		newins docs/examples/conf/ntpd-rs.preset 50-ntpd-rs.preset
+	fi
 
 	dodoc CHANGELOG.md README.md COPYRIGHT
 	einstalldocs

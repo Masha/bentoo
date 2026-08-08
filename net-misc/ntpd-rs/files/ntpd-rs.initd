@@ -1,0 +1,49 @@
+#!/sbin/openrc-run
+# Copyright 1999-2026 Gentoo Authors
+# Distributed under the terms of the GNU General Public License v2
+
+# OpenRC translation of upstream docs/examples/conf/ntpd-rs.service (1.9.0).
+#
+# CAP_SYS_TIME IS LOAD-BEARING, NOT DECORATION.  Measured on 1.9.0: started as
+# a non-root user without it, ntp-daemon logs
+#     ERROR ntpd::daemon::system: Could not control clock:
+#           Insufficient permissions to interact with the clock.
+# and exits within a second.  Deleting the capabilities= line below therefore
+# does not merely reduce privilege -- it produces a service that reports
+# "started" and is not running.  CAP_NET_BIND_SERVICE is exercised only when a
+# [[server]] block in ntp.toml binds port 123; it costs nothing when none does.
+#
+# WHAT THIS TRANSLATION LOSES.  The unit declares Restart=no and OpenRC has no
+# exact equivalent: supervise-daemon always respawns, bounded by respawn_max
+# (default 10).  That difference only bites if you enable accumulated-threshold
+# in ntp.toml, which makes the daemon exit ON PURPOSE after too much cumulative
+# stepping -- a respawn discards that protection.  /etc/conf.d/ntpd-rs carries
+# the setting for that case.  The unit's
+# Conflicts=systemd-timesyncd.service ntp.service chrony.service likewise has
+# no OpenRC counterpart: do not add a second time daemon to a runlevel.
+
+description="Network Time Service (ntpd-rs)"
+
+command="/usr/bin/ntp-daemon"
+command_args="${NTPD_RS_OPTS}"
+command_user="ntpd-rs:ntpd-rs"
+# ntp-daemon does not fork (measured on 1.9.0: no child process, exits only on
+# a signal), so it is supervised rather than backgrounded.
+supervisor="supervise-daemon"
+
+# AmbientCapabilities=CAP_SYS_TIME CAP_NET_BIND_SERVICE, in cap_iab(3) syntax.
+capabilities="^cap_sys_time,^cap_net_bind_service"
+
+depend() {
+	need net
+	use dns
+}
+
+start_pre() {
+	# RuntimeDirectory=ntpd-rs.  ntp-daemon binds its observation socket at
+	# observation-path (/run/ntpd-rs/observe by default) but does NOT create
+	# the parent directory -- ntpd/src/daemon/sockets.rs binds with no
+	# create_dir_all().  The directory cannot be created at build time
+	# either: acct-user/ntpd-rs does not exist on the build host (R1.9).
+	checkpath -d -o ntpd-rs:ntpd-rs -m 0755 /run/ntpd-rs
+}

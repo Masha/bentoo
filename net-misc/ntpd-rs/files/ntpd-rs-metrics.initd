@@ -1,0 +1,42 @@
+#!/sbin/openrc-run
+# Copyright 1999-2026 Gentoo Authors
+# Distributed under the terms of the GNU General Public License v2
+
+# OpenRC translation of upstream docs/examples/conf/ntpd-rs-metrics.service.
+#
+# This is the SECOND daemon net-misc/ntpd-rs installs: a Prometheus/OpenMetrics
+# exporter.  It is a different binary running under a different service account
+# than ntpd-rs itself, which is why it gets its own service rather than being
+# folded into that one.  It reads the ntp-daemon observation socket named in
+# /etc/ntpd-rs/ntp.toml and serves metrics over HTTP (127.0.0.1:9975 default).
+#
+# It is not needed to keep time and upstream's own preset ships it disabled;
+# add it to a runlevel only if you scrape it.
+#
+# THERE IS NO start_pre HERE, AND THAT IS DELIBERATE.  The unit declares
+# RuntimeDirectory=ntpd-rs-observe, but nothing uses that directory: the string
+# occurs nowhere in the 1.9.0 source outside the packaging documentation.  The
+# exporter only reads the daemon's socket -- created world-readable, see
+# default_observation_permissions() returning 0o666 in
+# ntpd/src/daemon/config/mod.rs -- and binds a TCP port.  Measured on 1.9.0: it
+# starts and serves as an unprivileged user with no runtime directory of its
+# own and no capabilities.
+
+description="Network Time Service (ntpd-rs) metrics exporter"
+
+command="/usr/bin/ntp-metrics-exporter"
+command_args="${NTPD_RS_METRICS_OPTS}"
+command_user="ntpd-rs-observe:ntpd-rs-observe"
+# Does not fork (measured on 1.9.0), same as ntp-daemon.
+supervisor="supervise-daemon"
+
+# Restart=always.  0 means unlimited respawns -- see supervise-daemon(8).
+respawn_max="${NTPD_RS_METRICS_RESPAWN_MAX:-0}"
+
+depend() {
+	need net
+	# Not `need`: the exporter starts and answers with errors while the
+	# daemon is down, and pulling ntpd-rs into the runlevel as a side effect
+	# of scraping it would be surprising.
+	use ntpd-rs
+}

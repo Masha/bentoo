@@ -110,7 +110,9 @@ LICENSE+="
 SLOT="0"
 KEYWORDS="~amd64"
 
-IUSE="wayland +hwaccel"
+# `systemd` gates the unit ONLY. The OpenRC init script is installed
+# unconditionally -- see src_install.
+IUSE="wayland +hwaccel systemd"
 
 RDEPEND="
 	media-libs/alsa-lib
@@ -198,7 +200,17 @@ src_install() {
 	newicon -s 256 res/128x128@2x.png rustdesk.png
 
 	domenu "${FILESDIR}"/rustdesk{,-link}.desktop
-	systemd_dounit "${FILESDIR}"/rustdesk.service
+
+	# OpenRC service, installed unconditionally: it costs a systemd user
+	# nothing, while gating it would leave an OpenRC user with no way to run
+	# the daemon this package exists to provide. The file is byte-identical
+	# to net-misc/rustdesk-bin/files/rustdesk.initd -- FILESDIR is
+	# per-package, so it has to be duplicated rather than shared.
+	newinitd "${FILESDIR}"/rustdesk.initd rustdesk
+
+	if use systemd; then
+		systemd_dounit "${FILESDIR}"/rustdesk.service
+	fi
 
 	einstalldocs
 }
