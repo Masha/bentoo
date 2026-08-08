@@ -20,8 +20,28 @@ set -euo pipefail
 
 repo=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
 
-module="${repo}/app-eselect/eselect-nodejs/files/nodejs.eselect-1"
-[[ -f ${module} ]] || { echo "not found: ${module}" >&2; exit 1; }
+# The module filename carries the eselect-nodejs major (nodejs.eselect-<N>), so it
+# moves on every bump of that package: d8b541d78 renamed it -1 -> -2 and left this
+# path pointing at a file that no longer existed, which made the script exit 1 on
+# the missing file before it compared anything at all. A guard that hardcodes the
+# name it is guarding is blind to exactly the failure it exists to catch, so glob
+# for the module instead of naming a version.
+shopt -s nullglob
+modules=( "${repo}"/app-eselect/eselect-nodejs/files/nodejs.eselect-[0-9]* )
+shopt -u nullglob
+(( ${#modules[@]} )) || {
+	echo "not found: ${repo}/app-eselect/eselect-nodejs/files/nodejs.eselect-<major>" >&2
+	exit 1
+}
+
+# Highest major wins. More than one file means several eselect-nodejs versions
+# coexist in the tree and only the newest is compared -- report that rather than
+# narrowing the check in silence.
+module=$(printf '%s\n' "${modules[@]}" | sort -V | tail -n1)
+if (( ${#modules[@]} > 1 )); then
+	echo "note: ${#modules[@]} module files present, comparing only $(basename "${module}")" >&2
+fi
+echo "module file  : ${module#"${repo}"/}"
 
 shopt -s nullglob
 ebuilds=( "${repo}"/net-libs/nodejs/nodejs-[0-9]*.ebuild )
