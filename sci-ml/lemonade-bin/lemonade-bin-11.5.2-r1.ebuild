@@ -6,8 +6,26 @@ EAPI=8
 # HYBRID PACKAGING -- DO NOT "SIMPLIFY" THIS ON A VERSION BUMP.
 #
 # 1) Why the binaries come from the "embeddable" tarball and NOT from the .deb:
-#    Upstream's .deb (and the Fedora RPMs) link against Debian-13 sonames that
-#    do not exist on Gentoo:
+#
+#    1a) THE REASON THAT OUTLIVES THE SONAMES -- the .deb's lemond links
+#    libsystemd.so.0.  Measured 2026-08-08 on the 11.5.2 payload:
+#       readelf -dW <deb>/usr/bin/lemond | grep NEEDED
+#          libsystemd.so.0  libcap.so.2  libcpp-httplib.so.0.41  ...
+#       imports: sd_bus_open_system sd_bus_call_method sd_bus_message_read
+#                sd_bus_message_unref sd_bus_error_free sd_bus_unref
+#                sd_pid_get_unit
+#    DT_NEEDED is a hard load-time requirement, so that binary does not even
+#    start on a host without systemd's libraries -- it merges cleanly, passes
+#    QA, and then fails at exec on an OpenRC box.  That is the exact failure
+#    sci-biology/foldingathome hit between 8.5.5 and 8.5.6.  The embeddable
+#    lemond links neither libsystemd nor libcap (same command, same day).
+#    This is listed FIRST because the soname reasons below are fixable --
+#    someone could package cpp-httplib 0.41 -- and this one is not.  If a
+#    future bump makes the .deb payload look tempting again, re-run the readelf
+#    above before touching src_install.
+#
+#    1b) Debian-13 sonames.  Upstream's .deb (and the Fedora RPMs) link against
+#    sonames that do not exist on Gentoo:
 #       libcpp-httplib.so.0.41  -- Gentoo builds cpp-httplib as .so.0.50.1
 #       libwebsockets.so.19     -- Gentoo ships libwebsockets.so.21
 #       libmbedcrypto.so.16     -- Gentoo installs this as libmbedcrypto-3.so.16
@@ -150,9 +168,24 @@ src_install() {
 	# the units use StateDirectory and AmbientCapabilities.  That was wrong on
 	# both counts: StateDirectory/RuntimeDirectory map onto `checkpath -d` in
 	# start_pre(), which lemond.initd already does, and OpenRC does have a
-	# `capabilities` variable (supervise-daemon --capabilities).  CAP_SYS_RESOURCE
-	# is deliberately NOT set here, to keep this file identical to the sibling's;
-	# adding it is a change to both packages, not a gap this revision closes.
+	# `capabilities` variable (supervise-daemon --capabilities).
+	#
+	# CAP_SYS_RESOURCE is deliberately NOT set, and that is now a measurement
+	# rather than a preference.  Run 2026-08-08: lemond started with zero
+	# capabilities and RLIMIT_MEMLOCK soft = hard = 8 MiB, bound its HTTP and
+	# WebSocket servers and built its 114-entry model cache, with no capability,
+	# rlimit or memlock diagnostic.  Upstream's own systemd USER unit ships with
+	# no AmbientCapabilities at all over the same ExecStart, so upstream already
+	# runs this daemon without it in one of its two scopes.  The binary does
+	# call setrlimit, so the capability is not decorative upstream -- it is what
+	# would permit raising a HARD limit -- but the only memlock diagnostics in
+	# it (memlock_ok, "Memlock limits are too low.") sit in an NPU-readiness
+	# block next to npu_driver_ok and "NPU validation failed.", i.e. they report
+	# a condition rather than gate startup.
+	# NOT covered: the test host has no NPU, so that probe was never reached.
+	# On a Ryzen AI box with a restrictive memlock ceiling the OpenRC answer is
+	# an admin knob -- rc_ulimit="-l unlimited" in /etc/conf.d/lemond, or
+	# /etc/security/limits.conf -- not a capability in this file.
 	newinitd "${FILESDIR}"/lemond.initd lemond
 	newconfd "${FILESDIR}"/lemond.confd lemond
 

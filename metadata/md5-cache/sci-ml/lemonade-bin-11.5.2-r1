@@ -11,5 +11,5 @@ RDEPEND=!!sci-ml/lemonade acct-group/lemonade acct-user/lemonade app-arch/unzip 
 RESTRICT=bindist mirror strip
 SLOT=0
 SRC_URI=amd64? ( https://github.com/lemonade-sdk/lemonade/releases/download/v11.5.2/lemonade-embeddable-11.5.2-ubuntu-x64.tar.gz -> lemonade-bin-11.5.2-amd64.tar.gz ) arm64? ( https://github.com/lemonade-sdk/lemonade/releases/download/v11.5.2/lemonade-embeddable-11.5.2-ubuntu-arm64.tar.gz -> lemonade-bin-11.5.2-arm64.tar.gz ) https://github.com/lemonade-sdk/lemonade/releases/download/v11.5.2/lemonade-server_11.5.2-debian13_amd64.deb -> lemonade-bin-11.5.2-data.deb
-_eclasses_=toolchain-funcs	58a918e3a42d0156f010dcfd43725be5	multilib	fc812e8eb2170022c28272d80a1f9e77	systemd	a964c0cbe818b5729da1dbfcee5be861	eapi9-pipestatus	d2c134036ac31c3085aebc9147f572bd	multiprocessing	45d0620f25c2f063ad6276ecd9ed9399	unpacker	a89c769f7dcf68bd2a6d23da9ede2ad2
-_md5_=dd49c0366cd4aa659ad081c975586a4f
+_eclasses_=eapi9-pipestatus	d2c134036ac31c3085aebc9147f572bd	multilib	fc812e8eb2170022c28272d80a1f9e77	multiprocessing	45d0620f25c2f063ad6276ecd9ed9399	systemd	a964c0cbe818b5729da1dbfcee5be861	toolchain-funcs	58a918e3a42d0156f010dcfd43725be5	unpacker	a89c769f7dcf68bd2a6d23da9ede2ad2
+_md5_=99f8f97243d98e1deae17a257bd699f9
