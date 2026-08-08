@@ -642,6 +642,22 @@ src_prepare() {
 		sed -i "s|/bin/rustfmt|/bin/rustfmt${suffix}|g" build/rust/rust_bindgen_generator.gni ||
 			die "Failed to update rustfmt path"
 
+		# bytemuck's `nightly_portable_simd` feature uses core::simd::{LaneCount,SupportedLaneCount},
+		# which Rust removed in 1.97. Upstream's bundled nightly still has them, so upstream never
+		# sees this; with system Rust, RUSTC_BOOTSTRAP=1 lets `feature(portable_simd)` through and
+		# the crate then fails to compile (E0405/E0425). The SIMD impls are only used by
+		# ui/android, which we don't build, so dropping the feature is safe here.
+		# ::gentoo does not carry this because its stable Rust is older; this overlay mirrors
+		# dev-lang/rust ahead, so 1.97 is what a bentoo user actually builds against.
+		# Re-checked against the 151.0.7922.108 tarball: the feature line is still there, and
+		# chromium-patches dropped rust/cr146-fix-botched-bytemuck-roll.patch in 151-3, so
+		# nothing upstream covers it either.
+		# The grep is a tripwire: `sed -i` that matches nothing still exits 0.
+		grep -q '"nightly_portable_simd",' third_party/rust/bytemuck/v1/BUILD.gn ||
+			die "bytemuck no longer enables nightly_portable_simd; drop this workaround"
+		sed -i '/"nightly_portable_simd",/d' third_party/rust/bytemuck/v1/BUILD.gn ||
+			die "Failed to disable bytemuck's nightly_portable_simd feature"
+
 	fi
 
 	# Do this before we apply patches since (e.g.) ppc64 needs to patch rollup and it's easier in ${S}
