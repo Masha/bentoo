@@ -81,6 +81,13 @@
 #     doexe. No package in this tree uses that idiom (measured: zero), so no
 #     detector is carried for it; the user-scope twin exists because
 #     sys-apps/xdg-desktop-portal actually does it.
+#   * the unit-side twin of the above: `insinto /usr/lib/systemd/system` (or
+#     /usr/lib/systemd/user) plus doins/newins, bypassing the systemd_* helpers
+#     entirely. Same false-negative shape, same measured justification - zero
+#     users in this tree - but it fails in the DANGEROUS direction: a package
+#     using it ships a unit the guard cannot see, so it reads as clean. The
+#     exeinto twin above fails the safe way, by hiding an init script that
+#     exists. Add a detector the day the first package uses it.
 #   * USE flags. A unit installed under `if use systemd` counts as installed,
 #     because the question is whether the package CAN put a unit on disk with
 #     no OpenRC counterpart - not whether one particular profile does.
