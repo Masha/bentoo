@@ -1154,7 +1154,13 @@ self_test_assertions() {
 		'rows=1 ebuild=zed-bin-1.15.0_pre.ebuild' \
 		"$(pkg_selection app-editors/zed-bin)"
 
-	# --- the five pins this story is about to move --------------------
+	# --- the five pins this story MOVED (all six predicted below) -----
+	#
+	# Each pin here fired red at the end of story 010 and was repinned to the
+	# value its own PIN-ABOUT-TO-MOVE comment had predicted, character for
+	# character. The comments are kept: they are what distinguishes a pin that
+	# moved because the tree was fixed from one moved to match whatever the
+	# script happened to print.
 
 	# The dual-verdict format itself: ONE row carrying TWO findings.
 	# sci-ml/lemonade-bin is the only package in the tree missing both scopes at
@@ -1171,8 +1177,8 @@ self_test_assertions() {
 	# changing - is a regression. Task 5.1 tells the two apart by whether this
 	# comment predicted it.
 	assert_eq A07 \
-		'sci-ml/lemonade-bin: one row, two findings - the dual-verdict format' \
-		'rows=1 system=FAIL user=WARN sys-unit=systemd_dounit sys-initd=- user-unit=systemd_douserunit user-initd=-' \
+		'sci-ml/lemonade-bin: one row carrying TWO scope verdicts - the dual-verdict format' \
+		'rows=1 system=PASS user=PASS sys-unit=systemd_dounit sys-initd=newinitd user-unit=systemd_douserunit user-initd=exeinto /etc/user/init.d + newexe' \
 		"$(pkg_state sci-ml/lemonade-bin)"
 
 	# PIN ABOUT TO MOVE: Task 2.1 adds the init scripts, after which this reads
@@ -1183,15 +1189,15 @@ self_test_assertions() {
 	# its two daemons need - a single newinitd flips the verdict. R1.1 is proven
 	# by Task 2.1's own build assertion and by nothing here.
 	assert_eq A08 \
-		'net-misc/ntpd-rs: a system unit with no init script is a FAIL' \
-		'rows=1 system=FAIL user=n/a sys-unit=systemd_dounit sys-initd=- user-unit=- user-initd=-' \
+		'net-misc/ntpd-rs: the system unit is paired with an init script' \
+		'rows=1 system=PASS user=n/a sys-unit=systemd_dounit sys-initd=newinitd user-unit=- user-initd=-' \
 		"$(pkg_state net-misc/ntpd-rs)"
 
 	# PIN ABOUT TO MOVE: Task 2.2 adds the init script, after which system=PASS
 	# with sys-initd=newinitd.
 	assert_eq A09 \
-		'net-misc/rustdesk: a system unit with no init script is a FAIL' \
-		'rows=1 system=FAIL user=n/a sys-unit=systemd_dounit sys-initd=- user-unit=- user-initd=-' \
+		'net-misc/rustdesk: the system unit is paired with an init script' \
+		'rows=1 system=PASS user=n/a sys-unit=systemd_dounit sys-initd=newinitd user-unit=- user-initd=-' \
 		"$(pkg_state net-misc/rustdesk)"
 
 	# PIN ABOUT TO MOVE: Task 2.2 covers this package too, with the same script
@@ -1205,7 +1211,7 @@ self_test_assertions() {
 	# the classifier saw the second one and not the first.
 	assert_eq A10 \
 		'net-misc/rustdesk-bin: the installed unit counts, the one buried in the payload does not' \
-		'rows=1 system=FAIL user=n/a sys-unit=systemd_dounit sys-initd=- user-unit=- user-initd=-' \
+		'rows=1 system=PASS user=n/a sys-unit=systemd_dounit sys-initd=newinitd user-unit=- user-initd=-' \
 		"$(pkg_state net-misc/rustdesk-bin)"
 
 	# R3.9's severity half: a user-scope gap is a WARN and leaves the exit code
@@ -1218,8 +1224,8 @@ self_test_assertions() {
 	# PIN ABOUT TO MOVE: Task 3.2 adds the user-scope script on a revbump, after
 	# which user=PASS and user-initd=exeinto /etc/user/init.d + newexe.
 	assert_eq A11 \
-		'mail-mta/proton-mail-bridge: a user unit with no user-scope script is a WARN, not a FAIL' \
-		'rows=1 system=n/a user=WARN sys-unit=- sys-initd=- user-unit=systemd_newuserunit user-initd=-' \
+		'mail-mta/proton-mail-bridge: the user unit is paired with a user-scope script' \
+		'rows=1 system=n/a user=PASS sys-unit=- sys-initd=- user-unit=systemd_newuserunit user-initd=exeinto /etc/user/init.d + newexe' \
 		"$(pkg_state mail-mta/proton-mail-bridge)"
 
 	# --- what a whole run does ----------------------------------------
@@ -1237,9 +1243,16 @@ self_test_assertions() {
 	# WHEN IT GOES STALE OTHERWISE: a new package landing with a unit and no
 	# init script makes this red. That is the guard WORKING, not a bad pin -
 	# fix the package, then repin. Never widen it.
+	# COVERAGE LOST WHEN THIS PIN MOVED, stated so nobody rediscovers it as a
+	# surprise: while the expected value was 5 rows / 6 findings, A12 was also
+	# the proof of R3.5 -- that a run keeps classifying past the first gap. A
+	# clean tree cannot demonstrate that, so R3.5 is now covered only by the
+	# code path, not by an assertion. Restoring it means asserting against a
+	# synthetic multi-gap fixture rather than against the live overlay; that is
+	# a deliberate follow-up, not something to fake by keeping a red pin.
 	assert_eq A12 \
-		'a whole run reports every finding rather than stopping at the first (R3.5)' \
-		'exit=1 rows=5 findings=6 allowlisted=1' \
+		'a clean run reports zero findings and still prints the allowlist (was R3.5)' \
+		'exit=0 rows=0 findings=0 allowlisted=1' \
 		"$(full_run "${SELF_TEST_SCRATCH}")"
 
 	# --- exit 2: nothing was compared ---------------------------------
