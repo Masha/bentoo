@@ -1,0 +1,29 @@
+# Lucas Couto <lucascs@protonmail.com> (2026-08-08)
+# ::gentoo masks >=app-text/calibre-8.11.0 (profiles/package.mask, 2025-12-15)
+# over the AI features upstream added in that release. The mask has held for
+# eight months and pins ::gentoo's installable calibre at 8.9.0, six minor
+# series and one major behind upstream.
+#
+# This overlay ships the current series instead. The AI code is opt-in by
+# construction, not by policy: nothing under src/calibre/ai/ is imported until
+# the user configures a backend, and Preferences->Tweaks carries
+# hide_ai_features to remove the menu entries entirely. Of the seven backends
+# upstream provides, two -- ollama and lm_studio -- talk only to localhost, so
+# using the feature at all does not require handing text to a third party.
+# Nothing here is enabled by default and nothing phones home on its own.
+#
+# The atom is deliberately UNqualified, which is the opposite of what the
+# nodejs entry in profiles/package.mask needs, and for the same underlying
+# reason. Portage stamps every repo-level atom with the repository being
+# processed, and when it processes this overlay it re-reads the master's
+# package.mask too -- so ::gentoo's calibre mask lands here twice, once as
+# ">=app-text/calibre-8.11.0::gentoo" and once as "...::bentoo". The ::bentoo
+# copy is the one that masks this overlay's ebuild, and only a bare atom
+# (which Portage stamps ::bentoo in turn) cancels it. An explicit ::gentoo
+# here cancels the wrong copy and leaves 9.13.0 masked -- measured.
+#
+# Leaving ::gentoo's own calibre ebuilds masked is intentional: this overlay
+# ships the version it vouches for and does not unmask a master's packages.
+#
+# Remove this entry if ::gentoo lifts its mask.
+>=app-text/calibre-8.11.0

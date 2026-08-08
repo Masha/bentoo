@@ -52,8 +52,10 @@ SRC_URI+="
 # dependency either: upstream installs nothing and ships no pkg-config file,
 # it only *generates* headers at build time, so the subproject fallback is the
 # only consumable form.  Keep VENUS_PROTOCOL_COMMIT in sync with the
-# "revision" field of that wrap file on every bump.
-VENUS_PROTOCOL_COMMIT="027b9aca5c480d02bea6ef1b15406f5fd15cd7d7"
+# "revision" field of that wrap file on every bump; src_unpack hard-fails when
+# it drifts, because meson only checks the *declared* version of whatever is on
+# disk (== 1.1 here) and a stale pin silently builds against wrong headers.
+VENUS_PROTOCOL_COMMIT="e94b12f301b9eb27ebead757128a18420b4f7994"
 VENUS_PROTOCOL_P="venus-protocol-${VENUS_PROTOCOL_COMMIT}"
 # Only the virtio Vulkan driver needs it (with_virtio_vk in meson.build).
 SRC_URI+="
@@ -209,10 +211,21 @@ src_unpack() {
 
 	if use vulkan && use video_cards_virgl; then
 		unpack "${VENUS_PROTOCOL_P}.tar.gz"
-		# The name is the "directory" field of subprojects/venus-protocol.wrap;
-		# meson resolves the wrap from disk instead of cloning when it exists.
-		mv "${WORKDIR}/${VENUS_PROTOCOL_P}" \
-			"${S}/subprojects/venus-protocol-1.0" || die
+		# meson resolves the wrap from disk instead of cloning only when the
+		# tree sits at the exact "directory" field, so read it from the wrap
+		# rather than hardcoding it: upstream renamed it venus-protocol-1.0 ->
+		# -1.1 mid-series and a hardcoded path fails as a generic "Subproject
+		# is buildable: NO".  "revision" is checked for the same reason.
+		local vn_wrap="${S}/subprojects/venus-protocol.wrap"
+		local vn_dir vn_rev
+		vn_dir=$(sed -n 's/^[[:space:]]*directory[[:space:]]*=[[:space:]]*//p' \
+			"${vn_wrap}") || die
+		vn_rev=$(sed -n 's/^[[:space:]]*revision[[:space:]]*=[[:space:]]*//p' \
+			"${vn_wrap}") || die
+		[[ -n ${vn_dir} ]] || die "no 'directory' field in ${vn_wrap}"
+		[[ ${vn_rev} == "${VENUS_PROTOCOL_COMMIT}" ]] ||
+			die "VENUS_PROTOCOL_COMMIT is stale: the wrap wants ${vn_rev}"
+		mv "${WORKDIR}/${VENUS_PROTOCOL_P}" "${S}/subprojects/${vn_dir}" || die
 	fi
 
 	# We need this because we cannot tell meson to use DISTDIR yet

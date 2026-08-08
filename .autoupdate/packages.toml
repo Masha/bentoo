@@ -7,7 +7,7 @@
 # ebuild (Gentoo version rules: prefixes v/release-/ver-/version- stripped;
 # regex returns capture group 1 of the FIRST match on the raw body).
 #
-# 411 records — 228 regex, 183 json. 20 disabled (enabled = false),
+# 417 records — 228 regex, 189 json. 20 disabled (enabled = false),
 # 3 held (hold = true): dev-build/gn, dev-lang/ghc, sci-ml/stable-diffusion-cpp.
 #
 # No record uses parser = "script" any more: the three that did (antigravity-bin,
@@ -629,6 +629,37 @@ headers = { "User-Agent" = "bentoo-autoupdate" }
 version = "0.9.2"
 comments = """
 dxvk-nvapi — tag "vX.Y.Z".
+"""
+# END
+
+["app-emulation/wine-vanilla"]
+url = "https://gitlab.winehq.org/api/v4/projects/wine%2Fwine/releases?per_page=30"
+parser = "regex"
+pattern = '"tag_name":"wine-([0-9]+\.[0-9]+(?:\.[0-9]+)?)"'
+version = "11.15"
+comments = """
+wine-vanilla — upstream is GitLab (gitlab.winehq.org), not GitHub; the
+wine-mirror/wine repo on GitHub is a read-only mirror. The releases endpoint is
+used rather than repository/tags because only it is restricted to published
+releases.
+
+The closing quote in the pattern is load-bearing: release candidates DO appear
+in this list (wine-11.0-rc1 .. rc5 are present today), so an unanchored
+'wine-([0-9.]+)' would capture "12.0" from "wine-12.0-rc1" every January and
+report a version whose tarball does not exist yet — dl.winehq.org publishes
+wine-12.0-rc1.tar.xz, never wine-12.0.tar.xz, until the final release. Requiring
+the quote makes an -rc tag fail to match, so during the rc window the first match
+falls through to the last real release. Measured on the live body 2026-08-08:
+"11.15" normally, still "11.15" with a synthetic wine-12.0-rc1 prepended, versus
+"12.0" for the unanchored variant.
+
+Version numbering has no third component in the development series (11.15); the
+optional group covers the stable point releases (10.0.1, 9.0.1) that Wine issues
+off a .0 branch.
+
+Upstream ships a new development release every ~2 weeks. This overlay carries a
+single version, deliberately one release ahead of ::gentoo, which held 11.14 on
+the day 11.15 landed.
 """
 # END
 
@@ -1284,6 +1315,21 @@ parser = "regex"
 pattern = 'OpenVPN-([0-9]+\.[0-9]+\.[0-9]+)'
 comments = """
 openvpn — community-downloads page; anchored to "OpenVPN-X.Y.Z".
+"""
+# END
+
+["app-text/calibre"]
+url = "https://api.github.com/repos/kovidgoyal/calibre/releases/latest"
+parser = "json"
+path = "tag_name"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "9.13.0"
+comments = """
+calibre — GitHub release tag "vX.Y.Z" ("v" stripped). releases/latest, not the
+tag list: upstream tags every point release and ranking refs/tags would report a
+newer tag than the one that actually has a published tarball on
+download.calibre-ebook.com. A bump must also re-check the two patches in files/:
+both are rebases of ::gentoo's and neither applies across series unchanged.
 """
 # END
 
