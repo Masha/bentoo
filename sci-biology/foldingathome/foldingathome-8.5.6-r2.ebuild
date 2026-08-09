@@ -74,6 +74,9 @@ RESTRICT="bindist mirror strip"
 # dropping the := means Portage no longer even pretends a rebuild would help.
 # A fix for a static-OpenSSL CVE here has to come from upstream re-releasing
 # the .deb against a newer bundled OpenSSL.
+#
+# virtual/zlib:= replaces sys-libs/zlib:= -- pkgcheck flags the direct atom
+# as deprecated.
 RDEPEND="
 	${PYTHON_DEPS}
 	$(python_gen_cond_dep '
@@ -84,7 +87,7 @@ RDEPEND="
 	app-arch/lz4
 	app-misc/ca-certificates
 	sys-libs/glibc
-	sys-libs/zlib:=
+	virtual/zlib:=
 	elogind? ( sys-auth/elogind )
 	systemd? ( sys-apps/systemd )
 "
