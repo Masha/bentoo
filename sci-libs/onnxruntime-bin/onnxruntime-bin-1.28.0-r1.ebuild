@@ -33,7 +33,14 @@ KEYWORDS="~amd64"
 # Note these are glibc-linked binaries and cannot work against musl; ::gentoo
 # handles that class of package with a musl profile mask rather than an
 # RDEPEND on sys-libs/glibc, which would be unsolvable on musl profiles.
+#
+# The blocker is the other half of the pair declared by sci-libs/onnxruntime.
+# Both install libonnxruntime.so, its SONAMEs, the /usr/include/onnxruntime
+# tree, lib/cmake/onnxruntime/ and the .pc file -- 26 shared paths at the same
+# prefix. Hard, and symmetric, following sci-ml/lemonade{,-bin}: portage has no
+# ordering that resolves it, since neither package upgrades into the other.
 RDEPEND="
+	!!sci-libs/onnxruntime
 	sys-devel/gcc:*
 "
 

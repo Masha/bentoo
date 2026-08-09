@@ -34,7 +34,20 @@ IUSE="python test"
 REQUIRED_USE="${PYTHON_REQUIRED_USE}"
 RESTRICT="!test? ( test )"
 
+# The -bin package installs the same 26 paths this one does -- libonnxruntime.so
+# and its SONAMEs, libonnxruntime_providers_shared.so, the whole
+# /usr/include/onnxruntime tree, lib/cmake/onnxruntime/ and the .pc file. Same
+# upstream, same version, same install prefix: they are two ways to get one
+# library, not two libraries. Observed on 2026-08-08 as a real merge failure
+# with -bin already installed, which is the only way this surfaces -- an
+# unprivileged image build never runs collision-protect.
+#
+# Hard blocker rather than soft, matching sci-ml/lemonade{,-bin} in this
+# overlay: portage cannot resolve the conflict by ordering, because neither
+# package is an upgrade path for the other. One has to be unmerged by hand.
 RDEPEND="
+	!!sci-libs/onnxruntime-bin
+
 	dev-cpp/abseil-cpp:=
 	dev-libs/cpuinfo
 	dev-libs/protobuf:=
