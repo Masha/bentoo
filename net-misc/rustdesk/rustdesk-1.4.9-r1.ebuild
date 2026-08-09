@@ -75,8 +75,17 @@ _VCPKG_PV="1.4.7"
 # git ls-tree HEAD externals
 _HWCODEC_EXTERNALS_COMMIT="8903740a1f47884906a6e347ad3d8d56304d9771"
 # fix: libs/hbb_common is a empty directory
-# git ls-tree HEAD libs/hbb_common
-_HBB_COMMON_COMMIT="48c37de3e6c4e399af6f51ca20e8e3e1fd037976"
+# It is a git submodule, and GitHub's tag tarball ships submodule directories
+# EMPTY, so the commit has to be pinned here by hand -- which means it goes
+# stale silently on a bump. It did: until 2026-08-08 this pinned 48c37de3, a
+# commit that matches NO release (1.4.7 wants df6badca, 1.4.8 387603f4), and
+# `cargo build` died with 58 errors of the form "no field/method X on
+# hbb_common::...". The package had never been buildable at 1.4.9; the broken
+# crates Manifest above hid it, because nothing got past the fetch.
+# ALWAYS re-derive this against the tag, never carry it over:
+#   git ls-tree ${PV} libs/hbb_common
+#   curl -s "https://api.github.com/repos/rustdesk/rustdesk/contents/libs/hbb_common?ref=${PV}" | jq -r .sha
+_HBB_COMMON_COMMIT="7e1c392c62d39c364127307cd408421dd5f8cfb0"
 # fix: kcp-sys-*/kcp is a empty directory
 # git clone https://github.com/rustdesk-org/kcp-sys
 # git ls-tree HEAD kcp
