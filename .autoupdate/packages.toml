@@ -7,7 +7,7 @@
 # ebuild (Gentoo version rules: prefixes v/release-/ver-/version- stripped;
 # regex returns capture group 1 of the FIRST match on the raw body).
 #
-# 417 records — 228 regex, 189 json. 20 disabled (enabled = false),
+# 418 records — 229 regex, 189 json. 20 disabled (enabled = false),
 # 3 held (hold = true): dev-build/gn, dev-lang/ghc, sci-ml/stable-diffusion-cpp.
 #
 # No record uses parser = "script" any more: the three that did (antigravity-bin,
@@ -1240,6 +1240,28 @@ comments = """
 lua — www.lua.org não responde (timeout); official mirror lua/lua, tag_name "vX.Y.Z".
 
 Project site / FTP / SourceForge / Launchpad
+"""
+# END
+
+["dev-lang/rapydscript-ng"]
+url = "https://api.github.com/repos/kovidgoyal/rapydscript-ng/tags?per_page=5"
+parser = "regex"
+pattern = '"name":\s*"v([0-9]+\.[0-9]+\.[0-9]+)"'
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "0.8.6"
+comments = """
+rapydscript-ng — tags, not releases/latest: upstream publishes no GitHub
+releases at all and that endpoint answers 404. The tag list is newest-first and
+has no parallel channels, so group 1 of the first match is the current version.
+Measured 2026-08-08: 0.8.6.
+
+Carried here because ::gentoo is stuck on 0.7.22 and app-text/calibre 9.x needs
+>=0.8.5 -- below that floor calibre falls back to a Qt WebEngine compiler that
+dies on a sandbox violation. See the BDEPEND comment in the calibre ebuild.
+
+A bump must regenerate the NPM_DEPS list in the ebuild, not just PV: the eleven
+npm distfiles are pinned by version and a new upstream release can move any of
+them. Recipe is in the ebuild's header comment.
 """
 # END
 

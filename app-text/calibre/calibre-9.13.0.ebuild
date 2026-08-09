@@ -121,13 +121,24 @@ DEPEND="${COMMON_DEPEND}
 # dev-build/cmake is needed because setup.py build_headless() shells out to
 # cmake + make to build the libheadless.so Qt platform plugin. ::gentoo leaves
 # this dependency implicit.
+#
+# The rapydscript-ng floor is load-bearing and new in the 9.x series: upstream
+# raised its external-compiler check from >=0.7.5 to >=0.8.5 (see
+# external_compiler_version() in src/calibre/utils/rapydscript.py). Below the
+# floor the check does not error -- it silently reports "no external compiler"
+# and falls back to the compiler embedded in Qt WebEngine, which then tries to
+# mkdir inside /usr and dies on a sandbox violation halfway through
+# src_compile. ::gentoo's dependency is unversioned and its rapydscript-ng is
+# 0.7.22, so USE=system-mathjax cannot build there at all; this overlay carries
+# 0.8.6 for it. An unversioned atom here would turn a dependency error into
+# that sandbox failure, so do not drop the >=.
 BDEPEND="$(python_gen_cond_dep '
 		>=dev-python/pyqt-builder-1.10.3[${PYTHON_USEDEP}]
 		>=dev-python/sip-5[${PYTHON_USEDEP}]
 	')
 	virtual/pkgconfig
 	dev-build/cmake
-	system-mathjax? ( dev-lang/rapydscript-ng )
+	system-mathjax? ( >=dev-lang/rapydscript-ng-0.8.5 )
 	verify-sig? ( sec-keys/openpgp-keys-kovidgoyal )
 "
 
