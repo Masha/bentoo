@@ -1,29 +1,43 @@
 #!/usr/bin/env bash
-# Assert the sci-biology/foldingathome libsystemd fix against a real installed
-# image -- not against the text of the ebuild.
+# Assert properties of the sci-biology/foldingathome installed *image* -- not of
+# the text of the ebuild.
 #
-# The bug: the prebuilt fah-client carries a DT_NEEDED on libsystemd.so.0 and is
-# linked BIND_NOW, so on an OpenRC box (elogind, no systemd) the loader aborts
-# before main() and the client never starts. The fix installs a symlink that
-# points libsystemd.so.0 at elogind's libelogind.so.0 and bakes a private
-# RUNPATH into the binary so that symlink is found with no help from the caller.
+# Two defect classes are covered, both found the same way and both invisible to
+# a reader of the ebuild source.
 #
-# Every claim in that sentence is a property of the *installed image*, so this
-# script builds the image and inspects it. Grepping the ebuild would only prove
-# that the source says the right thing: it would not catch a dosym landing in
-# the wrong directory, a patchelf call silently no-opping, an eclass stripping
-# the RUNPATH back out, or a USE-flag combination that was never buildable.
+# 1. THE LOADER FIX (checks 01-13). The prebuilt fah-client carries a DT_NEEDED
+#    on libsystemd.so.0 and is linked BIND_NOW, so on an OpenRC box (elogind, no
+#    systemd) the loader aborts before main() and the client never starts. The
+#    fix installs a symlink that points libsystemd.so.0 at elogind's
+#    libelogind.so.0 and bakes a private RUNPATH into the binary so that symlink
+#    is found with no help from the caller.
+#
+# 2. DEPENDENCY RECONCILIATION (checks 14-15). RDEPEND must describe the payload
+#    that is actually installed, in both directions: nothing the binary loads
+#    may be undeclared, and nothing declared as a library may go unused. The
+#    first direction is the same failure class as (1) -- a missing SONAME is a
+#    dead client, not a degraded one. The second is quieter but real: a stale
+#    `dev-libs/openssl:=` forced a pointless rebuild of a prebuilt package on
+#    every OpenSSL subslot bump.
+#
+# Both are properties of the *installed image*, so this script builds the image
+# and inspects it. Grepping the ebuild would only prove that the source says the
+# right thing: it would not catch a dosym landing in the wrong directory, a
+# patchelf call silently no-opping, an eclass stripping the RUNPATH back out, a
+# USE-flag combination that was never buildable, or an RDEPEND atom that reads
+# plausibly and provides nothing the binary asks for.
 #
 # It runs `ebuild ... clean install` four times, once per USE combination, and
-# asserts 13 properties across the resulting images and build logs:
+# asserts 15 properties across the resulting images and build logs:
 #
-#   (a) USE="elogind -systemd"    the fix path         checks 01-03, 08-13
+#   (a) USE="elogind -systemd"    the fix path         checks 01-03, 08-15
 #   (b) USE="-elogind systemd"    no regression        checks 04-05
 #   (c) USE="elogind systemd"     must be refused      check  06
 #   (d) USE="-elogind -systemd"   must be refused      check  07
 #
 # Requirements traced: R1.1 R1.2 (01-03) - R2.1 R2.2 (04-05) - R3.2 (06-07) -
-# Unchanged Behavior (08-13).
+# Unchanged Behavior (08-13). Checks 14-15 come from story 011 and trace no
+# requirement: it is a Fast-mode bugfix with no story.md.
 #
 # NOT covered here, stated up front so a green run is not over-read:
 #   * the resulting ownership of the three state dirs. Setting it needs root
@@ -32,13 +46,25 @@
 #     script prints this caveat again at the end.
 #   * arm64 installability. That is a KEYWORDS / $(get_libdir) property, not
 #     something an amd64 image can show. No check is faked for it.
+#   * checks 14-15 run against image (a) only. DT_NEEDED is identical in both
+#     images -- patchelf rewrites RUNPATH, never NEEDED -- so a second run would
+#     add a pair of check IDs and no information. The systemd-only half of
+#     RDEPEND is therefore unreconciled; see the coverage note at the end.
+#   * checks 14-15 answer "is it declared", never "is the declared version
+#     right". A too-loose version range is out of reach of an image inspection.
 #
-# Usage: bash verify.sh <path-to-ebuild>
+# Usage: bash check-foldingathome-image.sh <path-to-ebuild>
 #
-#   bash verify.sh .../sci-biology/foldingathome/foldingathome-8.5.6-r1.ebuild
-#   bash verify.sh /var/tmp/epic-009/redrepo/sci-biology/foldingathome/foldingathome-8.5.6.ebuild
+#   bash scripts/check-foldingathome-image.sh \
+#       sci-biology/foldingathome/foldingathome-8.5.6-r2.ebuild
+#   bash scripts/check-foldingathome-image.sh \
+#       /var/tmp/epic-009/redrepo/sci-biology/foldingathome/foldingathome-8.5.6.ebuild
 #
-# Env:   PORTAGE_TMPDIR   where builds land (default /var/tmp/epic-009)
+# Env:   PORTAGE_TMPDIR   where builds land (default /var/tmp/epic-009). The
+#                         story-numbered default is kept from story 009 on
+#                         purpose: it is a scratch path, and repointing it would
+#                         invalidate the build paths recorded in that story's
+#                         evidence for no gain.
 #
 # Exit:  0  every check passed
 #        1  at least one check failed
@@ -110,7 +136,7 @@ CATEGORY=$(basename -- "$(dirname -- "${PKGDIR}")")
 [[ ${PN} == foldingathome ]] ||
 	precondition "this script only verifies sci-biology/foldingathome, got ${CATEGORY}/${PN}"
 
-for tool in ebuild readelf readlink patchelf; do
+for tool in ebuild readelf readlink patchelf strings qatom qfile qlist portageq; do
 	command -v "${tool}" >/dev/null 2>&1 ||
 		precondition "required tool not found in PATH: ${tool}"
 done
@@ -118,6 +144,12 @@ unset tool
 
 # patchelf above is not optional: without it the elogind path cannot be built at
 # all, so its absence is a broken environment rather than a broken ebuild.
+#
+# The four q* tools ship in app-portage/portage-utils and drive checks 14-15:
+# qatom parses dependency atoms, qfile maps a file to its owning package, qlist
+# lists a package's files. They are preconditions rather than optional
+# degradations on purpose -- a dependency check that silently skips itself when
+# a tool is missing reports green for work it never did.
 
 [[ ${PORTAGE_TMPDIR} == /* ]] || precondition "PORTAGE_TMPDIR must be absolute: ${PORTAGE_TMPDIR}"
 mkdir -p "${PORTAGE_TMPDIR}" 2>/dev/null ||
@@ -246,6 +278,181 @@ dyn_runpaths() { # <dynamic-section-text> -> one bracketed value per line
 		value=${line##*\[}
 		printf '%s\n' "${value%%\]*}"
 	done <<<"$1"
+}
+
+dyn_needed() { # <dynamic-section-text> -> one SONAME per line
+	local line value
+	while IFS= read -r line; do
+		[[ ${line} == *"(NEEDED)"* ]] || continue
+		[[ ${line} == *\[*\]* ]] || continue
+		value=${line##*\[}
+		printf '%s\n' "${value%%\]*}"
+	done <<<"$1"
+}
+
+# Library names the binary carries as plain string literals. A dlopen'd library
+# has NO DT_NEEDED entry -- its SONAME exists only as an argument handed to
+# dlopen(3) at runtime -- so this is the one way to see it from outside a
+# running process. Deliberately a superset: it also re-catches the DT_NEEDED
+# names, which live in .dynstr and are therefore strings too. A superset is the
+# safe direction here, because check 15 uses it to EXCUSE a declared atom.
+elf_lib_strings() { # <binary> -> one library name per line
+	LC_ALL=C strings -a "$1" 2>/dev/null |
+		grep -oE '\blib[A-Za-z0-9_+.-]*\.so[0-9.]*' | sort -u || true
+}
+
+# ---------------------------------------------------------------------------
+# Dependency helpers (checks 14-15)
+# ---------------------------------------------------------------------------
+
+# One value out of the build directory portage writes beside the image.
+# RDEPEND is read from here, never from the ebuild text, because this copy is
+# already USE-resolved: the elogind build lists sys-auth/elogind and the systemd
+# build lists sys-apps/systemd, which is exactly the question being asked.
+build_info() { # <name> -> file contents, or empty
+	local f=${PORTAGE_TMPDIR}/portage/${CATEGORY}/${PF}/build-info/$1
+	if [[ -r ${f} ]]; then
+		cat -- "${f}"
+	fi
+}
+
+# cat/pkg for each atom token, with no virtual expansion.
+#
+# Parsing is delegated to qatom rather than to a local regex on purpose: Gentoo
+# versions contain hyphens (1.2.3_p1-r2), so the obvious "strip everything after
+# the last dash" is wrong often enough to matter, and getting it wrong here
+# silently drops an atom from the declared set -- which reads as a FAIL against
+# the ebuild rather than as a bug in this script.
+dep_atoms_flat() { # <dependency-string> -> one cat/pkg per line
+	local tok cp
+	for tok in $1; do
+		case ${tok} in
+			'('|')'|'||') continue ;;   # any-of and group punctuation
+			*'?')         continue ;;   # USE-conditional label, e.g. elogind?
+			'!'*)         continue ;;   # blocker: not a provider
+		esac
+		cp=$(qatom -F '%{CATEGORY}/%{PN}' "${tok}" 2>/dev/null) || continue
+		if [[ ${cp} == */* && ${cp} != *'<unset>'* ]]; then
+			printf '%s\n' "${cp}"
+		fi
+	done
+}
+
+# ... plus one level of virtual expansion.
+#
+# A virtual installs no files of its own, so a SONAME can never resolve to it.
+# Every provider is accepted rather than only the merged one: the question this
+# answers is "did the ebuild declare a path to this library", and any provider
+# of the virtual is such a path. Expansion is one level and non-recursive so
+# termination is obvious by construction.
+dep_atoms() { # <dependency-string> -> sorted unique cat/pkg per line
+	local cp cpv vdeps
+	while IFS= read -r cp; do
+		printf '%s\n' "${cp}"
+		if [[ ${cp} == virtual/* ]]; then
+			cpv=$(portageq best_visible / "${cp}" 2>/dev/null) || cpv=
+			if [[ -n ${cpv} ]]; then
+				vdeps=$(portageq metadata / ebuild "${cpv}" RDEPEND 2>/dev/null) || vdeps=
+				if [[ -n ${vdeps} ]]; then
+					dep_atoms_flat "${vdeps}"
+				fi
+			fi
+		fi
+	done < <(dep_atoms_flat "$1") | sort -u
+}
+
+# Which package provides a SONAME, answered image-first.
+#
+# The image is asked before the host, and the order is load-bearing. This
+# package ships its OWN libsystemd.so.0 (the elogind symlink from story 009), so
+# a host lookup would answer sys-apps/systemd on a systemd box -- an atom the
+# elogind build correctly does NOT declare. That is a false FAIL produced
+# entirely by asking the wrong machine.
+soname_owner() { # <soname> -> "self" | "cat/pkg" | "" if unresolved
+	local soname=$1 path owner
+
+	if [[ -n $(find "${IMG}" -name "${soname}" -print -quit 2>/dev/null) ]]; then
+		printf 'self'
+		return
+	fi
+
+	for path in "/usr/${LIBDIR}/${soname}" "/${LIBDIR}/${soname}" \
+	            "/usr/lib/${soname}" "/lib/${soname}"; do
+		if [[ -e ${path} ]]; then
+			# Command substitution, never `qfile | head`: head exits on the
+			# first line, qfile takes SIGPIPE, and pipefail then reports a
+			# successful lookup as a failure.
+			owner=$(qfile -qC "${path}" 2>/dev/null || true)
+			owner=${owner%%$'\n'*}
+			if [[ -n ${owner} ]]; then
+				printf '%s' "${owner}"
+				return
+			fi
+		fi
+	done
+}
+
+# The shared-library basenames a package owns on THIS host. Empty output means
+# either "not a library package" or "not installed"; the caller separates those
+# two with pkg_installed, because they must not be reported the same way.
+pkg_sonames() { # <cat/pkg> -> one basename per line
+	local files f
+	files=$(qlist "$1" 2>/dev/null || true)
+	if [[ -z ${files} ]]; then
+		return
+	fi
+	while IFS= read -r f; do
+		if [[ ${f} == *.so || ${f} == *.so.* ]]; then
+			printf '%s\n' "${f##*/}"
+		fi
+	done <<<"${files}"
+}
+
+pkg_installed() { # <cat/pkg>
+	[[ -n $(qlist -I "$1" 2>/dev/null || true) ]]
+}
+
+# Skipped by check 14. The loader is not a package dependency, and the glibc
+# SONAMEs are all covered by the single sys-libs/glibc atom already in RDEPEND
+# -- resolving them one by one would add lookups and no information. Both sets
+# are printed with the check result so the exemption stays visible.
+GLIBC_SONAMES=(
+	libc.so.6 libm.so.6 libdl.so.2 libpthread.so.0 librt.so.1
+	libresolv.so.2 libutil.so.1 libanl.so.1
+)
+
+soname_exempt() { # <soname>
+	local g
+	case $1 in
+		ld-linux*.so*|ld64.so*|ld.so*|ld-musl*.so*) return 0 ;;
+	esac
+	for g in "${GLIBC_SONAMES[@]}"; do
+		if [[ $1 == "${g}" ]]; then
+			return 0
+		fi
+	done
+	return 1
+}
+
+# Exempt from check 15. Each of these is declared for a reason that is not ELF
+# linkage, so "no SONAME of this package appears in the binary" is the expected
+# state and not a defect:
+#
+#   dev-lang/python*, dev-python/*   fahctl is a python SCRIPT. It needs the
+#                                    interpreter and the websocket-client
+#                                    module; fah-client links neither, and
+#                                    libpython would otherwise be flagged.
+#   acct-user/*, acct-group/*        identities for the state dirs. No code.
+#   virtual/*                        installs nothing; judged through the
+#                                    providers dep_atoms expanded it into.
+#
+# Printed on every run: an exemption nobody can see is how a check quietly stops
+# covering what its name promises -- the exact failure that produced story 011.
+atom_exempt() { # <cat/pkg>
+	case $1 in
+		dev-lang/python*|dev-python/*|acct-user/*|acct-group/*|virtual/*) return 0 ;;
+	esac
+	return 1
 }
 
 # $(get_libdir) on the target profile: the dosym in the ebuild spells the
@@ -430,6 +637,123 @@ else
 	fail '13' 'fowners-calls' "no fowners call logged for: ${missing_chowns[*]}"
 fi
 
+# --- 14/15  story 011: RDEPEND must describe the payload, in both directions.
+#
+# Both are evaluated here, inside section (a), and not at the end of the script:
+# `ebuild clean` wipes the build directory, so build-info/RDEPEND for THIS USE
+# combination stops existing the moment the (b) build starts.
+
+if [[ ! -f ${BIN_A} ]]; then
+	fail '14' 'dt-needed-declared' "binary absent from image: $(rel "${BIN_A}")"
+	fail '15' 'declared-libs-used' 'cannot inspect a binary that is not there'
+else
+	DYN_DEP=$(elf_dyn "${BIN_A}")
+	RDEP_A=$(build_info RDEPEND)
+
+	if [[ -z ${RDEP_A} ]]; then
+		fail '14' 'dt-needed-declared' \
+			"build-info/RDEPEND unreadable under ${PORTAGE_TMPDIR}/portage/${CATEGORY}/${PF}"
+		fail '15' 'declared-libs-used' 'no declared set to compare against'
+	else
+		declared=()
+		mapfile -t declared < <(dep_atoms "${RDEP_A}")
+		needed=()
+		mapfile -t needed < <(dyn_needed "${DYN_DEP}")
+
+		# --- 14  nothing the loader needs may be undeclared.
+		undeclared=()
+		unresolved=()
+		exempted=()
+		selfprov=()
+		for soname in "${needed[@]}"; do
+			if soname_exempt "${soname}"; then
+				exempted+=( "${soname}" )
+				continue
+			fi
+			owner=$(soname_owner "${soname}")
+			if [[ -z ${owner} ]]; then
+				# Not "declared or not" -- unanswerable on this host. Counted as
+				# a failure rather than a note: a SONAME nothing on the system
+				# provides is the very outage this check exists to prevent.
+				unresolved+=( "${soname}" )
+			elif [[ ${owner} == self ]]; then
+				selfprov+=( "${soname}" )
+			elif [[ " ${declared[*]} " != *" ${owner} "* ]]; then
+				undeclared+=( "${soname} -> ${owner}" )
+			fi
+		done
+
+		if (( ${#undeclared[@]} == 0 && ${#unresolved[@]} == 0 )); then
+			pass '14' 'dt-needed-declared' \
+				"${#needed[@]} DT_NEEDED entries all accounted for"
+		else
+			detail=
+			if (( ${#undeclared[@]} > 0 )); then
+				detail="needed but not in RDEPEND: ${undeclared[*]}"
+			fi
+			if (( ${#unresolved[@]} > 0 )); then
+				detail="${detail}${detail:+; }unresolved on this host: ${unresolved[*]}"
+			fi
+			fail '14' 'dt-needed-declared' "${detail}"
+		fi
+		if (( ${#selfprov[@]} > 0 )); then
+			note "14  provided by the package's own image: ${selfprov[*]}"
+		fi
+		if (( ${#exempted[@]} > 0 )); then
+			note "14  exempt (loader + the sys-libs/glibc set): ${exempted[*]}"
+		fi
+
+		# --- 15  nothing declared as a library may go unreferenced.
+		used=$( { printf '%s\n' "${needed[@]}"; elf_lib_strings "${BIN_A}"; } | sort -u )
+		unused=()
+		unknown=()
+		exempt15=()
+		nonlib=()
+		for atom in "${declared[@]}"; do
+			if atom_exempt "${atom}"; then
+				exempt15+=( "${atom}" )
+				continue
+			fi
+			if ! pkg_installed "${atom}"; then
+				unknown+=( "${atom}" )
+				continue
+			fi
+			sonames=()
+			mapfile -t sonames < <(pkg_sonames "${atom}")
+			if (( ${#sonames[@]} == 0 )); then
+				nonlib+=( "${atom}" )
+				continue
+			fi
+			hit=0
+			for soname in "${sonames[@]}"; do
+				if [[ $'\n'${used}$'\n' == *$'\n'"${soname}"$'\n'* ]]; then
+					hit=1
+					break
+				fi
+			done
+			if (( hit == 0 )); then
+				unused+=( "${atom} [${#sonames[@]} lib(s), none referenced]" )
+			fi
+		done
+
+		if (( ${#unused[@]} == 0 )); then
+			pass '15' 'declared-libs-used' \
+				"every declared library atom is referenced by the binary"
+		else
+			fail '15' 'declared-libs-used' "declared but never loaded: ${unused[*]}"
+		fi
+		if (( ${#unknown[@]} > 0 )); then
+			note "15  NOT JUDGED, not installed on this host: ${unknown[*]}"
+		fi
+		if (( ${#nonlib[@]} > 0 )); then
+			note "15  ships no shared library, nothing to reference: ${nonlib[*]}"
+		fi
+		if (( ${#exempt15[@]} > 0 )); then
+			note "15  exempt by rule (see atom_exempt): ${exempt15[*]}"
+		fi
+	fi
+fi
+
 # ---------------------------------------------------------------------------
 # (b) USE="-elogind systemd" -- the systemd path must stay clean
 # ---------------------------------------------------------------------------
@@ -517,6 +841,24 @@ note 'arm64 installability NOT VERIFIED, and no check is faked for it. It is a'
 note '  KEYWORDS / $(get_libdir) property: an amd64 image cannot show it. The'
 note '  symlink target checked at 03 is the amd64 spelling of that same'
 note "  \$(get_libdir) expression (${LIBDIR}), which is as close as this host gets."
+printf '\n'
+
+note 'checks 14-15 are HOST-RELATIVE. Both resolve SONAME <-> package through'
+note '  this machine, so an atom that is not installed here cannot be judged --'
+note '  those are listed as NOT JUDGED above rather than counted green. The same'
+note '  run on a differently-populated host can therefore cover more, or less.'
+printf '\n'
+
+note 'check 15 EXEMPTS whole atom classes (python, acct-*, virtual/*) because'
+note '  they are declared for reasons other than ELF linkage. The exempt list is'
+note '  printed with the check on every run: an exemption nobody can see is how'
+note '  a gate goes stale, which is exactly what produced this pair of checks.'
+printf '\n'
+
+note 'the systemd half of RDEPEND is UNRECONCILED. Checks 14-15 run against'
+note '  image (a) only. DT_NEEDED is identical in (b) -- patchelf rewrites'
+note '  RUNPATH, never NEEDED -- but sys-apps/systemd is never put through'
+note '  check 15, so a stale atom reachable only under USE=systemd would pass.'
 
 # ---------------------------------------------------------------------------
 # Verdict -- decided here, at the end, so one red never hides the rest
