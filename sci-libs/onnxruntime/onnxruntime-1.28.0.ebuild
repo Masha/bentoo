@@ -22,7 +22,14 @@ SRC_URI="
 
 LICENSE="MIT"
 SLOT="0"
-KEYWORDS="~amd64 ~arm64"
+# ~amd64 only, and that is a packaging decision rather than an upstream
+# limitation: upstream builds and publishes aarch64 artifacts. Story 002
+# keyworded ~arm64 against a qemu-user chroot build that was descoped on
+# 2026-08-08, which left the keyword asserting a build nobody had run.
+# Shipping an unvalidated keyword is worse than shipping none: it tells an
+# arm64 user the package was considered when it was only assumed. Restore
+# ~arm64 together with a recorded arm64 build, not before.
+KEYWORDS="~amd64"
 IUSE="python test"
 REQUIRED_USE="${PYTHON_REQUIRED_USE}"
 RESTRICT="!test? ( test )"

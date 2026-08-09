@@ -29,7 +29,16 @@ else
 		)
 	"
 	S="${WORKDIR}/llama.cpp-${MY_PV}"
-	KEYWORDS="~amd64 ~arm64"
+	# ~amd64 only, and that is a packaging decision rather than an upstream
+	# limitation: ggml exposes GGML_CPU_ARM_ARCH and upstream exercises ARM
+	# heavily. Story 002 keyworded ~arm64 against a qemu-user chroot build
+	# that was descoped on 2026-08-08, which left the keyword asserting a
+	# build nobody had run. Shipping an unvalidated keyword is worse than
+	# shipping none: it tells an arm64 user the package was considered when
+	# it was only assumed. This package is the one the whole family's arm64
+	# policy was to be measured against, so it is also the one to re-validate
+	# first. Restore ~arm64 together with a recorded arm64 build, not before.
+	KEYWORDS="~amd64"
 fi
 
 SRC_URI+="

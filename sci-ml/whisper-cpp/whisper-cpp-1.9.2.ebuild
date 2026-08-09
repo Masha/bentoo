@@ -16,7 +16,14 @@ S="${WORKDIR}/${MY_P}"
 
 LICENSE="MIT"
 SLOT="0"
-KEYWORDS="~amd64 ~arm64"
+# ~amd64 only, and that is a packaging decision rather than an upstream
+# limitation: ggml carries a NEON path and upstream treats Apple Silicon as a
+# headline platform. Story 002 keyworded ~arm64 against a qemu-user chroot
+# build that was descoped on 2026-08-08, which left the keyword asserting a
+# build nobody had run. Shipping an unvalidated keyword is worse than shipping
+# none: it tells an arm64 user the package was considered when it was only
+# assumed. Restore ~arm64 together with a recorded arm64 build, not before.
+KEYWORDS="~amd64"
 
 X86_CPU_FLAGS=(
 	sse4_2

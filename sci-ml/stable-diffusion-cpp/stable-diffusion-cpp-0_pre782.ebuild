@@ -38,7 +38,16 @@ else
 			-> ${PN}-ggml-${GGML_COMMIT}.tar.gz
 	"
 	S="${WORKDIR}/stable-diffusion.cpp-${MY_PV}"
-	KEYWORDS="~amd64 ~arm64"
+	# ~amd64 only, and that is a packaging decision rather than an upstream
+	# limitation: CMake has no arch gate beyond SD_METAL and ggml supplies
+	# the NEON path. Story 002 keyworded ~arm64 against a qemu-user chroot
+	# build that was descoped on 2026-08-08, which left the keyword asserting
+	# a build nobody had run. Shipping an unvalidated keyword is worse than
+	# shipping none: it tells an arm64 user the package was considered when
+	# it was only assumed. Restore ~arm64 together with a recorded arm64
+	# build, not before. The REQUIRED_USE arm64? ( !rocm ) constraint stays:
+	# it costs nothing here and is correct whenever the keyword returns.
+	KEYWORDS="~amd64"
 fi
 
 # For the -9999 (git-r3) build the guard added by this patch is a no-op and
