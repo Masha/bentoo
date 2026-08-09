@@ -1221,7 +1221,19 @@ chromium_configure() {
 		#		"linker_path=\"${EPREFIX}/usr/bin/mold\""
 		#	)
 		#else
-		myconf_gn+=( "use_lld=true" )
+		# use_mold has to be turned off explicitly, it is not implied by
+		# use_lld=true: M151 made use_mold default-on for non-official Linux
+		# builds (build/config/compiler/compiler.gni) and the two are
+		# independent - use_lld picks the linker, use_mold still governs
+		# linker_path. Left alone it resolves to
+		# //buildtools/third_party/mold/cipd/mold, a CIPD binary that release
+		# tarballs never ship, and ninja dies with "missing and no known rule
+		# to make it" before compiling anything.
+		# chromium-patches' toolchain/cr151-mold-unbundle.patch does not save
+		# us here: it only adds a linker_path override that wins when non-empty,
+		# and the empty default still falls through to the CIPD path whenever
+		# use_mold is true. ::gentoo carries the same bug.
+		myconf_gn+=( "use_lld=true" "use_mold=false" )
 		#fi
 
 		if [[ ${LLVM_SLOT} -lt 23 ]]; then
