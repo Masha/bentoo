@@ -49,6 +49,31 @@ RESTRICT="bindist mirror strip"
 # RDEPEND set necessarily pulls one in on a minimal headless or container
 # host, so app-misc/ca-certificates is declared explicitly rather than left
 # to arrive as a side effect of some other dependency.
+#
+# Upstream's .deb Depends lists libexpat1, but no libexpat.so* string exists
+# anywhere in fah-client: not in DT_NEEDED, not among the lib*.so* string
+# literals a dlopen call would need. fah-client does import dlopen/dlsym
+# (from libdl.so.2, already DT_NEEDED); the only other lib*.so* names present
+# are the optional CUDA/OpenCL/ROCm backends, out of scope by overlay policy,
+# so a dlopen-based load of Expat was checked for and ruled out. What the
+# string table does carry is Expat's own compiled-in material -- its license
+# text, its internal version string "expat_2.2.6", an XML_DTD error message
+# -- plus the mangled cbang adapter symbol cb::XML::ExpatAdapter. That is
+# static linkage, not a missing runtime dependency, so dev-libs/expat is
+# deliberately not declared; do not re-add it from the .deb's Depends without
+# repeating this check.
+#
+# dev-libs/openssl:= was removed after the same check came back just as
+# clean: no libssl.so*/libcrypto.so* in DT_NEEDED or in the string table, and
+# upstream's own Depends never lists it either. What IS present is the
+# CRYPTOGAMS perlasm identification strings ("... CRYPTOGAMS by
+# <appro@openssl.org>"), an embedded "OpenSSL 1.1.1n 15 Mar 2022" version
+# banner, and cbang/openssl/*.cpp source paths -- TLS is linked statically
+# into fah-client. That is a live CVE-exposure fact, not just a build detail:
+# a host-side openssl security update does not patch this binary, and
+# dropping the := means Portage no longer even pretends a rebuild would help.
+# A fix for a static-OpenSSL CVE here has to come from upstream re-releasing
+# the .deb against a newer bundled OpenSSL.
 RDEPEND="
 	${PYTHON_DEPS}
 	$(python_gen_cond_dep '
@@ -58,7 +83,6 @@ RDEPEND="
 	acct-user/foldingathome
 	app-arch/lz4
 	app-misc/ca-certificates
-	dev-libs/openssl:=
 	sys-libs/glibc
 	sys-libs/zlib:=
 	elogind? ( sys-auth/elogind )
