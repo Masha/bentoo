@@ -55,6 +55,33 @@ declare -A GIT_CRATES=(
 	[x11]='https://github.com/bjornsnoen/x11-rs;c2e9bfaa7b196938f8700245564d8ac5d447786a;x11-rs-%commit%/x11'
 )
 
+# LLVM 22 IS DELIBERATELY ABSENT. Tested 2026-08-08 -- it does not work, and the
+# blocker is upstream, not packaging. Adding 22 here and building with
+# USE="llvm_slot_22" gets 64 errors in `scrap`:
+#
+#   error[E0609]: no field `g_w` on type `vpx_codec_enc_cfg`
+#       = note: available fields are: `_address`
+#   error[E0609]: no field `g_w` on type `common::aom::aom_codec_enc_cfg`
+#       = note: available field is: `_address`
+#   error: could not compile `scrap` (lib) due to 64 previous errors
+#
+# `_address` is the ONLY field bindgen emits for a type it gave up parsing, so
+# those bindings came back opaque: libs/scrap asks for bindgen 0.65 (0.65.1,
+# May 2023), and that bindgen cannot parse the libvpx/libaom headers through
+# libclang 22. Nothing in rustdesk's own code is at fault, and no ebuild change
+# fixes it -- scrap has to move to a current bindgen upstream first.
+#
+# Caveat on that measurement: RUST_NEEDS_LLVM=1 means the slot choice also
+# picks the Rust, so the two builds differed in both (llvm 21 -> rust-bin
+# 1.94.0, PASS; llvm 22 -> rust 1.97.1, FAIL). The variable is not isolable
+# without rebuilding Rust. It does not change the conclusion: `_address` is
+# text bindgen WRITES at build-script time using libclang, and rustc only
+# reports the missing fields afterwards -- the failing layer is bindgen/
+# libclang, and only LLVM moved there.
+#
+# Consequence for a host that pins LLVM_SLOT=22 in make.conf: this package
+# needs `net-misc/rustdesk llvm_slot_21` in package.use, and that is not a
+# temporary workaround. Re-test on the next bump; the fix arrives with scrap.
 LLVM_COMPAT=( 18 19 20 21 )
 RUST_MIN_VER="1.81.0"
 RUST_NEEDS_LLVM=1
