@@ -1,7 +1,7 @@
 # Erro with another packages
 >=dev-libs/nettle-4.0
 
-# Lucas Couto <lucascs@protonmail.com> (2026-08-02)
+# Lucas C.S. <lucascs@protonmail.com> (2026-08-02)
 # This overlay slots net-libs/nodejs by major version, giving each slot its
 # own prefix under /usr/lib*/node-<major>. ::gentoo keeps the package
 # unslotted at SLOT=0, installed into the shared /usr, so the two layouts

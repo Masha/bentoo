@@ -1,4 +1,4 @@
-# Lucas Couto <lucascs@protonmail.com> (2026-08-08)
+# Lucas C.S. <lucascs@protonmail.com> (2026-08-08)
 # ::gentoo masks >=app-text/calibre-8.11.0 (profiles/package.mask, 2025-12-15)
 # over the AI features upstream added in that release. The mask has held for
 # eight months and pins ::gentoo's installable calibre at 8.9.0, six minor
