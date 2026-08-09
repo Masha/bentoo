@@ -45,8 +45,9 @@ else
 	# a build nobody had run. Shipping an unvalidated keyword is worse than
 	# shipping none: it tells an arm64 user the package was considered when
 	# it was only assumed. Restore ~arm64 together with a recorded arm64
-	# build, not before. The REQUIRED_USE arm64? ( !rocm ) constraint stays:
-	# it costs nothing here and is correct whenever the keyword returns.
+	# build, not before. The arm64? ( !hip ) and arm64? ( !webm ) constraints
+	# in REQUIRED_USE stay: they cost nothing while the keyword is absent and
+	# are correct the moment it returns.
 	KEYWORDS="~amd64"
 fi
 
@@ -83,6 +84,17 @@ IUSE="openblas blis flexiblas hip cuda opencl vulkan wmma webm webp ${CPU_FLAGS[
 # pruning is not universal (an equivalent arm64? ( !webm ) guard in
 # sci-ml/stable-diffusion-cpp does not silence libwebm).  Treat the naming as a
 # recorded empirical workaround, not a rule.  See story 002 design D1.4a.
+#
+# On arm64? ( !webm ): media-libs/libwebm is ~amd64-only.  Unlike the ROCm
+# stack this is an incidental keywording gap in a small BSD library, not an
+# architectural limit -- DROP THAT LINE if libwebm ever gains ~arm64.
+#
+# This note lives ABOVE the assignment, and must stay here.  REQUIRED_USE is a
+# dependency spec, not bash: a '#' inside the string is parsed as a USE flag
+# token, and portage then rejects the package outright with
+#   invalid: REQUIRED_USE: USE flag '#' is not in IUSE
+# which masks it for everyone who syncs.  That is exactly what happened between
+# 2026-08-08 and the commit that moved these three lines out.
 REQUIRED_USE="
 	?? (
 		openblas
@@ -97,9 +109,6 @@ REQUIRED_USE="
 	)
 	hip? ( ${ROCM_REQUIRED_USE} )
 	arm64? ( !hip )
-	# media-libs/libwebm is ~amd64-only.  Unlike the ROCm stack this is an
-	# incidental keywording gap in a small BSD library, not an architectural
-	# limit -- DROP THIS LINE if libwebm ever gains ~arm64.
 	arm64? ( !webm )
 	cpu_flags_arm_sve2? ( cpu_flags_arm_sve )
 "
