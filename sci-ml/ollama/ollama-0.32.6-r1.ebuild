@@ -28,8 +28,19 @@ DEPEND="
 	acct-user/ollama
 	>=sci-ml/ggml-0.17
 "
+# sci-ml/ollama-bin is the same program obtained the other way, and the two
+# install four of the same paths: /usr/bin/ollama (a real binary here, a
+# symlink into /opt there), /etc/init.d/ollama, /etc/conf.d/ollama and
+# /usr/lib/systemd/system/ollama.service. The libraries do not clash --
+# /usr/lib/ollama here against /opt/ollama/lib there -- but the four above are
+# enough for collision-protect to abort the merge.
+#
+# Hard blocker, symmetric, matching sci-libs/onnxruntime{,-bin} and
+# sci-ml/lemonade{,-bin}: portage has no ordering that resolves this, since
+# neither package is an upgrade path for the other. One must be unmerged.
 RDEPEND="
 	${DEPEND}
+	!!sci-ml/ollama-bin
 	net-misc/curl:=
 "
 BDEPEND="

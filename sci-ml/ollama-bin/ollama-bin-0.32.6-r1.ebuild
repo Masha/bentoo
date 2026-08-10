@@ -37,9 +37,28 @@ CHECKREQS_DISK_BUILD="4G"
 
 QA_PREBUILT="*"
 
+# The other half of the blocker pair declared by sci-ml/ollama. Both provide
+# /usr/bin/ollama, /etc/init.d/ollama, /etc/conf.d/ollama and the systemd unit
+# -- same program, two ways of getting it. Hard and symmetric, following
+# sci-libs/onnxruntime{,-bin} and sci-ml/lemonade{,-bin} in this overlay.
+#
+# acct-user/ollama is unversioned on purpose. It used to read
+# >=acct-user/ollama-3, pointing at an override this overlay carried until
+# 5cacee117 dropped it in favour of ::gentoo's. ::gentoo ships
+# acct-user/ollama-0, so that atom became unsatisfiable the moment the override
+# left -- "there are no ebuilds to satisfy >=acct-user/ollama-3[cuda?]" -- and
+# this package has been uninstallable since. ::gentoo's version carries the
+# same IUSE=cuda and the same video-group handling, so nothing is lost by
+# depending on it unversioned.
+#
+# Keep these notes ABOVE the assignment. RDEPEND is a dependency spec, not
+# bash: a '#' inside the string is parsed as an atom and invalidates the
+# package's metadata for everyone who syncs. sci-ml/stable-diffusion-cpp spent
+# twenty days masked that way, from the same mistake in REQUIRED_USE.
 RDEPEND="
+	!!sci-ml/ollama
 	acct-group/ollama
-	>=acct-user/ollama-3[cuda?]
+	acct-user/ollama[cuda?]
 	amd64? (
 		cuda? ( dev-util/nvidia-cuda-toolkit )
 		rocm? (
@@ -49,7 +68,6 @@ RDEPEND="
 	)
 "
 
-DEPEND=""
 BDEPEND="systemd? ( sys-apps/systemd )"
 
 pkg_pretend() {
