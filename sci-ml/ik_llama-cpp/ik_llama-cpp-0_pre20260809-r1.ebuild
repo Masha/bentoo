@@ -180,6 +180,34 @@ src_install() {
 	# set above, and it describes the headers just removed.
 	rm -r "${ED}/usr/lib/pkgconfig" || die
 
+	# convert_hf_to_gguf.py does not go into the image.  ik_llama.cpp installs
+	# it with an install(FILES ...) rule in CMakeLists.txt; llama.cpp upstream
+	# carries the same script in its source tree and has no install rule for
+	# it, which is the only reason sci-ml/llama-cpp does not ship one either.
+	#
+	# Upstream's own requirements for it -- requirements-convert_hf_to_gguf.txt
+	# pulling in requirements-convert_legacy_llama.txt -- name six modules:
+	#
+	#   numpy, protobuf     in ::gentoo
+	#   torch               sci-ml/pytorch: the whole stack, in the RDEPEND of
+	#                       a package that is otherwise a self-contained C++
+	#                       inference binary
+	#   gguf                no ebuild anywhere, though the module itself ships
+	#                       in this very tarball under gguf-py/
+	#   transformers        no ebuild in any repo
+	#   sentencepiece       no ebuild in any repo
+	#
+	# transformers and sentencepiece are imported LATE, inside the tokenizer
+	# functions rather than at the top of the file.  Declaring only the
+	# top-level imports would therefore be worse than doing nothing: the script
+	# would start, accept its arguments, and die partway through a conversion
+	# instead of failing immediately.
+	#
+	# REVERSAL: package dev-python/{gguf,transformers,sentencepiece}, then
+	# reinstate this behind a USE flag that pulls all six.  gguf is the cheap
+	# one of the three -- the module is already in this tarball.
+	rm "${ED}/usr/bin/convert_hf_to_gguf.py" || die
+
 	# Every binary is named llama-* upstream, exactly as in sci-ml/llama-cpp.
 	local f
 	shopt -s nullglob
