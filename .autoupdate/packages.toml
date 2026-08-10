@@ -5959,17 +5959,25 @@ path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 comments = """
 ollama source — same repo as ollama-bin; tag "vX.Y.Z" (leading v stripped).
-enabled = false since 2026-07-26: the source ebuilds were removed from the
-overlay (only sci-ml/ollama-bin remains), so this is ordinary bookkeeping and
-reconciliation will flip it back if an ebuild reappears. It carried hold = true
-before that, for the llama.cpp rearch that makes every bump manual.
+Enabled again on 2026-08-10, when sci-ml/ollama-0.32.6 was restored to the
+overlay. History: it carried hold = true for the llama.cpp rearch that makes
+every bump manual, then enabled = false from 2026-07-26 while no source ebuild
+existed here — --clean had swept the whole directory on 2026-07-30, Manifest,
+metadata.xml and files/ included, leaving only sci-ml/ollama-bin.
 
-Whoever revives it: the llama.cpp tag is NOT free-form. It is read from
-LLAMA_CPP_VERSION, a one-line file at the repo root, by llama/server/
-CMakeLists.txt — so the value for a given release is
-raw.githubusercontent.com/ollama/ollama/v<PV>/LLAMA_CPP_VERSION (v0.32.4 ->
-b10091). The removed 0.32.3 ebuild carried LLAMA_CPP_tag=b10069 while its own
-release asked for b10091; do not copy that value forward.
+The llama.cpp tag is NOT free-form. It is read from LLAMA_CPP_VERSION, a
+one-line file at the repo root, by llama/server/CMakeLists.txt — so the value
+for a given release is raw.githubusercontent.com/ollama/ollama/v<PV>/
+LLAMA_CPP_VERSION (v0.32.4 -> b10091; v0.32.6 and v0.32.7 both -> b10242). The
+removed 0.32.3 ebuild carried LLAMA_CPP_tag=b10069 while its own release asked
+for b10091; do not copy that value forward.
+
+SRC_URI also pulls ${P}-deps.tar.xz from github.com/gentoo-golang-dist/ollama,
+a third-party repo that packages the Go dependencies roughly a day after
+upstream tags (v0.32.6: upstream 2026-08-04 18:49Z, deps 2026-08-05 17:27Z).
+Bumping on release day 404s on that file. Wait for the tag to appear; building
+the tarball locally does not help, since SRC_URI would still 404 for everyone
+else.
 
 --- ollama source: same upstream repo as sci-ml/ollama-bin ---
 """
