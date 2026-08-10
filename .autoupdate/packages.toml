@@ -1431,7 +1431,7 @@ transform = [['T.*', ""], ['-', ""]]
 commit_sha_path = "[0].sha"
 base_from = "none"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0_p20260711-r1"
+version = "0_p20260809"
 comments = """
 asus-ec-sensors — the single upstream tag (v0.1.0) is stale and board support
 lands as plain commits on master, so track master. base_from = "none" says
