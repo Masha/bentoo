@@ -9,7 +9,7 @@ inherit linux-mod-r1
 # so track a pinned commit instead. This is also the tree that feeds the in-kernel
 # driver: board support lands here first and is forwarded to hwmon afterwards
 # (e.g. ROG STRIX B850-E GAMING WIFI arrived here before Linux 7.2).
-COMMIT="503d0d3d3858f463973f2cfce4a3aa0173567500"
+COMMIT="75e1a9f1e8201121ee10ce59f28ad997024f8a2c"
 
 DESCRIPTION="Out-of-tree HWMON driver for ASUS motherboard embedded controller sensors"
 HOMEPAGE="https://github.com/zeule/asus-ec-sensors"
