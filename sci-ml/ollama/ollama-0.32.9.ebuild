@@ -8,11 +8,17 @@ inherit cmake go-module systemd
 DESCRIPTION="Get up and running with Llama 3, Mistral, Gemma, and other language models"
 HOMEPAGE="https://ollama.com"
 
-LLAMA_CPP_tag=b10242
+LLAMA_CPP_tag=b10353
+
+# gentoo-golang-dist packages the Go dependencies roughly a day after upstream
+# tags, so v${PV} 404s on release day. v${MY_DEPS_PV} carries the same module
+# set: go.mod and go.sum are byte-identical between the two tags. Retarget this
+# at v${PV} once the mirror catches up.
+MY_DEPS_PV="0.32.8"
 
 SRC_URI="
 	https://github.com/ollama/${PN}/archive/refs/tags/v${PV}.tar.gz -> ${P}.gh.tar.gz
-	https://github.com/gentoo-golang-dist/${PN}/releases/download/v${PV}/${P}-deps.tar.xz
+	https://github.com/gentoo-golang-dist/${PN}/releases/download/v${MY_DEPS_PV}/${PN}-${MY_DEPS_PV}-deps.tar.xz
 	https://github.com/ggml-org/llama.cpp/archive/refs/tags/${LLAMA_CPP_tag}.tar.gz
 		-> llama.cpp-${LLAMA_CPP_tag}.tar.gz
 "
