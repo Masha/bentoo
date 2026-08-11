@@ -348,6 +348,30 @@ artifact (dev.gentoo.org/~juippis/mozilla/patchsets/) with a counter unrelated
 to PV; the applier only bumps PV, so a series bump (153 -> 154) leaves the
 patchset stale and SRC_URI 404s at manifest time. Same failure mode as
 mail-client/betterbird-bin's MY_BUILD. Update it by hand on every bump.
+Bumps here MUST land together with mail-client/thunderbird-l10n below: this
+ebuild carries RDEPEND="~mail-client/thunderbird-l10n-${PV}", an exact-version
+dep, so a lone thunderbird bump leaves the package uninstallable.
+"""
+# END
+
+["mail-client/thunderbird-l10n"]
+url = "https://product-details.mozilla.org/1.0/thunderbird_versions.json"
+parser = "json"
+path = "LATEST_THUNDERBIRD_VERSION"
+version = "153.0.3"
+comments = """
+Thunderbird translation files — same upstream endpoint and key as
+mail-client/thunderbird above, because they are the same release: the .xpi are
+published under archive.mozilla.org/pub/thunderbird/releases/<PV>/ alongside
+the tarball, and there is no separate l10n version to track.
+The two entries are NOT independent. thunderbird RDEPENDs on
+~mail-client/thunderbird-l10n-${PV}, so whichever of the two lags behind breaks
+the other; that is exactly what happened when only thunderbird was tracked here
+and l10n silently stayed at 153.0.2. Keep both entries pointed at this same key
+and never disable one alone.
+The bump itself is mechanical (PV only, no patchset), but the manifest pulls 63
+.xpi (~35 MB): one per MOZ_LANGS entry except en-US, which ships in the main
+package.
 """
 # END
 
