@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@proton.me</email>
+	</maintainer>
+	<longdescription lang="en">
+		Installs only the versioned ICU runtime libraries (libicudata,
+		libicui18n and libicuuc) for a single older ABI, so that prebuilt
+		packages which were linked against it keep working on a system
+		carrying a newer dev-libs/icu.
+
+		Unlike dev-libs/icu, this package keeps upstream's symbol renaming
+		enabled, so its symbols are suffixed with the ICU major version and
+		cannot clash with the system ICU. No headers, pkg-config files or
+		tools are installed, so nothing can build against it by accident.
+	</longdescription>
+	<upstream>
+		<remote-id type="github">unicode-org/icu</remote-id>
+	</upstream>
+</pkgmetadata>

@@ -1,0 +1,15 @@
+BDEPEND=dev-lang/perl dev-util/ostree dev-util/patchelf sys-apps/flatpak
+DEFINED_PHASES=compile install postinst postrm preinst prepare unpack
+DESCRIPTION=WebKit-based browser by Kagi, with Chrome and Firefox extension support
+EAPI=8
+HOMEPAGE=https://orionbrowser.com/ https://kagi.com/orion/
+IDEPEND=dev-util/desktop-file-utils x11-misc/shared-mime-info
+INHERIT=desktop multilib toolchain-funcs xdg
+KEYWORDS=~amd64 ~arm64
+LICENSE=all-rights-reserved
+RDEPEND=app-crypt/libsecret app-text/enchant:2 dev-libs/expat dev-libs/glib:2 dev-libs/hidapi:0= dev-libs/hyphen dev-libs/icu-compat:77 dev-libs/libgcrypt:= dev-libs/libgpg-error dev-libs/libmanette dev-libs/libtasn1:= dev-libs/libxml2:= dev-libs/libxslt dev-libs/openssl:= dev-libs/wayland gui-libs/gtk:4 gui-libs/libadwaita:1 media-libs/fontconfig media-libs/freetype:2 media-libs/graphene media-libs/gst-plugins-base:1.0 media-libs/gstreamer:1.0 media-libs/harfbuzz:=[icu] media-libs/lcms:2 media-libs/libavif:= media-libs/libepoxy media-libs/libjpeg-turbo:= media-libs/libjxl-compat:0.11 media-libs/libpng:0= media-libs/libwebp:= media-libs/mesa media-libs/vulkan-loader media-libs/woff2 net-libs/libsoup:3.0 net-misc/curl sys-apps/bubblewrap sys-apps/dbus sys-apps/xdg-dbus-proxy sys-libs/libseccomp x11-libs/cairo x11-libs/gdk-pixbuf:2 x11-libs/libX11 x11-libs/libdrm x11-libs/pango
+RESTRICT=bindist mirror splitdebug strip
+SLOT=0
+SRC_URI=amd64? ( https://cdn.kagi.com/downloads/oriongtk.0.3.0.flatpak -> orion-bin-0.3.0-amd64.flatpak ) arm64? ( https://cdn.kagi.com/downloads/oriongtk.0.3.0.arm.flatpak -> orion-bin-0.3.0-arm64.flatpak )
+_eclasses_=desktop	e447b5f77146d69797e9f03ff177f3f1	toolchain-funcs	58a918e3a42d0156f010dcfd43725be5	multilib	fc812e8eb2170022c28272d80a1f9e77	xdg-utils	42869b3c8d86a70ef3cf75165a395e09	xdg	3ef49a87c52c8b77c476351195dfe575
+_md5_=13b94e0e24ee635fe6fa1e7045c77227

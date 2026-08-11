@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@proton.me</email>
+	</maintainer>
+	<longdescription lang="en">
+		Installs only the versioned libjxl and libjxl_cms runtime libraries for
+		an older ABI, so that prebuilt packages linked against it keep working
+		on a system carrying a newer media-libs/libjxl.
+
+		media-libs/libjxl encodes the ABI in its subslot, which means a single
+		version of it can be installed at a time; this package fills the gap
+		for binary consumers. No headers, pkg-config files or tools are
+		installed, so nothing can build against it by accident.
+	</longdescription>
+	<upstream>
+		<remote-id type="github">libjxl/libjxl</remote-id>
+	</upstream>
+</pkgmetadata>

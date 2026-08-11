@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@proton.me</email>
+	</maintainer>
+	<longdescription lang="en">
+		Orion is a WebKit-based browser by Kagi, able to run Chrome and Firefox
+		extensions. Upstream publishes Linux builds only as a Flatpak; this
+		package unpacks that bundle and installs it as a native package, using
+		the system GTK, GStreamer and GLib rather than a runtime image.
+
+		The payload is proprietary and bundles its own WebKit, which is pinned
+		to older ICU and libjxl ABIs -- those come from dev-libs/icu-compat and
+		media-libs/libjxl-compat.
+	</longdescription>
+	<upstream>
+		<bugs-to>https://orionfeedback.org/</bugs-to>
+	</upstream>
+</pkgmetadata>

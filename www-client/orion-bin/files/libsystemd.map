@@ -1,0 +1,14 @@
+/* Copyright 1999-2026 Gentoo Authors
+ * Distributed under the terms of the GNU General Public License v2
+ *
+ * The Orion binaries reference sd_journal_send@LIBSYSTEMD_209, so the stub
+ * has to export the symbols under that exact version node.
+ */
+
+LIBSYSTEMD_209 {
+global:
+	sd_journal_send;
+	sd_journal_send_with_location;
+local:
+	*;
+};

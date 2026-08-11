@@ -7,8 +7,13 @@
 # ebuild (Gentoo version rules: prefixes v/release-/ver-/version- stripped;
 # regex returns capture group 1 of the FIRST match on the raw body).
 #
-# 418 records — 229 regex, 189 json. 20 disabled (enabled = false),
+# 421 records — 230 regex, 191 json. 21 disabled (enabled = false),
 # 3 held (hold = true): dev-build/gn, dev-lang/ghc, sci-ml/stable-diffusion-cpp.
+#
+# Two of the disabled records are disabled for a reason other than "package
+# gone": dev-libs/icu-compat and media-libs/libjxl-compat are pinned to an old
+# ABI on purpose, and a bump would destroy what they are for. Read their
+# comments before re-enabling either.
 #
 # No record uses parser = "script" any more: the three that did (antigravity-bin,
 # antigravity-hub-bin, gitkraken) were migrated to regex on 2026-08-06 because
@@ -6407,5 +6412,64 @@ on arm64/riscv.  Re-check the glibc floor of the -gnu tarballs on a bump
 (objdump -T | grep GLIBC_); 0.10.0 was 2.39 on x86_64 and 2.18 on i686.  If a
 floor ever passes the oldest glibc in ::gentoo, move that arch to its musl
 tarball.
+"""
+# END
+
+["www-client/orion-bin"]
+url = "https://orionbrowser.com/platforms/linux"
+parser = "regex"
+pattern = 'oriongtk\.([0-9.]+)\.flatpak'
+type = "bin"
+version = "0.3.0"
+comments = """
+Orion (Kagi) — the download page is the only versioned endpoint. Upstream
+publishes .flatpak bundles under cdn.kagi.com/downloads/ but neither lists nor
+redirects them, so the page's own link is what carries the version. The pattern
+deliberately does NOT match the oriongtk.<PV>.arm.flatpak sibling (same
+version, second SRC_URI entry); leave it that way or the first match changes
+with the page's link order.
+
+The published bundle lags the browser badly: 0.4.x has been out since 2026-07
+through the OSTree repo at flatpak.orionbrowser.com/repo/beta/ (refs
+app/com.kagi.Orion/{x86_64,aarch64}/beta), while the newest bundle here is
+0.3.0 from April. That repo publishes no static deltas, only ~280 objects
+addressed by hash, so it cannot feed SRC_URI — hence the ebuild tracks the
+bundle, not the repo.
+
+A 0.4.x bundle will also rename the app id from com.kagi.OrionGtk to
+com.kagi.Orion: MY_ID in the ebuild must follow it, and src_unpack asserts on
+the ref name, so a blind PV bump fails loudly rather than silently.
+"""
+# END
+
+["dev-libs/icu-compat"]
+enabled = false
+url = "https://api.github.com/repos/unicode-org/icu/releases/latest"
+parser = "json"
+path = "tag_name"
+transform = [['^release-', ""], ['-', "."]]
+version = "77.1"
+comments = """
+Pinned on purpose — do NOT enable. The package exists to carry the ICU 77 ABI
+for www-client/orion-bin, whose prebuilt WebKit imports u_*_77 symbols;
+dev-libs/icu already covers the current ABI. Bumping this one would remove the
+only reason it exists. The record is kept, disabled, so the endpoint stays
+documented: needing a different ABI means a NEW package at that version, never
+a bump of this one.
+"""
+# END
+
+["media-libs/libjxl-compat"]
+enabled = false
+url = "https://api.github.com/repos/libjxl/libjxl/releases/latest"
+parser = "json"
+path = "tag_name"
+transform = [['^v', ""]]
+version = "0.11.2"
+comments = """
+Pinned on purpose — do NOT enable, same reasoning as dev-libs/icu-compat. It
+supplies the libjxl 0.11 ABI that orion-bin's bundled WebKit links against,
+while media-libs/libjxl carries the current one. Only the last 0.11.x release
+belongs here; a 0.12+ bump would drop the very ABI this package exists for.
 """
 # END

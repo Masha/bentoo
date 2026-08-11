@@ -1,4 +1,39 @@
-# Erro with another packages
+# Lucas C.S. <lucascs@protonmail.com> (2026-08-11)
+# Nettle 4.0 is a deliberately incompatible release. The *_digest functions
+# lost their length argument (sha256_digest(ctx, len, out) is now
+# sha256_digest(ctx, out)), and struct aes_ctx, the generic HMAC interface,
+# sha.h, pgp.h, md5-compat.h and dsa-compat.h were all deleted. Sonames moved
+# to libnettle.so.9 / libhogweed.so.7. The package is not slotted, so 3 and 4
+# cannot coexist: every consumer has to be ported, not merely rebuilt.
+#
+# Two pieces of infrastructure have no upstream fix at all:
+#   app-emulation/qemu  - crypto/hash-nettle.c casts every *_digest to a
+#                         three-argument function pointer, so the call still
+#                         COMPILES against nettle 4 and then passes the length
+#                         where the output pointer belongs. It is not a FTBFS,
+#                         it is a run-time crash. The worst failure mode here.
+#   sys-fs/cryptsetup   - USE=nettle still calls hash->digest(ctx, len, buf).
+#                         Its HAVE_NETTLE_VERSION_H guard only prints a version
+#                         string, it does not select an API.
+#
+# Fixed in git but not in any release: net-misc/tigervnc (after 1.16.2),
+# dev-libs/libzip (after 1.11.4). Fixed in a release ::gentoo does not ship:
+# gui-libs/neatvnc needs 1.0.1. Still unfixed upstream: net-misc/aria2,
+# net-libs/srt, sci-geosciences/viking, and the nettle-sys crate behind
+# app-crypt/rpm-sequoia and app-crypt/sequoia-sop.
+#
+# Prebuilt consumers (net-im/element-desktop-bin, games-util/heroic-bin,
+# app-text/master-pdf-editor) ship linked against libnettle.so.8 and cannot be
+# rebuilt at all, so they have no path forward while the package stays
+# unslotted.
+#
+# Already ported, for the record: net-libs/gnutls-3.8.13, net-misc/curl-8.21.0,
+# net-proxy/squid-7.6, app-arch/libarchive-3.8.6, net-dns/dnsmasq-2.93,
+# net-misc/chrony-4.8, www-servers/lighttpd-1.4.85.
+#
+# ::gentoo has not started this transition either -- it still ships only
+# 3.10.2. Remove this entry once qemu and cryptsetup both build and run
+# against nettle 4.
 >=dev-libs/nettle-4.0
 
 # Lucas C.S. <lucascs@protonmail.com> (2026-08-02)
