@@ -26,7 +26,7 @@ LICENSE="Apache-1.1 Apache-2.0 BlueOak-1.0.0 BSD BSD-2 MIT npm? ( Artistic-2 )"
 # scripts/check-slot-naming-contract.sh asserts this literal matches the major in
 # the filename, which is what a computed value used to guarantee: copy this file
 # to a new major and forget to change the line, and that check fails.
-SLOT="24"
+SLOT="26"
 if [[ ${PV} == *9999 ]]; then
 	inherit git-r3
 	EGIT_REPO_URI="https://github.com/nodejs/node"
@@ -49,79 +49,21 @@ REQUIRED_USE="inspector? ( icu ssl )
 
 RESTRICT="!test? ( test )"
 
-# Version-driven bounds, taken from ::gentoo's own 24 series
-# (nodejs-24.16.0-r1) rather than from the 26 ebuild: a 26-era floor would
-# reject libraries slot 24 builds against perfectly well. This block, SRC_URI
-# and PATCHES are the only places the two slots are expected to differ.
-#
-# What these numbers are NOT is a mirror of what deps/ vendors. They are the
-# floors ::gentoo's 24 maintainer settled on -- the oldest API each --shared-*
-# link is known to work against. Measured against this tarball, deps/ is ahead
-# of several of them, and that is fine:
-#
-#   dep       floor here  24.18.1 has  26.5.1 has  ::gentoo has
-#   ada       3.3.0       3.4.4        3.4.4       3.4.4
-#   brotli    1.1.0       1.2.0        1.2.0       1.2.0-r1
-#   c-ares    1.34.5      1.34.6       1.34.6      1.34.8
-#   libuv     1.52.1      1.52.1       1.52.1      1.52.1
-#   simdjson  4.6.1       4.6.4        4.6.4       4.6.2
-#   nghttp2   1.69.0      1.69.0       1.69.0      1.69.0
-#   nghttp3   1.14.0      1.14.0       1.17.0      1.18.0
-#   ngtcp2    1.14.0      1.15.1       1.23.0      1.25.0
-#   openssl   3.5.6       3.5.7        3.5.7       3.6.3
-#
-# Left alone deliberately, and the simdjson row is why: "raise every floor to
-# whatever deps/ vendors" is the obvious-looking rule and it is wrong. deps/
-# vendors simdjson 4.6.4 while ::gentoo ships at most 4.6.2, so that rule
-# makes the package uninstallable. A floor is a claim about an API, and
-# raising one without a build behind it buys a user-visible restriction with
-# no evidence. Move a line here when a build actually fails below it.
-#
-# Two rows are real 24-vs-26 differences rather than staleness -- nghttp3 and
-# ngtcp2. 24.18.1 vendors 1.14.0 and 1.15.1 where 26.5.1 vendors 1.17.0 and
-# 1.23.0, so the 26 ebuild's higher floors would simply be wrong here. ada and
-# brotli, by contrast, have CONVERGED since ::gentoo's 24.16.0-r1 snapshot:
-# both majors now vendor 3.4.4 and 1.2.0. Their floors differ only because
-# ::gentoo's 24 ebuild predates that, not because the series disagree.
-#
-# dev-cpp/simdutf is DELIBERATELY ABSENT, matching this overlay's 26 ebuild
-# and diverging from ::gentoo, which carries >=dev-cpp/simdutf-7.3.4:= plus
-# --shared-simdutf on BOTH its 24.16.0-r1 and its 26.3.0. That is the whole
-# point: it is a bentoo decision about the package, not a difference between
-# majors, so re-adding it here alone would split the two slots on a choice
-# that is not allowed to differ between them.
-#
-# It also stands on its own merits. --shared-simdutf does not REPLACE the
-# bundled copy, it adds a second one. Node 24.18.1 ships no top-level
-# deps/simdutf; the only copy is deps/v8/third_party/simdutf, v6.4.0.
-# node_shared_simdutf gates exactly two places -- node.gypi:237 (node's own
-# target) and node.gyp:1525 (the host js2c tool) -- while
-# tools/v8_gypfiles/v8.gyp:1079 makes v8_base_without_compiler depend on that
-# vendored simdutf UNCONDITIONALLY. So with the flag on, node's src/*.cc
-# compiles against the system headers (dev-cpp/simdutf is 9.0.0 here) while
-# V8 compiles against 6.4.0, and both land in one binary. Neither side uses a
-# versioned namespace -- both spell it plain `simdutf::`, 435 such symbols in
-# libsimdutf.so.34 -- so that is an ODR violation, not a tidy substitution.
-#
-# Weighed against Gentoo's prefer-system-libraries policy, which genuinely
-# points the other way. If that wins, the change belongs on BOTH slots and
-# needs a real build on each: --shared-simdutf has never been exercised in
-# this overlay, whereas the fallback has (slot 26, commit ecb7586e).
-COMMON_DEPEND=">=app-arch/brotli-1.1.0:=
+COMMON_DEPEND=">=app-arch/brotli-1.2.0:=
 	dev-db/sqlite:3
-	>=dev-cpp/ada-3.3.0:=
+	>=dev-cpp/ada-3.4.4:=
 	>=dev-libs/libuv-1.52.1:=
 	>=dev-libs/simdjson-4.6.1:=
-	>=net-dns/c-ares-1.34.5:=
+	>=net-dns/c-ares-1.34.6:=
 	>=net-libs/nghttp2-1.69.0:=
-	>=net-libs/nghttp3-1.14.0:=
+	>=net-libs/nghttp3-1.15.0:=
 	virtual/zlib:=
 	system-icu? ( >=dev-libs/icu-73:= )
 	system-ssl? (
-		>=net-libs/ngtcp2-1.14.0:=
+		>=net-libs/ngtcp2-1.22.0:=
 		>=dev-libs/openssl-3.5.6:0=
 	)
-	!system-ssl? ( >=net-libs/ngtcp2-1.14.0:=[-gnutls] )
+	!system-ssl? ( >=net-libs/ngtcp2-1.22.0:=[-gnutls] )
 	|| (
 		sys-devel/gcc:*
 		llvm-runtimes/libatomic-stub
@@ -178,33 +120,6 @@ PDEPEND="pnpm? ( sys-apps/pnpm )"
 CHECKREQS_MEMORY="8G"
 CHECKREQS_DISK_BUILD="22G"
 
-# The 26 ebuild has no global PATCHES at all; this one does, and that is
-# expected -- a patch exists because a particular major's source needs it, so
-# PATCHES is one of the three places (with SRC_URI and the dependency bounds
-# above) where two slots of the same recipe legitimately differ.
-#
-# The 32-bit patch is V8 upstream commit ddfa1b3d ("[turboshaft] Rename TupleOp
-# to MakeTupleOp to avoid name conflicts"), backported for
-# https://bugs.gentoo.org/969806, where the unrenamed TupleOp collides on
-# 32-bit targets -- ~arm and ~x86 here. Carried verbatim from ::gentoo, byte for
-# byte, so a future sync can diff it. Verified still NEEDED at 24.18.1, not
-# merely still applying: a dry run takes all 50 hunks forward (with offsets),
-# whereas a patch already merged upstream comes back reversed.
-#
-# DELIBERATELY ABSENT -- do not reintroduce ::gentoo 24.16.0-r1's second entry:
-#   SRC_URI += https://deps.gentoo.zip/net-libs/nodejs/${P}-nghttp2-1.69.0.patch
-#   PATCHES += "${DISTDIR}"/${P}-nghttp2-1.69.0.patch
-# It backported upstream's own adaptation to the nghttp2 1.69.0 API into a
-# 24.16.0 that still vendored 1.67.x. At 24.18.1 upstream has done that itself:
-# deps/nghttp2/lib/includes/nghttp2/nghttp2ver.h reads NGHTTP2_VERSION "1.69.0",
-# so the tree already speaks the API that >=net-libs/nghttp2-1.69.0:= provides.
-# The patch is also version-stamped and simply does not exist for this release
-# -- deps.gentoo.zip serves it for 24.16.0 only (24.17.0, 24.18.0 and 24.18.1
-# all return 404), so carrying the entry forward would break fetching outright.
-PATCHES=(
-	"${FILESDIR}"/${PN}-24.14.0-32-bit.patch
-)
-
 pkg_pretend() {
 	if [[ ${MERGE_TYPE} != "binary" ]]; then
 		if is-flagq "-g*" && ! is-flagq "-g*0" ; then
@@ -240,19 +155,14 @@ src_prepare() {
 	export V=1
 	export BUILDTYPE=Release
 
-	# fix compilation on Darwin (~x64-macos)
+	# fix compilation on Darwin
 	# https://code.google.com/p/gyp/issues/detail?id=260
 	#
-	# The expression, NOT the one the 26 ebuild and ::gentoo's 24 series both
-	# still carry. gyp-next 0.22.2 -- the copy vendored here -- writes the pair
-	# as two separately quoted lines:
-	#     cflags.append("-arch")
-	#     cflags.append(archs[0])
-	# so the old `/append('-arch/d` matches NOTHING in this tree (grepped: the
-	# single-quoted spelling occurs nowhere under ${S}), and an anchored sed
-	# that matches nothing still exits 0 -- `|| die` cannot see it. {N;d;} takes
-	# both lines of each pair, at 665/666 and 947/948. ::gentoo made the same
-	# correction in its 26.3.0 ebuild.
+	# The pattern matters: the file spells it append("-arch") on one line with
+	# the architecture on the next, so the old single-quoted /append('-arch/d
+	# matched nothing at all and deleted neither line -- verified against this
+	# tarball. An anchored sed that matches nothing still exits 0, so `|| die`
+	# never saw it. ::gentoo corrected this in its own 26.3.0.
 	sed -i -e '/append("-arch")/{N;d;}' tools/gyp/pylib/gyp/xcode_emulation.py || die
 
 	# DELIBERATELY ABSENT -- do not reintroduce the ::gentoo libdir seds:
@@ -288,37 +198,29 @@ src_prepare() {
 		BUILDTYPE=Debug
 	fi
 
+	# Build fixes carried from ::gentoo's 26.7.0 (it lists these as a global
+	# PATCHES array; this ebuild has none, so they go here). gcc17 is a
+	# bentoo-local rebase -- see the header of the 26.7.0 copy for why the
+	# ::gentoo 26.6.0 one cannot be used verbatim.
+	PATCHES+=(
+		"${FILESDIR}"/${PN}-26.7.0-gcc17.patch
+		"${FILESDIR}"/${PN}-26.6.0-format-cstdlib.patch
+		"${FILESDIR}"/${PN}-26.6.0-v8-climits.patch
+	)
+
 	# We need to disable mprotect on two files when it builds Bug 694100.
 	#
-	# A 24.18.1-specific copy, NOT the ${PN}-24.1.0-paxmarking.patch that
-	# ::gentoo and this overlay's 26 ebuild both point at. Same change byte
-	# for byte -- only the @@ line numbers and the context lines around them
-	# were regenerated -- but the 24.1.0 file lands its last hunk here "with
-	# fuzz 1", because 24.18.1 inserted a node_with_ltcg conditional into the
-	# mksnapshot target's 'conditions' list, splitting the three lines that
-	# hunk anchors on.
-	#
-	# Fuzz is treated as a failure rather than a warning, and the reason is
-	# that nothing downstream will treat it as one: portage's __eapply_patch
-	# greps its own output for "with fuzz", prints the line, and still
-	# returns SUCCESS. A fuzzy hunk that drifted one target further down
-	# would still produce a syntactically valid gyp file, so the first
-	# symptom would be a compile error -- and only under USE=pax-kernel,
-	# which is off by default, so it could sit unnoticed for majors.
-	#
-	# Checked, not assumed: at 24.18.1 the fuzzy application does land on the
-	# correct site, and this rebased file reproduces its output byte for byte
-	# (identical sha256 on both patched files). It is replaced anyway so the
-	# next bump cannot inherit the drift silently -- the point is to make the
-	# anchor exact again, not to fix a bug that has already bitten.
-	#
-	# Slot 26 is NOT fixed by this and is deliberately left alone: repointing
-	# it is a cross-slot change. For the record, 26.5.1 fuzzes on the shared
-	# file twice -- v8.gyp hunk 3 for the same reason as here, plus node.gyp
-	# hunk 1, where upstream swapped 'src/node_webstorage.h' for
-	# 'src/ffi/types.h' in the context.
+	# A 26.5.1-specific copy, NOT the shared ${PN}-24.1.0-paxmarking.patch:
+	# against this tarball that file applies with "fuzz 1" in both node.gyp
+	# (its context still names src/node_webstorage.h, which 26 replaced with
+	# src/ffi/types.h) and tools/v8_gypfiles/v8.gyp. Fuzz cannot be sat on --
+	# portage's __eapply_patch greps its own output for "with fuzz", prints it
+	# and still returns SUCCESS, so a hunk that drifts to the wrong site ships
+	# silently and only breaks at compile time, only for USE=pax-kernel users.
+	# The rebased copy applies with --fuzz=0 and produces a byte-identical
+	# result to the original.
 	use pax-kernel &&
-		PATCHES+=( "${FILESDIR}"/${PN}-24.18.1-paxmarking.patch )
+		PATCHES+=( "${FILESDIR}"/${PN}-26.5.1-paxmarking.patch )
 
 	use ppc64 &&
 		PATCHES+=(	"${FILESDIR}/${PN}-24.11.1-restore-ppc64be.patch" )
@@ -358,29 +260,6 @@ src_configure() {
 	else
 		myconf+=( --with-intl=none )
 	fi
-	# Corepack off, and on this major that takes an EXPLICIT flag.
-	#
-	# ::gentoo's 24 series exposes USE=corepack; this overlay does not, on
-	# either slot -- corepack would put a fourth binary (plus the yarn/pnpm
-	# shims it enables) into the same /usr/bin that app-eselect/eselect-nodejs
-	# arbitrates, and it carries `corepack? ( !sys-apps/yarn )`, a blocker whose
-	# whole purpose is that collision. Dropping the flag is what keeps both
-	# slots exposing one surface and eselect managing exactly three names.
-	#
-	# The flag polarity FLIPPED between the two majors, so "off" is not the same
-	# code in both files. Read from each release's own configure.py:
-	#   24.18.1  parser.add_argument('--without-corepack', ..., default=None)
-	#            node_install_corepack = b(not options.without_corepack)
-	#            -> default None, so `not None` is True: OMITTING THE FLAG
-	#               INSTALLS COREPACK. Opt-out.
-	#   26.5.1   node_install_corepack = b(options.with_corepack)
-	#            -> default off; omission is already "off". Opt-in.
-	# Hence this line exists here and has no counterpart in the 26 ebuild, and
-	# it is unconditional rather than `use corepack ||` because there is no such
-	# USE flag to read. tools/install.py:209 gates corepack_files() on that one
-	# variable, so this is the only thing standing between the slot prefix and
-	# a bin/corepack nobody asked for.
-	myconf+=( --without-corepack )
 	use inspector || myconf+=( --without-inspector )
 	use npm || myconf+=( --without-npm )
 	use snapshot || myconf+=( --without-node-snapshot )
@@ -427,13 +306,15 @@ src_install() {
 
 	pax-mark -m "${ED}${NODE_SLOT_DIR}"/bin/node
 
-	# set up a symlink structure that node-gyp expects..
-	# Inside the slot prefix: /usr/include/node belongs to eselect nodejs.
-	dodir "${NODE_SLOT_DIR}"/include/node/deps/{v8,uv}
-	dosym . "${NODE_SLOT_DIR}"/include/node/src
-	for var in deps/{uv,v8}/include; do
-		dosym ../.. "${NODE_SLOT_DIR}"/include/node/${var}
-	done
+	# No include/node symlink farm here. The old "structure that node-gyp
+	# expects" (src -> . ; deps/{uv,v8}/include -> ../..) is CYCLIC: it makes
+	# include/node/src/src/src/... and include/node/deps/v8/include/deps/v8/
+	# include/... expand forever. ::gentoo dropped it for that reason, and any
+	# consumer that walks /usr/include recursively without cycle detection
+	# spins until it is OOM-killed -- chromium >=150 does exactly that, via
+	# gn's expand_directory() (bentoo#35, Gentoo bug #980202 WONTFIX: the fix
+	# belongs here, not in chromium/gn). The headers themselves are installed
+	# by the plain `default`/emake install above; nothing else is needed.
 
 	# Version-suffixed entry points (R1.4). These are the only /usr/bin paths
 	# this ebuild owns: the unsuffixed node/npm/npx belong to

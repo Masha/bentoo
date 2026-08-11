@@ -1,0 +1,27 @@
+https://bugs.gentoo.org/977454
+https://github.com/lief-project/LIEF/pull/1351
+
+From dba3bba004ad0eba3cb966340ddfcaf6137b7f15 Mon Sep 17 00:00:00 2001
+From: Ted Rodgers <ted.d.rodgers@gmail.com>
+Date: Sun, 14 Jun 2026 22:57:44 -0400
+Subject: [PATCH] add #include <sstream> for gcc-17
+
+Rebased for 26.7.0: upstream inserted #include "LIEF/errors.hpp" right after
+the <ostream> include, so ::gentoo's ${PN}-26.6.0-gcc17.patch only lands here
+"with fuzz 2". Portage prints that and still returns SUCCESS, so the drift
+would ship silently -- this copy applies with --fuzz=0 and produces a
+byte-identical result.
+---
+ include/LIEF/PE/ResourcesManager.hpp | 1 +
+ 1 file changed, 1 insertion(+)
+
+--- a/deps/LIEF/include/LIEF/PE/ResourcesManager.hpp
++++ b/deps/LIEF/include/LIEF/PE/ResourcesManager.hpp
+@@ -16,6 +16,7 @@
+ #ifndef LIEF_PE_RESOURCES_MANAGER_H
+ #define LIEF_PE_RESOURCES_MANAGER_H
+ #include <ostream>
++#include <sstream>
+
+ #include "LIEF/errors.hpp"
+ #include "LIEF/visibility.h"
