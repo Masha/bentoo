@@ -6570,3 +6570,19 @@ while media-libs/libjxl carries the current one. Only the last 0.11.x release
 belongs here; a 0.12+ bump would drop the very ABI this package exists for.
 """
 # END
+
+["sys-process/nohang"]
+url = "https://api.github.com/repos/hakavlad/nohang/releases/latest"
+parser = "json"
+path = "tag_name"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "0.3.0"
+comments = """
+nohang — GitHub release tag "vX.Y.Z" ("v" stripped). Verified against
+/releases/latest on 2026-08-12: returns v0.3.0, matching the ebuild.
+
+Releases are rare and the gap is not a broken probe: v0.2.0 (2020-12) stood as
+latest for five years before v0.3.0 (2025-12). master keeps moving in between,
+which is what the 9999 ebuild is for; 9999 is not version-checked.
+"""
+# END

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@protonmail.com</email>
+		<name>Lucas Couto</name>
+	</maintainer>
+	<longdescription lang="en">
+		Userspace low memory handler. It watches PSI (Pressure Stall Information)
+		-- the kernel's measure of how long tasks actually stall waiting on
+		memory -- along with MemAvailable and swap, and terminates the heaviest
+		offender before the machine starts thrashing. The kernel OOM killer only
+		acts once an allocation has already failed, by which point the desktop
+		has typically been unresponsive for minutes.
+
+		It is the closest equivalent to systemd-oomd for hosts that do not run
+		systemd: systemd-oomd is also PSI-driven, but ships as a systemd unit and
+		kills whole cgroups, whereas nohang is init-agnostic and picks individual
+		processes through a configurable badness score. Unlike sys-apps/earlyoom
+		it reads PSI rather than free-memory percentages alone.
+
+		Two configuration profiles are installed and they are mutually exclusive:
+		nohang for headless and conservative setups, nohang-desktop for
+		interactive machines, which additionally warns the logged-in user through
+		desktop notifications before anything is killed.
+	</longdescription>
+	<use>
+		<flag name="desktop">
+			Pull in <pkg>x11-libs/libnotify</pkg> and <pkg>app-admin/sudo</pkg>, needed
+			by the nohang-desktop profile to send GUI warnings to the logged-in user
+		</flag>
+	</use>
+	<upstream>
+		<maintainer status="active">
+			<name>Alexey Avramov</name>
+		</maintainer>
+		<bugs-to>https://github.com/hakavlad/nohang/issues</bugs-to>
+		<remote-id type="github">hakavlad/nohang</remote-id>
+	</upstream>
+</pkgmetadata>
