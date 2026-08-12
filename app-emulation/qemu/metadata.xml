@@ -18,8 +18,6 @@
 		<flag name="curl">Support ISOs / -cdrom directives via HTTP or HTTPS.</flag>
 		<flag name="fdt">Enables firmware device tree support</flag>
 		<flag name="fuse">Enables FUSE block device export</flag>
-		<flag name="glusterfs">Enables GlusterFS cluster fileystem via
-			<pkg>sys-cluster/glusterfs</pkg></flag>
 		<flag name="gnutls">Enable TLS support for the VNC console server.
 		For 1.4 and newer this also enables WebSocket support.
 		For 2.0 through 2.3 also enables disk quorum support.</flag>
