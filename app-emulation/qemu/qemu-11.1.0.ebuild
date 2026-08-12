@@ -552,6 +552,15 @@ qemu_src_configure() {
 		--disable-guest-agent
 		--disable-strip
 		--disable-download
+
+		# New in 11.1: a standalone D-Bus VNC server. Upstream builds it
+		# but never installs it (tools/qemu-vnc/meson.build calls
+		# executable() with no install:), so it is pure build cost here.
+		# Worse, it links libqemuui, which drags ui/ into a tools-only
+		# tree where neither trace/trace-ui.h nor the input-keymap .c.inc
+		# files are generated -- both are still gated on have_system --
+		# and the build dies. Revisit if upstream ever installs it.
+		--disable-qemu-vnc
 		--python="${PYTHON}"
 
 		# bug #746752: TCG interpreter has a few limitations:
