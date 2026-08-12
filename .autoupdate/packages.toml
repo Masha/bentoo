@@ -918,7 +918,7 @@ url = "https://api.github.com/repos/netdata/netdata/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "2.10.4"
+version = "2.11.0"
 comments = """
 netdata — tag "vX.Y.Z".
 """
@@ -1169,7 +1169,7 @@ url = "https://api.github.com/repos/vim/vim/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "9.2.0943"
+version = "9.2.0947"
 comments = """
 vim — no releases (404); tags[0] "vX.Y.ZZZZ".
 """
@@ -1180,7 +1180,7 @@ url = "https://api.github.com/repos/vim/vim/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "9.2.0943"
+version = "9.2.0947"
 comments = """
 vim-core — same upstream repo as vim.
 """
@@ -1514,7 +1514,7 @@ base_from = "file"
 base_url = "https://raw.githubusercontent.com/zed-industries/zed/main/crates/zed/Cargo.toml"
 base_pattern = '(?m)^version = "([0-9][0-9.]*)"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.16.0_pre20260812"
+version = "1.17.0_pre20260812"
 comments = """
 zed — commit-tracked on main; _pre suffix preserved from current ebuild.
 2026-08-06: 2 commits landed same UTC day (d61e80b -> 6b2aa1c), so the date
@@ -1552,7 +1552,7 @@ path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
 series = '^[0-9.]+$'
-version = "1.14.2"
+version = "1.15.0"
 comments = """
 zed-bin (stable channel) — releases/latest is the stable release by definition
 (prerelease=false); upstream tags it "vX.Y.Z" and the preview "vX.Y.Z-pre".
@@ -1577,7 +1577,7 @@ select = "max"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
 series = '_pre$'
-version = "1.15.0_pre"
+version = "1.16.0_pre"
 comments = """
 zed-bin (preview channel) — releases/latest never returns a prerelease, so the
 preview needs the full list: the pattern takes only "vX.Y.Z-pre" tags and the
@@ -1675,7 +1675,7 @@ base_from = "tag"
 base_url = "https://api.github.com/repos/KhronosGroup/SPIRV-Headers/git/refs/tags"
 base_tag_pattern = '^vulkan-sdk-([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)$'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.357.0_p20260805"
+version = "1.4.357.0_p20260812"
 comments = """
 spirv-headers — commit-tracked on main; scans titles for vulkan-sdk-X.Y.Z.W to detect base bump.
 """
@@ -6262,7 +6262,7 @@ stable/alpha entries); transform "-beta-"->"_beta" yields PV=4.0.0_beta2.
 url = "https://storage.googleapis.com/flutter_infra_release/releases/releases_linux.json"
 parser = "regex"
 pattern = '"channel": "stable",\s+"version": "([0-9]+\.[0-9]+\.[0-9]+)"'
-version = "3.44.9"
+version = "3.47.0"
 comments = """
 Flutter — official releases_linux.json (pretty-printed, newest-first). The
 current_release.stable is a hash, not a version, so anchor the regex on the
