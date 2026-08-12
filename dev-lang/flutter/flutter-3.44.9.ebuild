@@ -20,9 +20,12 @@ RESTRICT="bindist mirror strip"
 
 QA_PREBUILT="*"
 
-# Flutter 3.44.4 bundles and validates Dart SDK 3.12.2; a different dart-sdk
-# version triggers an "sdk mismatch" error. Pin the exact version supplied by
-# the unbundled dev-lang/dart (installed at /usr/lib/dart).
+# This release bundles Dart SDK 3.12.2 (see dart_sdk_version in upstream's
+# releases_linux.json). src_install replaces the bundled SDK with the system
+# one, so the version must match exactly: bin/cache/flutter_tools.snapshot only
+# loads on the Dart VM it was compiled against. Keep this pin in sync with the
+# dart_sdk_version of ${PV}, and keep the matching dev-lang/dart ebuild in the
+# tree even after dart is bumped.
 RDEPEND="~dev-lang/dart-3.12.2"
 
 src_prepare() {
