@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@protonmail.com</email>
+		<name>Lucas Couto</name>
+	</maintainer>
+	<longdescription lang="en">
+		OpenAI's official Electron desktop application for Linux, published under
+		the Codex brand and released on 2026-08-11. It bundles ChatGPT, ChatGPT
+		Work and the Codex coding agent in a single window; the Codex CLI, a
+		private Node.js runtime and ripgrep are shipped inside the payload.
+
+		This is proprietary, closed-source software distributed only as a
+		prebuilt binary: nothing here is compiled from source, the package is
+		neither mirrored nor redistributable in binary form, and using it
+		requires an OpenAI account. Upstream calls the installed command
+		"chatgpt", which is why the package name and the binary name differ.
+
+		Note that the Linux build is a preview: it has no setuid sandbox helper
+		and depends on unprivileged user namespaces for renderer isolation.
+	</longdescription>
+	<use>
+		<flag name="apparmor">Install the upstream AppArmor profile, which grants
+			the app the user-namespace access its renderer sandbox needs</flag>
+		<flag name="egl">Use EGL for smooth rendering on high refresh rate monitors</flag>
+		<flag name="wayland">Run in wayland mode under wayland sessions, xwayland
+			otherwise. This flag doesn't affect x11 sessions.</flag>
+	</use>
+	<upstream>
+		<doc lang="en">https://developers.openai.com/codex/app</doc>
+	</upstream>
+</pkgmetadata>

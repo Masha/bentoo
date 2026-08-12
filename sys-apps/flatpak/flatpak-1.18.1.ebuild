@@ -12,11 +12,10 @@ SRC_URI="https://github.com/${PN}/${PN}/releases/download/${PV}/${P}.tar.xz"
 
 LICENSE="LGPL-2.1+"
 SLOT="0"
-# 1.19.x is flatpak's development line -- upstream numbers unstable series with
-# an odd minor (1.15, 1.17, 1.19) and marks the GitHub releases as prereleases,
-# stabilising into the next even one (1.20). Keep it entirely ~arch: the stable
-# counterpart lives in flatpak-1.18.1.ebuild, released the same day.
-KEYWORDS="~amd64 ~arm ~arm64 ~loong ~ppc64 ~riscv ~x86"
+# 1.18.x is flatpak's stable line (even minor, prerelease=false upstream), so it
+# carries the stable keywords inherited from ::gentoo's 1.16.6. The development
+# line lives alongside in flatpak-1.19.0.ebuild and stays ~arch.
+KEYWORDS="amd64 arm arm64 ~loong ~ppc64 ~riscv x86"
 IUSE="doc introspection policykit seccomp systemd test X"
 RESTRICT="!test? ( test )"
 

@@ -1,0 +1,19 @@
+# Copyright 1999-2026 Gentoo Authors
+# Distributed under the terms of the GNU General Public License v2
+
+# QEMU system emulation targets that ::gentoo does not describe yet.
+#
+# This file is additive: Portage and pkgcheck read profiles/desc/ from every
+# repository in the stack and merge them, so only the targets missing from
+# ::gentoo belong here.  Everything else keeps coming from
+# gentoo/profiles/desc/qemu_softmmu_targets.desc.
+#
+# hexagon gained system emulation in QEMU 11.1 -- the release ships
+# configs/targets/hexagon-softmmu.mak alongside the long-standing
+# hexagon-linux-user.mak.  ::gentoo still lists hexagon only under
+# qemu_user_targets (its qemu-9999 keeps it in IUSE_USER_TARGETS), so without
+# this entry pkgcheck reports UnknownUseFlags for qemu_softmmu_targets_hexagon
+# and the flag would be invisible to users of this overlay.
+#
+# Drop this file once ::gentoo describes the flag itself.
+hexagon - Qualcomm Hexagon system emulation target

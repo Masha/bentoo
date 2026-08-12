@@ -238,7 +238,7 @@ itself has no Cloudflare challenge, so SRC_URI fetches fine under portage's wget
 url = "https://raw.githubusercontent.com/obsidianmd/obsidian-releases/HEAD/desktop-releases.json"
 parser = "json"
 path = "latestVersion"
-version = "1.13.6"
+version = "1.13.7"
 comments = """
 Obsidian — official release manifest consumed by the updater.
 """
@@ -407,6 +407,24 @@ transform = [['^go', ""]]
 comments = """
 go — official go.dev/dl JSON; [0] is the newest stable release. "version" is "goX.Y.Z";
 transform strips the "go" prefix to match PV. Live=1.26.5.
+"""
+# END
+
+["dev-util/codex-desktop-bin"]
+url = "https://persistent.oaistatic.com/codex-app-prod/linux/deb/dists/stable/main/binary-amd64/Packages"
+parser = "regex"
+pattern = 'Package: chatgpt\nVersion: ([0-9]+\.[0-9]+\.[0-9]+)'
+version = "26.803.81509"
+comments = """
+OpenAI Codex/ChatGPT desktop app — read the APT index of the very repo that
+SRC_URI pulls from. Both openai.com and chatgpt.com sit behind Cloudflare and
+answer 403 to curl, and there is no release-notes endpoint; this index is plain
+text, deterministic, and carries the Size/SHA256 of the .deb as a bonus.
+Anchor on "Package: chatgpt": the Debian package is named chatgpt, not codex
+(the app unifies ChatGPT + ChatGPT Work + Codex under one binary).
+Only .deb is published — the sibling /rpm/ path of the same CDN 404s.
+Do NOT switch to .../deb/latest/chatgpt_amd64.deb: it resolves, but it is a
+moving alias and unusable as a distfile.
 """
 # END
 
@@ -983,7 +1001,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^b(\d+)$', "0_pre$1"]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0_pre10369"
+version = "0_pre10375"
 comments = """
 llama-cpp — upstream tags builds "bNNNN" (no semver); the ebuild carries them as
 the 0_pre<build> snapshot scheme and bridges back with MY_PV="b${PV#0_pre}", so
@@ -1033,14 +1051,45 @@ bleachbit — tag "vX.Y.Z".
 """
 # END
 
-["sys-apps/flatpak"]
-url = "https://api.github.com/repos/flatpak/flatpak/tags"
-parser = "json"
-path = "[0].name"
+["sys-apps/flatpak@stable"]
+url = "https://api.github.com/repos/flatpak/flatpak/tags?per_page=30"
+parser = "regex"
+pattern = '"name":\s*"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+series = '^1\.18\.'
+version = "1.18.1"
+comments = """
+flatpak (stable line) — flatpak numbers its unstable series with an ODD minor
+(1.15, 1.17, 1.19) and stabilises into the next EVEN one; GitHub marks the odd
+releases prerelease=true. The overlay therefore ships both lines side by side
+and probes them separately.
+
+series pins this record to 1.18.x, so the day 1.20 opens the check fails loudly
+instead of silently bumping the stable ebuild onto a development release --
+which is exactly what the previous single record did: it read tags[0], the
+newest tag overall, and pulled 1.19.0 in with ::gentoo's stable KEYWORDS still
+attached.
+
+releases/latest is not usable here either: it skips prereleases, so it would
+lag behind whenever the newest tag is a development one. Promote this series
+together with sys-apps/flatpak@testing.
+"""
+# END
+
+["sys-apps/flatpak@testing"]
+url = "https://api.github.com/repos/flatpak/flatpak/tags?per_page=30"
+parser = "regex"
+pattern = '"name":\s*"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+series = '^1\.19\.'
 version = "1.19.0"
 comments = """
-flatpak — releases/latest is older stable; tags[0] tracks the newer line.
+flatpak (development line) — same tag index as @stable, pinned to 1.19.x. The
+ebuild is entirely ~arch on purpose; see the KEYWORDS comment in
+flatpak-1.19.0.ebuild. When 1.20.0 ships, that is the moment this series and
+@stable both move: 1.20 becomes stable and 1.21 becomes the new testing line.
 """
 # END
 
@@ -1075,6 +1124,32 @@ pattern = '"tag_name":\s*"edk2-stable([0-9]{6})"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
 comments = """
 edk2 — tag "edk2-stableYYYYMM"; regex captures the 6-digit datestamp.
+"""
+# END
+
+["sys-firmware/intel-microcode"]
+url = "https://api.github.com/repos/intel/Intel-Linux-Processor-Microcode-Data-Files/releases/latest"
+parser = "regex"
+pattern = '"tag_name":\s*"microcode-([0-9]{8})"'
+suffix = "_p20260513"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "20260811_p20260513"
+comments = """
+intel-microcode — tag "microcode-YYYYMMDD"; the regex captures the datestamp,
+which is the whole of PV before the _p.
+
+The _p suffix is NOT tracked by this probe and is hardcoded above. It carries
+the intel-microcode-collection snapshot, a separate tarball built by hand from
+github.com/platomav/CPUMicrocodes and uploaded by Gentoo developers; it is only
+consulted for USE=-vanilla, where it adds microcodes Intel never shipped in its
+own tarball. Upstream Intel and the collection move on unrelated schedules, so
+pinning the suffix here lets the Intel date bump on its own instead of being
+held back by a collection that has not been refreshed.
+
+20260513 is the newest collection published: distfiles.gentoo.org/pub/proj
+lists nothing after it, and ~mpagano and ~sam agree. Raise both this suffix and
+the ebuild's _p by hand when a newer one appears -- the applier only rewrites
+the Intel date.
 """
 # END
 
@@ -1305,17 +1380,16 @@ nettle — GNU FTP release dir sorted newest-first; file "nettle-X.Y.Z.tar.gz".
 # END
 
 ["app-emulation/qemu"]
-enabled = false
 url = "https://www.qemu.org/download/"
 parser = "regex"
 pattern = 'qemu-([0-9]+\.[0-9]+\.[0-9]+)'
+version = "11.1.0"
 comments = """
 qemu — /download/ puts the current "qemu-X.Y.Z.tar.xz" link first.
-HOLD (2026-06-27): pinned at 11.0.1, the last version with an official tarball
-on download.qemu.org. The /download/ page already advertises qemu-11.0.2 but
-download.qemu.org/qemu-11.0.2.tar.xz is still 404; the GitHub git-archive
-fallback lacks subprojects/packagecache and dies at configure ("missing
-subprojects"). Re-enable once download.qemu.org/qemu-<ver>.tar.xz is published.
+The 2026-06-27 HOLD is lifted: download.qemu.org publishes the official
+tarballs again (11.0.2, 11.0.3 and 11.1.0 all return HTTP 200), so the
+GitHub git-archive fallback — which lacks subprojects/packagecache and dies
+at configure — is no longer needed.
 """
 # END
 
@@ -1618,7 +1692,7 @@ base_from = "tag"
 base_url = "https://api.github.com/repos/KhronosGroup/SPIRV-Tools/git/refs/tags"
 base_tag_pattern = '^vulkan-sdk-([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)$'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.357.0_p20260810"
+version = "1.4.357.0_p20260812"
 comments = """
 spirv-tools — commit-tracked on main; scans titles for vulkan-sdk-X.Y.Z.W to detect base bump.
 """
@@ -6044,7 +6118,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "1.26.0"
+version = "1.27.0"
 comments = """
 Opengrep (LGPL fork of Semgrep CE) — GitHub releases/latest tag "vX.Y.Z"
 (v stripped). SRC_URI pulls the bare per-arch/libc release binaries
@@ -6352,7 +6426,7 @@ transform = [['T.*', ""], ['-', ""]]
 commit_sha_path = "sha"
 base_from = "none"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0_pre20260811"
+version = "0_pre20260812"
 comments = """
 ik_llama-cpp — base_from = "none": upstream publishes no usable release
 series.  Verified 2026-07-19 and again 2026-08-04: the repo has exactly ONE
@@ -6442,16 +6516,17 @@ tarball.
 ["www-client/orion-bin"]
 url = "https://orionbrowser.com/platforms/linux"
 parser = "regex"
-pattern = 'oriongtk\.([0-9.]+)\.flatpak'
+pattern = 'alt="Orion Beta ([0-9.]+)"'
 type = "bin"
 version = "0.3.0"
 comments = """
 Orion (Kagi) — the download page is the only versioned endpoint. Upstream
 publishes .flatpak bundles under cdn.kagi.com/downloads/ but neither lists nor
-redirects them, so the page's own link is what carries the version. The pattern
-deliberately does NOT match the oriongtk.<PV>.arm.flatpak sibling (same
-version, second SRC_URI entry); leave it that way or the first match changes
-with the page's link order.
+redirects them. The page no longer links the bundle at all — it now sends the
+visitor to /platforms/linux/install (flatpak remote-add), so the only version
+string left on it is the screenshot's alt text, "Orion Beta <PV>", which is
+what the pattern reads. It appears exactly once; the oriongtk.<PV>.flatpak
+link the pattern used to match is gone.
 
 The published bundle lags the browser badly: 0.4.x has been out since 2026-07
 through the OSTree repo at flatpak.orionbrowser.com/repo/beta/ (refs
