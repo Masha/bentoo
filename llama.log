@@ -1,5 +1,0 @@
-[1786324094] 
-example usage:
-[1786324094] 
-    /usr/bin/ik_llama-batched-bench -m model.gguf -c 2048 -b 2048 -ub 512 -npp 128,256,512 -ntg 128,256 -npl 1,2,4,8,16,32 [-pps]
-[1786324094] 
