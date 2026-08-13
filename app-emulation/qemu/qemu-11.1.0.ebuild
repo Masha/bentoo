@@ -178,6 +178,23 @@ ALL_DEPEND="
 
 # Dependencies required for qemu tools (qemu-nbd, qemu-img, qemu-io, ...)
 # softmmu targets (qemu-system-*).
+#
+# BENTOO-DIVERGENCE: nettle upper bound - ::gentoo carries no bound here, this
+# overlay adds `<dev-libs/nettle-4.0`.  The ${PN}-11.1.0-nettle-4 patch below
+# restores the BUILD against nettle 4 (which deleted <nettle/sha.h>), and that
+# is all it restores.  crypto/hash-nettle.c and crypto/hmac-nettle.c cast every
+# *_digest to a three-argument function pointer; nettle 4 dropped the length
+# argument, so the cast silences the compiler and the call then hands the
+# length to nettle in the register it reads as the output pointer.  Measured:
+# a SHA-256 finalize passes 0x20 as `digest`, i.e. a 32-byte write to the zero
+# page, on every hash and HMAC the nettle backend serves -- LUKS/qcow2 crypto,
+# VNC auth, virtio-crypto, TLS.  Guest- and network-reachable, and a crash, not
+# a build failure, which is the worse of the two.
+#
+# profiles/package.mask already masks >=dev-libs/nettle-4.0 for this reason, but
+# a mask is user-overridable and this is not: the bound makes the broken pairing
+# unsatisfiable rather than merely discouraged.  Drop it, not the mask, once
+# QEMU's crypto backend is ported to the two-argument digest API.
 SOFTMMU_TOOLS_DEPEND="
 	>=x11-libs/pixman-0.28.0[static-libs(+)]
 	accessibility? (
@@ -195,6 +212,7 @@ SOFTMMU_TOOLS_DEPEND="
 	gnutls? (
 		>=net-libs/gnutls-3.7.5:=[static-libs(+)]
 		>=dev-libs/nettle-3.7.3:=[static-libs(+)]
+		<dev-libs/nettle-4.0
 	)
 	gtk? (
 		x11-libs/gtk+:3[wayland?,X?]
@@ -358,8 +376,13 @@ RDEPEND="
 # ::gentoo's, carried under a different filename: ::gentoo renames it to the
 # oldest version it still applies to (qemu-10.2.2-...), this overlay kept the
 # name minted when the series 11 ebuild was first written (qemu-11.0.0-...).
-# All six patches below were re-verified against the 11.1.0 tarball with
+# All seven patches below were re-verified against the 11.1.0 tarball with
 # `patch -p1 --dry-run`; none needed a rebase.
+#
+# The nettle-4 patch is upstream (queued by Daniel P. Berrangé) and is a BUILD
+# fix only -- it restores the include after nettle 4.0 deleted <nettle/sha.h>.
+# QEMU is still runtime-broken against nettle 4, which is why the DEPEND bound
+# above exists; read the comment there before touching either.
 PATCHES=(
 	"${FILESDIR}"/${PN}-10.1.2-fix_passt.patch
 	"${FILESDIR}"/${PN}-9.0.0-disable-keymap.patch
@@ -367,6 +390,7 @@ PATCHES=(
 	"${FILESDIR}"/${PN}-8.1.0-skip-tests.patch
 	"${FILESDIR}"/${PN}-8.1.0-find-sphinx.patch
 	"${FILESDIR}"/${PN}-11.0.0-optionrom-pass-Wl-no-error-rwx-segments.patch
+	"${FILESDIR}"/${PN}-11.1.0-nettle-4.patch
 )
 
 QA_PREBUILT="

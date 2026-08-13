@@ -259,7 +259,7 @@ url = "https://dl.pstmn.io/api/version/latest?platform=linux64&channel=stable"
 parser = "json"
 path = "version"
 type = "bin"
-version = "12.23.2"
+version = "12.23.5"
 comments = """
 Postman — official version API; clean {"version":"..."}.
 """
@@ -1001,7 +1001,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^b(\d+)$', "0_pre$1"]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0_pre10405"
+version = "0_pre10408"
 comments = """
 llama-cpp — upstream tags builds "bNNNN" (no semver); the ebuild carries them as
 the 0_pre<build> snapshot scheme and bridges back with MY_PV="b${PV#0_pre}", so
@@ -6584,5 +6584,22 @@ nohang — GitHub release tag "vX.Y.Z" ("v" stripped). Verified against
 Releases are rare and the gap is not a broken probe: v0.2.0 (2020-12) stood as
 latest for five years before v0.3.0 (2025-12). master keeps moving in between,
 which is what the 9999 ebuild is for; 9999 is not version-checked.
+"""
+# END
+
+["sys-devel/mold"]
+url = "https://api.github.com/repos/rui314/mold/releases/latest"
+parser = "json"
+path = "tag_name"
+transform = [['^v', ""]]
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "2.42.0"
+comments = """
+mold — GitHub releases/latest -> tag_name "vX.Y.Z" ("v" stripped). Prefer
+latestRelease over ranking refs/tags: rui314/mold has no parallel prerelease
+channel today, but tag ranking has already produced false "outdated" results
+elsewhere in this overlay (see brave-browser stable/beta), so latestRelease is
+the default posture regardless. This overlay ships only the released ebuild;
+the 9999 live one stays in ::gentoo and is not mirrored here.
 """
 # END

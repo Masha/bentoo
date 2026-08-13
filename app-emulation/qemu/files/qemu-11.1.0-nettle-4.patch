@@ -1,0 +1,38 @@
+https://patchew.org/QEMU/20260813093359.4038558-1-marcandre.lureau@redhat.com/
+https://gitlab.com/qemu-project/qemu/-/work_items/4184
+
+Build fix ONLY. nettle 4.0 deleted <nettle/sha.h>, and this restores the build.
+It does not make QEMU usable with nettle 4: crypto/hash-nettle.c and
+crypto/hmac-nettle.c still cast every *_digest to a three-argument function
+pointer, and nettle 4 dropped the length argument, so the call compiles and then
+passes the length where the output pointer belongs. See the nettle entry in
+profiles/package.mask and the DEPEND bound in the ebuild.
+
+From: Marc-André Lureau <marcandre.lureau@redhat.com>
+
+sha.h has been deprecated. It seems we can rely on sha1.h/sha2.h
+since we depend on >= 3.7.3.
+
+Resolves: https://gitlab.com/qemu-project/qemu/-/work_items/4184
+Reviewed-by: Philippe Mathieu-Daudé <philmd@oss.qualcomm.com>
+Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+---
+ crypto/hash-nettle.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/crypto/hash-nettle.c b/crypto/hash-nettle.c
+index 53f68301efb5..2589bbf4c10e 100644
+--- a/crypto/hash-nettle.c
++++ b/crypto/hash-nettle.c
+@@ -24,7 +24,8 @@
+ #include "crypto/hash.h"
+ #include "hashpriv.h"
+ #include <nettle/md5.h>
+-#include <nettle/sha.h>
++#include <nettle/sha1.h>
++#include <nettle/sha2.h>
+ #include <nettle/ripemd160.h>
+ #ifdef CONFIG_CRYPTO_SM3
+ #include <nettle/sm3.h>
+--
+2.55.0.543.g5ebe2ebe4ea8
