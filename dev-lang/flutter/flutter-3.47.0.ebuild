@@ -20,13 +20,13 @@ RESTRICT="bindist mirror strip"
 
 QA_PREBUILT="*"
 
-# This release bundles Dart SDK 3.12.2 (see dart_sdk_version in upstream's
+# This release bundles Dart SDK 3.13.0 (see dart_sdk_version in upstream's
 # releases_linux.json). src_install replaces the bundled SDK with the system
 # one, so the version must match exactly: bin/cache/flutter_tools.snapshot only
 # loads on the Dart VM it was compiled against. Keep this pin in sync with the
 # dart_sdk_version of ${PV}, and keep the matching dev-lang/dart ebuild in the
 # tree even after dart is bumped.
-RDEPEND="~dev-lang/dart-3.12.2"
+RDEPEND="~dev-lang/dart-3.13.0"
 
 src_prepare() {
 	default
