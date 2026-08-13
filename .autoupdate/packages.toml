@@ -138,7 +138,7 @@
 url = "https://registry.npmjs.org/@anthropic-ai/claude-code"
 parser = "json"
 path = "dist-tags.latest"
-version = "2.1.229"
+version = "2.1.231"
 comments = """
 claude-code — npm @anthropic-ai/claude-code; dist-tags.latest is the stable channel.
 
@@ -761,7 +761,7 @@ url = "https://api.github.com/repos/getsentry/sentry-native/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.16.2"
+version = "0.16.3"
 comments = """
 sentry-native — tag bare "X.Y.Z".
 """
@@ -885,7 +885,7 @@ url = "https://api.github.com/repos/v-novaltd/LCEVCdec/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "4.2.0"
+version = "4.2.1"
 comments = """
 lcevc_dec — release tag bare semver.
 """
@@ -1001,7 +1001,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^b(\d+)$', "0_pre$1"]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0_pre10375"
+version = "0_pre10405"
 comments = """
 llama-cpp — upstream tags builds "bNNNN" (no semver); the ebuild carries them as
 the 0_pre<build> snapshot scheme and bridges back with MY_PV="b${PV#0_pre}", so
@@ -1786,7 +1786,7 @@ base_from = "file"
 base_url = "https://raw.githubusercontent.com/KhronosGroup/Vulkan-Loader/main/CMakeLists.txt"
 base_pattern = '(?m)^project\([A-Za-z_-]+ VERSION ([0-9][0-9.]*)'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.359_p20260811"
+version = "1.4.359_p20260813"
 comments = """
 vulkan-loader — commit-tracked on main; scans for "Update for Vulkan-Docs X.Y.Z" to detect base bump.
 """
@@ -5688,7 +5688,7 @@ url = "https://antigravity.google/download"
 parser = "regex"
 pattern = '/antigravity/stable/([0-9]+\.[0-9]+\.[0-9]+-[0-9]+)/'
 transform = [['-', "."]]
-version = "2.5.2.6697361355964416"
+version = "2.5.5.4923483625488384"
 comments = """
 Antigravity IDE — the original VS Code fork (NOT "Antigravity 2.0", the separate
 desktop hub). /download now ships the download links in the raw HTML, so no
@@ -5875,7 +5875,7 @@ of the Python binding needs no re-verification.
 url = "https://pypi.org/pypi/pyee/json"
 parser = "json"
 path = "info.version"
-version = "13.0.1"
+version = "14.0.0"
 comments = """
 inherit pypi; PyPI info.version is canonical. Live=13.0.1 == current PV (no prefix to strip).
 """
@@ -6426,7 +6426,7 @@ transform = [['T.*', ""], ['-', ""]]
 commit_sha_path = "sha"
 base_from = "none"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0_pre20260812"
+version = "0_pre20260813"
 comments = """
 ik_llama-cpp — base_from = "none": upstream publishes no usable release
 series.  Verified 2026-07-19 and again 2026-08-04: the repo has exactly ONE
