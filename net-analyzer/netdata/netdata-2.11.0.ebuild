@@ -7,6 +7,12 @@ PYTHON_COMPAT=( python3_{11..14} )
 inherit cmake fcaps linux-info optfeature python-single-r1 systemd
 
 DLIB_VER="19.24.8"
+# Bundled unconditionally by packaging/cmake/Modules/NetdataSQLite.cmake, which
+# also builds ext/recover/{sqlite3recover,dbdata}.c -- dev-db/sqlite ships
+# neither, so there is no system-library path here. Keep in sync with
+# SQLITE_VERSION_NUMBER / SQLITE_VERSION_YEAR in that file on every bump.
+SQLITE_VER_NUM="3530300"
+SQLITE_VER_YEAR="2026"
 
 if [[ ${PV} == *9999 ]] ; then
 	EGIT_REPO_URI="https://github.com/netdata/${PN}.git"
@@ -15,6 +21,7 @@ else
 	SRC_URI="
 		https://github.com/netdata/netdata/releases/download/v${PV}/${PN}-v${PV}.tar.gz -> ${P}.tar.gz
 		https://github.com/davisking/dlib/archive/v${DLIB_VER}.tar.gz -> dlib-${DLIB_VER}.tar.gz
+		https://www.sqlite.org/${SQLITE_VER_YEAR}/sqlite-src-${SQLITE_VER_NUM}.zip
 		"
 	S="${WORKDIR}/${PN}-v${PV}"
 	KEYWORDS="~amd64"
@@ -23,7 +30,7 @@ fi
 DESCRIPTION="Linux real time system monitoring, done right!"
 HOMEPAGE="https://github.com/netdata/netdata https://my-netdata.io/"
 
-LICENSE="GPL-3+ MIT BSD"
+LICENSE="GPL-3+ MIT BSD public-domain"
 SLOT="0"
 IUSE="cups +dbengine ipmi jemalloc mongodb mysql nfacct nodejs prometheus +python systemd xen"
 REQUIRED_USE="
@@ -84,8 +91,15 @@ RDEPEND="
 	systemd? ( sys-apps/systemd )"
 DEPEND="${RDEPEND}"
 BDEPEND="
+	app-arch/unzip
 	virtual/pkgconfig
 "
+
+PATCHES=(
+	# Lets NETDATA_SQLITE_SOURCE_PATH replace the build-time download of the
+	# bundled SQLite, which the network sandbox blocks.
+	"${FILESDIR}/${P}-sqlite-local-source.patch"
+)
 
 FILECAPS=(
 	'cap_dac_read_search,cap_sys_ptrace+ep'
@@ -101,6 +115,7 @@ pkg_setup() {
 src_configure() {
 	local mycmakeargs=(
 		-DNETDATA_DLIB_SOURCE_PATH="${WORKDIR}/dlib-${DLIB_VER}"
+		-DNETDATA_SQLITE_SOURCE_PATH="${WORKDIR}/sqlite-src-${SQLITE_VER_NUM}"
 		-DCMAKE_DISABLE_FIND_PACKAGE_Git=ON
 		-DCMAKE_INSTALL_PREFIX=/
 		-DFETCHCONTENT_FULLY_DISCONNECTED=ON
