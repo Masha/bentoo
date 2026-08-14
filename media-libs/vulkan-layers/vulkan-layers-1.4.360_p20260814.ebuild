@@ -14,7 +14,7 @@ if [[ ${PV} == *9999* ]]; then
 else
 	EGIT_COMMIT="fbf06bb6aec463da14891b9ee72a3ab123c3bc9c"
 	SRC_URI="https://github.com/KhronosGroup/${MY_PN}/archive/${EGIT_COMMIT}.tar.gz -> ${P}.tar.gz"
-	KEYWORDS="amd64 arm arm64 ~loong ppc ppc64 ~riscv x86"
+	KEYWORDS="~amd64 ~arm ~arm64 ~loong ~ppc ~ppc64 ~riscv ~x86"
 	S="${WORKDIR}"/${MY_PN}-${EGIT_COMMIT}
 fi
 
@@ -26,13 +26,17 @@ SLOT="0"
 IUSE="wayland test X"
 RESTRICT="!test? ( test ) test"
 
-RDEPEND="dev-util/spirv-tools[${MULTILIB_USEDEP}]"
+# BENTOO-DIVERGENCE: DEPEND - ::gentoo pins the SDK in lockstep (~pkg-${PV});
+# bentoo ships snapshots that bump on independent dates, so an exact pin can
+# never be satisfied. Floors on the companion snapshots keep the coupling the
+# pins exist to enforce. Raise them on every bump of any of the five.
+RDEPEND=">=dev-util/spirv-tools-1.4.357.0_p20260813[${MULTILIB_USEDEP}]"
 DEPEND="${RDEPEND}
 	${PYTHON_DEPS}
-	dev-util/glslang:=[${MULTILIB_USEDEP}]
-	dev-util/spirv-headers
-	dev-util/vulkan-headers
-	>=dev-util/vulkan-utility-libraries-1.4.353-r1:=[${MULTILIB_USEDEP}]
+	>=dev-util/glslang-1.4.357.0_p20260813:=[${MULTILIB_USEDEP}]
+	>=dev-util/spirv-headers-1.4.357.0_p20260812
+	>=dev-util/vulkan-headers-1.4.360_p20260814
+	>=dev-util/vulkan-utility-libraries-1.4.360:=[${MULTILIB_USEDEP}]
 	wayland? ( dev-libs/wayland:=[${MULTILIB_USEDEP}] )
 	X? (
 		x11-libs/libX11:=[${MULTILIB_USEDEP}]

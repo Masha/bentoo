@@ -14,7 +14,7 @@ if [[ ${PV} == *9999* ]]; then
 else
 	EGIT_COMMIT="245b48c522b5375c0acd5377d52bef5e4917f31e"
 	SRC_URI="https://github.com/KhronosGroup/${MY_PN}/archive/${EGIT_COMMIT}.tar.gz -> ${PF}.tar.gz"
-	KEYWORDS="amd64 ~arm ~arm64 ~loong ~ppc ppc64 ~riscv x86"
+	KEYWORDS="~amd64 ~arm ~arm64 ~loong ~ppc ~ppc64 ~riscv ~x86"
 	S="${WORKDIR}"/${MY_PN}-${EGIT_COMMIT}
 fi
 
@@ -26,7 +26,11 @@ SLOT="0"
 IUSE="test"
 RESTRICT="!test? ( test )"
 
-DEPEND="dev-util/vulkan-headers
+# BENTOO-DIVERGENCE: DEPEND - ::gentoo pins the SDK in lockstep (~pkg-${PV});
+# bentoo ships snapshots that bump on independent dates, so an exact pin can
+# never be satisfied. A floor on the companion snapshot keeps the coupling the
+# pin exists to enforce. Raise it on every vulkan-headers bump.
+DEPEND=">=dev-util/vulkan-headers-1.4.360_p20260814
 	test? (
 		dev-cpp/gtest
 		>=dev-cpp/magic_enum-0.9.7

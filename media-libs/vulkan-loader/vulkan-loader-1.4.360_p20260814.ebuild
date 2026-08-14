@@ -13,7 +13,7 @@ if [[ ${PV} == *9999* ]]; then
 else
 	EGIT_COMMIT="83ddfc5ec5ca64ddd1055cefa1559c568101075a"
 	SRC_URI="https://github.com/KhronosGroup/${MY_PN}/archive/${EGIT_COMMIT}.tar.gz -> ${P}.tar.gz"
-	KEYWORDS="amd64 arm arm64 ~loong ppc ppc64 ~riscv x86"
+	KEYWORDS="~amd64 ~arm ~arm64 ~loong ~ppc ~ppc64 ~riscv ~x86"
 	S="${WORKDIR}"/${MY_PN}-${EGIT_COMMIT}
 fi
 
@@ -24,8 +24,12 @@ LICENSE="Apache-2.0"
 SLOT="0"
 IUSE="layers wayland X"
 
+# BENTOO-DIVERGENCE: DEPEND - ::gentoo pins the SDK in lockstep (~pkg-${PV});
+# bentoo ships snapshots that bump on independent dates, so an exact pin can
+# never be satisfied. A floor on the companion snapshot keeps the coupling the
+# pin exists to enforce. Raise it on every vulkan-headers bump.
 DEPEND="
-	dev-util/vulkan-headers
+	>=dev-util/vulkan-headers-1.4.360_p20260814
 	wayland? ( dev-libs/wayland:=[${MULTILIB_USEDEP}] )
 	X? (
 		x11-base/xorg-proto

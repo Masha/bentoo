@@ -12,7 +12,7 @@ if [[ ${PV} == *9999* ]]; then
 else
 	GIT_COMMIT="24ae85ba2abc9fe14097ceaebe6be5825a7acfba"
 	SRC_URI="https://github.com/KhronosGroup/${PN}/archive/${GIT_COMMIT}.tar.gz -> ${P}.tar.gz"
-	KEYWORDS="amd64 ~arm ~arm64 ~loong ~ppc ppc64 ~riscv x86"
+	KEYWORDS="~amd64 ~arm ~arm64 ~loong ~ppc ~ppc64 ~riscv ~x86"
 	S="${WORKDIR}/${PN}-${GIT_COMMIT}"
 fi
 
@@ -22,11 +22,15 @@ HOMEPAGE="https://www.khronos.org/opengles/sdk/tools/Reference-Compiler/ https:/
 LICENSE="BSD"
 SLOT="0/16.1"
 
+# BENTOO-DIVERGENCE: DEPEND - ::gentoo pins the SDK in lockstep (~pkg-${PV});
+# bentoo ships snapshots that bump on independent dates, so an exact pin can
+# never be satisfied. A floor on the companion snapshot keeps the coupling the
+# pin exists to enforce. Raise it on every spirv-tools bump.
 BDEPEND="${PYTHON_DEPS}
-	dev-util/spirv-tools[${MULTILIB_USEDEP}]
+	>=dev-util/spirv-tools-1.4.357.0_p20260813[${MULTILIB_USEDEP}]
 "
 
-DEPEND="dev-util/spirv-tools[${MULTILIB_USEDEP}]"
+DEPEND=">=dev-util/spirv-tools-1.4.357.0_p20260813[${MULTILIB_USEDEP}]"
 RDEPEND="${DEPEND}"
 
 multilib_src_configure() {

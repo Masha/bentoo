@@ -14,7 +14,7 @@ if [[ ${PV} == *9999* ]]; then
 else
 	EGIT_COMMIT="bb9d0b1b97bd3548128f87d180194e912df4d5df"
 	SRC_URI="https://github.com/KhronosGroup/${MY_PN}/archive/${EGIT_COMMIT}.tar.gz -> ${P}.tar.gz"
-	KEYWORDS="~alpha amd64 ~arm ~arm64 ~hppa ~loong ~mips ~ppc ppc64 ~riscv ~s390 ~sparc x86"
+	KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~loong ~mips ~ppc ~ppc64 ~riscv ~s390 ~sparc ~x86"
 	S="${WORKDIR}"/${MY_PN}-${EGIT_COMMIT}
 fi
 
@@ -26,7 +26,12 @@ SLOT="0"
 IUSE="test"
 RESTRICT="!test? ( test )"
 
-DEPEND="dev-util/spirv-headers"
+# BENTOO-DIVERGENCE: DEPEND - ::gentoo pins the SDK in lockstep (~pkg-${PV});
+# bentoo ships snapshots that bump on independent dates, so an exact pin can
+# never be satisfied. The floor keeps the coupling the pin exists to enforce:
+# core_tables_body.inc is generated from grammar files that only newer
+# spirv-headers ship (obentoo/bentoo#37). Raise it on every spirv-headers bump.
+DEPEND=">=dev-util/spirv-headers-1.4.357.0_p20260812"
 # RDEPEND=""
 BDEPEND="${PYTHON_DEPS}"
 

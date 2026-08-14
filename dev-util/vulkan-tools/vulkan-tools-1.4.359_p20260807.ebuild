@@ -14,7 +14,7 @@ if [[ ${PV} == *9999* ]]; then
 else
 	EGIT_COMMIT="572d10d787b74601ea09b696521c950c259ae815"
 	SRC_URI="https://github.com/KhronosGroup/${MY_PN}/archive/${EGIT_COMMIT}.tar.gz -> ${P}.tar.gz"
-	KEYWORDS="amd64 arm arm64 ~loong ppc ppc64 ~riscv"
+	KEYWORDS="~amd64 ~arm ~arm64 ~loong ~ppc ~ppc64 ~riscv"
 	S="${WORKDIR}"/${MY_PN}-${EGIT_COMMIT}
 fi
 
@@ -26,8 +26,12 @@ SLOT="0"
 IUSE="cube wayland test X"
 RESTRICT="!test? ( test )"
 
+# BENTOO-DIVERGENCE: DEPEND - ::gentoo pins the SDK in lockstep (~pkg-${PV});
+# bentoo ships snapshots that bump on independent dates, so an exact pin can
+# never be satisfied. Floors on the companion snapshots keep the coupling the
+# pins exist to enforce. Raise them on every glslang/vulkan-headers/loader bump.
 BDEPEND="${PYTHON_DEPS}
-	cube? ( >=dev-util/glslang-1.4.350.0:=[${MULTILIB_USEDEP}] )
+	cube? ( >=dev-util/glslang-1.4.357.0_p20260813:=[${MULTILIB_USEDEP}] )
 "
 RDEPEND="
 	wayland? ( dev-libs/wayland[${MULTILIB_USEDEP}] )
@@ -37,9 +41,9 @@ RDEPEND="
 	)
 "
 DEPEND="${RDEPEND}
-	dev-util/vulkan-headers
+	>=dev-util/vulkan-headers-1.4.360_p20260814
 	X? ( x11-libs/libXrandr[${MULTILIB_USEDEP}] )
-	test? ( ~media-libs/vulkan-loader-${PV}[${MULTILIB_USEDEP},wayland?,X?] )
+	test? ( >=media-libs/vulkan-loader-1.4.360_p20260814[${MULTILIB_USEDEP},wayland?,X?] )
 "
 
 pkg_setup() {
