@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@protonmail.com</email>
+		<name>Lucas Couto</name>
+	</maintainer>
+	<longdescription lang="en">
+		The official OpenAI Python library. It provides synchronous and
+		asynchronous clients for the OpenAI REST API, covering responses, chat
+		completions, embeddings, images, audio, files, batches, fine-tuning,
+		vector stores and the realtime API, with request/response models typed
+		via pydantic. It also ships an Azure OpenAI client and, optionally, an
+		Amazon Bedrock provider.
+	</longdescription>
+	<use>
+		<flag name="aiohttp">Enable the aiohttp-backed async HTTP transport
+			(<pkg>dev-python/aiohttp</pkg>) as an alternative to the default
+			httpx2 transport</flag>
+		<flag name="bedrock">Enable the Amazon Bedrock provider, which signs
+			requests with SigV4 via <pkg>dev-python/botocore</pkg></flag>
+	</use>
+	<upstream>
+		<remote-id type="github">openai/openai-python</remote-id>
+		<remote-id type="pypi">openai</remote-id>
+		<bugs-to>https://github.com/openai/openai-python/issues</bugs-to>
+		<changelog>https://github.com/openai/openai-python/blob/main/CHANGELOG.md</changelog>
+	</upstream>
+</pkgmetadata>

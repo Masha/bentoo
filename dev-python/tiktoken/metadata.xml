@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@proton.me</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<longdescription lang="en">
+		tiktoken is a byte pair encoding (BPE) tokeniser from OpenAI. It splits
+		text into the integer tokens that GPT-family models actually consume, and
+		decodes them back, which is what token counting, context-window budgeting
+		and prompt truncation are built on. The hot loop is a Rust extension
+		module bound through pyo3, so it is roughly an order of magnitude faster
+		than pure-Python tokenisers. Encoding tables (r50k_base, p50k_base,
+		cl100k_base, o200k_base, o200k_harmony) are downloaded on first use and
+		cached locally.
+	</longdescription>
+	<upstream>
+		<remote-id type="github">openai/tiktoken</remote-id>
+		<remote-id type="pypi">tiktoken</remote-id>
+		<bugs-to>https://github.com/openai/tiktoken/issues</bugs-to>
+		<changelog>https://github.com/openai/tiktoken/blob/main/CHANGELOG.md</changelog>
+	</upstream>
+</pkgmetadata>

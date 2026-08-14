@@ -1040,6 +1040,25 @@ tarball plus arch-independent data from the .deb.
 """
 # END
 
+["sci-ml/amd-gaia"]
+url = "https://pypi.org/pypi/amd-gaia/json"
+parser = "json"
+path = "info.version"
+version = "0.23.0"
+comments = """
+amd-gaia — AMD's local agent framework; the client half of the stack whose
+server is sci-ml/lemonade above. PyPI, not GitHub: the dist is named
+"amd-gaia" while the repo is amd/gaia, and info.version is clean X.Y.Z with no
+prefix to strip. Live=0.23.0 == current PV.
+
+Upstream keeps its metadata in setup.py (version comes from
+src/gaia/version.py by regex), so a bump only needs PV — there is no commit
+hash or date component. The webui bundle under src/gaia/apps/webui/dist ships
+pre-built inside the sdist, so unlike sci-ml/lemonade there is NO node_modules
+distfile to regenerate by hand on a bump.
+"""
+# END
+
 ["sys-apps/bleachbit"]
 url = "https://api.github.com/repos/bleachbit/bleachbit/releases/latest"
 parser = "json"
@@ -1675,7 +1694,7 @@ base_from = "tag"
 base_url = "https://api.github.com/repos/KhronosGroup/SPIRV-Headers/git/refs/tags"
 base_tag_pattern = '^vulkan-sdk-([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)$'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.357.0_p20260812"
+version = "1.4.357.0_p20260814"
 comments = """
 spirv-headers — commit-tracked on main; scans titles for vulkan-sdk-X.Y.Z.W to detect base bump.
 """
@@ -5889,6 +5908,67 @@ version = "0.10.2"
 comments = """
 toml — MUST use PyPI, not GitHub: uiri/toml has no releases and its /tags [0] is v0.6.5
 (non-semver order, project dead since 0.10.2/2020). info.version is canonical. Live=0.10.2.
+"""
+# END
+
+["dev-python/jiter"]
+url = "https://pypi.org/pypi/jiter/json"
+parser = "json"
+path = "info.version"
+version = "0.16.0"
+comments = """
+jiter — pyo3/maturin extension pulled in by dev-python/openai. info.version is
+clean X.Y.Z. Live=0.16.0 == current PV.
+A bump is NOT just PV: the CRATES block must be regenerated with pycargoebuild
+from the new sdist's Cargo.lock, and pycargoebuild has to be run from
+crates/jiter-python (the maturin manifest-path), not the sdist root — the root
+is a workspace and pycargoebuild refuses it.
+"""
+# END
+
+["dev-python/openai"]
+url = "https://pypi.org/pypi/openai/json"
+parser = "json"
+path = "info.version"
+version = "3.0.0"
+comments = """
+openai — official Python SDK; core dep of sci-ml/amd-gaia. info.version is
+clean X.Y.Z. Live=3.0.0 == current PV.
+Watch the HTTP dep across bumps: since 3.0.0 upstream requires httpx2 (the
+Pydantic fork, dev-python/httpx2), NOT dev-python/httpx. The two are separate
+packages with no blocker between them, so a wrong atom here resolves fine and
+fails only at import time.
+"""
+# END
+
+["dev-python/tavily-python"]
+url = "https://pypi.org/pypi/tavily-python/json"
+parser = "json"
+path = "info.version"
+version = "0.7.27"
+comments = """
+tavily-python — web-search client, core install_requires of sci-ml/amd-gaia
+(imported lazily inside gaia/web/tavily.py, so it only matters at call time).
+PyPI dist is "tavily-python" but the imported module is "tavily".
+info.version is clean X.Y.Z. Live=0.7.27 == current PV.
+Depends on dev-python/httpx, which ::gentoo marks deprecated (upstream encode
+stopped accepting bug reports); pkgcheck DeprecatedDep on this record is
+expected until upstream moves off it.
+"""
+# END
+
+["dev-python/tiktoken"]
+url = "https://pypi.org/pypi/tiktoken/json"
+parser = "json"
+path = "info.version"
+version = "0.13.0"
+comments = """
+tiktoken — OpenAI's BPE tokenizer, pyo3 extension; dep of
+dev-python/tavily-python. info.version is clean X.Y.Z. Live=0.13.0 == current PV.
+A bump is NOT just PV: regenerate the CRATES block with pycargoebuild from the
+new sdist's Cargo.lock. Do not trust a rendered PyPI page for the version here
+— the project page lagged a full minor behind info.version when this record was
+written, which is why the probe reads the JSON API.
 """
 # END
 

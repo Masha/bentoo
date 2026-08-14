@@ -19,6 +19,9 @@ that some endpoint answers — `url` plus a working `parser`. Neither holds here
 So the register lives here: a plain tracked file, next to the thing it
 complements, visible to a fresh clone and to a second maintainer.
 
+Its sibling `not-packageable.md` records the opposite failure: an upstream that
+probes perfectly well, but whose artifact cannot be turned into an ebuild.
+
 ## A. Unreachable — the current upstream version cannot be confirmed
 
 The package may or may not be behind. Nobody can tell, and that is the point:

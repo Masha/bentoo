@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@protonmail.com</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<longdescription lang="en">
+		Official Python client for the Tavily API, a web search engine built for
+		LLM and RAG pipelines. It exposes a synchronous TavilyClient and an
+		asyncio AsyncTavilyClient covering search, extract, crawl and map, plus
+		a TavilyHybridClient that combines Tavily results with a local vector
+		store. Results can be trimmed to a token budget, which is why tiktoken
+		is a hard runtime dependency. The PyPI distribution is named
+		tavily-python; the importable module is tavily.
+	</longdescription>
+	<upstream>
+		<remote-id type="github">tavily-ai/tavily-python</remote-id>
+		<remote-id type="pypi">tavily-python</remote-id>
+		<bugs-to>https://github.com/tavily-ai/tavily-python/issues</bugs-to>
+	</upstream>
+</pkgmetadata>

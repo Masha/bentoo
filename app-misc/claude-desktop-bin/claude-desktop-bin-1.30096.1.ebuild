@@ -10,20 +10,30 @@ CHROMIUM_LANGS="af am ar bg bn ca cs da de el en-GB es es-419 et fa fi fil fr gu
 inherit chromium-2 desktop optfeature pax-utils unpacker xdg
 
 # curl -sA 'Mozilla/5.0' "https://claude.ai/api/desktop/linux/x64/deb/latest" | jq -r '.url'
+# The arm64 endpoint (.../linux/arm64/deb/latest) ships the same version and the
+# same BUILD_ID hash, so one variable covers both SRC_URI branches.
 BUILD_ID="194d93c2558cfbfcd2b8b7a90e02774c489d1875"
 
 MY_PN="${PN%-bin}"
 
 DESCRIPTION="Desktop application for Claude.ai"
 HOMEPAGE="https://claude.ai/ https://code.claude.com/docs/en/desktop-linux"
-SRC_URI="https://downloads.claude.ai/releases/linux/x64/${PV}/Claude-${BUILD_ID}.deb
-	-> ${P}.deb"
+SRC_URI="
+	amd64? (
+		https://downloads.claude.ai/releases/linux/x64/${PV}/Claude-${BUILD_ID}.deb
+			-> ${P}-x86_64.deb
+	)
+	arm64? (
+		https://downloads.claude.ai/releases/linux/arm64/${PV}/Claude-${BUILD_ID}.deb
+			-> ${P}-aarch64.deb
+	)
+"
 S="${WORKDIR}"
 
 # Anthropic proprietary app; MIT covers the bundled Electron/Chromium runtime.
 LICENSE="all-rights-reserved MIT"
 SLOT="0"
-KEYWORDS="-* ~amd64"
+KEYWORDS="-* ~amd64 ~arm64"
 IUSE="egl wayland"
 RESTRICT="bindist mirror strip"
 
@@ -107,8 +117,10 @@ src_install() {
 pkg_postinst() {
 	xdg_pkg_postinst
 
+	# sys-firmware/edk2-ovmf was moved to sys-firmware/edk2 in 3Q-2024, which is
+	# also the package carrying the aarch64 firmware.
 	optfeature "sandboxed code execution in a virtual machine" \
-		"app-emulation/qemu sys-firmware/edk2-ovmf app-emulation/virtiofsd"
+		"app-emulation/qemu sys-firmware/edk2 app-emulation/virtiofsd"
 	optfeature "system tray icon" x11-libs/libayatana-appindicator
 	optfeature "storing credentials in a keyring" virtual/secret-service
 }

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@protonmail.com</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<longdescription lang="en">
+		GAIA is AMD's agent framework for machines that run their models
+		locally. It provides the CLI (gaia, gaia-cli), an MCP bridge
+		(gaia-mcp), a chat and agent runtime, a RAG pipeline and a browser UI,
+		and it drives all of them through an OpenAI-compatible HTTP endpoint.
+
+		GAIA does not perform inference itself and contains no acceleration
+		backend: it is a client. The server it is designed against is Lemonade
+		(sci-ml/lemonade in this overlay), which is what reaches Ryzen AI NPU
+		and iGPU hardware; any other OpenAI-compatible endpoint works too.
+		Because the model is reached over HTTP and the code is pure Python,
+		nothing in this package is architecture specific.
+
+		Upstream ships a long list of optional extras. Only the ones whose
+		every dependency is already packaged are exposed as USE flags here;
+		the rest are documented, with the missing package named, in a comment
+		in the ebuild rather than silently dropped.
+
+		The browser UI bundle under gaia/apps/webui/dist is shipped
+		pre-compiled by upstream and is installed as-is — this package needs
+		no npm or Node.js at build time.
+	</longdescription>
+	<use>
+		<flag name="api">Pull in <pkg>dev-python/fastapi</pkg>, <pkg>dev-python/uvicorn</pkg> and <pkg>dev-python/httpx</pkg>, required by the local REST server (the "gaia api" command) and by the browser UI it serves</flag>
+	</use>
+	<upstream>
+		<remote-id type="github">amd/gaia</remote-id>
+		<remote-id type="pypi">amd-gaia</remote-id>
+		<bugs-to>https://github.com/amd/gaia/issues</bugs-to>
+		<doc>https://github.com/amd/gaia/blob/main/README.md</doc>
+		<changelog>https://github.com/amd/gaia/releases</changelog>
+	</upstream>
+</pkgmetadata>

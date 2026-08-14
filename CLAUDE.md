@@ -37,6 +37,10 @@ Practical consequences, binding on every packaging decision:
 - An upstream that cannot be probed at all gets **no** record. Those are listed
   in `.autoupdate/dead-upstreams.md`, so an unverifiable package is never
   mistaken for a verified one.
+- An upstream that was assessed and **rejected** goes in
+  `.autoupdate/not-packageable.md`, with the evidence and the condition that
+  would reopen the decision — otherwise the same investigation is redone on
+  every sweep.
 
 ### Every daemon must be startable without systemd
 
