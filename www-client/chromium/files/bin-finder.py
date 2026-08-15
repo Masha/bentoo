@@ -4,6 +4,7 @@
 import os
 import struct
 import argparse
+import sys
 
 # Magic numbers
 ELF_MAGIC = b"\x7fELF"
@@ -163,13 +164,16 @@ def scan_path(root_path, show_elf, show_wasm):
 
                         # Performance: Drop from page cache
                         os.posix_fadvise(fd, 0, 0, os.POSIX_FADV_DONTNEED)
-                    except (PermissionError, OSError):
+                    except OSError:
                         continue
                     finally:
                         if fd is not None:
                             os.close(fd)
-    except (PermissionError, OSError):
-        pass
+    except OSError as err:
+        # Deliberately non-fatal: an unreadable directory must not abort the
+        # scan, but the skip must stay visible in the build log. stdout is
+        # parsed by the caller (| xargs rm -f), so warn on stderr only.
+        print(f"bin-finder: skipping {root_path}: {err}", file=sys.stderr)
 
 
 if __name__ == "__main__":
