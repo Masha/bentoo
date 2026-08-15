@@ -7,7 +7,7 @@
 # ebuild (Gentoo version rules: prefixes v/release-/ver-/version- stripped;
 # regex returns capture group 1 of the FIRST match on the raw body).
 #
-# 421 records — 230 regex, 191 json. 21 disabled (enabled = false),
+# 508 records — 310 regex, 198 json. 18 disabled (enabled = false),
 # 3 held (hold = true): dev-build/gn, dev-lang/ghc, sci-ml/stable-diffusion-cpp.
 #
 # Two of the disabled records are disabled for a reason other than "package
@@ -1808,6 +1808,1528 @@ headers = { "User-Agent" = "bentoo-autoupdate" }
 version = "1.4.360_p20260814"
 comments = """
 vulkan-loader — commit-tracked on main; scans for "Update for Vulkan-Docs X.Y.Z" to detect base bump.
+"""
+# END
+
+["kde-frameworks/attica"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fattica/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+attica — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/baloo"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fbaloo/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+baloo — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/bluez-qt"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fbluez-qt/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+bluez-qt — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/breeze-icons"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fbreeze-icons/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+breeze-icons — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/extra-cmake-modules"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fextra-cmake-modules/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+extra-cmake-modules — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/frameworkintegration"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fframeworkintegration/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+frameworkintegration — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/kapidox"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkapidox/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+kapidox — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/karchive"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkarchive/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+karchive — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/kauth"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkauth/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+kauth — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/kbookmarks"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkbookmarks/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+kbookmarks — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/kcalendarcore"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkcalendarcore/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+kcalendarcore — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/kcmutils"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkcmutils/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+kcmutils — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/kcodecs"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkcodecs/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+kcodecs — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/kcolorscheme"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkcolorscheme/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+kcolorscheme — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/kcompletion"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkcompletion/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+kcompletion — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/kconfig"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkconfig/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+kconfig — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/kconfigwidgets"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkconfigwidgets/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+kconfigwidgets — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/kcontacts"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkcontacts/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+kcontacts — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/kcoreaddons"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkcoreaddons/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+kcoreaddons — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/kcrash"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkcrash/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+kcrash — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/kdav"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkdav/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+kdav — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/kdbusaddons"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkdbusaddons/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+kdbusaddons — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/kdeclarative"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkdeclarative/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+kdeclarative — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/kded"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkded/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+kded — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/kdesu"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkdesu/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+kdesu — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/kdnssd"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkdnssd/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+kdnssd — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/kdoctools"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkdoctools/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+kdoctools — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/kfilemetadata"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkfilemetadata/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+kfilemetadata — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/kglobalaccel"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkglobalaccel/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+kglobalaccel — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/kguiaddons"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkguiaddons/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+kguiaddons — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/kholidays"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkholidays/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+kholidays — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/ki18n"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fki18n/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+ki18n — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/kiconthemes"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkiconthemes/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+kiconthemes — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/kidletime"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkidletime/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+kidletime — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/kimageformats"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkimageformats/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+kimageformats — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/kio"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkio/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+kio — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/kirigami"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkirigami/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+kirigami — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/kitemmodels"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkitemmodels/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+kitemmodels — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/kitemviews"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkitemviews/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+kitemviews — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/kjobwidgets"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkjobwidgets/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+kjobwidgets — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/kmime"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkmime/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+kmime — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/knewstuff"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fknewstuff/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+knewstuff — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/knotifications"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fknotifications/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+knotifications — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/knotifyconfig"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fknotifyconfig/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+knotifyconfig — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/kpackage"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkpackage/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+kpackage — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/kparts"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkparts/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+kparts — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/kpeople"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkpeople/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+kpeople — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/kplotting"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkplotting/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+kplotting — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/kpty"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkpty/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+kpty — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/kquickcharts"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkquickcharts/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+kquickcharts — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/krunner"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkrunner/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+krunner — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/ksecretd-services"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkwallet/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+ksecretd-services -> frameworks/kwallet (sub-extracted: service files only).
+KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/kservice"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkservice/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+kservice — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/kstatusnotifieritem"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkstatusnotifieritem/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+kstatusnotifieritem — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/ksvg"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fksvg/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+ksvg — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/ktexteditor"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fktexteditor/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+ktexteditor — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/ktexttemplate"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fktexttemplate/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+ktexttemplate — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/ktextwidgets"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fktextwidgets/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+ktextwidgets — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/kunitconversion"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkunitconversion/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+kunitconversion — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/kuserfeedback"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkuserfeedback/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+kuserfeedback — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/kwallet"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkwallet/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+kwallet — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/kwallet-runtime"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkwallet/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+kwallet-runtime -> frameworks/kwallet (sub-extracted from the same tarball).
+KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/kwidgetsaddons"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkwidgetsaddons/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+kwidgetsaddons — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/kwindowsystem"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkwindowsystem/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+kwindowsystem — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/kxmlgui"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkxmlgui/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+kxmlgui — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/modemmanager-qt"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fmodemmanager-qt/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+modemmanager-qt — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/networkmanager-qt"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fnetworkmanager-qt/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+networkmanager-qt — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/oxygen-icons"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Foxygen-icons/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+oxygen-icons — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/prison"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fprison/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+prison — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/purpose"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fpurpose/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+purpose — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/qqc2-desktop-style"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fqqc2-desktop-style/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+qqc2-desktop-style — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/solid"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fsolid/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+solid — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/sonnet"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fsonnet/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+sonnet — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/syndication"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fsyndication/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+syndication — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/syntax-highlighting"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fsyntax-highlighting/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+syntax-highlighting — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
+"""
+# END
+
+["kde-frameworks/threadweaver"]
+url = "https://invent.kde.org/api/v4/projects/frameworks%2Fthreadweaver/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
+select = "max"
+version = "6.29.0"
+comments = """
+threadweaver — KDE Frameworks family (76) — one series, all released together (6.29.0).
+Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
+/tags is paginated and six repos (kcalendarcore, kcontacts, kdav, kholidays,
+kmime, syndication) also carry the old KDE Applications axis (v19.08.3 …
+v26.04.3), which sits ahead of the v6.x tags on page 1 — measured, the wrong
+axis won. api.github.com also caps at 60 req/h without a token and kde-plasma
+already spends 73 there. search=^v6 filters server-side; select=max because
+GitLab does not order tags by version. The closing quote in the pattern drops
+the -rc1 tag that every release carries. When KF moves to 7.x this pattern
+freezes on purpose: a :7 category would be a different set of ebuilds.
 """
 # END
 
