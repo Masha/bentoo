@@ -79,3 +79,70 @@ ostree --repo="$R" cat app/com.nvidia.geforcenow/x86_64/master /files/bin/GeForc
 
 Re-open the decision only if NVIDIA ships a non-Flatpak artifact, or drops the
 in-app `flatpak update` call. The version alone moving is not a reason to.
+
+---
+
+## `www-apps/anythingllm` — AnythingLLM
+
+**Assessed:** 2026-07-19 (story 004 Task 6) · **Re-verified:** 2026-08-16 ·
+**Upstream version then:** `v1.16.0`, published 2026-08-13 · **Verdict:** not
+packageable as a from-source ebuild.
+
+Upstream is alive and its releases probe fine — this is not a dead upstream, and
+it is not abandonware. What fails is the artifact. Upstream publishes desktop
+installers and a container image; it publishes no source release, and it states
+that the deployment an ebuild would produce is unsupported.
+
+| Blocker | Evidence |
+|---|---|
+| Non-container deployment is unsupported **as policy**, not as an oversight: "Any issues experienced from bare-metal or non-containerized deployments will be **not** answered or supported" | `BARE_METAL.md`, re-read 2026-08-16 — wording unchanged |
+| No source tarball in any release. `v1.16.0` ships 6 assets, all desktop installers: `.AppImage` ×2, `.exe` ×2, `.dmg` ×2 | releases API, 2026-08-16 |
+| Release assets are inconsistent across versions, so no asset name can be relied on | `v1.14.0` shipped 1 asset, `v1.14.1` 6, `v1.14.2` 8, `v1.15.0` 7, `v1.16.0` 6 |
+| ~2437 npm resolutions across three lockfiles | counted 2026-07-19; **not** re-counted on 2026-08-16 |
+| Four prebuilt-binary fetches at install time — prisma engines, puppeteer Chromium, sharp libvips, node-canvas | counted 2026-07-19; **not** re-verified |
+| Declined by nixpkgs, Flathub, Snap, Debian, Fedora and openSUSE — no distribution carries it | survey 2026-07-19 |
+
+### How to re-verify
+
+Read-only, three API calls, no clone:
+
+```bash
+# Is there a source release yet? Any asset that is not a desktop installer.
+curl -sS -H 'User-Agent: bentoo-overlay-probe' \
+  https://api.github.com/repos/Mintplex-Labs/anything-llm/releases/latest \
+  | python3 -c "import sys,json;d=json.load(sys.stdin);print(d['tag_name']);[print(' ',a['name']) for a in d['assets']]"
+
+# Is the asset set stable across releases, or still drifting?
+curl -sS -H 'User-Agent: bentoo-overlay-probe' \
+  "https://api.github.com/repos/Mintplex-Labs/anything-llm/releases?per_page=5" \
+  | python3 -c "import sys,json;[print(r['tag_name'],len(r['assets'])) for r in json.load(sys.stdin)]"
+
+# Has upstream's own stance on non-Docker deployment changed?
+curl -sSL https://raw.githubusercontent.com/Mintplex-Labs/anything-llm/master/BARE_METAL.md | head -8
+```
+
+Re-open **the from-source decision** only if upstream publishes a source release
+*and* drops the unsupported-deployment warning. Either one alone is not enough:
+a tarball whose only supported runtime is a container still cannot become an
+ebuild anybody should install.
+
+### A separate door, deliberately left open
+
+The rejection above is about building from source. A `-bin` package repacking
+`AnythingLLMDesktop.AppImage` is a **different question**, and the evidence no
+longer blocks it: the AppImage has shipped in every release since `v1.14.1`, for
+both `x86_64` and `Arm64`, at a URL that is versioned by the release tag.
+
+That is not a packaging problem — it is the policy question of whether bentoo
+carries prebuilt-only desktop apps, which the overlay has already answered once
+in the affirmative with `app-misc/claude-desktop-bin`. It is the same decision
+story 004 Task 5 holds open for `app-misc/jan-bin`. Recorded here so the two are
+settled together rather than one at a time, and so nobody reads "not packageable"
+as covering a route that was never assessed.
+
+**Note on where this record lives.** Story 004 Task 6 instructed that this go in
+`packages.toml` as `enabled = false`. That instruction predates the register
+split and contradicts it: `anythingllm` is not an overlay package, and
+`enabled = false` is for a record that *once* worked, not for one that never
+can. Filed here instead, which is the destination CLAUDE.md now prescribes for
+an upstream assessed and rejected.

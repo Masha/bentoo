@@ -29,7 +29,7 @@
 #                        (default /var/db/repos/gentoo)
 #   PARITY_REPORT_DIR=<path>
 #                        where the two reports are written
-#                        (default .epic/stories/007-gentoo-parity-baseline)
+#                        (default .epic/reports/gentoo-parity)
 #
 # Exit status:
 #   0  the sweep found nothing to act on, or every self-test assertion passed
@@ -55,15 +55,22 @@ OVERLAY_ROOT=$(cd -- "${SCRIPT_DIR}/.." && pwd -P)
 # container, a second sync, a machine that keeps its trees elsewhere.
 GENTOO_REPO=${GENTOO_REPO:-/var/db/repos/gentoo}
 
-# Both reports live with the story that produced them. .epic/ is gitignored,
-# which is exactly why the script itself lives in scripts/ instead: the report
-# is a snapshot, the guard that regenerates it has to outlive the story.
+# Both reports are snapshots; the guard that regenerates them has to outlive the
+# story that first asked for them, which is why this script lives in scripts/
+# while its output goes under the gitignored .epic/.
+#
+# That output must NOT go inside .epic/stories/. It used to default to
+# .epic/stories/007-gentoo-parity-baseline, and line ~2470 does `mkdir -p` on
+# this path: once story 007 was archived, every run re-created a directory
+# bearing an archived story's number, holding a single filtered report. Epic
+# then listed 007 as an active story again, and overlay story numbers are never
+# recycled. A report directory is not a story - keep it out of their namespace.
 #
 # Overridable for the reason GENTOO_REPO is, and for one of its own: A12 runs a
 # whole sweep in a subprocess to prove that a run finding nothing still writes a
 # complete report. Without somewhere else to put it, --self-test would publish
 # over the real report on every invocation - a guard editing what it measures.
-REPORT_DIR=${PARITY_REPORT_DIR:-"${OVERLAY_ROOT}/.epic/stories/007-gentoo-parity-baseline"}
+REPORT_DIR=${PARITY_REPORT_DIR:-"${OVERLAY_ROOT}/.epic/reports/gentoo-parity"}
 PARITY_DATA="${REPORT_DIR}/parity-data.tsv"
 PARITY_REPORT="${REPORT_DIR}/parity-report.md"
 
