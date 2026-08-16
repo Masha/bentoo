@@ -31,7 +31,10 @@ DOCS=( AUTHORS.md README.md )
 PATCHES=(
 	# OpenCV 5 moved CascadeClassifier/HOGDescriptor to the contrib xobjdetect
 	# module; include it explicitly in facedetect/facebl0r (not fixed upstream).
-	"${FILESDIR}/${P}-opencv5-xobjdetect.patch"
+	# Named after ${PN}, not ${P}: the patch is version-agnostic (guarded by
+	# CV_VERSION_MAJOR) and the autoupdate applier renames the ebuild on a bump
+	# but never the files/ entries, which broke 3.2.3 -> 3.3.0 in prepare.
+	"${FILESDIR}/${PN}-opencv5-xobjdetect.patch"
 )
 
 src_prepare() {
