@@ -8,13 +8,20 @@ all. Recorded so that an **unverifiable** package is never mistaken for a
 ## Why this file and not `packages.toml`
 
 `packages.toml` maps **overlay** packages, and every record there is a promise
-that some endpoint answers — `url` plus a working `parser`. Neither holds here:
+that some endpoint answers — `url` plus a working `parser`. That promise cannot
+be kept for anything listed here, for one of two reasons:
 
-- **None of the nine is a `bentoo` package.** All are installed from `::gentoo`,
-  so the overlay has no record to disable and no maintenance duty over them.
-- **An unreachable host cannot back a probe.** Authoring a record whose fetch is
-  guaranteed to fail would break that file's own contract, and `enabled = false`
-  is for a record that *once* worked, not for one that never can.
+- **There is no reachable endpoint.** Sections A and B. Authoring a record whose
+  fetch is guaranteed to fail would break that file's own contract, and
+  `enabled = false` is for a record that *once* worked, not for one that never
+  can. None of those packages is a `bentoo` package either — all are installed
+  from `::gentoo`, so the overlay has no record to disable and no maintenance
+  duty over them.
+- **There is no upstream at all.** Section C, added 2026-08-16. These *are*
+  `bentoo` packages, which is exactly why they need saying: a `bentoo` package
+  with no record looks identical to one nobody has got around to yet. Their
+  versions are assigned by the packager, not published by anyone, so there is
+  nothing to compare against and no probe to write.
 
 So the register lives here: a plain tracked file, next to the thing it
 complements, visible to a fresh clone and to a second maintainer.
@@ -46,6 +53,29 @@ candidates and must never be raised as such.
 | `app-dicts/myspell-nn` | `2.0.10` | `alioth.debian.org` + SF `spell-norwegian` | alioth.debian.org was retired and no longer resolves; the SourceForge project returns 404; freshmeat is shut down. |
 | `sys-firmware/sgabios` | `0.1_pre10` | `gitlab.com/qemu-project/sgabios` | **No confirmable last version.** code.google.com is extinct; the QEMU repo has **zero tags** (GitLab tags API returns an empty array), HEAD `72f39d4` from 2018-07-15. The ebuild pins commit `23d4749` from 2010. |
 | `app-dicts/myspell-mi` | `20190630` | `github.com/scardracs/gentoo-packages` | **No confirmable last version.** The source repo was deleted (API: `Not Found`), the distfile is absent from the Gentoo mirrors, and there is no upstream feed left. |
+
+## C. No upstream by construction — nothing to probe, by design
+
+These are `bentoo` packages whose version nobody publishes. They are listed so
+that a package with no `packages.toml` record is never mistaken for one that was
+overlooked: every ebuild in this overlay is now either in `packages.toml` or in
+this file.
+
+| Package | Version | Why there is nothing to probe |
+|---|---|---|
+| `acct-user/lemonade` | `0` | Account package. `acct-user`/`acct-group` ebuilds declare a system user; the version is an ordinal the packager picks, and upstream ships no such concept. Bumps only when the UID/GID or the account's shape changes. |
+| `acct-group/lemonade` | `0` | As above. |
+| `acct-user/ntpd-rs` | `0` | As above. |
+| `acct-group/ntpd-rs` | `0` | As above. |
+| `acct-user/ntpd-rs-observe` | `0` | As above. |
+| `acct-group/ntpd-rs-observe` | `0` | As above. |
+| `app-eselect/eselect-nodejs` | `2-r1` | Written for this overlay (story 005) to arbitrate the `net-libs/nodejs` slots. `HOMEPAGE` is Gentoo's "no homepage" placeholder because there is genuinely none: bentoo is the upstream. It moves when the slot contract does, which `check-slot-naming-contract.sh` asserts. |
+| `sys-libs/binutils-libs` | `2.47` | **Deliberately unrecorded, not overlooked.** Upstream is probeable — it is the same GNU release directory `sys-devel/binutils` tracks. It has no record of its own precisely so automation cannot move it independently: the two must be bumped together against bentoo's own patchset, and a record here would invite exactly the drift it is meant to prevent. See the `sys-devel/binutils` comment in `packages.toml`. |
+
+The account packages are the reason this section is a table rather than a
+sentence. Six of them look like an omission at a glance, and the temptation on
+each sweep is to "fix" it by writing six records against endpoints that do not
+exist.
 
 ## How to re-verify
 

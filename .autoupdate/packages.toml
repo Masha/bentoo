@@ -161,6 +161,32 @@ version and is fetched separately because npm resolves it offline from DISTDIR.
 """
 # END
 
+["sys-kernel/linux-firmware"]
+url = "https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/atom/?h=main"
+parser = "regex"
+pattern = '<updated>([0-9]{4}-[0-9]{2}-[0-9]{2})'
+transform = [['-', ""]]
+aux_var = "EGIT_COMMIT"
+aux_pattern = 'id>urn:sha1:([0-9a-f]{40})'
+version = "20260706"
+comments = """
+linux-firmware — kernel.org's cgit atom feed, because this package has no
+releases to track: it is fetched with git-r3 from a pinned commit and versioned
+by that commit's date (PV=YYYYMMDD), with no SRC_URI and no Manifest.
+
+The pattern takes the newest commit date and the transform strips the dashes to
+match PV.  aux_var carries the other half: EGIT_COMMIT must move WITH the date,
+or the ebuild claims a date it does not ship — the same class of silent
+mismatch that shipped a wrong source tree for sci-ml/ik_llama-cpp before its
+SHA variable was wired up.
+
+aux_pattern runs against the raw feed, where the first urn:sha1 is the newest
+commit — the same entry the first <updated> came from.  If kernel.org ever
+reorders the feed, these two would describe different commits; check that they
+agree before applying.
+"""
+# END
+
 ["sys-apps/pnpm"]
 url = "https://registry.npmjs.org/pnpm"
 parser = "json"
@@ -510,6 +536,36 @@ comments = """
 CrossOver — changelog page lists each release as `<a name="X.Y.Z">`, newest first;
 present in the raw HTML (not JS-only). Download is the .deb under media.codeweavers.com
 named by ${PV}; the .bin installer (install-crossover-X.Y.Z.bin) mirrors the same version.
+"""
+# END
+
+["app-backup/duplicati-bin"]
+url = "https://api.github.com/repos/duplicati/duplicati/releases/latest"
+parser = "json"
+path = "tag_name"
+transform = [['^v', ""], ['_.*', ""]]
+aux_var = "MY_DATE"
+aux_pattern = '_stable_([0-9]{4}-[0-9]{2}-[0-9]{2})'
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "2.3.0.4"
+comments = """
+duplicati-bin — tag_name is "vX.Y.Z.W_<channel>_<YYYY-MM-DD>", e.g.
+v2.3.0.4_stable_2026-07-09.  The transform strips the leading v and everything
+from the first underscore, leaving the PV.
+
+THE DATE IS LOAD-BEARING and is why aux_var exists here.  The ebuild rebuilds
+both the tag and every asset name from MY_DATE:
+    MY_TAG="v${PV}_${MY_CHANNEL}_${MY_DATE}"
+    MY_ASSET="duplicati-${PV}_${MY_CHANNEL}_${MY_DATE}"
+so an applier that moved PV alone would emit SRC_URI entries pointing at the
+OLD release's date — a guaranteed 404, caught only at fetch time.  aux_pattern
+runs against the raw response body, not the extracted version, which is what
+lets it reach the date the path expression has already discarded.
+
+MY_CHANNEL is left alone deliberately: it is "stable", and a channel change is
+a decision, not a bump.  If upstream ever ships a non-stable release as latest,
+this record starts extracting the wrong thing — check the channel before
+applying a version whose date looks off.
 """
 # END
 
@@ -1125,6 +1181,46 @@ held back by a collection that has not been refreshed.
 lists nothing after it, and ~mpagano and ~sam agree. Raise both this suffix and
 the ebuild's _p by hand when a newer one appears -- the applier only rewrites
 the Intel date.
+"""
+# END
+
+["www-client/chromium"]
+hold = true
+url = "https://api.github.com/repos/chromium-linux-tarballs/chromium-tarballs/releases/latest"
+parser = "json"
+path = "tag_name"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "151.0.7922.108"
+comments = """
+chromium — probes the TARBALL repo, not chromiumdash or the Chrome release
+feed, because that repo is what actually gates a bump: SRC_URI points at
+chromium-linux-tarballs/chromium-tarballs, and a version Google shipped but
+nobody has tarballed cannot be packaged here.  Verified 2026-08-16: the repo
+publishes 151.0.7922.137 while this overlay carries .108.
+
+hold = true, and it is NOT a bookkeeping accident.  A bump is never a PV swap:
+the ebuild pins three more things that must move with it, none of which this
+probe can see —
+
+  PATCH_V         chromium-patches, versioned "<major>-<n>" (151-3 today), NOT
+                  by chromium PV.  Confirmed 2026-08-16: the archive URL built
+                  from either .108 or .137 returns 404, so an applier that only
+                  rewrote PV would produce an ebuild whose patchset URL is
+                  wrong or whose patches belong to another point release.
+  COPIUM_COMMIT   pinned SHA of a second patch source
+  TEST_FONT       pinned SHA of the test-font tarball
+
+The patchset also LAGS the release: its tag for a series is cut against the
+first dev build, so on a stable bump some patches fail to apply and have to be
+rebased by hand — 5 of 21 did on one earlier series.  Do not remove hold, and
+do not read "outdated" here as "run --apply"; read it as "a human has work".
+
+Reported as [bin] by the checker.  That is the RESTRICT heuristic misfiring on
+this ebuild's RESTRICT block, not a claim about the package -- chromium builds
+from source here.  Do NOT try to correct it with type = "src": tested
+2026-08-16, that value is not recognised and drops the package out of the
+counts entirely ("Checked 0 source, 0 bin"), which is worse than a wrong label.
+type only accepts "bin".
 """
 # END
 
@@ -7490,6 +7586,31 @@ nohang — GitHub release tag "vX.Y.Z" ("v" stripped). Verified against
 Releases are rare and the gap is not a broken probe: v0.2.0 (2020-12) stood as
 latest for five years before v0.3.0 (2025-12). master keeps moving in between,
 which is what the 9999 ebuild is for; 9999 is not version-checked.
+"""
+# END
+
+["sys-devel/binutils"]
+hold = true
+url = "https://ftp.gnu.org/gnu/binutils/"
+parser = "regex"
+pattern = 'binutils-([0-9]+\.[0-9]+(?:\.[0-9]+)?)\.tar\.xz'
+select = "max"
+version = "2.47"
+comments = """
+binutils — GNU's own release directory, which lists every tarball; select=max
+takes the highest.  Verified 2026-08-16: 2.47 is the newest published and is
+what this overlay carries.
+
+hold = true because a bump here is NOT a PV swap.  bentoo ships its own
+patchset in files/patches-1 (PATCH_VER=1) — Gentoo's official patchset tarball
+for 2.47 returns 404, which is why the overlay carries the package at all.  A
+new upstream release means the patch series has to be rebased and re-hosted
+BEFORE the ebuild can move; an auto-applied PV would point PATCH_VER at a
+series that does not exist for it.
+
+Treat an "outdated" result as notice that patch work is due, not as a bump.
+sys-libs/binutils-libs tracks the same upstream and must move together — it has
+no record of its own precisely so the two cannot drift apart by automation.
 """
 # END
 
