@@ -5,7 +5,7 @@ EAPI=8
 
 PYTHON_COMPAT=( python3_{12..14} )
 
-inherit cmake cuda python-single-r1 toolchain-funcs
+inherit cmake cuda flag-o-matic python-single-r1 toolchain-funcs
 
 DESCRIPTION="Speech-to-text, TTS, speaker diarization etc. using onnxruntime"
 HOMEPAGE="
@@ -193,6 +193,25 @@ src_prepare() {
 
 src_configure() {
 	use python && python_setup
+
+	# Keep the build directory out of the installed binaries.
+	#
+	# Upstream puts __FILE__ in its message macros, so the sandbox path is not
+	# merely debug metadata — it is printed AT THE USER. `sherpa-onnx --help`
+	# opened with
+	#   /var/tmp/portage/sci-ml/sherpa-onnx-1.13.5/work/.../parse-options.cc:415
+	# before this, and 113 such paths were baked into the installed files.
+	#
+	# Map ${WORKDIR}, not ${S}: the vendored dependencies are configured under
+	# ${S}_build/_deps (kaldi_decoder-src and friends) and leak their own paths,
+	# so remapping only the source tree would clear about half of them.
+	#
+	# -ffile-prefix-map covers __FILE__, __BASE_FILE__ and the debug records in
+	# one flag; -fdebug-prefix-map would leave the user-visible strings alone,
+	# which are the ones that matter here. The target path follows Gentoo's
+	# split-debug convention so a debugger still resolves sources when
+	# FEATURES=splitdebug installs them.
+	append-flags -ffile-prefix-map="${WORKDIR}=/usr/src/debug/${CATEGORY}/${PF}"
 
 	local mycmakeargs=(
 		# Self-contained install under /opt keeps the ~23 CLI tools and the
