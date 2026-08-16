@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@proton.me</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<use>
+		<flag name="cuda">Build the NVIDIA CUDA execution provider (requires the CUDA Toolkit; the nvcc host compiler is resolved from the installed toolkit, not hardcoded)</flag>
+		<flag name="portaudio">Build the example CLI tools that record and play audio. Adds no system dependency: upstream vendors and statically links portaudio</flag>
+		<flag name="python">Build and install the Python bindings (pybind11) into site-packages</flag>
+		<flag name="tts">Build text-to-speech support, which pulls the vendored espeak-ng and piper-phonemize sources</flag>
+		<flag name="websocket">Build the WebSocket server and client examples</flag>
+	</use>
+	<longdescription lang="en">
+		sherpa-onnx is the speech toolkit of the k2-fsa project:
+		speech-to-text, text-to-speech, speaker diarization, voice activity
+		detection, source separation and keyword spotting, all running on ONNX
+		Runtime with no PyTorch dependency.
+
+		This is a source build linked against the system sci-libs/onnxruntime
+		rather than a bundled copy, which is what
+		SHERPA_ONNX_USE_PRE_INSTALLED_ONNXRUNTIME_IF_AVAILABLE selects.
+
+		Upstream's CMake build resolves roughly a dozen small dependencies
+		through FetchContent at configure time — eigen, asio, cargs, json,
+		kaldi-decoder, kaldi-native-fbank, kaldifst, openfst, kissfft,
+		simple-sentencepiece, hclust-cpp, and optionally espeak-ng,
+		piper-phonemize, portaudio, websocketpp and pybind11. This ebuild
+		declares every one of them in SRC_URI, pinned by tag or full commit
+		SHA, and stages them into the source directory so CMake resolves them
+		locally. The build therefore needs no network access and carries no
+		RESTRICT="network-sandbox".
+
+		Model files are not bundled; each task loads its own from upstream.
+		See https://k2-fsa.github.io/sherpa/onnx/pretrained_models/
+	</longdescription>
+	<upstream>
+		<remote-id type="github">k2-fsa/sherpa-onnx</remote-id>
+		<bugs-to>https://github.com/k2-fsa/sherpa-onnx/issues</bugs-to>
+	</upstream>
+</pkgmetadata>

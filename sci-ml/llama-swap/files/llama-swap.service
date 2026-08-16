@@ -1,0 +1,39 @@
+[Unit]
+Description=Model-swapping proxy for OpenAI-compatible backends (user %i)
+Documentation=https://github.com/mostlygeek/llama-swap
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=%i
+Group=%i
+# LLAMA_SWAP_CONFIG must come from /etc/default/llama-swap@%i. It is not
+# defaulted to %h/.config/llama-swap.yaml because %h resolves to /root for
+# system-manager units, and hardcoding /home/%i would assume a passwd layout
+# this overlay cannot promise.
+#
+# The file is mandatory on purpose: without a config path the daemon has
+# nothing to serve, and failing to start is the honest outcome. Install it by
+# copying the shipped example:
+#   cp /etc/default/llama-swap@.example /etc/default/llama-swap@<user>
+EnvironmentFile=/etc/default/llama-swap@%i
+Environment="LLAMA_SWAP_LISTEN=127.0.0.1:8080"
+Environment="LLAMA_SWAP_EXTRA_OPTS="
+ExecStart=/usr/bin/llama-swap --config ${LLAMA_SWAP_CONFIG} --listen ${LLAMA_SWAP_LISTEN} ${LLAMA_SWAP_EXTRA_OPTS}
+Restart=always
+RestartSec=5s
+
+# Defense-in-depth hardening. ProtectSystem=full leaves /home and /var
+# writable, so the backends llama-swap spawns (llama.cpp and friends) can
+# still write to user caches under ~/.cache/.
+NoNewPrivileges=true
+PrivateTmp=true
+LockPersonality=true
+RestrictSUIDSGID=true
+RestrictRealtime=true
+ProtectSystem=full
+ProtectControlGroups=true
+
+[Install]
+WantedBy=multi-user.target

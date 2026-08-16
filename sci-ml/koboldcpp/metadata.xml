@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@proton.me</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<longdescription lang="en">
+		KoboldCpp is a local AI server built on ggml/llama.cpp that bundles LLM
+		text generation (the KoboldAI Lite web UI plus an OpenAI-compatible
+		API), Stable Diffusion image generation, Whisper speech-to-text and
+		TTS behind a single pure-Python launcher.
+
+		This ebuild builds the ggml backends from source and installs the
+		launcher (koboldcpp.py) together with the embedded web UI and
+		resources. It ships neither the upstream PyInstaller binary nor any
+		model weights, and it deletes the prebuilt helper binaries the source
+		tarball carries for Windows so that no executable blob is installed.
+
+		The CPU backend is built portable rather than tuned to the build host,
+		and its x86 instruction set is selected through CPU_FLAGS_X86: upstream
+		offers three tiers (AVX2+FMA+F16C, AVX only, SSE3 only). GPU
+		acceleration is optional in every direction - Vulkan (upstream's
+		officially supported path for both AMD and NVIDIA), CUDA/cuBLAS, and
+		ROCm/hipBLAS - and a CPU-only build works with all of them disabled.
+	</longdescription>
+	<use>
+		<flag name="cuda">Build the CUDA/cuBLAS backend (koboldcpp_cublas) for
+			NVIDIA GPUs, for every architecture the installed toolkit
+			supports</flag>
+		<flag name="rocm">Build the ROCm/hipBLAS backend (koboldcpp_hipblas)
+			for AMD GPUs, for the architectures selected in
+			AMDGPU_TARGETS</flag>
+		<flag name="vulkan">Build the Vulkan backend (koboldcpp_vulkan),
+			upstream's officially supported GPU path for both AMD and
+			NVIDIA</flag>
+	</use>
+	<upstream>
+		<remote-id type="github">LostRuins/koboldcpp</remote-id>
+		<bugs-to>https://github.com/LostRuins/koboldcpp/issues</bugs-to>
+		<changelog>https://github.com/LostRuins/koboldcpp/releases</changelog>
+	</upstream>
+</pkgmetadata>
