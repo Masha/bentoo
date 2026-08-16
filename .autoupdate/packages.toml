@@ -957,7 +957,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^b(\d+)$', "0_pre$1"]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0_pre10448"
+version = "0_pre10452"
 comments = """
 llama-cpp — upstream tags builds "bNNNN" (no semver); the ebuild carries them as
 the 0_pre<build> snapshot scheme and bridges back with MY_PV="b${PV#0_pre}", so
@@ -1489,7 +1489,7 @@ base_from = "file"
 base_url = "https://raw.githubusercontent.com/zed-industries/zed/main/crates/zed/Cargo.toml"
 base_pattern = '(?m)^version = "([0-9][0-9.]*)"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.17.0_pre20260815"
+version = "1.17.0_pre20260816"
 comments = """
 zed — commit-tracked on main; _pre suffix preserved from current ebuild.
 2026-08-06: 2 commits landed same UTC day (d61e80b -> 6b2aa1c), so the date
@@ -6589,7 +6589,7 @@ url = "https://api.github.com/repos/dyne/frei0r/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "3.2.3"
+version = "3.3.0"
 comments = """
 dyne/frei0r; SRC_URI pulls archive/refs/tags/v${PV}.tar.gz, so track git tags (newest=[0]).
 Leading "v" stripped. Use /tags not releases/latest: the latter lags (reports 3.2.1 while
@@ -6892,7 +6892,21 @@ one-line file at the repo root, by llama/server/CMakeLists.txt — so the value
 for a given release is raw.githubusercontent.com/ollama/ollama/v<PV>/
 LLAMA_CPP_VERSION (v0.32.4 -> b10091; v0.32.6 and v0.32.7 both -> b10242). The
 removed 0.32.3 ebuild carried LLAMA_CPP_tag=b10069 while its own release asked
-for b10091; do not copy that value forward.
+for b10091; do not copy that value forward. It happened again anyway: 0.32.13
+shipped carrying b10353 while its release asks for b10380, fixed in -r1 on
+2026-08-16.
+
+That stale tag is not cosmetic, because a second field moves with it. The
+ebuild builds the vendored llama.cpp with LLAMA_USE_SYSTEM_GGML=ON, so the
+DEPEND range on sci-ml/ggml has to bracket the ABI the pinned tag was written
+against: ggml-0.20.0 added a trailing "int64_t K" to ggml_ssm_scan, which
+b10380 still calls with eight arguments, and an uncapped >=sci-ml/ggml-0.17
+let the solver pick 0.20.0 and fail the build (obentoo/bentoo#40). Every bump
+therefore has THREE manual steps, none of which the applier performs: resync
+LLAMA_CPP_tag from LLAMA_CPP_VERSION, diff ggml_ssm_scan (and its neighbours in
+ggml/include/ggml.h) between the old tag and the new one, and move the
+sci-ml/ggml ceiling to match. llama.cpp b10448 already carries the new arity,
+so the ceiling opens up as soon as the pin reaches it.
 
 SRC_URI also pulls ${P}-deps.tar.xz from github.com/gentoo-golang-dist/ollama,
 a third-party repo that packages the Go dependencies roughly a day after

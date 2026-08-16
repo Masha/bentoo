@@ -8,7 +8,11 @@ inherit cmake go-module systemd
 DESCRIPTION="Get up and running with Llama 3, Mistral, Gemma, and other language models"
 HOMEPAGE="https://ollama.com"
 
-LLAMA_CPP_tag=b10353
+# Read from LLAMA_CPP_VERSION at the root of the v${PV} tag, never chosen
+# freely: llama/server/CMakeLists.txt reads that file to pin the FetchContent
+# revision. The autoupdate applier only rewrites PV, so this has to be resynced
+# by hand on every bump.
+LLAMA_CPP_tag=b10380
 
 # gentoo-golang-dist packages the Go dependencies roughly a day after upstream
 # tags, so v${PV} 404s on release day. v${MY_DEPS_PV} carries the same module
@@ -29,10 +33,18 @@ KEYWORDS="~amd64"
 
 RESTRICT="mirror test"
 
+# The ceiling on sci-ml/ggml is load-bearing, not cosmetic. src_configure sets
+# LLAMA_USE_SYSTEM_GGML=ON, so the vendored llama.cpp compiles against the
+# system headers: ggml-0.20.0 added a trailing "int64_t K" to ggml_ssm_scan,
+# while llama.cpp b10380 still calls it with eight arguments. Without the
+# ceiling the solver pulls 0.20.0 and llama-model-loader.cpp fails to compile
+# (obentoo/bentoo#40). Raise it once LLAMA_CPP_tag reaches a revision that
+# carries the new arity -- b10448 already does.
 DEPEND="
 	acct-group/ollama
 	acct-user/ollama
 	>=sci-ml/ggml-0.17
+	<sci-ml/ggml-0.20.0
 "
 # sci-ml/ollama-bin is the same program obtained the other way, and the two
 # install four of the same paths: /usr/bin/ollama (a real binary here, a
