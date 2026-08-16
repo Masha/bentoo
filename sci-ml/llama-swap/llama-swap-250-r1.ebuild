@@ -128,7 +128,19 @@ src_compile() {
 	# releases (verified absent at v250), so the stub wrote to a path nothing
 	# read.
 
+	# -trimpath removes the build directory from the binary. Go records the
+	# absolute path of every compiled file by default, which put 305 copies of
+	# /var/tmp/portage/... into the installed binary. Unlike the C++ case in
+	# sci-ml/sherpa-onnx these are not printed at the user, but they are still
+	# the sandbox path of whoever built the package, and they defeat
+	# reproducible builds: two machines produce different binaries from
+	# identical input.
+	#
+	# ::gentoo tolerates the leak widely (docker ships 1327 of these, podman
+	# 2759), so this is a deliberate improvement on the baseline rather than a
+	# rule being followed.
 	ego build \
+		-trimpath \
 		-tags "${mytags[*]}" \
 		-ldflags "-s -w -X main.version=${PV} -X main.commit=gentoo -X main.date=unknown" \
 		-o "${PN}" .
