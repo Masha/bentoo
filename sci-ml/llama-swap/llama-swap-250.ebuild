@@ -20,8 +20,19 @@ SRC_URI="https://github.com/mostlygeek/${PN}/archive/refs/tags/v${PV}.tar.gz -> 
 S="${WORKDIR}/${PN}-${PV}"
 
 LICENSE="MIT"
-# Dependent (bundled, statically linked) Go module licenses
-LICENSE+=" Apache-2.0 BSD BSD-2 ISC MIT MPL-2.0"
+# Dependent (bundled, statically linked) Go module licenses. Go links
+# statically, so every one of these ships inside the installed binary.
+#
+# Surveyed at v250 on 2026-08-16 by running `go mod vendor` and classifying all
+# 85 license files across the 80 vendored modules: 50 MIT, 15 BSD-2,
+# 12 Apache-2.0, 6 BSD (3-clause), 1 ISC. The only unclassified file was
+# modernc.org/memory/LICENSE-LOGO, which is a Wikimedia URL for a logo, not a
+# code license; that module carries its real LICENSE separately.
+#
+# MPL-2.0 is deliberately absent. An earlier draft listed it, copied from
+# dev-util/trivy's set rather than surveyed — no vendored module here is under
+# it. Re-run the survey at each bump instead of carrying this list forward.
+LICENSE+=" Apache-2.0 BSD BSD-2 ISC"
 SLOT="0"
 # ~arm64 ships here, unlike the ggml family in this overlay, and the difference
 # is real rather than a lapse: this is pure Go with no cgo. There is no
