@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@proton.me</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<use>
+		<flag name="ui">Build and embed the Svelte web interface. Requires npm at build time; without this flag the binary serves the API only and /ui returns nothing</flag>
+	</use>
+	<longdescription lang="en">
+		llama-swap sits in front of one or more OpenAI-compatible inference
+		servers and starts, stops and swaps them on demand, so a single
+		endpoint can serve many models without keeping them all resident.
+		It works with llama.cpp, vLLM and anything else exposing the same API.
+
+		The daemon has no authentication of its own and both shipped service
+		files bind 127.0.0.1 by default. Put an authenticating proxy in front
+		of it before exposing it to a network you do not control.
+
+		Written in pure Go with no cgo, which is why it carries ~arm64 while
+		the C++ inference packages in this overlay do not.
+	</longdescription>
+	<upstream>
+		<remote-id type="github">mostlygeek/llama-swap</remote-id>
+		<bugs-to>https://github.com/mostlygeek/llama-swap/issues</bugs-to>
+	</upstream>
+</pkgmetadata>

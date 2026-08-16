@@ -7138,6 +7138,80 @@ Live=153.0.1-1 (asset x86_64 confirmado 200).
 """
 # END
 
+["sci-ml/llama-swap"]
+url = "https://api.github.com/repos/mostlygeek/llama-swap/releases/latest"
+parser = "json"
+path = "tag_name"
+transform = [['^v', ""]]
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "250"
+comments = """
+llama-swap — releases/latest; tag_name is "vNNN" (a plain incrementing integer,
+not semver), transform strips the v.  Verified by real download on 2026-08-16:
+tag_name "v250" (2026-08-14).
+
+Do NOT add a dot-separated version check anywhere downstream: PV is a single
+integer and 250 > 249 only numerically.
+
+The ebuild carries RESTRICT="network-sandbox" because upstream ships no
+vendor/ directory and the Go module cache is filled in src_unpack, matching
+dev-util/trivy and dev-util/act.  If that is ever traded for a generated vendor
+tarball hosted on distfiles.obentoo.org, this record must gain hold = true —
+the bump would then require publishing the tarball first, exactly as
+dev-build/gn documents.  While it stays as-is, auto-bumping is safe.
+"""
+# END
+
+["sci-ml/sherpa-onnx"]
+url = "https://api.github.com/repos/k2-fsa/sherpa-onnx/releases/latest"
+parser = "json"
+path = "tag_name"
+transform = [['^v', ""]]
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "1.13.5"
+comments = """
+sherpa-onnx — releases/latest; tag_name is "vX.Y.Z", transform strips the v.
+Verified by real download on 2026-08-16: tag_name "v1.13.5" (2026-08-11).
+
+BUMPS ARE NOT MECHANICAL HERE.  Besides the main tarball, SRC_URI pins 16
+vendored dependencies by tag or full commit SHA, because upstream resolves them
+through CMake FetchContent at configure time and the ebuild defeats that by
+pre-staging the archives into ${S}.  A bump must re-read the cmake/*.cmake
+modules and re-pin every URL that moved — upstream bumps these silently inside
+a release.  If a pin goes stale the build does NOT fail: CMake falls through to
+the network and the sandbox kills it, or worse, on a permissive setup it
+succeeds against an unreviewed tree.
+
+Four of those pins are .zip on purpose (kissfft, websocketpp, piper-phonemize,
+espeak-ng).  pkgcheck flags TarballAvailable on them; do not act on it.  See the
+SRC_URI comment in the ebuild for the verified reason.
+"""
+# END
+
+["sci-ml/koboldcpp"]
+url = "https://api.github.com/repos/LostRuins/koboldcpp/releases/latest"
+parser = "json"
+path = "tag_name"
+transform = [['^v', ""]]
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "1.118.1"
+comments = """
+koboldcpp — releases/latest; tag_name is "vX.Y[.Z]", so the transform strips the
+leading v to match PV.  Verified by real download on 2026-08-16: tag_name
+"v1.118.1", and the tarball it implies (archive/refs/tags/v1.118.1.tar.gz,
+88471225 B) hashes to the Manifest entry.
+
+Do NOT switch this to a ranked refs/tags probe.  Upstream cuts point releases
+(1.118 then 1.118.1) and the paginated tag list is not ordered by recency, so
+ranking tags returns an older tag as "latest".  releases/latest is authoritative
+here because upstream does publish a real release object per version.
+
+Upstream also attaches prebuilt PyInstaller binaries to every release.  This
+overlay builds from the source tarball and ignores them; the assets moving is
+not a version signal and must not be probed.
+"""
+# END
+
 ["sci-ml/whisper-cpp"]
 url = "https://api.github.com/repos/ggml-org/whisper.cpp/releases/latest"
 parser = "json"
