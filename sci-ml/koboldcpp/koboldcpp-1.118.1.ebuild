@@ -119,6 +119,18 @@ pkg_setup() {
 src_prepare() {
 	default
 
+	# cuda.eclass EXPORT_FUNCTIONS src_prepare, and defining src_prepare here
+	# overrides it -- so cuda_sanitize only runs if called explicitly. Gate it
+	# on the flag: cuda_sanitize resolves cuda_gccdir, which dies with
+	# "cuda-config not found" when no toolkit is installed, and that would
+	# break the build for every user without CUDA. sci-ml/sherpa-onnx hit
+	# exactly that in the merge gate on 2026-08-16 by not defining src_prepare
+	# at all and inheriting the eclass one unguarded.
+	#
+	# Without this call the USE=cuda build passes unsanitized NVCCFLAGS
+	# straight to nvcc.
+	use cuda && cuda_src_prepare
+
 	# The release build strips the .so at link time (-s); leave stripping
 	# to Portage so splitdebug/nostrip are honored and the pre-stripped QA
 	# notice is silenced. Keep -DNDEBUG (it no-ops assert()).

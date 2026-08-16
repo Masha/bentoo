@@ -175,6 +175,22 @@ src_unpack() {
 	done
 }
 
+src_prepare() {
+	# MUST be defined, even though it looks like boilerplate.
+	#
+	# cuda.eclass does `EXPORT_FUNCTIONS src_prepare`, and its cuda_src_prepare
+	# calls cuda_sanitize unconditionally -- which resolves cuda_gccdir, which
+	# dies with "cuda-config not found" when the CUDA toolkit is absent. With
+	# no src_prepare of its own, this ebuild inherited that one and failed in
+	# the prepare phase for EVERY user without CUDA installed, including
+	# USE=-cuda. Caught by the merge gate on 2026-08-16; pkgcheck cannot see it.
+	#
+	# cmake_src_prepare, not `default`: the cmake eclass tracks state here that
+	# cmake_src_configure later depends on.
+	cmake_src_prepare
+	use cuda && cuda_src_prepare
+}
+
 src_configure() {
 	use python && python_setup
 
