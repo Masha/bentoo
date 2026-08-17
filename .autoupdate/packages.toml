@@ -1013,7 +1013,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^b(\d+)$', "0_pre$1"]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0_pre10453"
+version = "0_pre10472"
 comments = """
 llama-cpp — upstream tags builds "bNNNN" (no semver); the ebuild carries them as
 the 0_pre<build> snapshot scheme and bridges back with MY_PV="b${PV#0_pre}", so
@@ -1582,9 +1582,9 @@ path = "[0].commit.committer.date"
 transform = [['T.*', ""], ['-', ""]]
 commit_sha_path = "[0].sha"
 base_from = "file"
-base_url = "https://raw.githubusercontent.com/zed-industries/zed/main/crates/zed/Cargo.toml"
+base_url = "https://api.github.com/repos/zed-industries/zed/contents/crates/zed/Cargo.toml?ref=main"
 base_pattern = '(?m)^version = "([0-9][0-9.]*)"'
-headers = { "User-Agent" = "bentoo-autoupdate" }
+headers = { "User-Agent" = "bentoo-autoupdate", "Accept" = "application/vnd.github.raw" }
 version = "1.17.0_pre20260817"
 comments = """
 zed — commit-tracked on main; _pre suffix preserved from current ebuild.
@@ -1593,6 +1593,12 @@ component alone did not change; bumped as -r1 (same-day revision) instead.
 2026-08-07: same again (cc053a4 -> 38ca910), so -r1 once more. Manual bump; the
 base version stayed 1.16.0 and only 5 crates moved (ctor, link-section,
 linktime-proc-macro, pathfinder_simd).
+2026-08-17: raw.githubusercontent.com started answering 429/503 (rate limit),
+tripping the circuit breaker on the base-version fetch. Same file now comes from
+the contents API on api.github.com — the host the commit probe already uses —
+with Accept: application/vnd.github.raw, which returns the file verbatim (the
+default media type would be base64 and the pattern would never match). The
+commits endpoint ignores that Accept, so the main probe is unaffected.
 """
 # END
 
@@ -1701,7 +1707,7 @@ commit_sha_path = "[0].id"
 base_from = "file"
 base_url = "https://gitlab.freedesktop.org/mobile-broadband/ModemManager/-/raw/main/meson.build"
 base_pattern = "(?m)^  version: '([0-9][0-9.]*)'"
-version = "1.25.95_p20260721"
+version = "1.25.95_p20260817"
 comments = """
 modemmanager — commit-tracked on main (GitLab); date YYYYMMDD becomes _pDATE suffix.
 """
@@ -6441,7 +6447,7 @@ parser = "regex"
 pattern = 'href="([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)/"'
 select = "max"
 series = '^26\.2\.'
-version = "26.2.5.2"
+version = "26.2.6.1"
 comments = """
 libreoffice (stable line) — old/ lists every 4-segment release directory of both
 release lines, so series pins this entry to 26.2.x and select=max takes the
@@ -6461,7 +6467,7 @@ pattern = 'href="([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)/"'
 select = "max"
 suffix = "_pre"
 series = '^26\.8\.'
-version = "26.8.0.1_pre"
+version = "26.8.0.2_pre"
 comments = """
 libreoffice (testing line) — same index as @stable, pinned to 26.8.x. Upstream
 numbers a testing release exactly like a final one (download.documentfoundation
@@ -6496,7 +6502,7 @@ pattern = 'href="([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)/"'
 select = "max"
 suffix = "_pre"
 series = '^26\.8\.'
-version = "26.8.0.1_pre"
+version = "26.8.0.2_pre"
 comments = """
 libreoffice-l10n (testing line) — reads the same archive index as
 app-office/libreoffice@testing, and for the same reason: it follows the core
@@ -6521,7 +6527,7 @@ pattern = 'href="([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)/"'
 select = "max"
 suffix = "_pre"
 series = '^26\.8\.'
-version = "26.8.0.1_pre"
+version = "26.8.0.2_pre"
 comments = """
 myspell-hu — PV=LO_VER; the hu langpack ships in the LibreOffice archive tree the
 ebuild's SRC_URI pulls from, so it reads the same index and follows the same
@@ -6647,7 +6653,7 @@ url = "https://api.github.com/repos/redis/redis/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "8.10.0"
+version = "8.10.1"
 comments = """
 redis/redis official Releases; tag is bare X.Y.Z (no "v"), matching the SRC_URI
 archive tag and PV. Live latest=8.8.0 (prerelease=false) — the 8.x line, not a Valkey fork.
@@ -7034,7 +7040,7 @@ url = "https://api.github.com/repos/google/osv-scanner/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "2.5.0"
+version = "2.5.1"
 comments = """
 OSV-Scanner — GitHub releases/latest tag "vX.Y.Z" (v stripped). Live=v2.4.0.
 """

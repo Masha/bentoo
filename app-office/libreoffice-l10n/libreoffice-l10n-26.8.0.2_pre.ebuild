@@ -10,6 +10,9 @@ MY_PV="${PV/_alpha/.alpha}"
 MY_PV="${MY_PV/_beta/.beta}"
 MY_PV="${MY_PV/_pre/}"
 [[ ${PV} == *alpha* || ${PV} == *beta* ]] && PN_DEV="Dev"
+# Pre-release series (alpha/beta/rc, i.e. _pre) are published under testing/
+# only; stable/${BASE_PV} does not exist for them at all.
+[[ ${PV} == *_alpha* || ${PV} == *_beta* || ${PV} == *_pre* ]] && TESTING_ONLY=1
 
 DESCRIPTION="Translations for the Libreoffice suite"
 HOMEPAGE="https://www.libreoffice.org"
@@ -37,7 +40,7 @@ lo_uris() {
 	local kind=${1} dir=${2}
 	local dest="LibreOffice_${MY_PV}_Linux_x86-64_rpm_${kind}_${dir}.tar.gz"
 
-	if [[ -n ${PN_DEV} ]]; then
+	if [[ -n ${TESTING_ONLY} ]]; then
 		echo "${BASE_SRC_URI_TESTING}/x86_64/LibreOffice${PN_DEV}_${MY_PV}_Linux_x86-64_rpm_${kind}_${dir}.tar.gz -> ${dest}"
 	else
 		echo "${BASE_SRC_URI_STABLE}/x86_64/LibreOffice_${BASE_PV}_Linux_x86-64_rpm_${kind}_${dir}.tar.gz -> ${dest}
