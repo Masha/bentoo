@@ -27,7 +27,10 @@ MYSPELL_THES=(
 	"opt/libreoffice26.8/share/extensions/dict-hu/th_hu_HU_v2.idx"
 )
 
-RPM_COMPRESS_TYPE="none"
+# Upstream ships the dict RPM with an xz payload (PayloadIsXz), verified on the
+# 26.8.0.2 langpack. Declaring "none" made the eclass advertise the wrong
+# BDEPEND and triggered a QA notice at unpack time.
+RPM_COMPRESS_TYPE="xz"
 
 inherit rpm myspell-r2
 
@@ -43,5 +46,14 @@ IUSE=""
 src_unpack() {
 	myspell-r2_src_unpack
 
-	rpm_unpack ./LibreOffice_${LO_VER}_Linux_x86-64_rpm_langpack_hu/RPMS/libreoffice26.8-dict-hu-${LO_VER}-1.x86_64.rpm
+	# The trailing -N is upstream's RPM release (respin) counter, not part of the
+	# LibreOffice version: the same LO_VER has shipped as -1 and as -2. Glob it
+	# instead of hardcoding, or every respin breaks src_unpack.
+	local rpms=(
+		./LibreOffice_${LO_VER}_Linux_x86-64_rpm_langpack_hu/RPMS/libreoffice26.8-dict-hu-${LO_VER}-*.x86_64.rpm
+	)
+	[[ -f ${rpms[0]} ]] ||
+		die "no dict-hu RPM matched under LibreOffice_${LO_VER}_Linux_x86-64_rpm_langpack_hu/RPMS/"
+
+	rpm_unpack "${rpms[0]}"
 }
