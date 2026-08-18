@@ -1585,7 +1585,7 @@ base_from = "file"
 base_url = "https://api.github.com/repos/zed-industries/zed/contents/crates/zed/Cargo.toml?ref=main"
 base_pattern = '(?m)^version = "([0-9][0-9.]*)"'
 headers = { "User-Agent" = "bentoo-autoupdate", "Accept" = "application/vnd.github.raw" }
-version = "1.17.0_pre20260817"
+version = "1.17.0_pre20260818"
 comments = """
 zed — commit-tracked on main; _pre suffix preserved from current ebuild.
 2026-08-06: 2 commits landed same UTC day (d61e80b -> 6b2aa1c), so the date
@@ -1599,6 +1599,11 @@ the contents API on api.github.com — the host the commit probe already uses �
 with Accept: application/vnd.github.raw, which returns the file verbatim (the
 default media type would be base64 and the pattern would never match). The
 commits endpoint ignores that Accept, so the main probe is unaffected.
+2026-08-18: async-tar moved from crates.io to a zed-industries git fork, so it
+left CRATES for GIT_CRATES. It needs no src_prepare sed: those nine seds exist
+only for the [patch.crates-io] entries, which cargo.eclass does not rewrite.
+Patch 0002 needed a context rebase in crates/zed/Cargo.toml (upstream reordered
+channel/chrono).
 """
 # END
 

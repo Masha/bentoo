@@ -73,7 +73,6 @@ CRATES="
 	async-std@1.13.2
 	async-stream-impl@0.3.6
 	async-stream@0.3.6
-	async-tar@0.6.1
 	async-trait@0.1.89
 	async-tungstenite@0.31.0
 	async_zip@0.0.18
@@ -1548,6 +1547,7 @@ declare -A GIT_CRATES=(
 	[alacritty_terminal]='https://github.com/zed-industries/alacritty;4c129667ce56611becdc82de6e28218c80e2e88f;alacritty-%commit%/alacritty_terminal'
 	[async-pipe]='https://github.com/zed-industries/async-pipe-rs;82d00a04211cf4e1236029aa03e6b6ce2a74c553;async-pipe-rs-%commit%'
 	[async-process]='https://github.com/zed-industries/async-process;0b6d6713570af61806e1e5cb40e0f757cb93fd9d;async-process-%commit%'
+	[async-tar]='https://github.com/zed-industries/async-tar;bd3ad6f89df9a9da7a8535958756d6bf465936a0;async-tar-%commit%'
 	[async-task]='https://github.com/smol-rs/async-task;b4486cd71e4e94fbda54ce6302444de14f4d190e;async-task-%commit%'
 	[calloop]='https://github.com/zed-industries/calloop;eb6b4fd17b9af5ecc226546bdd04185391b3e265;calloop-%commit%'
 	[dap-types]='https://github.com/zed-industries/dap-types;1b461b310481d01e02b2603c16d7144b926339f8;dap-types-%commit%/dap-types'
@@ -1622,7 +1622,7 @@ declare -A GIT_CRATES=(
 	[zed-xim]='https://github.com/zed-industries/xim-rs;16f35a2c881b815a2b6cdfd6687988e84f8447d8;xim-rs-%commit%'
 )
 
-EGIT_COMMIT="8968bf78084f30809aa2ce1574a3be68ed02a513"
+EGIT_COMMIT="3624a5bfda8a4610bf9926499517a776c7028321"
 LLVM_COMPAT=( 22 )
 RUST_MIN_VER="1.96.0"
 RUST_NEEDS_LLVM=1
