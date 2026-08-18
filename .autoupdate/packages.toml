@@ -6486,7 +6486,7 @@ parser = "regex"
 pattern = 'href="([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)/"'
 select = "max"
 series = '^26\.2\.'
-version = "26.2.5.1"
+version = "26.2.6.1"
 comments = """
 libreoffice-l10n (stable line) — follows the core release, so it reads the same
 archive index rather than the headless src/ probe: that probe returns whatever
