@@ -6,7 +6,7 @@ EAPI=8
 ECM_HANDBOOK="optional"
 ECM_TEST="forceoptional"
 KFMIN=6.26.0
-QTMIN=6.10.1
+QTMIN=6.11.2
 inherit ecm plasma.kde.org xdg
 
 DESCRIPTION="Screenshot capture utility"
@@ -66,6 +66,15 @@ BDEPEND="
 	virtual/pkgconfig
 "
 
+# BENTOO-DIVERGENCE: PATCHES - this overlay ships media-libs/opencv-5.0.0, and
+# upstream asks CMake for "OpenCV 4.7" explicitly. OpenCV 5's config rejects
+# that request on a major version mismatch, so src_configure dies before a
+# single object is compiled -- ::gentoo does not hit this because it still
+# ships 4.x. Everything else here is byte-identical to ::gentoo's -r1, and the
+# revision is matched deliberately: on a tie Portage picks this repo
+# (priority 0) over ::gentoo (priority -1000). Drop this once ::gentoo carries
+# an OpenCV 5 fix of its own.
+#
 # Deliberately ${PN}, not ${P}: this patch has been byte-identical since 6.7.1
 # and a version in its name only means every bump must rename the file by hand.
 # 6.7.4 shipped without that rename and would die in src_prepare.
@@ -76,8 +85,4 @@ src_configure() {
 		$(cmake_use_find_package share KF6Purpose)
 	)
 	ecm_src_configure
-}
-
-pkg_postinst() {
-	xdg_pkg_postinst
 }
