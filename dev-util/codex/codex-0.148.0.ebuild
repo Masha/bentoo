@@ -20,12 +20,18 @@ CRATES="
 "
 
 # Mirrors every "source = git+..." entry in codex-rs/Cargo.lock. Diff this block
-# against that file on every bump: a stale rev makes cargo die with
-# "can't checkout <repo>#<rev>", and an entry the lock no longer references only
-# costs a pointless fetch. Upstream moved crossterm from nornagon to
-# openai-oss-forks in 0.147.0 and dropped its ratatui fork back to crates.io.
+# against that file on every bump; an entry the lock no longer references only
+# costs a pointless fetch, but a stale rev is silent here. src_prepare rewrites
+# [patch.crates-io] as "path = <unpacked dir>", and a path carries no revision,
+# so cargo never reports "can't checkout <repo>#<rev>" -- it just compiles the
+# previous release's source. That surfaces much later as unrelated-looking
+# errors in a consumer crate: 0.148.0 with the 0.147.0 crossterm failed with
+# E0425/E0433 in codex-tui for discard_buffered_input, buffer_input and
+# InputDiscardStatus, all added by the fork after f69a4a04.
+# Upstream moved crossterm from nornagon to openai-oss-forks in 0.147.0 and
+# dropped its ratatui fork back to crates.io.
 declare -A GIT_CRATES=(
-	[crossterm]='https://github.com/openai-oss-forks/crossterm;f69a4a0499f2fdc7d5d222df32373ffffe9ba3f5;crossterm-%commit%'
+	[crossterm]='https://github.com/openai-oss-forks/crossterm;45fecb9508105988f42fe6ff0441783ed3717f92;crossterm-%commit%'
 	[nucleo-matcher]='https://github.com/helix-editor/nucleo;4253de9faabb4e5c6d81d946a5e35a90f87347ee;nucleo-%commit%/matcher'
 	[nucleo]='https://github.com/helix-editor/nucleo;4253de9faabb4e5c6d81d946a5e35a90f87347ee;nucleo-%commit%'
 	[runfiles]='https://github.com/dzbarsky/rules_rust;b56cbaa8465e74127f1ea216f813cd377295ad81;rules_rust-%commit%/rust/runfiles'
