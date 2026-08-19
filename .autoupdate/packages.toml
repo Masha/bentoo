@@ -166,9 +166,6 @@ url = "https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.g
 parser = "regex"
 pattern = '<updated>([0-9]{4}-[0-9]{2}-[0-9]{2})'
 transform = [['-', ""]]
-aux_var = "EGIT_COMMIT"
-aux_pattern = 'id>urn:sha1:([0-9a-f]{40})'
-version = "20260818"
 patched = """
 Fetched with git-r3 from the pinned EGIT_COMMIT instead of ::gentoo's release \
 tarball: the gitlab archive ::gentoo falls back to is unreachable behind \
@@ -177,6 +174,9 @@ narrowed to ~amd64 ~arm64, and src_unpack is unconditional git-r3 rather than \
 ::gentoo's tarball/9999 branch. Drop this once a tagged ::gentoo release we \
 would actually ship fetches on its own.\
 """
+aux_var = "EGIT_COMMIT"
+aux_pattern = 'id>urn:sha1:([0-9a-f]{40})'
+version = "20260818"
 comments = """
 linux-firmware — kernel.org's cgit atom feed, because this package has no
 releases to track: it is fetched with git-r3 from a pinned commit and versioned
@@ -3587,7 +3587,6 @@ url = "https://api.github.com/repos/KDE/plasma-workspace/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "6.7.4"
 patched = """
 Applies files/spectacle-opencv5.patch, which ::gentoo does not ship at 6.7.4 — \
 it carries no files/ directory for this package at all — and adds a \
@@ -3596,6 +3595,7 @@ named ${PN}-opencv5.patch, not ${P}-, deliberately: it has been byte-identical \
 since 6.7.1, and a version in the filename would make every bump rename it by \
 hand. Drop this once ::gentoo carries the opencv5 fix itself.\
 """
+version = "6.7.4"
 comments = """
 spectacle -> KDE/plasma-workspace (anchor: overlay versions it as Plasma)
 """
