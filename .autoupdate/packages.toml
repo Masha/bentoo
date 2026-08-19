@@ -293,7 +293,7 @@ url = "https://dl.pstmn.io/api/version/latest?platform=linux64&channel=stable"
 parser = "json"
 path = "version"
 type = "bin"
-version = "12.24.1"
+version = "12.24.2"
 comments = """
 Postman — official version API; clean {"version":"..."}.
 """
@@ -700,6 +700,7 @@ dxvk-nvapi — tag "vX.Y.Z".
 # END
 
 ["app-emulation/wine-vanilla"]
+enabled = false
 url = "https://gitlab.winehq.org/api/v4/projects/wine%2Fwine/releases?per_page=30"
 parser = "regex"
 pattern = '"tag_name":"wine-([0-9]+\.[0-9]+(?:\.[0-9]+)?)"'
@@ -1333,7 +1334,7 @@ dav2d — default tag order (new project).
 url = "https://gitlab.isc.org/api/v4/projects/isc-projects%2Fbind9/repository/tags?search=v9.20&order_by=version&sort=desc"
 parser = "json"
 path = "[0].name"
-version = "9.20.26"
+version = "9.20.27"
 comments = """
 bind-tools — pinned to the 9.20 stable branch via search; "v" stripped.
 """
