@@ -187,7 +187,7 @@ CRATES="
 	cast@0.3.0
 	cbc@0.1.2
 	cbindgen@0.28.0
-	cc@1.2.49
+	cc@1.4.3
 	cesu8@1.1.0
 	cexpr@0.6.0
 	cfg-expr@0.20.6
@@ -257,19 +257,19 @@ CRATES="
 	cpal@0.17.1
 	cpp_demangle@0.4.5
 	cpufeatures@0.2.17
-	cranelift-assembler-x64-meta@0.123.12
-	cranelift-assembler-x64@0.123.12
-	cranelift-bforest@0.123.12
-	cranelift-bitset@0.123.12
-	cranelift-codegen-meta@0.123.12
-	cranelift-codegen-shared@0.123.12
-	cranelift-codegen@0.123.12
-	cranelift-control@0.123.12
-	cranelift-entity@0.123.12
-	cranelift-frontend@0.123.12
-	cranelift-isle@0.123.12
-	cranelift-native@0.123.12
-	cranelift-srcgen@0.123.12
+	cranelift-assembler-x64-meta@0.123.13
+	cranelift-assembler-x64@0.123.13
+	cranelift-bforest@0.123.13
+	cranelift-bitset@0.123.13
+	cranelift-codegen-meta@0.123.13
+	cranelift-codegen-shared@0.123.13
+	cranelift-codegen@0.123.13
+	cranelift-control@0.123.13
+	cranelift-entity@0.123.13
+	cranelift-frontend@0.123.13
+	cranelift-isle@0.123.13
+	cranelift-native@0.123.13
+	cranelift-srcgen@0.123.13
 	crash-context@0.6.3
 	crash-handler@0.7.0
 	crc-catalog@2.4.0
@@ -402,7 +402,7 @@ CRATES="
 	ff@0.12.1
 	filedescriptor@0.8.3
 	filetime@0.2.29
-	find-msvc-tools@0.1.5
+	find-msvc-tools@0.1.11
 	fixedbitset@0.4.2
 	fixedbitset@0.5.7
 	flate2@1.1.8
@@ -891,8 +891,8 @@ CRATES="
 	pulldown-cmark@0.10.3
 	pulldown-cmark@0.12.2
 	pulldown-cmark@0.13.0
-	pulley-interpreter@36.0.12
-	pulley-macros@36.0.12
+	pulley-interpreter@36.0.13
+	pulley-macros@36.0.13
 	pxfm@0.1.25
 	qoi@0.4.1
 	quick-error@1.2.3
@@ -1031,7 +1031,7 @@ CRATES="
 	serde_derive@1.0.228
 	serde_derive_internals@0.29.1
 	serde_fmt@1.0.3
-	serde_json@1.0.145
+	serde_json@1.0.151
 	serde_json_lenient@0.2.4
 	serde_path_to_error@0.1.20
 	serde_repr@0.1.20
@@ -1054,6 +1054,7 @@ CRATES="
 	shellexpand@3.1.1
 	shingles@0.1.1
 	shlex@1.3.0
+	shlex@2.0.1
 	signal-hook-registry@1.4.6
 	signal-hook@0.4.4
 	signature@1.6.4
@@ -1230,12 +1231,10 @@ CRATES="
 	tree-sitter-html@0.23.2
 	tree-sitter-jsdoc@0.23.2
 	tree-sitter-json@0.24.8
-	tree-sitter-language@0.1.5
 	tree-sitter-python@0.25.0
 	tree-sitter-regex@0.24.3
 	tree-sitter-ruby@0.23.1
 	tree-sitter-rust@0.24.2
-	tree-sitter@0.26.9
 	triomphe@0.1.15
 	try-lock@0.2.5
 	ttf-parser@0.25.1
@@ -1319,25 +1318,25 @@ CRATES="
 	wasmparser@0.244.0
 	wasmparser@0.252.0
 	wasmprinter@0.236.1
-	wasmtime-c-api-impl@36.0.9
-	wasmtime-environ@36.0.12
-	wasmtime-internal-asm-macros@36.0.12
-	wasmtime-internal-c-api-macros@36.0.9
-	wasmtime-internal-component-macro@36.0.12
-	wasmtime-internal-component-util@36.0.12
-	wasmtime-internal-cranelift@36.0.12
-	wasmtime-internal-fiber@36.0.12
-	wasmtime-internal-jit-debug@36.0.12
-	wasmtime-internal-jit-icache-coherence@36.0.12
-	wasmtime-internal-math@36.0.12
-	wasmtime-internal-slab@36.0.12
-	wasmtime-internal-unwinder@36.0.12
-	wasmtime-internal-versioned-export-macros@36.0.12
-	wasmtime-internal-winch@36.0.12
-	wasmtime-internal-wit-bindgen@36.0.12
+	wasmtime-c-api-impl@36.0.13
+	wasmtime-environ@36.0.13
+	wasmtime-internal-asm-macros@36.0.13
+	wasmtime-internal-c-api-macros@36.0.13
+	wasmtime-internal-component-macro@36.0.13
+	wasmtime-internal-component-util@36.0.13
+	wasmtime-internal-cranelift@36.0.13
+	wasmtime-internal-fiber@36.0.13
+	wasmtime-internal-jit-debug@36.0.13
+	wasmtime-internal-jit-icache-coherence@36.0.13
+	wasmtime-internal-math@36.0.13
+	wasmtime-internal-slab@36.0.13
+	wasmtime-internal-unwinder@36.0.13
+	wasmtime-internal-versioned-export-macros@36.0.13
+	wasmtime-internal-winch@36.0.13
+	wasmtime-internal-wit-bindgen@36.0.13
 	wasmtime-wasi-io@36.0.12
 	wasmtime-wasi@36.0.12
-	wasmtime@36.0.12
+	wasmtime@36.0.13
 	wast@35.0.2
 	wax@0.7.0
 	wayland-backend@0.3.15
@@ -1375,7 +1374,7 @@ CRATES="
 	winapi-util@0.1.11
 	winapi-x86_64-pc-windows-gnu@0.4.0
 	winapi@0.3.9
-	winch-codegen@36.0.12
+	winch-codegen@36.0.13
 	windows-bindgen@0.61.1
 	windows-collections@0.2.0
 	windows-collections@0.3.2
@@ -1532,6 +1531,7 @@ CRATES="
 	zerovec-derive@0.11.1
 	zerovec@0.11.4
 	zip@0.6.6
+	zmij@1.0.23
 	zstd-safe@5.0.2+zstd.1.5.2
 	zstd-sys@2.0.16+zstd.1.5.7
 	zstd@0.11.2+zstd.1.5.2
@@ -1600,11 +1600,13 @@ declare -A GIT_CRATES=(
 	[rodio]='https://github.com/RustAudio/rodio;e50e726ddd0292f6ef9de0dda6b90af4ed1fb66a;rodio-%commit%'
 	[roughr-merman]='https://github.com/zed-industries/merman;a3ed8d9f3fd1d74c802f25ed9edd501743796504;merman-%commit%/crates/roughr'
 	[trash]='https://github.com/zed-industries/trash-rs;41c6c800d884a89351f3b8856d12894cccee261d;trash-rs-%commit%'
+	[tree-sitter]='https://github.com/tree-sitter/tree-sitter;dff1fd868c750dbbae179fcd5c43ce987e4e0528;tree-sitter-%commit%/lib'
 	[tree-sitter-cpp]='https://github.com/tree-sitter/tree-sitter-cpp;5cb9b693cfd7bfacab1d9ff4acac1a4150700609;tree-sitter-cpp-%commit%'
 	[tree-sitter-gitcommit]='https://github.com/zed-industries/tree-sitter-git-commit;88309716a69dd13ab83443721ba6e0b491d37ee9;tree-sitter-git-commit-%commit%'
 	[tree-sitter-gomod]='https://github.com/camdencheek/tree-sitter-go-mod;2e886870578eeba1927a2dc4bd2e2b3f598c5f9a;tree-sitter-go-mod-%commit%'
 	[tree-sitter-gowork]='https://github.com/zed-industries/tree-sitter-go-work;acb0617bf7f4fda02c6217676cc64acb89536dc7;tree-sitter-go-work-%commit%'
 	[tree-sitter-heex]='https://github.com/zed-industries/tree-sitter-heex;1dd45142fbb05562e35b2040c6129c9bca346592;tree-sitter-heex-%commit%'
+	[tree-sitter-language]='https://github.com/tree-sitter/tree-sitter;dff1fd868c750dbbae179fcd5c43ce987e4e0528;tree-sitter-%commit%/crates/language'
 	[tree-sitter-md]='https://github.com/zed-industries/tree-sitter-markdown;b596e737286780d7bfa9fcddceaeeb754574b352;tree-sitter-markdown-%commit%'
 	[tree-sitter-typescript]='https://github.com/zed-industries/tree-sitter-typescript;e2c53597d6a5d9cf7bbe8dccde576fe1e46c5899;tree-sitter-typescript-%commit%'
 	[tree-sitter-yaml]='https://github.com/zed-industries/tree-sitter-yaml;baff0b51c64ef6a1fb1f8390f3ad6015b83ec13a;tree-sitter-yaml-%commit%'
@@ -1827,6 +1829,15 @@ src_prepare() {
 	NOTIFY_GIT+=", rev = \"${NOTIFY_COMMIT}\""
 	local NOTIFY_PATH="notify = \\{ path = \"${WORKDIR}/notify-${NOTIFY_COMMIT}/notify\""
 
+	local TREE_SITTER_COMMIT="dff1fd868c750dbbae179fcd5c43ce987e4e0528"
+	local TREE_SITTER_GIT="tree-sitter = { git = \"https://github.com/tree-sitter/tree-sitter\""
+	TREE_SITTER_GIT+=", rev = \"${TREE_SITTER_COMMIT}\""
+	local TREE_SITTER_PATH="tree-sitter = \\{ path = \"${WORKDIR}/tree-sitter-${TREE_SITTER_COMMIT}/lib\""
+
+	local TS_LANGUAGE_GIT="tree-sitter-language = { git = \"https://github.com/tree-sitter/tree-sitter\""
+	TS_LANGUAGE_GIT+=", rev = \"${TREE_SITTER_COMMIT}\""
+	local TS_LANGUAGE_PATH="tree-sitter-language = \\{ path = \"${WORKDIR}/tree-sitter-${TREE_SITTER_COMMIT}/crates/language\""
+
 	local NOTIFY_TYPES_GIT="notify-types = { git = \"https://github.com/zed-industries/notify\""
 	NOTIFY_TYPES_GIT+=", rev = \"${NOTIFY_COMMIT}\""
 	local NOTIFY_TYPES_PATH="notify-types = \\{ path = \"${WORKDIR}/notify-${NOTIFY_COMMIT}/notify-types\""
@@ -1840,6 +1851,8 @@ src_prepare() {
 		-e "s#${WIN_CAP_GIT}#${WIN_CAP_PATH}#" \
 		-e "s#${NOTIFY_TYPES_GIT}#${NOTIFY_TYPES_PATH}#" \
 		-e "s#${NOTIFY_GIT}#${NOTIFY_PATH}#" \
+		-e "s#${TS_LANGUAGE_GIT}#${TS_LANGUAGE_PATH}#" \
+		-e "s#${TREE_SITTER_GIT}#${TREE_SITTER_PATH}#" \
 		-i "${S}/Cargo.toml" || die "Cargo fetch workaround failed"
 
 	# Toggle gpui display backend features based on USE flags
