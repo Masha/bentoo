@@ -14,7 +14,7 @@ inherit desktop distutils-r1 toolchain-funcs verify-sig virtualx
 DESCRIPTION="Clean junk to free disk space and to maintain privacy"
 HOMEPAGE="https://www.bleachbit.org"
 SRC_URI="
-	https://download.bleachbit.org/${P}.tar.bz2
+	https://download.sourceforge.net/project/bleachbit/bleachbit/${PV}/${P}.tar.bz2
 	verify-sig? (
 		https://download.sourceforge.net/project/bleachbit/bleachbit/${PV}/detached_signatures/${P}.tar.bz2.sig
 	)
