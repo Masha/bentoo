@@ -62,7 +62,7 @@ IUSE="accessibility +aio alsa bpf bzip2 capstone +curl debug ${QEMU_DOC_USEFLAG}
 # hexagon gained system emulation (hexagon-softmmu) in QEMU 11.1, so it moved
 # from the user-only list into the shared one.
 #
-# BENTOO-DIVERGENCE: IUSE - the emulation target lists track series 11, so they
+# BENTOO-DIVERGENCE: IUSE: the emulation target lists track series 11, so they
 # differ from ::gentoo's stable 10.2.x on two flags, both dictated by what the
 # 11.1.0 tarball actually ships in configs/targets/:
 #   qemu_softmmu_targets_hexagon     gained: hexagon-softmmu.mak is new in 11.1
@@ -372,10 +372,15 @@ RDEPEND="
 	)
 "
 
-# BENTOO-DIVERGENCE: PATCHES - the optionrom patch is the same fix as
-# ::gentoo's, carried under a different filename: ::gentoo renames it to the
-# oldest version it still applies to (qemu-10.2.2-...), this overlay kept the
-# name minted when the series 11 ebuild was first written (qemu-11.0.0-...).
+# PATCHES, for a reader -- deliberately NOT a BENTOO-DIVERGENCE tag: the
+# comparison tracks four axes only (inherit, options, iuse, deps), so a tag on a
+# PATCHES axis would be well-formed, match no finding, and declare nothing while
+# looking like it declared something.
+#
+# The optionrom patch is the same fix as ::gentoo's, carried under a different
+# filename: ::gentoo renames it to the oldest version it still applies to
+# (qemu-10.2.2-...), this overlay kept the name minted when the series 11 ebuild
+# was first written (qemu-11.0.0-...).
 # All seven patches below were re-verified against the 11.1.0 tarball with
 # `patch -p1 --dry-run`; none needed a rebase.
 #

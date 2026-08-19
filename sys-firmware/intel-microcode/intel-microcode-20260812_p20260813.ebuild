@@ -25,15 +25,22 @@ inherit dist-kernel-utils linux-info mount-boot
 # * the first date is upstream
 # * the second date is snapshot (use last commit date in repo) from intel-microcode-collection
 #
-# NOTE (bentoo): the two dates are deliberately far apart here.  20260811 is the
-# current Intel release; 20260513 is the *newest* intel-microcode-collection
-# snapshot published by Gentoo developers -- every later date was probed and
-# returns 404 on all three mirrors (distfiles.gentoo.org/pub/proj,
-# ~mpagano, ~sam).  The collection is only consulted for USE=-vanilla, where it
-# adds microcodes Intel never shipped in its own tarball, so a stale collection
-# costs nothing on the official microcodes and never holds back an Intel bump.
-# Raise the _p suffix by hand as soon as a newer collection tarball appears; the
-# autoupdate probe only tracks the Intel date.
+# NOTE (bentoo): the _p suffix is NOT tracked by the autoupdate probe, which
+# follows the Intel date only.  It is pinned by hand in
+# .autoupdate/packages.toml and has to be raised here whenever a newer
+# intel-microcode-collection tarball is published.
+#
+# Raised 2026-08-18.  It had sat at _p20260513 under a comment asserting that
+# every later snapshot returned 404 on all three mirrors.  That had stopped
+# being true -- ::gentoo's own Manifest carries collection-20260811 and
+# collection-20260813 -- and the pin had drifted into an August Intel release
+# carrying a May collection.  When raising it next, CHECK instead of trusting
+# this paragraph: grep the ::gentoo Manifest for the snapshot before concluding
+# it does not exist.
+#
+# The collection is only consulted for USE=-vanilla, where it adds microcodes
+# Intel never shipped in its own tarball, so a stale collection costs nothing on
+# the official microcodes and never holds back an Intel bump.
 
 COLLECTION_SNAPSHOT="${PV##*_p}"
 INTEL_SNAPSHOT="${PV/_p*}"
@@ -44,8 +51,10 @@ INTEL_SNAPSHOT="${PV/_p*}"
 
 DESCRIPTION="Intel IA32/IA64 microcode update data"
 HOMEPAGE="https://github.com/intel/Intel-Linux-Processor-Microcode-Data-Files https://github.com/platomav/CPUMicrocodes http://inertiawar.com/microcode/"
-# The ~sam mirror used by ::gentoo stops at intel-microcode-collection-20240526;
-# the official pub/proj location is the one that actually serves 20260513.
+# The ~sam mirror ::gentoo also lists stops at intel-microcode-collection-20240526,
+# so it is dropped here and the official pub/proj location goes first -- that is
+# the one that actually serves current snapshots.  Deliberately no version in
+# this comment: it went stale the moment the pin moved.
 SRC_URI="
 	https://github.com/intel/Intel-Linux-Processor-Microcode-Data-Files/archive/microcode-${INTEL_SNAPSHOT}.tar.gz
 	https://github.com/intel/Intel-Linux-Processor-Microcode-Data-Files/raw/437f382b1be4412b9d03e2bbdcda46d83d581242/intel-ucode/06-4e-03 -> intel-ucode-sig_0x406e3-rev_0xd6.bin
