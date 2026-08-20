@@ -1600,7 +1600,6 @@ declare -A GIT_CRATES=(
 	[rodio]='https://github.com/RustAudio/rodio;e50e726ddd0292f6ef9de0dda6b90af4ed1fb66a;rodio-%commit%'
 	[roughr-merman]='https://github.com/zed-industries/merman;a3ed8d9f3fd1d74c802f25ed9edd501743796504;merman-%commit%/crates/roughr'
 	[trash]='https://github.com/zed-industries/trash-rs;41c6c800d884a89351f3b8856d12894cccee261d;trash-rs-%commit%'
-	[tree-sitter]='https://github.com/tree-sitter/tree-sitter;dff1fd868c750dbbae179fcd5c43ce987e4e0528;tree-sitter-%commit%/lib'
 	[tree-sitter-cpp]='https://github.com/tree-sitter/tree-sitter-cpp;5cb9b693cfd7bfacab1d9ff4acac1a4150700609;tree-sitter-cpp-%commit%'
 	[tree-sitter-gitcommit]='https://github.com/zed-industries/tree-sitter-git-commit;88309716a69dd13ab83443721ba6e0b491d37ee9;tree-sitter-git-commit-%commit%'
 	[tree-sitter-gomod]='https://github.com/camdencheek/tree-sitter-go-mod;2e886870578eeba1927a2dc4bd2e2b3f598c5f9a;tree-sitter-go-mod-%commit%'
@@ -1610,6 +1609,7 @@ declare -A GIT_CRATES=(
 	[tree-sitter-md]='https://github.com/zed-industries/tree-sitter-markdown;b596e737286780d7bfa9fcddceaeeb754574b352;tree-sitter-markdown-%commit%'
 	[tree-sitter-typescript]='https://github.com/zed-industries/tree-sitter-typescript;e2c53597d6a5d9cf7bbe8dccde576fe1e46c5899;tree-sitter-typescript-%commit%'
 	[tree-sitter-yaml]='https://github.com/zed-industries/tree-sitter-yaml;baff0b51c64ef6a1fb1f8390f3ad6015b83ec13a;tree-sitter-yaml-%commit%'
+	[tree-sitter]='https://github.com/tree-sitter/tree-sitter;dff1fd868c750dbbae179fcd5c43ce987e4e0528;tree-sitter-%commit%/lib'
 	[wasm_thread]='https://github.com/zed-industries/wasm_thread;0cf96c7708dfb97ccf3da50347e25edcf75d6937;wasm_thread-%commit%'
 	[webrtc-sys-build]='https://github.com/zed-industries/livekit-rust-sdks;d0e27be0cdad89eadab3e36207cda0a2b6e359ee;livekit-rust-sdks-%commit%/webrtc-sys/build'
 	[webrtc-sys]='https://github.com/zed-industries/livekit-rust-sdks;d0e27be0cdad89eadab3e36207cda0a2b6e359ee;livekit-rust-sdks-%commit%/webrtc-sys'
@@ -1624,7 +1624,7 @@ declare -A GIT_CRATES=(
 	[zed-xim]='https://github.com/zed-industries/xim-rs;16f35a2c881b815a2b6cdfd6687988e84f8447d8;xim-rs-%commit%'
 )
 
-EGIT_COMMIT="6e0a0835755ea57c1db4e0057f1a30ddba554706"
+EGIT_COMMIT="32a0e813a5132ee66b2cbc47d64b4c36b409f7f3"
 LLVM_COMPAT=( 22 )
 RUST_MIN_VER="1.96.0"
 RUST_NEEDS_LLVM=1
@@ -1792,21 +1792,21 @@ src_prepare() {
 	echo "nightly" > crates/zed/RELEASE_CHANNEL || die
 
 	# Cargo offline fetch workaround
-	local ASYNC_PROCESS_COMMIT="6e0a0835755ea57c1db4e0057f1a30ddba554706"
+	local ASYNC_PROCESS_COMMIT="0b6d6713570af61806e1e5cb40e0f757cb93fd9d"
 	local ASYNC_PROCESS_GIT="async-process = { git = \"https://github.com/zed-industries/async-process.git\""
 	ASYNC_PROCESS_GIT+=", rev = \"${ASYNC_PROCESS_COMMIT}\""
 	local ASYNC_PROCESS_PATH="async-process = \\{ path = \"${WORKDIR}/async-process-${ASYNC_PROCESS_COMMIT}\""
 
-	local ASYNC_TASK_COMMIT="6e0a0835755ea57c1db4e0057f1a30ddba554706"
+	local ASYNC_TASK_COMMIT="b4486cd71e4e94fbda54ce6302444de14f4d190e"
 	local ASYNC_TASK_GIT="async-task = { git = \"https://github.com/smol-rs/async-task.git\""
 	ASYNC_TASK_GIT+=", rev = \"${ASYNC_TASK_COMMIT}\""
 	local ASYNC_TASK_PATH="async-task = \\{ path = \"${WORKDIR}/async-task-${ASYNC_TASK_COMMIT}\""
 
-	local CALLOOP_COMMIT="6e0a0835755ea57c1db4e0057f1a30ddba554706"
+	local CALLOOP_COMMIT="eb6b4fd17b9af5ecc226546bdd04185391b3e265"
 	local CALLOOP_GIT="calloop = { git = \"https://github.com/zed-industries/calloop\""
 	local CALLOOP_PATH="calloop = \\{ path = \"${WORKDIR}/calloop-${CALLOOP_COMMIT}\""
 
-	local LIVEKIT_COMMIT="6e0a0835755ea57c1db4e0057f1a30ddba554706"
+	local LIVEKIT_COMMIT="d0e27be0cdad89eadab3e36207cda0a2b6e359ee"
 	local LIVEKIT_GIT="livekit = { git = \"https://github.com/zed-industries/livekit-rust-sdks\""
 	LIVEKIT_GIT+=", rev = \"${LIVEKIT_COMMIT}\""
 	local LIVEKIT_PATH="livekit = \\{ path = \"${WORKDIR}/livekit-rust-sdks-${LIVEKIT_COMMIT}/livekit\""
@@ -1815,7 +1815,7 @@ src_prepare() {
 	LIBWERBRTC_GIT+=", rev = \"${LIVEKIT_COMMIT}\""
 	local LIBWERBRTC_PATH="libwebrtc = \\{ path = \"${WORKDIR}/livekit-rust-sdks-${LIVEKIT_COMMIT}/libwebrtc\""
 
-	local WIN_CAP_COMMIT="6e0a0835755ea57c1db4e0057f1a30ddba554706"
+	local WIN_CAP_COMMIT="f0d6c1b6691db75461b732f6d5ff56eed002eeb9"
 	local WIN_CAP_GIT="windows-capture = { git = \"https://github.com/zed-industries/windows-capture.git\""
 	WIN_CAP_GIT+=", rev = \"${WIN_CAP_COMMIT}\""
 	local WIN_CAP_PATH="windows-capture = \\{ path = \"${WORKDIR}/windows-capture-${WIN_CAP_COMMIT}\""
@@ -1824,12 +1824,12 @@ src_prepare() {
 	WEBRTC_SYS_GIT+=", rev = \"${LIVEKIT_COMMIT}\""
 	local WEBRTC_SYS_PATH="webrtc-sys = \\{ path = \"${WORKDIR}/livekit-rust-sdks-${LIVEKIT_COMMIT}/webrtc-sys\""
 
-	local NOTIFY_COMMIT="6e0a0835755ea57c1db4e0057f1a30ddba554706"
+	local NOTIFY_COMMIT="0890bbb8ca40a4b5d1f67031698dd7918b37d991"
 	local NOTIFY_GIT="notify = { git = \"https://github.com/zed-industries/notify\""
 	NOTIFY_GIT+=", rev = \"${NOTIFY_COMMIT}\""
 	local NOTIFY_PATH="notify = \\{ path = \"${WORKDIR}/notify-${NOTIFY_COMMIT}/notify\""
 
-	local TREE_SITTER_COMMIT="6e0a0835755ea57c1db4e0057f1a30ddba554706"
+	local TREE_SITTER_COMMIT="dff1fd868c750dbbae179fcd5c43ce987e4e0528"
 	local TREE_SITTER_GIT="tree-sitter = { git = \"https://github.com/tree-sitter/tree-sitter\""
 	TREE_SITTER_GIT+=", rev = \"${TREE_SITTER_COMMIT}\""
 	local TREE_SITTER_PATH="tree-sitter = \\{ path = \"${WORKDIR}/tree-sitter-${TREE_SITTER_COMMIT}/lib\""
