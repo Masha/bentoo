@@ -740,7 +740,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.25.0"
+version = "0.26.0"
 comments = """
 bentoolkit — releases/latest devolve tag_name "vX.Y.Z"; o transform tira o "v",
 senao o bump gera um PV invalido (bentoolkit-v0.17.0).
@@ -7397,13 +7397,23 @@ not a version signal and must not be probed.
 # END
 
 ["sci-ml/whisper-cpp"]
-url = "https://api.github.com/repos/ggml-org/whisper.cpp/releases/latest"
-parser = "json"
-path = "tag_name"
+url = "https://api.github.com/repos/ggml-org/whisper.cpp/releases?per_page=20"
+parser = "regex"
+pattern = '"tag_name": ?"v([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 version = "1.9.2"
 comments = """
 whisper-cpp — tag "vX.Y.Z"; the leading v is stripped by the normalizer.
+
+2026-08-20: upstream started publishing llama.cpp-style build releases
+("b4938"), and releases/latest now answers the newest build tag, not the
+newest versioned release — the checker rightly reported it as
+non-comparable.  This entry therefore reads the release LIST and picks the
+highest "vX.Y.Z" tag (gstreamer's regex+select=max shape).  Known limit: a
+regex over the list cannot see the prerelease flag, so a versioned tag
+still marked prerelease (v1.9.3 was, on the day this changed) is proposed
+as soon as it appears rather than when it is promoted.
 
 --- story 002: AI stack foundation (added 2026-07-19) ---
 All endpoints below were download-validated against the real upstream
