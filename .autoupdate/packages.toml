@@ -407,7 +407,7 @@ transform strips the "go" prefix to match PV. Live=1.26.5.
 url = "https://persistent.oaistatic.com/codex-app-prod/linux/deb/dists/stable/main/binary-amd64/Packages"
 parser = "regex"
 pattern = 'Package: chatgpt\nVersion: ([0-9]+\.[0-9]+\.[0-9]+)'
-version = "26.818.21641"
+version = "26.818.31338"
 comments = """
 OpenAI Codex/ChatGPT desktop app — read the APT index of the very repo that
 SRC_URI pulls from. Both openai.com and chatgpt.com sit behind Cloudflare and
@@ -1253,7 +1253,7 @@ url = "https://api.github.com/repos/vim/vim/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "9.2.0990"
+version = "9.2.0992"
 comments = """
 vim — no releases (404); tags[0] "vX.Y.ZZZZ".
 """
@@ -1264,7 +1264,7 @@ url = "https://api.github.com/repos/vim/vim/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "9.2.0990"
+version = "9.2.0992"
 comments = """
 vim-core — same upstream repo as vim.
 """
@@ -1656,7 +1656,7 @@ path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
 series = '^[0-9.]+$'
-version = "1.15.1"
+version = "1.16.1"
 comments = """
 zed-bin (stable channel) — releases/latest is the stable release by definition
 (prerelease=false); upstream tags it "vX.Y.Z" and the preview "vX.Y.Z-pre".
@@ -1681,7 +1681,7 @@ select = "max"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
 series = '_pre$'
-version = "1.16.1_pre"
+version = "1.17.0_pre"
 comments = """
 zed-bin (preview channel) — releases/latest never returns a prerelease, so the
 preview needs the full list: the pattern takes only "vX.Y.Z-pre" tags and the
@@ -6599,7 +6599,7 @@ url = "https://antigravity.google/download"
 parser = "regex"
 pattern = '/antigravity-hub/([0-9]+\.[0-9]+\.[0-9]+-[0-9]+)/'
 transform = [['-', "."]]
-version = "2.8.1.6512087774658560"
+version = "2.9.1.4871453687021568"
 comments = """
 Antigravity 2.0 — the standalone desktop hub (agent orchestration), a separate
 product from the IDE above. /download now ships the links in the raw HTML, so the
@@ -6977,7 +6977,7 @@ parser = "regex"
 pattern = 'webkitgtk-(2\.52\.[0-9]+)\.tar\.xz'
 select = "max"
 revision = 410
-version = "2.52.5-r411"
+version = "2.52.6-r410"
 comments = """
 revision is the SLOT's BASE revision, not whatever the current ebuild carries.
 -r411 is a revbump WITHIN a PV; a PV change resets it to the base, exactly as
@@ -7001,7 +7001,7 @@ parser = "regex"
 pattern = 'webkitgtk-(2\.52\.[0-9]+)\.tar\.xz'
 select = "max"
 revision = 600
-version = "2.52.5-r601"
+version = "2.52.6-r600"
 comments = """
 600 is the base for this SLOT (::gentoo ships -r600 for every PV and -r601 as
 the revbump), and the overlay now follows it: the ebuild is
@@ -7402,7 +7402,7 @@ parser = "regex"
 pattern = '"tag_name": ?"v([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.9.2"
+version = "1.9.3"
 comments = """
 whisper-cpp — tag "vX.Y.Z"; the leading v is stripped by the normalizer.
 
