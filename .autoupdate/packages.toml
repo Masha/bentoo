@@ -7,8 +7,11 @@
 # ebuild (Gentoo version rules: prefixes v/release-/ver-/version- stripped;
 # regex returns capture group 1 of the FIRST match on the raw body).
 #
-# 508 records — 310 regex, 198 json. 18 disabled (enabled = false),
-# 3 held (hold = true): dev-build/gn, dev-lang/ghc, sci-ml/stable-diffusion-cpp.
+# 451 records — 313 regex, 138 json. 100 disabled (enabled = false),
+# 5 held (hold = true): www-client/chromium, dev-build/gn, dev-lang/ghc,
+# sci-ml/stable-diffusion-cpp, sys-cluster/minikube. Recounted with tomllib on
+# 2026-08-20 by the one-liner below; the previous figures (508/310/198/18/3)
+# had drifted and were never a count of this file as it stands.
 #
 # Two of the disabled records are disabled for a reason other than "package
 # gone": dev-libs/icu-compat and media-libs/libjxl-compat are pinned to an old
@@ -138,7 +141,7 @@
 url = "https://registry.npmjs.org/@anthropic-ai/claude-code"
 parser = "json"
 path = "dist-tags.latest"
-version = "2.1.236"
+version = "2.1.237"
 comments = """
 claude-code — npm @anthropic-ai/claude-code; dist-tags.latest is the stable channel.
 
@@ -293,7 +296,7 @@ url = "https://dl.pstmn.io/api/version/latest?platform=linux64&channel=stable"
 parser = "json"
 path = "version"
 type = "bin"
-version = "12.24.2"
+version = "12.24.4"
 comments = """
 Postman — official version API; clean {"version":"..."}.
 """
@@ -404,7 +407,7 @@ transform strips the "go" prefix to match PV. Live=1.26.5.
 url = "https://persistent.oaistatic.com/codex-app-prod/linux/deb/dists/stable/main/binary-amd64/Packages"
 parser = "regex"
 pattern = 'Package: chatgpt\nVersion: ([0-9]+\.[0-9]+\.[0-9]+)'
-version = "26.814.41957"
+version = "26.818.21641"
 comments = """
 OpenAI Codex/ChatGPT desktop app — read the APT index of the very repo that
 SRC_URI pulls from. Both openai.com and chatgpt.com sit behind Cloudflare and
@@ -986,7 +989,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "1.10.4"
+version = "1.10.5"
 comments = """
 bisq (bisq-bin) — tag "vX.Y.Z".
 """
@@ -1168,6 +1171,7 @@ edk2 — tag "edk2-stableYYYYMM"; regex captures the 6-digit datestamp.
 # END
 
 ["sys-firmware/intel-microcode"]
+enabled = false
 url = "https://api.github.com/repos/intel/Intel-Linux-Processor-Microcode-Data-Files/releases/latest"
 parser = "regex"
 pattern = '"tag_name":\s*"microcode-([0-9]{8})"'
@@ -7007,6 +7011,7 @@ which is why this entry carried no revision until 2026-07-26.
 # END
 
 ["sci-ml/ollama"]
+enabled = false
 url = "https://api.github.com/repos/ollama/ollama/releases/latest"
 parser = "json"
 path = "tag_name"
@@ -7146,6 +7151,7 @@ SRC_URI releases/download/v${PV}/${P}-bundle.tar.gz. Live=v0.2.0.
 # END
 
 ["net-im/telegram-desktop"]
+enabled = false
 url = "https://api.github.com/repos/telegramdesktop/tdesktop/releases/latest"
 parser = "json"
 path = "tag_name"
@@ -7258,7 +7264,7 @@ stable/alpha entries); transform "-beta-"->"_beta" yields PV=4.0.0_beta2.
 url = "https://storage.googleapis.com/flutter_infra_release/releases/releases_linux.json"
 parser = "regex"
 pattern = '"channel": "stable",\s+"version": "([0-9]+\.[0-9]+\.[0-9]+)"'
-version = "3.47.1"
+version = "3.47.1-r1"
 comments = """
 Flutter — official releases_linux.json (pretty-printed, newest-first). The
 current_release.stable is a hash, not a version, so anchor the regex on the
@@ -7540,6 +7546,7 @@ because ::gentoo is stuck on 1.33 (2025).  Drop both once ::gentoo ships 2.x.
 # END
 
 ["sys-apps/uutils-coreutils"]
+enabled = false
 url = "https://api.github.com/repos/uutils/coreutils/releases/latest"
 parser = "json"
 path = "tag_name"
@@ -7658,6 +7665,7 @@ which is what the 9999 ebuild is for; 9999 is not version-checked.
 # END
 
 ["sys-devel/mold"]
+enabled = false
 url = "https://api.github.com/repos/rui314/mold/releases/latest"
 parser = "json"
 path = "tag_name"
@@ -7696,5 +7704,43 @@ Upstream's pre-release axis is X.0.99.90N (21.0.99.901 -> 21.1.0,
 rules, so max moves rc1 -> rc2 -> final on its own with no record change. The
 overlay is deliberately on that RC axis right now (26.0.99.901, the 26.1.0 rc1),
 which is why nothing here filters pre-releases out.
+"""
+# END
+
+["sys-cluster/minikube"]
+hold = true
+url = "https://api.github.com/repos/kubernetes/minikube/releases/latest"
+parser = "json"
+path = "tag_name"
+transform = [['^v', ""]]
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "1.38.1-r1"
+comments = """
+minikube — GitHub releases/latest -> tag_name "vX.Y.Z" ("v" stripped).
+Live-verified 2026-08-20: v1.38.1, which is what the overlay ships.
+
+hold = true, for two reasons that both break an unattended bump:
+
+  1. The ebuild pulls a SECOND distfile, ${P}-deps.tar.xz, from
+     dev.gentoo.org/~zmedico/dist/ -- a vendored Go module tree that a Gentoo
+     developer generates by hand, per version. It is not published on the
+     upstream release, so a tag can be live for days with no deps tarball
+     behind it, and pkgdev manifest would then fail on a 404. Confirm with
+     `curl -sI https://dev.gentoo.org/~zmedico/dist/minikube-<PV>-deps.tar.xz`
+     before bumping.
+  2. GIT_COMMIT= is hardcoded to the commit the tag points at, and feeds
+     `minikube version`. The applier rewrites PV and SRC_URI, not a free-text
+     ebuild variable, so a bump that only moves the version ships a binary
+     reporting the PREVIOUS commit. Read it from
+     `/repos/kubernetes/minikube/git/ref/tags/v<PV>` -> object.sha.
+
+Note that hold only stops the checker from proposing the bump; an explicit
+--apply still rewrites the ebuild. See feedback on hold not being enforced on
+apply.
+
+This overlay carries the package (::gentoo has it too) because ::gentoo's
+1.38.1 does not build with USE=libvirt: it still asks make for the
+out/docker-machine-driver-kvm2 target that 1.38 deleted along with
+cmd/drivers/kvm. Drop this package from the overlay once ::gentoo fixes it.
 """
 # END
