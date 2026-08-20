@@ -6,7 +6,7 @@ EAPI=8
 inherit unpacker
 
 # Build number: not derivable from PV, read it off the download page
-MY_BUILD="2"
+MY_BUILD="1"
 MY_P="nomachine-personal-edition_${PV}_${MY_BUILD}"
 
 DESCRIPTION="Client for NoMachine remote servers"

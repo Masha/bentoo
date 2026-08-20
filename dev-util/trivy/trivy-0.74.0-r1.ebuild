@@ -20,7 +20,12 @@ KEYWORDS="~amd64"
 # network/registry fixtures and are restricted.
 RESTRICT="network-sandbox test"
 
-BDEPEND=">=dev-lang/go-1.26.3"
+# Go 1.27 is the floor, not a preference: pkg/x/json and the CloudFormation
+# parser use encoding/json/v2, which graduated from GOEXPERIMENT to a
+# default-on package in 1.27, and the patch below targets that finalized API.
+BDEPEND=">=dev-lang/go-1.27.0"
+
+PATCHES=( "${FILESDIR}"/${PN}-json-v2-errunsupported.patch )
 
 src_unpack() {
 	default
@@ -29,9 +34,6 @@ src_unpack() {
 }
 
 src_compile() {
-	# Trivy (pkg/x/json) uses the experimental encoding/json/v2 stdlib API,
-	# which is gated behind the jsonv2 Go experiment.
-	export GOEXPERIMENT=jsonv2
 	ego build \
 		-ldflags="-s -X github.com/aquasecurity/trivy/pkg/version/app.ver=${PV}" \
 		-o trivy ./cmd/trivy

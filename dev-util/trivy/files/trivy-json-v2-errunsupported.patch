@@ -1,0 +1,47 @@
+Replace json.SkipFunc with errors.ErrUnsupported (Go 1.27 json/v2 API).
+
+encoding/json/v2 graduated from GOEXPERIMENT to a default-on package in Go
+1.27, and the API review dropped the json.SkipFunc sentinel.  The mechanism it
+named still exists, but the signal a type-specific (un)marshal function returns
+to decline a value and fall through to the next applicable function is now any
+error matching errors.ErrUnsupported -- see the JoinMarshalers/JoinUnmarshalers
+documentation and arshal_funcs.go:147 in the Go 1.27 sources.
+
+Both call sites here decline before touching the decoder (PeekKind and
+UnreadBuffer read no tokens), which is what json/v2 requires: it only forwards
+ErrUnsupported as a skip when the decoder depth and length are unchanged,
+otherwise it rejects the call as an unsupported mutation.
+
+Without this the package fails to compile against Go 1.27 with
+"undefined: json.SkipFunc".
+
+--- a/pkg/x/json/json.go
++++ b/pkg/x/json/json.go
+@@ -4,6 +4,7 @@
+ 	"bytes"
+ 	"encoding/json/jsontext"
+ 	"encoding/json/v2"
++	"errors"
+ 	"io"
+ 
+ 	"golang.org/x/xerrors"
+@@ -106,7 +107,7 @@
+ 
+ 		// Check visited set to avoid infinity loops
+ 		if visited.Contains(start) {
+-			return json.SkipFunc
++			return errors.ErrUnsupported
+ 		}
+ 		visited.Append(start)
+ 
+--- a/pkg/iac/scanners/cloudformation/parser/parameter.go
++++ b/pkg/iac/scanners/cloudformation/parser/parameter.go
+@@ -54,7 +54,7 @@
+ 		}
+ 		return nil
+ 	}
+-	return json.SkipFunc
++	return errors.ErrUnsupported
+ }
+ 
+ func (p *Parameter) Type() cftypes.CfType {
