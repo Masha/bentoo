@@ -7171,6 +7171,37 @@ the highest uploaded release; if a bump seems missing, verify against .releases.
 """
 # END
 
+["app-admin/awscli2"]
+url = "https://api.github.com/repos/aws/aws-cli/tags?per_page=100"
+parser = "regex"
+pattern = '"name":\s*"([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+series = '^2\.'
+version = "2.36.27"
+comments = """
+aws-cli v2 — GitHub tag index, pinned to the 2.x series. Verified 2026-08-19
+against the live endpoint: 100 matches, all of them 2.x, max = 2.36.27 = ebuild.
+
+releases/latest is NOT usable here: aws/aws-cli publishes no GitHub releases at
+all, only tags. And the repository carries two parallel channels -- v1 (still
+actively released; ::gentoo ships app-admin/awscli-1.46.0) and v2 -- on the SAME
+tag index, which is why select = "max" alone would be unsafe.
+
+series is what makes it safe, and it is deliberately kept even though it is
+redundant today: the API currently returns tags in an order where every one of
+the first 100 is a 2.x, so no 1.x is even in the window. That ordering is not a
+documented guarantee. The day a 1.x enters the page, an unfiltered "max" over
+"1.46.0" vs "2.36.27" still picks the 2.x by numeric comparison -- but a future
+1.x line that outran the 2.x minor would silently retarget this record onto the
+v1 channel, which is a different package (app-admin/awscli in ::gentoo).
+
+The v2 source is NOT on PyPI: pypi.org/pypi/awscli/json reports info.version =
+1.46.0 and has zero 2.x releases, so a PyPI probe would permanently report this
+package as ten majors behind. The GitHub tag index is the only source of truth.
+"""
+# END
+
 ["app-admin/ansible-core"]
 url = "https://api.github.com/repos/ansible/ansible/releases/latest"
 parser = "json"
@@ -7631,5 +7662,30 @@ channel today, but tag ranking has already produced false "outdated" results
 elsewhere in this overlay (see brave-browser stable/beta), so latestRelease is
 the default posture regardless. This overlay ships only the released ebuild;
 the 9999 live one stays in ::gentoo and is not mirrored here.
+"""
+# END
+
+["x11-base/xwayland"]
+url = "https://xorg.freedesktop.org/archive/individual/xserver/"
+parser = "regex"
+pattern = 'xwayland-([0-9.]+)\.tar\.xz'
+select = "max"
+version = "26.0.99.901"
+comments = """
+xwayland — the official xorg archive directory, which is the only endpoint that
+lists xwayland tarballs on their own axis. The repository behind them
+(xorg/xserver) tags xorg-server-* in the SAME tag space, so ranking refs/tags
+there would cross version axes; the file listing cannot.
+
+select = "max" is load-bearing, not decoration. The listing is ordered oldest
+first, so the default select="first" yields 21.0.99.901 — measured, 212 matches,
+first = 21.0.99.901 and max = 26.0.99.901. The pattern also matches the
+companion .tar.xz.sig lines, which is harmless: they carry the same capture.
+
+Upstream's pre-release axis is X.0.99.90N (21.0.99.901 -> 21.1.0,
+22.0.99.901 -> 22.1.0), and it sorts BELOW the release it precedes under Gentoo
+rules, so max moves rc1 -> rc2 -> final on its own with no record change. The
+overlay is deliberately on that RC axis right now (26.0.99.901, the 26.1.0 rc1),
+which is why nothing here filters pre-releases out.
 """
 # END

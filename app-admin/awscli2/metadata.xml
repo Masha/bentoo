@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@protonmail.com</email>
+		<name>Lucas Couto</name>
+	</maintainer>
+	<upstream>
+		<remote-id type="github">aws/aws-cli</remote-id>
+		<bugs-to>https://github.com/aws/aws-cli/issues</bugs-to>
+		<doc>https://docs.aws.amazon.com/cli/latest/userguide/</doc>
+		<changelog>https://raw.githubusercontent.com/aws/aws-cli/v2/CHANGELOG.rst</changelog>
+	</upstream>
+	<longdescription lang="en">
+The AWS Command Line Interface, major version 2, built from source.
+
+AWS CLI v2 is a separate product line from v1: it adds AWS SSO / IAM
+Identity Center login, an interactive auto-prompt with server-side
+completion, the `aws configure import`/`export` family, YAML output, and a
+CRT-accelerated `aws s3` transfer manager. It also carries forked copies of
+botocore and s3transfer under awscli/, which is where those v2-only features
+live; they are deliberately not unbundled.
+
+Because both v1 (app-admin/awscli) and v2 install /usr/bin/aws, this package
+is named awscli2 and blocks app-admin/awscli and app-admin/awscli-bin rather
+than replacing them. Migrating from v1 to v2 is an explicit choice with
+behavioural differences documented upstream; it is not something a @world
+update should do silently.
+
+Unlike v1, AWS CLI v2 is not published on PyPI. The only source release is
+the GitHub tag, which is what this ebuild builds.
+	</longdescription>
+</pkgmetadata>

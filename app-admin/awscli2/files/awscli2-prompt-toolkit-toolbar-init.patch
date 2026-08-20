@@ -1,0 +1,41 @@
+From: Lucas C.S. <lucascs@protonmail.com>
+Subject: [PATCH] wizard: call ConditionalContainer.__init__ instead of
+ hand-setting its attributes
+
+ToolbarView subclasses ConditionalContainer (via BaseToolbarView ->
+BaseHelpContainer) but bypasses the parent constructor, assigning .content
+and .filter by hand.  That mirrored the parent's entire state only for
+prompt_toolkit < 3.0.52.  Since 3.0.52 the constructor also sets
+.alternative_content, which preferred_width()/preferred_height() read on
+every render, so the bypass leaves the attribute undefined and any attempt
+to draw the wizard toolbar dies with:
+
+    AttributeError: 'ToolbarView' object has no attribute 'alternative_content'
+
+Upstream pins prompt-toolkit<3.0.52 in pyproject.toml, which hides the bug
+for the bundled installer but is not satisfiable on a distro shipping a
+newer one.  Calling the parent constructor is equivalent for the old
+version and correct for the new one -- to_container()/to_filter() are
+applied inside it.
+
+Every other subclass reaches ConditionalContainer through
+BaseHelpContainer.__init__, which does call super(), so this is the only
+site affected.
+
+Not yet submitted upstream.
+--- a/awscli/customizations/wizard/ui/layout.py
++++ b/awscli/customizations/wizard/ui/layout.py
+@@ -283,8 +283,11 @@
+     CONDITION = prompt_has_details | error_bar_enabled
+ 
+     def __init__(self):
+-        self.content = to_container(self.create_window(self.help_text))
+-        self.filter = to_filter(self.CONDITION)
++        ConditionalContainer.__init__(
++            self,
++            self.create_window(self.help_text),
++            self.CONDITION,
++        )
+ 
+     def create_window(self, help_text):
+         text_control = FormattedTextControl(text=lambda: help_text)
