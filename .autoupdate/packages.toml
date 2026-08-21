@@ -7248,7 +7248,7 @@ parser = "json"
 path = "name"
 transform = [['^.*\(v', ""], ['\)$', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.8.0"
+version = "0.8.1"
 comments = """
 staticcheck — upstream dominikh/go-tools carries TWO version axes: the CalVer tag
 ("2026.1") and the SemVer the ebuild uses ("0.7.0"). tag_name yields the CalVer, so
