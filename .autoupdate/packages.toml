@@ -1160,7 +1160,6 @@ xdg-desktop-portal — releases/latest older; tags[0] tracks the newer line.
 # END
 
 ["sys-firmware/edk2"]
-enabled = false
 url = "https://api.github.com/repos/tianocore/edk2/releases/latest"
 parser = "regex"
 pattern = '"tag_name":\s*"edk2-stable([0-9]{6})"'
