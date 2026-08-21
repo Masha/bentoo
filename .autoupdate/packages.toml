@@ -392,7 +392,6 @@ Proton Mail Bridge — GitHub release tag "vX.Y.Z" ("v" stripped).
 # END
 
 ["dev-lang/go"]
-enabled = false
 url = "https://go.dev/dl/?mode=json"
 parser = "json"
 path = "[0].version"
@@ -1198,35 +1197,59 @@ the Intel date.
 # END
 
 ["www-client/chromium"]
-hold = true
 url = "https://api.github.com/repos/chromium-linux-tarballs/chromium-tarballs/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "151.0.7922.108"
+version = "151.0.7922.173"
 comments = """
 chromium — probes the TARBALL repo, not chromiumdash or the Chrome release
 feed, because that repo is what actually gates a bump: SRC_URI points at
 chromium-linux-tarballs/chromium-tarballs, and a version Google shipped but
-nobody has tarballed cannot be packaged here.  Verified 2026-08-16: the repo
-publishes 151.0.7922.137 while this overlay carries .108.
+nobody has tarballed cannot be packaged here.  Verified 2026-08-21: the repo
+publishes 151.0.7922.173 (stable, 2026-08-20) and this overlay now carries it.
 
-hold = true, and it is NOT a bookkeeping accident.  A bump is never a PV swap:
-the ebuild pins three more things that must move with it, none of which this
-probe can see —
+NO hold SINCE 2026-08-21 -- and that makes the warning below load-bearing, not
+decorative.  It was removed deliberately, to put the package back in the mass
+sweep: while held it was invisible there, and that is how the registry sat
+pinned at .108 for days while the directory held nothing.  What was measured
+before removing it, on bentoolkit 0.26.0: a targeted `--check www-client/chromium`
+DOES probe a held package and answers correctly, so the hold was never blinding
+a directed look; whether the mass `--check` still skips held was NOT measured.
+
+THE RISK THIS TRADES FOR.  `--apply` no longer refuses this package (it did,
+since 0.15.1).  A bump is never a PV swap: the ebuild pins three more things
+that must move with it, none of which this probe can see —
 
   PATCH_V         chromium-patches, versioned "<major>-<n>" (151-3 today), NOT
                   by chromium PV.  Confirmed 2026-08-16: the archive URL built
                   from either .108 or .137 returns 404, so an applier that only
                   rewrote PV would produce an ebuild whose patchset URL is
                   wrong or whose patches belong to another point release.
+                  Re-listed 2026-08-21: 151-3 is still the newest tag on the
+                  series, so the .173 bump moved none of these three pins.
   COPIUM_COMMIT   pinned SHA of a second patch source
   TEST_FONT       pinned SHA of the test-font tarball
 
 The patchset also LAGS the release: its tag for a series is cut against the
 first dev build, so on a stable bump some patches fail to apply and have to be
-rebased by hand — 5 of 21 did on one earlier series.  Do not remove hold, and
-do not read "outdated" here as "run --apply"; read it as "a human has work".
+rebased by hand — 5 of 21 did on one earlier series.  Never read "outdated" here
+as "run --apply"; read it as "a human has work".
+
+WITHIN one series a PV swap is survivable — measured 2026-08-21, PATCH_V stayed
+151-3 from .108 through .173, and all 21 patches applied to .173 with zero
+rejects.  ACROSS a series boundary it is not: an applier that only rewrites PV
+would leave PATCH_V on the old series, and the archive URL then 404s or delivers
+another release's patches.  So the rule after the hold removal is: an update
+inside 151.x may be applied after checking PATCH_V by hand; the jump to 152
+is a human bump, always.
+
+Also cleared on 2026-08-21: a stale entry had been sitting in
+~/.config/bentoo/autoupdate/pending.json since 2026-08-16, pinned at
+".108 -> .137" — both versions now obsolete, and the older one an ebuild that no
+longer exists.  It was inert only because the hold made `--apply` refuse it.
+Removing the hold without clearing it first would have aimed `--apply all` at a
+backwards bump, so it was removed FIRST, in that order.
 
 Reported as [bin] by the checker.  That is the RESTRICT heuristic misfiring on
 this ebuild's RESTRICT block, not a claim about the package -- chromium builds
@@ -1245,11 +1268,47 @@ afterwards ended in "no ebuild file found" -- behind a plan that had already
 priced the bump as a patch at depth none, a verdict about an ebuild that was not
 there to read.
 
-hold = true DID NOT protect the directory from that sweep.  Read the flag as a
-note to a human, not as a guard the tooling enforces.  Note also that
+The hold that then existed DID NOT protect the directory from that sweep -- it
+gated `--apply`, never `--clean`, which is what deleted the package.  Nothing
+about removing the hold changes that exposure, in either direction.  Note also
+that
 metadata/md5-cache/www-client/chromium-151.0.7922.108 SURVIVED the deletion and
 sat orphaned for two days with no tool reporting the inconsistency; the restore
-was byte-identical to 7cbe62f54^, so ebuild and cache line up again.
+was byte-identical to 7cbe62f54^.  Both .108 files were then removed together by
+the .173 bump below.
+
+BUMPED to 151.0.7922.173 on 2026-08-21, and the base was NOT the overlay's own
+.108: ::gentoo had moved to 151.0.7922.169-r1, so that ebuild was copied and its
+PV swapped, which is how the bump inherited the upstream work done in between
+(lld became a direct dep, +47 test exclusions since .137).  Five downstream
+deltas were re-applied and each was re-argued in place, not copied blind:
+
+  LLVM_COMPAT=( 22 )   gate re-measured against the 151-3 tag: llvm/ holds one
+                       directory, lt-23/, with three patches, so 22 is inside it
+  KEYWORDS ~arch       the copied base was STABLE ("amd64 arm64"); this overlay
+                       has run .173 nowhere, so the stable keywords were dropped
+  NODE_VER 24.16.0-r1  ::gentoo lowered its floor to 24.12.0 to stabilise
+                       .169-r1; nothing here forces that, and this overlay's
+                       nodejs is slotted, so both floors resolve identically
+  bytemuck sed         nightly_portable_simd vs Rust >=1.97, tripwired by a grep.
+                       Measured IN the .173 tarball, not assumed: the string is
+                       still in third_party/rust/bytemuck/v1/BUILD.gn, so the
+                       tripwire stays quiet and the sed still has work to do
+  use_mold=false       see below
+
+The mold delta is the one a future copy-from-::gentoo will silently lose.
+use_lld=true does not turn use_mold off -- they are independent, and use_mold is
+what picks linker_path.  Read at the .173 tag, the declare_args default is on for
+linux/x64+arm64 clang builds unless is_official_build, so it bites USE=-official
+only; with this ebuild's default +official it already resolves false.  That is
+the same case ::gentoo .137 covered with a symlink into
+buildtools/third_party/mold/cipd/mold plus "!official? ( >=sys-devel/mold )" --
+and .169-r1 DELETED both without adding use_mold=false, so the base copied here
+is uncovered for -official and the overlay's own fix is the only thing standing.
+
+Not proved by this bump: nothing was merged (no sudo on this host).  pkgcheck and
+the Manifest cover the ebuild text and the distfiles; neither runs src_prepare,
+so a 151-3 patch that fails to apply on .173 would only surface at build time.
 """
 # END
 
