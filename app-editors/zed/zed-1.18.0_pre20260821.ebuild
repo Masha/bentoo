@@ -1872,8 +1872,14 @@ src_prepare() {
 	fi
 
 	# Toggle screen-capture feature on gpui_platform
+	# The first expression deletes the whole LINE: since ef50ad95 the
+	# gpui_platform features array is multi-line, so removing only the text
+	# would leave an orphan comma ("extra comma in array") that makes the TOML
+	# invalid. The other three keep covering the inline form, in case upstream
+	# collapses the array again.
 	if ! use screen-capture; then
-		sed -e 's/"screen-capture", //' \
+		sed -e '/^[[:space:]]*"screen-capture",\?[[:space:]]*$/d' \
+			-e 's/"screen-capture", //' \
 			-e 's/, "screen-capture"//' \
 			-e 's/"screen-capture"//' \
 			-i "${S}/crates/zed/Cargo.toml" || die "Failed to disable screen-capture feature"
