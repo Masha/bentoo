@@ -396,6 +396,7 @@ url = "https://go.dev/dl/?mode=json"
 parser = "json"
 path = "[0].version"
 transform = [['^go', ""]]
+version = "1.27.0"
 comments = """
 go — official go.dev/dl JSON; [0] is the newest stable release. "version" is "goX.Y.Z";
 transform strips the "go" prefix to match PV. Live=1.26.5.
