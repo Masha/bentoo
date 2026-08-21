@@ -6,7 +6,13 @@ EAPI=8
 inherit linux-mod-r1
 
 MY_PN="mediatek-mt7927-dkms"
-MY_PV="${PV}-1"
+# Upstream re-tags the same version with an incrementing packaging revision
+# (v2.14-1 ... v2.14-6) and the CONTENT differs between them: Makefile, the
+# mt76/mt7925 Kbuilds and the shipped tree all change. So -N is NOT a mere
+# packaging counter -- it must track upstream, which is why it lives in its own
+# variable kept in sync by .autoupdate (aux_var), not hardcoded to -1.
+MY_BUILD="1"
+MY_PV="${PV}-${MY_BUILD}"
 MY_P="${MY_PN}-${MY_PV}"
 
 # Kernel release whose mt76/bluetooth source the patches target. The mini source
