@@ -16,19 +16,19 @@ if [[ ${PV} == *9999* ]]; then
 	inherit git-r3
 	EGIT_REPO_URI="https://github.com/ggml-org/llama.cpp.git"
 else
-	MY_PV="b${PV#0_pre}"
-	# Upstream's Release workflow failed for b10156, so that tag carries the
-	# source but no release assets at all -- the prebuilt webui dist among them.
-	# b10155 is the closest tag that published one, and the only commit in
-	# between (91f8c9c "Disable -ffast-math on HIP") does not touch tools/ui.
-	MY_UI_PV="b10155"
+	MY_PV="v${PV}"
+	# Upstream switched to semver release tags (vX.Y.Z); the numbered nightly
+	# tags (bNNNNN) still exist and remain the only place the prebuilt webui
+	# dist and the build number are published.  Each semver release names its
+	# nightly in the nightly-tag.txt asset -- v0.2.0 points at b10566.
+	MY_BUILD="b10566"
 	SRC_URI="
 		https://github.com/ggml-org/llama.cpp/archive/refs/tags/${MY_PV}.tar.gz -> ${P}.tar.gz
 		webui? (
-			https://github.com/ggml-org/llama.cpp/releases/download/${MY_UI_PV}/llama-${MY_UI_PV}-ui.tar.gz -> ${PN}-${MY_UI_PV}-ui.tar.gz
+			https://github.com/ggml-org/llama.cpp/releases/download/${MY_BUILD}/llama-${MY_BUILD}-ui.tar.gz -> ${PN}-${MY_BUILD}-ui.tar.gz
 		)
 	"
-	S="${WORKDIR}/llama.cpp-${MY_PV}"
+	S="${WORKDIR}/llama.cpp-${PV}"
 	# ~amd64 only, and that is a packaging decision rather than an upstream
 	# limitation: ggml exposes GGML_CPU_ARM_ARCH and upstream exercises ARM
 	# heavily. Story 002 keyworded ~arm64 against a qemu-user chroot build
@@ -157,7 +157,7 @@ src_unpack() {
 			# entry, so use one of those instead.
 			die "USE=webui is unsupported on a live ebuild: the webui dist has no verifiable source"
 		else
-			ln -s "${WORKDIR}/llama-${MY_UI_PV}" "${S}/tools/ui/dist" || die
+			ln -s "${WORKDIR}/llama-${MY_BUILD}" "${S}/tools/ui/dist" || die
 		fi
 	fi
 }
@@ -179,7 +179,7 @@ src_configure() {
 			-DLLAMA_BUILD_COMMIT="$(git rev-parse HEAD)"
 		)
 	else
-		local mycmakeargs=( -DLLAMA_BUILD_NUMBER="${MY_PV#b}" )
+		local mycmakeargs=( -DLLAMA_BUILD_NUMBER="${MY_BUILD#b}" )
 	fi
 
 	mycmakeargs+=(
