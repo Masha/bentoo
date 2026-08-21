@@ -296,7 +296,7 @@ url = "https://dl.pstmn.io/api/version/latest?platform=linux64&channel=stable"
 parser = "json"
 path = "version"
 type = "bin"
-version = "12.24.4"
+version = "12.24.5"
 comments = """
 Postman — official version API; clean {"version":"..."}.
 """
@@ -1025,7 +1025,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^b(\d+)$', "0_pre$1"]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0_pre10545"
+version = "0_pre10549"
 comments = """
 llama-cpp — upstream tags builds "bNNNN" (no semver); the ebuild carries them as
 the 0_pre<build> snapshot scheme and bridges back with MY_PV="b${PV#0_pre}", so
@@ -1318,7 +1318,7 @@ url = "https://api.github.com/repos/brave/brave-browser/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.93.137"
+version = "1.93.138"
 comments = """
 brave-browser — releases/latest is the stable channel (tag "vX.Y.Z").
 """
@@ -1329,7 +1329,7 @@ url = "https://api.github.com/repos/vim/vim/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "9.2.0992"
+version = "9.2.0993"
 comments = """
 vim — no releases (404); tags[0] "vX.Y.ZZZZ".
 """
@@ -1340,7 +1340,7 @@ url = "https://api.github.com/repos/vim/vim/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "9.2.0992"
+version = "9.2.0993"
 comments = """
 vim-core — same upstream repo as vim.
 """
@@ -1465,7 +1465,7 @@ xf86-video-qxl — tags carry "xf86-video-qxl-" prefix; regex extracts the versi
 url = "https://gitlab.freedesktop.org/api/v4/projects/NetworkManager%2FNetworkManager/repository/tags?order_by=version&sort=desc&per_page=40"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
-version = "1.58.0"
+version = "1.58.1"
 comments = """
 networkmanager — version sort + per_page=40; regex skips *-dev/*-rc, first stable X.Y.Z.
 """
@@ -1949,7 +1949,7 @@ base_from = "file"
 base_url = "https://raw.githubusercontent.com/KhronosGroup/Vulkan-ValidationLayers/main/CMakeLists.txt"
 base_pattern = '(?m)^project\([A-Za-z_-]+ VERSION ([0-9][0-9.]*)'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.360_p20260820"
+version = "1.4.360_p20260821"
 comments = """
 vulkan-layers — commit-tracked on main (Vulkan-ValidationLayers); scans for "Update for Vulkan-Docs X.Y.Z".
 """
@@ -6802,7 +6802,7 @@ url = "https://api.github.com/repos/dyne/frei0r/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "3.4.1"
+version = "3.4.3"
 comments = """
 dyne/frei0r; SRC_URI pulls archive/refs/tags/v${PV}.tar.gz, so track git tags (newest=[0]).
 Leading "v" stripped. Use /tags not releases/latest: the latter lags (reports 3.2.1 while
