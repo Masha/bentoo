@@ -90,7 +90,6 @@ src_configure() {
 		-Dxingmux=disabled
 		-Dy4m=disabled
 		-Dadaptivedemux2=disabled
-		-Daalib=disabled
 		-Damrnb=disabled
 		-Damrwbdec=disabled
 		-Dbz2=disabled
@@ -104,7 +103,6 @@ src_configure() {
 		-Djack=disabled
 		-Djpeg=disabled
 		-Dlame=disabled
-		-Dlibcaca=disabled
 		-Dmpg123=disabled
 		-Doss=disabled
 		-Doss4=disabled
