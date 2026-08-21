@@ -1234,6 +1234,22 @@ from source here.  Do NOT try to correct it with type = "src": tested
 2026-08-16, that value is not recognised and drops the package out of the
 counts entirely ("Checked 0 source, 0 bin"), which is worse than a wrong label.
 type only accepts "bin".
+
+RESTORED 2026-08-21 after an accidental removal.  Commit 7cbe62f54 (2026-08-19)
+deleted this package from the overlay in full -- ebuild, Manifest, metadata.xml
+and both files/ scripts -- in a sweep that also removed six other packages.
+Those six were deliberate: five had their record disabled in the same pass, and
+dev-util/claude-code was reinstalled.  This one was not.  Its record stayed
+enabled and pinned at .108 while the directory held nothing, so every check
+afterwards ended in "no ebuild file found" -- behind a plan that had already
+priced the bump as a patch at depth none, a verdict about an ebuild that was not
+there to read.
+
+hold = true DID NOT protect the directory from that sweep.  Read the flag as a
+note to a human, not as a guard the tooling enforces.  Note also that
+metadata/md5-cache/www-client/chromium-151.0.7922.108 SURVIVED the deletion and
+sat orphaned for two days with no tool reporting the inconsistency; the restore
+was byte-identical to 7cbe62f54^, so ebuild and cache line up again.
 """
 # END
 
