@@ -7103,11 +7103,14 @@ headers = { "User-Agent" = "bentoo-autoupdate" }
 version = "0.32.14"
 comments = """
 ollama source — same repo as ollama-bin; tag "vX.Y.Z" (leading v stripped).
-Enabled again on 2026-08-10, when sci-ml/ollama-0.32.6 was restored to the
-overlay. History: it carried hold = true for the llama.cpp rearch that makes
-every bump manual, then enabled = false from 2026-07-26 while no source ebuild
-existed here — --clean had swept the whole directory on 2026-07-30, Manifest,
-metadata.xml and files/ included, leaving only sci-ml/ollama-bin.
+NO source ebuild is in the overlay since 2026-08-19: 7cbe62f54 dropped
+sci-ml/ollama-0.32.14 because ::gentoo had caught up, the same sweep that
+retired telegram-desktop, uutils-coreutils, mold and intel-microcode that day.
+That removal was deliberate, unlike the one on 2026-07-30 when --clean swept
+the whole directory (Manifest, metadata.xml and files/ included) by accident.
+Earlier history: hold = true for the llama.cpp rearch that makes every bump
+manual, then enabled = false from 2026-07-26, then enabled again on 2026-08-10
+when sci-ml/ollama-0.32.6 was restored. Only sci-ml/ollama-bin remains here.
 
 The llama.cpp tag is NOT free-form. It is read from LLAMA_CPP_VERSION, a
 one-line file at the repo root, by llama/server/CMakeLists.txt — so the value
@@ -7129,6 +7132,14 @@ LLAMA_CPP_tag from LLAMA_CPP_VERSION, diff ggml_ssm_scan (and its neighbours in
 ggml/include/ggml.h) between the old tag and the new one, and move the
 sci-ml/ggml ceiling to match. llama.cpp b10448 already carries the new arity,
 so the ceiling opens up as soon as the pin reaches it.
+
+That is exactly how ::gentoo settled it, and it is why nothing here needs the
+ceiling any more: ollama-0.32.15 pins b10488, which calls ggml_ssm_scan with
+nine arguments (ctx, s, x, dt, w, B, C, ids, /*K=*/1), and its DEPEND is a
+FLOOR — >=sci-ml/ggml-0.20.0:= — not a ceiling. Users of this overlay resolve
+to sci-ml/ollama-0.32.15::gentoo with sci-ml/ggml-0.20.2 and build fine. Should
+the source ebuild ever return here, copy that shape instead of reintroducing
+the cap: a floor tracks upstream, a ceiling has to be nursed on every bump.
 
 SRC_URI also pulls ${P}-deps.tar.xz from github.com/gentoo-golang-dist/ollama,
 a third-party repo that packages the Go dependencies roughly a day after
