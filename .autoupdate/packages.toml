@@ -1164,6 +1164,7 @@ url = "https://api.github.com/repos/tianocore/edk2/releases/latest"
 parser = "regex"
 pattern = '"tag_name":\s*"edk2-stable([0-9]{6})"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "202605"
 comments = """
 edk2 — tag "edk2-stableYYYYMM"; regex captures the 6-digit datestamp.
 """
