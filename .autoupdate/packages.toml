@@ -3625,7 +3625,7 @@ url = "https://api.github.com/repos/KDE/kdeplasma-addons/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "6.7.4"
+version = "6.7.4-r1"
 comments = """
 kdeplasma-addons — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
 Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
