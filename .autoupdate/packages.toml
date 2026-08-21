@@ -7,11 +7,17 @@
 # ebuild (Gentoo version rules: prefixes v/release-/ver-/version- stripped;
 # regex returns capture group 1 of the FIRST match on the raw body).
 #
-# 451 records — 313 regex, 138 json. 100 disabled (enabled = false),
-# 5 held (hold = true): www-client/chromium, dev-build/gn, dev-lang/ghc,
+# 451 records — 314 regex, 137 json. 96 disabled (enabled = false),
+# 7 held (hold = true): dev-build/gn, dev-lang/{rust,rust-bin,rust-common,ghc},
 # sci-ml/stable-diffusion-cpp, sys-cluster/minikube. Recounted with tomllib on
-# 2026-08-20 by the one-liner below; the previous figures (508/310/198/18/3)
-# had drifted and were never a count of this file as it stands.
+# 2026-08-21 by the one-liner below.
+#
+# These figures drift FAST — every one of them was wrong again one day after the
+# 2026-08-20 recount claimed 313/138/100/5 (and that one had corrected an even
+# older 508/310/198/18/3). Between the two recounts www-client/chromium left the
+# held set and the three dev-lang/rust* records joined it. Never trust the line
+# above; re-run the one-liner. It is kept only because a wrong count that is
+# CHECKABLE beats no count at all.
 #
 # Two of the disabled records are disabled for a reason other than "package
 # gone": dev-libs/icu-compat and media-libs/libjxl-compat are pinned to an old
@@ -59,7 +65,6 @@
 #   hold = true                         # ONLY when true. See "enabled vs hold".
 #   track = "commit"                    # omit for tag/version tracking
 #   url = "https://…"                   # REQUIRED — the endpoint being probed
-#   timeout = 60                        # seconds, only for reliably slow hosts
 #   parser = "json"                     # REQUIRED — json | regex | html | script
 #   path = "tag_name"                   # REQUIRED for parser=json
 #   pattern = 'name-([0-9.]+)\.tar\.xz' # REQUIRED for parser=regex (1 capture group)
@@ -70,12 +75,18 @@
 #   commit_sha_path = "[0].sha"         # REQUIRED with track="commit"
 #   commit_message_path = "commit.message"
 #   commit_version_pattern = 'sdk-([0-9.]+)'
+#   headers = { "User-Agent" = "bentoo-autoupdate" }
+#   timeout = 60                        # seconds, only for reliably slow hosts
+#   meta = { key = "value" }            # documentation only; NEVER a secret
+#   type = "bin"                        # ONLY to override the -bin/RESTRICT heuristic
+#   series = '^[0-9]+\.[0-9]*[02468]\.' # release LINE this entry tracks (@label keys)
 #   aux_var = "MY_BUILD"                # free-text ebuild var kept in sync…
 #   aux_pattern = 'esr-bb([0-9]+)'      # …always paired with aux_var
-#   headers = { "User-Agent" = "bentoo-autoupdate" }
-#   binary = true                       # binary package → manifest-only testing
-#   type = "bin"                        # ONLY to override the -bin/RESTRICT heuristic
-#   meta = { key = "value" }            # documentation only; NEVER a secret
+#   # `binary = true` is RETIRED — the linter rewrites it to type = "bin".
+#   # The order above is not decorative: it is CanonicalFieldOrder in the
+#   # bentoolkit's lint.go, and `--lint` reports field-order against it. This
+#   # block listed aux_var/aux_pattern BEFORE headers until 2026-08-21, which is
+#   # exactly the mistake it then produced in net-wireless/mt7927-dkms.
 #   # package — one line saying WHY this source/parser, plus every caveat a
 #   # future bump must know (stale endpoints, prerelease traps, hand-edited vars).
 #
@@ -5111,10 +5122,18 @@ media-plugins/gst-plugins-mpeg2dec — linha ESTAVEL (minor par). O overlay carr
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
 ebuild do diretorio (o 1.29.x de desenvolvimento) como "versao atual" e esta linha
 nunca mais seria atualizada, reportando "up to date" para sempre.
+
+PRAZO DE VALIDADE (2026-08-21): o upstream removeu o plugin a partir da 1.29 e `main` ja nao
+o traz, entao a 1.28.x e' a ULTIMA serie que o tem. Quando o gstreamer publicar a 1.30 este
+registro passa a rastrear uma serie sem plugin e o pacote sai do overlay inteiro — nao bumpe
+para 1.30 sem antes conferir se ext/mpeg2dec voltou. A entrada @dev irma ja foi desabilitada
+por essa razao. Este comentario NAO vale para os outros pares @stable/@dev do GStreamer: o
+boilerplate e' compartilhado, a remocao do plugin e' so deste.
 """
 # END
 
 ["media-plugins/gst-plugins-mpeg2dec@dev"]
+enabled = false
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
@@ -5128,6 +5147,17 @@ que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria
 montar SRC_URI/S, porque a eclass gstreamer-meson usa ${PV} direto e nao tem override.
 1.29.x sao releases de desenvolvimento tagueadas pelo upstream, nao pre-releases.
 Ver a entrada @stable irma.
+
+DISABLED 2026-08-21: o plugin foi REMOVIDO do upstream a partir da serie 1.29, entao esta
+linha nunca mais tera ebuild. Medido em subprojects/gst-plugins-ugly/ext/mpeg2dec/meson.build:
+ref 1.28 -> HTTP 200, ref 1.29.2 -> 404, ref main -> 404. Por isso o ebuild 1.29.2 saiu do
+overlay em dfec4fbdc, e o checker passou a emitir ErrSeriesNotFound a cada varredura.
+NAO e' bookkeeping automatico: ErrSeriesNotFound e' deliberadamente distinto de
+ErrNoEbuildFound (ebuild_select.go), justamente para NAO auto-desabilitar um filtro que nao
+casa — o checker avisa e espera decisao humana. Esta e' a decisao. Pelo mesmo motivo este
+`enabled = false` e' estavel: a reconciliacao de revive (checker.go, CheckAll) so reabilita
+quando getCurrentVersion retorna sem erro, e aqui ela retorna ErrSeriesNotFound.
+Reabrir SO se o upstream restaurar o plugin numa serie impar.
 """
 # END
 
@@ -6817,9 +6847,9 @@ url = "https://api.github.com/repos/jetm/mediatek-mt7927-dkms/tags"
 parser = "json"
 path = "[0].name"
 transform = [['^v', ""], ['-[0-9]+$', ""]]
+headers = { "User-Agent" = "bentoo-autoupdate" }
 aux_var = "MY_BUILD"
 aux_pattern = '"name":\s*"v[0-9.]+-([0-9]+)"'
-headers = { "User-Agent" = "bentoo-autoupdate" }
 version = "2.13"
 comments = """
 mt7927-dkms — jetm/mediatek-mt7927-dkms tags "vMAJOR.MINOR-N"; transform strips "v" and the
