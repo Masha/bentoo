@@ -5,7 +5,7 @@ EAPI=8
 
 inherit flag-o-matic multilib toolchain-funcs
 
-DESCRIPTION="ICU runtime libraries for prebuilt packages linked against the ICU 78 ABI"
+DESCRIPTION="ICU runtime libraries for prebuilt packages linked against the ICU 77 ABI"
 HOMEPAGE="https://icu.unicode.org/"
 SRC_URI="https://github.com/unicode-org/icu/releases/download/release-${PV}/icu4c-${PV}-sources.tgz"
 S="${WORKDIR}/icu/source"
