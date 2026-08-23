@@ -40,7 +40,6 @@ CRATES="
 	anstyle@1.0.13
 	any_vec@0.14.0
 	anyhow@1.0.102
-	approx@0.4.0
 	approx@0.5.1
 	ar_archive_writer@0.5.1
 	arbitrary@1.4.2
@@ -51,7 +50,6 @@ CRATES="
 	arrayvec@0.7.6
 	as-raw-xcb-connection@1.0.1
 	as-slice@0.2.1
-	ascii-canvas@3.0.0
 	ascii@1.1.0
 	ash@0.38.0+1.3.281
 	ashpd@0.13.2
@@ -121,15 +119,12 @@ CRATES="
 	base64@0.21.7
 	base64@0.22.1
 	base64ct@1.8.0
-	beef@0.5.2
 	bigdecimal@0.4.8
 	bincode@1.3.3
 	bindgen@0.71.1
 	bindgen@0.72.1
-	bit-set@0.5.3
 	bit-set@0.8.0
 	bit-set@0.9.1
-	bit-vec@0.6.3
 	bit-vec@0.8.0
 	bit-vec@0.9.1
 	bit_field@0.10.3
@@ -195,7 +190,6 @@ CRATES="
 	cfg_aliases@0.1.1
 	cfg_aliases@0.2.1
 	cgl@0.3.2
-	cgmath@0.18.0
 	chardetng@0.1.17
 	chrono@0.4.42
 	chunked_transfer@1.5.0
@@ -299,15 +293,12 @@ CRATES="
 	cxxbridge-cmd@1.0.187
 	cxxbridge-flags@1.0.187
 	cxxbridge-macro@1.0.187
-	darling@0.14.4
 	darling@0.20.11
 	darling@0.21.3
 	darling@0.23.0
-	darling_core@0.14.4
 	darling_core@0.20.11
 	darling_core@0.21.3
 	darling_core@0.23.0
-	darling_macro@0.14.4
 	darling_macro@0.20.11
 	darling_macro@0.21.3
 	darling_macro@0.23.0
@@ -321,9 +312,6 @@ CRATES="
 	der@0.6.1
 	der@0.7.10
 	deranged@0.5.4
-	derive_builder@0.12.0
-	derive_builder_core@0.12.0
-	derive_builder_macro@0.12.0
 	derive_more-impl@2.1.1
 	derive_more@2.1.1
 	derive_setters@0.1.9
@@ -331,8 +319,6 @@ CRATES="
 	diff@0.1.13
 	diffy@0.4.2
 	digest@0.10.7
-	dirs-next@2.0.0
-	dirs-sys-next@0.1.2
 	dirs-sys@0.5.0
 	dirs@6.0.0
 	dispatch2@0.3.1
@@ -347,6 +333,8 @@ CRATES="
 	doxygen-rs@0.4.2
 	dtoa-short@0.3.5
 	dtoa@1.0.10
+	dugong-graphlib@0.8.0-alpha.5
+	dugong@0.8.0-alpha.5
 	dunce@1.0.5
 	dwrote@0.11.5
 	dyn-clone@1.0.20
@@ -360,7 +348,6 @@ CRATES="
 	embedded-io@0.4.0
 	embedded-io@0.6.1
 	emojis@0.6.4
-	ena@0.14.4
 	encode_unicode@1.0.0
 	encoding_rs@0.8.35
 	endi@1.1.0
@@ -381,7 +368,7 @@ CRATES="
 	error-graph@0.1.1
 	etagere@0.2.15
 	etcetera@0.8.0
-	euclid@0.22.11
+	euclid@0.22.14
 	event-listener-strategy@0.5.4
 	event-listener@2.5.3
 	event-listener@5.4.1
@@ -453,7 +440,6 @@ CRATES="
 	generator@0.8.7
 	generic-array@0.14.7
 	gethostname@1.1.0
-	getopts@0.2.24
 	getrandom@0.2.16
 	getrandom@0.3.4
 	getrandom@0.4.1
@@ -461,24 +447,6 @@ CRATES="
 	gimli@0.32.3
 	gio-sys@0.21.5
 	gl_generator@0.14.0
-	glam@0.14.0
-	glam@0.15.2
-	glam@0.16.0
-	glam@0.17.3
-	glam@0.18.0
-	glam@0.19.0
-	glam@0.20.5
-	glam@0.21.3
-	glam@0.22.0
-	glam@0.23.0
-	glam@0.24.2
-	glam@0.25.0
-	glam@0.27.0
-	glam@0.28.0
-	glam@0.29.3
-	glam@0.30.10
-	glam@0.31.1
-	glam@0.32.1
 	glib-macros@0.21.5
 	glib-sys@0.21.5
 	glib@0.21.5
@@ -492,6 +460,7 @@ CRATES="
 	gpu-allocator@0.28.0
 	gpu-descriptor-types@0.2.0
 	gpu-descriptor@0.3.2
+	granit-parser@1.0.0
 	group@0.12.1
 	h2@0.3.27
 	h2@0.4.12
@@ -546,13 +515,17 @@ CRATES="
 	hyper@1.7.0
 	iana-time-zone-haiku@0.1.2
 	iana-time-zone@0.1.64
-	icu_collections@2.0.0
-	icu_locale_core@2.0.0
-	icu_normalizer@2.0.0
-	icu_normalizer_data@2.0.0
-	icu_properties@2.0.1
-	icu_properties_data@2.0.1
-	icu_provider@2.0.0
+	icu_collator@2.3.0
+	icu_collator_data@2.3.0
+	icu_collections@2.3.0
+	icu_locale_core@2.3.0
+	icu_locale_fallback@2.3.0
+	icu_locale_fallback_data@2.3.0
+	icu_normalizer@2.3.0
+	icu_normalizer_data@2.3.0
+	icu_properties@2.3.0
+	icu_properties_data@2.3.0
+	icu_provider@2.3.0
 	id-arena@2.2.1
 	ident_case@1.0.1
 	idna@1.1.0
@@ -597,7 +570,7 @@ CRATES="
 	jni@0.21.1
 	jobserver@0.1.34
 	js-sys@0.3.97
-	json5@0.4.1
+	json5@1.3.1
 	json_dotpath@1.1.0
 	jsonschema@0.37.4
 	jsonwebtoken@10.3.0
@@ -608,10 +581,8 @@ CRATES="
 	kqueue-sys@1.1.2
 	kqueue@1.2.0
 	kurbo@0.13.1
-	kurbo@0.9.5
 	kv-log-macro@1.0.7
-	lalrpop-util@0.20.2
-	lalrpop@0.20.2
+	lalrpop-util@0.23.1
 	lazy_static@1.5.0
 	leak@0.1.2
 	leaky-cow@0.1.1
@@ -623,7 +594,7 @@ CRATES="
 	libdbus-sys@0.2.6
 	libfuzzer-sys@0.4.10
 	libloading@0.8.9
-	libm@0.2.15
+	libm@0.2.16
 	libmimalloc-sys@0.1.44
 	libredox@0.1.10
 	libsqlite3-sys@0.30.1
@@ -639,10 +610,7 @@ CRATES="
 	lmdb-master-sys@0.2.5
 	lock_api@0.4.14
 	log@0.4.29
-	logos-codegen@0.14.4
-	logos-derive@0.14.4
-	logos@0.14.4
-	lol_html@2.8.1
+	lol_html@3.0.1
 	loom@0.7.2
 	loop9@0.1.5
 	lru-slab@0.1.2
@@ -658,6 +626,7 @@ CRATES="
 	mach2@0.4.3
 	mach2@0.5.0
 	malloc_buf@0.0.6
+	manatee@0.8.0-alpha.5
 	maplit@1.0.2
 	markup5ever@0.12.1
 	markup5ever@0.35.0
@@ -665,17 +634,19 @@ CRATES="
 	match_token@0.35.0
 	matchers@0.2.0
 	matchit@0.7.3
-	matrixmultiply@0.3.10
 	maybe-owned@0.3.4
 	maybe-rayon@0.1.1
 	md-5@0.10.6
 	mdbook@0.4.40
-	memchr@2.7.6
+	memchr@2.8.3
 	memfd@0.6.5
 	memmap2@0.9.8
 	memoffset@0.9.1
 	merge@0.1.0
 	merge_derive@0.1.0
+	merman-core@0.8.0-alpha.5
+	merman-render@0.8.0-alpha.5
+	merman@0.8.0-alpha.5
 	metal@0.33.0
 	mimalloc@0.1.48
 	mime@0.3.17
@@ -693,7 +664,6 @@ CRATES="
 	msvc_spectre_libs@0.1.3
 	multimap@0.8.3
 	naga@29.0.4
-	nalgebra@0.34.2
 	nanoid@0.4.0
 	native-tls@0.2.18
 	nbformat@1.2.0
@@ -844,7 +814,6 @@ CRATES="
 	plotters@0.3.7
 	png@0.17.16
 	png@0.18.0
-	points_on_curve@0.7.0
 	polling@3.11.0
 	pollster@0.2.5
 	pollster@0.4.0
@@ -887,10 +856,8 @@ CRATES="
 	ptr_meta@0.1.4
 	ptr_meta_derive@0.1.4
 	pulldown-cmark-escape@0.10.1
-	pulldown-cmark-escape@0.11.0
 	pulldown-cmark@0.10.3
-	pulldown-cmark@0.12.2
-	pulldown-cmark@0.13.0
+	pulldown-cmark@0.13.4
 	pulley-interpreter@36.0.13
 	pulley-macros@36.0.13
 	pxfm@0.1.25
@@ -901,6 +868,7 @@ CRATES="
 	quick-xml@0.37.5
 	quick-xml@0.38.3
 	quick-xml@0.39.3
+	quick-xml@0.41.0
 	quinn-proto@0.11.14
 	quinn-udp@0.5.14
 	quinn@0.11.9
@@ -928,7 +896,6 @@ CRATES="
 	ravif@0.13.0
 	raw-window-handle@0.6.2
 	raw-window-metal@1.1.0
-	rawpointer@0.2.1
 	rayon-core@1.13.0
 	rayon@1.11.0
 	rdrand@0.4.0
@@ -936,7 +903,6 @@ CRATES="
 	read-fonts@0.37.0
 	redox_syscall@0.5.18
 	redox_syscall@0.7.5
-	redox_users@0.4.6
 	redox_users@0.5.2
 	ref-cast-impl@1.0.25
 	ref-cast@1.0.25
@@ -958,6 +924,7 @@ CRATES="
 	rkyv_derive@0.7.45
 	rmp@0.8.14
 	rmpv@1.3.0
+	roughr-merman@0.12.3
 	roxmltree@0.20.0
 	roxmltree@0.21.1
 	rpassword@7.5.2
@@ -994,7 +961,6 @@ CRATES="
 	ryu-js@1.0.2
 	ryu@1.0.23
 	saa@5.4.9
-	safe_arch@0.7.4
 	same-file@1.0.6
 	scc@3.5.6
 	schannel@0.1.28
@@ -1022,7 +988,7 @@ CRATES="
 	security-framework-sys@2.15.0
 	security-framework@2.11.1
 	security-framework@3.5.1
-	selectors@0.35.0
+	selectors@0.37.0
 	self_cell@1.2.2
 	semver@1.0.27
 	serde@1.0.228
@@ -1059,7 +1025,6 @@ CRATES="
 	signal-hook@0.4.4
 	signature@1.6.4
 	signature@2.2.0
-	simba@0.9.1
 	simd-adler32@0.3.7
 	simd_helpers@0.1.0
 	simdutf8@0.1.5
@@ -1105,7 +1070,6 @@ CRATES="
 	string_cache@0.8.9
 	string_cache_codegen@0.5.4
 	stringprep@0.1.5
-	strsim@0.10.0
 	strsim@0.11.1
 	strum@0.26.3
 	strum@0.27.2
@@ -1122,8 +1086,6 @@ CRATES="
 	sval_ref@2.15.0
 	sval_serde@2.15.0
 	svg_fmt@0.4.5
-	svg_path_ops@0.11.0
-	svgtypes@0.11.0
 	svgtypes@0.16.1
 	swash@0.2.6
 	symphonia-bundle-flac@0.5.5
@@ -1163,7 +1125,6 @@ CRATES="
 	tauri-winrt-notification@0.7.3
 	tempfile@3.23.0
 	tendril@0.4.3
-	term@0.7.0
 	termcolor@1.4.1
 	terminal_size@0.4.3
 	thiserror-impl@1.0.69
@@ -1179,7 +1140,7 @@ CRATES="
 	tiny-skia-path@0.11.4
 	tiny-skia@0.11.4
 	tiny_http@0.12.0
-	tinystr@0.8.1
+	tinystr@0.8.4
 	tinytemplate@1.2.1
 	tinyvec@1.10.0
 	tinyvec_macros@0.1.1
@@ -1255,10 +1216,10 @@ CRATES="
 	unicode-general-category@1.1.0
 	unicode-ident@1.0.19
 	unicode-linebreak@0.1.5
-	unicode-normalization@0.1.24
+	unicode-normalization@0.1.25
 	unicode-properties@0.1.3
 	unicode-script@0.5.8
-	unicode-segmentation@1.12.0
+	unicode-segmentation@1.13.3
 	unicode-vo@0.1.0
 	unicode-width@0.2.2
 	unicode-xid@0.2.6
@@ -1271,6 +1232,7 @@ CRATES="
 	urlencoding@2.1.3
 	usvg@0.46.0
 	utf-8@0.7.6
+	utf16_iter@1.0.5
 	utf8-chars@3.0.6
 	utf8_iter@1.0.4
 	utf8parse@0.2.2
@@ -1366,7 +1328,6 @@ CRATES="
 	which@4.4.2
 	which@6.0.3
 	whoami@1.6.1
-	wide@0.7.33
 	wiggle-generate@36.0.12
 	wiggle-macro@36.0.12
 	wiggle@36.0.12
@@ -1488,7 +1449,8 @@ CRATES="
 	wit-parser@0.236.1
 	wit-parser@0.244.0
 	witx@0.9.1
-	writeable@0.6.1
+	write16@1.0.0
+	writeable@0.6.4
 	wyz@0.5.1
 	x11-clipboard@0.9.3
 	x11@2.21.0
@@ -1509,8 +1471,8 @@ CRATES="
 	yansi@1.0.1
 	yazi@0.2.1
 	yeslogic-fontconfig-sys@6.0.0
-	yoke-derive@0.8.0
-	yoke@0.8.0
+	yoke-derive@0.8.2
+	yoke@0.8.3
 	zbus-lockstep-macros@0.5.2
 	zbus-lockstep@0.5.2
 	zbus@5.13.2
@@ -1527,9 +1489,9 @@ CRATES="
 	zeroize@1.8.2
 	zeroize_derive@1.4.2
 	zeromq@0.5.0
-	zerotrie@0.2.2
-	zerovec-derive@0.11.1
-	zerovec@0.11.4
+	zerotrie@0.2.5
+	zerovec-derive@0.11.5
+	zerovec@0.11.8
 	zip@0.6.6
 	zmij@1.0.23
 	zstd-safe@5.0.2+zstd.1.5.2
@@ -1551,8 +1513,6 @@ declare -A GIT_CRATES=(
 	[async-task]='https://github.com/smol-rs/async-task;b4486cd71e4e94fbda54ce6302444de14f4d190e;async-task-%commit%'
 	[calloop]='https://github.com/zed-industries/calloop;eb6b4fd17b9af5ecc226546bdd04185391b3e265;calloop-%commit%'
 	[dap-types]='https://github.com/zed-industries/dap-types;1b461b310481d01e02b2603c16d7144b926339f8;dap-types-%commit%/dap-types'
-	[dugong-graphlib]='https://github.com/zed-industries/merman;a3ed8d9f3fd1d74c802f25ed9edd501743796504;merman-%commit%/crates/dugong-graphlib'
-	[dugong]='https://github.com/zed-industries/merman;a3ed8d9f3fd1d74c802f25ed9edd501743796504;merman-%commit%/crates/dugong'
 	[gh-workflow-macros]='https://github.com/zed-industries/gh-workflow;37f3c0575d379c218a9c455ee67585184e40d43f;gh-workflow-%commit%/crates/gh-workflow-macros'
 	[gh-workflow]='https://github.com/zed-industries/gh-workflow;37f3c0575d379c218a9c455ee67585184e40d43f;gh-workflow-%commit%/crates/gh-workflow'
 	[libwebrtc]='https://github.com/zed-industries/livekit-rust-sdks;d0e27be0cdad89eadab3e36207cda0a2b6e359ee;livekit-rust-sdks-%commit%/libwebrtc'
@@ -1561,10 +1521,6 @@ declare -A GIT_CRATES=(
 	[livekit-runtime]='https://github.com/zed-industries/livekit-rust-sdks;d0e27be0cdad89eadab3e36207cda0a2b6e359ee;livekit-rust-sdks-%commit%/livekit-runtime'
 	[livekit]='https://github.com/zed-industries/livekit-rust-sdks;d0e27be0cdad89eadab3e36207cda0a2b6e359ee;livekit-rust-sdks-%commit%/livekit'
 	[lsp-types]='https://github.com/zed-industries/lsp-types;f4dfa89a21ca35cd929b70354b1583fabae325f8;lsp-types-%commit%'
-	[manatee]='https://github.com/zed-industries/merman;a3ed8d9f3fd1d74c802f25ed9edd501743796504;merman-%commit%/crates/manatee'
-	[merman-core]='https://github.com/zed-industries/merman;a3ed8d9f3fd1d74c802f25ed9edd501743796504;merman-%commit%/crates/merman-core'
-	[merman-render]='https://github.com/zed-industries/merman;a3ed8d9f3fd1d74c802f25ed9edd501743796504;merman-%commit%/crates/merman-render'
-	[merman]='https://github.com/zed-industries/merman;a3ed8d9f3fd1d74c802f25ed9edd501743796504;merman-%commit%/crates/merman'
 	[notify-types]='https://github.com/zed-industries/notify;0890bbb8ca40a4b5d1f67031698dd7918b37d991;notify-%commit%/notify-types'
 	[notify]='https://github.com/zed-industries/notify;0890bbb8ca40a4b5d1f67031698dd7918b37d991;notify-%commit%/notify'
 	[nvim-rs]='https://github.com/KillTheMule/nvim-rs;764dd270c642f77f10f3e19d05cc178a6cbe69f3;nvim-rs-%commit%'
@@ -1598,7 +1554,6 @@ declare -A GIT_CRATES=(
 	[proptest-macro]='https://github.com/proptest-rs/proptest;3dca198a8fef1b32e3a66f1e1897c955b4dc5b5b;proptest-%commit%/proptest-macro'
 	[proptest]='https://github.com/proptest-rs/proptest;3dca198a8fef1b32e3a66f1e1897c955b4dc5b5b;proptest-%commit%/proptest'
 	[rodio]='https://github.com/RustAudio/rodio;e50e726ddd0292f6ef9de0dda6b90af4ed1fb66a;rodio-%commit%'
-	[roughr-merman]='https://github.com/zed-industries/merman;a3ed8d9f3fd1d74c802f25ed9edd501743796504;merman-%commit%/crates/roughr'
 	[trash]='https://github.com/zed-industries/trash-rs;41c6c800d884a89351f3b8856d12894cccee261d;trash-rs-%commit%'
 	[tree-sitter-cpp]='https://github.com/tree-sitter/tree-sitter-cpp;5cb9b693cfd7bfacab1d9ff4acac1a4150700609;tree-sitter-cpp-%commit%'
 	[tree-sitter-gitcommit]='https://github.com/zed-industries/tree-sitter-git-commit;88309716a69dd13ab83443721ba6e0b491d37ee9;tree-sitter-git-commit-%commit%'
@@ -1792,21 +1747,21 @@ src_prepare() {
 	echo "nightly" > crates/zed/RELEASE_CHANNEL || die
 
 	# Cargo offline fetch workaround
-	local ASYNC_PROCESS_COMMIT="d9ad6aff67e47de43abb270d22de75dd950f1b48"
+	local ASYNC_PROCESS_COMMIT="0b6d6713570af61806e1e5cb40e0f757cb93fd9d"
 	local ASYNC_PROCESS_GIT="async-process = { git = \"https://github.com/zed-industries/async-process.git\""
 	ASYNC_PROCESS_GIT+=", rev = \"${ASYNC_PROCESS_COMMIT}\""
 	local ASYNC_PROCESS_PATH="async-process = \\{ path = \"${WORKDIR}/async-process-${ASYNC_PROCESS_COMMIT}\""
 
-	local ASYNC_TASK_COMMIT="d9ad6aff67e47de43abb270d22de75dd950f1b48"
+	local ASYNC_TASK_COMMIT="b4486cd71e4e94fbda54ce6302444de14f4d190e"
 	local ASYNC_TASK_GIT="async-task = { git = \"https://github.com/smol-rs/async-task.git\""
 	ASYNC_TASK_GIT+=", rev = \"${ASYNC_TASK_COMMIT}\""
 	local ASYNC_TASK_PATH="async-task = \\{ path = \"${WORKDIR}/async-task-${ASYNC_TASK_COMMIT}\""
 
-	local CALLOOP_COMMIT="d9ad6aff67e47de43abb270d22de75dd950f1b48"
+	local CALLOOP_COMMIT="eb6b4fd17b9af5ecc226546bdd04185391b3e265"
 	local CALLOOP_GIT="calloop = { git = \"https://github.com/zed-industries/calloop\""
 	local CALLOOP_PATH="calloop = \\{ path = \"${WORKDIR}/calloop-${CALLOOP_COMMIT}\""
 
-	local LIVEKIT_COMMIT="d9ad6aff67e47de43abb270d22de75dd950f1b48"
+	local LIVEKIT_COMMIT="d0e27be0cdad89eadab3e36207cda0a2b6e359ee"
 	local LIVEKIT_GIT="livekit = { git = \"https://github.com/zed-industries/livekit-rust-sdks\""
 	LIVEKIT_GIT+=", rev = \"${LIVEKIT_COMMIT}\""
 	local LIVEKIT_PATH="livekit = \\{ path = \"${WORKDIR}/livekit-rust-sdks-${LIVEKIT_COMMIT}/livekit\""
@@ -1815,7 +1770,7 @@ src_prepare() {
 	LIBWERBRTC_GIT+=", rev = \"${LIVEKIT_COMMIT}\""
 	local LIBWERBRTC_PATH="libwebrtc = \\{ path = \"${WORKDIR}/livekit-rust-sdks-${LIVEKIT_COMMIT}/libwebrtc\""
 
-	local WIN_CAP_COMMIT="d9ad6aff67e47de43abb270d22de75dd950f1b48"
+	local WIN_CAP_COMMIT="f0d6c1b6691db75461b732f6d5ff56eed002eeb9"
 	local WIN_CAP_GIT="windows-capture = { git = \"https://github.com/zed-industries/windows-capture.git\""
 	WIN_CAP_GIT+=", rev = \"${WIN_CAP_COMMIT}\""
 	local WIN_CAP_PATH="windows-capture = \\{ path = \"${WORKDIR}/windows-capture-${WIN_CAP_COMMIT}\""
@@ -1824,12 +1779,12 @@ src_prepare() {
 	WEBRTC_SYS_GIT+=", rev = \"${LIVEKIT_COMMIT}\""
 	local WEBRTC_SYS_PATH="webrtc-sys = \\{ path = \"${WORKDIR}/livekit-rust-sdks-${LIVEKIT_COMMIT}/webrtc-sys\""
 
-	local NOTIFY_COMMIT="d9ad6aff67e47de43abb270d22de75dd950f1b48"
+	local NOTIFY_COMMIT="0890bbb8ca40a4b5d1f67031698dd7918b37d991"
 	local NOTIFY_GIT="notify = { git = \"https://github.com/zed-industries/notify\""
 	NOTIFY_GIT+=", rev = \"${NOTIFY_COMMIT}\""
 	local NOTIFY_PATH="notify = \\{ path = \"${WORKDIR}/notify-${NOTIFY_COMMIT}/notify\""
 
-	local TREE_SITTER_COMMIT="d9ad6aff67e47de43abb270d22de75dd950f1b48"
+	local TREE_SITTER_COMMIT="dff1fd868c750dbbae179fcd5c43ce987e4e0528"
 	local TREE_SITTER_GIT="tree-sitter = { git = \"https://github.com/tree-sitter/tree-sitter\""
 	TREE_SITTER_GIT+=", rev = \"${TREE_SITTER_COMMIT}\""
 	local TREE_SITTER_PATH="tree-sitter = \\{ path = \"${WORKDIR}/tree-sitter-${TREE_SITTER_COMMIT}/lib\""
