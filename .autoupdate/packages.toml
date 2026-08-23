@@ -1340,7 +1340,7 @@ url = "https://api.github.com/repos/vim/vim/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "9.2.0995"
+version = "9.2.1001"
 comments = """
 vim — no releases (404); tags[0] "vX.Y.ZZZZ".
 """
@@ -1351,7 +1351,7 @@ url = "https://api.github.com/repos/vim/vim/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "9.2.0995"
+version = "9.2.1001"
 comments = """
 vim-core — same upstream repo as vim.
 """
@@ -1685,7 +1685,7 @@ base_from = "file"
 base_url = "https://api.github.com/repos/zed-industries/zed/contents/crates/zed/Cargo.toml?ref=main"
 base_pattern = '(?m)^version = "([0-9][0-9.]*)"'
 headers = { "User-Agent" = "bentoo-autoupdate", "Accept" = "application/vnd.github.raw" }
-version = "1.18.0_pre20260822"
+version = "1.18.0_pre20260823"
 comments = """
 zed — commit-tracked on main; _pre suffix preserved from current ebuild.
 2026-08-06: 2 commits landed same UTC day (d61e80b -> 6b2aa1c), so the date
@@ -1960,7 +1960,7 @@ base_from = "file"
 base_url = "https://raw.githubusercontent.com/KhronosGroup/Vulkan-ValidationLayers/main/CMakeLists.txt"
 base_pattern = '(?m)^project\([A-Za-z_-]+ VERSION ([0-9][0-9.]*)'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.360_p20260821"
+version = "1.4.360_p20260823"
 comments = """
 vulkan-layers — commit-tracked on main (Vulkan-ValidationLayers); scans for "Update for Vulkan-Docs X.Y.Z".
 """
@@ -1977,7 +1977,7 @@ base_from = "file"
 base_url = "https://raw.githubusercontent.com/KhronosGroup/Vulkan-Loader/main/CMakeLists.txt"
 base_pattern = '(?m)^project\([A-Za-z_-]+ VERSION ([0-9][0-9.]*)'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.360_p20260821"
+version = "1.4.360_p20260823"
 comments = """
 vulkan-loader — commit-tracked on main; scans for "Update for Vulkan-Docs X.Y.Z" to detect base bump.
 """
@@ -6516,7 +6516,7 @@ parser = "json"
 path = "[0].name"
 transform = [['-', "."]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "7.1.2.29"
+version = "7.1.2.30"
 comments = """
 imagemagick — GitHub tags newest-first ("7.1.2-24"); transform hyphen→dot so it
 compares against the ebuild "7.1.2.24" (was SKIP: "not comparable").
@@ -7284,7 +7284,7 @@ url = "https://api.github.com/repos/lucascouts/claude-agent-acp-plus/releases/la
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.7.0"
+version = "0.8.0"
 comments = """
 claude-agent-acp-plus — GitHub releases/latest tag "vX.Y.Z" (v stripped).
 SRC_URI releases/download/v${PV}/${P}-bundle.tar.gz. Live=v0.2.0.
