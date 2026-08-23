@@ -1,0 +1,11 @@
+DEFINED_PHASES=compile install
+DEPEND=>=net-libs/nodejs-22.13:*
+DESCRIPTION=Fast, disk space efficient package manager
+EAPI=8
+HOMEPAGE=https://pnpm.io
+KEYWORDS=~amd64 ~arm64
+LICENSE=MIT
+RDEPEND=>=net-libs/nodejs-22.13:*
+SLOT=0
+SRC_URI=https://registry.npmjs.org/pnpm/-/pnpm-11.23.0.tgz
+_md5_=a387edc8fde7ce6e5b8d8d2759a35678
