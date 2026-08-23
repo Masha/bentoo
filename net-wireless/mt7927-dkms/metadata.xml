@@ -20,12 +20,14 @@
 	</longdescription>
 	<use>
 		<flag name="btmtk">
-			Rebuild the btusb/btmtk Bluetooth modules and install the
-			proprietary MT6639 Bluetooth firmware. Only needed for the HP
-			EliteMini adapter (USB ID 0489:e156), which is absent from the
-			in-tree tables; every other MT6639 works with the native
-			Bluetooth stack from kernel 7.1 on. Enabling this replaces the
-			in-tree btusb for every Bluetooth device on the system.
+			Rebuild the btusb/btmtk Bluetooth modules out of tree. Only
+			needed for the HP EliteMini adapter (USB ID 0489:e156), which is
+			absent from the in-tree tables; every other MT6639 works with the
+			native Bluetooth stack from kernel 7.1 on. Enabling this replaces
+			the in-tree btusb for every Bluetooth device on the system. The
+			proprietary MT6639 Bluetooth firmware is installed either way,
+			since the in-tree driver needs it too and no other package
+			provides it.
 		</flag>
 	</use>
 	<upstream>

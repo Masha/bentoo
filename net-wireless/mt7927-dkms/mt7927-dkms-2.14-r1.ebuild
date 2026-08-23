@@ -25,8 +25,12 @@ MT76_KVER="7.2"
 KSRC_P="mt7927-kernel-src-${MT76_KVER}"
 # Pre-extracted MT6639 Bluetooth firmware blob (proprietary, from the ASUS
 # driver package V5603998_20250709R). The blob does not change with the dkms
-# release, so pin the repackaged distfile version independently of ${PV}. Only
-# the Bluetooth side needs it -- see the WiFi firmware note in src_install.
+# release, so pin the repackaged distfile version independently of ${PV}. It is
+# fetched and installed UNCONDITIONALLY, including with USE=-btmtk: no other
+# package on the system carries it (linux-firmware only takes vendor blobs from
+# the copyright holder, so MR !946 was closed), and the kernel's OWN btmtk --
+# the in-tree one that runs when this flag is off -- asks for the same file.
+# Tying it to the flag left the native Bluetooth stack with no firmware at all.
 FW_PV="2.11"
 FW_P="mt7927-firmware-${FW_PV}"
 
@@ -38,14 +42,13 @@ HOMEPAGE="https://github.com/jetm/mediatek-mt7927-dkms"
 SRC_URI="
 	https://github.com/jetm/${MY_PN}/archive/refs/tags/v${MY_PV}.tar.gz -> ${P}.tar.gz
 	${R2_BASE}/${KSRC_P}.tar.xz
-	btmtk? ( ${R2_BASE}/${FW_P}.tar.xz )
+	${R2_BASE}/${FW_P}.tar.xz
 "
 S="${WORKDIR}/${MY_P}"
 
 # Kernel modules + mini source are GPL-2; the MT6639 firmware blob is
-# proprietary MediaTek/ASUS with no redistribution grant, and it is only
-# fetched when the Bluetooth side is built.
-LICENSE="GPL-2 btmtk? ( all-rights-reserved )"
+# proprietary MediaTek/ASUS with no redistribution grant.
+LICENSE="GPL-2 all-rights-reserved"
 SLOT="0"
 KEYWORDS="~amd64"
 
@@ -64,7 +67,7 @@ KEYWORDS="~amd64"
 IUSE="btmtk"
 
 # Do not let Gentoo mirrors carry the proprietary firmware.
-RESTRICT="btmtk? ( mirror )"
+RESTRICT="mirror"
 
 # mt76 WiFi modules link against mac80211/cfg80211; the BT side additionally
 # needs the bluetooth core plus the btusb stack (checked in pkg_setup).
@@ -79,9 +82,7 @@ pkg_setup() {
 
 src_unpack() {
 	unpack "${P}.tar.gz"
-	if use btmtk; then
-		unpack "${FW_P}.tar.xz"
-	fi
+	unpack "${FW_P}.tar.xz"
 }
 
 src_prepare() {
@@ -178,13 +179,14 @@ src_install() {
 		mt7925-common mt7925e
 	)
 
-	if use btmtk; then
-		# btmtk on 7.2 asks for mediatek/mt7927/BT_RAM_CODE_MT6639_2_<n>_hdr.bin,
-		# hence the mt7927 subdirectory.
-		insinto /lib/firmware/mediatek/mt7927
-		doins "${WORKDIR}/${FW_P}"/BT_RAM_CODE_MT6639_*.bin
-		modules+=( btmtk btusb )
-	fi
+	# The MT6639 Bluetooth blob goes in either way. btmtk asks for
+	# mediatek/mt7927/BT_RAM_CODE_MT6639_2_<n>_hdr.bin (hence the subdirectory),
+	# and that is true of the IN-TREE btmtk as much as of the rebuilt one -- this
+	# package is its only source anywhere on the system.
+	insinto /lib/firmware/mediatek/mt7927
+	doins "${WORKDIR}/${FW_P}"/BT_RAM_CODE_MT6639_*.bin
+
+	use btmtk && modules+=( btmtk btusb )
 
 	# Force the out-of-tree updates/ modules to override the in-tree copies.
 	local depmod_conf="${T}/${PN}.conf"
@@ -233,11 +235,13 @@ pkg_postinst() {
 		elog "drain: shut down, switch off the PSU / unplug power, wait 10 seconds,"
 		elog "then power back on. See jetm/mediatek-mt7927-dkms issue #23."
 	else
-		elog "Bluetooth modules were NOT built (USE=-btmtk). Kernel 7.1 and"
-		elog "newer carry native MT6639 Bluetooth, so the rebuild only adds the"
-		elog "HP EliteMini ID 0489:e156, which is still not upstream. Enable"
-		elog "USE=btmtk only if lsusb reports that exact ID -- the module is"
-		elog "the only way to get it, since it must be in btmtk_mt6639_devs[]."
+		elog "Bluetooth modules were NOT built (USE=-btmtk), but the MT6639"
+		elog "firmware WAS installed -- the kernel's own btmtk needs it and no"
+		elog "other package ships it. Kernel 7.1 and newer carry native MT6639"
+		elog "support, so the rebuild only adds the HP EliteMini ID 0489:e156,"
+		elog "which is still not upstream. Enable USE=btmtk only if lsusb reports"
+		elog "that exact ID -- the module is the only way to get it, since it"
+		elog "must be in the driver's own btmtk_mt6639_devs[] table."
 	fi
 	elog ""
 	elog "With USE=dist-kernel this is rebuilt automatically on kernel upgrades."
