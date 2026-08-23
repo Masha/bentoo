@@ -152,7 +152,7 @@
 url = "https://registry.npmjs.org/@anthropic-ai/claude-code"
 parser = "json"
 path = "dist-tags.latest"
-version = "2.1.240"
+version = "2.1.241"
 comments = """
 claude-code — npm @anthropic-ai/claude-code; dist-tags.latest is the stable channel.
 
@@ -6850,7 +6850,7 @@ transform = [['^v', ""], ['-[0-9]+$', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
 aux_var = "MY_BUILD"
 aux_pattern = '"name":\s*"v[0-9.]+-([0-9]+)"'
-version = "2.14"
+version = "2.14-r1"
 comments = """
 mt7927-dkms — jetm/mediatek-mt7927-dkms tags "vMAJOR.MINOR-N"; transform strips "v" and the
 trailing "-N" to get the PV. THE -N IS LOAD-BEARING and is why aux_var exists here: upstream
@@ -7834,21 +7834,29 @@ the 9999 live one stays in ::gentoo and is not mirrored here.
 # END
 
 ["x11-base/xwayland"]
-url = "https://xorg.freedesktop.org/archive/individual/xserver/"
+url = "https://gitlab.freedesktop.org/api/v4/projects/xorg%2Fxserver/repository/tags?per_page=100&search=xwayland-"
 parser = "regex"
-pattern = 'xwayland-([0-9.]+)\.tar\.xz'
+pattern = '"name":"xwayland-([0-9.]+)"'
 select = "max"
 version = "26.0.99.901"
 comments = """
-xwayland — the official xorg archive directory, which is the only endpoint that
-lists xwayland tarballs on their own axis. The repository behind them
-(xorg/xserver) tags xorg-server-* in the SAME tag space, so ranking refs/tags
-there would cross version axes; the file listing cannot.
+xwayland — the xorg/xserver tag list on gitlab.freedesktop.org, narrowed to the
+xwayland axis by the API's own search= filter.
 
-select = "max" is load-bearing, not decoration. The listing is ordered oldest
-first, so the default select="first" yields 21.0.99.901 — measured, 212 matches,
-first = 21.0.99.901 and max = 26.0.99.901. The pattern also matches the
-companion .tar.xz.sig lines, which is harmless: they carry the same capture.
+The former endpoint was the official archive directory
+(https://xorg.freedesktop.org/archive/individual/xserver/, which www.x.org
+redirects to). It stopped answering entirely — measured 2026-08-23, the TCP
+connection times out with no response, so the record could not be probed at all.
+
+The repository tags xorg-server-* in the SAME tag space, so a bare ref ranking
+would cross version axes. search=xwayland- makes the server drop those before
+they are ever sent, and the pattern anchors on the JSON "name" field, so a tag
+message that quotes a version cannot leak into the capture. Measured: 100 tags
+returned, every one on the xwayland axis, max = 26.0.99.901.
+
+select = "max" is load-bearing, not decoration. The default ordering is by last
+update, so select="first" is whatever was touched most recently rather than the
+newest version.
 
 Upstream's pre-release axis is X.0.99.90N (21.0.99.901 -> 21.1.0,
 22.0.99.901 -> 22.1.0), and it sorts BELOW the release it precedes under Gentoo
