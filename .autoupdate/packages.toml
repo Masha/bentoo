@@ -496,7 +496,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "2.1.2.1"
+version = "2.1.2.2"
 comments = """
 PixiEditor — GitHub releases (tag is 4-part bare version, e.g. 2.1.1.5).
 """
@@ -7469,7 +7469,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "250-r1"
+version = "251"
 comments = """
 llama-swap — releases/latest; tag_name is "vNNN" (a plain incrementing integer,
 not semver), transform strips the v.  Verified by real download on 2026-08-16:
