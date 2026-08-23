@@ -751,7 +751,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.26.0"
+version = "0.27.0"
 comments = """
 bentoolkit — releases/latest devolve tag_name "vX.Y.Z"; o transform tira o "v",
 senao o bump gera um PV invalido (bentoolkit-v0.17.0).
@@ -6850,7 +6850,7 @@ transform = [['^v', ""], ['-[0-9]+$', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
 aux_var = "MY_BUILD"
 aux_pattern = '"name":\s*"v[0-9.]+-([0-9]+)"'
-version = "2.13"
+version = "2.14"
 comments = """
 mt7927-dkms — jetm/mediatek-mt7927-dkms tags "vMAJOR.MINOR-N"; transform strips "v" and the
 trailing "-N" to get the PV. THE -N IS LOAD-BEARING and is why aux_var exists here: upstream
@@ -6862,6 +6862,13 @@ and takes the first match, i.e. the same [0].name the path expression reads.
 CAVEAT: a new -N with an UNCHANGED version is invisible to the checker (PV is what it
 compares), so v2.14-6 after v2.14-1 needs a hand-made -rN revbump. Same class as nxplayer.
 A bump re-checks the dkms revision AND Secure Boot module signing (linux-mod-r1, SIG_FORCE).
+SECOND CAVEAT, and the reason a bump here can never be unattended: the ebuild builds against
+a mini source tarball of the kernel release upstream rebased onto (MT76_KVER), hosted on our
+own R2. When upstream moves that base -- 7.0 -> 7.1.3 in 2.13, 7.1.3 -> 7.2 in 2.14 -- the
+new mt7927-kernel-src-<KVER>.tar.xz DOES NOT EXIST YET and every fetch 404s until someone
+repacks and uploads it. Recipe: extract drivers/net/wireless/mediatek/mt76 and
+drivers/bluetooth out of the official linux-<KVER>.tar.xz, keeping the linux-<KVER>/ prefix,
+with `tar --sort=name --owner=0 --group=0 --numeric-owner --mtime='2026-01-01 00:00:00'`.
 """
 # END
 

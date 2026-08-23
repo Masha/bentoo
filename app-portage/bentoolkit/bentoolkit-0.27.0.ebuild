@@ -12,8 +12,8 @@ SRC_URI="https://github.com/obentoo/${PN}/archive/refs/tags/v${PV}.tar.gz -> ${P
 LICENSE="MIT"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
-RESTRICT="network-sandbox"
 IUSE="+secure kde playwright +browser +system-snapshot systemd"
+RESTRICT="network-sandbox"
 
 # playwright and browser are two alternative backends for the same headless
 # "script" version parser, so at most one may be enabled.
@@ -57,7 +57,9 @@ src_unpack() {
 src_compile() {
 	local version_pkg="github.com/obentoo/bentoolkit/internal/common/version"
 	local build_date=$(date -u '+%Y-%m-%d_%H:%M:%S')
-	local ldflags="-X ${version_pkg}.Version=${PV} -X ${version_pkg}.Commit=release -X ${version_pkg}.BuildDate=${build_date}"
+	local ldflags="-X ${version_pkg}.Version=${PV}"
+	ldflags+=" -X ${version_pkg}.Commit=release"
+	ldflags+=" -X ${version_pkg}.BuildDate=${build_date}"
 
 	# The "script" version parser (headless-browser backend used by some
 	# autoupdate packages) lives behind a build tag; without one the binary

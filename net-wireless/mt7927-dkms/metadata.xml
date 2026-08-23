@@ -8,16 +8,26 @@
 	<longdescription lang="en">
 		Out-of-tree kernel modules for the MediaTek MT7927 (Filogic 380)
 		WiFi 7 + Bluetooth 5.4 combo found on recent ASUS/Gigabyte/MSI
-		motherboards. The WiFi side (PCIe, architecturally MT7925) and the
-		Bluetooth side (USB MT6639) are not yet supported by the mainline
-		mt76/btusb drivers. This package extracts the mt76 and bluetooth
-		source from a vanilla kernel tarball, applies the upstream
-		(jetm/mediatek-mt7927-dkms) patch series adding the MT7927 PCI/USB
-		IDs, 320MHz EHT data path and firmware paths, builds the modules
-		against the running kernel and installs them under updates/ so they
-		override the in-tree copies. Firmware blobs for the MT6639 are
-		extracted from the proprietary ASUS driver ZIP.
+		motherboards. Kernel 7.2 carries the mainline MT7927 support, so
+		this package extracts the mt76 source from a vanilla 7.2 tarball,
+		applies the four AP-mode additions still out of tree (HE AP PHY
+		capabilities, the STA_REC_MURU and STA_REC_TX_PROC TLVs, and STA
+		fallback recovery in the TX free path) plus the version-guarded
+		compat shims, and installs the modules under updates/ so they
+		override the in-tree copies on hosts older than 7.2. The Bluetooth
+		side is optional: from 7.1 the MT6639 is native, and rebuilding
+		btusb/btmtk only adds the HP EliteMini ID 0489:e156.
 	</longdescription>
+	<use>
+		<flag name="btmtk">
+			Rebuild the btusb/btmtk Bluetooth modules and install the
+			proprietary MT6639 Bluetooth firmware. Only needed for the HP
+			EliteMini adapter (USB ID 0489:e156), which is absent from the
+			in-tree tables; every other MT6639 works with the native
+			Bluetooth stack from kernel 7.1 on. Enabling this replaces the
+			in-tree btusb for every Bluetooth device on the system.
+		</flag>
+	</use>
 	<upstream>
 		<remote-id type="github">jetm/mediatek-mt7927-dkms</remote-id>
 	</upstream>
