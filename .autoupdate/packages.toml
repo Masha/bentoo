@@ -34,6 +34,11 @@
 # --apply all, run:
 #   git diff .autoupdate/packages.toml | grep -- '-enabled = false'
 # A removed line there is always a bug, never an intention.
+# Since 2026-08-24 this no longer depends on anyone remembering to run it:
+# scripts/check-autoupdate-damage.sh enforces it, and .git/hooks/pre-commit
+# refuses the commit. It also covers the sibling defect in app-editors/zed,
+# where the applier clobbers the seven src_prepare git-dep revisions with
+# EGIT_COMMIT. Both are the same root cause: the pass rewrites past target.
 #
 # No record uses parser = "script" any more: the three that did (antigravity-bin,
 # antigravity-hub-bin, gitkraken) were migrated to regex on 2026-08-06 because
