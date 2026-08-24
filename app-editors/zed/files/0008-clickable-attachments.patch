@@ -6,14 +6,12 @@ Subject: [PATCH 8/8] feat(agent_ui): clickable file mention links in replayed
 
 Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
 ---
- crates/agent_ui/src/message_editor.rs | 80 +++++++++++++++++++++++++++
- 1 file changed, 80 insertions(+)
 
 diff --git a/crates/agent_ui/src/message_editor.rs b/crates/agent_ui/src/message_editor.rs
-index f9878d6..00c123a 100644
+index fe10a36..044e788 100644
 --- a/crates/agent_ui/src/message_editor.rs
 +++ b/crates/agent_ui/src/message_editor.rs
-@@ -1732,7 +1732,25 @@ impl MessageEditor {
+@@ -1737,7 +1737,25 @@ impl MessageEditor {
          for chunk in message {
              match chunk {
                  acp::ContentBlock::Text(text_content) => {
@@ -39,7 +37,7 @@ index f9878d6..00c123a 100644
                  }
                  acp::ContentBlock::Resource(acp::EmbeddedResource {
                      resource: acp::EmbeddedResourceResource::TextResourceContents(resource),
-@@ -5593,6 +5611,68 @@ mod tests {
+@@ -5599,6 +5617,68 @@ mod tests {
          assert_eq!(mention_uris.len(), 1);
      }
  
@@ -108,6 +106,3 @@ index f9878d6..00c123a 100644
      #[gpui::test]
      async fn test_set_message_replaces_existing_content(cx: &mut TestAppContext) {
          init_test(cx);
--- 
-2.55.0
-

@@ -82,11 +82,9 @@ sub-task 7.2). The hunks below are byte-identical to the original export, so the
 `From` line still names the commit this patch was first exported from.
 
 ---
- crates/feature_flags/src/flags.rs | 4 ++++
- 1 file changed, 4 insertions(+)
 
 diff --git a/crates/feature_flags/src/flags.rs b/crates/feature_flags/src/flags.rs
-index 31096cc..2029ee7 100644
+index 6a10534..3375676 100644
 --- a/crates/feature_flags/src/flags.rs
 +++ b/crates/feature_flags/src/flags.rs
 @@ -24,6 +24,10 @@ pub struct AcpBetaFeatureFlag;
@@ -100,6 +98,3 @@ index 31096cc..2029ee7 100644
  }
  register_feature_flag!(AcpBetaFeatureFlag);
  
--- 
-2.55.0
-

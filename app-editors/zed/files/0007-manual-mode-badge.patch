@@ -15,15 +15,12 @@ shared via mode_selector::shows_manual_mode_badge.
 
 Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
 ---
- crates/agent_ui/src/config_options.rs | 113 +++++++++++++++++++++--
- crates/agent_ui/src/mode_selector.rs  | 127 +++++++++++++++++++++++++-
- 2 files changed, 228 insertions(+), 12 deletions(-)
 
 diff --git a/crates/agent_ui/src/config_options.rs b/crates/agent_ui/src/config_options.rs
-index df4eeca..c5ce895 100644
+index cbefa71..196dc74 100644
 --- a/crates/agent_ui/src/config_options.rs
 +++ b/crates/agent_ui/src/config_options.rs
-@@ -456,6 +456,8 @@ impl Render for ConfigOptionSelector {
+@@ -458,6 +458,8 @@ impl Render for ConfigOptionSelector {
  
                  let trigger_button = self.render_trigger_button(window, cx);
  
@@ -32,7 +29,7 @@ index df4eeca..c5ce895 100644
                  let show_category_keybindings = option
                      .category
                      .as_ref()
-@@ -527,16 +529,40 @@ impl Render for ConfigOptionSelector {
+@@ -529,16 +531,40 @@ impl Render for ConfigOptionSelector {
                      content.into_any()
                  });
  
@@ -83,7 +80,7 @@ index df4eeca..c5ce895 100644
              }
              acp::SessionConfigKind::Boolean(boolean) => {
                  let option_id = option.id.clone();
-@@ -967,6 +993,22 @@ fn get_current_select_value(
+@@ -970,6 +996,22 @@ fn get_current_select_value(
          })
  }
  
@@ -106,7 +103,7 @@ index df4eeca..c5ce895 100644
  fn setting_value_for_config_option_value(
      value: &acp::SessionConfigOptionValue,
  ) -> Option<AgentConfigOptionValue> {
-@@ -1275,6 +1317,57 @@ mod tests {
+@@ -1278,6 +1320,57 @@ mod tests {
          assert!(!handled);
      }
  
@@ -321,6 +318,3 @@ index 46c1543..253aee8 100644
 +        }
 +    }
  }
--- 
-2.55.0
-

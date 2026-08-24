@@ -6,14 +6,12 @@ Subject: [PATCH] feat(agent_ui): multiline auto-growing string fields in
 
 Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 ---
- .../src/conversation_view/elicitation.rs      | 32 ++++++++++++++++++-
- 1 file changed, 31 insertions(+), 1 deletion(-)
 
 diff --git a/crates/agent_ui/src/conversation_view/elicitation.rs b/crates/agent_ui/src/conversation_view/elicitation.rs
-index 3eaaa06..55bb938 100644
+index 6260d46..764fd93 100644
 --- a/crates/agent_ui/src/conversation_view/elicitation.rs
 +++ b/crates/agent_ui/src/conversation_view/elicitation.rs
-@@ -43,7 +43,7 @@ impl ElicitationFormState {
+@@ -57,7 +57,7 @@ impl ElicitationFormState {
                      let options = single_select_options(schema);
                      if options.is_empty() {
                          let editor = cx.new(|cx| {
@@ -22,7 +20,7 @@ index 3eaaa06..55bb938 100644
                              if let Some(default) = &schema.default {
                                  editor.set_text(default.clone(), window, cx);
                              }
-@@ -639,6 +639,36 @@ mod tests {
+@@ -821,6 +821,36 @@ mod tests {
              Editor::single_line(window, cx)
          });
      }
@@ -59,6 +57,3 @@ index 3eaaa06..55bb938 100644
  }
  
  #[derive(RegisterComponent)]
--- 
-2.55.0
-
