@@ -5,33 +5,24 @@ EAPI=8
 
 inherit flag-o-matic toolchain-funcs
 
-DESCRIPTION="ICU runtime libraries for prebuilt packages linked against the ICU 78 ABI"
+MY_PV="${PV//./_}"
+
+DESCRIPTION="ICU runtime libraries for prebuilt packages linked against the ICU 77 ABI"
 HOMEPAGE="https://icu.unicode.org/"
-SRC_URI="https://github.com/unicode-org/icu/releases/download/release-${PV}/icu4c-${PV}-sources.tgz"
+SRC_URI="https://github.com/unicode-org/icu/releases/download/release-${PV/./-}/icu4c-${MY_PV}-src.tgz"
 S="${WORKDIR}/icu/source"
 
 LICENSE="BSD"
 SLOT="$(ver_cut 1)"
 KEYWORDS="~amd64 ~arm64"
 
-# This slot carries the ABI that dev-libs/icu itself currently ships, so every
-# library it installs is a file dev-libs/icu already owns -- measured: all six
-# of libicu{data,i18n,uc}.so.78{,.3} belong to dev-libs/icu-78.3. Until ::gentoo
-# moves past 78 this package has nothing to add, and the block says so instead
-# of leaving the collision for emerge to hit.
-#
-# The block lifts by itself: when dev-libs/icu goes to 79, slot 0/78 stops
-# existing and this ebuild becomes what a -compat package is for -- the ABI the
-# system no longer carries. That is also when it stops being a copy.
-RDEPEND="!!dev-libs/icu:0/78"
-
 # Nothing should ever build against this package: it exists so that binaries
-# which were compiled elsewhere against SONAME libicu*.so.78 keep loading.
+# which were compiled elsewhere against SONAME libicu*.so.77 keep loading.
 # Only the versioned runtime libraries are installed, so it never becomes a
 # link-time target and never collides with dev-libs/icu.
 
 src_configure() {
-	# Upstream renames every exported symbol to u_foo_78; dev-libs/icu builds
+	# Upstream renames every exported symbol to u_foo_77; dev-libs/icu builds
 	# with U_DISABLE_RENAMING=1 and exports plain u_foo instead. Keeping the
 	# renaming enabled here is what lets both libraries live in one process:
 	# their symbol namespaces do not overlap.

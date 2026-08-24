@@ -7,7 +7,7 @@ inherit cmake
 
 MY_PN="${PN%-compat}"
 
-DESCRIPTION="libjxl runtime libraries for prebuilt packages linked against the 0.12 ABI"
+DESCRIPTION="libjxl runtime libraries for prebuilt packages linked against the 0.11 ABI"
 HOMEPAGE="https://github.com/libjxl/libjxl/"
 SRC_URI="
 	https://github.com/libjxl/libjxl/archive/refs/tags/v${PV}.tar.gz
@@ -22,25 +22,12 @@ KEYWORDS="~amd64 ~arm64"
 # media-libs/libjxl carries SLOT="0/$(ver_cut 1-2)", so only one ABI of it can
 # ever be installed. This package supplies the older runtime alongside it,
 # without headers, pkg-config files or tools, so nothing links against it.
-#
-# This slot, however, is the ABI media-libs/libjxl currently ships: all four of
-# libjxl{,_cms}.so.0.12{,.0} belong to media-libs/libjxl-0.12.0, so there is no
-# older runtime to supply yet. The block states that instead of leaving a file
-# collision for emerge to hit, and lifts by itself once ::gentoo moves to 0.13
-# -- the moment this ebuild starts being a compat package rather than a copy.
-COMMON_DEPEND="
+RDEPEND="
 	app-arch/brotli:=
 	>=dev-cpp/highway-1.0.7
 	>=media-libs/lcms-2.13:2
 "
-# The block belongs to RDEPEND alone: what conflicts is the installed file, not
-# the build. This package compiles its own libjxl from source and never needs
-# media-libs/libjxl present to do it.
-RDEPEND="
-	${COMMON_DEPEND}
-	!!media-libs/libjxl:0/0.12
-"
-DEPEND="${COMMON_DEPEND}"
+DEPEND="${RDEPEND}"
 
 src_configure() {
 	# Everything that is not the core decoding library is off: this package

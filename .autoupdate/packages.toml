@@ -7,10 +7,12 @@
 # ebuild (Gentoo version rules: prefixes v/release-/ver-/version- stripped;
 # regex returns capture group 1 of the FIRST match on the raw body).
 #
-# 451 records — 314 regex, 137 json. 96 disabled (enabled = false),
+# 451 records — 314 regex, 137 json. 98 disabled (enabled = false),
 # 7 held (hold = true): dev-build/gn, dev-lang/{rust,rust-bin,rust-common,ghc},
 # sci-ml/stable-diffusion-cpp, sys-cluster/minikube. Recounted with tomllib on
-# 2026-08-21 by the one-liner below.
+# 2026-08-24 by the one-liner below. The 96 -> 98 step is not new records: it is
+# dev-libs/icu-compat and media-libs/libjxl-compat getting their enabled = false
+# back, see below.
 #
 # These figures drift FAST — every one of them was wrong again one day after the
 # 2026-08-20 recount claimed 313/138/100/5 (and that one had corrected an even
@@ -23,6 +25,15 @@
 # gone": dev-libs/icu-compat and media-libs/libjxl-compat are pinned to an old
 # ABI on purpose, and a bump would destroy what they are for. Read their
 # comments before re-enabling either.
+#
+# Those two are also the proof that enabled = false is not a gate. On
+# 2026-08-12 (b165e5745) a probe bumped both and the applier DELETED their
+# enabled = false lines; their SLOT is derived from the version, so each bump
+# erased the slot orion-bin depends on. It surfaced 12 days later as
+# `there are no ebuilds to satisfy "dev-libs/icu-compat:77"`. After any
+# --apply all, run:
+#   git diff .autoupdate/packages.toml | grep -- '-enabled = false'
+# A removed line there is always a bug, never an intention.
 #
 # No record uses parser = "script" any more: the three that did (antigravity-bin,
 # antigravity-hub-bin, gitkraken) were migrated to regex on 2026-08-06 because
@@ -7779,32 +7790,54 @@ the ref name, so a blind PV bump fails loudly rather than silently.
 # END
 
 ["dev-libs/icu-compat"]
+enabled = false
 url = "https://api.github.com/repos/unicode-org/icu/releases/latest"
 parser = "json"
 path = "tag_name"
 transform = [['^release-', ""], ['-', "."]]
 version = "78.3"
 comments = """
-Pinned on purpose — do NOT enable. The package exists to carry the ICU 77 ABI
-for www-client/orion-bin, whose prebuilt WebKit imports u_*_77 symbols;
-dev-libs/icu already covers the current ABI. Bumping this one would remove the
-only reason it exists. The record is kept, disabled, so the endpoint stays
-documented: needing a different ABI means a NEW package at that version, never
-a bump of this one.
+Pinned on purpose — do NOT enable. This package carries the ICU 77 ABI for
+www-client/orion-bin, whose prebuilt WebKit imports u_*_77 symbols, while
+dev-libs/icu covers the current one. SLOT is derived from the version
+($(ver_cut 1)), so a bump does not update the package: it DELETES the slot.
+That is not a hypothetical — b165e5745 (2026-08-12) bumped 77.1 → 78.3 and
+emerge started answering `there are no ebuilds to satisfy "dev-libs/icu-compat:77"`.
+
+Read this before touching version: `enabled = false` is documentation, not a
+gate. A `bentoo overlay autoupdate --check dev-libs/icu-compat` arms the pending
+queue anyway, and the applier that follows deletes this very line. If a probe
+was run here, clear the entry from ~/.config/bentoo/autoupdate/pending.json by
+hand, and after any `--apply all` check
+`git diff .autoupdate/packages.toml | grep -- '-enabled = false'`.
+
+The overlay now ships BOTH 77.1 (the ABI orion-bin needs) and 78.3. version
+stays at 78.3 because it tracks the newest ebuild here, so the record does not
+read as a pending bump if it is ever re-enabled. 78.3 is not installable while
+::gentoo ships dev-libs/icu-78.3 — every file it carries belongs to that
+package — so it declares `!!dev-libs/icu:0/78` and unblocks itself when ::gentoo
+moves to 79. Needing a further ABI means adding a NEW version alongside these,
+never renaming one of them.
 """
 # END
 
 ["media-libs/libjxl-compat"]
+enabled = false
 url = "https://api.github.com/repos/libjxl/libjxl/releases/latest"
 parser = "json"
 path = "tag_name"
 transform = [['^v', ""]]
 version = "0.12.0"
 comments = """
-Pinned on purpose — do NOT enable, same reasoning as dev-libs/icu-compat. It
-supplies the libjxl 0.11 ABI that orion-bin's bundled WebKit links against,
-while media-libs/libjxl carries the current one. Only the last 0.11.x release
-belongs here; a 0.12+ bump would drop the very ABI this package exists for.
+Pinned on purpose — do NOT enable, same reasoning as dev-libs/icu-compat, and
+the same incident: b165e5745 bumped 0.11.2 → 0.12.0, SLOT went from 0.11 to
+0.12, and orion-bin's `media-libs/libjxl-compat:0.11` lost its only provider.
+Read that record's comment for how the `enabled = false` gate fails.
+
+0.11.2 supplies the ABI orion-bin's bundled WebKit links against; 0.12.0 is
+kept alongside it but blocks `!!media-libs/libjxl:0/0.12`, since every file it
+installs already belongs to media-libs/libjxl-0.12.0. It becomes a real compat
+package — and unblocks itself — once ::gentoo moves to 0.13.
 """
 # END
 
