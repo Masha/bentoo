@@ -535,6 +535,7 @@ release.gitkraken.com/linux/gitkraken-amd64.tar.gz 302 target).
 
 ["net-print/hplip-plugin"]
 enabled = false
+disabled_by = "auto"
 url = "https://sourceforge.net/projects/hplip/rss?path=/hplip"
 parser = "regex"
 pattern = 'hplip-([0-9]+\.[0-9]+\.[0-9]+)'
@@ -635,6 +636,7 @@ qBittorrent — tag "release-X.Y.Z" ("release-" stripped).
 
 ["app-containers/podman"]
 enabled = false
+disabled_by = "auto"
 url = "https://api.github.com/repos/containers/podman/releases/latest"
 parser = "json"
 path = "tag_name"
@@ -731,6 +733,7 @@ dxvk-nvapi — tag "vX.Y.Z".
 
 ["app-emulation/wine-vanilla"]
 enabled = false
+disabled_by = "auto"
 url = "https://gitlab.winehq.org/api/v4/projects/wine%2Fwine/releases?per_page=30"
 parser = "regex"
 pattern = '"tag_name":"wine-([0-9]+\.[0-9]+(?:\.[0-9]+)?)"'
@@ -1199,6 +1202,7 @@ edk2 — tag "edk2-stableYYYYMM"; regex captures the 6-digit datestamp.
 
 ["sys-firmware/intel-microcode"]
 enabled = false
+disabled_by = "auto"
 url = "https://api.github.com/repos/intel/Intel-Linux-Processor-Microcode-Data-Files/releases/latest"
 parser = "regex"
 pattern = '"tag_name":\s*"microcode-([0-9]{8})"'
@@ -1500,6 +1504,7 @@ networkmanager — version sort + per_page=40; regex skips *-dev/*-rc, first sta
 
 ["dev-libs/wayland"]
 enabled = false
+disabled_by = "auto"
 url = "https://gitlab.freedesktop.org/api/v4/projects/wayland%2Fwayland/repository/tags?order_by=version&sort=desc&per_page=10"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
@@ -1512,6 +1517,7 @@ Live=1.26.0 > ebuild 1.25.91 (RC). Anubis may need a retry.
 
 ["dev-util/wayland-scanner"]
 enabled = false
+disabled_by = "auto"
 url = "https://gitlab.freedesktop.org/api/v4/projects/wayland%2Fwayland/repository/tags?order_by=version&sort=desc&per_page=10"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
@@ -1592,6 +1598,7 @@ blender — download page; anchored to "blender-X.Y.Z".
 
 ["media-libs/libffado"]
 enabled = false
+disabled_by = "auto"
 url = "http://www.ffado.org/"
 parser = "regex"
 pattern = '[Vv]ersion ([0-9]+\.[0-9]+\.[0-9]+)'
@@ -1622,6 +1629,7 @@ ufw — Launchpad "0.36" series releases API, newest-first.
 
 ["net-vpn/openvpn"]
 enabled = false
+disabled_by = "auto"
 url = "https://openvpn.net/community-downloads/"
 parser = "regex"
 pattern = 'OpenVPN-([0-9]+\.[0-9]+\.[0-9]+)'
@@ -2010,6 +2018,7 @@ vulkan-loader — commit-tracked on main; scans for "Update for Vulkan-Docs X.Y.
 
 ["kde-frameworks/attica"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fattica/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -2031,6 +2040,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/baloo"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fbaloo/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -2052,6 +2062,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/bluez-qt"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fbluez-qt/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -2073,6 +2084,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/breeze-icons"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fbreeze-icons/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -2094,6 +2106,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/extra-cmake-modules"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fextra-cmake-modules/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -2115,6 +2128,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/frameworkintegration"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fframeworkintegration/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -2136,6 +2150,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/kapidox"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkapidox/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -2157,6 +2172,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/karchive"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkarchive/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -2178,6 +2194,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/kauth"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkauth/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -2199,6 +2216,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/kbookmarks"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkbookmarks/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -2220,6 +2238,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/kcalendarcore"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkcalendarcore/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -2241,6 +2260,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/kcmutils"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkcmutils/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -2262,6 +2282,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/kcodecs"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkcodecs/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -2283,6 +2304,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/kcolorscheme"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkcolorscheme/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -2304,6 +2326,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/kcompletion"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkcompletion/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -2325,6 +2348,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/kconfig"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkconfig/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -2346,6 +2370,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/kconfigwidgets"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkconfigwidgets/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -2367,6 +2392,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/kcontacts"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkcontacts/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -2388,6 +2414,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/kcoreaddons"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkcoreaddons/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -2409,6 +2436,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/kcrash"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkcrash/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -2430,6 +2458,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/kdav"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkdav/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -2451,6 +2480,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/kdbusaddons"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkdbusaddons/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -2472,6 +2502,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/kdeclarative"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkdeclarative/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -2493,6 +2524,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/kded"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkded/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -2514,6 +2546,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/kdesu"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkdesu/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -2535,6 +2568,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/kdnssd"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkdnssd/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -2556,6 +2590,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/kdoctools"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkdoctools/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -2577,6 +2612,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/kfilemetadata"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkfilemetadata/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -2598,6 +2634,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/kglobalaccel"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkglobalaccel/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -2619,6 +2656,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/kguiaddons"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkguiaddons/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -2640,6 +2678,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/kholidays"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkholidays/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -2661,6 +2700,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/ki18n"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fki18n/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -2682,6 +2722,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/kiconthemes"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkiconthemes/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -2703,6 +2744,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/kidletime"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkidletime/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -2724,6 +2766,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/kimageformats"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkimageformats/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -2745,6 +2788,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/kio"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkio/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -2766,6 +2810,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/kirigami"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkirigami/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -2787,6 +2832,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/kitemmodels"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkitemmodels/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -2808,6 +2854,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/kitemviews"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkitemviews/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -2829,6 +2876,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/kjobwidgets"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkjobwidgets/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -2850,6 +2898,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/kmime"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkmime/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -2871,6 +2920,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/knewstuff"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fknewstuff/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -2892,6 +2942,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/knotifications"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fknotifications/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -2913,6 +2964,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/knotifyconfig"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fknotifyconfig/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -2934,6 +2986,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/kpackage"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkpackage/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -2955,6 +3008,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/kparts"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkparts/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -2976,6 +3030,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/kpeople"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkpeople/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -2997,6 +3052,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/kplotting"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkplotting/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -3018,6 +3074,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/kpty"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkpty/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -3039,6 +3096,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/kquickcharts"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkquickcharts/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -3060,6 +3118,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/krunner"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkrunner/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -3081,6 +3140,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/ksecretd-services"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkwallet/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -3103,6 +3163,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/kservice"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkservice/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -3124,6 +3185,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/kstatusnotifieritem"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkstatusnotifieritem/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -3145,6 +3207,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/ksvg"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fksvg/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -3166,6 +3229,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/ktexteditor"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fktexteditor/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -3187,6 +3251,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/ktexttemplate"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fktexttemplate/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -3208,6 +3273,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/ktextwidgets"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fktextwidgets/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -3229,6 +3295,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/kunitconversion"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkunitconversion/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -3250,6 +3317,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/kuserfeedback"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkuserfeedback/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -3271,6 +3339,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/kwallet"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkwallet/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -3292,6 +3361,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/kwallet-runtime"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkwallet/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -3314,6 +3384,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/kwidgetsaddons"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkwidgetsaddons/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -3335,6 +3406,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/kwindowsystem"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkwindowsystem/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -3356,6 +3428,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/kxmlgui"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkxmlgui/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -3377,6 +3450,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/modemmanager-qt"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fmodemmanager-qt/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -3398,6 +3472,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/networkmanager-qt"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fnetworkmanager-qt/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -3419,6 +3494,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/oxygen-icons"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Foxygen-icons/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -3440,6 +3516,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/prison"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fprison/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -3461,6 +3538,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/purpose"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fpurpose/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -3482,6 +3560,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/qqc2-desktop-style"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fqqc2-desktop-style/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -3503,6 +3582,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/solid"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fsolid/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -3524,6 +3604,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/sonnet"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fsonnet/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -3545,6 +3626,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/syndication"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fsyndication/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -3566,6 +3648,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/syntax-highlighting"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fsyntax-highlighting/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -3587,6 +3670,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 
 ["kde-frameworks/threadweaver"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fthreadweaver/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
@@ -5159,6 +5243,7 @@ boilerplate e' compartilhado, a remocao do plugin e' so deste.
 
 ["media-plugins/gst-plugins-mpeg2dec@dev"]
 enabled = false
+disabled_by = "auto"
 url = "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
@@ -6468,6 +6553,7 @@ Ver a entrada @stable irma.
 
 ["app-admin/calamares"]
 enabled = false
+disabled_by = "auto"
 url = "https://codeberg.org/api/v1/repos/Calamares/calamares/tags"
 parser = "json"
 path = "[0].name"
@@ -6843,6 +6929,7 @@ Live=v0.7.0.
 
 ["net-misc/rclone"]
 enabled = false
+disabled_by = "auto"
 url = "https://api.github.com/repos/rclone/rclone/releases/latest"
 parser = "json"
 path = "tag_name"
@@ -6899,6 +6986,7 @@ with `tar --sort=name --owner=0 --group=0 --numeric-owner --mtime='2026-01-01 00
 
 ["dev-python/playwright-bin"]
 enabled = false
+disabled_by = "auto"
 url = "https://pypi.org/pypi/playwright/json"
 parser = "json"
 path = "info.version"
@@ -7011,6 +7099,7 @@ must regenerate CRATES= (pycargoebuild). GitHub releases/latest agrees (tag 0.19
 
 ["media-libs/kquickimageeditor"]
 enabled = false
+disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/libraries%2Fkquickimageeditor/repository/tags"
 parser = "json"
 path = "[0].name"
@@ -7112,6 +7201,7 @@ would commit an ebuild that doesn't build. Probe kept live: `--check dev-lang/gh
 
 ["media-sound/audacity"]
 enabled = false
+disabled_by = "auto"
 url = "https://api.github.com/repos/audacity/audacity/tags?per_page=100"
 parser = "regex"
 pattern = 'Audacity-(3\.7\.[0-9]+)'
@@ -7167,6 +7257,7 @@ which is why this entry carried no revision until 2026-07-26.
 
 ["sci-ml/ollama"]
 enabled = false
+disabled_by = "auto"
 url = "https://api.github.com/repos/ollama/ollama/releases/latest"
 parser = "json"
 path = "tag_name"
@@ -7294,6 +7385,7 @@ Live=v0.7.0.
 
 ["sys-apps/openrazer"]
 enabled = false
+disabled_by = "auto"
 url = "https://api.github.com/repos/openrazer/openrazer/releases/latest"
 parser = "json"
 path = "tag_name"
@@ -7318,6 +7410,7 @@ SRC_URI releases/download/v${PV}/${P}-bundle.tar.gz. Live=v0.2.0.
 
 ["net-im/telegram-desktop"]
 enabled = false
+disabled_by = "auto"
 url = "https://api.github.com/repos/telegramdesktop/tdesktop/releases/latest"
 parser = "json"
 path = "tag_name"
@@ -7440,6 +7533,7 @@ first stable release object and capture its version. Live=3.44.5.
 
 ["sys-power/upower"]
 enabled = false
+disabled_by = "auto"
 url = "https://gitlab.freedesktop.org/api/v4/projects/upower%2Fupower/repository/tags?per_page=10"
 parser = "regex"
 pattern = '"name":"v([0-9]+\.[0-9]+\.[0-9]+)"'
@@ -7723,6 +7817,7 @@ because ::gentoo is stuck on 1.33 (2025).  Drop both once ::gentoo ships 2.x.
 
 ["sys-apps/uutils-coreutils"]
 enabled = false
+disabled_by = "auto"
 url = "https://api.github.com/repos/uutils/coreutils/releases/latest"
 parser = "json"
 path = "tag_name"
@@ -7864,6 +7959,7 @@ which is what the 9999 ebuild is for; 9999 is not version-checked.
 
 ["sys-devel/mold"]
 enabled = false
+disabled_by = "auto"
 url = "https://api.github.com/repos/rui314/mold/releases/latest"
 parser = "json"
 path = "tag_name"
