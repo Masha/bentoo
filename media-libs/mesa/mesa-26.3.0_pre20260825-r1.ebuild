@@ -10,7 +10,10 @@ PYTHON_COMPAT=( python3_{12..14} )
 
 inherit flag-o-matic llvm-r2 meson-multilib python-any-r1 linux-info
 
-MY_P="${PF/_/-}"
+# Note: ${P}, not ${PF} -- this names the distfile, which does not change
+# across revisions.  With ${PF} the first revbump would look for
+# mesa-26.3.0-pre20260825-r1.tar.gz and miss the Manifest entry.
+MY_P="${P/_/-}"
 
 CRATES="
 	paste@1.0.14
@@ -306,6 +309,12 @@ pkg_setup() {
 		rust_pkg_setup
 	fi
 }
+
+PATCHES=(
+	# Build fix: the ASTC decoder shader needs SPIR-V 1.2, which glslang
+	# started enforcing in 2026-08.  Drop when upstream carries it.
+	"${FILESDIR}"/${PN}-astc-spirv1.2.patch
+)
 
 src_prepare() {
 	default
