@@ -98,11 +98,16 @@ check_enabled_false() {
 
 # --- class 2 ---------------------------------------------------------------
 
+# ACMR, not ACM: every applier bump lands as a RENAME (foo-1.2.ebuild ->
+# foo-1.3.ebuild, similarity 96-100%), so a filter without R prints "ebuilds:
+# none in scope" on exactly the commits this check exists for -- a silent pass,
+# not a clean one. Observed on the 2026-08-24 bump: ten renamed ebuilds, none
+# examined.
 _ebuild_list() {
 	if [[ "${SCOPE}" == "all" ]]; then
 		git -C "${REPO}" ls-files '*.ebuild'
 	else
-		_diff --name-only --diff-filter=ACM -- '*.ebuild'
+		_diff --name-only --diff-filter=ACMR -- '*.ebuild'
 	fi
 }
 
