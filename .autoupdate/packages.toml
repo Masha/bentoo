@@ -1709,7 +1709,7 @@ base_from = "file"
 base_url = "https://api.github.com/repos/zed-industries/zed/contents/crates/zed/Cargo.toml?ref=main"
 base_pattern = '(?m)^version = "([0-9][0-9.]*)"'
 headers = { "User-Agent" = "bentoo-autoupdate", "Accept" = "application/vnd.github.raw" }
-version = "1.18.0_pre20260825"
+version = "1.18.0_pre20260825-r1"
 comments = """
 zed — commit-tracked on main; _pre suffix preserved from current ebuild.
 2026-08-06: 2 commits landed same UTC day (d61e80b -> 6b2aa1c), so the date
@@ -1746,6 +1746,18 @@ https://github.com/zed-industries/async-process.git: you are in the offline
 mode" - i.e. src_compile cannot work in the network-less sandbox. Fixed as -r1
 (not in place) because the ebuild was already published; SRC_URI names the
 tarball after ${PF}, so -r1 also renames the DIST entry.
+2026-08-25: a different applier defect, on 1.18.0_pre20260825 (0969b0db). The
+seven src_prepare commits were left alone this time, but CRATES and GIT_CRATES
+were copied verbatim from the previous ebuild while upstream's Cargo.lock had
+moved: wasmtime 36.0.14 -> 48.0.1 (plus cranelift 0.123 -> 0.135, regalloc2
+0.12 -> 0.15, the wasm-tools 0.236/0.252 -> 0.254 set) and tree-sitter
+dff1fd86 -> 43623ec9. Offline cargo would fail on the first missing crate. The
+lesson generalises: the applier only ever edits EGIT_COMMIT and version, so any
+bump whose Cargo.lock changed needs pycargoebuild re-run and its CRATES /
+GIT_CRATES blocks transplanted -- diff Cargo.lock between the old and new
+commit to know whether that is needed. Fixed as -r1 on f42c6e87, whose
+Cargo.lock is byte-identical to 0969b0db's, so the regenerated blocks are
+correct for both.
 """
 # END
 

@@ -14,6 +14,7 @@ CRATES="
 	accesskit_unix@0.21.0
 	accesskit_windows@0.33.1
 	addr2line@0.25.1
+	addr2line@0.26.1
 	adler2@2.0.1
 	aes@0.8.4
 	agent-client-protocol-derive@2.0.0
@@ -39,7 +40,7 @@ CRATES="
 	anstyle-wincon@3.0.10
 	anstyle@1.0.13
 	any_vec@0.14.0
-	anyhow@1.0.102
+	anyhow@1.0.104
 	approx@0.5.1
 	ar_archive_writer@0.5.1
 	arbitrary@1.4.2
@@ -148,7 +149,7 @@ CRATES="
 	bs58@0.5.1
 	bstr@1.12.1
 	built@0.8.0
-	bumpalo@3.19.0
+	bumpalo@3.20.3
 	by_address@1.2.1
 	bytecheck@0.6.12
 	bytecheck_derive@0.6.12
@@ -168,12 +169,9 @@ CRATES="
 	cached_proc_macro_types@0.1.1
 	calloop-wayland-source@0.4.1
 	camino@1.2.1
-	cap-fs-ext@3.4.6
-	cap-net-ext@3.4.6
-	cap-primitives@3.4.6
-	cap-rand@3.4.6
-	cap-std@3.4.6
-	cap-time-ext@3.4.6
+	cap-fs-ext@4.0.3
+	cap-primitives@4.0.3
+	cap-std@4.0.3
 	cargo-platform@0.1.9
 	cargo-platform@0.3.2
 	cargo_metadata@0.19.2
@@ -185,11 +183,12 @@ CRATES="
 	cc@1.4.3
 	cesu8@1.1.0
 	cexpr@0.6.0
-	cfg-expr@0.20.6
+	cfg-expr@0.20.9
 	cfg-if@1.0.4
 	cfg_aliases@0.1.1
 	cfg_aliases@0.2.1
 	cgl@0.3.2
+	chacha20@0.10.1
 	chardetng@0.1.17
 	chrono@0.4.42
 	chunked_transfer@1.5.0
@@ -249,21 +248,22 @@ CRATES="
 	coreaudio-sys@0.2.17
 	cosmic-text@0.19.0
 	cpal@0.17.1
-	cpp_demangle@0.4.5
+	cpp_demangle@0.5.1
 	cpufeatures@0.2.17
-	cranelift-assembler-x64-meta@0.123.14
-	cranelift-assembler-x64@0.123.14
-	cranelift-bforest@0.123.14
-	cranelift-bitset@0.123.14
-	cranelift-codegen-meta@0.123.14
-	cranelift-codegen-shared@0.123.14
-	cranelift-codegen@0.123.14
-	cranelift-control@0.123.14
-	cranelift-entity@0.123.14
-	cranelift-frontend@0.123.14
-	cranelift-isle@0.123.14
-	cranelift-native@0.123.14
-	cranelift-srcgen@0.123.14
+	cpufeatures@0.3.0
+	cranelift-assembler-x64-meta@0.135.1
+	cranelift-assembler-x64@0.135.1
+	cranelift-bforest@0.135.1
+	cranelift-bitset@0.135.1
+	cranelift-codegen-meta@0.135.1
+	cranelift-codegen-shared@0.135.1
+	cranelift-codegen@0.135.1
+	cranelift-control@0.135.1
+	cranelift-entity@0.135.1
+	cranelift-frontend@0.135.1
+	cranelift-isle@0.135.1
+	cranelift-native@0.135.1
+	cranelift-srcgen@0.135.1
 	crash-context@0.6.3
 	crash-handler@0.7.0
 	crc-catalog@2.4.0
@@ -376,7 +376,6 @@ CRATES="
 	exr@1.74.0
 	extended@0.1.0
 	failspot@0.2.0
-	fallible-iterator@0.3.0
 	fancy-regex@0.16.2
 	fancy-regex@0.18.0
 	fast-srgb8@1.0.0
@@ -384,7 +383,6 @@ CRATES="
 	fastrand@2.3.0
 	fax@0.2.6
 	fax_derive@0.2.0
-	fd-lock@4.0.4
 	fdeflate@0.3.7
 	ff@0.12.1
 	filedescriptor@0.8.3
@@ -445,6 +443,7 @@ CRATES="
 	getrandom@0.4.1
 	gif@0.14.2
 	gimli@0.32.3
+	gimli@0.33.0
 	gio-sys@0.21.5
 	gl_generator@0.14.0
 	glib-macros@0.21.5
@@ -526,7 +525,7 @@ CRATES="
 	icu_properties@2.3.0
 	icu_properties_data@2.3.0
 	icu_provider@2.3.0
-	id-arena@2.2.1
+	id-arena@2.3.0
 	ident_case@1.0.1
 	idna@1.1.0
 	idna_adapter@1.2.1
@@ -548,8 +547,9 @@ CRATES="
 	instant@0.1.13
 	interpolate_name@0.2.4
 	inventory@0.3.21
-	io-extras@0.18.4
+	io-extras@0.19.0
 	io-lifetimes@2.0.4
+	io-lifetimes@3.0.1
 	io-surface@0.16.1
 	iovec@0.1.4
 	ipc-channel@0.19.0
@@ -603,7 +603,7 @@ CRATES="
 	link-section@0.19.2
 	linkify@0.10.0
 	linktime-proc-macro@0.2.2
-	linux-raw-sys@0.11.0
+	linux-raw-sys@0.12.1
 	linux-raw-sys@0.4.15
 	litemap@0.8.0
 	litrs@1.0.0
@@ -625,6 +625,7 @@ CRATES="
 	mac@0.1.1
 	mach2@0.4.3
 	mach2@0.5.0
+	mach2@0.6.0
 	malloc_buf@0.0.6
 	manatee@0.8.0-alpha.5
 	maplit@1.0.2
@@ -730,6 +731,7 @@ CRATES="
 	objc_exception@0.1.2
 	objc_id@0.1.1
 	object@0.37.3
+	object@0.39.1
 	octocrab@0.49.7
 	once_cell@1.21.4
 	once_cell_polyfill@1.70.1
@@ -858,8 +860,8 @@ CRATES="
 	pulldown-cmark-escape@0.10.1
 	pulldown-cmark@0.10.3
 	pulldown-cmark@0.13.4
-	pulley-interpreter@36.0.14
-	pulley-macros@36.0.14
+	pulley-interpreter@48.0.1
+	pulley-macros@48.0.1
 	pxfm@0.1.25
 	qoi@0.4.1
 	quick-error@1.2.3
@@ -875,12 +877,14 @@ CRATES="
 	quote@1.0.47
 	r-efi@5.3.0
 	radium@0.7.0
+	rand@0.10.2
 	rand@0.3.23
 	rand@0.4.6
 	rand@0.8.6
 	rand@0.9.4
 	rand_chacha@0.3.1
 	rand_chacha@0.9.0
+	rand_core@0.10.1
 	rand_core@0.3.1
 	rand_core@0.4.2
 	rand_core@0.6.4
@@ -907,7 +911,7 @@ CRATES="
 	ref-cast-impl@1.0.25
 	ref-cast@1.0.25
 	referencing@0.37.4
-	regalloc2@0.12.2
+	regalloc2@0.15.2
 	regex-automata@0.4.14
 	regex-lite@0.1.8
 	regex-syntax@0.8.8
@@ -943,7 +947,7 @@ CRATES="
 	rustix-linux-procfs@0.1.1
 	rustix-openpty@0.2.0
 	rustix@0.38.44
-	rustix@1.1.2
+	rustix@1.1.4
 	rustls-native-certs@0.6.3
 	rustls-native-certs@0.8.3
 	rustls-pemfile@1.0.4
@@ -1115,13 +1119,12 @@ CRATES="
 	system-configuration@0.5.1
 	system-configuration@0.6.1
 	system-deps@7.0.7
-	system-interface@0.27.3
 	taffy@0.13.0
 	tagptr@0.2.0
 	take-until@0.2.0
 	tao-core-video-sys@0.2.0
 	tap@1.0.1
-	target-lexicon@0.13.3
+	target-lexicon@0.13.5
 	tauri-winrt-notification@0.7.3
 	tempfile@3.23.0
 	tendril@0.4.3
@@ -1214,7 +1217,7 @@ CRATES="
 	unicode-bidi@0.3.18
 	unicode-ccc@0.4.0
 	unicode-general-category@1.1.0
-	unicode-ident@1.0.19
+	unicode-ident@1.0.24
 	unicode-linebreak@0.1.5
 	unicode-normalization@0.1.25
 	unicode-properties@0.1.3
@@ -1267,38 +1270,36 @@ CRATES="
 	wasm-bindgen@0.2.120
 	wasm-encoder@0.201.0
 	wasm-encoder@0.227.1
-	wasm-encoder@0.236.1
 	wasm-encoder@0.244.0
 	wasm-encoder@0.252.0
+	wasm-encoder@0.254.0
 	wasm-metadata@0.201.0
 	wasm-metadata@0.227.1
 	wasm-metadata@0.244.0
+	wasm-metadata@0.254.0
 	wasm-streams@0.4.2
 	wasmparser@0.201.0
 	wasmparser@0.227.1
-	wasmparser@0.236.1
 	wasmparser@0.244.0
 	wasmparser@0.252.0
-	wasmprinter@0.236.1
-	wasmtime-c-api-impl@36.0.13
-	wasmtime-environ@36.0.14
-	wasmtime-internal-asm-macros@36.0.14
-	wasmtime-internal-c-api-macros@36.0.13
-	wasmtime-internal-component-macro@36.0.14
-	wasmtime-internal-component-util@36.0.14
-	wasmtime-internal-cranelift@36.0.14
-	wasmtime-internal-fiber@36.0.14
-	wasmtime-internal-jit-debug@36.0.14
-	wasmtime-internal-jit-icache-coherence@36.0.14
-	wasmtime-internal-math@36.0.14
-	wasmtime-internal-slab@36.0.14
-	wasmtime-internal-unwinder@36.0.14
-	wasmtime-internal-versioned-export-macros@36.0.14
-	wasmtime-internal-winch@36.0.14
-	wasmtime-internal-wit-bindgen@36.0.14
-	wasmtime-wasi-io@36.0.14
-	wasmtime-wasi@36.0.14
-	wasmtime@36.0.14
+	wasmparser@0.254.0
+	wasmprinter@0.254.0
+	wasmtime-c-api-impl@48.0.1
+	wasmtime-environ@48.0.1
+	wasmtime-internal-c-api-macros@48.0.1
+	wasmtime-internal-component-macro@48.0.1
+	wasmtime-internal-component-util@48.0.1
+	wasmtime-internal-core@48.0.1
+	wasmtime-internal-cranelift@48.0.1
+	wasmtime-internal-fiber@48.0.1
+	wasmtime-internal-jit-debug@48.0.1
+	wasmtime-internal-jit-icache-coherence@48.0.1
+	wasmtime-internal-unwinder@48.0.1
+	wasmtime-internal-versioned-export-macros@48.0.1
+	wasmtime-internal-wit-bindgen@48.0.1
+	wasmtime-wasi-io@48.0.1
+	wasmtime-wasi@48.0.1
+	wasmtime@48.0.1
 	wast@35.0.2
 	wax@0.7.0
 	wayland-backend@0.3.15
@@ -1328,14 +1329,13 @@ CRATES="
 	which@4.4.2
 	which@6.0.3
 	whoami@1.6.1
-	wiggle-generate@36.0.14
-	wiggle-macro@36.0.14
-	wiggle@36.0.14
+	wiggle-generate@48.0.1
+	wiggle-macro@48.0.1
+	wiggle@48.0.1
 	winapi-i686-pc-windows-gnu@0.4.0
 	winapi-util@0.1.11
 	winapi-x86_64-pc-windows-gnu@0.4.0
 	winapi@0.3.9
-	winch-codegen@36.0.14
 	windows-bindgen@0.61.1
 	windows-collections@0.2.0
 	windows-collections@0.3.2
@@ -1444,10 +1444,11 @@ CRATES="
 	wit-component@0.201.0
 	wit-component@0.227.1
 	wit-component@0.244.0
+	wit-component@0.254.0
 	wit-parser@0.201.0
 	wit-parser@0.227.1
-	wit-parser@0.236.1
 	wit-parser@0.244.0
+	wit-parser@0.254.0
 	witx@0.9.1
 	write16@1.0.0
 	writeable@0.6.4
@@ -1560,11 +1561,11 @@ declare -A GIT_CRATES=(
 	[tree-sitter-gomod]='https://github.com/camdencheek/tree-sitter-go-mod;2e886870578eeba1927a2dc4bd2e2b3f598c5f9a;tree-sitter-go-mod-%commit%'
 	[tree-sitter-gowork]='https://github.com/zed-industries/tree-sitter-go-work;acb0617bf7f4fda02c6217676cc64acb89536dc7;tree-sitter-go-work-%commit%'
 	[tree-sitter-heex]='https://github.com/zed-industries/tree-sitter-heex;1dd45142fbb05562e35b2040c6129c9bca346592;tree-sitter-heex-%commit%'
-	[tree-sitter-language]='https://github.com/tree-sitter/tree-sitter;dff1fd868c750dbbae179fcd5c43ce987e4e0528;tree-sitter-%commit%/crates/language'
+	[tree-sitter-language]='https://github.com/tree-sitter/tree-sitter;43623ec9bf0eaaf7113285c46e8a09018f181b18;tree-sitter-%commit%/crates/language'
 	[tree-sitter-md]='https://github.com/zed-industries/tree-sitter-markdown;b596e737286780d7bfa9fcddceaeeb754574b352;tree-sitter-markdown-%commit%'
 	[tree-sitter-typescript]='https://github.com/zed-industries/tree-sitter-typescript;e2c53597d6a5d9cf7bbe8dccde576fe1e46c5899;tree-sitter-typescript-%commit%'
 	[tree-sitter-yaml]='https://github.com/zed-industries/tree-sitter-yaml;baff0b51c64ef6a1fb1f8390f3ad6015b83ec13a;tree-sitter-yaml-%commit%'
-	[tree-sitter]='https://github.com/tree-sitter/tree-sitter;dff1fd868c750dbbae179fcd5c43ce987e4e0528;tree-sitter-%commit%/lib'
+	[tree-sitter]='https://github.com/tree-sitter/tree-sitter;43623ec9bf0eaaf7113285c46e8a09018f181b18;tree-sitter-%commit%/lib'
 	[wasm_thread]='https://github.com/zed-industries/wasm_thread;0cf96c7708dfb97ccf3da50347e25edcf75d6937;wasm_thread-%commit%'
 	[webrtc-sys-build]='https://github.com/zed-industries/livekit-rust-sdks;d0e27be0cdad89eadab3e36207cda0a2b6e359ee;livekit-rust-sdks-%commit%/webrtc-sys/build'
 	[webrtc-sys]='https://github.com/zed-industries/livekit-rust-sdks;d0e27be0cdad89eadab3e36207cda0a2b6e359ee;livekit-rust-sdks-%commit%/webrtc-sys'
@@ -1579,7 +1580,7 @@ declare -A GIT_CRATES=(
 	[zed-xim]='https://github.com/zed-industries/xim-rs;16f35a2c881b815a2b6cdfd6687988e84f8447d8;xim-rs-%commit%'
 )
 
-EGIT_COMMIT="0969b0dba3f3411592fce801d00f8d81b8dcf902"
+EGIT_COMMIT="f42c6e873eee375b94ec8684001a1d6eba8c3a2b"
 LLVM_COMPAT=( 22 )
 RUST_MIN_VER="1.97.1"
 RUST_NEEDS_LLVM=1
@@ -1784,7 +1785,7 @@ src_prepare() {
 	NOTIFY_GIT+=", rev = \"${NOTIFY_COMMIT}\""
 	local NOTIFY_PATH="notify = \\{ path = \"${WORKDIR}/notify-${NOTIFY_COMMIT}/notify\""
 
-	local TREE_SITTER_COMMIT="dff1fd868c750dbbae179fcd5c43ce987e4e0528"
+	local TREE_SITTER_COMMIT="43623ec9bf0eaaf7113285c46e8a09018f181b18"
 	local TREE_SITTER_GIT="tree-sitter = { git = \"https://github.com/tree-sitter/tree-sitter\""
 	TREE_SITTER_GIT+=", rev = \"${TREE_SITTER_COMMIT}\""
 	local TREE_SITTER_PATH="tree-sitter = \\{ path = \"${WORKDIR}/tree-sitter-${TREE_SITTER_COMMIT}/lib\""
