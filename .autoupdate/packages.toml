@@ -900,7 +900,7 @@ url = "https://api.github.com/repos/openai/codex/releases/latest"
 parser = "regex"
 pattern = '"tag_name":\s*"rust-v([0-9]+\.[0-9]+\.[0-9]+)"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.149.1"
+version = "0.150.0"
 comments = """
 codex — tag "rust-vX.Y.Z" ("rust-" not strippable); regex extracts X.Y.Z from tag_name.
 """
@@ -912,7 +912,7 @@ parser = "regex"
 pattern = '"tag_name":\s*"rust-v([0-9]+\.[0-9]+\.[0-9]+)"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "0.149.1"
+version = "0.150.0"
 comments = """
 codex-bin — same upstream tag "rust-vX.Y.Z"; regex on tag_name.
 """
@@ -957,7 +957,7 @@ url = "https://api.github.com/repos/harfbuzz/harfbuzz/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "14.3.1"
+version = "14.4.0"
 comments = """
 harfbuzz — release tag bare semver.
 """
@@ -1101,7 +1101,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "11.7.0"
+version = "11.8.0"
 comments = """
 lemonade — GitHub release tag "vX.Y.Z" ("v" stripped). Built from source
 (CMake); the webapp node_modules distfile on distfiles.obentoo.org is NOT
@@ -1116,7 +1116,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "11.7.0"
+version = "11.8.0"
 comments = """
 lemonade-bin — same upstream as sci-ml/lemonade, prebuilt "embeddable"
 tarball plus arch-independent data from the .deb.
@@ -1389,7 +1389,7 @@ url = "https://api.github.com/repos/vim/vim/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "9.2.1011"
+version = "9.2.1013"
 comments = """
 vim — no releases (404); tags[0] "vX.Y.ZZZZ".
 """
@@ -1400,7 +1400,7 @@ url = "https://api.github.com/repos/vim/vim/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "9.2.1011"
+version = "9.2.1013"
 comments = """
 vim-core — same upstream repo as vim.
 """
@@ -1852,7 +1852,7 @@ select = "max"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
 series = '_pre$'
-version = "1.17.2_pre"
+version = "1.18.0_pre"
 comments = """
 zed-bin (preview channel) — releases/latest never returns a prerelease, so the
 preview needs the full list: the pattern takes only "vX.Y.Z-pre" tags and the
@@ -1933,7 +1933,7 @@ base_from = "tag"
 base_url = "https://api.github.com/repos/KhronosGroup/glslang/git/refs/tags"
 base_tag_pattern = '^vulkan-sdk-([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)$'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.357.0_p20260824"
+version = "1.4.357.0_p20260824-r1"
 comments = """
 glslang — commit-tracked on main; scans titles for vulkan-sdk-X.Y.Z.W to detect base bump.
 """
@@ -6697,7 +6697,7 @@ url = "https://godotengine.org/download/archive/"
 parser = "regex"
 pattern = '(\d+\.\d+(?:\.\d+)?-(?:stable|beta\d*|rc\d*|dev\d*))'
 transform = [['-stable', ""], ['-beta', "_beta"], ['-rc', "_rc"], ['-dev', "_alpha"]]
-version = "4.8_alpha3"
+version = "4.8_alpha4"
 comments = """
 godot — download archive lists newest first; transform the upstream suffix to
 Gentoo form (-stable→bare, -beta→_beta, -rc→_rc, -dev→_alpha).
@@ -6895,7 +6895,7 @@ url = "https://antigravity.google/download"
 parser = "regex"
 pattern = '/antigravity-hub/([0-9]+\.[0-9]+\.[0-9]+-[0-9]+)/'
 transform = [['-', "."]]
-version = "2.10.0.4996573600546816"
+version = "2.11.0.6376446768316416"
 comments = """
 Antigravity 2.0 — the standalone desktop hub (agent orchestration), a separate
 product from the IDE above. /download now ships the links in the raw HTML, so the
@@ -7529,7 +7529,7 @@ pattern = '"name":\s*"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 series = '^2\.'
-version = "2.36.31"
+version = "2.36.32"
 comments = """
 aws-cli v2 — GitHub tag index, pinned to the 2.x series. Verified 2026-08-19
 against the live endpoint: 100 matches, all of them 2.x, max = 2.36.27 = ebuild.
