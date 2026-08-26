@@ -1,8 +1,8 @@
 diff --git a/Cargo.lock b/Cargo.lock
-index e76b343..703924f 100644
+index 7b0063f..082970d 100644
 --- a/Cargo.lock
 +++ b/Cargo.lock
-@@ -3071,6 +3071,31 @@ version = "0.7.6"
+@@ -3076,6 +3076,31 @@ version = "0.7.6"
  source = "registry+https://github.com/rust-lang/crates.io-index"
  checksum = "a1d728cc89cf3aee9ff92b05e62b19ee65a02b5702cff7d5a377e32c6ae29d8d"
  
@@ -34,7 +34,7 @@ index e76b343..703924f 100644
  [[package]]
  name = "cli"
  version = "0.1.0"
-@@ -22782,6 +22807,7 @@ dependencies = [
+@@ -22723,6 +22748,7 @@ dependencies = [
   "channel",
   "chrono",
   "clap",
@@ -43,7 +43,7 @@ index e76b343..703924f 100644
   "client",
   "clock",
 diff --git a/Cargo.toml b/Cargo.toml
-index df1de09..2169ada 100644
+index 641ad6b..6bf0a4f 100644
 --- a/Cargo.toml
 +++ b/Cargo.toml
 @@ -25,6 +25,7 @@ members = [
@@ -1627,7 +1627,7 @@ index 0000000..2978e1b
 +    json!({ "content": [{ "type": "text", "text": payload.to_string() }] })
 +}
 diff --git a/crates/project/src/project.rs b/crates/project/src/project.rs
-index 3a6e053..2e026b2 100644
+index 79042b5..3f961de 100644
 --- a/crates/project/src/project.rs
 +++ b/crates/project/src/project.rs
 @@ -253,6 +253,10 @@ pub struct Project {
@@ -1733,7 +1733,7 @@ index 106bc35..a826d08 100644
              project.update(cx, move |_, cx| {
                  match remote_client {
 diff --git a/crates/zed/Cargo.toml b/crates/zed/Cargo.toml
-index b257121..f9c9dfe 100644
+index c58d058..511f18f 100644
 --- a/crates/zed/Cargo.toml
 +++ b/crates/zed/Cargo.toml
 @@ -88,6 +88,7 @@ breadcrumbs.workspace = true

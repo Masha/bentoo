@@ -1,6 +1,6 @@
-From da4fa9833252b08d24ccd6c54ab0af48cd6a46ed Mon Sep 17 00:00:00 2001
+From ba559c782de78127d1b73c9e0934d2b657816194 Mon Sep 17 00:00:00 2001
 From: lucascouts <lucascs@protonmail.com>
-Date: Tue, 25 Aug 2026 21:59:41 -0300
+Date: Wed, 26 Aug 2026 14:12:46 -0300
 Subject: [PATCH] feat(agent_ui): require Shift to make a thread menu choice
  the default
 
@@ -30,9 +30,16 @@ answer serves clicks and keyboard confirms alike, and so neither `ui` nor
 from ContextMenuEntry to a custom entry: the built-in entry renders a single
 icon at the end, and these menus now have two things to say about a row.
 
-select_model gains a persist_default parameter rather than reading the
-modifier itself -- it takes no Window -- and default_model_id so the picker
-can mark the default without the UI having to know how an agent stores it.
+ModeSelector keeps set_mode as it was and gains set_mode_as_default beside
+it, both delegating to a private apply_mode, rather than growing a bool
+parameter. A parameter would have been the smaller diff but it rewrites
+every existing call site, including ones this patch cannot see -- the tests
+that other downstream patches add, and whatever upstream writes next.
+
+select_model does take the flag as a parameter: it is a trait method with no
+Window to read the modifier from, its implementors are all upstream, and
+every caller is updated here. It also gains default_model_id so the picker
+can mark the default without the UI knowing how an agent stores it.
 
 Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>
 ---
@@ -41,11 +48,11 @@ Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>
  crates/agent_ui/src/agent_ui.rs               |   1 +
  crates/agent_ui/src/config_options.rs         | 133 ++++++------
  .../src/conversation_view/thread_view.rs      |  67 +++++-
- crates/agent_ui/src/mode_selector.rs          | 158 ++++++++++----
+ crates/agent_ui/src/mode_selector.rs          | 177 ++++++++++++----
  crates/agent_ui/src/model_selector.rs         |  35 +++-
  crates/agent_ui/src/set_as_default.rs         |  68 ++++++
  .../src/ui/model_selector_components.rs       |  15 ++
- 9 files changed, 531 insertions(+), 165 deletions(-)
+ 9 files changed, 552 insertions(+), 163 deletions(-)
  create mode 100644 crates/agent_ui/src/set_as_default.rs
 
 diff --git a/crates/acp_thread/src/connection.rs b/crates/acp_thread/src/connection.rs
@@ -96,10 +103,10 @@ index 5f0cf69..8ea6077 100644
              Task::ready(Ok(()))
          }
 diff --git a/crates/agent/src/agent.rs b/crates/agent/src/agent.rs
-index 1b46bdf..bc728bc 100644
+index 6c8537c..8f788b1 100644
 --- a/crates/agent/src/agent.rs
 +++ b/crates/agent/src/agent.rs
-@@ -2462,7 +2462,12 @@ impl acp_thread::AgentModelSelector for NativeAgentModelSelector {
+@@ -2523,7 +2523,12 @@ impl acp_thread::AgentModelSelector for NativeAgentModelSelector {
          })
      }
  
@@ -113,7 +120,7 @@ index 1b46bdf..bc728bc 100644
          log::debug!(
              "Setting model for session {}: {}",
              self.session_id,
-@@ -2508,30 +2513,45 @@ impl acp_thread::AgentModelSelector for NativeAgentModelSelector {
+@@ -2569,30 +2574,45 @@ impl acp_thread::AgentModelSelector for NativeAgentModelSelector {
              }
          });
  
@@ -179,7 +186,7 @@ index 1b46bdf..bc728bc 100644
      fn selected_model(&self, cx: &mut App) -> Task<Result<acp_thread::AgentModelInfo>> {
          let Some(thread) = self
              .connection
-@@ -5665,6 +5685,86 @@ mod internal_tests {
+@@ -5726,6 +5746,86 @@ mod internal_tests {
          );
      }
  
@@ -266,7 +273,7 @@ index 1b46bdf..bc728bc 100644
      #[gpui::test]
      async fn test_model_selection_persists_to_settings(cx: &mut TestAppContext) {
          init_test(cx);
-@@ -5712,7 +5812,7 @@ mod internal_tests {
+@@ -5773,7 +5873,7 @@ mod internal_tests {
          // Select a model
          let selector = connection.model_selector(&session_id).unwrap();
          let model_id = AgentModelId::new("fake/fake");
@@ -275,7 +282,7 @@ index 1b46bdf..bc728bc 100644
              .await
              .unwrap();
  
-@@ -5762,9 +5862,11 @@ mod internal_tests {
+@@ -5823,9 +5923,11 @@ mod internal_tests {
          agent.update(cx, |agent, cx| agent.models.refresh_list(cx));
  
          let selector = connection.model_selector(&session_id).unwrap();
@@ -290,7 +297,7 @@ index 1b46bdf..bc728bc 100644
          cx.run_until_parked();
  
          // Verify enable_thinking was written to settings as true.
-@@ -5836,9 +5938,11 @@ mod internal_tests {
+@@ -5897,9 +5999,11 @@ mod internal_tests {
  
          // Select the thinking model via select_model.
          let selector = connection.model_selector(&session_id).unwrap();
@@ -305,7 +312,7 @@ index 1b46bdf..bc728bc 100644
  
          // select_model should have enabled thinking based on the model's supports_thinking().
          agent.read_with(cx, |agent, _| {
-@@ -5853,7 +5957,7 @@ mod internal_tests {
+@@ -5914,7 +6018,7 @@ mod internal_tests {
  
          // Switch back to the non-thinking model.
          let selector = connection.model_selector(&session_id).unwrap();
@@ -314,7 +321,7 @@ index 1b46bdf..bc728bc 100644
              .await
              .unwrap();
  
-@@ -5970,9 +6074,11 @@ mod internal_tests {
+@@ -6031,9 +6135,11 @@ mod internal_tests {
          let session_id = acp_thread.read_with(cx, |thread, _| thread.session_id().clone());
  
          let selector = connection.model_selector(&session_id).unwrap();
@@ -329,7 +336,7 @@ index 1b46bdf..bc728bc 100644
  
          // Verify thinking is enabled after selecting the thinking model.
          let thread = agent.read_with(cx, |agent, _| {
-@@ -6073,9 +6179,11 @@ mod internal_tests {
+@@ -6134,9 +6240,11 @@ mod internal_tests {
          let session_id = acp_thread.read_with(cx, |thread, _| thread.session_id().clone());
  
          let selector = connection.model_selector(&session_id).unwrap();
@@ -344,7 +351,7 @@ index 1b46bdf..bc728bc 100644
  
          let thread = agent.read_with(cx, |agent, _| {
              agent.sessions.get(&session_id).unwrap().thread.clone()
-@@ -6183,9 +6291,11 @@ mod internal_tests {
+@@ -6244,9 +6352,11 @@ mod internal_tests {
          let session_id = acp_thread.read_with(cx, |thread, _| thread.session_id().clone());
  
          let selector = connection.model_selector(&session_id).unwrap();
@@ -359,7 +366,7 @@ index 1b46bdf..bc728bc 100644
  
          let send = acp_thread.update(cx, |thread, cx| thread.send(vec!["Hello".into()], cx));
          let send = cx.foreground_executor().spawn(send);
-@@ -6312,9 +6422,11 @@ mod internal_tests {
+@@ -6373,9 +6483,11 @@ mod internal_tests {
          cx.run_until_parked();
  
          let selector = connection.model_selector(&session_id).unwrap();
@@ -756,7 +763,7 @@ index dfff305..d62b48c 100644
              select.await?;
              this.update(cx, |this, cx| this.retry_generation(cx))?;
 diff --git a/crates/agent_ui/src/mode_selector.rs b/crates/agent_ui/src/mode_selector.rs
-index 46c1543..dbe77cf 100644
+index 46c1543..74c71ff 100644
 --- a/crates/agent_ui/src/mode_selector.rs
 +++ b/crates/agent_ui/src/mode_selector.rs
 @@ -7,10 +7,11 @@ use gpui::{Context, Entity, WeakEntity, Window, prelude::*};
@@ -772,25 +779,37 @@ index 46c1543..dbe77cf 100644
  use crate::{CycleModeSelector, ToggleProfileSelector, ui::documentation_aside_side};
  
  pub struct ModeSelector {
-@@ -54,7 +55,9 @@ impl ModeSelector {
+@@ -54,6 +55,8 @@ impl ModeSelector {
              .unwrap_or(0);
  
          if let Some(next_mode) = all_modes.get((current_index + 1) % all_modes.len()) {
--            self.set_mode(next_mode.id.clone(), cx);
 +            // Cycling moves the thread only; the default is changed from the
 +            // menu, with Shift held.
-+            self.set_mode(next_mode.id.clone(), false, cx);
+             self.set_mode(next_mode.id.clone(), cx);
          }
      }
- 
-@@ -62,9 +65,16 @@ impl ModeSelector {
+@@ -62,9 +65,31 @@ impl ModeSelector {
          self.connection.current_mode()
      }
  
--    pub fn set_mode(&mut self, mode: acp::SessionModeId, cx: &mut Context<Self>) {
++    /// Moves this thread to `mode`, leaving the mode new threads start on
++    /// alone. See [`Self::set_mode_as_default`] for the other half.
++    ///
++    /// The two intents get two methods rather than one flag argument so that
++    /// callers which only ever mean "just this thread" -- and the tests that
++    /// cover them -- keep reading, and compiling, unchanged.
+     pub fn set_mode(&mut self, mode: acp::SessionModeId, cx: &mut Context<Self>) {
 -        self.agent_server
 -            .set_default_mode(Some(mode.clone()), self.fs.clone(), cx);
-+    pub fn set_mode(
++        self.apply_mode(mode, false, cx);
++    }
++
++    /// Moves this thread to `mode` and makes it the mode new threads start on.
++    pub fn set_mode_as_default(&mut self, mode: acp::SessionModeId, cx: &mut Context<Self>) {
++        self.apply_mode(mode, true, cx);
++    }
++
++    fn apply_mode(
 +        &mut self,
 +        mode: acp::SessionModeId,
 +        persist_default: bool,
@@ -803,7 +822,7 @@ index 46c1543..dbe77cf 100644
  
          let task = self.connection.set_mode(mode, cx);
          self.setting_mode = true;
-@@ -93,38 +103,71 @@ impl ModeSelector {
+@@ -93,38 +118,75 @@ impl ModeSelector {
          ContextMenu::build(window, cx, move |mut menu, _window, cx| {
              let all_modes = self.connection.all_modes();
              let current_mode = self.connection.current_mode();
@@ -886,7 +905,11 @@ index 46c1543..dbe77cf 100644
 +                            let persist_default = persists_default(window);
 +                            weak_self
 +                                .update(cx, |this, cx| {
-+                                    this.set_mode(mode_id.clone(), persist_default, cx);
++                                    if persist_default {
++                                        this.set_mode_as_default(mode_id.clone(), cx);
++                                    } else {
++                                        this.set_mode(mode_id.clone(), cx);
++                                    }
 +                                })
 +                                .ok();
 +                        }
@@ -902,7 +925,7 @@ index 46c1543..dbe77cf 100644
          })
      }
  }
-@@ -205,21 +248,27 @@ mod tests {
+@@ -205,21 +267,27 @@ mod tests {
      use project::{AgentId, Project};
      use std::{any::Any, cell::RefCell};
  
@@ -942,7 +965,7 @@ index 46c1543..dbe77cf 100644
  
          assert_eq!(
              agent_server.saved_defaults.lock().as_slice(),
-@@ -231,6 +280,27 @@ mod tests {
+@@ -231,6 +299,31 @@ mod tests {
          );
      }
  
@@ -960,7 +983,11 @@ index 46c1543..dbe77cf 100644
 +            let selector = cx.new(|_| ModeSelector::new(modes, server, fs));
 +
 +            selector.update(cx, |selector, cx| {
-+                selector.set_mode(acp::SessionModeId::new("manual"), persist_default, cx);
++                if persist_default {
++                    selector.set_mode_as_default(acp::SessionModeId::new("manual"), cx);
++                } else {
++                    selector.set_mode(acp::SessionModeId::new("manual"), cx);
++                }
 +            });
 +        });
 +
