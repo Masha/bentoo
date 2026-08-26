@@ -168,7 +168,7 @@
 url = "https://registry.npmjs.org/@anthropic-ai/claude-code"
 parser = "json"
 path = "dist-tags.latest"
-version = "2.1.245"
+version = "2.1.246"
 comments = """
 claude-code — npm @anthropic-ai/claude-code; dist-tags.latest is the stable channel.
 
@@ -285,7 +285,7 @@ path = "version"
 headers = { "User-Agent" = "Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0" }
 aux_var = "BUILD_ID"
 aux_pattern = 'Claude-([0-9a-f]{40})\.deb'
-version = "1.37937.0"
+version = "1.37937.1"
 comments = """
 Claude Desktop — official download API behind the claude.ai/download button
 ({"version","url"}). claude.ai sits behind Cloudflare: a plain curl/wget UA gets
@@ -323,7 +323,7 @@ url = "https://dl.pstmn.io/api/version/latest?platform=linux64&channel=stable"
 parser = "json"
 path = "version"
 type = "bin"
-version = "12.25.3"
+version = "12.25.5"
 comments = """
 Postman — official version API; clean {"version":"..."}.
 """
@@ -379,7 +379,7 @@ url = "https://nodejs.org/dist/latest-v26.x/SHASUMS256.txt"
 parser = "regex"
 pattern = 'node-v(26\.[0-9]+\.[0-9]+)\.tar\.xz'
 select = "max"
-version = "26.7.0-r2"
+version = "26.8.0"
 comments = """
 Node.js SLOT 26 — the current line.
 Identical in shape to net-libs/nodejs:24 above, which carries the shared
@@ -400,7 +400,7 @@ url = "https://proton.me/download/mail/linux/version.json"
 parser = "json"
 path = "Releases[0].Version"
 type = "bin"
-version = "1.13.4"
+version = "1.14.0"
 comments = """
 Proton Mail (desktop) — proton.me version.json; Releases[0] is the EarlyAccess/beta
 channel that matches the ebuild's *-beta.rpm (GitHub inbox-desktop is stale).
@@ -412,7 +412,7 @@ url = "https://api.github.com/repos/ProtonMail/proton-bridge/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "3.25.0-r1"
+version = "3.26.0"
 comments = """
 Proton Mail Bridge — GitHub release tag "vX.Y.Z" ("v" stripped).
 """
@@ -1048,7 +1048,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "1.10.6"
+version = "1.10.7"
 comments = """
 bisq (bisq-bin) — tag "vX.Y.Z".
 """
@@ -1072,7 +1072,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "0.32.15"
+version = "0.33.0"
 comments = """
 ollama-bin — same upstream repo.
 """
@@ -1703,7 +1703,7 @@ commit_sha_path = "[0].id"
 base_from = "file"
 base_url = "https://gitlab.freedesktop.org/mesa/mesa/-/raw/main/VERSION"
 base_pattern = '^([0-9][0-9.]*)-devel'
-version = "26.3.0_pre20260825-r1"
+version = "26.3.0_pre20260826"
 comments = """
 mesa — commit-tracked on main; _pre suffix preserved from current ebuild.
 
@@ -1721,7 +1721,7 @@ commit_sha_path = "[0].id"
 base_from = "file"
 base_url = "https://gitlab.freedesktop.org/mesa/mesa/-/raw/main/VERSION"
 base_pattern = '^([0-9][0-9.]*)-devel'
-version = "26.3.0_pre20260825"
+version = "26.3.0_pre20260826"
 comments = """
 mesa_clc — part of the mesa tree; same source/rule as media-libs/mesa.
 """
@@ -1738,7 +1738,7 @@ base_from = "file"
 base_url = "https://api.github.com/repos/zed-industries/zed/contents/crates/zed/Cargo.toml?ref=main"
 base_pattern = '(?m)^version = "([0-9][0-9.]*)"'
 headers = { "User-Agent" = "bentoo-autoupdate", "Accept" = "application/vnd.github.raw" }
-version = "1.18.0_pre20260825-r1"
+version = "1.19.0_pre20260826"
 comments = """
 zed — commit-tracked on main; _pre suffix preserved from current ebuild.
 2026-08-06: 2 commits landed same UTC day (d61e80b -> 6b2aa1c), so the date
@@ -1817,7 +1817,7 @@ path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
 series = '^[0-9.]+$'
-version = "1.16.2"
+version = "1.16.3"
 comments = """
 zed-bin (stable channel) — releases/latest is the stable release by definition
 (prerelease=false); upstream tags it "vX.Y.Z" and the preview "vX.Y.Z-pre".
@@ -1863,7 +1863,7 @@ base_from = "file"
 base_url = "https://raw.githubusercontent.com/sqlitebrowser/sqlitebrowser/master/CMakeLists.txt"
 base_pattern = '(?m)^\s+VERSION ([0-9][0-9.]*)'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "3.13.99_p20260809"
+version = "3.13.99_p20260826"
 comments = """
 sqlitebrowser — commit-tracked on master (uses COMMIT= without quotes); date YYYYMMDD becomes _pDATE suffix.
 """
@@ -2034,7 +2034,7 @@ base_from = "file"
 base_url = "https://raw.githubusercontent.com/KhronosGroup/Vulkan-ValidationLayers/main/CMakeLists.txt"
 base_pattern = '(?m)^project\([A-Za-z_-]+ VERSION ([0-9][0-9.]*)'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.360_p20260825"
+version = "1.4.360_p20260826"
 comments = """
 vulkan-layers — commit-tracked on main (Vulkan-ValidationLayers); scans for "Update for Vulkan-Docs X.Y.Z".
 """
@@ -2051,7 +2051,7 @@ base_from = "file"
 base_url = "https://raw.githubusercontent.com/KhronosGroup/Vulkan-Loader/main/CMakeLists.txt"
 base_pattern = '(?m)^project\([A-Za-z_-]+ VERSION ([0-9][0-9.]*)'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.360_p20260824"
+version = "1.4.360_p20260826"
 comments = """
 vulkan-loader — commit-tracked on main; scans for "Update for Vulkan-Docs X.Y.Z" to detect base bump.
 """
@@ -6958,7 +6958,7 @@ url = "https://api.github.com/repos/lucascouts/claude-agent-tui/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.10.3"
+version = "0.11.1"
 comments = """
 Renamed from dev-util/claude-agent-tui (commit e8a05fdc: del old ebuild + add
 claude-agent-acp-tui, same upstream repo lucascouts/claude-agent-tui, same PV).
@@ -7386,7 +7386,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "1.27.1"
+version = "1.28.0"
 comments = """
 Opengrep (LGPL fork of Semgrep CE) — GitHub releases/latest tag "vX.Y.Z"
 (v stripped). SRC_URI pulls the bare per-arch/libc release binaries
@@ -7607,7 +7607,7 @@ parser = "json"
 path = "[0].tag_name"
 transform = [['-', "_p"]]
 type = "bin"
-version = "154.0_p2"
+version = "154.0.1_p2"
 comments = """
 LibreWolf (bin) — NÃO usar as tags do repo "source": o upstream tagueia o
 source antes de publicar os binários, e o -bin morre com 404 no pkgdev
@@ -7811,7 +7811,7 @@ transform = [['T.*', ""], ['-', ""]]
 commit_sha_path = "sha"
 base_from = "none"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0_pre20260825"
+version = "0_pre20260826"
 comments = """
 ik_llama-cpp — base_from = "none": upstream publishes no usable release
 series.  Verified 2026-07-19 and again 2026-08-04: the repo has exactly ONE
