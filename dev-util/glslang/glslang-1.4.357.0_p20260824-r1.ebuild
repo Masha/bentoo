@@ -20,7 +20,12 @@ DESCRIPTION="Khronos reference front-end for GLSL and ESSL, and sample SPIR-V ge
 HOMEPAGE="https://www.khronos.org/opengles/sdk/tools/Reference-Compiler/ https://github.com/KhronosGroup/glslang"
 
 LICENSE="BSD"
-SLOT="0/16.1"
+# BENTOO-DIVERGENCE: SLOT - ::gentoo tracks the released tag and carries 0/16.4;
+# this snapshot builds libglslang.so.16.5.0, so the subslot follows the library
+# the package actually installs. It had been stale at 0/16.1 since the ebuild
+# was copied over from glslang-1.4.335.0. Bump it whenever the built soname
+# minor changes -- glslang breaks C++ ABI between minors.
+SLOT="0/16.5"
 
 # BENTOO-DIVERGENCE: DEPEND - ::gentoo pins the SDK in lockstep (~pkg-${PV});
 # bentoo ships snapshots that bump on independent dates, so an exact pin can
@@ -32,6 +37,19 @@ BDEPEND="${PYTHON_DEPS}
 
 DEPEND=">=dev-util/spirv-tools-1.4.357.0_p20260813[${MULTILIB_USEDEP}]"
 RDEPEND="${DEPEND}"
+
+# BENTOO-DIVERGENCE: PATCHES - not in ::gentoo, which sits on the released tag
+# and never saw the offending commit. Upstream eaff806e (PR #4052, 2026-08-24)
+# made glslang emit the LocalSizeId execution mode from SPIR-V 1.2 instead of
+# 1.6, without declaring SPV_KHR_maintenance4 -- so the module it produces is
+# rejected by spirv-val under Vulkan. Breaks the whole ggml shader tree
+# (obentoo/bentoo#42). Because this package tracks main by commit, the patch
+# carries no version in its name: the autoupdate applier never renames files/.
+# Drop it -- do not rebase -- once upstream fixes the gate. See the patch
+# header for what is deliberately NOT reverted.
+PATCHES=(
+	"${FILESDIR}"/${PN}-revert-localsizeid-below-spv16.patch
+)
 
 multilib_src_configure() {
 	local mycmakeargs=(
