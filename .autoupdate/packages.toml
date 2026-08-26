@@ -1738,7 +1738,7 @@ base_from = "file"
 base_url = "https://api.github.com/repos/zed-industries/zed/contents/crates/zed/Cargo.toml?ref=main"
 base_pattern = '(?m)^version = "([0-9][0-9.]*)"'
 headers = { "User-Agent" = "bentoo-autoupdate", "Accept" = "application/vnd.github.raw" }
-version = "1.19.0_pre20260826"
+version = "1.19.0_pre20260826-r1"
 comments = """
 zed — commit-tracked on main; _pre suffix preserved from current ebuild.
 2026-08-06: 2 commits landed same UTC day (d61e80b -> 6b2aa1c), so the date
@@ -1787,6 +1787,16 @@ GIT_CRATES blocks transplanted -- diff Cargo.lock between the old and new
 commit to know whether that is needed. Fixed as -r1 on f42c6e87, whose
 Cargo.lock is byte-identical to 0969b0db's, so the regenerated blocks are
 correct for both.
+2026-08-26: manual bump ac099b4a -> fc9258b4, both committed on the same UTC
+day (14:53 -> 18:21), so it lands as -r1. livekit-rust-sdks moved d0e27be0 ->
+0a1c519c -- that rev is one of the seven `local *_COMMIT` values in src_prepare,
+so pycargoebuild fixed GIT_CRATES but LIVEKIT_COMMIT had to be edited by hand;
+left stale it would leave the four livekit [patch.crates-io] lines pointing at
+git and break offline cargo. zed-reqwest also moved (c1566246 -> 33bc764a) but
+carries no sed, being GIT_CRATES-only. WEBRTC_TAG in the new livekit rev is
+still webrtc-0001d84-4, so WEBRTC_COMMIT is unchanged. All eleven sed patterns
+verified at exactly one match against the new Cargo.toml, and all eight patches
+applied clean with no rebase.
 """
 # END
 
