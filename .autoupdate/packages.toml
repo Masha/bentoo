@@ -7421,13 +7421,11 @@ SRC_URI releases/download/v${PV}/${P}-bundle.tar.gz. Live=v0.2.0.
 # END
 
 ["net-im/telegram-desktop"]
-enabled = false
-disabled_by = "auto"
 url = "https://api.github.com/repos/telegramdesktop/tdesktop/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "7.0.9"
+version = "7.1.2"
 comments = """
 Telegram Desktop — GitHub releases/latest tag "vX.Y.Z" (v stripped). Verified
 2026-07-24: releases/latest correctly skips the beta prereleases upstream also
