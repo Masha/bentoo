@@ -16,7 +16,26 @@
 #   (b165e5745) the applier deleted both lines; the symptom arrived 12 days
 #   later as `there are no ebuilds to satisfy "dev-libs/icu-compat:77"`.
 #   8dd837928 restored them and wrote the check down; the applier did it again
-#   the same day. A removed line here is always a bug, never an intention.
+#   the same day.
+#
+#   Two different things wear `enabled = false`, and only one is a pin. A record
+#   disabled because the package LEFT the overlay also carries
+#   `disabled_by = "auto"` -- 95 of the 99 do. When such a package comes back,
+#   clearing both lines is the documented, correct move, and counting the line
+#   called that damage: on 2026-08-25 this check refused the commit re-adding
+#   net-im/telegram-desktop, whose record had been auto-disabled when 7.0.9 was
+#   dropped in 7cbe62f54. So it no longer counts; it pairs each cleared pin
+#   against `disabled_by` and against the tree:
+#
+#     cleared, never had disabled_by  -> damage: a manual ABI pin, always
+#     cleared, disabled_by kept       -> damage: half-cleared, the record probes
+#                                       an upstream the overlay does not ship
+#     both cleared, no ebuild staged  -> damage: re-enabled for a package that
+#                                       did not actually come back
+#     both cleared, ebuild present    -> the package returned; this is the point
+#
+#   The four manual pins carry no `disabled_by`, so the first rule covers them
+#   exactly as the counting version did.
 #
 # CLASS 2 -- a 40-hex literal clobbered with EGIT_COMMIT.
 #   app-editors/zed pins seven vendored git dependencies by commit, each a
@@ -82,18 +101,85 @@ _blob() {
 
 # --- class 1 ---------------------------------------------------------------
 
+# _records <before|after> — one `name<TAB>enabled_false<TAB>has_disabled_by` line
+# per record. A grep would be shorter and wrong: `comments = """ … """` is free
+# text, and a block quoting a record header or an `enabled = false` line would
+# be read as one. The scanner tracks the fence and ignores what is inside it.
+_records() {
+	local content
+	if [[ "$1" == "before" ]]; then
+		content="$(git -C "${REPO}" show 'HEAD:.autoupdate/packages.toml' 2>/dev/null || true)"
+	else
+		content="$(_blob .autoupdate/packages.toml)"
+	fi
+	printf '%s\n' "${content}" | awk '
+		function fences(s,   n) { n = 0; while (match(s, /"""/)) { n++; s = substr(s, RSTART + 3) } return n }
+		!inblk {
+			if ($0 ~ /^\[".*"\]$/) { rec = substr($0, 3, length($0) - 4); order[++k] = rec; en[rec] = 0; db[rec] = 0 }
+			else if (rec != "" && $0 ~ /^enabled[ \t]*=[ \t]*false[ \t]*$/) en[rec] = 1
+			else if (rec != "" && $0 ~ /^disabled_by[ \t]*=/) db[rec] = 1
+		}
+		{ if (fences($0) % 2) inblk = !inblk }
+		END { for (i = 1; i <= k; i++) printf "%s\t%d\t%d\n", order[i], en[order[i]], db[order[i]] }
+	'
+}
+
+# Reads the index under --staged, the tree otherwise — the same revision _blob
+# reads. A package returning in THIS commit is only in the index.
+_has_ebuild() {
+	if [[ "${STAGED}" == "yes" ]]; then
+		[[ -n "$(git -C "${REPO}" ls-files --cached -- "$1/*.ebuild")" ]]
+	else
+		compgen -G "${REPO}/$1/*.ebuild" >/dev/null
+	fi
+}
+
+# The backticks below quote field names for a human reader; single quotes are
+# what keeps them literal, so SC2016 is the intended state, not a warning.
+# shellcheck disable=SC2016
 check_enabled_false() {
-	local removed
-	removed="$(_diff -- .autoupdate/packages.toml | grep -c '^-enabled = false' || true)"
-	if ((removed == 0)); then
-		printf 'ok    packages.toml: no pinned record was re-enabled\n'
+	local -A was_off=() had_by=()
+	local rec en db bad=0 ok=0
+
+	while IFS=$'\t' read -r rec en db; do
+		[[ -n "${rec}" ]] || continue
+		((en)) && { was_off["${rec}"]=1; had_by["${rec}"]="${db}"; }
+	done < <(_records before)
+
+	while IFS=$'\t' read -r rec en db; do
+		[[ -n "${rec}" && -n "${was_off[${rec}]:-}" ]] || continue
+		((en == 0)) || continue
+
+		if [[ "${had_by[${rec}]}" == "0" ]]; then
+			printf 'FAIL  packages.toml: %s lost `enabled = false` and never had `disabled_by`\n' "${rec}"
+			printf '        that pin is manual and permanent: the record carries an old ABI\n'
+			printf '        another package depends on, and re-enabling it erases that SLOT.\n'
+			printf '        Restore with: git checkout -- .autoupdate/packages.toml\n'
+			bad=1
+		elif ((db)); then
+			printf 'FAIL  packages.toml: %s lost `enabled = false` but kept `disabled_by`\n' "${rec}"
+			printf '        the two are written and cleared together; half-cleared, the record\n'
+			printf '        probes an upstream the overlay does not ship.\n'
+			bad=1
+		elif ! _has_ebuild "${rec}"; then
+			printf 'FAIL  packages.toml: %s was re-enabled but ships no ebuild\n' "${rec}"
+			printf '        `disabled_by = "auto"` is cleared when the package comes BACK; with\n'
+			printf '        no ebuild the probe files pendings for something absent.\n'
+			bad=1
+		else
+			((++ok))
+		fi
+	done < <(_records after)
+
+	if ((bad)); then
+		FOUND=1
 		return 0
 	fi
-	printf 'FAIL  packages.toml: %s pinned record(s) lost the enabled = false pin\n' "${removed}"
-	printf '        those records are pinned OFF on purpose; a bump erases the\n'
-	printf '        SLOT another package depends on. Restore with:\n'
-	printf '          git checkout -- .autoupdate/packages.toml\n'
-	FOUND=1
+	if ((ok)); then
+		printf 'ok    packages.toml: %s record(s) re-enabled, each with an ebuild back in tree\n' "${ok}"
+	else
+		printf 'ok    packages.toml: no pinned record was re-enabled\n'
+	fi
 }
 
 # --- class 2 ---------------------------------------------------------------
