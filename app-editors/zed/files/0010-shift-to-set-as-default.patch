@@ -43,17 +43,6 @@ can mark the default without the UI knowing how an agent stores it.
 
 Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>
 ---
- crates/acp_thread/src/connection.rs           |  25 ++-
- crates/agent/src/agent.rs                     | 194 ++++++++++++++----
- crates/agent_ui/src/agent_ui.rs               |   1 +
- crates/agent_ui/src/config_options.rs         | 133 ++++++------
- .../src/conversation_view/thread_view.rs      |  67 +++++-
- crates/agent_ui/src/mode_selector.rs          | 177 ++++++++++++----
- crates/agent_ui/src/model_selector.rs         |  35 +++-
- crates/agent_ui/src/set_as_default.rs         |  68 ++++++
- .../src/ui/model_selector_components.rs       |  15 ++
- 9 files changed, 552 insertions(+), 163 deletions(-)
- create mode 100644 crates/agent_ui/src/set_as_default.rs
 
 diff --git a/crates/acp_thread/src/connection.rs b/crates/acp_thread/src/connection.rs
 index 5f0cf69..8ea6077 100644
@@ -103,7 +92,7 @@ index 5f0cf69..8ea6077 100644
              Task::ready(Ok(()))
          }
 diff --git a/crates/agent/src/agent.rs b/crates/agent/src/agent.rs
-index 6c8537c..8f788b1 100644
+index 6139ce7..58311da 100644
 --- a/crates/agent/src/agent.rs
 +++ b/crates/agent/src/agent.rs
 @@ -2523,7 +2523,12 @@ impl acp_thread::AgentModelSelector for NativeAgentModelSelector {
@@ -186,7 +175,7 @@ index 6c8537c..8f788b1 100644
      fn selected_model(&self, cx: &mut App) -> Task<Result<acp_thread::AgentModelInfo>> {
          let Some(thread) = self
              .connection
-@@ -5726,6 +5746,86 @@ mod internal_tests {
+@@ -5832,6 +5852,86 @@ mod internal_tests {
          );
      }
  
@@ -273,7 +262,7 @@ index 6c8537c..8f788b1 100644
      #[gpui::test]
      async fn test_model_selection_persists_to_settings(cx: &mut TestAppContext) {
          init_test(cx);
-@@ -5773,7 +5873,7 @@ mod internal_tests {
+@@ -5879,7 +5979,7 @@ mod internal_tests {
          // Select a model
          let selector = connection.model_selector(&session_id).unwrap();
          let model_id = AgentModelId::new("fake/fake");
@@ -282,7 +271,7 @@ index 6c8537c..8f788b1 100644
              .await
              .unwrap();
  
-@@ -5823,9 +5923,11 @@ mod internal_tests {
+@@ -5929,9 +6029,11 @@ mod internal_tests {
          agent.update(cx, |agent, cx| agent.models.refresh_list(cx));
  
          let selector = connection.model_selector(&session_id).unwrap();
@@ -297,7 +286,7 @@ index 6c8537c..8f788b1 100644
          cx.run_until_parked();
  
          // Verify enable_thinking was written to settings as true.
-@@ -5897,9 +5999,11 @@ mod internal_tests {
+@@ -6003,9 +6105,11 @@ mod internal_tests {
  
          // Select the thinking model via select_model.
          let selector = connection.model_selector(&session_id).unwrap();
@@ -312,7 +301,7 @@ index 6c8537c..8f788b1 100644
  
          // select_model should have enabled thinking based on the model's supports_thinking().
          agent.read_with(cx, |agent, _| {
-@@ -5914,7 +6018,7 @@ mod internal_tests {
+@@ -6020,7 +6124,7 @@ mod internal_tests {
  
          // Switch back to the non-thinking model.
          let selector = connection.model_selector(&session_id).unwrap();
@@ -321,7 +310,7 @@ index 6c8537c..8f788b1 100644
              .await
              .unwrap();
  
-@@ -6031,9 +6135,11 @@ mod internal_tests {
+@@ -6137,9 +6241,11 @@ mod internal_tests {
          let session_id = acp_thread.read_with(cx, |thread, _| thread.session_id().clone());
  
          let selector = connection.model_selector(&session_id).unwrap();
@@ -336,7 +325,7 @@ index 6c8537c..8f788b1 100644
  
          // Verify thinking is enabled after selecting the thinking model.
          let thread = agent.read_with(cx, |agent, _| {
-@@ -6134,9 +6240,11 @@ mod internal_tests {
+@@ -6240,9 +6346,11 @@ mod internal_tests {
          let session_id = acp_thread.read_with(cx, |thread, _| thread.session_id().clone());
  
          let selector = connection.model_selector(&session_id).unwrap();
@@ -351,7 +340,7 @@ index 6c8537c..8f788b1 100644
  
          let thread = agent.read_with(cx, |agent, _| {
              agent.sessions.get(&session_id).unwrap().thread.clone()
-@@ -6244,9 +6352,11 @@ mod internal_tests {
+@@ -6350,9 +6458,11 @@ mod internal_tests {
          let session_id = acp_thread.read_with(cx, |thread, _| thread.session_id().clone());
  
          let selector = connection.model_selector(&session_id).unwrap();
@@ -366,7 +355,7 @@ index 6c8537c..8f788b1 100644
  
          let send = acp_thread.update(cx, |thread, cx| thread.send(vec!["Hello".into()], cx));
          let send = cx.foreground_executor().spawn(send);
-@@ -6373,9 +6483,11 @@ mod internal_tests {
+@@ -6479,9 +6589,11 @@ mod internal_tests {
          cx.run_until_parked();
  
          let selector = connection.model_selector(&session_id).unwrap();
@@ -394,7 +383,7 @@ index 1570315..7fecb19 100644
  mod terminal_inline_assistant;
  pub mod terminal_thread_metadata_store;
 diff --git a/crates/agent_ui/src/config_options.rs b/crates/agent_ui/src/config_options.rs
-index cbefa71..d074719 100644
+index 196dc74..a93fea9 100644
 --- a/crates/agent_ui/src/config_options.rs
 +++ b/crates/agent_ui/src/config_options.rs
 @@ -22,6 +22,9 @@ use unicode_segmentation::UnicodeSegmentation;
@@ -426,7 +415,7 @@ index cbefa71..d074719 100644
          let task = self
              .config_options
              .set_config_option(config_id, next_value, cx);
-@@ -555,6 +553,14 @@ impl Render for ConfigOptionSelector {
+@@ -581,6 +579,14 @@ impl Render for ConfigOptionSelector {
                                  .color(Color::Muted),
                          );
                      }
@@ -441,7 +430,7 @@ index cbefa71..d074719 100644
                      content.into_any()
                  });
  
-@@ -585,14 +591,16 @@ impl Render for ConfigOptionSelector {
+@@ -611,14 +617,16 @@ impl Render for ConfigOptionSelector {
                          .label_size(LabelSize::Small)
                          .label_color(Color::Muted)
                          .disabled(self.setting_value)
@@ -465,7 +454,7 @@ index cbefa71..d074719 100644
  
                              let task = config_options.set_config_option(
                                  config_id.clone(),
-@@ -773,16 +781,18 @@ impl PickerDelegate for ConfigOptionPickerDelegate {
+@@ -799,16 +807,18 @@ impl PickerDelegate for ConfigOptionPickerDelegate {
          })
      }
  
@@ -491,7 +480,7 @@ index cbefa71..d074719 100644
              let task = self.config_options.set_config_option(
                  self.config_id.clone(),
                  acp::SessionConfigOptionValue::value_id(option.value.clone()),
-@@ -831,6 +841,13 @@ impl PickerDelegate for ConfigOptionPickerDelegate {
+@@ -857,6 +867,13 @@ impl PickerDelegate for ConfigOptionPickerDelegate {
                  let current_value = self.current_value();
                  let is_selected = current_value.as_ref() == Some(&option.value);
  
@@ -505,7 +494,7 @@ index cbefa71..d074719 100644
                  let is_favorite = self.favorites.contains(&option.value);
  
                  let option_name = option.name.clone();
-@@ -857,9 +874,22 @@ impl PickerDelegate for ConfigOptionPickerDelegate {
+@@ -883,9 +900,22 @@ impl PickerDelegate for ConfigOptionPickerDelegate {
                                  .spacing(ListItemSpacing::Sparse)
                                  .toggle_state(selected)
                                  .child(h_flex().w_full().child(Label::new(option_name).truncate()))
@@ -531,7 +520,7 @@ index cbefa71..d074719 100644
                                  .end_slot_on_hover(div().pr_1p5().child({
                                      let (icon, color, tooltip) = if is_favorite {
                                          (IconName::StarFilled, Color::Accent, "Unfavorite")
-@@ -914,6 +944,14 @@ impl PickerDelegate for ConfigOptionPickerDelegate {
+@@ -940,6 +970,14 @@ impl PickerDelegate for ConfigOptionPickerDelegate {
      fn documentation_aside_index(&self) -> Option<usize> {
          self.selected_description.as_ref().map(|(ix, _)| *ix)
      }
@@ -546,8 +535,8 @@ index cbefa71..d074719 100644
  }
  
  fn extract_options(
-@@ -970,20 +1008,6 @@ fn get_current_select_value(
-         })
+@@ -1012,20 +1050,6 @@ fn shows_manual_mode_badge_for_option(option: &acp::SessionConfigOption) -> bool
+         }
  }
  
 -fn setting_value_for_config_option_value(
@@ -567,7 +556,7 @@ index cbefa71..d074719 100644
  fn options_to_picker_entries(
      options: &[ConfigOptionValue],
      favorites: &HashSet<acp::SessionConfigValueId>,
-@@ -1106,7 +1130,7 @@ mod tests {
+@@ -1148,7 +1172,7 @@ mod tests {
      use std::{any::Any, cell::RefCell};
  
      #[gpui::test]
@@ -576,7 +565,7 @@ index cbefa71..d074719 100644
          let agent_server = Rc::new(TestAgentServer::default());
          let config_options = Rc::new(TestSessionConfigOptions::new(vec![
              acp::SessionConfigOption::select(
-@@ -1140,12 +1164,9 @@ mod tests {
+@@ -1182,12 +1206,9 @@ mod tests {
              }));
          });
  
@@ -592,7 +581,7 @@ index cbefa71..d074719 100644
          );
          assert_eq!(
              config_options.set_values.borrow().as_slice(),
-@@ -1157,7 +1178,7 @@ mod tests {
+@@ -1199,7 +1220,7 @@ mod tests {
      }
  
      #[gpui::test]
@@ -601,7 +590,7 @@ index cbefa71..d074719 100644
          let agent_server = Rc::new(TestAgentServer::default());
          let config_options = Rc::new(TestSessionConfigOptions::new(vec![
              acp::SessionConfigOption::boolean("web_search", "Web Search", false)
-@@ -1183,12 +1204,9 @@ mod tests {
+@@ -1225,12 +1246,9 @@ mod tests {
              }));
          });
  
@@ -617,7 +606,7 @@ index cbefa71..d074719 100644
          );
          assert_eq!(
              config_options.set_values.borrow().as_slice(),
-@@ -1236,12 +1254,9 @@ mod tests {
+@@ -1278,12 +1296,9 @@ mod tests {
              }));
          });
  
@@ -634,7 +623,7 @@ index cbefa71..d074719 100644
          assert_eq!(
              config_options.set_values.borrow().as_slice(),
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
-index dfff305..d62b48c 100644
+index 7c4367e..ce9a342 100644
 --- a/crates/agent_ui/src/conversation_view/thread_view.rs
 +++ b/crates/agent_ui/src/conversation_view/thread_view.rs
 @@ -24,6 +24,7 @@ use sandbox::{SandboxFsPolicy, SandboxNetPolicy, SandboxPolicy};
@@ -751,7 +740,7 @@ index dfff305..d62b48c 100644
                  }))
              })
              .with_handle(self.thinking_effort_menu_handle.clone())
-@@ -11986,7 +12031,9 @@ impl ThreadView {
+@@ -11998,7 +12043,9 @@ impl ThreadView {
          else {
              return;
          };
@@ -763,7 +752,7 @@ index dfff305..d62b48c 100644
              select.await?;
              this.update(cx, |this, cx| this.retry_generation(cx))?;
 diff --git a/crates/agent_ui/src/mode_selector.rs b/crates/agent_ui/src/mode_selector.rs
-index 46c1543..74c71ff 100644
+index 253aee8..9d8aa55 100644
 --- a/crates/agent_ui/src/mode_selector.rs
 +++ b/crates/agent_ui/src/mode_selector.rs
 @@ -7,10 +7,11 @@ use gpui::{Context, Entity, WeakEntity, Window, prelude::*};
@@ -834,17 +823,31 @@ index 46c1543..74c71ff 100644
 -                let is_selected = &mode.id == &current_mode;
 -                let entry = ContextMenuEntry::new(mode.name.clone())
 -                    .toggleable(IconPosition::End, is_selected);
--
++            // A custom entry rather than a ContextMenuEntry: the built-in entry
++            // renders one icon at the end, and this menu now has two things to
++            // say about a mode -- that the thread is on it, and that it is the
++            // one new threads start on.
++            for (ix, mode) in all_modes.into_iter().enumerate() {
++                let is_selected = mode.id == current_mode;
++                let is_default = default_mode.as_ref() == Some(&mode.id);
+ 
 -                let entry = if let Some(description) = &mode.description {
 -                    entry.documentation_aside(side, {
 -                        let description = description.clone();
--
++                let documentation = mode.description.as_ref().map(|description| {
++                    let description = description.clone();
+ 
 -                        move |_| Label::new(description.clone()).into_any_element()
 -                    })
 -                } else {
 -                    entry
 -                };
--
++                    DocumentationAside::new(
++                        side,
++                        Rc::new(move |_| Label::new(description.clone()).into_any_element()),
++                    )
++                });
+ 
 -                menu.push_item(entry.handler({
 -                    let mode_id = mode.id.clone();
 -                    let weak_self = weak_self.clone();
@@ -856,23 +859,6 @@ index 46c1543..74c71ff 100644
 -                            .ok();
 -                    }
 -                }));
-+            // A custom entry rather than a ContextMenuEntry: the built-in entry
-+            // renders one icon at the end, and this menu now has two things to
-+            // say about a mode -- that the thread is on it, and that it is the
-+            // one new threads start on.
-+            for (ix, mode) in all_modes.into_iter().enumerate() {
-+                let is_selected = mode.id == current_mode;
-+                let is_default = default_mode.as_ref() == Some(&mode.id);
-+
-+                let documentation = mode.description.as_ref().map(|description| {
-+                    let description = description.clone();
-+
-+                    DocumentationAside::new(
-+                        side,
-+                        Rc::new(move |_| Label::new(description.clone()).into_any_element()),
-+                    )
-+                });
-+
 +                let name = mode.name.clone();
 +
 +                menu = menu.custom_entry_with_docs(
@@ -925,7 +911,7 @@ index 46c1543..74c71ff 100644
          })
      }
  }
-@@ -205,21 +267,27 @@ mod tests {
+@@ -246,21 +308,27 @@ mod tests {
      use project::{AgentId, Project};
      use std::{any::Any, cell::RefCell};
  
@@ -965,7 +951,7 @@ index 46c1543..74c71ff 100644
  
          assert_eq!(
              agent_server.saved_defaults.lock().as_slice(),
-@@ -231,6 +299,31 @@ mod tests {
+@@ -272,6 +340,31 @@ mod tests {
          );
      }
  
@@ -1210,6 +1196,3 @@ index 34e01d7..29c5f7d 100644
                      .when(self.is_selected, |this| {
                          this.child(Icon::new(IconName::Check).color(Color::Accent))
                      })
--- 
-2.55.0
-

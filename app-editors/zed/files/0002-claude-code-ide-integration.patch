@@ -1,5 +1,5 @@
 diff --git a/Cargo.lock b/Cargo.lock
-index 7b0063f..082970d 100644
+index 7436afc..cdf200c 100644
 --- a/Cargo.lock
 +++ b/Cargo.lock
 @@ -3076,6 +3076,31 @@ version = "0.7.6"
@@ -34,7 +34,7 @@ index 7b0063f..082970d 100644
  [[package]]
  name = "cli"
  version = "0.1.0"
-@@ -22723,6 +22748,7 @@ dependencies = [
+@@ -22724,6 +22749,7 @@ dependencies = [
   "channel",
   "chrono",
   "clap",
@@ -1627,7 +1627,7 @@ index 0000000..2978e1b
 +    json!({ "content": [{ "type": "text", "text": payload.to_string() }] })
 +}
 diff --git a/crates/project/src/project.rs b/crates/project/src/project.rs
-index 79042b5..3f961de 100644
+index 70820f5..e8a386d 100644
 --- a/crates/project/src/project.rs
 +++ b/crates/project/src/project.rs
 @@ -253,6 +253,10 @@ pub struct Project {
@@ -1684,10 +1684,10 @@ index 79042b5..3f961de 100644
              project.set_role(role, cx);
              for worktree in worktrees {
 diff --git a/crates/project/src/terminals.rs b/crates/project/src/terminals.rs
-index 106bc35..a826d08 100644
+index 2d8a37c..3a1505c 100644
 --- a/crates/project/src/terminals.rs
 +++ b/crates/project/src/terminals.rs
-@@ -140,6 +140,14 @@ impl Project {
+@@ -134,6 +134,14 @@ impl Project {
          cx.spawn(async move |project, cx| {
              let mut env = env_task.await.unwrap_or_default();
              env.extend(settings.env);
@@ -1702,7 +1702,7 @@ index 106bc35..a826d08 100644
  
              let activation_script = maybe!(async {
                  for toolchain in toolchains {
-@@ -383,6 +391,14 @@ impl Project {
+@@ -376,6 +384,14 @@ impl Project {
              let shell_kind = ShellKind::new(&shell, path_style.is_windows());
              let mut env = env_task.await.unwrap_or_default();
              env.extend(settings.env);
@@ -1717,7 +1717,7 @@ index 106bc35..a826d08 100644
  
              let activation_script = maybe!(async {
                  for toolchain in toolchains {
-@@ -549,6 +565,14 @@ impl Project {
+@@ -541,6 +557,14 @@ impl Project {
          cx.spawn(async move |project, cx| {
              let mut env = env_task.await.unwrap_or_default();
              env.extend(settings.env);
