@@ -731,6 +731,35 @@ dxvk-nvapi — tag "vX.Y.Z".
 """
 # END
 
+["app-emulation/open-vm-tools"]
+url = "https://api.github.com/repos/vmware/open-vm-tools/releases/latest"
+parser = "json"
+path = "tag_name"
+transform = [['^stable-', ""]]
+headers = { "User-Agent" = "bentoo-autoupdate" }
+aux_var = "MY_BUILD"
+aux_pattern = 'open-vm-tools-[0-9.]+-([0-9]+)\.tar\.gz'
+version = "13.1.0"
+comments = """
+open-vm-tools — releases/latest, not /tags and not /releases[0]. Upstream ships
+two lines from one tag space: stable-12.5.4 and stable-13.0.5 were published the
+same day (2025-09-30), so ranking tags would pick whichever sorts higher and
+ordering by date is a coin flip between the channels. releases/latest names the
+one VMware promotes, which today is stable-13.1.0.
+
+The "stable-" prefix is not one the normalizer strips (it knows v/release-/ver-/
+version-), hence the transform.
+
+aux_var carries the other half of the release identity. The tarball is named
+open-vm-tools-<PV>-<build>.tar.gz, where <build> is an opaque counter that moves
+with every release (13.0.10 = 25056151, 13.1.0 = 25218885) and cannot be derived
+from PV. Left inline in MY_P it would survive a PV bump and the SRC_URI would
+404 at manifest time -- the failure mail-client/betterbird-bin still documents.
+aux_pattern reads it back out of the asset name in the same JSON body the
+version came from, so the two always describe one release.
+"""
+# END
+
 ["app-emulation/wine-vanilla"]
 enabled = false
 disabled_by = "auto"

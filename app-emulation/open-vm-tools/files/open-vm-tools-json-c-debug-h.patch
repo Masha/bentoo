@@ -1,0 +1,34 @@
+Put the project's own include directory ahead of the pkg-config flags.
+
+libdndcp_la_CPPFLAGS listed @GTK_CPPFLAGS@ first, so every -I emitted by
+"pkg-config --cflags gtk+-3.0" preceded the tree's own -I paths.  On a system
+where that expands to -I/usr/include/json-c the plugin's
+
+    #include "debug.h"
+
+resolves to json-c's debug.h instead of open-vm-tools' lib/include/debug.h.
+json-c's header does not declare Debug(), so every LOG() in the dndcp plugin
+fails to compile:
+
+    dndGuest/copyPasteRpcV4.cc:31:28: error: 'Debug' was not declared in this
+    scope; did you mean 'g_debug'?
+
+json-c reaches the gtk+-3.0 cflags through util-linux built with USE=cryptsetup:
+mount.pc carries "Requires.private: blkid libcryptsetup" and libcryptsetup.pc
+carries "Requires.private: ... json-c ...".  That is why the failure looks
+compiler- or version-specific in bug reports while really depending on how
+util-linux was built -- it reproduces identically on 13.0.10 and 13.1.0.
+
+Only the search order changes; no flag is added or removed.
+
+Bug: https://bugs.gentoo.org/956496
+--- a/services/plugins/dndcp/Makefile.am
++++ b/services/plugins/dndcp/Makefile.am
+@@ -23,6 +23,7 @@
+ plugin_LTLIBRARIES = libdndcp.la
+ 
+ libdndcp_la_CPPFLAGS =
++libdndcp_la_CPPFLAGS += -I$(top_srcdir)/lib/include
+ libdndcp_la_CPPFLAGS += @GTK_CPPFLAGS@
+ libdndcp_la_CPPFLAGS += @PLUGIN_CPPFLAGS@
+ libdndcp_la_CPPFLAGS += -I$(top_srcdir)/services/plugins/dndcp/dnd

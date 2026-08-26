@@ -1,0 +1,22 @@
+#!/sbin/openrc-run
+# Copyright 1999-2026 Gentoo Authors
+# Distributed under the terms of the GNU General Public License v2
+
+description="VGAuth guest authentication service for open-vm-tools"
+
+# "-s" is service mode: the process stays in the foreground and logs to a file,
+# which is what vgauthd.service relies on (it is a plain Type=simple unit), so
+# OpenRC daemonizes it and owns the pidfile.  The binary also accepts "-b",
+# which forks by itself, but that path writes a pid lock file at a path
+# hardcoded in vgauth/service/main.c (/var/run/vmware/vgauthsvclog_pid.txt) that
+# the service manager does not control -- a stale file there blocks a restart.
+command="/usr/bin/VGAuthService"
+command_args="-s"
+command_background="yes"
+pidfile="/run/${RC_SVCNAME}.pid"
+
+depend() {
+	# The alias store lives under /var/lib/vmware and is created on first
+	# start, so /var must be mounted before that happens.
+	need localmount
+}
