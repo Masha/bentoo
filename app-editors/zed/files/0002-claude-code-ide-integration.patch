@@ -1,8 +1,8 @@
 diff --git a/Cargo.lock b/Cargo.lock
-index b6a0102..71dda2e 100644
+index e76b343..703924f 100644
 --- a/Cargo.lock
 +++ b/Cargo.lock
-@@ -3087,6 +3087,31 @@ version = "0.7.6"
+@@ -3071,6 +3071,31 @@ version = "0.7.6"
  source = "registry+https://github.com/rust-lang/crates.io-index"
  checksum = "a1d728cc89cf3aee9ff92b05e62b19ee65a02b5702cff7d5a377e32c6ae29d8d"
  
@@ -34,7 +34,7 @@ index b6a0102..71dda2e 100644
  [[package]]
  name = "cli"
  version = "0.1.0"
-@@ -22805,6 +22830,7 @@ dependencies = [
+@@ -22782,6 +22807,7 @@ dependencies = [
   "channel",
   "chrono",
   "clap",
@@ -43,7 +43,7 @@ index b6a0102..71dda2e 100644
   "client",
   "clock",
 diff --git a/Cargo.toml b/Cargo.toml
-index 80ef66a..49e983a 100644
+index df1de09..2169ada 100644
 --- a/Cargo.toml
 +++ b/Cargo.toml
 @@ -25,6 +25,7 @@ members = [
@@ -1733,7 +1733,7 @@ index 106bc35..a826d08 100644
              project.update(cx, move |_, cx| {
                  match remote_client {
 diff --git a/crates/zed/Cargo.toml b/crates/zed/Cargo.toml
-index f8675c3..ee7e295 100644
+index b257121..f9c9dfe 100644
 --- a/crates/zed/Cargo.toml
 +++ b/crates/zed/Cargo.toml
 @@ -88,6 +88,7 @@ breadcrumbs.workspace = true
@@ -1745,7 +1745,7 @@ index f8675c3..ee7e295 100644
  cli.workspace = true
  client.workspace = true
 diff --git a/crates/zed/src/main.rs b/crates/zed/src/main.rs
-index b8eba3b..797d8bd 100644
+index e96f975..9bafa03 100644
 --- a/crates/zed/src/main.rs
 +++ b/crates/zed/src/main.rs
 @@ -706,6 +706,7 @@ fn main() {

@@ -1619,7 +1619,7 @@ SLOT="0"
 # flags default. O suporte a arm64 no SRC_URI/src_configure foi mantido para
 # facilitar um re-keyword futuro.
 KEYWORDS="~amd64"
-IUSE="+X +claude-agent-acp-plus +claude-agent-acp-tui +claude-code-ide collab extensions-cli +mimalloc neovim +pulseaudio screen-capture tracy +wayland"
+IUSE="+X +agent-explicit-defaults +claude-agent-acp-plus +claude-agent-acp-tui +claude-code-ide collab extensions-cli +mimalloc neovim +pulseaudio screen-capture tracy +wayland"
 REQUIRED_USE="|| ( X wayland )"
 CHECKREQS_DISK_BUILD="18G"
 CHECKREQS_MEMORY="8G"
@@ -1723,6 +1723,14 @@ src_prepare() {
 	# terminal-ide story 001: Claude Code IDE integration (upstream PR #58300 + API-drift fixes).
 	if use claude-code-ide; then
 		PATCHES+=( "${FILESDIR}/0002-claude-code-ide-integration.patch" )
+	fi
+
+	# 0010: a thread menu choice (permission mode, model, thinking effort, an ACP
+	# agent's config options) applies to that thread only; Shift also makes it the
+	# default for new threads. Independent of the two blocks above -- it applies to
+	# the packaged source on its own -- so it gets its own flag.
+	if use agent-explicit-defaults; then
+		PATCHES+=( "${FILESDIR}/0010-shift-to-set-as-default.patch" )
 	fi
 
 	default
