@@ -334,7 +334,7 @@ url = "https://nodejs.org/dist/latest-v24.x/SHASUMS256.txt"
 parser = "regex"
 pattern = 'node-v(24\.[0-9]+\.[0-9]+)\.tar\.xz'
 select = "max"
-version = "24.19.0-r2"
+version = "24.20.0"
 comments = """
 Node.js SLOT 24 — the previous LTS line.
 
@@ -1817,7 +1817,7 @@ path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
 series = '^[0-9.]+$'
-version = "1.16.3"
+version = "1.17.2"
 comments = """
 zed-bin (stable channel) — releases/latest is the stable release by definition
 (prerelease=false); upstream tags it "vX.Y.Z" and the preview "vX.Y.Z-pre".
@@ -1940,7 +1940,7 @@ base_from = "tag"
 base_url = "https://api.github.com/repos/KhronosGroup/SPIRV-Headers/git/refs/tags"
 base_tag_pattern = '^vulkan-sdk-([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)$'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.357.0_p20260814"
+version = "1.4.357.0_p20260826"
 comments = """
 spirv-headers — commit-tracked on main; scans titles for vulkan-sdk-X.Y.Z.W to detect base bump.
 """
@@ -6739,37 +6739,55 @@ url = "https://downloadarchive.documentfoundation.org/libreoffice/old/"
 parser = "regex"
 pattern = 'href="([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)/"'
 select = "max"
-series = '^26\.2\.'
-version = "26.2.6.1"
+series = '^26\.8\.'
+version = "26.8.0.3"
 comments = """
-libreoffice (stable line) — old/ lists every 4-segment release directory of both
-release lines, so series pins this entry to 26.2.x and select=max takes the
-newest within it. The testing line has its own entry (@testing) and its own
-pending/cache record.
+libreoffice (stable line) — old/ lists every 4-segment release directory of every
+release line, so series pins this entry to 26.8.x and select=max takes the newest
+within it.
 
-WHEN THE STABLE LINE MOVES ON (26.8 promoted, a 27.2 opening): repoint series
-here and in @testing together. A stale series is not silent — a version outside
-it fails the check loudly instead of bumping the wrong line.
+26.8.0 was released in week 35 of 2026 — RC3 was promoted unchanged, which is why
+the final tarball is still named libreoffice-26.8.0.3.tar.xz — so this line lost
+its _pre marker on 2026-08-26. The 26.2 line is no longer tracked: it reaches EOL
+on 2026-11-30 and the overlay keeps 26.2.6.1 frozen until that ebuild is dropped.
+
+PROMOTION IS INVISIBLE TO THIS PROBE. old/ lists build directories, and upstream
+creates none when it promotes an RC to final; the only signal is
+download.documentfoundation.org/libreoffice/stable/ starting to list the release.
+Whoever repoints series must read stable/ by hand — see @testing for the full
+procedure.
 """
 # END
 
 ["app-office/libreoffice@testing"]
+enabled = false
+disabled_by = "no 27.2 build published yet — re-enable when old/ first lists a 27.2.x directory (alpha1 due around week 47 of 2026)"
 url = "https://downloadarchive.documentfoundation.org/libreoffice/old/"
 parser = "regex"
 pattern = 'href="([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)/"'
 select = "max"
 suffix = "_pre"
-series = '^26\.8\.'
-version = "26.8.0.3_pre"
+series = '^27\.2\.'
 comments = """
-libreoffice (testing line) — same index as @stable, pinned to 26.8.x. Upstream
-numbers a testing release exactly like a final one (download.documentfoundation
-.org/libreoffice/stable/ stops at 26.2.5 while testing/ carries 26.8.0), so
-suffix marks it _pre: Gentoo sorts _pre below the bare version, which keeps the
-ebuild honest AND makes the bump fire the moment upstream promotes the release.
-The ebuild strips the marker for SRC_URI via MY_PV="${MY_PV/_pre/}".
+libreoffice (testing line) — same index as @stable, repointed to 27.2.x on
+2026-08-26, when 26.8.0 was released and the 26.8 records were promoted. Disabled
+until upstream publishes the first 27.2 build: there is no ebuild to mirror, so no
+version is recorded either.
 
-No suffix_when is needed here: series already delimits the line.
+Upstream numbers a testing release exactly like a final one (old/ carries
+26.8.0.1, .2 and .3 whether they are RCs or the release), so suffix marks it _pre:
+Gentoo sorts _pre below the bare version, which keeps the ebuild honest while the
+line is in RC. The ebuild strips the marker for SRC_URI via MY_PV="${MY_PV/_pre/}".
+
+THE _pre DOES NOT FALL OFF BY ITSELF. This comment used to claim the marker "makes
+the bump fire the moment upstream promotes the release" — it does not. The archive
+index gains no new directory when an RC becomes the release, so the probe sees
+nothing change and the ebuild keeps a _pre it no longer deserves. Promotion shows
+up in exactly two places: a new directory under
+download.documentfoundation.org/libreoffice/stable/, and the schedule on
+wiki.documentfoundation.org ReleasePlan/<series> — readable through api.php only,
+the article itself is behind Anubis. Check those, then drop suffix here, repoint
+@stable, and rename the ebuilds.
 """
 # END
 
@@ -6778,38 +6796,48 @@ url = "https://downloadarchive.documentfoundation.org/libreoffice/old/"
 parser = "regex"
 pattern = 'href="([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)/"'
 select = "max"
-series = '^26\.2\.'
-version = "26.2.6.1"
+series = '^26\.8\.'
+version = "26.8.0.3"
 comments = """
 libreoffice-l10n (stable line) — follows the core release, so it reads the same
-archive index rather than the headless src/ probe: that probe returns whatever
-is newest overall, which is the testing line, and a stable entry must not see
-it. Promote together with app-office/libreoffice@stable.
+archive index rather than the headless src/ probe: that probe returns whatever is
+newest overall, which is the pre-release line, and a stable entry must not see it.
+Promote together with app-office/libreoffice@stable.
+
+The ebuild picks its mirror from the version itself: with no _pre marker it builds
+SRC_URI from stable/<base>/rpm instead of testing/<base>/rpm. Both serve the same
+bytes — the 26.8.0 langpacks under stable/ match the Manifest recorded from
+testing/ (verified for hu on 2026-08-26: 2840184 bytes and the same SHA512) — so
+dropping the marker leaves the Manifest untouched.
 """
 # END
 
 ["app-office/libreoffice-l10n@testing"]
+enabled = false
+disabled_by = "no 27.2 build published yet — re-enable together with app-office/libreoffice@testing"
 url = "https://downloadarchive.documentfoundation.org/libreoffice/old/"
 parser = "regex"
 pattern = 'href="([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)/"'
 select = "max"
 suffix = "_pre"
-series = '^26\.8\.'
-version = "26.8.0.3_pre"
+series = '^27\.2\.'
 comments = """
 libreoffice-l10n (testing line) — reads the same archive index as
 app-office/libreoffice@testing, and for the same reason: it follows the core
-release, so both must see one and the same version.
+release, so both must see one and the same version. Repointed to 27.2.x and
+disabled on 2026-08-26, when 26.8 was promoted.
 
-Was the headless src//@libreoffice.js probe until 2026-08-01; dropped because
-that index carries every release since 2012 (~590 KB, ~16 s just to transfer)
-and the script then fetches a per-release dir on top of it, so the browser page
-load kept dying on ERR_TIMED_OUT. The archive index is ~97 KB, lists the
-4-segment version directly, and needs no browser at all.
+Was the headless src//@libreoffice.js probe until 2026-08-01; dropped because that
+index carries every release since 2012 (~590 KB, ~16 s just to transfer) and the
+script then fetches a per-release dir on top of it, so the browser page load kept
+dying on ERR_TIMED_OUT. The archive index is ~97 KB, lists the 4-segment version
+directly, and needs no browser at all.
 
-series asserts this really is the 26.8 line, so the day upstream moves on the
-check fails loudly instead of bumping the wrong ebuild. Same _pre marker and
-same promotion moment as app-office/libreoffice@testing.
+series asserts this really is the line being tracked, so the day upstream moves on
+the check fails loudly instead of bumping the wrong ebuild. Same _pre marker and
+same promotion moment as app-office/libreoffice@testing — including the caveat
+recorded there: the promotion is invisible to this probe, so the marker comes off
+by hand.
 """
 # END
 
@@ -6818,20 +6846,20 @@ url = "https://downloadarchive.documentfoundation.org/libreoffice/old/"
 parser = "regex"
 pattern = 'href="([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)/"'
 select = "max"
-suffix = "_pre"
 series = '^26\.8\.'
-version = "26.8.0.3_pre"
+version = "26.8.0.3"
 comments = """
 myspell-hu — PV=LO_VER; the hu langpack ships in the LibreOffice archive tree the
 ebuild's SRC_URI pulls from, so it reads the same index and follows the same
-release line. Only one line is packaged here (no @stable counterpart), but series
-still pins it: without it select=max would silently follow whichever line is
-numerically ahead, and the resulting bump would target a langpack the ebuild's
+release line. Only one line is packaged here (no @stable/@testing split), but
+series still pins it: without it select=max would silently follow whichever line
+is numerically ahead, and the resulting bump would target a langpack the ebuild's
 paths ("libreoffice26.8/...") do not match.
 
-suffix marks 26.8 as the testing line, exactly as for app-office/libreoffice. The
-ebuild strips the marker with LO_VER="${PV/_pre/}" before building SRC_URI, so
-the distfile name is unchanged. Promote together with the two libreoffice records.
+The _pre marker came off on 2026-08-26 together with app-office/libreoffice:
+26.8.0 was released in week 35 of 2026. When the overlay moves to 27.2 this record
+moves with the core one — repoint series, re-add suffix, and fix the
+"libreoffice26.8" paths inside the ebuild.
 """
 # END
 

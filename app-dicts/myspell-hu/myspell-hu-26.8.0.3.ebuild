@@ -8,9 +8,10 @@ EAPI=8
 # The "libreoffice26.8" paths use the LO series (major.minor); if upstream moves
 # to a new series, bump those paths accordingly.
 #
-# _pre marks the LibreOffice testing line (26.8 is testing while 26.2 is stable)
-# and is stripped here: upstream's archive path carries the bare version, exactly
-# as app-office/libreoffice does with MY_PV.
+# _pre would mark a LibreOffice pre-release line and is stripped here, exactly as
+# app-office/libreoffice does with MY_PV: upstream's archive path always carries
+# the bare version. 26.8 carries no marker since 26.8.0 was released in week 35 of
+# 2026; the strip stays for whichever line is next in RC.
 LO_VER="${PV/_pre/}"
 
 MYSPELL_DICT=(
