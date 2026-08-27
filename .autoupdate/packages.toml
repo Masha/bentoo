@@ -8154,3 +8154,38 @@ out/docker-machine-driver-kvm2 target that 1.38 deleted along with
 cmd/drivers/kvm. Drop this package from the overlay once ::gentoo fixes it.
 """
 # END
+
+["dev-python/tree-sitter"]
+hold = true
+url = "https://api.github.com/repos/tree-sitter/py-tree-sitter/tags"
+parser = "json"
+path = "[0].name"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "0.26.0-r1"
+comments = """
+py-tree-sitter — no releases endpoint worth reading; tags[0] is "vX.Y.Z" and
+the list is plain descending, with no parallel channel to rank around.
+Verified 2026-08-27: tags[0] = v0.26.0, followed by v0.25.2, v0.25.1, v0.25.0.
+
+hold = true, and the reason is a patch rather than a broken endpoint. This
+overlay carries 0.26.0-r1 = ::gentoo's 0.26.0 plus
+files/tree-sitter-0.26.0-point-refcount.patch, which makes Point.row and
+Point.column return a strong reference instead of a borrowed one. Without it
+dev-util/pkgcheck segfaults in roughly half its scans and still exits 0, so a
+green scan can be hiding dropped checks. An unattended bump would drop the
+patch on the floor and the regression would come back silently.
+
+Note that `hold` only binds the checker, not --apply, so this record is a
+warning and not a guard. The guard is profiles/package.mask, which excludes
+anything above 0.26.0-r1 coming from ::gentoo.
+
+Clearing the hold: upstream has no fixed release yet (v0.26.0 is still the
+newest tag) and no report was filed, so do not expect one to arrive on its own.
+When a new tag shows up, ask the source rather than the version number --
+
+  grep Py_XNewRef tree_sitter/binding/point.c
+
+Two hits mean the fix is upstream: drop our patch, drop the package.mask entry,
+drop this hold, and bump normally. No hits mean the bump needs the patch
+rebased onto the new tree first.
+"""
