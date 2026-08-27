@@ -1,0 +1,55 @@
+Guard the legacy main-screen plugin calls behind DISABLE_DEPRECATED.
+
+EditorMainScreen::add_main_plugin() and ::remove_main_plugin() are declared and
+defined only inside #ifndef DISABLE_DEPRECATED (editor/editor_main_screen.h,
+editor/editor_main_screen.cpp) -- they are the legacy path that wraps a plugin's
+main screen into an EditorDock via LegacyMainScreenContainer.  Their two call
+sites in EditorNode::add_editor_plugin()/remove_editor_plugin(), however, carry
+no guard at all, so building with deprecated=no (which the ebuild passes when
+USE=-deprecated, defining -DDISABLE_DEPRECATED) fails with:
+
+    editor/editor_node.cpp:4450:48: error: 'class EditorMainScreen' has no
+        member named 'add_main_plugin'
+    editor/editor_node.cpp:4461:48: error: 'class EditorMainScreen' has no
+        member named 'remove_main_plugin'
+
+EditorPlugin::has_main_screen() itself is declared outside the guard
+(editor/plugins/editor_plugin.h), so only the two calls need covering; a grep
+over the tree confirms editor_node.cpp holds the only uses outside
+editor_main_screen.{h,cpp}.
+
+The whole `if` is wrapped rather than just its body: with the body gone the
+condition would be a pure no-op, and has_main_screen() may dispatch into
+GDVIRTUAL0RC(bool, _has_main_screen) on script/extension plugins, i.e. run
+user code for a result nothing consumes.
+
+Not an upstream mirror: master still carries the unguarded calls at the same
+lines and no issue or PR covers it, so this stays until upstream either guards
+them or finishes migrating main screens to EditorDock -- recheck on every bump.
+
+--- a/editor/editor_node.cpp
++++ b/editor/editor_node.cpp
+@@ -4446,9 +4446,11 @@
+ }
+ 
+ void EditorNode::add_editor_plugin(EditorPlugin *p_editor, bool p_config_changed) {
++#ifndef DISABLE_DEPRECATED
+ 	if (p_editor->has_main_screen()) {
+ 		singleton->editor_main_screen->add_main_plugin(p_editor);
+ 	}
++#endif
+ 	singleton->editor_data.add_editor_plugin(p_editor);
+ 	singleton->add_child(p_editor);
+ 	if (p_config_changed) {
+@@ -4457,9 +4459,11 @@
+ }
+ 
+ void EditorNode::remove_editor_plugin(EditorPlugin *p_editor, bool p_config_changed) {
++#ifndef DISABLE_DEPRECATED
+ 	if (p_editor->has_main_screen()) {
+ 		singleton->editor_main_screen->remove_main_plugin(p_editor);
+ 	}
++#endif
+ 	p_editor->make_visible(false);
+ 	p_editor->clear();
+ 	if (p_config_changed) {

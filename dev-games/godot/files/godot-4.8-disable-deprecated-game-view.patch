@@ -1,0 +1,55 @@
+Reach the main screen through the live dock API instead of the deprecated one.
+
+GameViewPluginBase::_focus_another_editor() restores the previously focused
+main-screen editor when the embedded game window is closed.  It does so through
+EditorInterface::set_main_screen_editor(), which is declared and defined only
+inside #ifndef DISABLE_DEPRECATED (editor/editor_interface.h,
+editor/editor_interface.cpp), while the caller carries no guard, so building
+with deprecated=no (USE=-deprecated, -DDISABLE_DEPRECATED) fails with:
+
+    editor/run/game_view_plugin.cpp:1855:59: error: 'class EditorInterface' has
+        no member named 'set_main_screen_editor'
+
+Unlike EditorMainScreen::add_main_plugin() -- see the companion patch
+godot-4.8-disable-deprecated-main-screen.patch, where no non-deprecated
+equivalent exists and the call has to be compiled out -- this one has a live
+replacement, so the call is rewritten rather than guarded.  The three lines
+substituted here are exactly the body of set_main_screen_editor():
+
+    EditorDock *dock = EditorNode::get_singleton()->get_editor_main_screen()
+                           ->get_dock_by_name(p_name);
+    ERR_FAIL_NULL_MSG(dock, "The editor name '" + p_name + "' was not found.");
+    EditorDockManager::get_singleton()->focus_dock(dock);
+
+Every symbol it needs is available in both configurations:
+EditorNode::get_editor_main_screen() (editor/editor_node.h, static),
+DockTabContainer::get_dock_by_name() (editor/docks/dock_tab_container.h),
+EditorDockManager::get_dock_by_name()/focus_dock()
+(editor/docks/editor_dock_manager.h) -- none sit under a guard.  All four
+headers are already included by game_view_plugin.cpp, so no new include is
+needed.  ERR_FAIL_NULL_MSG returns from a void function either way, and the
+call was the last statement on that branch, so control flow is unchanged.
+
+Note that EditorInterface::get_dock_by_name() would NOT be equivalent: it
+forwards to EditorDockManager and therefore searches every dock, whereas the
+deprecated method looks only among the main screen's own docks.  Inlining the
+original body keeps that narrower lookup.
+
+Deliberately unconditional: the rewritten code compiles and behaves identically
+with deprecated=yes, so it needs no #ifdef, and it keeps working once upstream
+drops the deprecated method entirely.  Not an upstream mirror -- master still
+carries the same call and no issue or PR covers it; recheck on every bump.
+
+--- a/editor/run/game_view_plugin.cpp
++++ b/editor/run/game_view_plugin.cpp
+@@ -1852,7 +1852,9 @@
+ 		if (last_editor.is_empty() || (last_editor == "Script" && ScriptEditor::get_singleton()->get_current_layout() == EditorDock::DOCK_LAYOUT_FLOATING)) {
+ 			CanvasItemEditor::get_singleton()->make_visible();
+ 		} else {
+-			EditorInterface::get_singleton()->set_main_screen_editor(last_editor);
++			EditorDock *dock = EditorNode::get_editor_main_screen()->get_dock_by_name(last_editor);
++			ERR_FAIL_NULL_MSG(dock, "The editor name '" + last_editor + "' was not found.");
++			EditorDockManager::get_singleton()->focus_dock(dock);
+ 		}
+ 	}
+ }

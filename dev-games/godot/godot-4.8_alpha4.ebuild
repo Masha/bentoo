@@ -97,6 +97,8 @@ BDEPEND="
 PATCHES=(
 	"${FILESDIR}"/${PN}-4.5-scons.patch
 	"${FILESDIR}"/${PN}-4.8-system-pcre2.patch
+	"${FILESDIR}"/${PN}-4.8-disable-deprecated-main-screen.patch
+	"${FILESDIR}"/${PN}-4.8-disable-deprecated-game-view.patch
 )
 
 src_prepare() {
