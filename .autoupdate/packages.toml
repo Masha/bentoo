@@ -1445,7 +1445,7 @@ url = "https://api.github.com/repos/brave/brave-browser/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.93.138"
+version = "1.94.117"
 comments = """
 brave-browser — releases/latest is the stable channel (tag "vX.Y.Z").
 """
@@ -1672,7 +1672,7 @@ nettle — GNU FTP release dir sorted newest-first; file "nettle-X.Y.Z.tar.gz".
 url = "https://www.qemu.org/download/"
 parser = "regex"
 pattern = 'qemu-([0-9]+\.[0-9]+\.[0-9]+)'
-version = "11.1.0"
+version = "11.1.1"
 comments = """
 qemu — /download/ puts the current "qemu-X.Y.Z.tar.xz" link first.
 The 2026-06-27 HOLD is lifted: download.qemu.org publishes the official
@@ -2128,7 +2128,7 @@ base_from = "file"
 base_url = "https://raw.githubusercontent.com/KhronosGroup/Vulkan-Loader/main/CMakeLists.txt"
 base_pattern = '(?m)^project\([A-Za-z_-]+ VERSION ([0-9][0-9.]*)'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.360_p20260826"
+version = "1.4.360_p20260827"
 comments = """
 vulkan-loader — commit-tracked on main; scans for "Update for Vulkan-Docs X.Y.Z" to detect base bump.
 """
@@ -7667,7 +7667,7 @@ stable/alpha entries); transform "-beta-"->"_beta" yields PV=4.0.0_beta2.
 url = "https://storage.googleapis.com/flutter_infra_release/releases/releases_linux.json"
 parser = "regex"
 pattern = '"channel": "stable",\s+"version": "([0-9]+\.[0-9]+\.[0-9]+)"'
-version = "3.47.1-r1"
+version = "3.47.2"
 comments = """
 Flutter — official releases_linux.json (pretty-printed, newest-first). The
 current_release.stable is a hash, not a version, so anchor the regex on the
