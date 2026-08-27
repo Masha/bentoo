@@ -48,7 +48,10 @@ RUST_MIN_VER="1.95.0"
 # whichever dependency moved ("failed to select a version for the requirement").
 # Only pin it to an older tag when upstream published no tarball AND the two
 # Cargo.lock files are byte-identical.
-MY_CRATES_TAG="rust-v${PV}"
+# Pinned to rust-v0.150.0: the crate-dist fork published no tarball for
+# rust-v0.150.1 and codex-rs/Cargo.lock is byte-identical between the two tags
+# (sha256 beb9a924bf01f03ecfa9fedbf50a602cbaa5399df5cbe57e2d6bd40529e055a6).
+MY_CRATES_TAG="rust-v0.150.0"
 
 # python3 .github/scripts/rusty_v8_bazel.py resolved-v8-crate-version
 RUSTY_V8_TAG="147.4.0"
@@ -63,7 +66,7 @@ HOMEPAGE="https://github.com/openai/codex"
 # See .github/workflows/crates.yml for the generation process.
 SRC_URI="
 	https://github.com/openai/${PN}/archive/rust-v${PV}.tar.gz -> ${P}.tar.gz
-	https://github.com/gentoo-zh-drafts/codex/releases/download/${MY_CRATES_TAG}/codex-${MY_CRATES_TAG}-crates.tar.xz -> ${P}-crates.tar.xz
+	https://github.com/gentoo-zh-drafts/codex/releases/download/${MY_CRATES_TAG}/codex-${MY_CRATES_TAG}-crates.tar.xz -> ${PN}-${MY_CRATES_TAG}-crates.tar.xz
 	amd64? (
 		https://github.com/openai/codex/releases/download/rusty-v8-v${RUSTY_V8_TAG}/librusty_v8_release_x86_64-unknown-linux-musl.a.gz
 			-> rusty_v8_${RUSTY_V8_TAG}_librusty_v8_release_x86_64-unknown-linux-musl.a.gz

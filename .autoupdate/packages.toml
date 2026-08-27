@@ -434,7 +434,7 @@ transform strips the "go" prefix to match PV. Live=1.26.5.
 url = "https://persistent.oaistatic.com/codex-app-prod/linux/deb/dists/stable/main/binary-amd64/Packages"
 parser = "regex"
 pattern = 'Package: chatgpt\nVersion: ([0-9]+\.[0-9]+\.[0-9]+)'
-version = "26.820.60940"
+version = "26.820.71523"
 comments = """
 OpenAI Codex/ChatGPT desktop app — read the APT index of the very repo that
 SRC_URI pulls from. Both openai.com and chatgpt.com sit behind Cloudflare and
@@ -900,7 +900,7 @@ url = "https://api.github.com/repos/openai/codex/releases/latest"
 parser = "regex"
 pattern = '"tag_name":\s*"rust-v([0-9]+\.[0-9]+\.[0-9]+)"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.150.0"
+version = "0.150.1"
 comments = """
 codex — tag "rust-vX.Y.Z" ("rust-" not strippable); regex extracts X.Y.Z from tag_name.
 """
@@ -912,7 +912,7 @@ parser = "regex"
 pattern = '"tag_name":\s*"rust-v([0-9]+\.[0-9]+\.[0-9]+)"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "0.150.0"
+version = "0.150.1"
 comments = """
 codex-bin — same upstream tag "rust-vX.Y.Z"; regex on tag_name.
 """

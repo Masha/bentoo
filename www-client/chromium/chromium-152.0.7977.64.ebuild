@@ -28,7 +28,7 @@ GN_MIN_VER=0.2374
 # Node for M145+ should be 24.12.0 but that's not packaged in Gentoo yet. See #969145
 TEST_FONT="9c07d19d9c5ee1ff94f717e6fb17e0c8c354e6f9"
 BUNDLED_CLANG_VER="llvmorg-23-init-19482-g53d18800-1"
-BUNDLED_RUST_VER="b998449636a48e2c4a362809085b600a0174e1f2-2"
+BUNDLED_RUST_VER="b998449636a48e2c4a362809085b600a0174e1f2-5"
 RUST_SHORT_HASH=${BUNDLED_RUST_VER:0:10}-${BUNDLED_RUST_VER##*-}
 # bentoo: kept at the floor .108/.137 carried.  ::gentoo lowered it to 24.12.0
 # in .169-r1 to let the ebuild stabilise (KEYWORDS="amd64 arm64" cannot depend
@@ -39,7 +39,13 @@ RUST_SHORT_HASH=${BUNDLED_RUST_VER:0:10}-${BUNDLED_RUST_VER##*-}
 NODE_VER="24.16.0-r1"
 GO_MIN_VER="1.25.0"
 ESBUILD_VER="0.25.1"
-ROLLUP_VER="4.57.1" # currently manual.
+# currently manual. Measured on the 152 tarball: devtools-frontend/src/package.json
+# pins rollup 4.60.4, but deps.gentoo.zip -- which is where the wasm-node repack
+# is hosted -- still only carries 4.57.1, so that is what SRC_URI can name. Left
+# at 4.57.1 deliberately; the devtools rollup config is version-tolerant and
+# nothing has been observed to break. Raise it the moment deps.gentoo.zip catches
+# up, or if a devtools bundling step starts failing.
+ROLLUP_VER="4.57.1"
 VIRTUALX_REQUIRED="pgo"
 
 CHROMIUM_LANGS="af am ar bg bn ca cs da de el en-GB es es-419 et fa fi fil fr gu he
@@ -49,7 +55,7 @@ CHROMIUM_LANGS="af am ar bg bn ca cs da de el en-GB es es-419 et fa fi fil fr gu
 # bentoo: slot 22 enabled downstream (::gentoo ships 21 only). The only
 # version-gated patches are chromium-patches' llvm/lt-23/, which 22 shares
 # with 21, and every other slot reference is dynamic (${LLVM_SLOT}).
-# Re-measured against the 151-3 tag on 2026-08-21: llvm/ still holds exactly
+# Re-measured against the 152 tag on 2026-08-27: llvm/ still holds exactly
 # one directory, lt-23/, with three patches (cr147-disable-fno-lifetime-dse,
 # cr149-ubsan-feature, cr151-fdiagnostics-show-inlining-chain), so 22 remains
 # inside the gate.
@@ -76,7 +82,7 @@ inherit python-any-r1 readme.gentoo-r1 rust systemd toolchain-funcs virtualx xdg
 DESCRIPTION="Open-source version of Google Chrome web browser"
 HOMEPAGE="https://www.chromium.org/"
 PPC64_HASH="7aae8a84e327fc2078ce1625c9c70bfda77d626f"
-PATCH_V="151-3"
+PATCH_V="152"
 COPIUM_COMMIT="3c7e56fb4523b43b47595bb3a22f77178fc76293"
 SRC_URI="https://github.com/chromium-linux-tarballs/chromium-tarballs/releases/download/${PV}/chromium-${PV}-linux.tar.xz
 	https://deps.gentoo.zip/www-client/chromium/rollup-wasm-node-${ROLLUP_VER}.tgz
@@ -577,7 +583,17 @@ src_prepare() {
 		# Copium patches go here.
 		PATCHES+=(
 			"${WORKDIR}/copium/cr143-libsync-__BEGIN_DECLS.patch"
-			"${WORKDIR}/copium/cr149-unbundle-minizip-undo-unicode.patch"
+			# bentoo: rebase of copium's cr149-unbundle-minizip-undo-unicode.patch.
+			# Chromium teaches its *bundled* minizip to surface the Info-ZIP Unicode
+			# Path Extra Field as unz_file_info64::{size_utf8_filename,utf8_filename};
+			# the system minizip from sys-libs/zlib[minizip] -- which this ebuild
+			# requires, see the "against policy" note on the bundled-libraries list --
+			# has neither member, so zip_reader.cc does not compile without this.
+			# 152 rewrote OpenEntry() around the extra field, so the M149 hunk no
+			# longer applies, and copium dropped the patch in cc01835a ("Partial
+			# refresh for M152") without replacing it. Re-check on every bump: if
+			# copium ships a cr15x- successor, take theirs and delete ours.
+			"${FILESDIR}/chromium-152-unbundle-minizip-undo-unicode.patch"
 		)
 
 		# Automate conditional application of chromium-patches
@@ -665,7 +681,8 @@ src_prepare() {
 		# ::gentoo does not carry this because its stable Rust is older; this overlay mirrors
 		# dev-lang/rust ahead, so 1.97 is what a bentoo user actually builds against.
 		# Still uncovered upstream: chromium-patches dropped rust/cr146-fix-botched-bytemuck-roll.patch
-		# in 151-3 and has not brought it back.
+		# in 151-3 and the 152 tag has not brought it back -- there is no rust/ directory
+		# in the patchset at all.
 		# The grep is a tripwire: `sed -i` that matches nothing still exits 0.
 		grep -q '"nightly_portable_simd",' third_party/rust/bytemuck/v1/BUILD.gn ||
 			die "bytemuck no longer enables nightly_portable_simd; drop this workaround"
@@ -1250,7 +1267,7 @@ chromium_configure() {
 		# the case ::gentoo .137 covered with "!official? ( >=sys-devel/mold )".
 		# Setting it unconditionally is still right: it states the intent for
 		# both USE states instead of leaving one of them to a Chromium default.
-		# chromium-patches' toolchain/cr151-mold-unbundle.patch does not save
+		# chromium-patches' toolchain/cr152-mold-unbundle.patch does not save
 		# us here: it only adds a linker_path override that wins when non-empty,
 		# and the empty default still falls through to the CIPD path whenever
 		# use_mold is true. Measured on .173, patchset 151-3 applied, by running
