@@ -545,22 +545,58 @@ hplip-plugin — version tracks HPLIP; SourceForge RSS lists "hplip-X.Y.Z" newes
 # END
 
 ["net-ftp/filezilla-pro"]
+hold = true
 url = "https://filezillapro.com/filezilla-pro-version-history/"
 parser = "regex"
 pattern = 'Latest:\s*([0-9]+\.[0-9]+\.[0-9]+)'
 headers = { "User-Agent" = "Mozilla/5.0" }
-meta = { fetch_method = "post", fetch_url = "https://filezilla-project.org/prodownload.php?beta=0", fetch_serial_env = "FILEZILLA_PRO_KEY", fetch_serial_field = "key", fetch_filename = "FileZilla_Pro_{version}_x86_64-linux-gnu.tar.xz", fetch_form = "mail=&number=&platform=linux&platform_cli=win&platform_cli_nonpro=win&platform_fzpes=win&download_program=Start download of FileZilla Pro" }
+meta = { fetch_method = "post", fetch_url = "https://download.filezillapro.com/", fetch_serial_env = "FILEZILLA_PRO_KEY", fetch_serial_field = "key", fetch_filename = "filezilla-pro-{version}_x86_64-linux-gnu.tar.xz", fetch_form = "mail=&number=&platform=linux&platform_cli=win&platform_cli_nonpro=win&platform_fzpes=win&download_program=Start download of FileZilla Pro" }
 type = "bin"
 version = "3.70.5"
 comments = """
 FileZilla Pro — version-history page's "Latest: X.Y.Z" is the current stable
 release (the h3 changelog list also includes -betaN, so anchor on "Latest:").
 Binary, serial-gated: the .tar.xz is not on a public mirror — at --apply time
-the [meta] block drives an authenticated POST to prodownload.php (the form's
-`key` field carries the serial; ALL form fields must be sent or the server
-silently re-shows the form). The serial comes from $FILEZILLA_PRO_KEY (or
-~/.config/bentoo/secrets) and is never committed here. The downloaded file is
-dropped into pkgdev's distdir so the Manifest digests it directly.
+the [meta] block drives an authenticated POST whose `key` field carries the
+serial; ALL form fields must be sent or the server silently re-shows the form.
+The serial comes from $FILEZILLA_PRO_KEY (or ~/.config/bentoo/secrets) and is
+never committed here. The downloaded file is dropped into pkgdev's distdir so
+the Manifest digests it directly.
+
+fetch_url must be the FINAL endpoint, never filezilla-project.org/prodownload.php:
+that path now answers 302 -> https://download.filezillapro.com/, and Go's
+net/http rewrites POST to GET on 301/302/303 and drops the body, so the serial
+never arrives and the bare form comes back as HTML. The applier then reports
+"likely an invalid serial", but the serial was never sent at all. The form's own
+action is "/" on that host, and it carries no `beta` field, so the old ?beta=0
+query is dropped too. Measured 2026-08-27.
+
+fetch_filename must equal the basename of the ebuild's SRC_URI —
+${P}_x86_64-linux-gnu.tar.xz, i.e. filezilla-pro-<PV>_… — and NOT the vendor's
+own FileZilla_Pro_<PV>_… name. The applier writes the download under exactly
+this name and pkgdev digests it by SRC_URI basename; any other name sends pkgdev
+back to distfiles.obentoo.org for a file that is not mirrored there yet. This
+path never completed a bump before, which is why the mismatch went unseen.
+
+Reading a failure: the download page ships as an AES-CBC blob decrypted in the
+browser (key, IV and algorithm are inline attributes of the #contentwrapper div,
+so it decrypts offline). The server's real message lives in #prodownload_error
+and is invisible to a plain HTML reader. On 2026-08-27 it read "Your download
+limit has been exceeded" — a vendor-side quota on the serial, not a config
+fault: endpoint, form and serial were all accepted.
+
+hold = true since 2026-08-27, and the reason is the fixed endpoint above rather
+than the quota alone. While fetch_url still pointed at the redirecting host the
+serial never left this machine, so a failed --apply cost nothing; now that the
+POST lands, every attempt spends a real authenticated request against the very
+quota that is exhausted, and it fails anyway at the fetch step. Retrying is
+therefore worse than not trying. Support was contacted on 2026-08-27.
+
+Clearing the hold: probe with `--check net-ftp/filezilla-pro --force`, which
+reads only the version-history page and never touches the download endpoint.
+Then confirm by hand that a POST to fetch_url returns the tarball instead of
+HTML — decrypt #prodownload_error as described above, because a quota refusal
+and a good response are both HTTP 200. Only then drop this line and apply.
 """
 # END
 
