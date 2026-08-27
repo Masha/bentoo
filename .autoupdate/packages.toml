@@ -1668,6 +1668,29 @@ nettle — GNU FTP release dir sorted newest-first; file "nettle-X.Y.Z.tar.gz".
 """
 # END
 
+["dev-libs/libgcrypt"]
+url = "https://gnupg.org/ftp/gcrypt/libgcrypt/"
+parser = "regex"
+pattern = 'libgcrypt-([0-9]+\.[0-9]+\.[0-9]+)\.tar\.bz2'
+select = "max"
+version = "1.12.3"
+comments = """
+libgcrypt — official gnupg.org FTP dir, the only place upstream publishes. The
+listing happens to be newest-first today (1.12.3 is the first match), but the
+record uses select = "max" rather than relying on that: the dir holds every
+release since 1.4 in one flat page, so a change of sort order would silently
+pin an ancient version. Safe here because the dir carries NO prereleases —
+every .tar.bz2 in it is a plain X.Y.Z (checked 2026-08-27, 12 versions).
+
+Carried in the overlay because ::gentoo is still on 1.12.2 while 1.12.3
+(2026-08-26) fixes an OOB read in the GOST28147 IMIT MAC, a NULL deref in ECC
+genkey, assertion failures in OCB and small-order Ed25519, plus missing
+validation in Argon2/Balloon/KEM/RSA-PSS. Drop this ebuild once ::gentoo
+catches up — the ebuild is a verbatim copy of theirs except for KEYWORDS,
+which are downgraded to ~arch because a fresh release is not stable.
+"""
+# END
+
 ["app-emulation/qemu"]
 url = "https://www.qemu.org/download/"
 parser = "regex"
@@ -8225,3 +8248,4 @@ Two hits mean the fix is upstream: drop our patch, drop the package.mask entry,
 drop this hold, and bump normally. No hits mean the bump needs the patch
 rebased onto the new tree first.
 """
+# END
