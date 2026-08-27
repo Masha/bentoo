@@ -434,7 +434,7 @@ transform strips the "go" prefix to match PV. Live=1.26.5.
 url = "https://persistent.oaistatic.com/codex-app-prod/linux/deb/dists/stable/main/binary-amd64/Packages"
 parser = "regex"
 pattern = 'Package: chatgpt\nVersion: ([0-9]+\.[0-9]+\.[0-9]+)'
-version = "26.820.71523"
+version = "26.820.80927"
 comments = """
 OpenAI Codex/ChatGPT desktop app — read the APT index of the very repo that
 SRC_URI pulls from. Both openai.com and chatgpt.com sit behind Cloudflare and
@@ -1196,7 +1196,7 @@ pattern = '"name":\s*"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 series = '^1\.18\.'
-version = "1.18.1"
+version = "1.18.2"
 comments = """
 flatpak (stable line) — flatpak numbers its unstable series with an ODD minor
 (1.15, 1.17, 1.19) and stabilises into the next EVEN one; GitHub marks the odd
@@ -1456,7 +1456,7 @@ url = "https://api.github.com/repos/vim/vim/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "9.2.1014"
+version = "9.2.1015"
 comments = """
 vim — no releases (404); tags[0] "vX.Y.ZZZZ".
 """
@@ -1467,7 +1467,7 @@ url = "https://api.github.com/repos/vim/vim/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "9.2.1014"
+version = "9.2.1015"
 comments = """
 vim-core — same upstream repo as vim.
 """
@@ -1659,12 +1659,18 @@ them. Recipe is in the ebuild's header comment.
 # END
 
 ["dev-libs/nettle"]
-url = "https://ftp.gnu.org/gnu/nettle/?C=M;O=D"
+url = "https://www.lysator.liu.se/~nisse/archive/"
 parser = "regex"
 pattern = 'nettle-([0-9.]+)\.tar\.gz'
+select = "max"
 version = "4.0"
 comments = """
-nettle — GNU FTP release dir sorted newest-first; file "nettle-X.Y.Z.tar.gz".
+nettle — upstream author's own archive dir; file "nettle-X.Y.Z.tar.gz".
+ftp.gnu.org stopped answering (connection times out, no HTTP status), so the
+probe moved to the release dir linked from the nettle homepage. It is nginx,
+not Apache: "?C=M;O=D" does nothing there and the listing is alphabetical, so
+select = "max" replaces the newest-first sort. ftpmirror.gnu.org also answers
+but redirects to a random, possibly stale mirror on every hit.
 """
 # END
 
@@ -1899,7 +1905,7 @@ transform = [['T.*', ""], ['-', ""]]
 commit_sha_path = "[0].sha"
 base_from = "none"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0_p20260823"
+version = "0_p20260827"
 comments = """
 asus-ec-sensors — the single upstream tag (v0.1.0) is stale and board support
 lands as plain commits on master, so track master. base_from = "none" says
@@ -2057,7 +2063,7 @@ base_from = "tag"
 base_url = "https://api.github.com/repos/KhronosGroup/SPIRV-Tools/git/refs/tags"
 base_tag_pattern = '^vulkan-sdk-([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)$'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.357.0_p20260825"
+version = "1.4.357.0_p20260827"
 comments = """
 spirv-tools — commit-tracked on main; scans titles for vulkan-sdk-X.Y.Z.W to detect base bump.
 """
@@ -7619,7 +7625,7 @@ pattern = '"name":\s*"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 series = '^2\.'
-version = "2.36.32"
+version = "2.36.33"
 comments = """
 aws-cli v2 — GitHub tag index, pinned to the 2.x series. Verified 2026-08-19
 against the live endpoint: 100 matches, all of them 2.x, max = 2.36.27 = ebuild.
