@@ -168,7 +168,7 @@
 url = "https://registry.npmjs.org/@anthropic-ai/claude-code"
 parser = "json"
 path = "dist-tags.latest"
-version = "2.1.247"
+version = "2.1.248"
 comments = """
 claude-code — npm @anthropic-ai/claude-code; dist-tags.latest is the stable channel.
 
@@ -206,7 +206,7 @@ would actually ship fetches on its own.\
 """
 aux_var = "EGIT_COMMIT"
 aux_pattern = 'id>urn:sha1:([0-9a-f]{40})'
-version = "20260825"
+version = "20260827"
 comments = """
 linux-firmware — kernel.org's cgit atom feed, because this package has no
 releases to track: it is fetched with git-r3 from a pinned commit and versioned
@@ -835,7 +835,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.28.1"
+version = "0.28.2"
 comments = """
 bentoolkit — releases/latest devolve tag_name "vX.Y.Z"; o transform tira o "v",
 senao o bump gera um PV invalido (bentoolkit-v0.17.0).
@@ -914,7 +914,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "0.12.6"
+version = "0.12.7"
 comments = """
 uv (uv-bin) — tag bare "X.Y.Z".
 """
