@@ -1,0 +1,51 @@
+From: Lucas C.S. <lucascs@protonmail.com>
+Subject: [PATCH] point: return a strong reference from the row/column getters
+
+PyTuple_GetItem() returns a borrowed reference, but a PyGetSetDef getter must
+return a strong one, since the caller becomes the owner.  Point.row and
+Point.column hand out the underlying tuple item without claiming it, so
+destroying a temporary Point frees an integer the caller is still using.
+
+The practical fallout is a use-after-free that corrupts the heap.  It bites any
+code that reads a point off a short-lived Point, the canonical case being a
+sort key:
+
+    sorted(nodes, key=attrgetter("start_point.row", "start_point.column"))
+
+pkgcheck does exactly that in pkgcheck/bash/__init__.py, and segfaults in
+roughly half of all scans.  Worse, the crash lands in a multiprocessing worker,
+so pkgcheck still exits 0 and silently drops whole checks.
+
+Minimal reproducer (row must exceed 256 to escape CPython's small-int cache):
+
+    p = node.start_point
+    r = p.row
+    sys.getrefcount(r)   # 2
+    del p
+    sys.getrefcount(r)   # 672873104 -- freed
+
+The rest of the binding already gets this right: Py_NewRef appears 26 times
+across node.c, query.c, parser.c and friends.  Point regressed in 0.26.0, which
+rewrote it as a tuple subclass with hand-written getters; 0.25.2 built it with
+PyStructSequence, whose accessors CPython generates with correct refcounting.
+
+Upstream has no fixed release: v0.26.0 is the latest tag.  No upstream PR or
+Gentoo bug was filed for this, deliberately -- do not go looking for one.
+This patch is overlay maintenance: rebase it on every 0.26.x bump and drop it
+only once an upstream release actually carries the fix.
+--- a/tree_sitter/binding/point.c
++++ b/tree_sitter/binding/point.c
+@@ -33,11 +33,11 @@
+ }
+ 
+ PyObject *point_get_row(PyObject *self, void *Py_UNUSED(payload)) {
+-    return PyTuple_GetItem(self, 0);
++    return Py_XNewRef(PyTuple_GetItem(self, 0));
+ }
+ 
+ PyObject *point_get_column(PyObject *self, void *Py_UNUSED(payload)) {
+-    return PyTuple_GetItem(self, 1);
++    return Py_XNewRef(PyTuple_GetItem(self, 1));
+ }
+ 
+ PyObject *point_edit(PyObject *self, PyObject *args, PyObject *kwargs) {
