@@ -1370,6 +1370,37 @@ is uncovered for -official and the overlay's own fix is the only thing standing.
 Not proved by this bump: nothing was merged (no sudo on this host).  pkgcheck and
 the Manifest cover the ebuild text and the distfiles; neither runs src_prepare,
 so a 151-3 patch that fails to apply on .173 would only surface at build time.
+
+AND THAT IS EXACTLY WHAT HAPPENED ON THE 152 JUMP.  The bump to 152.0.7977.64
+(2026-08-25) rewrote PV and left PATCH_V on "151-3", the failure this comment had
+predicted four days earlier.  It surfaced 2026-08-27 as a user build dying in
+src_prepare on common/cr145-revert-to-rollup-wasm.patch -- upstream renamed it
+cr152- and rebased it, and the 151-3 copy no longer matches
+devtools-frontend/.../lit/rebuild.sh.  Fixed by moving PATCH_V to "152" (the tag
+exists since 2026-08-22) and BUNDLED_RUST_VER to sub-revision 5 (tools/rust/
+update_rust.py in the 152 tarball says 5; the ebuild still named 2).
+
+Two more things the 152 patchset changed that a PATCH_V swap alone does not
+cover, both measured against the 152 tarball on 2026-08-27:
+  - common/cr151-metric-histogram-non-git.patch is GONE, correctly: upstream
+    fixed tools/metrics/BUILD.gn itself, both guards now read
+    path_exists("//.git").  Nothing downstream has to replace it.
+  - copium dropped cr149-unbundle-minizip-undo-unicode.patch in cc01835a
+    ("Partial refresh for M152") without a successor, and 152 rewrote the code it
+    targeted.  That one DOES have to be replaced -- this overlay requires the
+    system minizip -- so it now lives in
+    files/chromium-152-unbundle-minizip-undo-unicode.patch.  Re-check on every
+    bump; if copium ships a cr15x- successor, take theirs and delete ours.
+
+Verified this time by actually running the phase: PORTAGE_CONFIGROOT with
+FEATURES=unprivileged, `ebuild ... clean prepare`, 21 patches, zero rejects.
+That closes the gap this comment names above -- do it on every series jump.
+
+ALSO FIXED, unrelated to the patches: the 152 bump wrote a DIST line for
+chromium-152.0.7977.64-linux.tar.xz with size 965279004, while upstream serves
+1774809076.  A truncated download had been hashed (see the pkgdev stale-DIST
+trap).  Any bump that touches this package must confirm size/SHA512 against the
+file in DISTDIR, not trust pkgdev's exit code.
 """
 # END
 
