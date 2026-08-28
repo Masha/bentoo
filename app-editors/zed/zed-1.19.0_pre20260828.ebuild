@@ -1718,6 +1718,11 @@ src_prepare() {
 			# source on its own, so it rides this flag by choice rather than by
 			# dependency -- it also covers the native agent's own menus.
 			"${FILESDIR}/0010-shift-to-set-as-default.patch"
+			# 0011: an "Account" section in the context tooltip -- the account
+			# quota windows (5-hour, weekly, per-model) that the adapter already
+			# forwards under _meta["_claude/rateLimit"] and Zed discarded. Rides
+			# this flag by dependency: no other agent sends that key.
+			"${FILESDIR}/0011-account-usage-panel.patch"
 		)
 	fi
 
