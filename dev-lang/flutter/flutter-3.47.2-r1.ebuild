@@ -20,12 +20,20 @@ RESTRICT="bindist mirror strip"
 
 QA_PREBUILT="*"
 
-# This release bundles Dart SDK 3.13.1 (see dart_sdk_version in upstream's
+# This release bundles Dart SDK 3.13.2 (see dart_sdk_version in upstream's
 # releases_linux.json). src_install replaces the bundled SDK with the system
 # one, so the version must match exactly: bin/cache/flutter_tools.snapshot only
 # loads on the Dart VM it was compiled against. Keep this pin in sync with the
 # dart_sdk_version of ${PV}, and keep the matching dev-lang/dart ebuild in the
 # tree even after dart is bumped.
+#
+# The pin is what the revision is for: .autoupdate bumps PV without reading
+# RDEPEND, so 3.47.2 shipped carrying 3.47.1's pin and merged against a Dart
+# the snapshot was not built on. A plain edit would not reinstall it -- only a
+# revbump does. Verify against the source, never the changelog:
+#
+#   curl -s 'https://storage.googleapis.com/flutter_infra_release/releases/releases_linux.json' \
+#     | jq -r '.releases[] | select(.channel=="stable") | "\(.version)\t\(.dart_sdk_version)"' | head
 #
 # acct-group/flutter is a DEPEND as well as an RDEPEND: src_install calls
 # fowners, and the fowners helper resolves the group name against
@@ -33,7 +41,7 @@ QA_PREBUILT="*"
 DEPEND="acct-group/flutter"
 RDEPEND="
 	${DEPEND}
-	~dev-lang/dart-3.13.1
+	~dev-lang/dart-3.13.2
 "
 
 DOC_CONTENTS="The Flutter SDK is installed in /opt/flutter.
