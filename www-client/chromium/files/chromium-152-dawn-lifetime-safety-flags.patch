@@ -1,0 +1,34 @@
+From: bentoo overlay <lucascouts@users.noreply.github.com>
+Subject: [PATCH] dawn: do not pass -Xclang lifetime-safety flags to a system clang
+
+Dawn's src/utils warning config disables Clang's experimental lifetime-safety
+analysis with two -Xclang flags. They exist only in the toolchain Chromium
+bundles; a system clang that lacks the analysis also lacks the flags and
+rejects them as `unknown argument`, which is fatal (unlike an unknown -W...,
+which the build already silences with -Wno-unknown-warning-option).
+
+Dropping them is safe precisely because the analysis is absent: there is no
+pass to turn off. The -Wno-lifetime-safety* entries are kept -- they cost
+nothing on a clang that does not know them.
+
+Only occurrence of -Xclang lifetime flags in the tree (9954 .gn/.gni files
+checked); pdfium, skia and v8 use plain -W forms that need no patching.
+--- a/third_party/dawn/src/utils/BUILD.gn
++++ b/third_party/dawn/src/utils/BUILD.gn
+@@ -214,12 +214,12 @@
+       # The lifetime-safety-* warnings are part of an experimental analysis.
+       # Many individual diagnostics (like
+       # -Wlifetime-safety-lifetimebound-violation) are not yet mapped to
+-      # toggleable warning flags, so we suppress the entire group and disable
+-      # the analysis pass.
++      # toggleable warning flags, so we suppress the entire group. The
++      # -Xclang flags that disable the analysis pass itself are omitted: a
++      # system clang that lacks the pass also lacks the flags, and rejects
++      # them outright. Nothing to disable there in the first place.
+       "-Wno-lifetime-safety",
+       "-Wno-lifetime-safety-all",
+-      "-Xclang=-fno-lifetime-safety-inference",
+-      "-Xclang=-fno-experimental-lifetime-safety-tu-analysis",
+     ]
+ 
+     # P3. Checks that could be nice but probably don't help with hardening.

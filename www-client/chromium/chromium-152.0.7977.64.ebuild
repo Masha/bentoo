@@ -606,6 +606,17 @@ src_prepare() {
 			# the one that does not. Only reachable here: with USE=bundled-
 			# toolchain the flag is true and the patch is a no-op.
 			"${FILESDIR}/chromium-152-cbor-crubit-optional.patch"
+			# bentoo: dawn/src/utils turns off Clang's experimental lifetime-safety
+			# analysis with two -Xclang flags. Those exist only in the toolchain
+			# Chromium bundles -- a system clang without the analysis is also
+			# without the flags, and rejects them as `unknown argument`. That is
+			# fatal, unlike an unknown -W..., which the append-flags
+			# -Wno-unknown-warning-option in src_configure already silences.
+			# Dropping them is safe because there is no pass to turn off in the
+			# first place. Sole occurrence in the tree: pdfium, skia and v8 use
+			# plain -W forms that a system clang tolerates. Drop this once
+			# chromium-patches ships an llvm/lt-<n>/ patch covering it.
+			"${FILESDIR}/chromium-152-dawn-lifetime-safety-flags.patch"
 		)
 
 		# Automate conditional application of chromium-patches
