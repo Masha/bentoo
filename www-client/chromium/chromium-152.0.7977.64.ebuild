@@ -594,6 +594,18 @@ src_prepare() {
 			# refresh for M152") without replacing it. Re-check on every bump: if
 			# copium ships a cr15x- successor, take theirs and delete ours.
 			"${FILESDIR}/chromium-152-unbundle-minizip-undo-unicode.patch"
+			# bentoo: M152 rewrote the CBOR reader in Rust and exposes it to C++
+			# through Crubit, but gated it on `!is_cronet_build` alone. Crubit's
+			# C++ support library lives only inside Google's bundled Rust
+			# toolchain -- the release tarball ships no
+			# third_party/rust-toolchain at all -- so with a system Rust sysroot
+			# gn dies loading //build/rust/crubit. Every other Crubit consumer
+			# (qr_code_generator, build/rust/std, build/rust/tests) already
+			# guards on enable_cpp_api_from_rust, which //build/config/rust.gni
+			# turns false precisely when rust_sysroot_absolute is set; cbor is
+			# the one that does not. Only reachable here: with USE=bundled-
+			# toolchain the flag is true and the patch is a no-op.
+			"${FILESDIR}/chromium-152-cbor-crubit-optional.patch"
 		)
 
 		# Automate conditional application of chromium-patches

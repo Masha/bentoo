@@ -1,0 +1,77 @@
+From: Lucas C.S. <lucascs@protonmail.com>
+Subject: [PATCH] components/cbor: gate the Crubit CBOR reader on enable_cpp_api_from_rust
+
+M152 moved the CBOR reader to a Rust implementation exposed to C++ through
+Crubit, but gated it on `!is_cronet_build` alone.  Crubit's C++ support library
+is not in the Chromium tree: `//build/rust/crubit` reaches it through
+`crubit_src_dir`, which `//build_overrides/crubit.gni` hardcodes to
+`//third_party/rust-toolchain/lib/third_party/crubit` -- a path that exists only
+inside Google's bundled Rust toolchain and that the release tarball does not
+ship at all (`third_party/crubit/` holds an OWNERS file and a README saying so).
+A build against a system Rust sysroot therefore dies in `gn gen`:
+
+  ERROR at //build/rust/crubit/BUILD.gn:11:5: Unable to load
+  ".../third_party/rust-toolchain/lib/third_party/crubit/support/BUILD.gn".
+      "$crubit_src_dir/support:support_cpp",
+
+`enable_cpp_api_from_rust`, in //build/config/rust.gni, already states exactly
+this condition -- it is false whenever `rust_sysroot_absolute` is set -- and
+every other Crubit consumer honours it: `components/qr_code_generator`,
+`build/rust/std`, and `build/rust/tests/test_cpp_including_rust` all guard their
+`//build/rust/crubit` dependency with it.  `components/cbor` is the one that
+does not.
+
+Honouring it here selects the C++ reader instead, which is not a degraded path:
+it is the same fallback Cronet builds use, kept alive behind
+`BUILDFLAG(USE_CBOR_RUST)` in reader.{h,cc} and exercised by reader_unittest.cc.
+
+Upstream keeps the buildflag until Cronet gains Crubit support
+(crbug.com/535682335) and has not fixed the gate on main as of 2026-08-28.
+Drop this patch once the upstream condition accounts for a non-bundled Rust
+toolchain.
+--- a/components/cbor/BUILD.gn
++++ b/components/cbor/BUILD.gn
+@@ -1,21 +1,27 @@
+ # Copyright 2017 The Chromium Authors
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
+ import("//build/buildflag_header.gni")
+ import("//build/config/cronet/config.gni")
++import("//build/config/rust.gni")
+ import("//testing/libfuzzer/fuzzer_test.gni")
+ 
++# Crubit's C++ support library ships only inside the bundled Rust toolchain, so
++# a build using a system Rust sysroot cannot reach //build/rust/crubit at all.
++# `enable_cpp_api_from_rust` is already false in exactly that configuration.
++_use_cbor_rust = !is_cronet_build && enable_cpp_api_from_rust
++
+ buildflag_header("buildflags") {
+   header = "cbor_buildflags.h"
+ 
+   # TODO(crbug.com/535682335): Remove `USE_CBOR_RUST` buildflag entirely,
+   # unconditionally enable Rust CBOR parser, and drop `is_cronet_build` check
+   # once Cronet supports Crubit dependencies.
+-  flags = [ "USE_CBOR_RUST=!$is_cronet_build" ]
++  flags = [ "USE_CBOR_RUST=$_use_cbor_rust" ]
+ }
+ 
+ component("cbor") {
+   sources = [
+     "constants.h",
+     "diagnostic_writer.cc",
+@@ -34,13 +40,13 @@ component("cbor") {
+ 
+   deps = [
+     ":buildflags",
+     "//base",
+   ]
+ 
+-  if (!is_cronet_build) {
++  if (_use_cbor_rust) {
+     public_deps = [
+       "//build/rust/crubit",
+       "//components/cbor/rust:cbor_rust_bindings",
+     ]
+   }
+ }
