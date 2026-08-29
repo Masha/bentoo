@@ -6,9 +6,9 @@ EAPI=8
 LLVM_COMPAT=( {18..22} )
 PYTHON_COMPAT=( python3_{12..14} )
 
-inherit llvm-r1 meson python-any-r1
+inherit llvm-r2 meson python-any-r1
 
-PN="mesa"
+MY_PN="mesa"
 MY_PV="${PV/_/-}"
 
 DESCRIPTION="mesa_clc tool used for building OpenCL C to SPIR-V"
@@ -21,7 +21,7 @@ if [[ ${PV} == 9999 ]]; then
 else
 	GIT_COMMIT="4a7a29d007446f68ac6ac3633b58282fe99cd700"
 	S="${WORKDIR}/mesa-${GIT_COMMIT}"
-	SRC_URI="https://gitlab.freedesktop.org/${PN}/${PN}/-/archive/${GIT_COMMIT}/mesa-${GIT_COMMIT}.tar.gz -> ${PF}.tar.gz"
+	SRC_URI="https://gitlab.freedesktop.org/${MY_PN}/${MY_PN}/-/archive/${GIT_COMMIT}/mesa-${GIT_COMMIT}.tar.gz -> ${PF}.tar.gz"
 	KEYWORDS="~amd64 ~arm ~arm64 ~x86"
 fi
 
