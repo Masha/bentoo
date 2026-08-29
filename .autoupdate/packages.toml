@@ -551,7 +551,7 @@ pattern = 'Latest:\s*([0-9]+\.[0-9]+\.[0-9]+)'
 headers = { "User-Agent" = "Mozilla/5.0" }
 meta = { fetch_method = "post", fetch_url = "https://download.filezillapro.com/", fetch_serial_env = "FILEZILLA_PRO_KEY", fetch_serial_field = "key", fetch_filename = "filezilla-pro-{version}_x86_64-linux-gnu.tar.xz", fetch_form = "mail=&number=&platform=linux&platform_cli=win&platform_cli_nonpro=win&platform_fzpes=win&download_program=Start download of FileZilla Pro" }
 type = "bin"
-version = "3.70.5"
+version = "3.71.1"
 comments = """
 FileZilla Pro — version-history page's "Latest: X.Y.Z" is the current stable
 release (the h3 changelog list also includes -betaN, so anchor on "Latest:").
