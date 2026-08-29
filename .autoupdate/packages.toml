@@ -545,6 +545,7 @@ hplip-plugin — version tracks HPLIP; SourceForge RSS lists "hplip-X.Y.Z" newes
 # END
 
 ["net-ftp/filezilla-pro"]
+hold = true
 url = "https://filezillapro.com/filezilla-pro-version-history/"
 parser = "regex"
 pattern = 'Latest:\s*([0-9]+\.[0-9]+\.[0-9]+)'
