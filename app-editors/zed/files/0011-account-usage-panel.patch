@@ -34,11 +34,6 @@ does not render at all.
 Covered by seven unit tests in `acp_thread`, including the accumulate-not-replace
 regression and the percent normalisation.
 ---
- crates/acp_thread/src/acp_thread.rs           | 343 +++++++++++++++++-
- crates/agent_ui/src/agent_diff.rs             |   1 +
- crates/agent_ui/src/conversation_view.rs      |   9 +
- .../src/conversation_view/thread_view.rs      | 113 +++++-
- 4 files changed, 463 insertions(+), 3 deletions(-)
 
 diff --git a/crates/acp_thread/src/acp_thread.rs b/crates/acp_thread/src/acp_thread.rs
 index 194a528..41af005 100644
@@ -653,6 +648,3 @@ index ce9a342..d2433f8 100644
                  .when(
                      global_agents_md_loaded || project_rules_count > 0,
                      move |this| {
--- 
-2.55.0
-
