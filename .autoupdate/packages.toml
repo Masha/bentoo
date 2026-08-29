@@ -7,17 +7,21 @@
 # ebuild (Gentoo version rules: prefixes v/release-/ver-/version- stripped;
 # regex returns capture group 1 of the FIRST match on the raw body).
 #
-# 451 records — 314 regex, 137 json. 98 disabled (enabled = false),
-# 7 held (hold = true): dev-build/gn, dev-lang/{rust,rust-bin,rust-common,ghc},
-# sci-ml/stable-diffusion-cpp, sys-cluster/minikube. Recounted with tomllib on
-# 2026-08-24 by the one-liner below. The 96 -> 98 step is not new records: it is
-# dev-libs/icu-compat and media-libs/libjxl-compat getting their enabled = false
-# back, see below.
+# 456 records — 318 regex, 138 json. 99 disabled (enabled = false),
+# 11 held (hold = true): app-office/libreoffice@legacy,
+# app-office/libreoffice-l10n@legacy, dev-build/gn,
+# dev-lang/{rust,rust-bin,rust-common,ghc}, dev-python/tree-sitter,
+# net-ftp/filezilla-pro, sci-ml/stable-diffusion-cpp, sys-cluster/minikube.
+# Recounted with tomllib on 2026-08-29 by the one-liner below. The historical
+# 96 -> 98 step was not new records: it was dev-libs/icu-compat and
+# media-libs/libjxl-compat getting their enabled = false back, see below.
 #
-# These figures drift FAST — every one of them was wrong again one day after the
-# 2026-08-20 recount claimed 313/138/100/5 (and that one had corrected an even
-# older 508/310/198/18/3). Between the two recounts www-client/chromium left the
-# held set and the three dev-lang/rust* records joined it. Never trust the line
+# These figures drift FAST — the recount above replaces a 2026-08-24 one that
+# read 451/314/137/98/7 and was wrong five days later, which in turn had
+# replaced a 2026-08-20 recount claiming 313/138/100/5 that was wrong one day
+# later (and that one had corrected an even older 508/310/198/18/3). Between
+# the 08-20 and 08-24 recounts www-client/chromium left the held set and the
+# three dev-lang/rust* records joined it. Never trust the line
 # above; re-run the one-liner. It is kept only because a wrong count that is
 # CHECKABLE beats no count at all.
 #
@@ -25,6 +29,13 @@
 # gone": dev-libs/icu-compat and media-libs/libjxl-compat are pinned to an old
 # ABI on purpose, and a bump would destroy what they are for. Read their
 # comments before re-enabling either.
+#
+# Since 2026-08-29 both carry a TEXTUAL disabled_by. Reconciliation clears only
+# a disable it recorded itself — that is `disabled_by = "auto"`, which 95
+# records carry — so any other text freezes the entry and also stops the
+# "left N package(s) disabled" notice from naming it every run. Do NOT take that
+# notice's advice here: "auto" on these two would authorise the re-enable, both
+# ebuilds ARE present, and the next apply would repeat b165e5745 exactly.
 #
 # Those two are also the proof that enabled = false is not a gate. On
 # 2026-08-12 (b165e5745) a probe bumped both and the applier DELETED their
@@ -6897,6 +6908,36 @@ the article itself is behind Anubis. Check those, then drop suffix here, repoint
 """
 # END
 
+["app-office/libreoffice@legacy"]
+hold = true
+url = "https://downloadarchive.documentfoundation.org/libreoffice/old/"
+parser = "regex"
+pattern = 'href="([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)/"'
+select = "max"
+series = '^26\.2\.'
+version = "26.2.6.1"
+comments = """
+libreoffice (legacy line) — this record exists to GIVE THE 26.2.6.1 EBUILD AN
+OWNER, and for nothing else. Without it no entry claims that ebuild, so
+`bentoo overlay autoupdate --clean` lists it for deletion and the only thing
+holding the sweep back is the missing version pin on @testing — an accidental
+guard that evaporates the day 27.2 ships and @testing is re-enabled with a pin
+of its own.
+
+hold, NOT enabled = false: the ebuild IS in the overlay, and enabled is
+bookkeeping the checker flips by itself, so a false there gets reverted. hold is
+the maintainer decision "present, never auto-bump", which is exactly the intent
+here — the 26.2 line still receives point releases until it reaches EOL on
+2026-11-30, and the overlay deliberately keeps 26.2.6.1 frozen instead of
+following them.
+
+The fields mirror @stable so the record still probes correctly if the hold is
+ever lifted; series pins it to the line this ebuild belongs to. DELETE THIS
+RECORD when the 26.2.6.1 ebuild is dropped after EOL: a record claiming a
+version the overlay no longer ships is worse than no record at all.
+"""
+# END
+
 ["app-office/libreoffice-l10n@stable"]
 url = "https://downloadarchive.documentfoundation.org/libreoffice/old/"
 parser = "regex"
@@ -6944,6 +6985,23 @@ the check fails loudly instead of bumping the wrong ebuild. Same _pre marker and
 same promotion moment as app-office/libreoffice@testing — including the caveat
 recorded there: the promotion is invisible to this probe, so the marker comes off
 by hand.
+"""
+# END
+
+["app-office/libreoffice-l10n@legacy"]
+hold = true
+url = "https://downloadarchive.documentfoundation.org/libreoffice/old/"
+parser = "regex"
+pattern = 'href="([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)/"'
+select = "max"
+series = '^26\.2\.'
+version = "26.2.6.1"
+comments = """
+libreoffice-l10n (legacy line) — same purpose and same reasoning as
+app-office/libreoffice@legacy, which carries the full explanation: it owns the
+26.2.6.1 ebuild so the sweep stops reporting it as unclaimed, and it is held
+rather than disabled because the ebuild is present. Drop both records together
+when the 26.2 ebuilds are dropped after EOL on 2026-11-30.
 """
 # END
 
@@ -7780,15 +7838,33 @@ dev-build/gn documents.  While it stays as-is, auto-bumping is safe.
 # END
 
 ["sci-ml/sherpa-onnx"]
-url = "https://api.github.com/repos/k2-fsa/sherpa-onnx/releases/latest"
-parser = "json"
-path = "tag_name"
-transform = [['^v', ""]]
+url = "https://api.github.com/repos/k2-fsa/sherpa-onnx/tags?per_page=100"
+parser = "regex"
+pattern = '"name": ?"v([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 version = "1.13.6"
 comments = """
-sherpa-onnx — releases/latest; tag_name is "vX.Y.Z", transform strips the v.
-Verified by real download on 2026-08-16: tag_name "v1.13.5" (2026-08-11).
+sherpa-onnx — TAG list, highest "vX.Y.Z". This is the axis the ebuild itself
+consumes: SRC_URI takes archive/refs/tags/v${PV}.tar.gz, never a release asset.
+
+2026-08-29: releases/latest started answering the tag "tauri" (created
+2026-08-25) and the checker rightly reported it as non-comparable. Upstream
+publishes ASSET-ONLY releases out of the same tag space as the versioned ones —
+tauri, flutter, xcframework, vocoder-models, asr-models-qnn-* — and /latest is
+simply whichever release was created last, so it names a version only by luck.
+
+The release LIST (whisper-cpp's shape, tried first) is NOT usable here: each
+release carries hundreds of assets, so ?per_page=30 answers 13.7 MB and the
+checker refuses it — "response body too large: limit 10485760 bytes". Even
+per_page=10 is 4.3 MB for only three versioned tags. /tags is 41 KB for 100
+tags, 98 of them versioned.
+
+Known limit of reading tags: a tag exists the moment it is pushed, so a bump can
+be proposed before upstream publishes the matching release. Harmless here —
+the tarball is generated from the tag, so it is fetchable as soon as the tag is.
+Verified by real probe on 2026-08-29: highest vX.Y.Z is v1.13.6 (2026-08-18);
+the previous json/tag_name record was verified on 2026-08-16 against "v1.13.5".
 
 BUMPS ARE NOT MECHANICAL HERE.  Besides the main tarball, SRC_URI pins 16
 vendored dependencies by tag or full commit SHA, because upstream resolves them
@@ -8064,6 +8140,7 @@ the ref name, so a blind PV bump fails loudly rather than silently.
 
 ["dev-libs/icu-compat"]
 enabled = false
+disabled_by = "pinned to the ICU 77 ABI www-client/orion-bin needs — NEVER auto-enable: SLOT derives from the version, so a bump deletes the slot instead of updating it (b165e5745)"
 url = "https://api.github.com/repos/unicode-org/icu/releases/latest"
 parser = "json"
 path = "tag_name"
@@ -8096,6 +8173,7 @@ never renaming one of them.
 
 ["media-libs/libjxl-compat"]
 enabled = false
+disabled_by = "pinned to the libjxl 0.11 ABI www-client/orion-bin needs — NEVER auto-enable: same version-derived SLOT failure as dev-libs/icu-compat"
 url = "https://api.github.com/repos/libjxl/libjxl/releases/latest"
 parser = "json"
 path = "tag_name"
