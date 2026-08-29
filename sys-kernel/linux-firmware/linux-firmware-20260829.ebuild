@@ -8,7 +8,7 @@ inherit dist-kernel-utils eapi9-ver linux-info mount-boot savedconfig git-r3
 # The gitlab archive tarball is unreachable (Cloudflare), so fetch the exact
 # commit over git from kernel.org (shallow, no distfile/Manifest).
 EGIT_REPO_URI="https://git.kernel.org/pub/scm/linux/kernel/git/firmware/${PN}.git"
-EGIT_COMMIT="78d93c941b6a93a4cc429ed0a3c1aa8d29453339"
+EGIT_COMMIT="458e40fdbb4dad5134ec230a42df21aea1b5baf8"
 EGIT_CLONE_TYPE="shallow"
 
 KEYWORDS="~amd64 ~arm64"
