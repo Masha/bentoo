@@ -468,7 +468,7 @@ Vendor HTML / regex scraping
 url = "https://www.betterbird.eu/downloads/"
 parser = "regex"
 pattern = 'Current version:\s*Betterbird\s*([0-9]+\.[0-9]+\.[0-9]+)\s+ESR\s*\([^)]*esr-bb[0-9]+'
-version = "153.1.0"
+version = "153.2.0"
 comments = """
 Betterbird — anchor on the "Current version: Betterbird <ver> ESR (<ver>esr-bbNN, <date>)" label
 (not a bare "esr-bb" match): the page also lists "Previous/" archive links, so
