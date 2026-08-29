@@ -121,6 +121,7 @@ CRATES="
 	base64@0.22.1
 	base64ct@1.8.0
 	beef@0.5.2
+	betlang@0.1.1
 	bigdecimal@0.4.8
 	bincode@1.3.3
 	bindgen@0.71.1
@@ -383,6 +384,7 @@ CRATES="
 	fax@0.2.6
 	fax_derive@0.2.0
 	fdeflate@0.3.7
+	fearless_simd@0.4.1
 	ff@0.12.1
 	filedescriptor@0.8.3
 	filetime@0.2.29
