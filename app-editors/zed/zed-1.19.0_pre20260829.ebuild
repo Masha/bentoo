@@ -1725,6 +1725,15 @@ src_prepare() {
 			# forwards under _meta["_claude/rateLimit"] and Zed discarded. Rides
 			# this flag by dependency: no other agent sends that key.
 			"${FILESDIR}/0011-account-usage-panel.patch"
+			# 0012: a "Worktrees" entry in the agent panel menu, dispatching the
+			# existing zero-arg zed_actions::git::Worktree so the picker chooses
+			# between creating a worktree and switching to one. Zed ships
+			# worktrees end to end and the panel already reaches them -- but only
+			# under request.use_new_worktree, an input of the create_thread AGENT
+			# TOOL, so the model could open one and the user could not. It applies
+			# to the packaged source on its own, so like 0010 it rides this flag
+			# by choice rather than by dependency.
+			"${FILESDIR}/0012-agent-panel-worktree-entry.patch"
 		)
 	fi
 
