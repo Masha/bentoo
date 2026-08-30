@@ -576,6 +576,38 @@ hplip-plugin — version tracks HPLIP; SourceForge RSS lists "hplip-X.Y.Z" newes
 """
 # END
 
+["net-ftp/filezilla"]
+url = "https://dev.gentoo.org/~dlan/distfiles/filezilla/"
+parser = "regex"
+pattern = 'FileZilla_([0-9]+\.[0-9]+\.[0-9]+)_src\.tar\.xz'
+select = "max"
+version = "3.71.1"
+comments = """
+FileZilla (the free client) — this record probes a MIRROR, not the upstream
+project, and that is deliberate. filezilla-project.org publishes no fetchable
+source URL at all: https://download.filezilla-project.org/client/<file> answers
+307 -> the homepage (measured 2026-08-30), download.php serves its links through
+a token-signed CDN, and versions.php/changelog.php render no version string to a
+plain HTML reader. There is nothing on the vendor's side a parser can anchor on.
+
+What the mirror listing answers is the only question that matters here anyway:
+which tarball can actually be packaged. A version this record cannot see is a
+version nobody can fetch.
+
+select = "max" because the directory listing is name-ordered, not release-
+ordered, and regex otherwise returns capture group 1 of the FIRST match.
+
+Standing anomaly as of 2026-08-30: version is 3.71.1 while the mirror tops out
+at 3.71.0, so the probe reports the overlay as AHEAD. That is real, not a
+config fault — ::gentoo committed filezilla-3.71.1.ebuild that same day with a
+SRC_URI to a file the mirror has not published yet, and no Gentoo mirror carries
+it either. Both repositories ship an ebuild that cannot fetch. The anomaly
+clears itself the moment FileZilla_3.71.1_src.tar.xz lands in the listing; until
+then, treat an "up to date"/"ahead" verdict here as "the 3.71.1 distfile still
+does not exist", not as "nothing to do".
+"""
+# END
+
 ["net-ftp/filezilla-pro"]
 hold = true
 url = "https://filezillapro.com/filezilla-pro-version-history/"
