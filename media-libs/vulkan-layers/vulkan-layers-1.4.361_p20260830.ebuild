@@ -30,11 +30,11 @@ RESTRICT="!test? ( test ) test"
 # bentoo ships snapshots that bump on independent dates, so an exact pin can
 # never be satisfied. Floors on the companion snapshots keep the coupling the
 # pins exist to enforce. Raise them on every bump of any of the five.
-RDEPEND=">=dev-util/spirv-tools-1.4.357.0_p20260813[${MULTILIB_USEDEP}]"
+RDEPEND=">=dev-util/spirv-tools-1.4.357.0_p20260828-r1[${MULTILIB_USEDEP}]"
 DEPEND="${RDEPEND}
 	${PYTHON_DEPS}
 	>=dev-util/glslang-1.4.357.0_p20260813:=[${MULTILIB_USEDEP}]
-	>=dev-util/spirv-headers-1.4.357.0_p20260812
+	>=dev-util/spirv-headers-1.4.357.0_p20260826-r1
 	>=dev-util/vulkan-headers-1.4.360_p20260814
 	>=dev-util/vulkan-utility-libraries-1.4.360:=[${MULTILIB_USEDEP}]
 	wayland? ( dev-libs/wayland:=[${MULTILIB_USEDEP}] )

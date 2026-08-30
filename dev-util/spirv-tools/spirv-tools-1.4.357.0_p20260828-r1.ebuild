@@ -31,7 +31,14 @@ RESTRICT="!test? ( test )"
 # never be satisfied. The floor keeps the coupling the pin exists to enforce:
 # core_tables_body.inc is generated from grammar files that only newer
 # spirv-headers ship (obentoo/bentoo#37). Raise it on every spirv-headers bump.
-DEPEND=">=dev-util/spirv-headers-1.4.357.0_p20260812"
+#
+# -r1: no source change, same EGIT_COMMIT. The rebuild is the point --
+# core_tables_body.inc is generated at build time from the grammar the header
+# package installs, so a spirv-headers bump silently leaves an already-merged
+# spirv-tools generating tables for the OLD grammar. Raising the floor alone
+# does not recompile anything; the revision is what makes portage do it.
+# Here it picks up SPV_QCOM_subgroup_size from spirv-headers-1.4.357.0_p20260826-r1.
+DEPEND=">=dev-util/spirv-headers-1.4.357.0_p20260826-r1"
 # RDEPEND=""
 BDEPEND="${PYTHON_DEPS}"
 
