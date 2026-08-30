@@ -466,7 +466,7 @@ transform strips the "go" prefix to match PV. Live=1.26.5.
 url = "https://persistent.oaistatic.com/codex-app-prod/linux/deb/dists/stable/main/binary-amd64/Packages"
 parser = "regex"
 pattern = 'Package: chatgpt\nVersion: ([0-9]+\.[0-9]+\.[0-9]+)'
-version = "26.825.41651"
+version = "26.825.51511"
 comments = """
 OpenAI Codex/ChatGPT desktop app — read the APT index of the very repo that
 SRC_URI pulls from. Both openai.com and chatgpt.com sit behind Cloudflare and
