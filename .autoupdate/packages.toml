@@ -309,6 +309,27 @@ itself has no Cloudflare challenge, so SRC_URI fetches fine under portage's wget
 """
 # END
 
+["app-misc/tmux"]
+url = "https://api.github.com/repos/tmux/tmux/releases/latest"
+parser = "json"
+path = "tag_name"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "3.7c"
+comments = """
+tmux - GitHub release tag, a bare version with no "v" prefix.
+
+Point releases carry a letter suffix (3.7 -> 3.7a -> 3.7b -> 3.7c). That is a
+valid Gentoo version component and it sorts in the same order upstream intends,
+so the tag needs no rewriting.
+
+releases/latest rather than ranking refs/tags: upstream has historically tagged
+release candidates in the same tag space (the ::gentoo ebuild still guards
+KEYWORDS with [[ ${PV} != *_rc* ]]), and ranking tags would promote one. No _rc
+tag appears in the most recent 100 as of 2026-08-29, but the endpoint costs
+nothing and closes the hole permanently.
+"""
+# END
+
 ["app-office/obsidian"]
 url = "https://raw.githubusercontent.com/obsidianmd/obsidian-releases/HEAD/desktop-releases.json"
 parser = "json"

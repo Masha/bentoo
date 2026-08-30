@@ -1,0 +1,27 @@
+#!/sbin/openrc-run
+# Copyright 1999-2026 Gentoo Authors
+# Distributed under the terms of the GNU General Public License v2
+
+# USER-SCOPE service, installed to /etc/user/init.d and started by openrc-user
+# as the logged-in user -- never by the system init.  It is the OpenRC
+# counterpart of the tmux@.service/tmux@.socket user units this package
+# installs under USE=systemd, and unlike them it is installed unconditionally:
+# a systemd user loses nothing by having it on disk, and it is the only way to
+# have a persistent tmux server on a host that does not run systemd at all.
+#
+# The systemd unit is socket-activated (tmux@.socket listens on
+# /tmp/tmux-%U/%i).  OpenRC has no socket activation, so the server is simply
+# started up front; tmux creates the same socket itself on startup, so a client
+# finds it at the usual path either way.
+#
+# supervise-daemon, not start-stop-daemon: "tmux -D" deliberately does NOT
+# daemonise -- it is the mode the systemd unit uses -- so something has to stay
+# around and own the process.
+
+supervisor=supervise-daemon
+command="/usr/bin/tmux"
+command_args="-D ${TMUX_OPTS:--L default}"
+
+depend() {
+	after dbus
+}

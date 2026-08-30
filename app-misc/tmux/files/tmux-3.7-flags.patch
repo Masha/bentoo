@@ -1,0 +1,34 @@
+Do not let tmux pick the optimisation and debug level itself; that is what
+CFLAGS is for and the ebuild already handles it (see the replace-flags call for
+bug 438558).
+
+This is app-misc/tmux/files/tmux-2.4-flags.patch from ::gentoo, rebased. The
+old patch dropped "-O2" from an "AM_CFLAGS += -std=gnu99 -O2" line and a bare
+"AM_CFLAGS += -g".  Upstream has since moved both: the optimisation level now
+sits behind the IS_OPTIMIZED conditional, and -g became "-g3 -ggdb" under
+IS_DEBUG.  The old hunk therefore no longer applies, but the reason for it did
+not go away -- IS_OPTIMIZED defaults to yes (configure.ac, enable_optimizations=yes),
+so an unpatched build still appends its own -O2.
+
+--disable-optimizations is not a substitute: the else branch of that same
+conditional appends -O0, which is strictly worse.
+
+Removing the whole conditional leaves AM_CONDITIONAL(IS_OPTIMIZED) defined and
+unused, which automake accepts (only the reverse, used-but-undefined, is an
+error).
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -21,13 +21,7 @@
+ # Set flags for gcc.
+ if IS_GCC
+ AM_CFLAGS += -std=gnu99
+-if IS_OPTIMIZED
+-AM_CFLAGS += -O2
+-else
+-AM_CFLAGS += -O0
+-endif
+ if IS_DEBUG
+-AM_CFLAGS += -g3 -ggdb
+ AM_CFLAGS += -Wno-long-long -Wall -W -Wformat=2 -Wno-use-after-free
+ AM_CFLAGS += -Wmissing-prototypes -Wstrict-prototypes -Wmissing-declarations
+ AM_CFLAGS += -Wwrite-strings -Wshadow -Wpointer-arith -Wsign-compare
