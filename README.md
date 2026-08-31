@@ -2,6 +2,8 @@
 
 Bentōō is an initiative to distribute an user-friendly version of Gentoo linux Stage[5] to new users, with more updated packages, focusing on agility, security, privacy and games.
 
+Telegram: https://t.me/bentoolinux
+
 ## Overlays
 
 ### eselect repository
