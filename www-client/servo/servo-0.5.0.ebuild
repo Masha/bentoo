@@ -28,9 +28,11 @@ inherit cargo desktop xdg
 DESCRIPTION="A web browser engine written in Rust (servoshell tech demo)"
 HOMEPAGE="https://servo.org/ https://github.com/servo/servo"
 
-# NOTE: upstream dropped the "v" prefix from both the release tag and the
-# vendored asset name starting with 0.4.0 (v0.3.0/servo-v0.3.0-... -> 0.4.0/servo-0.4.0-...).
-SRC_URI="https://github.com/servo/servo/releases/download/${PV}/${P}-src-vendored.tar.gz"
+# NOTE: upstream dropped the "v" prefix from both the release tag and the vendored
+# asset name at 0.4.0 (v0.3.0/servo-v0.3.0-... -> 0.4.0/servo-0.4.0-...), then
+# restored it at 0.5.0 (v0.5.0/servo-v0.5.0-...).
+MY_P="${PN}-v${PV}"
+SRC_URI="https://github.com/servo/servo/releases/download/v${PV}/${MY_P}-src-vendored.tar.gz"
 S="${WORKDIR}"
 
 # Servo itself is MPL-2.0. The vendored crates and the bundled SpiderMonkey carry
