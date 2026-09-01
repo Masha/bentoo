@@ -1,8 +1,8 @@
 diff --git a/Cargo.lock b/Cargo.lock
-index 053c989..e05d2b8 100644
+index 386fac6..c648c58 100644
 --- a/Cargo.lock
 +++ b/Cargo.lock
-@@ -3111,6 +3111,31 @@ version = "0.7.6"
+@@ -3113,6 +3113,31 @@ version = "0.7.6"
  source = "registry+https://github.com/rust-lang/crates.io-index"
  checksum = "a1d728cc89cf3aee9ff92b05e62b19ee65a02b5702cff7d5a377e32c6ae29d8d"
  
@@ -34,7 +34,7 @@ index 053c989..e05d2b8 100644
  [[package]]
  name = "cli"
  version = "0.1.0"
-@@ -22776,6 +22801,7 @@ dependencies = [
+@@ -22783,6 +22808,7 @@ dependencies = [
   "channel",
   "chrono",
   "clap",

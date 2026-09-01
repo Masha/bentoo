@@ -43,8 +43,6 @@ unconditional, so the entry is present in terminal mode too. `ContextMenu::actio
 renders the action's existing keybinding beside the label, which is most of the
 discoverability this is for.
 ---
- crates/agent_ui/src/agent_panel.rs | 5 +++++
- 1 file changed, 5 insertions(+)
 
 diff --git a/crates/agent_ui/src/agent_panel.rs b/crates/agent_ui/src/agent_panel.rs
 index 9435b3b..70fc53c 100644
@@ -65,6 +63,3 @@ index 9435b3b..70fc53c 100644
                              .action("Toggle Threads Sidebar", Box::new(ToggleWorkspaceSidebar));
  
                          if has_auth_methods || supports_logout {
--- 
-2.55.0
-
