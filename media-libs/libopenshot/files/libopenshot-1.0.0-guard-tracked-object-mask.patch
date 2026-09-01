@@ -1,0 +1,23 @@
+--- a/src/EffectBase.cpp	2026-08-18 03:00:44.000000000 -0300
++++ b/src/EffectBase.cpp	2026-09-01 11:51:43.242559748 -0300
+@@ -547,6 +547,7 @@
+ 	return scaled_mask;
+ }
+ 
++#ifdef USE_OPENCV
+ std::shared_ptr<QImage> EffectBase::TrackedObjectMask(std::shared_ptr<QImage> target_image, int64_t frame_number) const {
+ 	if (!target_image || target_image->isNull() || trackedObjects.empty())
+ 		return {};
+@@ -596,6 +597,12 @@
+ 		return {};
+ 	return mask_image;
+ }
++#else
++// TrackedObjectBBox is only compiled into the library when OpenCV is enabled
++// (OPENSHOT_CV_SOURCES), so referencing it unconditionally leaves libopenshot.so
++// with undefined symbols and breaks every downstream link.
++std::shared_ptr<QImage> EffectBase::TrackedObjectMask(std::shared_ptr<QImage>, int64_t) const { return {}; }
++#endif
+ 
+ void EffectBase::BlendWithMask(std::shared_ptr<QImage> original_image, std::shared_ptr<QImage> effected_image,
+ 							   std::shared_ptr<QImage> mask_image) const {
