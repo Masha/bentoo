@@ -78,6 +78,21 @@ src_unpack() {
 	use webapp && unpack "${WEBAPP_NODE_MODULES}"
 }
 
+# Rewrite one upstream CMake line, asserting the match first.  sed exits 0
+# when its pattern matches nothing, so a bare `sed ... || die` cannot tell
+# "rewritten" from "upstream moved the line".  That is not hypothetical here:
+# 11.5.2 moved the mbedtls probe from src/cpp/cli/CMakeLists.txt into the
+# top-level CMakeLists.txt, the rewrite below kept editing the old file, and
+# the package failed at configure time on every release from 11.5.2 to 11.8.1
+# without anything in the ebuild noticing.  Break loudly on the next move.
+lemonade_sed_cmake() {
+	local pattern=${1} replacement=${2} file=${3}
+
+	grep -qF "${pattern}" "${file}" ||
+		die "upstream no longer has \"${pattern}\" in ${file}; recheck the probe"
+	sed -i -e "s|${pattern}|${replacement}|" "${file}" || die
+}
+
 src_prepare() {
 	cmake_src_prepare
 
@@ -86,22 +101,40 @@ src_prepare() {
 	# calls that have no option() to turn them off, so the detection itself has
 	# to be neutralised or the build links them behind the USE flag's back.
 	if ! use systemd; then
-		sed -i -e 's/pkg_check_modules(SYSTEMD QUIET libsystemd)/set(SYSTEMD_FOUND FALSE)/' \
-			CMakeLists.txt || die
+		lemonade_sed_cmake \
+			'pkg_check_modules(SYSTEMD QUIET libsystemd)' \
+			'set(SYSTEMD_FOUND FALSE)' \
+			CMakeLists.txt
 	fi
 	if ! use caps; then
-		sed -i -e 's/pkg_check_modules(LIBCAP QUIET libcap)/set(LIBCAP_FOUND FALSE)/' \
-			CMakeLists.txt || die
+		lemonade_sed_cmake \
+			'pkg_check_modules(LIBCAP QUIET libcap)' \
+			'set(LIBCAP_FOUND FALSE)' \
+			CMakeLists.txt
 	fi
 
-	# mbedtls (HTTPS and digest verification in the CLI) is looked up under its
-	# upstream names, but Gentoo suffixes the slot onto everything it installs:
-	# mbedtls-3.pc / libmbedtls-3.so, headers under /usr/include/mbedtls3.  The
-	# probe therefore misses it and the fallback find_library() misses it too,
-	# so point pkg-config at the slotted module names instead.  Keep this in
-	# sync with the mbedtls slot in COMMON_DEPEND.
-	sed -i -e 's/pkg_check_modules(MBEDTLS QUIET mbedtls mbedx509 mbedcrypto)/pkg_check_modules(MBEDTLS QUIET mbedtls-3 mbedx509-3 mbedcrypto-3)/' \
-		src/cpp/cli/CMakeLists.txt || die
+	# mbedtls (HTTPS, and the SHA-256/SHA-1 digest check lemond runs over every
+	# model it downloads) is looked up under its upstream names, but Gentoo
+	# suffixes the slot onto everything it installs: mbedtls-3.pc /
+	# libmbedtls-3.so, headers under /usr/include/mbedtls3.  Point pkg-config at
+	# the slotted module names.  Keep in sync with the slot in COMMON_DEPEND.
+	lemonade_sed_cmake \
+		'pkg_check_modules(MBEDTLS QUIET mbedtls mbedx509 mbedcrypto)' \
+		'pkg_check_modules(MBEDTLS QUIET mbedtls-3 mbedx509-3 mbedcrypto-3)' \
+		CMakeLists.txt
+
+	# Close the hand-rolled fallback the probe drops into when pkg-config comes
+	# up empty.  It searches for <mbedtls/ssl.h> and libmbedtls.so, and the :3
+	# slot installs neither, so it can only ever match net-libs/mbedtls:0 -- the
+	# 2.28 series, which upstream's BRANCHES.md no longer lists as a supported
+	# LTS and which this package does not depend on.  Nothing downstream catches
+	# that: the CLI only calls mbedtls_md_*, which is ABI-stable across 2.28 and
+	# 3.6, so the mismatch compiles, links, and ships a :3= subslot guarding a
+	# library the binary never loads.  Make the configure fail instead.
+	lemonade_sed_cmake \
+		'find_library(MBEDTLS_LIBRARY NAMES mbedtls)' \
+		'set(MBEDTLS_LIBRARY MBEDTLS_LIBRARY-NOTFOUND)' \
+		CMakeLists.txt
 
 	# dev-cpp/cpp-httplib ships a CMake package config (httplib::httplib) but no
 	# pkg-config file, while upstream only probes httplib through

@@ -13,4 +13,4 @@ RESTRICT=!test? ( test )
 SLOT=0
 SRC_URI=https://github.com/lemonade-sdk/lemonade/archive/refs/tags/v11.8.1.tar.gz -> lemonade-11.8.1.tar.gz webapp? ( https://distfiles.obentoo.org/lemonade-webapp-node_modules-11.5.0.tar.xz )
 _eclasses_=toolchain-funcs	58a918e3a42d0156f010dcfd43725be5	flag-o-matic	fd3558f73f6503093adee69adf41020d	multiprocessing	45d0620f25c2f063ad6276ecd9ed9399	ninja-utils	d063ea1900a793f93eb095010d6d9156	xdg-utils	42869b3c8d86a70ef3cf75165a395e09	cmake	c54f532543a549f7318d6c49aaf8e953	multilib	fc812e8eb2170022c28272d80a1f9e77
-_md5_=827f6fa47636cc527313b0b28d75adff
+_md5_=61e0f529b32f0755b393905917a45354
