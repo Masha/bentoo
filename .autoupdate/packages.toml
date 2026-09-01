@@ -8386,3 +8386,25 @@ drop this hold, and bump normally. No hits mean the bump needs the patch
 rebased onto the new tree first.
 """
 # END
+
+["media-libs/nvidia-vaapi-driver"]
+url = "https://api.github.com/repos/elFarto/nvidia-vaapi-driver/releases/latest"
+parser = "json"
+path = "tag_name"
+transform = [['^v', ""]]
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "0.0.18"
+comments = """
+nvidia-vaapi-driver — releases/latest; tag_name is "v0.0.NN", transform strips
+the v.  Verified by real download on 2026-09-01: tag_name "v0.0.18", the same
+release named in html_url .../releases/tag/v0.0.18.
+
+Upstream tags releases and publishes them, so releases/latest is authoritative
+here -- there is no parallel channel that would make ranking /tags a better
+probe.  See feedback-github-latest-release-vs-tags for why /tags is the wrong
+default when one exists.
+
+This package lives in ::gentoo too, at 0.0.17.  bentoo carries it only to stay
+ahead; drop the ebuild and set enabled = false the day ::gentoo catches up.
+"""
+# END
