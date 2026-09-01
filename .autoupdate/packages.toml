@@ -179,7 +179,7 @@
 url = "https://registry.npmjs.org/@anthropic-ai/claude-code"
 parser = "json"
 path = "dist-tags.latest"
-version = "2.1.252"
+version = "2.1.257"
 comments = """
 claude-code — npm @anthropic-ai/claude-code; dist-tags.latest is the stable channel.
 
@@ -269,7 +269,7 @@ url = "https://api2.cursor.sh/updates/api/download/stable/linux-x64/cursor"
 parser = "json"
 path = "version"
 commit_sha_path = "commitSha"
-version = "3.18.9"
+version = "3.18.25"
 comments = """
 Cursor — official download API; "version" is the full version. commitSha is the
 per-release BUILD_ID embedded in SRC_URI; the applier substitutes it into the
@@ -296,7 +296,7 @@ path = "version"
 headers = { "User-Agent" = "Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0" }
 aux_var = "BUILD_ID"
 aux_pattern = 'Claude-([0-9a-f]{40})\.deb'
-version = "1.40609.0"
+version = "1.40609.1"
 comments = """
 Claude Desktop — official download API behind the claude.ai/download button
 ({"version","url"}). claude.ai sits behind Cloudflare: a plain curl/wget UA gets
