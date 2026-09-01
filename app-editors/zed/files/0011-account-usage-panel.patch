@@ -440,10 +440,10 @@ index 194a528..41af005 100644
      use anyhow::anyhow;
      use feature_flags::FeatureFlag as _;
 diff --git a/crates/agent_ui/src/agent_diff.rs b/crates/agent_ui/src/agent_diff.rs
-index 9995be3..6f7ae1d 100644
+index bef45ba..fcd278c 100644
 --- a/crates/agent_ui/src/agent_diff.rs
 +++ b/crates/agent_ui/src/agent_diff.rs
-@@ -1484,6 +1484,7 @@ impl AgentDiff {
+@@ -1465,6 +1465,7 @@ impl AgentDiff {
              AcpThreadEvent::TitleUpdated
              | AcpThreadEvent::StatusChanged
              | AcpThreadEvent::TokenUsageUpdated
