@@ -8408,3 +8408,126 @@ This package lives in ::gentoo too, at 0.0.17.  bentoo carries it only to stay
 ahead; drop the ebuild and set enabled = false the day ::gentoo catches up.
 """
 # END
+
+["net-libs/cppzmq"]
+url = "https://api.github.com/repos/zeromq/cppzmq/releases/latest"
+parser = "json"
+path = "tag_name"
+transform = [['^v', ""]]
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "4.11.0"
+comments = """
+cppzmq — releases/latest; tag_name is "vX.Y.Z", transform strips the v.
+Verified by real download on 2026-09-01: tag_name "v4.11.0", published
+2025-06-20.
+
+Header-only C++ binding for libzmq.  It exists in this overlay for exactly one
+reason: media-libs/libopenshot does #include <zmq.hpp> in ZmqLogger.h, and
+net-libs/zeromq does not install that header.  Measured with g++ on 2026-09-01:
+without cppzmq the include is a fatal error, with it the TU compiles.  Neither
+::gentoo nor any master ships this package.
+
+A bump must re-check IUSE=test against the tarball, not against this comment.
+4.10.0 tested with Catch2 v2 (<catch2/catch.hpp>) and 4.11.0 moved to v3
+(catch2/catch_all.hpp, Catch2::Catch2WithMain); since dev-cpp/catch keeps v2 and
+v3 in the same SLOT=0, a release that walks that back would silently demand a
+Catch2 downgrade.  4.11.0 also deleted the ENABLE_DRAFTS option, so do not
+reintroduce a drafts USE flag without grepping CMakeLists.txt for it first.
+"""
+# END
+
+["media-libs/libopenshot-audio"]
+url = "https://api.github.com/repos/OpenShot/libopenshot-audio/releases/latest"
+parser = "json"
+path = "tag_name"
+transform = [['^v', ""]]
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "1.0.0"
+comments = """
+libopenshot-audio — releases/latest; tag_name is "vX.Y.Z", transform strips the
+v.  Verified by real download on 2026-09-01: tag_name "v1.0.0", published
+2026-08-30.
+
+JUCE-based audio backend for media-libs/libopenshot, which requires it with
+find_package(OpenShotAudio 1.0.0 REQUIRED).  The three OpenShot repositories
+release in lockstep -- openshot-qt v4.0.0, libopenshot v1.0.0 and
+libopenshot-audio v1.0.0 were all published within four seconds of each other on
+2026-08-30 -- so treat a bump here as a bump of the whole set and check the
+other two records before applying just one.
+
+A bump must re-read PROJECT_SO_VERSION in CMakeLists.txt: it is 10 today and the
+ebuild encodes it as SLOT="0/10".  The applier does not touch SLOT, so a soname
+change would silently leave revdeps un-rebuilt against a new ABI.
+"""
+# END
+
+["media-libs/libopenshot"]
+url = "https://api.github.com/repos/OpenShot/libopenshot/releases/latest"
+parser = "json"
+path = "tag_name"
+transform = [['^v', ""]]
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "1.0.0"
+comments = """
+libopenshot — releases/latest; tag_name is "vX.Y.Z", transform strips the v.
+Verified by real download on 2026-09-01: tag_name "v1.0.0", published
+2026-08-30.
+
+Releases in lockstep with libopenshot-audio and openshot-qt; bump the three
+together.
+
+Two things a bump MUST re-verify by hand, because the applier only rewrites the
+version and both failures are silent:
+
+1. PROJECT_SO_VERSION (31 today) backs SLOT="0/31".
+
+2. The two patches in files/ are version-named, so the applier will NOT rename
+   them and the ebuild will die on a missing FILESDIR entry -- which is the good
+   outcome.  The bad outcome is renaming them without re-testing.  Both encode
+   upstream state that a release can change:
+   - guard-tracked-object-mask: EffectBase::TrackedObjectMask() calls
+     TrackedObjectBBox methods without the #ifdef USE_OPENCV guard that
+     Clip.cpp and Timeline.cpp have.  Since TrackedObjectBBox.cpp only enters
+     the build via OPENSHOT_CV_SOURCES, USE=-opencv otherwise yields a
+     libopenshot.so with undefined symbols (verified with nm -DC) and every
+     downstream link fails.  Upstream bug; drop the patch when it lands there.
+   - opencv5-cxx20: this overlay ships media-libs/opencv-5.0.0 and opencv is
+     SLOT="0/${PV}", so 4 and 5 cannot coexist -- upstream's
+     find_package(OpenCV 4) rejects the 5.  The patch also raises
+     CMAKE_CXX_STANDARD to 20, which abseil/protobuf 7.x requires; note that
+     -DCMAKE_CXX_STANDARD=20 on the command line does NOT work, the set() in
+     CMakeLists.txt wins.  Beware the diagnosis trap: in C++17 the abseil
+     headers fail to parse and emit ~690 errors that read as OpenCV errors
+     ("cv::boundingRect is not a member").  Fix the standard first.
+"""
+# END
+
+["media-video/openshot"]
+url = "https://api.github.com/repos/OpenShot/openshot-qt/releases/latest"
+parser = "json"
+path = "tag_name"
+transform = [['^v', ""]]
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "4.0.0"
+comments = """
+openshot — releases/latest on the openshot-qt repository; tag_name is "vX.Y.Z",
+transform strips the v.  Verified by real download on 2026-09-01: tag_name
+"v4.0.0", published 2026-08-30.  Note PN is openshot but the repository, the
+tarball and S are all openshot-qt.
+
+Releases in lockstep with libopenshot and libopenshot-audio; bump the three
+together.
+
+::gentoo last-rited this package on 2024-03-26 and removed it on 2024-05-08
+(bug #909996) for two stated reasons: deprecated distutils-r1 API and a
+dev-qt/qtwebengine:5 dependency.  The 4.x series resolves both -- verified on
+2026-09-01 that grep -rn WebEngine src/ returns zero hits and the tree contains
+no .html at all, the timeline having been rewritten in native Qt.  If a future
+release reintroduces a web engine, that is a reason to stop bumping, not to
+paper over.
+
+dev-python/pyqt6[scxml] is load-bearing and easy to lose on a bump: qt_api.py
+aborts the launch with "PyQt6 QtStateMachine module not available" without it,
+and scxml is not default-on in pyqt6.
+"""
+# END

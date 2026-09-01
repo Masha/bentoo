@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>otakugeekx@gmail.com</email>
+		<name>Lucas Couto</name>
+	</maintainer>
+	<longdescription lang="en">
+		OpenShot Audio Library (libopenshot-audio) is the audio engine behind
+		the OpenShot video editor. It is a curated subset of the JUCE
+		framework (audio basics, devices, formats, core, data structures, DSP
+		and events) packaged as a standalone shared library, exporting the
+		CMake target OpenShot::Audio that media-libs/libopenshot links
+		against. It provides audio device I/O, sample-rate conversion,
+		resampling, mixing, buffering and decoding of common audio formats, so
+		that the video pipeline can play back and render synchronized audio.
+		On Linux it drives ALSA. A small demo player, openshot-audio-demo, is
+		installed as a smoke test for the library. The JUCE sources are
+		vendored upstream in JuceLibraryCode/ and are built from that bundled
+		copy: JUCE is consumed as source modules by design and there is no
+		system JUCE this library can be built against.
+	</longdescription>
+	<use>
+		<flag name="doc">Build the Doxygen API documentation for the library.
+			Upstream enables this by default; here it is opt-in so that
+			installing the library does not pull in
+			<pkg>app-text/doxygen</pkg> and Graphviz.</flag>
+	</use>
+	<upstream>
+		<remote-id type="github">OpenShot/libopenshot-audio</remote-id>
+		<bugs-to>https://github.com/OpenShot/libopenshot-audio/issues</bugs-to>
+		<doc>https://openshot.org/files/libopenshot-audio/</doc>
+	</upstream>
+</pkgmetadata>

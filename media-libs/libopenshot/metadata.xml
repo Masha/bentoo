@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>otakugeekx@gmail.com</email>
+		<name>Lucas Couto</name>
+	</maintainer>
+	<longdescription lang="en">
+		libopenshot is the C++ video editing engine behind OpenShot Video Editor.
+		It composes a timeline of clips, transitions and effects on top of FFmpeg
+		for decoding and encoding, JUCE (via libopenshot-audio) for audio, and Qt
+		for image compositing and text rendering. SWIG bindings expose the whole
+		API to Python and Ruby, which is how the OpenShot application drives it.
+		Optional backends add ImageMagick image handling, babl-based advanced
+		chroma keying, OpenCV motion tracking and object detection, and Wayland
+		screen capture through xdg-desktop-portal and PipeWire.
+	</longdescription>
+	<use>
+		<flag name="babl">Use <pkg>media-libs/babl</pkg> for the advanced chroma key colourspace conversions</flag>
+		<flag name="imagemagick">Use <pkg>media-gfx/imagemagick</pkg> for image reading and writing</flag>
+		<flag name="opencv">Build the OpenCV effects: motion tracking, stabilization and object detection</flag>
+		<flag name="ruby">Build the SWIG Ruby bindings</flag>
+		<flag name="wayland">Build the screen capture module using xdg-desktop-portal and <pkg>media-video/pipewire</pkg></flag>
+	</use>
+	<upstream>
+		<bugs-to>https://github.com/OpenShot/libopenshot/issues</bugs-to>
+		<remote-id type="github">OpenShot/libopenshot</remote-id>
+	</upstream>
+</pkgmetadata>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>otakugeekx@gmail.com</email>
+		<name>Lucas Couto</name>
+	</maintainer>
+	<longdescription lang="en">
+		cppzmq is the official header-only C++ binding for libzmq (ZeroMQ). It
+		maps the libzmq C API to C++ concepts: type-safe handles instead of
+		void*, exception-based error handling instead of errno, and RAII
+		classes that release contexts, sockets and messages automatically.
+		Only two headers are installed, zmq.hpp (direct mappings of the C API)
+		and zmq_addon.hpp (higher-level helpers such as multipart messages),
+		together with a pkg-config file and the CMake package files that make
+		find_package(cppzmq) work. Because it is header-only nothing is
+		compiled here: the code becomes part of whatever links against libzmq.
+	</longdescription>
+	<upstream>
+		<bugs-to>https://github.com/zeromq/cppzmq/issues</bugs-to>
+		<remote-id type="github">zeromq/cppzmq</remote-id>
+	</upstream>
+</pkgmetadata>

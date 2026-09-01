@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@proton.me</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<longdescription lang="en">
+		OpenShot is a non-linear video editor built on libopenshot: multiple
+		tracks, keyframe animation, transitions, chroma-key and title
+		generation, driven from a Qt desktop interface.
+
+		This package was last-rited from ::gentoo in 2024 (bug #909996) for two
+		reasons, both of which the 4.x series removes: the ebuild used the
+		deprecated distutils-r1 API, and the timeline was rendered inside
+		dev-qt/qtwebengine:5. Release 4.0.0 rewrote the timeline in native Qt —
+		there is not a single WebEngine reference or .html asset left under
+		src/ — so no qtwebengine dependency is declared here.
+
+		Two dependencies are deliberately not declared. dev-python/sentry-sdk
+		drives crash reporting and is absent from ::gentoo; the application logs
+		that it is disabled and runs normally without it, and telemetry should
+		be something a user opts into rather than something a dependency graph
+		installs. The ComfyUI integration new in 4.0.0 probes a local endpoint
+		at runtime and degrades silently when nothing answers, so it needs no
+		build-time dependency either.
+
+		One dependency is less obvious than it looks: dev-python/pyqt6 must be
+		built with USE=scxml. The application drives its UI with QStateMachine
+		in 26 places, and pyqt6 only builds that binding — and pulls
+		dev-qt/qtscxml — when scxml is enabled. Without it the launcher aborts
+		with "PyQt6 QtStateMachine module not available".
+	</longdescription>
+	<upstream>
+		<remote-id type="github">OpenShot/openshot-qt</remote-id>
+		<bugs-to>https://github.com/OpenShot/openshot-qt/issues</bugs-to>
+		<doc>https://www.openshot.org/user-guide/</doc>
+	</upstream>
+</pkgmetadata>
