@@ -973,7 +973,6 @@ CRATES="
 	schemars_derive@1.0.4
 	scoped-tls@1.0.1
 	scopeguard@1.2.0
-	scratch@1.0.9
 	screencapturekit-sys@0.2.8
 	screencapturekit@0.2.8
 	scroll@0.12.0
@@ -1577,7 +1576,7 @@ declare -A GIT_CRATES=(
 	[zed-xim]='https://github.com/zed-industries/xim-rs;16f35a2c881b815a2b6cdfd6687988e84f8447d8;xim-rs-%commit%'
 )
 
-EGIT_COMMIT="5e28272c1407ced4bae4a90deaea25352a1fbc96"
+EGIT_COMMIT="d3e54c97f4e22c77de7057f010c600d180e15ee6"
 LLVM_COMPAT=( 22 )
 RUST_MIN_VER="1.97.1"
 RUST_NEEDS_LLVM=1

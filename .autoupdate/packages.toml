@@ -1898,7 +1898,7 @@ base_from = "file"
 base_url = "https://api.github.com/repos/zed-industries/zed/contents/crates/zed/Cargo.toml?ref=main"
 base_pattern = '(?m)^version = "([0-9][0-9.]*)"'
 headers = { "User-Agent" = "bentoo-autoupdate", "Accept" = "application/vnd.github.raw" }
-version = "1.19.0_pre20260901"
+version = "1.19.0_pre20260901-r1"
 comments = """
 zed — commit-tracked on main; _pre suffix preserved from current ebuild.
 2026-08-06: 2 commits landed same UTC day (d61e80b -> 6b2aa1c), so the date
@@ -1957,6 +1957,25 @@ carries no sed, being GIT_CRATES-only. WEBRTC_TAG in the new livekit rev is
 still webrtc-0001d84-4, so WEBRTC_COMMIT is unchanged. All eleven sed patterns
 verified at exactly one match against the new Cargo.toml, and all eight patches
 applied clean with no rebase.
+2026-09-01: second same-day bump (5e28272c 19:34 -> d3e54c97 19:59 UTC), so
+-r1 again rather than a new date. Cargo.lock moved by only +2/-0 -- `ollama`
+became a dependency of the workspace-local edit_prediction crate and `log` a
+feature of wayland-backend -- so no crate version or source changed, and
+pycargoebuild reproduced GIT_CRATES and the LICENSE block byte-identically.
+It did drop scratch@1.0.9 from CRATES, and that is correct: upstream now
+carries `[patch.crates-io] scratch = { path = "corgi-patches/scratch" }` (corgi
+needs each crate to get its own OUT_DIR, which the published scratch bakes in at
+build time), so the crate comes from the source tree and the CRATES entry had
+been fetching an unused .crate ever since. No sed is needed for it -- the patch
+is already a path.
+Verified before publishing: the seven `local *_COMMIT` values all still resolve
+against the new Cargo.lock, each of the eleven sed patterns matched the new
+Cargo.toml exactly once, and running the eleven left zero [patch.crates-io]
+entries pointing at git -- the check that the 08-20/08-23/08-25 defects failed.
+All ten patches applied sequentially at fuzz zero (-F0); 0011, 0012 and 0002
+carry line offsets only, so no rebase was needed. md5-cache _md5_ matches the
+ebuild, and pkgcheck reports only the two findings the published ebuild already
+had (deprecated llvm-r1, one over-long line in src_prepare).
 """
 # END
 
