@@ -54,11 +54,18 @@ SRC_URI+="
 # sandbox cannot clone (--wrap-mode nodownload).  It cannot become a system
 # dependency either: upstream installs nothing and ships no pkg-config file,
 # it only *generates* headers at build time, so the subproject fallback is the
-# only consumable form.  Keep VENUS_PROTOCOL_COMMIT in sync with the
-# "revision" field of that wrap file on every bump; src_unpack hard-fails when
-# it drifts, because meson only checks the *declared* version of whatever is on
-# disk (== 1.1 here) and a stale pin silently builds against wrong headers.
-VENUS_PROTOCOL_COMMIT="e94b12f301b9eb27ebead757128a18420b4f7994"
+# only consumable form.  Keep VENUS_PROTOCOL_REV in sync with the "revision"
+# field of that wrap file on every bump; src_unpack hard-fails when it drifts,
+# because meson only checks the *declared* version of whatever is on disk
+# (== 1.1.1 here) and a stale pin silently builds against wrong headers.
+#
+# The wrap pins by tag since 26.3.0_pre20260901 (it used to name a bare sha),
+# so the two are separate variables: REV is whatever the wrap literally says
+# and is what the drift check compares against, COMMIT is the sha that tag
+# resolved to.  SRC_URI must fetch the sha -- a tag can be moved upstream, and
+# a moved tag would change the distfile under a Manifest that still verifies.
+VENUS_PROTOCOL_REV="v1.1.1"
+VENUS_PROTOCOL_COMMIT="efc6903b07634d9df85ed067feea24d2dd77acb2"
 VENUS_PROTOCOL_P="venus-protocol-${VENUS_PROTOCOL_COMMIT}"
 # Only the virtio Vulkan driver needs it (with_virtio_vk in meson.build).
 SRC_URI+="
@@ -226,8 +233,27 @@ src_unpack() {
 		vn_rev=$(sed -n 's/^[[:space:]]*revision[[:space:]]*=[[:space:]]*//p' \
 			"${vn_wrap}") || die
 		[[ -n ${vn_dir} ]] || die "no 'directory' field in ${vn_wrap}"
-		[[ ${vn_rev} == "${VENUS_PROTOCOL_COMMIT}" ]] ||
-			die "VENUS_PROTOCOL_COMMIT is stale: the wrap wants ${vn_rev}"
+		[[ ${vn_rev} == "${VENUS_PROTOCOL_REV}" ]] ||
+			die "VENUS_PROTOCOL_REV is stale: the wrap wants ${vn_rev}"
+
+		# Agreeing with "revision" is not proof the pinned sha carries the
+		# right headers now that the wrap names a tag: a tag can be moved, and
+		# VENUS_PROTOCOL_COMMIT is resolved by hand at bump time.  Compare what
+		# the subproject declares against what mesa demands, which is the check
+		# that actually matters.  meson would catch it too, but only as the
+		# generic "Subproject venus-protocol is buildable: NO".
+		local vn_want vn_have
+		vn_want=$(sed -n "/dependency('venus-protocol'/,/^[[:space:]]*)/{
+			s/^[[:space:]]*version[[:space:]]*:[[:space:]]*'==[[:space:]]*\([0-9.]\+\)'.*/\1/p
+		}" "${S}/meson.build") || die
+		vn_have=$(sed -n "/^project(/,/^)/{
+			s/^[[:space:]]*version:[[:space:]]*'\([0-9.]\+\)'.*/\1/p
+		}" "${WORKDIR}/${VENUS_PROTOCOL_P}/meson.build") || die
+		[[ -n ${vn_want} ]] || die "no venus-protocol version constraint in ${S}/meson.build"
+		[[ -n ${vn_have} ]] || die "no project() version in the venus-protocol tarball"
+		[[ ${vn_want} == "${vn_have}" ]] ||
+			die "VENUS_PROTOCOL_COMMIT declares ${vn_have}, mesa requires ${vn_want}"
+
 		mv "${WORKDIR}/${VENUS_PROTOCOL_P}" "${S}/subprojects/${vn_dir}" || die
 	fi
 
