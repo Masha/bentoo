@@ -1326,6 +1326,63 @@ headers = { "User-Agent" = "bentoo-autoupdate" }
 version = "202608"
 comments = """
 edk2 — tag "edk2-stableYYYYMM"; regex captures the 6-digit datestamp.
+
+THIS RECORD COVERS PV ONLY. The ebuild pins a second, independent release
+train: SBO_VER, the Microsoft secureboot_objects version supplying the signed
+DBXUpdate.bin blobs (the Secure Boot revocation list). No field here can reach
+it — aux_pattern is documented in bentoolkit's config.go as applied to the SAME
+response body as the version probe, and the DBX lives in another repository;
+there is no aux_url, and base_url resolves a snapshot's base version instead.
+So this record reports "up to date" while the revocation list rots, which is
+exactly what happened: measured 2026-09-01, SBO_VER sat at 1.6.4 while v1.6.5
+had been out since 2026-07-07 and the amd64 blob had grown by 576 bytes of new
+revocations. Guarded instead by scripts/check-edk2-dbx-freshness.sh — run it
+after every bump. Bumping SBO_VER changes the DIST entries, so it needs a
+revbump plus a Manifest regeneration, never an in-place edit.
+"""
+# END
+
+["sys-firmware/edk2-bin"]
+enabled = false
+disabled_by = "auto"
+url = "https://dev.gentoo.org/~chewi/distfiles/"
+parser = "regex"
+pattern = 'edk2-([0-9]{6})-[0-9]+-qemu-x86_64\.xpak'
+select = "max"
+type = "bin"
+comments = """
+edk2-bin — NOT probed at tianocore. The distfiles are Gentoo binpkgs (.xpak)
+that chewi@ builds and hosts himself; upstream publishes no binaries at all, so
+github.com/tianocore/edk2 is HOMEPAGE only. Probing the source's own record
+(sys-firmware/edk2, GitHub releases) would report a datestamp months before the
+xpaks exist and emit an ebuild whose SRC_URI 404s.
+The directory listing is alphabetical, so select = "max" is load-bearing: the
+FIRST match is the oldest series still hosted (202511), not the newest.
+CAVEAT, measured 2026-09-01: matching x86_64 proves that ONE of the four
+targets landed, never all four. The upload order is not stable — 202511 began
+with loongarch64, 202602 put x86_64 two hours ahead of the rest, and 202608 sat
+at aarch64-only for hours. Before applying a bump, HEAD all four:
+  for a in aarch64 loongarch64 riscv64 x86_64; do curl -sI -o /dev/null \
+    -w "$a %{http_code}\n" \
+    "https://dev.gentoo.org/~chewi/distfiles/edk2-<VER>-1-qemu-$a.xpak"; done
+Anything but four 200s means the release is still landing — wait, do not drop
+targets from EDK2_QEMU_TARGETS.
+The "-1" in the filename is chewi's binpkg build number, not part of PV; it has
+been 1 for every release so far, and BINPKG in the ebuild hardcodes it.
+
+NOT IN THE OVERLAY as of 2026-09-01, hence enabled = false. The copy that was
+prepared here was byte-identical to ::gentoo's 202605 — `overlay prune` filed it
+under "Identical to ::gentoo — our copy holds nothing of ours" — and 202608
+could not be built on top of it: only the aarch64 xpak had landed, the other
+three still 404. The record survives the removal on purpose: its endpoint,
+select and type are VERIFIED (probed 2026-09-01, returned 202605 correctly), so
+whoever re-adds the package when the four xpaks land does not redo that work.
+disabled_by = "auto" so reconciliation re-enables it by itself once an ebuild
+reappears; do NOT replace it with free text, which would freeze the entry.
+type = "bin" is explicit because the -bin/RESTRICT heuristic misses this one:
+the xpaks hold guest firmware images (.fd), not host ELF, so the ebuild carries
+neither RESTRICT=strip nor QA_PREBUILT and was being counted under --only
+source. Measured 2026-09-01: without it, "Checked 1 source, 0 bin".
 """
 # END
 

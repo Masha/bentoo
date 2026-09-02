@@ -84,10 +84,16 @@ surfaces on a user's machine.
 | `gentoo-parity.sh [cat[/pkg]]` | names every axis on which a package diverges from its `::gentoo` counterpart; strictly read-only, writes reports under `.epic/` |
 | `check-slot-naming-contract.sh` | `net-libs/nodejs` and `app-eselect/eselect-nodejs` agree on where a slot lives |
 | `check-foldingathome-image.sh <ebuild>` | properties of the installed *image*, not of the ebuild text (loader fix + `RDEPEND` reconciliation) |
+| `check-edk2-dbx-freshness.sh` | `sys-firmware/edk2`'s `SBO_VER` still names the newest Secure Boot revocation list; exits `2`, not `1`, when the network is the problem |
 | `test-eselect-nodejs.sh` | slot ordering (`node9` vs `node10`) and directory replacement in the eselect module |
 
-`check-openrc-coverage.sh` and `gentoo-parity.sh` also take `--self-test`, which
+`check-openrc-coverage.sh`, `gentoo-parity.sh` and
+`check-edk2-dbx-freshness.sh` also take `--self-test`, which
 runs their assertions without touching the tree.
+
+`check-edk2-dbx-freshness.sh` is the only one that needs the network, which is
+why it is deliberately absent from `.git/hooks/pre-commit`: a guard that turns
+red offline is a guard people learn to skip. Run it in upstream sweeps.
 
 ## Working rules
 

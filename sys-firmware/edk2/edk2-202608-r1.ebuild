@@ -4,7 +4,7 @@
 EAPI=8
 
 PYTHON_REQ_USE="sqlite"
-PYTHON_COMPAT=( python3_{12..14} )
+PYTHON_COMPAT=( python3_{12..15} )
 
 inherit edo prefix python-any-r1 readme.gentoo-r1 secureboot toolchain-funcs
 
@@ -18,7 +18,7 @@ BUNDLED_MBEDTLS_SUBMODULE_SHA="0bebf8b8c7f07abe3571ded48a11aa907a1ffb20"
 BUNDLED_MIPI_SYS_T_SUBMODULE_SHA="370b5944c046bab043dd8b133727b2135af7747a"
 BUNDLED_OPENSSL_SUBMODULE_P="openssl-3.5.7"
 
-SBO_VER="1.6.4" # https://github.com/microsoft/secureboot_objects/releases
+SBO_VER="1.6.5" # https://github.com/microsoft/secureboot_objects/releases
 DBX_URI="https://github.com/microsoft/secureboot_objects/raw/refs/tags/v${SBO_VER}/PostSignedObjects/DBX/@ARCH@/DBXUpdate.bin -> @ARCH@_DBXUpdate_v${SBO_VER}.bin"
 
 SRC_URI="
