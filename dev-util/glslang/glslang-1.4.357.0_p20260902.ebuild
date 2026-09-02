@@ -38,19 +38,6 @@ BDEPEND="${PYTHON_DEPS}
 DEPEND=">=dev-util/spirv-tools-1.4.357.0_p20260813[${MULTILIB_USEDEP}]"
 RDEPEND="${DEPEND}"
 
-# BENTOO-DIVERGENCE: PATCHES - not in ::gentoo, which sits on the released tag
-# and never saw the offending commit. Upstream eaff806e (PR #4052, 2026-08-24)
-# made glslang emit the LocalSizeId execution mode from SPIR-V 1.2 instead of
-# 1.6, without declaring SPV_KHR_maintenance4 -- so the module it produces is
-# rejected by spirv-val under Vulkan. Breaks the whole ggml shader tree
-# (obentoo/bentoo#42). Because this package tracks main by commit, the patch
-# carries no version in its name: the autoupdate applier never renames files/.
-# Drop it -- do not rebase -- once upstream fixes the gate. See the patch
-# header for what is deliberately NOT reverted.
-PATCHES=(
-	"${FILESDIR}"/${PN}-revert-localsizeid-below-spv16.patch
-)
-
 multilib_src_configure() {
 	local mycmakeargs=(
 		-DENABLE_PCH=OFF
