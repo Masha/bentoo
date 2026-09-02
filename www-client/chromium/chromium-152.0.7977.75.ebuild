@@ -84,6 +84,11 @@ HOMEPAGE="https://www.chromium.org/"
 PPC64_HASH="7aae8a84e327fc2078ce1625c9c70bfda77d626f"
 PATCH_V="152"
 COPIUM_COMMIT="3c7e56fb4523b43b47595bb3a22f77178fc76293"
+# bentoo: gitlab.raptorengineering.com is serving 502 for the openpower archive,
+# so the ppc64? block also lists the Gentoo mirror copy. "cc/" is that mirror's
+# filename-hash bucket (BLAKE2B of the distfile name, first 2 hex chars);
+# pkgcore does not derive it from mirror://, so it is spelled out and must be
+# recomputed whenever PPC64_HASH changes.
 SRC_URI="https://github.com/chromium-linux-tarballs/chromium-tarballs/releases/download/${PV}/chromium-${PV}-linux.tar.xz
 	https://deps.gentoo.zip/www-client/chromium/rollup-wasm-node-${ROLLUP_VER}.tgz
 	https://gitlab.com/Matt.Jolly/chromium-patches/-/archive/${PATCH_V}/chromium-patches-${PATCH_V}.tar.bz2
@@ -102,6 +107,7 @@ SRC_URI="https://github.com/chromium-linux-tarballs/chromium-tarballs/releases/d
 	)
 	ppc64? (
 		https://gitlab.raptorengineering.com/raptor-engineering-public/chromium/openpower-patches/-/archive/${PPC64_HASH}/openpower-patches-${PPC64_HASH}.tar.bz2 -> chromium-openpower-${PPC64_HASH:0:10}.tar.bz2
+		https://distfiles.gentoo.org/distfiles/cc/chromium-openpower-${PPC64_HASH:0:10}.tar.bz2
 	)
 	pgo? ( https://github.com/elkablo/chromium-profiler/releases/download/v0.2/chromium-profiler-0.2.tar )"
 
