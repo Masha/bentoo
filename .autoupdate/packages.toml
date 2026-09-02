@@ -355,7 +355,7 @@ url = "https://dl.pstmn.io/api/version/latest?platform=linux64&channel=stable"
 parser = "json"
 path = "version"
 type = "bin"
-version = "12.26.1"
+version = "12.26.3"
 comments = """
 Postman — official version API; clean {"version":"..."}.
 """
@@ -466,7 +466,7 @@ transform strips the "go" prefix to match PV. Live=1.26.5.
 url = "https://persistent.oaistatic.com/codex-app-prod/linux/deb/dists/stable/main/binary-amd64/Packages"
 parser = "regex"
 pattern = 'Package: chatgpt\nVersion: ([0-9]+\.[0-9]+\.[0-9]+)'
-version = "26.831.20005"
+version = "26.831.21537"
 comments = """
 OpenAI Codex/ChatGPT desktop app — read the APT index of the very repo that
 SRC_URI pulls from. Both openai.com and chatgpt.com sit behind Cloudflare and
@@ -544,7 +544,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "2.1.2.2"
+version = "2.1.2.3"
 comments = """
 PixiEditor — GitHub releases (tag is 4-part bare version, e.g. 2.1.1.5).
 """
@@ -2109,7 +2109,7 @@ base_from = "file"
 base_url = "https://raw.githubusercontent.com/sqlitebrowser/sqlitebrowser/master/CMakeLists.txt"
 base_pattern = '(?m)^\s+VERSION ([0-9][0-9.]*)'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "3.13.99_p20260826"
+version = "3.13.99_p20260902"
 comments = """
 sqlitebrowser — commit-tracked on master (uses COMMIT= without quotes); date YYYYMMDD becomes _pDATE suffix.
 """
@@ -2169,7 +2169,7 @@ base_from = "tag"
 base_url = "https://api.github.com/repos/KhronosGroup/glslang/git/refs/tags"
 base_tag_pattern = '^vulkan-sdk-([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)$'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.357.0_p20260824-r1"
+version = "1.4.357.0_p20260902"
 comments = """
 glslang — commit-tracked on main; scans titles for vulkan-sdk-X.Y.Z.W to detect base bump.
 """
@@ -2280,7 +2280,7 @@ base_from = "file"
 base_url = "https://raw.githubusercontent.com/KhronosGroup/Vulkan-ValidationLayers/main/CMakeLists.txt"
 base_pattern = '(?m)^project\([A-Za-z_-]+ VERSION ([0-9][0-9.]*)'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.361_p20260901"
+version = "1.4.361_p20260902"
 comments = """
 vulkan-layers — commit-tracked on main (Vulkan-ValidationLayers); scans for "Update for Vulkan-Docs X.Y.Z".
 """
@@ -7279,7 +7279,7 @@ url = "https://api.github.com/repos/lucascouts/claude-agent-tui/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.11.1"
+version = "0.12.0"
 comments = """
 Renamed from dev-util/claude-agent-tui (commit e8a05fdc: del old ebuild + add
 claude-agent-acp-tui, same upstream repo lucascouts/claude-agent-tui, same PV).
@@ -7460,11 +7460,10 @@ must regenerate CRATES= (pycargoebuild). GitHub releases/latest agrees (tag 0.19
 # END
 
 ["media-libs/kquickimageeditor"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/libraries%2Fkquickimageeditor/repository/tags"
 parser = "json"
 path = "[0].name"
+version = "0.7.0.1"
 comments = """
 KDE invent tags API, [0]=newest. Tags are clean vX.Y.Z (leading v stripped). Live=v0.6.2.
 Watch for future beta/rc tags surfacing at [0]; fallback is regex over download.kde.org/stable listing.
@@ -7775,7 +7774,7 @@ url = "https://api.github.com/repos/telegramdesktop/tdesktop/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "7.1.3"
+version = "7.1.4"
 comments = """
 Telegram Desktop — GitHub releases/latest tag "vX.Y.Z" (v stripped). Verified
 2026-07-24: releases/latest correctly skips the beta prereleases upstream also
