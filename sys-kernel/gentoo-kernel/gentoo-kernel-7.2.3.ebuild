@@ -9,45 +9,15 @@ inherit kernel-build toolchain-funcs verify-sig
 
 BASE_P=linux-${PV%.*}
 PATCH_PV=${PV%_p*}
-# This ebuild runs AHEAD of ::gentoo, which has not opened the 7.2 series yet
-# (top dist-kernel is 7.1.10; patchsets/7.2/ does not exist upstream).  One
-# deliberate divergence from the official ebuild remains, and it MUST be
-# reverted once ::gentoo publishes a 7.2 dist-kernel:
-#
-#  1. PATCHSET is self-hosted.  It is the 7.1.9 dist-kernel patchset verbatim
-#     -- all 9 patches apply cleanly and in sequence to the 7.2.1 tree with
-#     zero rejects (re-verified for this bump), and the genpatches 7.1 and 7.2
-#     branches are byte-identical, so Gentoo added nothing new for this series.
-#     The tarball is renamed with a -bentoo suffix on purpose: reusing the
-#     upstream name would collide with the file Gentoo is about to publish, and
-#     a same-named distfile already in DISTDIR does not get its DIST entry
-#     recalculated by pkgdev manifest.  It keeps the 7.2.0 filename because the
-#     bytes are unchanged -- a second name for identical content would only add
-#     a redundant distfile.
-#
-# The 7.2.0 ebuild also had to drop patch-${PATCH_PV}.xz, because kernel.org
-# never publishes an incremental patch for a .0 release.  That no longer
-# applies: 7.2.1 has one, so the SRC_URI entry, the eapply call and the
-# verify-sig checksum entry are all back to their official form.
-#
-# CONFIG_VER intentionally lags at 7.1.9-gentoo: Fedora has no 7.2 config yet.
-# Measured cost on this tree via `make listnewconfig` after the merge: 88
-# symbols undecided, 61 of which resolve to n.  Of the 27 that resolve to y/m,
-# 14 are new KUNIT/self-test entries that CONFIG_KUNIT_ALL_TESTS=m would enable
-# under a 7.2 config too, and 5 are CONFIG_GENTOO_* -- those come from the
-# patchset's own distro/Kconfig and take their defaults regardless of how old
-# the Fedora config is.  That leaves ~8 substantive symbols (SCHED_CACHE,
-# KMALLOC_PARTITION_RANDOM, CMA_SIZE_PERNUMA, NET_VENDOR_ALIBABA and three
-# APPARMOR sub-options), all at the upstream default.
-PATCHSET=linux-gentoo-patches-7.2.0-bentoo
+PATCHSET=linux-gentoo-patches-7.1.9
 # https://koji.fedoraproject.org/koji/packageinfo?packageID=8
 # forked to git.gentoo.org:fork/fedora/kernel
-CONFIG_VER=7.1.9-gentoo
+CONFIG_VER=7.2.2-gentoo
 GENTOO_CONFIG_P=gentoo-kernel-config-g19
-SHA256SUM_DATE=20260827
+SHA256SUM_DATE=20260902
 # Debian kconfig commit from:
 # https://salsa.debian.org/kernel-team/linux/-/tree/debian/latest/debian/
-DEBIAN_COMMIT=2cf5b3f4c3ecd0ce83cd3d179b73821fb8707525
+DEBIAN_COMMIT=31e70f1f469ef1ce4c910df1d12b7de09da561d1
 
 DESCRIPTION="Linux kernel built with Gentoo patches"
 HOMEPAGE="
@@ -57,7 +27,7 @@ HOMEPAGE="
 SRC_URI+="
 	https://cdn.kernel.org/pub/linux/kernel/v$(ver_cut 1).x/${BASE_P}.tar.xz
 	https://cdn.kernel.org/pub/linux/kernel/v$(ver_cut 1).x/patch-${PATCH_PV}.xz
-	https://distfiles.obentoo.org/${PATCHSET}.tar.xz
+	https://distfiles.gentoo.org/pub/proj/dist-kernel/patchsets/$(ver_cut 1-2)/${PATCHSET}.tar.xz
 	https://gitweb.gentoo.org/proj/dist-kernel/gentoo-kernel-config.git/snapshot/${GENTOO_CONFIG_P}.tar.bz2
 	https://gitweb.gentoo.org/fork/fedora/kernel.git/snapshot/kernel-${CONFIG_VER}.tar.bz2
 	https://salsa.debian.org/kernel-team/linux/-/archive/${DEBIAN_COMMIT}/linux-${DEBIAN_COMMIT}.tar.bz2
