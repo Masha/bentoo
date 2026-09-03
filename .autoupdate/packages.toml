@@ -7946,16 +7946,35 @@ predates this record, hence its late creation.
 ["media-sound/audacity-bin"]
 url = "https://api.github.com/repos/audacity/audacity/releases?per_page=15"
 parser = "regex"
-pattern = '"tag_name":"Audacity-([0-9]+\.[0-9]+\.[0-9]+-beta-[0-9]+)"'
-transform = [['-beta-', "_beta"]]
+pattern = '"tag_name":"Audacity-(4\.[0-9]+\.[0-9]+)"'
+select = "max"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "4.0.0_beta4"
+version = "4.0.0"
 comments = """
-Audacity (AppImage) — tracks the 4.x BETA line, not stable. releases/latest
-would return the newest STABLE (3.7.x), so read the full /releases list and
-regex the first "Audacity-X.Y.Z-beta-N" tag (first match skips interleaved
-stable/alpha entries); transform "-beta-"->"_beta" yields PV=4.0.0_beta2.
+Audacity (AppImage) — tracked the 4.x BETA line until Audacity-4.0.0 shipped on
+2026-09-03; it now tracks 4.x STABLE, and the transform that turned "-beta-"
+into "_beta" went with it.
+
+releases/latest is still the wrong endpoint, for the same reason as before: the
+3.7.x line is maintained in parallel (3.7.9 landed 2026-09-01, two days before
+4.0.0), so whichever line published most recently owns that endpoint. Read the
+full /releases list instead and anchor the series on "4\\.".
+
+The closing quote in the pattern is load-bearing, not punctuation. Without it
+"Audacity-4.0.0-beta-4" matches too -- the group simply stops at 4.0.0 and the
+record silently follows the beta line again. Verified against the live response
+on 2026-09-03: 4.0.0 matches; 4.0.0-beta-4 and 3.7.9 do not.
+
+select = "max" because /releases is chronological, not sorted: a 4.1 pre-release
+published after a 4.0.x hotfix would otherwise make the first match the older
+version.
+
+Asset names changed completely at 4.0.0 (Audacity-4.0.0-beta4-x86_64.AppImage
+-> audacity-linux-4.0.0-x86_64.AppImage) and the ebuild now fetches TWO of them,
+x86_64 and aarch64. An applier that only rewrites the version still produces
+valid URLs; a return to the beta line does not, and needs the ebuild edited by
+hand.
 """
 # END
 
