@@ -428,6 +428,8 @@ be fixed there before any entry could ever track it.
 # END
 
 ["mail-client/thunderbird"]
+enabled = false
+disabled_by = "removed 2026-09-02: ::gentoo caught up to 155.0, the exact version this overlay carried, so the ebuild had nothing left to add"
 url = "https://product-details.mozilla.org/1.0/thunderbird_versions.json"
 parser = "json"
 path = "LATEST_THUNDERBIRD_VERSION"
@@ -462,6 +464,8 @@ packages ever leave again, disable them instead.
 # END
 
 ["mail-client/thunderbird-l10n"]
+enabled = false
+disabled_by = "removed 2026-09-02: follows mail-client/thunderbird — ::gentoo ships the same 155.0"
 url = "https://product-details.mozilla.org/1.0/thunderbird_versions.json"
 parser = "json"
 path = "LATEST_THUNDERBIRD_VERSION"
