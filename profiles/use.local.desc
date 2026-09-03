@@ -140,10 +140,6 @@ dev-util/nvidia-cuda-toolkit:rdma - Enable infiniband support via sys-cluster/rd
 dev-util/nvidia-cuda-toolkit:sanitizer - Install compute-sanitizer tool
 dev-util/nvidia-cuda-toolkit:vis-profiler - Install the NVIDIA CUDA visual profiler (nvvp)
 dev-util/vulkan-tools:cube - Build the cube/cubepp demos
-kde-plasma/kdeplasma-addons:alternate-calendar - Support alternate calendar systems (currently Chinese or Indian) via dev-libs/icu
-kde-plasma/kdeplasma-addons:qmk - Pull in kde-plasma/kameleon-qmk-helper so the Kameleon kded can apply the accent colour to QMK keyboard LEDs
-kde-plasma/kdeplasma-addons:share - Enable applet for quickly sharing data to a variety of sources
-kde-plasma/kdeplasma-addons:webengine - Enable dictionary and web browser applets using dev-qt/qtwebengine
 kde-plasma/spectacle:share - Enable support for a share menu using kde-frameworks/purpose
 mail-client/betterbird-bin:wayland - Enable native Wayland support (set MOZ_ENABLE_WAYLAND=1 at runtime)
 mail-client/proton-mail-bin:pulseaudio - Pull in libpulse (or apulse) for notification sounds
@@ -353,17 +349,6 @@ sci-ml/llama-cpp:webui - Build server with embedded WebUI
 sci-ml/llama-cpp:wmma - Use rocWMMA to enhance flash attention performance
 sci-ml/ollama-bin:cuda - Enable NVIDIA CUDA GPU acceleration support. Requires compatible NVIDIA GPU (compute capability 6.0+, Pascal architecture or newer) and nvidia-cuda-toolkit. Significantly improves inference performance for large models.
 sci-ml/ollama-bin:rocm - Enable AMD ROCm GPU acceleration support. Requires compatible AMD GPU (Radeon RX 6000 series or newer, or Radeon VII) and ROCm libraries. May require HSA_OVERRIDE_GFX_VERSION environment variable for optimal compatibility. This is experimental and not all GPU models are supported.
-sys-apps/fwupd:amdgpu - Build and install AMD dGPU (Navi3x and above) plugin
-sys-apps/fwupd:archive - Use app-arch/libarchive for archives support
-sys-apps/fwupd:cbor - Enable CBOR support for coSWID and uSWID via dev-libs/libcbor
-sys-apps/fwupd:flashrom - Enable flashrom plugin via sys-apps/flashrom
-sys-apps/fwupd:modemmanager - Build and install Modem Manager plugin
-sys-apps/fwupd:nvme - Build and install NVMe plugin
-sys-apps/fwupd:protobuf - Enable protobuf plugins
-sys-apps/fwupd:spi - Install Intel-SPI plugin
-sys-apps/fwupd:synaptics - Install synaptics plugin
-sys-apps/fwupd:tpm - Install Trusted Platform Module plugin
-sys-apps/fwupd:uefi - Enable UEFI support
 sys-apps/xdg-desktop-portal:flatpak - Enable sys-apps/flatpak integration
 sys-apps/xdg-desktop-portal:seccomp - Use sys-apps/bubblewrap (which requires seccomp) to sandbox some functionality like icon handling
 sys-kernel/linux-firmware:compress-xz - Compress firmware using xz (app-arch/xz-utils) before installation

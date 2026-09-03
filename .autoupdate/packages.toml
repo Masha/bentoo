@@ -632,6 +632,8 @@ hplip-plugin — version tracks HPLIP; SourceForge RSS lists "hplip-X.Y.Z" newes
 # END
 
 ["net-ftp/filezilla"]
+enabled = false
+disabled_by = "removed 2026-09-02: the standing anomaly recorded below has cleared — dev.gentoo.org/~dlan now publishes FileZilla_3.71.1_src.tar.xz (HTTP 200, 3583056 bytes), so ::gentoo's single-mirror SRC_URI fetches unaided and the distfiles.obentoo.org fallback stopped being load-bearing"
 url = "https://dev.gentoo.org/~dlan/distfiles/filezilla/"
 parser = "regex"
 pattern = 'FileZilla_([0-9]+\.[0-9]+\.[0-9]+)_src\.tar\.xz'
@@ -1351,6 +1353,8 @@ flatpak-1.19.0.ebuild. When 1.20.0 ships, that is the moment this series and
 # END
 
 ["sys-apps/fwupd"]
+enabled = false
+disabled_by = "removed 2026-09-02: upstream re-signed 2.1.7 on 2026-08-19 and the overlay Manifest kept the withdrawn .asc (8c00e3f9...), which no longer exists upstream and breaks fetch. ::gentoo carries the current hash (97a4f4e1..., gpg-verified) and repaired the test suite this ebuild only disabled"
 url = "https://api.github.com/repos/fwupd/fwupd/releases/latest"
 parser = "regex"
 pattern = '"tag_name":\s*"([0-9]+\.[0-9]+\.[0-9]+)'
@@ -1851,6 +1855,8 @@ but redirects to a random, possibly stale mirror on every hit.
 # END
 
 ["dev-libs/libgcrypt"]
+enabled = false
+disabled_by = "removed 2026-09-02: byte-identical to ::gentoo's 1.12.3, which has since shipped -r1 with three post-1.12.3 RSA-OAEP/PSS validation patches. The overlay copy carried nothing of its own and lost on revision anyway"
 url = "https://gnupg.org/ftp/gcrypt/libgcrypt/"
 parser = "regex"
 pattern = 'libgcrypt-([0-9]+\.[0-9]+\.[0-9]+)\.tar\.bz2'
@@ -4033,6 +4039,8 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-plasma/breeze-gtk"]
+enabled = false
+disabled_by = "removed 2026-09-02: frozen copy of ::gentoo's 6.7.4 with nothing bentoo-specific; ::gentoo's -r1 carries newer PYTHON_COMPAT/QTMIN"
 url = "https://api.github.com/repos/KDE/breeze-gtk/tags"
 parser = "json"
 path = "[0].name"
@@ -4046,6 +4054,8 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/discover"]
+enabled = false
+disabled_by = "removed 2026-09-02: frozen copy; ::gentoo's -r1 renamed BUILD_SteamOSBackend to BUILD_HoloBackend, so the overlay passed a flag upstream no longer has"
 url = "https://api.github.com/repos/KDE/discover/tags"
 parser = "json"
 path = "[0].name"
@@ -4059,6 +4069,8 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/drkonqi"]
+enabled = false
+disabled_by = "removed 2026-09-02: frozen copy of ::gentoo's 6.7.4 with nothing bentoo-specific"
 url = "https://api.github.com/repos/KDE/drkonqi/tags"
 parser = "json"
 path = "[0].name"
@@ -4072,6 +4084,8 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/kameleon-qmk-helper"]
+enabled = false
+disabled_by = "removed 2026-09-02: existed only to lift kdeplasma-addons' kdeds/kameleon out of the corrosion dependency. ::gentoo now makes that optional natively via USE=led, so the split has no remaining purpose"
 url = "https://api.github.com/repos/KDE/plasma-workspace/tags"
 parser = "json"
 path = "[0].name"
@@ -4083,6 +4097,8 @@ kameleon-qmk-helper -> KDE/plasma-workspace (anchor: overlay versions it as Plas
 # END
 
 ["kde-plasma/kdeplasma-addons"]
+enabled = false
+disabled_by = "removed 2026-09-02: the overlay's USE=qmk + optional-corrosion patch + kameleon-qmk-helper split is superseded by ::gentoo's native USE=led, which gates the same Rust kded and ships newer KFMIN/QTMIN"
 url = "https://api.github.com/repos/KDE/kdeplasma-addons/tags"
 parser = "json"
 path = "[0].name"
@@ -4096,6 +4112,8 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/kwin"]
+enabled = false
+disabled_by = "removed 2026-09-02: frozen copy; ::gentoo's -r2 adds kwin-6.7.4-patchset-1 (fixes landing in 6.7.5) that the overlay had no counterpart for"
 url = "https://api.github.com/repos/KDE/kwin/tags"
 parser = "json"
 path = "[0].name"
@@ -4109,6 +4127,8 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/plasma-desktop"]
+enabled = false
+disabled_by = "removed 2026-09-02: frozen copy; ::gentoo's -r1 adds the X USE dep on qtbase"
 url = "https://api.github.com/repos/KDE/plasma-desktop/tags"
 parser = "json"
 path = "[0].name"
@@ -4122,6 +4142,8 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/plasma-firewall"]
+enabled = false
+disabled_by = "removed 2026-09-02: frozen copy of ::gentoo's 6.7.4 with nothing bentoo-specific"
 url = "https://api.github.com/repos/KDE/plasma-firewall/tags"
 parser = "json"
 path = "[0].name"
@@ -8540,6 +8562,8 @@ ahead; drop the ebuild and set enabled = false the day ::gentoo catches up.
 # END
 
 ["net-libs/cppzmq"]
+enabled = false
+disabled_by = "removed 2026-09-02: ::gentoo's 4.11.0 is strictly better — disable-static patch, demo/ removal for bug 957453, multilib CMAKECONFIG_INSTALL_DIR, and KEYWORDS covering amd64 ~arm ~arm64 ~riscv x86 against the overlay's ~amd64 ~arm64"
 url = "https://api.github.com/repos/zeromq/cppzmq/releases/latest"
 parser = "json"
 path = "tag_name"
