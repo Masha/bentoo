@@ -9,7 +9,7 @@ inherit desktop xdg
 # (e.g. "v2.3.0.4_stable_2026-07-09"), which is not a valid Gentoo version
 # suffix. Keep PV clean ("2.3.0.4") and reconstruct the upstream naming here.
 MY_CHANNEL="stable"
-MY_DATE="2026-07-09"
+MY_DATE="2026-09-03"
 MY_TAG="v${PV}_${MY_CHANNEL}_${MY_DATE}"
 MY_ASSET="duplicati-${PV}_${MY_CHANNEL}_${MY_DATE}"
 
