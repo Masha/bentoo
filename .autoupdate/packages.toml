@@ -340,13 +340,55 @@ Obsidian — official release manifest consumed by the updater.
 """
 # END
 
-["dev-lang/dart"]
+["dev-lang/dart@stable"]
+url = "https://storage.googleapis.com/flutter_infra_release/releases/releases_linux.json"
+parser = "regex"
+pattern = '"channel": "stable",\s+"version": "[0-9.]+",\s+"dart_sdk_version": "([0-9.]+)"'
+series = '^3\.13\.2$'
+version = "3.13.2"
+comments = """
+Dart (the line dev-lang/flutter can actually run) — "@stable" here is the
+OVERLAY's stable, not the Dart channel's: 3.13.3 and up are masked in
+profiles/package.mask, so 3.13.2 is the only version anyone can install, and it
+is the one flutter-3.47.2-r1 pins with ~dev-lang/dart-3.13.2. That pin is the
+ABI of bin/cache/flutter_tools.snapshot, not caution; read the mask entry.
+
+The source is deliberately Flutter's release index and not the Dart archive:
+this ebuild exists to serve Flutter, so it must follow the dart_sdk_version of
+the newest STABLE Flutter release — the same newest-first file the
+dev-lang/flutter record parses, one field further in.
+
+series is an EXACT match, and that is the safety mechanism, not decoration. The
+probe can only ever report "up to date" (3.13.2) or fail loudly ("outside this
+entry's series"); it can never report a bump. An auto-apply here would `git mv`
+this ebuild away and leave flutter with an unsatisfiable dependency. When the
+check does go red, Flutter has moved to a new Dart: bump dev-lang/flutter first,
+then this ebuild, then raise this series/version and the package.mask floor
+together.
+
+Its other job is to give the 3.13.2 ebuild an OWNER. A sweep deletes any ebuild
+no entry claims, which is exactly what happened on 2026-09-03 (d72f93009), two
+days after 62eeeb58d had restored it — the mask does not protect a file from
+`bentoo overlay autoupdate --clean`, only a claim does.
+"""
+# END
+
+["dev-lang/dart@testing"]
 url = "https://storage.googleapis.com/dart-archive/channels/stable/release/latest/VERSION"
 parser = "json"
 path = "version"
 version = "3.13.3"
 comments = """
-Dart — official stable channel VERSION manifest.
+Dart (upstream's own stable channel) — official VERSION manifest, unchanged from
+the single record this pair replaced. It is "@testing" because the overlay MASKS
+what it tracks: >=dev-lang/dart-3.13.3 is unusable until a Flutter release ships
+it, so the ebuild sits in the tree ahead of dev-lang/flutter rather than in front
+of users.
+
+No series on purpose — this entry follows upstream wherever it goes (3.13.4,
+3.14.0, …) and always resolves to the directory's highest ebuild, which is what
+the mask floor is written against. 3.13.2 is claimed by dev-lang/dart@stable, so
+a bump here renames only the ebuild this entry owns.
 """
 # END
 

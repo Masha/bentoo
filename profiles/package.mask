@@ -12,10 +12,18 @@
 # "emerge -uDN @world" picks dart 3.13.3, which nothing in the tree can satisfy
 # a dependency on, and the update stops on a conflict instead of proceeding.
 #
-# dev-lang/dart-3.13.2 is kept in the tree alongside it for exactly that reason
-# -- do not drop it in an overlay-maintainer pass that removes superseded
-# versions. It was already dropped once, by .autoupdate's own "git mv" bump in
-# 1693e3c57, which is what produced the conflict this entry answers.
+# dev-lang/dart-3.13.2 is kept in the tree alongside it for exactly that reason.
+# Do not drop it in an overlay-maintainer pass that removes superseded versions
+# -- it was dropped twice already: by .autoupdate's own "git mv" bump in
+# 1693e3c57, which produced the conflict this entry answers, and again in
+# d72f93009 by `autoupdate --clean`, which deletes every ebuild no registry
+# entry claims. THIS MASK PROTECTS NOTHING FROM THAT SWEEP: it speaks to
+# Portage, not to the tooling. The claim is what protects the file, and it now
+# exists -- .autoupdate/packages.toml carries two records for this atom,
+# dev-lang/dart@stable (3.13.2, the line Flutter runs, exact series so it can
+# never auto-bump) and dev-lang/dart@testing (upstream's stable channel, the
+# line this mask covers). Promote them together with the floor below; deleting
+# either record re-arms the sweep.
 #
 # The atom is a floor, not an equality, because .autoupdate bumps dart daily:
 # =dev-lang/dart-3.13.3 would let 3.13.4 through tomorrow and reopen the same
