@@ -7,12 +7,11 @@ EAPI=8
 
 CRATES="
 	accesskit@0.24.1
-	accesskit_atspi_common@0.18.0
-	accesskit_consumer@0.35.0
-	accesskit_consumer@0.37.0
-	accesskit_macos@0.26.0
-	accesskit_unix@0.21.0
-	accesskit_windows@0.33.1
+	accesskit_atspi_common@0.19.1
+	accesskit_consumer@0.38.0
+	accesskit_macos@0.26.3
+	accesskit_unix@0.22.1
+	accesskit_windows@0.34.0
 	addr2line@0.25.1
 	addr2line@0.26.1
 	adler2@2.0.1
@@ -124,7 +123,6 @@ CRATES="
 	betlang@0.1.1
 	bigdecimal@0.4.8
 	bincode@1.3.3
-	bindgen@0.71.1
 	bindgen@0.72.1
 	bit-set@0.8.0
 	bit-set@0.9.1
@@ -434,7 +432,7 @@ CRATES="
 	futures@0.1.31
 	futures@0.3.32
 	gaoya@0.2.0
-	generator@0.8.7
+	generator@0.8.9
 	generic-array@0.14.7
 	gethostname@1.1.0
 	getrandom@0.2.16
@@ -562,6 +560,8 @@ CRATES="
 	itertools@0.15.0
 	itoa@1.0.18
 	jiff-static@0.2.15
+	jiff-tzdb-platform@0.1.3
+	jiff-tzdb@0.1.8
 	jiff@0.2.15
 	jni-macros@0.22.4
 	jni-sys-macros@0.4.1
@@ -680,7 +680,6 @@ CRATES="
 	ndk@0.9.0
 	new_debug_unreachable@1.0.6
 	nix@0.28.0
-	nix@0.29.0
 	nix@0.30.1
 	nom@7.1.3
 	nom@8.0.0
@@ -729,6 +728,7 @@ CRATES="
 	objc2-io-kit@0.3.2
 	objc2-metal@0.2.2
 	objc2-metal@0.3.2
+	objc2-open-directory@0.3.2
 	objc2-quartz-core@0.2.2
 	objc2-quartz-core@0.3.2
 	objc2-user-notifications@0.3.2
@@ -752,8 +752,8 @@ CRATES="
 	openssl@0.10.81
 	optfield@0.4.0
 	option-ext@0.2.0
-	ordered-float@2.10.1
 	ordered-float@4.6.0
+	ordered-float@5.5.0
 	ordered-stream@0.2.0
 	ouroboros@0.18.5
 	ouroboros_macro@0.18.5
@@ -811,7 +811,7 @@ CRATES="
 	pkcs8@0.9.0
 	pkg-config@0.3.32
 	plain@0.2.3
-	plist@1.8.0
+	plist@1.10.0
 	plotters-backend@0.3.7
 	plotters-svg@0.3.7
 	plotters@0.3.7
@@ -870,10 +870,9 @@ CRATES="
 	quick-error@2.0.1
 	quick-xml@0.30.0
 	quick-xml@0.37.5
-	quick-xml@0.38.3
 	quick-xml@0.39.3
 	quick-xml@0.41.0
-	quinn-proto@0.11.14
+	quinn-proto@0.11.17
 	quinn-udp@0.5.14
 	quinn@0.11.9
 	quote@1.0.47
@@ -892,6 +891,7 @@ CRATES="
 	rand_core@0.6.4
 	rand_core@0.9.3
 	rand_distr@0.5.1
+	rand_pcg@0.10.2
 	rand_pcg@0.3.1
 	rand_xorshift@0.4.0
 	random_choice@0.3.2
@@ -1006,8 +1006,8 @@ CRATES="
 	serde_spanned@0.6.9
 	serde_spanned@1.0.3
 	serde_urlencoded@0.7.1
-	serde_with@3.20.0
-	serde_with_macros@3.20.0
+	serde_with@3.22.0
+	serde_with_macros@3.22.0
 	serde_yaml@0.9.34+deprecated
 	serde_yaml_ng@0.10.0
 	serial2@0.2.33
@@ -1048,7 +1048,7 @@ CRATES="
 	snafu-derive@0.8.9
 	snafu@0.8.9
 	socket2@0.5.10
-	socket2@0.6.3
+	socket2@0.6.5
 	spdx@0.10.9
 	spin@0.10.0
 	spin@0.9.8
@@ -1111,7 +1111,7 @@ CRATES="
 	synstructure@0.13.2
 	sys-locale@0.3.2
 	sysinfo@0.31.4
-	sysinfo@0.37.2
+	sysinfo@0.39.6
 	system-configuration-sys@0.5.0
 	system-configuration-sys@0.6.0
 	system-configuration@0.5.1
@@ -1124,7 +1124,7 @@ CRATES="
 	tap@1.0.1
 	target-lexicon@0.13.5
 	tauri-winrt-notification@0.7.3
-	tempfile@3.23.0
+	tempfile@3.27.0
 	tendril@0.5.1
 	termcolor@1.4.1
 	terminal_size@0.4.3
@@ -1269,7 +1269,6 @@ CRATES="
 	wasm-encoder@0.201.0
 	wasm-encoder@0.227.1
 	wasm-encoder@0.244.0
-	wasm-encoder@0.252.0
 	wasm-encoder@0.254.0
 	wasm-metadata@0.201.0
 	wasm-metadata@0.227.1
@@ -1279,7 +1278,6 @@ CRATES="
 	wasmparser@0.201.0
 	wasmparser@0.227.1
 	wasmparser@0.244.0
-	wasmparser@0.252.0
 	wasmparser@0.254.0
 	wasmprinter@0.254.0
 	wasmtime-c-api-impl@48.0.1
@@ -1356,7 +1354,6 @@ CRATES="
 	windows-numerics@0.2.0
 	windows-numerics@0.3.1
 	windows-registry@0.4.0
-	windows-registry@0.5.3
 	windows-registry@0.6.1
 	windows-result@0.1.2
 	windows-result@0.2.0
@@ -1808,7 +1805,8 @@ src_prepare() {
 
 	local TS_LANGUAGE_GIT="tree-sitter-language = { git = \"https://github.com/tree-sitter/tree-sitter\""
 	TS_LANGUAGE_GIT+=", rev = \"${TREE_SITTER_COMMIT}\""
-	local TS_LANGUAGE_PATH="tree-sitter-language = \\{ path = \"${WORKDIR}/tree-sitter-${TREE_SITTER_COMMIT}/crates/language\""
+	local TS_LANGUAGE_PATH="tree-sitter-language = \\{ path = \"${WORKDIR}"
+	TS_LANGUAGE_PATH+="/tree-sitter-${TREE_SITTER_COMMIT}/crates/language\""
 
 	local NOTIFY_TYPES_GIT="notify-types = { git = \"https://github.com/zed-industries/notify\""
 	NOTIFY_TYPES_GIT+=", rev = \"${NOTIFY_COMMIT}\""
