@@ -30,7 +30,31 @@ CRATES="
 # InputDiscardStatus, all added by the fork after f69a4a04.
 # Upstream moved crossterm from nornagon to openai-oss-forks in 0.147.0 and
 # dropped its ratatui fork back to crates.io.
+#
+# microsoft/mxc is one git repository holding eight workspace members, so it
+# gets eight entries pointing at the same commit. That is not redundancy: the
+# eclass emits one "<crate> = { path = ... }" line per key under a single
+# [patch.'<uri>'] block, and a member with no key is left resolving to the git
+# source, which dies under --offline exactly like the un-patched one did.
+# SRC_URI and DISTDIR see the same tarball eight times and deduplicate it, the
+# way nucleo/nucleo-matcher already do below.
+#
+# Every one of them is dead code here -- codex-sandboxing declares
+# appcontainer_common under [target.'cfg(windows)'.dependencies], and KEYWORDS
+# is Linux-only. They are vendored anyway because cargo resolves the whole
+# dependency graph before it ever looks at the target, so a Windows-gated git
+# dependency still has to be fetchable. Deleting them from Cargo.toml instead
+# would work and would be a divergence from upstream's lock to re-apply, and
+# re-verify, on every bump; at 6 MB the tarball is the cheaper contract.
 declare -A GIT_CRATES=(
+	[appcontainer_common]='https://github.com/microsoft/mxc;6cd3d58f05d3447e67109cfb75e042803b843ca4;mxc-%commit%/src/backends/appcontainer/common'
+	[learning_mode_core]='https://github.com/microsoft/mxc;6cd3d58f05d3447e67109cfb75e042803b843ca4;mxc-%commit%/src/core/learning_mode_core'
+	[learning_mode_windows]='https://github.com/microsoft/mxc;6cd3d58f05d3447e67109cfb75e042803b843ca4;mxc-%commit%/src/backends/learning_mode/windows'
+	[mxc_config_contract]='https://github.com/microsoft/mxc;6cd3d58f05d3447e67109cfb75e042803b843ca4;mxc-%commit%/src/core/mxc_config_contract'
+	[mxc_telemetry]='https://github.com/microsoft/mxc;6cd3d58f05d3447e67109cfb75e042803b843ca4;mxc-%commit%/src/mxc_telemetry'
+	[process_security_environment_spec]='https://github.com/microsoft/mxc;6cd3d58f05d3447e67109cfb75e042803b843ca4;mxc-%commit%/src/core/generated/process_security_environment_specification'
+	[sandbox_spec]='https://github.com/microsoft/mxc;6cd3d58f05d3447e67109cfb75e042803b843ca4;mxc-%commit%/src/core/generated/base_container_specification'
+	[wxc_common]='https://github.com/microsoft/mxc;6cd3d58f05d3447e67109cfb75e042803b843ca4;mxc-%commit%/src/core/wxc_common'
 	[crossterm]='https://github.com/openai-oss-forks/crossterm;45fecb9508105988f42fe6ff0441783ed3717f92;crossterm-%commit%'
 	[nucleo-matcher]='https://github.com/helix-editor/nucleo;4253de9faabb4e5c6d81d946a5e35a90f87347ee;nucleo-%commit%/matcher'
 	[nucleo]='https://github.com/helix-editor/nucleo;4253de9faabb4e5c6d81d946a5e35a90f87347ee;nucleo-%commit%'
@@ -42,19 +66,37 @@ declare -A GIT_CRATES=(
 RUST_MIN_VER="1.95.0"
 
 # Tag of the crate tarball published by the crate-dist fork
-# (gentoo-zh-drafts/codex); it tracks the upstream release for this version.
-# It MUST be bumped alongside PV whenever a tarball exists for the new tag:
-# leaving it behind vendors the previous release's crates and cargo then dies on
-# whichever dependency moved ("failed to select a version for the requirement").
-# Only pin it to an older tag when upstream published no tarball AND the two
-# Cargo.lock files are byte-identical.
-# Pinned to rust-v0.150.0: the crate-dist fork published no tarball for
-# rust-v0.150.1 and codex-rs/Cargo.lock is byte-identical between the two tags
-# (sha256 beb9a924bf01f03ecfa9fedbf50a602cbaa5399df5cbe57e2d6bd40529e055a6).
-MY_CRATES_TAG="rust-v0.150.0"
+# (gentoo-zh-drafts/codex). It is derived from PV rather than written out,
+# because the failure mode of the two choices is not symmetric. Deriving it and
+# guessing wrong means the fetch 404s -- loud, before a single crate compiles.
+# Writing it out and forgetting to raise it vendors the PREVIOUS release's
+# crates, and cargo then dies deep in the build on whichever dependency moved
+# ("failed to select a version for the requirement"), reading like an upstream
+# bug rather than a stale pin.
+#
+# That is not hypothetical: it stayed at a literal rust-v0.150.0 across the
+# 0.151, 0.152 and 0.153 bumps, and that vendor directory is missing six crates
+# the 0.153.0 lock needs -- cidr, flatbuffers, tracelogging, tracelogging_macros,
+# unicode-general-category, winreg.
+#
+# Replace it with a literal ONLY when the fork published no tarball for this
+# release AND the two codex-rs/Cargo.lock files are byte-identical; say which
+# tag and why, as the 0.150.1 case did (both locks hashed
+# beb9a924bf01f03ecfa9fedbf50a602cbaa5399df5cbe57e2d6bd40529e055a6).
+MY_CRATES_TAG="rust-v${PV}"
 
-# python3 .github/scripts/rusty_v8_bazel.py resolved-v8-crate-version
-RUSTY_V8_TAG="147.4.0"
+# Version of the prebuilt V8 static library, which MUST equal the version of
+# the "v8" crate the lock resolves -- the archive ships its own FFI bindings
+# (RUSTY_V8_SRC_BINDING_PATH), so a mismatched pair compiles against one ABI
+# and links against another. Upstream documents this as
+# ".github/scripts/rusty_v8_bazel.py resolved-v8-crate-version", but that
+# script is not runnable outside their Bazel checkout (it imports
+# run_bazel_with_buildbuddy). Read it off the lock instead:
+#
+#   awk '/^name = "v8"$/{f=1} f&&/^version = /{print $3; exit}' codex-rs/Cargo.lock
+#
+# It was stale at 147.4.0 while the lock had already moved to 150.4.0.
+RUSTY_V8_TAG="150.4.0"
 
 inherit cargo
 
@@ -66,7 +108,7 @@ HOMEPAGE="https://github.com/openai/codex"
 # See .github/workflows/crates.yml for the generation process.
 SRC_URI="
 	https://github.com/openai/${PN}/archive/rust-v${PV}.tar.gz -> ${P}.tar.gz
-	https://github.com/gentoo-zh-drafts/codex/releases/download/${MY_CRATES_TAG}/codex-${MY_CRATES_TAG}-crates.tar.xz -> ${PN}-${MY_CRATES_TAG}-crates.tar.xz
+	https://github.com/gentoo-zh-drafts/codex/releases/download/${MY_CRATES_TAG}/codex-${MY_CRATES_TAG}-crates.tar.xz
 	amd64? (
 		https://github.com/openai/codex/releases/download/rusty-v8-v${RUSTY_V8_TAG}/librusty_v8_release_x86_64-unknown-linux-musl.a.gz
 			-> rusty_v8_${RUSTY_V8_TAG}_librusty_v8_release_x86_64-unknown-linux-musl.a.gz

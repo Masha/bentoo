@@ -1106,6 +1106,21 @@ headers = { "User-Agent" = "bentoo-autoupdate" }
 version = "0.153.0"
 comments = """
 codex — tag "rust-vX.Y.Z" ("rust-" not strippable); regex extracts X.Y.Z from tag_name.
+
+A bump of this record moves PV and nothing else, and the from-source ebuild
+carries three pins PV does not reach. One is now derived (MY_CRATES_TAG is
+"rust-v${PV}"); the other two are hand-written and must be re-checked against
+codex-rs/Cargo.lock on every bump, or the build breaks at compile time:
+
+  GIT_CRATES    every "source = git+" line in the lock needs a matching entry,
+                one per crate even when several share a repository. 0.153.0
+                added eight from github.com/microsoft/mxc and the bump did not,
+                which is how it shipped unbuildable.
+  RUSTY_V8_TAG  must equal the resolved "v8" crate version:
+                awk '/^name = "v8"$/{f=1} f&&/^version = /{print $3; exit}'
+
+Both were stale in 0.153.0 as shipped. See the comments above each in the
+ebuild for the full reasoning.
 """
 # END
 
