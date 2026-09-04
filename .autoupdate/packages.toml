@@ -179,7 +179,7 @@
 url = "https://registry.npmjs.org/@anthropic-ai/claude-code"
 parser = "json"
 path = "dist-tags.latest"
-version = "2.1.259"
+version = "2.1.260"
 comments = """
 claude-code — npm @anthropic-ai/claude-code; dist-tags.latest is the stable channel.
 
@@ -1103,7 +1103,7 @@ url = "https://api.github.com/repos/openai/codex/releases/latest"
 parser = "regex"
 pattern = '"tag_name":\s*"rust-v([0-9]+\.[0-9]+\.[0-9]+)"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.153.0"
+version = "0.153.2"
 comments = """
 codex — tag "rust-vX.Y.Z" ("rust-" not strippable); regex extracts X.Y.Z from tag_name.
 
@@ -1130,7 +1130,7 @@ parser = "regex"
 pattern = '"tag_name":\s*"rust-v([0-9]+\.[0-9]+\.[0-9]+)"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "0.153.0"
+version = "0.153.2"
 comments = """
 codex-bin — same upstream tag "rust-vX.Y.Z"; regex on tag_name.
 """
@@ -1290,7 +1290,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "0.33.2"
+version = "0.33.3"
 comments = """
 ollama-bin — same upstream repo.
 """
@@ -1539,7 +1539,7 @@ url = "https://api.github.com/repos/chromium-linux-tarballs/chromium-tarballs/re
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "152.0.7977.75"
+version = "152.0.7977.82"
 comments = """
 chromium — probes the TARBALL repo, not chromiumdash or the Chrome release
 feed, because that repo is what actually gates a bump: SRC_URI points at
@@ -7052,7 +7052,7 @@ parser = "json"
 path = "[0].name"
 transform = [['-', "."]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "7.1.2.30"
+version = "7.1.2.31"
 comments = """
 imagemagick — GitHub tags newest-first ("7.1.2-24"); transform hyphen→dot so it
 compares against the ebuild "7.1.2.24" (was SKIP: "not comparable").
@@ -7316,7 +7316,7 @@ url = "https://antigravity.google/download"
 parser = "regex"
 pattern = '/antigravity-hub/([0-9]+\.[0-9]+\.[0-9]+-[0-9]+)/'
 transform = [['-', "."]]
-version = "2.12.0.5051501534642176"
+version = "2.12.2.6298742303883264"
 comments = """
 Antigravity 2.0 — the standalone desktop hub (agent orchestration), a separate
 product from the IDE above. /download now ships the links in the raw HTML, so the
@@ -7540,7 +7540,7 @@ is a workspace and pycargoebuild refuses it.
 url = "https://pypi.org/pypi/openai/json"
 parser = "json"
 path = "info.version"
-version = "3.7.0"
+version = "3.8.0"
 comments = """
 openai — official Python SDK; core dep of sci-ml/amd-gaia. info.version is
 clean X.Y.Z. Live=3.0.0 == current PV.
@@ -7949,7 +7949,7 @@ pattern = '"name":\s*"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 series = '^2\.'
-version = "2.36.38"
+version = "2.36.39"
 comments = """
 aws-cli v2 — GitHub tag index, pinned to the 2.x series. Verified 2026-08-19
 against the live endpoint: 100 matches, all of them 2.x, max = 2.36.27 = ebuild.
