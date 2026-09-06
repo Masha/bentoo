@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@proton.me</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<longdescription lang="en">
+		LocalAI serves local models over an OpenAI-compatible HTTP API, so any
+		client written against that API can talk to a model on this machine
+		instead of a hosted service. It also ships a browser UI, compiled into
+		the binary, for browsing the model gallery and chatting without a
+		separate client.
+
+		No acceleration backend is compiled in, and that is upstream's design
+		rather than a limitation of this ebuild: LocalAI resolves its inference
+		backends — llama.cpp, whisper.cpp, diffusers, and the rest — as OCI
+		artifacts fetched at RUNTIME, choosing one that matches the hardware it
+		finds. A CPU-only install is therefore the default and needs nothing
+		extra, and nobody has to pull in CUDA or ROCm to run this package. That
+		is why this package has no USE flags and no accelerator dependencies.
+
+		The build reaches no network. Upstream's Makefile makes three fetches:
+		it downloads a prebuilt protoc, runs `go install ...@version` twice for
+		the two protobuf code generators, and runs `npm install` for the React
+		UI. All three are replaced here. protoc comes from dev-libs/protobuf.
+		protoc-gen-go is built from LocalAI's own vendored sources, so the
+		generator matches the protobuf runtime the binary links against, and
+		protoc-gen-go-grpc — which is a separate Go module and so never
+		reachable through vendoring — is built from a small bundle of its own.
+		The React UI's node_modules and the Go dependencies both arrive as
+		distfiles, so every input to the build is recorded in the Manifest.
+	</longdescription>
+	<upstream>
+		<remote-id type="github">mudler/LocalAI</remote-id>
+		<bugs-to>https://github.com/mudler/LocalAI/issues</bugs-to>
+		<doc>https://localai.io/docs/</doc>
+		<changelog>https://github.com/mudler/LocalAI/releases</changelog>
+	</upstream>
+</pkgmetadata>
