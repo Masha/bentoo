@@ -179,7 +179,7 @@
 url = "https://registry.npmjs.org/@anthropic-ai/claude-code"
 parser = "json"
 path = "dist-tags.latest"
-version = "2.1.261"
+version = "2.1.263"
 comments = """
 claude-code — npm @anthropic-ai/claude-code; dist-tags.latest is the stable channel.
 
@@ -240,7 +240,7 @@ agree before applying.
 url = "https://registry.npmjs.org/pnpm"
 parser = "json"
 path = "dist-tags.latest"
-version = "11.25.0"
+version = "12.3.4"
 comments = """
 pnpm — npm package, stable channel. dist-tags.latest is the RIGHT endpoint and
 must stay: pnpm promotes through next-<major> first, and that channel carries
@@ -269,7 +269,7 @@ url = "https://api2.cursor.sh/updates/api/download/stable/linux-x64/cursor"
 parser = "json"
 path = "version"
 commit_sha_path = "commitSha"
-version = "3.19.7"
+version = "3.19.13"
 comments = """
 Cursor — official download API; "version" is the full version. commitSha is the
 per-release BUILD_ID embedded in SRC_URI; the applier substitutes it into the
@@ -569,7 +569,7 @@ transform strips the "go" prefix to match PV. Live=1.26.5.
 url = "https://persistent.oaistatic.com/codex-app-prod/linux/deb/dists/stable/main/binary-amd64/Packages"
 parser = "regex"
 pattern = 'Package: chatgpt\nVersion: ([0-9]+\.[0-9]+\.[0-9]+)'
-version = "26.901.41600"
+version = "26.901.51231"
 comments = """
 OpenAI Codex/ChatGPT desktop app — read the APT index of the very repo that
 SRC_URI pulls from. Both openai.com and chatgpt.com sit behind Cloudflare and
@@ -777,7 +777,7 @@ parser = "regex"
 pattern = '<a name="([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 type = "bin"
-version = "26.3.0"
+version = "26.3.0-r1"
 comments = """
 CrossOver — changelog page lists each release as `<a name="X.Y.Z">`, newest first;
 present in the raw HTML (not JS-only). Download is the .deb under media.codeweavers.com
@@ -1051,7 +1051,7 @@ url = "https://api.github.com/repos/getsentry/sentry-native/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.16.5"
+version = "0.16.5-r1"
 comments = """
 sentry-native — tag bare "X.Y.Z".
 """
@@ -1168,7 +1168,7 @@ url = "https://api.github.com/repos/FreeCAD/FreeCAD/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.1.3"
+version = "1.1.3-r1"
 comments = """
 FreeCAD — releases/latest bare "X.Y.Z" (avoids weekly-* snapshot tags).
 """
@@ -1323,7 +1323,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "11.9.0"
+version = "11.9.0-r1"
 comments = """
 lemonade — GitHub release tag "vX.Y.Z" ("v" stripped). Built from source
 (CMake); the webapp node_modules distfile on distfiles.obentoo.org is NOT
@@ -1447,7 +1447,7 @@ url = "https://api.github.com/repos/tianocore/edk2/releases/latest"
 parser = "regex"
 pattern = '"tag_name":\s*"edk2-stable([0-9]{6})"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "202608-r1"
+version = "202608-r2"
 comments = """
 edk2 — tag "edk2-stableYYYYMM"; regex captures the 6-digit datestamp.
 
@@ -1962,7 +1962,7 @@ at configure — is no longer needed.
 url = "https://www.blender.org/download/"
 parser = "regex"
 pattern = 'blender-([0-9]+\.[0-9]+\.[0-9]+)'
-version = "5.2.1"
+version = "5.2.1-r1"
 comments = """
 blender — download page; anchored to "blender-X.Y.Z".
 """
@@ -2048,7 +2048,7 @@ commit_sha_path = "[0].id"
 base_from = "file"
 base_url = "https://gitlab.freedesktop.org/mesa/mesa/-/raw/main/VERSION"
 base_pattern = '^([0-9][0-9.]*)-devel'
-version = "26.3.0_pre20260905"
+version = "26.3.0_pre20260906"
 comments = """
 mesa — commit-tracked on main; _pre suffix preserved from current ebuild.
 
@@ -2066,7 +2066,7 @@ commit_sha_path = "[0].id"
 base_from = "file"
 base_url = "https://gitlab.freedesktop.org/mesa/mesa/-/raw/main/VERSION"
 base_pattern = '^([0-9][0-9.]*)-devel'
-version = "26.3.0_pre20260905"
+version = "26.3.0_pre20260906"
 comments = """
 mesa_clc — part of the mesa tree; same source/rule as media-libs/mesa.
 """
@@ -2287,7 +2287,7 @@ commit_sha_path = "[0].id"
 base_from = "file"
 base_url = "https://gitlab.freedesktop.org/mobile-broadband/libqmi/-/raw/main/meson.build"
 base_pattern = "(?m)^  version: '([0-9][0-9.]*)'"
-version = "1.39.1_pre20260816"
+version = "1.39.1_pre20260816-r1"
 comments = """
 libqmi — commit-tracked on main; _pre suffix preserved from current ebuild.
 """
@@ -2442,7 +2442,7 @@ base_from = "file"
 base_url = "https://raw.githubusercontent.com/KhronosGroup/Vulkan-ValidationLayers/main/CMakeLists.txt"
 base_pattern = '(?m)^project\([A-Za-z_-]+ VERSION ([0-9][0-9.]*)'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.362_p20260905"
+version = "1.4.362_p20260906"
 comments = """
 vulkan-layers — commit-tracked on main (Vulkan-ValidationLayers); scans for "Update for Vulkan-Docs X.Y.Z".
 """
@@ -4474,7 +4474,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.6-r1"
 comments = """
 media-libs/gstreamer-editing-services — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -4489,7 +4489,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[13579]\.'
-version = "1.29.2"
+version = "1.29.2-r1"
 comments = """
 media-libs/gstreamer-editing-services — linha de DESENVOLVIMENTO (minor impar). Publicada com KEYWORDS ~arch,
 que e' o que impede o portage de instala-la por padrao: um sufixo _pre NAO faria isso
@@ -7111,7 +7111,7 @@ url = "https://godotengine.org/download/archive/"
 parser = "regex"
 pattern = '(\d+\.\d+(?:\.\d+)?-(?:stable|beta\d*|rc\d*|dev\d*))'
 transform = [['-stable', ""], ['-beta', "_beta"], ['-rc', "_rc"], ['-dev', "_alpha"]]
-version = "4.8_alpha4"
+version = "4.8_alpha4-r1"
 comments = """
 godot — download archive lists newest first; transform the upstream suffix to
 Gentoo form (-stable→bare, -beta→_beta, -rc→_rc, -dev→_alpha).
@@ -8140,7 +8140,7 @@ parser = "json"
 path = "[0].tag_name"
 transform = [['-', "_p"]]
 type = "bin"
-version = "155.0_p1"
+version = "155.0.1_p1"
 comments = """
 LibreWolf (bin) — NÃO usar as tags do repo "source": o upstream tagueia o
 source antes de publicar os binários, e o -bin morre com 404 no pkgdev
@@ -8160,7 +8160,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "253"
+version = "255"
 comments = """
 llama-swap — releases/latest; tag_name is "vNNN" (a plain incrementing integer,
 not semver), transform strips the v.  Verified by real download on 2026-08-16:
@@ -8252,7 +8252,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "4.9.0"
+version = "4.9.0-r1"
 comments = """
 LocalAI — releases/latest; tag_name is "vX.Y.Z", so the transform strips the
 leading v to match PV.  Verified on 2026-09-05: tag_name "v4.9.0", published
