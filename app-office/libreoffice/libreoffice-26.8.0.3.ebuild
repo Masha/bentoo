@@ -96,6 +96,9 @@ KEYWORDS="~amd64"
 # Extensions that need extra work:
 LO_EXTS="nlpsolver scripting-beanshell scripting-javascript wiki-publisher"
 
+# BENTOO-DIVERGENCE: IUSE - eot, an overlay-only flag choosing the system
+# media-libs/libeot over the bundled copy. ::gentoo has no equivalent because
+# it always bundles. See the note above DEPEND for why it is off by default.
 IUSE="accessibility base bluetooth +branding coinmp +cups custom-cflags +dbus debug eds eot
 googledrive gstreamer +gtk3 gtk4 kde ldap +mariadb odk pdfimport postgres qt6 test valgrind vulkan
 $(printf 'libreoffice_extensions_%s ' ${LO_EXTS})"
