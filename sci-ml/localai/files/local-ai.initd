@@ -1,0 +1,44 @@
+#!/sbin/openrc-run
+# Copyright 1999-2026 Gentoo Authors
+# Distributed under the terms of the GNU General Public License v2
+
+description="LocalAI OpenAI-compatible inference server"
+
+command="/usr/bin/local-ai"
+command_user="localai:localai"
+directory="/var/lib/localai"
+supervisor="supervise-daemon"
+output_log="/var/log/localai/local-ai.log"
+error_log="/var/log/localai/local-ai.log"
+
+# Every path is passed explicitly because local-ai defaults them to the CURRENT
+# WORKING DIRECTORY (models/, backends/, data/ ... relative to $PWD), which for
+# a system service would scatter multi-gigabyte model files wherever the daemon
+# happened to start.
+#
+# --address defaults to LOOPBACK here, and that is not merely a hardening
+# preference: local-ai's own default is ":8080", a wildcard, and it REFUSES TO
+# START on a wildcard or public address unless --allow-insecure-public-bind is
+# given. Left at upstream's default this service would not come up at all.
+command_args="run
+	--address ${LOCALAI_ADDRESS:-127.0.0.1:8080}
+	--models-path /var/lib/localai/models
+	--backends-path /var/lib/localai/backends
+	--localai-config-dir /var/lib/localai/configuration
+	--data-path /var/lib/localai/data
+	--generated-content-path /var/lib/localai/generated
+	--upload-path /var/lib/localai/upload
+	${LOCALAI_OPTS}"
+
+depend() {
+	need net
+	use dns
+}
+
+start_pre() {
+	local d
+	checkpath -d -o localai:localai -m 0750 /var/log/localai
+	for d in "" /models /backends /configuration /data /generated /upload; do
+		checkpath -d -o localai:localai -m 0750 "/var/lib/localai${d}"
+	done
+}

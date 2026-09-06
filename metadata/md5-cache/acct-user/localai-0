@@ -1,0 +1,9 @@
+DEFINED_PHASES=install postinst preinst prerm pretend
+DESCRIPTION=User for the LocalAI inference server
+EAPI=8
+INHERIT=acct-user
+KEYWORDS=~amd64 ~arm64
+RDEPEND=acct-group/localai
+SLOT=0
+_eclasses_=acct-user	b9c88d767674bff385e6af737802d263	edo	a5e294016aa84979fcb2459749eb80b2	user-info	9bc91a5977c2453c0a861b26f65057ea
+_md5_=366b53f0eeeab8391fd4eafa05a77210
