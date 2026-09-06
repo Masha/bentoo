@@ -247,20 +247,35 @@ must stay: pnpm promotes through next-<major> first, and that channel carries
 pre-releases (next-12 was 12.0.0-beta.3 on 2026-08-03), so probing next-11 would
 eventually report a beta as current.
 
-THE OVERLAY RUNS AHEAD OF THIS ENDPOINT, ON PURPOSE. The ebuild is at 11.19.0
-while dist-tags.latest still answers 11.18.0 — 11.19.0 lives on next-11, not yet
-promoted. Recorded because a silent record is a blind one: while latest is behind
-our own PV the checker reports nothing (it only fires on strictly-newer), so this
-package produces no signal at all until latest passes 11.19.0.
+THIS PACKAGE HAS FIVE DISTFILES SINCE 12.0.0, AND A BLIND BUMP BREAKS IT.
+pnpm 12 moved the implementation from a JavaScript bundle to a native Rust
+binary and stopped shipping it in the "pnpm" tarball; that tarball is now a
+wrapper whose only route to a binary is downloading one at first use. The
+ebuild therefore also fetches @pnpm/exe.linux-{x64,arm64}[-musl] as distfiles,
+one per ARCH/ELIBC pair.
 
-WHY THE BUMP WAS TAKEN ANYWAY, both re-verified 2026-08-03:
-  - the GitHub release v11.19.0 is prerelease=false, draft=false (2026-07-31)
-  - the registry tarball's sha512 equals the published dist.integrity,
-    sha512-eIHz7VkNRyxKlV4riLISF5ERYGbcyIy8o4SeybYPG7qm0syyIfqR2k4cZb7yvL43k2Wup6xTnHv4be3DobItzg==
+The 11.25.0 -> 12.3.4 bump (d203c5705) copied the old ebuild across that
+boundary and produced a package that failed in src_install on a dangling
+symlink -- bin/pnpm.cjs had become bin/pnpm.mjs -- which is the good outcome.
+The bad one was already in reach: had the symlink resolved, the wrapper would
+have been merged and would have downloaded its own binary into /usr on first
+run.
 
-RE-CHECK: once `curl -sS https://registry.npmjs.org/pnpm | jq -r '."dist-tags".latest'`
-reports >= 11.19.0, the lag is over and this paragraph can go — the record is an
-ordinary bump signal again. Do not "fix" the silence by repointing the url.
+BEFORE ACCEPTING A BUMP, confirm all four platform packages exist at the new
+version -- they are published as optional dependencies of the wrapper and are
+not guaranteed to be republished in lockstep:
+
+  for p in exe.linux-x64 exe.linux-x64-musl exe.linux-arm64 exe.linux-arm64-musl; do
+    printf '%s: ' "$p"
+    curl -sfI "https://registry.npmjs.org/@pnpm/$p/-/$p-<PV>.tgz" | head -1
+  done
+
+Four 200s and the SRC_URI follows ${PV} on its own. Anything else means the
+bump has to wait, not that a URL needs editing.
+
+Re-read the wrapper on any MAJOR bump. What is packaged here is upstream's
+install.js reproduced at merge time (native binary over the placeholder bin,
+download path deleted); a rearchitecture like 11 -> 12 invalidates it silently.
 """
 # END
 
