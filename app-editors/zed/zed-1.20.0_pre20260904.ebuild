@@ -1753,6 +1753,39 @@ src_prepare() {
 			# to the packaged source on its own, so like 0010 it rides this flag
 			# by choice rather than by dependency.
 			"${FILESDIR}/0012-agent-panel-worktree-entry.patch"
+			# 0013: the per-model quota row. The adapter forwards every
+			# rate_limits.model_scoped[] entry under one wire kind, and from_wire
+			# had no arm for it, so the row 0011's Account section was built to
+			# show never arrived. Adds a dynamic variant carrying the display name
+			# the server sends -- it adds a name, it does not open the enum.
+			# Rides this flag by DEPENDENCY, like 0011: no other agent sends the key.
+			"${FILESDIR}/0013-model-scoped-quota-window.patch"
+			# 0014: a copy button on the user's own message, yielding the string
+			# the edit path already serialises rather than a second serialisation.
+			# It sits on the shared container before the editable/non-editable
+			# branch, so subagent messages -- always non-editable -- get it too.
+			# Pure Zed, so it rides this flag by CHOICE, like 0010 and 0012.
+			"${FILESDIR}/0014-copy-the-user-s-own-message.patch"
+			# 0015: the thread archive scoped to its project. Three reads were
+			# global, not one -- the list, the ArchivedOnly fall-back guard, and
+			# the archived-only toggle's disabled state. Deliberately not via the
+			# store's entries_for_path, which drops archived threads: correct for
+			# the sidebar, fatal for an archive view. Pure Zed, by CHOICE.
+			"${FILESDIR}/0015-scoped-thread-history.patch"
+			# 0016: a rendered-markdown preview of the composer draft, through the
+			# same MarkdownElement that draws every agent response, reached by the
+			# ToggleMessagePreview action. The only one of these five that is new
+			# UI rather than an affordance over existing machinery. Pure Zed, by
+			# CHOICE.
+			"${FILESDIR}/0016-composer-markdown-preview.patch"
+			# 0017: native rendering for a compaction the adapter reports. The ACP
+			# compaction_update variant is unreachable here -- agent-client-protocol
+			# 2.0.0 carries zero occurrences of "compaction" -- so this reads the
+			# adapter's versioned _meta.contextCompaction and dispatches into the
+			# existing push_context_compaction; an unknown version falls through to
+			# the generic tool row. Rides this flag by DEPENDENCY: only this
+			# adapter emits that key.
+			"${FILESDIR}/0017-native-compaction-entry.patch"
 		)
 	fi
 
