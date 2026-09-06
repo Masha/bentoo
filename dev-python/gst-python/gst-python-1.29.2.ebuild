@@ -19,6 +19,7 @@ REQUIRED_USE="${PYTHON_REQUIRED_USE}"
 
 RDEPEND="${PYTHON_DEPS}
 	>=media-libs/gstreamer-${PV}:1.0[introspection]
+	>=media-libs/gst-plugins-bad-${PV}:1.0[introspection]
 	>=media-libs/gst-plugins-base-${PV}:1.0[introspection]
 	>=dev-python/pygobject-3.8:3[${PYTHON_USEDEP}]
 "

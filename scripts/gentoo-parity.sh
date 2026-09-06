@@ -4300,9 +4300,28 @@ self_test_assertions() {
 	# will not find the cause there.
 	#
 	# The invariant is untouched: 245 against 245.
+	#
+	# RE-MEASURED 2026-09-06 (second pass), 245 -> 235, and this one is the
+	# remediation itself rather than either tree moving. The gstreamer block was
+	# audited package by package and 14 rows were closed:
+	#
+	#   -10  gst-plugins-base gained virtual/opengl, gst-python gained
+	#        gst-plugins-bad, and gst-plugins-qt6 got the three deps the
+	#        gstreamer-meson eclass used to put in its DEPEND back - three real
+	#        lags, so the rows are gone rather than reclassified
+	#    -4  gst-plugins-bad's missing !media-plugins/gst-plugins-va blocker
+	#        turned out NOT to be a lag: ::gentoo removed that package and
+	#        blocks leftovers, while bentoo still ships it and pulls it through
+	#        PDEPEND. Tagged, so those four moved ALIGN -> JUSTIFIED and stay
+	#        in the total
+	#
+	# EXPECT THIS ASSERTION TO MOVE ON EVERY REMEDIATION PASS. It pins the
+	# absolute total, and closing a divergence is exactly what lowers it - the
+	# number going down is the work succeeding. What must never move is the
+	# equality of the two halves: 235 against 235.
 	assert_eq A20 \
 		'the four verdicts still sum to the row total, with the stale cache outside both' \
-		'rows=245 verdict-sum=245 stale=0' \
+		'rows=235 verdict-sum=235 stale=0' \
 		"$(row_arithmetic)"
 
 	# --- story 008: what a stale cache does to the exit code ----------

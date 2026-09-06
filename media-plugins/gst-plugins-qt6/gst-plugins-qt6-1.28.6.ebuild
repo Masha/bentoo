@@ -28,12 +28,11 @@ DEPEND="
 	dev-qt/qtbase:6=[gui,opengl,wayland,X?]
 	dev-qt/qtdeclarative:6[opengl]
 	>=media-libs/gst-plugins-base-${PV}:${SLOT}[egl,opengl,wayland,X?]
-"
-RDEPEND="${DEPEND}
 	>=dev-libs/glib-2.64.0:2
 	>=media-libs/gstreamer-$(ver_cut 1-2):${SLOT}
 	>=media-libs/${GST_ORG_MODULE}-${PV}:${SLOT}
 "
+RDEPEND="${DEPEND}"
 RDEPEND+=" || ( >=dev-qt/qtbase-6.10:6[wayland] <dev-qt/qtwayland-6.10:6 )"
 BDEPEND="${PYTHON_DEPS}
 	app-arch/xz-utils

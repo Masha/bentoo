@@ -15,6 +15,13 @@ KEYWORDS="~alpha amd64 ~arm ~arm64 ~hppa ~loong ~mips ~ppc ppc64 ~riscv ~sparc x
 IUSE="X bzip2 +introspection +orc udev vaapi vnc vulkan wayland"
 REQUIRED_USE="vulkan? ( || ( X wayland ) )"
 
+# BENTOO-DIVERGENCE: RDEPEND - no !media-plugins/gst-plugins-va blocker.
+# ::gentoo REMOVED media-plugins/gst-plugins-va and blocks whatever copy a
+# user still has installed. bentoo kept the package: the VA plugin is carved
+# out of this tarball in src_install and pulled back in through PDEPEND below,
+# so the blocker would refuse to install what this ebuild itself asks for.
+# BENTOO-DIVERGENCE: DEPEND - same blocker, reached through DEPEND="${RDEPEND}".
+
 # X11 is automagic for now, upstream #709530 - only used by librfb USE=vnc plugin
 # Baseline requirement for libva is 1.6, but 1.15 gets more features
 RDEPEND="
