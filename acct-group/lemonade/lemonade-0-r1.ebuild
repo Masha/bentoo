@@ -12,4 +12,6 @@ KEYWORDS="~amd64 ~arm64"
 
 # No reserved GID in the Gentoo GID/UID assignment table for lemonade,
 # so let the system pick the next free one.
-ACCT_GROUP_ID=-1
+# 601 to match acct-user/lemonade; see there for why not -1 and why not a
+# number inside the range ::gentoo allocates from.
+ACCT_GROUP_ID=601

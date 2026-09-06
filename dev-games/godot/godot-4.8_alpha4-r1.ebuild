@@ -98,13 +98,25 @@ BDEPEND="
 # carry them for (it stops at 4.7.2): system-pcre2 and two that disable
 # deprecated editor screens.
 #
-# The fourth, godot-4.5-scons.patch, shares ::gentoo's FILENAME but not its
-# CONTENT -- ours is the older cut, missing the hunk that respects AR
-# (Gentoo bug #977691) and the platform/linuxbsd/detect.py half. Same name,
-# different patch, is the worst of both: the sweep pairs them and sees a
-# difference forever. Either rebase ::gentoo's onto 4.8 or rename ours.
+# The fourth was godot-4.5-scons.patch, which shared ::gentoo's FILENAME but
+# not its CONTENT. RESOLVED 2026-09-06 by renaming it to
+# godot-4.8-scons-toolchain.patch: same name, different patch is the worst of
+# both, because the parity sweep pairs them and reports a difference forever.
+#
+# Renamed rather than replaced with ::gentoo's, because the two are not older
+# and newer cuts of one patch -- they are two mechanisms for the same goal, and
+# each is coupled to how its ebuild invokes scons. ::gentoo does
+# `tc-export AR CC CXX RANLIB` and patches platform/linuxbsd/detect.py to read
+# os.environ; src_compile here passes them as scons command-line variables, so
+# the patch declares them with opts.Add instead. Both were dry-run against the
+# 4.8-dev4 tree and both apply; mixing them is what would break.
+#
+# What ::gentoo's did have and ours did not is RANLIB, which was not respected
+# at all. Added here on our own mechanism -- opts.Add("RANLIB") in the patch,
+# RANLIB="$(tc-getRANLIB)" in esconsargs -- so the gap is closed without
+# swapping mechanisms. Gentoo bug #977691 covers the AR half.
 PATCHES=(
-	"${FILESDIR}"/${PN}-4.5-scons.patch
+	"${FILESDIR}"/${PN}-4.8-scons-toolchain.patch
 	"${FILESDIR}"/${PN}-4.8-system-pcre2.patch
 	"${FILESDIR}"/${PN}-4.8-disable-deprecated-main-screen.patch
 	"${FILESDIR}"/${PN}-4.8-disable-deprecated-game-view.patch
@@ -138,6 +150,7 @@ src_compile() {
 
 	local esconsargs=(
 		AR="$(tc-getAR)" CC="$(tc-getCC)" CXX="$(tc-getCXX)"
+		RANLIB="$(tc-getRANLIB)"
 
 		progress=no
 		verbose=yes

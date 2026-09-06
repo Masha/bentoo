@@ -12,5 +12,13 @@
 #LEMONADE_API_KEY=""
 #LEMONADE_ADMIN_API_KEY=""
 
+# Bind address for the API.  Loopback by default.  Widening this exposes an
+# inference API to the network: set LEMONADE_API_KEY above first.
+LEMOND_HOST="127.0.0.1"
+
 # Extra command-line arguments for lemond.
+#
+# Worth knowing: lemond announces itself over UDP for server discovery and
+# that is ON BY DEFAULT, on RFC1918 interfaces, even with the API bound to
+# loopback.  Add --no-broadcast here to stop it.
 LEMOND_OPTS=""

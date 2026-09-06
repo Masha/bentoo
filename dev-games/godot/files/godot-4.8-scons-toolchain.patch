@@ -1,0 +1,29 @@
+Declare AR and RANLIB as scons options so the ebuild can pass the
+toolchain's own binaries. Godot's SConstruct declares CC and CXX but
+neither of these, so without this scons silently uses its own defaults
+and a cross or non-default toolchain is ignored. Gentoo bug #977691
+covers AR; RANLIB has the same problem and is fixed here alongside.
+
+NOTE the mechanism differs from ::gentoo's patch of the same purpose,
+which is why this file no longer shares its name. ::gentoo exports the
+variables (tc-export) and patches platform/linuxbsd/detect.py to read
+os.environ; this passes them as scons command-line variables, which is
+what dev-games/godot's src_compile here already does for CC and CXX.
+Neither is more correct; mixing them is what breaks.
+--- a/SConstruct
++++ b/SConstruct
+@@ -304,2 +304,4 @@
+ opts.Add("CC", "C compiler binary")
++opts.Add("AR", "Archiver")
++opts.Add("RANLIB", "Ranlib")
+ opts.Add("LINK", "Linker binary")
+@@ -745,3 +746,3 @@
+         # `-msse2` is implied when compiling for x86_64.
+-        env.Append(CCFLAGS=["-msse4.2", "-mpopcnt"])
++        pass
+ elif env["arch"] == "x86_32":
+@@ -817,3 +818,3 @@
+         else:
+-            env.AppendUnique(LINKFLAGS=["-s"])
++            pass
+ 
