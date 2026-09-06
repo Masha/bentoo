@@ -58,6 +58,13 @@ ADDONS_SRC=(
 	"${ADDONS_URI}/frozen-1.2.0.tar.gz"
 	# not packaged in Gentoo, https://skia.org/
 	"${ADDONS_URI}/skia-m147-ad8ecedbfdef9f4ae4b1e73347b6dd56e6637d38.tar.xz"
+	# BENTOO-DIVERGENCE: SRC_URI - libeot, which ::gentoo does not fetch.
+	# Embedded OpenType is default-on for Linux from the 26.2 series onwards
+	# (configure.ac forces enable_eot=yes), so libeot is always needed: the
+	# system copy under USE=eot, the bundled one otherwise. The bundled build
+	# looks the tarball up in DISTDIR through --with-external-tar, so without
+	# this entry USE=-eot dies on UnpackedTarget/libeot-0.01.tar.bz2.
+	"!eot? ( ${ADDONS_URI}/libeot-0.01.tar.bz2 )"
 
 	"base? (
 		${ADDONS_URI}/ba2930200c9f019c2d93a8c88c651a0f-flow-engine-0.9.4.zip
@@ -253,8 +260,11 @@ COMMON_DEPEND="${PYTHON_DEPS}
 # The libeot dependency is behind USE=eot, and off by default. This is a
 # system-vs-bundled switch, not a feature switch: LibreOffice bundles libeot,
 # so --without-system-libeot builds the bundled copy and Embedded OpenType
-# keeps working either way. It is gated because media-libs/libeot is keyworded
-# only amd64/x86/riscv, and a hard dependency on it made this package
+# keeps working either way -- true only because ADDONS_SRC carries a matching
+# "!eot? ( ... libeot-0.01.tar.bz2 )" entry. The bundled build reads that
+# tarball out of DISTDIR, so dropping the entry makes USE=-eot die on
+# UnpackedTarget/libeot-0.01.tar.bz2. It is gated because media-libs/libeot is
+# keyworded only amd64/x86/riscv, and a hard dependency on it made this package
 # unresolvable on the arm, arm64, loong and ppc64 keywords it carries -- an
 # overlay that exists to cover third-party hardware should not lose four
 # arches to an optional unbundling.
