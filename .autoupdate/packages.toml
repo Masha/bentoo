@@ -8212,6 +8212,43 @@ not a version signal and must not be probed.
 """
 # END
 
+["sci-ml/localai"]
+url = "https://api.github.com/repos/mudler/LocalAI/releases/latest"
+parser = "json"
+path = "tag_name"
+transform = [['^v', ""]]
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "4.9.0"
+comments = """
+LocalAI — releases/latest; tag_name is "vX.Y.Z", so the transform strips the
+leading v to match PV.  Verified on 2026-09-05: tag_name "v4.9.0", published
+2026-08-20.
+
+releases/latest rather than a ranked refs/tags probe, and the reason here is not
+the usual one — the tag list was checked on 2026-09-05 and is clean and ordered
+(v4.9.0, v4.8.2, v4.8.1, ...).  It is that the ebuild fetches the CURATED asset
+LocalAI-v${PV}-source.tar.gz, which exists only on a release object.  A tag
+without a release would probe as a new version and then fail to fetch.
+
+THREE distfiles on distfiles.obentoo.org are NOT version-probed here, and each
+has its own trigger.  Regenerate by hand and upload BEFORE the ebuild lands; the
+generation recipes live in the ebuild header:
+
+  localai-<PV>-vendor.tar.xz                every bump, since go.mod moves with
+                                            the release.  Note `go mod vendor`
+                                            FAILS until protoc has generated
+                                            pkg/grpc/proto, which the tarball
+                                            does not ship.
+  localai-react-ui-node_modules-<N>.tar.xz  only when
+                                            core/http/react-ui/package-lock.json
+                                            changes; NODE_MODULES_PV in the
+                                            ebuild names the one in use.
+  protoc-gen-go-grpc-<N>-vendor.tar.xz      only when upstream repins the plugin
+                                            in the Makefile install-go-tools
+                                            target.
+"""
+# END
+
 ["sci-ml/whisper-cpp"]
 url = "https://api.github.com/repos/ggml-org/whisper.cpp/releases?per_page=20"
 parser = "regex"
