@@ -295,6 +295,7 @@ PARITY_ECLASS_DEFINITIONAL=()
 # the harness instead - which is a broken test, not a red one, and would prove
 # nothing about the rule being absent.
 
+PARITY_METADATA_SUPPRESSED=()  # <category>/<pn> TAB <why>
 PARITY_FILES_SUPPRESSED=()  # <category>/<pn> TAB <axis> TAB <count> TAB <why>
                            # R1.5 again: a files/ row is dropped only when
                            # every name in it is reachable from an ebuild, and
@@ -1517,6 +1518,60 @@ summarise_diff() {
 	fi
 }
 
+IUSE_UNION=""
+
+# iuse_union <repo root> <category/pn>
+# Every IUSE flag name the side declares for this package, across all its
+# md5-cache entries, +/- stripped, into IUSE_UNION padded with spaces so a
+# membership test is a substring test.
+iuse_union() {
+	local root=$1 key=$2 cat=${2%%/*} pn=${2#*/}
+	local f line flag
+
+	IUSE_UNION=" "
+	for f in "${root}/metadata/md5-cache/${cat}/${pn}"-*; do
+		[[ -f ${f} ]] || continue
+		# <pn>-<version>, not a sibling whose name merely starts the same
+		[[ ${f##*/} =~ ^${pn}-[0-9] ]] || continue
+		line=$(grep -m1 '^IUSE=' "${f}" 2>/dev/null) || continue
+		for flag in ${line#IUSE=}; do
+			flag=${flag#[+-]}
+			case ${IUSE_UNION} in
+				*" ${flag} "*) ;;
+				*) IUSE_UNION+="${flag} " ;;
+			esac
+		done
+	done
+}
+
+METADATA_FLAGS=""
+
+# metadata_flags <metadata.xml>
+# The <use><flag name=...> names it declares, space padded like IUSE_UNION.
+metadata_flags() {
+	local raw name
+
+	METADATA_FLAGS=" "
+	raw=$(xmllint --xpath '//use/flag/@name' "$1" 2>/dev/null) || raw=""
+	for name in $(printf '%s' "${raw}" | sed -E 's/ ?name="([^"]*)"/\1\n/g'); do
+		case ${METADATA_FLAGS} in
+			*" ${name} "*) ;;
+			*) METADATA_FLAGS+="${name} " ;;
+		esac
+	done
+}
+
+METADATA_BODY=""
+
+# metadata_body <metadata.xml>
+# Everything EXCEPT the maintainer and use blocks, whitespace collapsed. Those
+# two are the parts an overlay is expected to differ on; the rest is content.
+metadata_body() {
+	local raw
+	raw=$(xmllint --xpath '//pkgmetadata/*[not(self::maintainer) and not(self::use)]' "$1" 2>/dev/null) || raw=""
+	METADATA_BODY=$(printf '%s' "${raw}" | tr -s '[:space:]' ' ')
+}
+
 # Sub-task 4.1. metadata.xml, for every shared package.
 #
 # R4.1 says every shared package, and an absent file is therefore a finding and
@@ -1526,7 +1581,8 @@ summarise_diff() {
 # below is empty today and says so in the count rather than being left out.
 compare_metadata_xml() {
 	local key overlay_file gentoo_file overlay_text overlay_state gentoo_state
-	local diverged=0 incomplete=0
+	local body_overlay flags_overlay iuse_overlay explained flag
+	local diverged=0 incomplete=0 suppressed=0
 
 	for key in "${PARITY_SHARED_PACKAGES[@]}"; do
 		overlay_file="${OVERLAY_ROOT}/${key}/metadata.xml"
@@ -1556,6 +1612,62 @@ compare_metadata_xml() {
 		fi
 
 		diverged=$(( diverged + 1 ))
+
+		# Two of the three things metadata.xml holds cannot align, and
+		# saying so is the whole of this block.
+		#
+		# The MAINTAINER is definitional. This overlay maintains its fork
+		# and ::gentoo maintains theirs; a row saying the two names differ
+		# will be true for every package here, forever, and clearing it
+		# would mean handing the package back.
+		#
+		# A USE FLAG DESCRIPTION shadows the IUSE axis, which already has a
+		# # BENTOO-DIVERGENCE: mechanism. QA REQUIRES a description for
+		# every local flag, so adding a flag necessarily edits
+		# metadata.xml: reporting both counted one decision twice. Checked
+		# per side against that side's own IUSE rather than against the
+		# axis row, so this does not depend on stage ordering.
+		#
+		# What is NOT suppressed: a flag described on a side whose IUSE
+		# does not have it - that is a stale description, pkgcheck's
+		# UnusedLocalUse - and any difference in the REST of the file,
+		# longdescription and upstream, which is real content.
+		metadata_body "${overlay_file}"
+		body_overlay=${METADATA_BODY}
+		metadata_body "${gentoo_file}"
+		if [[ ${body_overlay} == "${METADATA_BODY}" ]]; then
+			metadata_flags "${overlay_file}"
+			flags_overlay=${METADATA_FLAGS}
+			metadata_flags "${gentoo_file}"
+			iuse_union "${OVERLAY_ROOT}" "${key}"
+			iuse_overlay=${IUSE_UNION}
+			iuse_union "${GENTOO_REPO}" "${key}"
+			explained=yes
+			for flag in ${flags_overlay}; do
+				case ${METADATA_FLAGS} in
+					*" ${flag} "*) continue ;;
+				esac
+				case ${iuse_overlay} in
+					*" ${flag} "*) ;;
+					*) explained="" ;;
+				esac
+			done
+			for flag in ${METADATA_FLAGS}; do
+				case ${flags_overlay} in
+					*" ${flag} "*) continue ;;
+				esac
+				case ${IUSE_UNION} in
+					*" ${flag} "*) ;;
+					*) explained="" ;;
+				esac
+			done
+			if [[ -n ${explained} ]]; then
+				suppressed=$(( suppressed + 1 ))
+				PARITY_METADATA_SUPPRESSED+=( "${key}"$'\t'"maintainer and/or USE flag descriptions that follow each side's own IUSE" )
+				continue
+			fi
+		fi
+
 		summarise_diff "${overlay_file}" "${gentoo_file}"
 		parity_row "${key}" "${PACKAGE_ROW_PV}" "${PACKAGE_ROW_PV}" \
 			"${PACKAGE_ROW_DISTANCE}" 'metadata.xml' \
@@ -1564,6 +1676,8 @@ compare_metadata_xml() {
 
 	printf '  [metadata] %d of %d shared package(s) diverge on metadata.xml; %d examined without one on a side\n' \
 		"${diverged}" "${#PARITY_SHARED_PACKAGES[@]}" "${incomplete}"
+	printf '  [metadata] %d of those suppressed as maintainer or IUSE-shadow only, each recorded with its reason\n' \
+		"${suppressed}"
 }
 
 # Every regular file under one files/ directory, keyed "<side>:<name relative to
@@ -2609,6 +2723,30 @@ write_parity_report() {
 				IFS=$'\t' read -r key overlay gentoo verdict <<<"${name}"
 				printf -- "| \`%s\` | \`%s\` | \`%s\` | %s |\n" \
 					"${key}" "${overlay}" "${gentoo}" "${verdict}"
+			done
+		else
+			printf -- '- none\n'
+		fi
+		printf '\n'
+
+		printf "## Suppressed \`metadata.xml\` rows\n\n"
+		printf -- 'Two of the three things this file holds cannot align. The\n'
+		printf -- 'MAINTAINER is definitional -- this overlay maintains its fork and\n'
+		printf -- '`::gentoo` maintains theirs, so that row would be true forever and\n'
+		printf -- 'clearing it would mean handing the package back. A USE FLAG\n'
+		printf -- 'DESCRIPTION shadows the `IUSE` axis, which already has a mechanism:\n'
+		printf -- 'QA REQUIRES a description for every local flag, so adding a flag\n'
+		printf -- 'necessarily edits this file, and reporting both counted one decision\n'
+		printf -- 'twice. Checked against the OWN `IUSE` of each side, so a\n'
+		printf -- 'description for a flag that side does not have is NOT suppressed -\n'
+		printf -- 'that is a stale description, and it survives here as it does in\n'
+		printf -- 'pkgcheck.\n\n'
+		if (( ${#PARITY_METADATA_SUPPRESSED[@]} )); then
+			printf "| Package | Why it was suppressed |\n"
+			printf '|---|---|\n'
+			for name in "${PARITY_METADATA_SUPPRESSED[@]}"; do
+				IFS=$'\t' read -r key verdict <<<"${name}"
+				printf -- "| \`%s\` | %s |\n" "${key}" "${verdict}"
 			done
 		else
 			printf -- '- none\n'
@@ -3910,9 +4048,15 @@ self_test_assertions() {
 	# with PVR and reporting live patches as unreferenced (see the note there),
 	# and two more because the files those rows named -- the only genuinely
 	# dead ones -- were deleted from the tree.
+	#
+	# RE-MEASURED AGAIN, 264 -> 244, when metadata.xml got the same treatment
+	# the files/ axes did: 20 of its 27 rows are a maintainer line that cannot
+	# align or a USE flag description that follows its own side's IUSE. Both
+	# are recorded in PARITY_METADATA_SUPPRESSED. The invariant holds again --
+	# 244 against 244.
 	assert_eq A20 \
 		'the four verdicts still sum to the row total, with the stale cache outside both' \
-		'rows=264 verdict-sum=264 stale=0' \
+		'rows=244 verdict-sum=244 stale=0' \
 		"$(row_arithmetic)"
 
 	# --- story 008: what a stale cache does to the exit code ----------
