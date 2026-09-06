@@ -209,6 +209,13 @@ src_install() {
 	newinitd "${FILESDIR}"/lemond.initd lemond
 	newconfd "${FILESDIR}"/lemond.confd lemond
 
+	# 0640, not the 0644 newconfd leaves behind. This file carries HF_TOKEN,
+	# LEMONADE_API_KEY and LEMONADE_ADMIN_API_KEY. root:root rather than
+	# root:lemonade is deliberate and sufficient: OpenRC sources conf.d as root
+	# and only then drops to the lemonade user, so the daemon never reads the
+	# file, and naming the group would need the account on the BUILD host.
+	fperms 0640 /etc/conf.d/lemond
+
 	# /var/lib/lemonade is created at first start, not here: the lemonade
 	# service account does not exist on the build host, so fowners by name would
 	# fail.  systemd's StateDirectory= and the initd's checkpath both create it
@@ -225,6 +232,15 @@ pkg_postinst() {
 	elog "Ryzen AI/NPU, ...) are not built here: lemond downloads and manages"
 	elog "them at runtime, which is why app-arch/unzip is a runtime dependency."
 	elog
-	elog "Set LEMONADE_API_KEY and HF_TOKEN in /etc/lemonade/conf.d/ for the"
-	elog "systemd unit, or in /etc/conf.d/lemond for the OpenRC service."
+	elog "Set LEMONADE_API_KEY and HF_TOKEN in /etc/conf.d/lemond for the"
+	elog "OpenRC service, or in /etc/default/lemond for the systemd unit --"
+	elog "that is the path upstream's unit actually reads (EnvironmentFile=)."
+	elog "Both should be mode 0640; the OpenRC one is installed that way."
+	elog
+	elog "DISCLOSURE: lemond announces itself over UDP for server discovery,"
+	elog "and that is ON BY DEFAULT. It broadcasts on RFC1918 interfaces even"
+	elog "when the API itself is bound to loopback, so a machine on the same"
+	elog "LAN can see that this host runs lemonade. Turn it off with"
+	elog "--no-broadcast in LEMOND_OPTS, or \"broadcast\": false in"
+	elog "/var/lib/lemonade/config.json."
 }

@@ -18,9 +18,19 @@ KEYWORDS="-* ~amd64"
 # BENTOO-DIVERGENCE: IUSE - capi, exposing the ISDN/CAPI support the shipped
 # binary already contains; ::gentoo does not offer the flag. Also
 # python_single_target_python3_14, from a wider PYTHON_COMPAT.
+#
+# capi is DEFAULT-OFF as of 2026-09-06, and the flag itself stays. The two are
+# separate questions: whether someone with legacy ISDN hardware should be able
+# to turn it on (yes -- "not useful to me" is not an exclusion criterion here),
+# and whether everyone else should pay for it by default (no). net-libs/libcapi
+# needs abi_x86_32, so leaving it on made every crossover user pull a 32-bit
+# multilib dependency for a network technology switched off commercially across
+# most of the world by 2022. Turning the flag on costs nothing extra to enable
+# later: the support is already inside the shipped binary, so the flag only
+# decides whether the library is present for it to use.
 # BENTOO-DIVERGENCE: RDEPEND - net-libs/libcapi behind that flag. It lives in
 # ::gentoo, so the dependency resolves; only the flag is ours.
-IUSE="+capi +cups +gphoto2 +gstreamer +jpeg +lcms +mp3 +nls osmesa +openal +opencl +opengl +pcap +png +scanner +ssl +v4l +vulkan"
+IUSE="capi +cups +gphoto2 +gstreamer +jpeg +lcms +mp3 +nls osmesa +openal +opencl +opengl +pcap +png +scanner +ssl +v4l +vulkan"
 REQUIRED_USE="${PYTHON_REQUIRED_USE}"
 
 RESTRICT="bindist mirror strip"

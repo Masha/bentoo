@@ -5,7 +5,12 @@
 description="Lemonade local LLM server"
 
 command="/usr/bin/lemond"
-command_args="${LEMOND_OPTS}"
+# --host is passed explicitly even though upstream already defaults to
+# localhost (docs/dev/getting-started.md: "Bind address (default:
+# localhost)"). Stating it here is robustness rather than a fix: the
+# service keeps binding loopback even if that upstream default changes,
+# and LEMOND_HOST in /etc/conf.d/lemond is the one place to widen it.
+command_args="--host ${LEMOND_HOST:-127.0.0.1} ${LEMOND_OPTS}"
 command_user="lemonade:lemonade"
 directory="/var/lib/lemonade"
 supervisor="supervise-daemon"
