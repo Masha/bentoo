@@ -90,6 +90,9 @@ RESTRICT="!test? ( test )"
 # both majors now vendor 3.4.4 and 1.2.0. Their floors differ only because
 # ::gentoo's 24 ebuild predates that, not because the series disagree.
 #
+# BENTOO-DIVERGENCE: DEPEND - no dev-cpp/simdutf, for the reason spelled out
+# immediately below. The prose predates the tag; only the tag is machine
+# readable, and without it the parity guard reads this as an unexplained lag.
 # dev-cpp/simdutf is DELIBERATELY ABSENT, matching this overlay's 26 ebuild
 # and diverging from ::gentoo, which carries >=dev-cpp/simdutf-7.3.4:= plus
 # --shared-simdutf on BOTH its 24.16.0-r1 and its 26.3.0. That is the whole

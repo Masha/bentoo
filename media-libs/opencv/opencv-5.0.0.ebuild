@@ -360,6 +360,13 @@ BDEPEND="
 	)
 "
 
+# BENTOO-DIVERGENCE: DEPEND - no media-libs/quirc, and no quirc USE flag to
+# hang it on. OpenCV 5 folded QR decoding into objdetect and dropped the
+# bundled quirc entirely (see the keeplibs list in src_prepare), so there is
+# nothing left for the dependency to feed. ::gentoo still has it because it
+# is on 4.12.
+# BENTOO-DIVERGENCE: RDEPEND - the same missing quirc, reached through
+# RDEPEND's reuse of the same block.
 # BENTOO-DIVERGENCE: PATCHES - the 5.0.0 set. ::gentoo is on 4.12 and its
 # list diverges accordingly: use-system-flatbuffers moved 4.8.1 -> 4.13.0,
 # use-system-opencl 4.8.1 -> 5.0.0, and the dnn caffe-proto regeneration is

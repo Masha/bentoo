@@ -36,6 +36,11 @@ REQUIRED_USE="${PYTHON_REQUIRED_USE}"
 RESTRICT="bindist mirror strip"
 QA_PREBUILT="*"
 
+# BENTOO-DIVERGENCE: BDEPEND - no app-alternatives/cpio, app-arch/unzip or
+# dev-util/bbe. Those three unpack ::gentoo's install-crossover-*.bin, a
+# self-extracting zip that has to be carved apart by hand. This ebuild takes
+# the .deb CodeWeavers publishes alongside it (see SRC_URI) and hands it to
+# unpack_deb, so none of the three is ever invoked.
 BDEPEND="${PYTHON_DEPS}
 	dev-lang/perl
 "

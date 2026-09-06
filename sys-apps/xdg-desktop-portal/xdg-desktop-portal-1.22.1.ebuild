@@ -25,6 +25,7 @@ DEPEND="
 	>=media-video/pipewire-0.3:=
 	>=sys-fs/fuse-3.10.0:3=[suid]
 	x11-libs/gdk-pixbuf
+	media-libs/gst-plugins-base:1.0
 	geolocation? ( >=app-misc/geoclue-2.5.3:2.0 )
 	flatpak? ( sys-apps/flatpak )
 	seccomp? ( sys-apps/bubblewrap )

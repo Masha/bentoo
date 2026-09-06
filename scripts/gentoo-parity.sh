@@ -4333,9 +4333,24 @@ self_test_assertions() {
 	#        ALIGN -> JUSTIFIED and stay in the total
 	#
 	# 232 against 232.
+	#
+	# RE-MEASURED 2026-09-06 (fourth pass), 232 -> 230, and the ratio inverted:
+	# ten rows triaged, ONE was a lag.
+	#
+	#    -2  xdg-desktop-portal gained media-libs/gst-plugins-base:1.0, which
+	#        upstream's meson.build requires unconditionally
+	#    +-0  eight rows across crossover-bin, nodejs, opencv, imagemagick,
+	#        minikube and xf86-video-qxl were decisions ALREADY explained in
+	#        prose beside the code and only missing the machine-readable tag
+	#
+	# That ratio is the finding, and it is what the tag mechanism is for: the
+	# deeper the remediation goes, the more of what is left is documentation
+	# debt rather than drift. ALIGN is "no reason RECORDED", never "no reason".
+	#
+	# 230 against 230.
 	assert_eq A20 \
 		'the four verdicts still sum to the row total, with the stale cache outside both' \
-		'rows=232 verdict-sum=232 stale=0' \
+		'rows=230 verdict-sum=230 stale=0' \
 		"$(row_arithmetic)"
 
 	# --- story 008: what a stale cache does to the exit code ----------

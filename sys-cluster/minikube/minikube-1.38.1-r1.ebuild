@@ -20,6 +20,10 @@ SLOT="0"
 KEYWORDS="~amd64 ~arm64"
 IUSE="libvirt"
 
+# BENTOO-DIVERGENCE: DEPEND - app-emulation/libvirt is in RDEPEND only, where
+# ::gentoo has it in both. The reason is below: nothing libvirt-related is
+# needed to COMPILE. One atom moved between axes, so it shows up as a
+# divergence on the axis it left as well as the one it landed on.
 # Since 1.38 the kvm2 driver is linked into the minikube binary itself
 # (pkg/minikube/registry/drvs/kvm2) and reaches libvirt through dlopen: the
 # Makefile builds with -tags libvirt_dlopen, which selects "#cgo LDFLAGS: -ldl"
@@ -28,6 +32,7 @@ IUSE="libvirt"
 # without it dlopen("libvirt.so.0") fails and only the kvm2 driver is lost.
 RDEPEND="libvirt? ( app-emulation/libvirt:=[qemu] )"
 
+# BENTOO-DIVERGENCE: BDEPEND - no dev-go/go-bindata, for the reason below.
 # go.mod says "go 1.25.0"; the eclass only floors go at its own default, and
 # portage raises a QA notice for the gap.  dev-go/go-bindata is gone from here:
 # the Makefile stopped invoking it, and nothing outside a comment and one

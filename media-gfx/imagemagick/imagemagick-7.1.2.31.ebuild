@@ -123,6 +123,11 @@ DEPEND="
 	${RDEPEND}
 	X? ( x11-base/xorg-proto )
 "
+# BENTOO-DIVERGENCE: BDEPEND - none of ::gentoo's verify-sig chain
+# (sec-keys/openpgp-keys-imagemagick, app-alternatives/gpg, app-crypt/gnupg,
+# app-portage/gemato). Not a second decision: it follows from the SRC_URI
+# divergence recorded above. Those atoms exist to verify a .asc fetched from
+# mirror://imagemagick, and this ebuild does not fetch from there.
 BDEPEND+=" virtual/pkgconfig"
 
 PATCHES=(
