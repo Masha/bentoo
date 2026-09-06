@@ -8,7 +8,7 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
 ---
 
 diff --git a/crates/agent_ui/src/conversation_view.rs b/crates/agent_ui/src/conversation_view.rs
-index cc33d45..fe676fa 100644
+index 87fa65d..43dbed6 100644
 --- a/crates/agent_ui/src/conversation_view.rs
 +++ b/crates/agent_ui/src/conversation_view.rs
 @@ -2501,13 +2501,33 @@ impl ConversationView {

@@ -46,8 +46,6 @@ Compile- and unit-verified only — that the preview appears on screen and reads
 correctly is an observation for a running editor, not something this crate
 asserts.
 ---
- crates/agent_ui/src/message_editor.rs | 225 +++++++++++++++++++++++++-
- 1 file changed, 220 insertions(+), 5 deletions(-)
 
 diff --git a/crates/agent_ui/src/message_editor.rs b/crates/agent_ui/src/message_editor.rs
 index 044e788..f068de1 100644
@@ -350,6 +348,3 @@ index 044e788..f068de1 100644
 +        });
 +    }
  }
--- 
-2.55.0
-

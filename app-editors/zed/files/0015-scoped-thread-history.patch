@@ -59,8 +59,6 @@ Verified: `cargo check -p agent_ui`, `cargo clippy -p agent_ui --all-targets` an
 construction rather than only by unit test. Not eyeball-verified in a running
 editor; that is what the live session is for.
 ---
- crates/agent_ui/src/threads_archive_view.rs | 292 ++++++++++++++++++--
- 1 file changed, 270 insertions(+), 22 deletions(-)
 
 diff --git a/crates/agent_ui/src/threads_archive_view.rs b/crates/agent_ui/src/threads_archive_view.rs
 index 09a3ea8..78a835d 100644
@@ -402,6 +400,3 @@ index 09a3ea8..78a835d 100644
 +        });
 +    }
  }
--- 
-2.55.0
-

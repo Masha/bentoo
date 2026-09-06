@@ -92,10 +92,10 @@ index 5f0cf69..8ea6077 100644
              Task::ready(Ok(()))
          }
 diff --git a/crates/agent/src/agent.rs b/crates/agent/src/agent.rs
-index 6139ce7..58311da 100644
+index f26ca09..69b72ec 100644
 --- a/crates/agent/src/agent.rs
 +++ b/crates/agent/src/agent.rs
-@@ -2523,7 +2523,12 @@ impl acp_thread::AgentModelSelector for NativeAgentModelSelector {
+@@ -2560,7 +2560,12 @@ impl acp_thread::AgentModelSelector for NativeAgentModelSelector {
          })
      }
  
@@ -109,7 +109,7 @@ index 6139ce7..58311da 100644
          log::debug!(
              "Setting model for session {}: {}",
              self.session_id,
-@@ -2569,30 +2574,45 @@ impl acp_thread::AgentModelSelector for NativeAgentModelSelector {
+@@ -2606,30 +2611,45 @@ impl acp_thread::AgentModelSelector for NativeAgentModelSelector {
              }
          });
  
@@ -175,7 +175,7 @@ index 6139ce7..58311da 100644
      fn selected_model(&self, cx: &mut App) -> Task<Result<acp_thread::AgentModelInfo>> {
          let Some(thread) = self
              .connection
-@@ -5832,6 +5852,86 @@ mod internal_tests {
+@@ -5872,6 +5892,86 @@ mod internal_tests {
          );
      }
  
@@ -262,7 +262,7 @@ index 6139ce7..58311da 100644
      #[gpui::test]
      async fn test_model_selection_persists_to_settings(cx: &mut TestAppContext) {
          init_test(cx);
-@@ -5879,7 +5979,7 @@ mod internal_tests {
+@@ -5919,7 +6019,7 @@ mod internal_tests {
          // Select a model
          let selector = connection.model_selector(&session_id).unwrap();
          let model_id = AgentModelId::new("fake/fake");
@@ -271,7 +271,7 @@ index 6139ce7..58311da 100644
              .await
              .unwrap();
  
-@@ -5929,9 +6029,11 @@ mod internal_tests {
+@@ -5969,9 +6069,11 @@ mod internal_tests {
          agent.update(cx, |agent, cx| agent.models.refresh_list(cx));
  
          let selector = connection.model_selector(&session_id).unwrap();
@@ -286,7 +286,7 @@ index 6139ce7..58311da 100644
          cx.run_until_parked();
  
          // Verify enable_thinking was written to settings as true.
-@@ -6003,9 +6105,11 @@ mod internal_tests {
+@@ -6043,9 +6145,11 @@ mod internal_tests {
  
          // Select the thinking model via select_model.
          let selector = connection.model_selector(&session_id).unwrap();
@@ -301,7 +301,7 @@ index 6139ce7..58311da 100644
  
          // select_model should have enabled thinking based on the model's supports_thinking().
          agent.read_with(cx, |agent, _| {
-@@ -6020,7 +6124,7 @@ mod internal_tests {
+@@ -6060,7 +6164,7 @@ mod internal_tests {
  
          // Switch back to the non-thinking model.
          let selector = connection.model_selector(&session_id).unwrap();
@@ -310,7 +310,7 @@ index 6139ce7..58311da 100644
              .await
              .unwrap();
  
-@@ -6137,9 +6241,11 @@ mod internal_tests {
+@@ -6177,9 +6281,11 @@ mod internal_tests {
          let session_id = acp_thread.read_with(cx, |thread, _| thread.session_id().clone());
  
          let selector = connection.model_selector(&session_id).unwrap();
@@ -325,7 +325,7 @@ index 6139ce7..58311da 100644
  
          // Verify thinking is enabled after selecting the thinking model.
          let thread = agent.read_with(cx, |agent, _| {
-@@ -6240,9 +6346,11 @@ mod internal_tests {
+@@ -6278,9 +6384,11 @@ mod internal_tests {
          let session_id = acp_thread.read_with(cx, |thread, _| thread.session_id().clone());
  
          let selector = connection.model_selector(&session_id).unwrap();
@@ -340,7 +340,7 @@ index 6139ce7..58311da 100644
  
          let thread = agent.read_with(cx, |agent, _| {
              agent.sessions.get(&session_id).unwrap().thread.clone()
-@@ -6350,9 +6458,11 @@ mod internal_tests {
+@@ -6386,9 +6494,11 @@ mod internal_tests {
          let session_id = acp_thread.read_with(cx, |thread, _| thread.session_id().clone());
  
          let selector = connection.model_selector(&session_id).unwrap();
@@ -355,7 +355,7 @@ index 6139ce7..58311da 100644
  
          let send = acp_thread.update(cx, |thread, cx| thread.send(vec!["Hello".into()], cx));
          let send = cx.foreground_executor().spawn(send);
-@@ -6479,9 +6589,11 @@ mod internal_tests {
+@@ -6513,9 +6623,11 @@ mod internal_tests {
          cx.run_until_parked();
  
          let selector = connection.model_selector(&session_id).unwrap();

@@ -58,8 +58,6 @@ Verified: `cargo check -p agent_ui`, `cargo test -p agent_ui --lib` (7 passed),
 this crate drives `render_entry`, so that it appears and writes to the clipboard
 is checked in a running Zed, not here.
 ---
- .../src/conversation_view/thread_view.rs      | 184 +++++++++++++++++-
- 1 file changed, 180 insertions(+), 4 deletions(-)
 
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
 index d2433f8..0a1fed0 100644
@@ -277,6 +275,3 @@ index d2433f8..0a1fed0 100644
  
      #[test]
      fn test_leading_native_command_matches_bare_and_with_remainder() {
--- 
-2.55.0
-

@@ -2083,7 +2083,7 @@ base_from = "file"
 base_url = "https://api.github.com/repos/zed-industries/zed/contents/crates/zed/Cargo.toml?ref=main"
 base_pattern = '(?m)^version = "([0-9][0-9.]*)"'
 headers = { "User-Agent" = "bentoo-autoupdate", "Accept" = "application/vnd.github.raw" }
-version = "1.20.0_pre20260904"
+version = "1.20.0_pre20260904-r1"
 comments = """
 zed — commit-tracked on main; _pre suffix preserved from current ebuild.
 2026-08-06: 2 commits landed same UTC day (d61e80b -> 6b2aa1c), so the date
@@ -2161,6 +2161,30 @@ All ten patches applied sequentially at fuzz zero (-F0); 0011, 0012 and 0002
 carry line offsets only, so no rebase was needed. md5-cache _md5_ matches the
 ebuild, and pkgcheck reports only the two findings the published ebuild already
 had (deprecated llvm-r1, one over-long line in src_prepare).
+2026-09-04: third same-day bump in a row (a7bc7d77 11:40 -> 5a9b9558 22:54
+UTC), so -r1 rather than a new date; SRC_URI already names the tarball after
+${PF}, so the DIST entry renames with it. This one was a MANUAL bump, so the
+applier's 40-hex rewrite never ran and `grep -c` of EGIT_COMMIT gave 1, not 8.
+Cargo.lock did move (13 commits, 45 files) but not in a way that touches deps:
+diffing it with tomllib against the ebuild gave 0 missing / 0 extra registry
+crates and 0 missing / 0 extra / 0 divergent git crates, and pycargoebuild
+re-run from crates/zed left the file byte-identical (same md5) -- the two
+WARNINGs it printed are what distinguishes that from a silent no-op run in the
+virtual workspace root.
+What did break was patch 0009. Upstream replaced AcpSession's `ref_count` with
+a `Subscription` released via `cx.observe_release`, extracting the insert into
+a new `register_session()`; both of 0009's `config_options.map(ConfigOptions::new)`
+-> `config_options` sites lost their context and 2 of 10 hunks FAILED. Rebased
+by regenerating with `git format-patch` from a corrected tree rather than by
+hand-editing @@ counts: the new patch has the same shape (10 hunks, +59/-26),
+so only the positions moved. After it, all fifteen patches apply sequentially
+at zero fuzz and `ebuild ... prepare` completes.
+Verified before publishing: eleven sed patterns each matched the new Cargo.toml
+exactly once and left zero [patch.crates-io] entries on `git =`; the four
+USE-flag seds produce valid TOML in all sixteen wayland/X/screen-capture/neovim
+combinations; `cargo metadata --offline` resolves the whole graph (exit 0);
+md5-cache _md5_ matches the ebuild; pkgcheck reports only the pre-existing
+deprecated-llvm-r1 finding.
 """
 # END
 

@@ -30,10 +30,10 @@ Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 ---
 
 diff --git a/crates/agent_servers/src/acp.rs b/crates/agent_servers/src/acp.rs
-index 4789ec0..96e2b5f 100644
+index a3b8c87..4034ed2 100644
 --- a/crates/agent_servers/src/acp.rs
 +++ b/crates/agent_servers/src/acp.rs
-@@ -1255,6 +1255,7 @@ impl AcpConnection {
+@@ -1302,6 +1302,7 @@ impl AcpConnection {
  
                      let (modes, config_options) =
                          config_state(response.modes, response.config_options);
@@ -41,16 +41,16 @@ index 4789ec0..96e2b5f 100644
  
                      if let Some(config_opts) = config_options.as_ref() {
                          this.apply_default_config_options(&session_id, config_opts, cx);
-@@ -1279,7 +1280,7 @@ impl AcpConnection {
+@@ -1317,7 +1318,7 @@ impl AcpConnection {
                              )));
                          };
                          session.session_modes = modes;
 -                        session.config_options = config_options.map(ConfigOptions::new);
 +                        session.config_options = config_options;
-                         session.ref_count = ref_count;
                      }
  
-@@ -1303,10 +1304,12 @@ impl AcpConnection {
+                     Ok(thread)
+@@ -1339,10 +1340,12 @@ impl AcpConnection {
      fn apply_default_config_options(
          &self,
          session_id: &acp::SessionId,
@@ -64,7 +64,7 @@ index 4789ec0..96e2b5f 100644
          let defaults_to_apply: Vec<_> = {
              let config_opts_ref = config_options.borrow();
              config_opts_ref
-@@ -1378,6 +1381,7 @@ impl AcpConnection {
+@@ -1414,6 +1417,7 @@ impl AcpConnection {
                  let session_id = session_id.clone();
                  let config_id_clone = config_id.clone();
                  let config_opts = config_options.clone();
@@ -72,7 +72,7 @@ index 4789ec0..96e2b5f 100644
                  let conn = self.connection.clone();
                  async move |_| {
                      let result = conn
-@@ -1390,23 +1394,37 @@ impl AcpConnection {
+@@ -1426,23 +1430,37 @@ impl AcpConnection {
                          .await
                          .log_err();
  
@@ -126,7 +126,7 @@ index 4789ec0..96e2b5f 100644
                              }
                          }
                      }
-@@ -1671,6 +1689,7 @@ impl AgentConnection for AcpConnection {
+@@ -1707,6 +1725,7 @@ impl AgentConnection for AcpConnection {
                  }
              }
  
@@ -134,16 +134,16 @@ index 4789ec0..96e2b5f 100644
              if let Some(config_opts) = config_options.as_ref() {
                  self.apply_default_config_options(&response.session_id, config_opts, cx);
              }
-@@ -1699,7 +1718,7 @@ impl AgentConnection for AcpConnection {
-                     thread: thread.downgrade(),
-                     suppress_abort_err: false,
-                     session_modes: modes,
--                    config_options: config_options.map(ConfigOptions::new),
+@@ -1734,7 +1753,7 @@ impl AgentConnection for AcpConnection {
+                     response.session_id,
+                     &thread,
+                     modes,
+-                    config_options.map(ConfigOptions::new),
 +                    config_options,
-                     ref_count: 1,
-                 },
-             );
-@@ -3617,11 +3636,9 @@ mod tests {
+                     cx,
+                 )
+             });
+@@ -3570,11 +3589,9 @@ mod tests {
                  AgentConfigOptionValue::Boolean(true),
              )]),
          );
@@ -158,7 +158,7 @@ index 4789ec0..96e2b5f 100644
  
          let mut async_cx = cx.to_async();
          connection.apply_default_config_options(
-@@ -3645,10 +3662,19 @@ mod tests {
+@@ -3598,10 +3615,19 @@ mod tests {
              acp::SessionConfigOptionValue::boolean(true)
          );
  
@@ -179,7 +179,7 @@ index 4789ec0..96e2b5f 100644
      }
  
      async fn connect_config_defaults_test_agent(
-@@ -3673,7 +3699,14 @@ mod tests {
+@@ -3626,7 +3652,14 @@ mod tests {
                                  .expect("set config requests mutex poisoned")
                                  .push(req);
  

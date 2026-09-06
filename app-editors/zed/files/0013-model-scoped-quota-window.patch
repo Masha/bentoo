@@ -49,8 +49,6 @@ halves — two model-scoped windows must not collapse into one, and one window
 moving must not split into two — plus the guards that the unknown kind and the
 unnamed model-scoped window are still dropped.
 ---
- crates/acp_thread/src/acp_thread.rs | 245 +++++++++++++++++++++++++++-
- 1 file changed, 236 insertions(+), 9 deletions(-)
 
 diff --git a/crates/acp_thread/src/acp_thread.rs b/crates/acp_thread/src/acp_thread.rs
 index 41af005..4686b00 100644
@@ -373,6 +371,3 @@ index 41af005..4686b00 100644
      use super::*;
      use anyhow::anyhow;
      use feature_flags::FeatureFlag as _;
--- 
-2.55.0
-

@@ -452,7 +452,7 @@ index bef45ba..fcd278c 100644
              | AcpThreadEvent::EntriesRemoved(_)
              | AcpThreadEvent::ToolAuthorizationRequested(_)
 diff --git a/crates/agent_ui/src/conversation_view.rs b/crates/agent_ui/src/conversation_view.rs
-index fe676fa..78b5333 100644
+index 43dbed6..f5f05e3 100644
 --- a/crates/agent_ui/src/conversation_view.rs
 +++ b/crates/agent_ui/src/conversation_view.rs
 @@ -324,6 +324,7 @@ impl Conversation {

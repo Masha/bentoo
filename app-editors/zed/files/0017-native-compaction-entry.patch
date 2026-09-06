@@ -72,8 +72,6 @@ Verified: `cargo test -p acp_thread` 149 passed, `cargo check -p agent_ui` clean
 `cargo clippy -p acp_thread --all-targets` and `--all-features -- --deny warnings`
 both zero.
 ---
- crates/acp_thread/src/acp_thread.rs | 576 +++++++++++++++++++++++++++-
- 1 file changed, 574 insertions(+), 2 deletions(-)
 
 diff --git a/crates/acp_thread/src/acp_thread.rs b/crates/acp_thread/src/acp_thread.rs
 index 4686b00..e2dcc35 100644
@@ -685,6 +683,3 @@ index 4686b00..e2dcc35 100644
  
      #[gpui::test]
      async fn test_usage_update_without_cost_preserves_existing_cost(cx: &mut TestAppContext) {
--- 
-2.55.0
-
