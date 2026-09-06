@@ -1717,6 +1717,12 @@ pkg_setup() {
 }
 
 src_prepare() {
+	# 0018 carries no USE flag on purpose. It adds the drop_folder_behavior
+	# setting, whose default is the behaviour Zed already had, so applying it
+	# unconditionally changes nothing for anyone who does not set it -- and a
+	# flag would only hide a setting behind a rebuild.
+	PATCHES+=( "${FILESDIR}/0018-drop-folder-opens-project.patch" )
+
 	if use claude-agent-acp-plus; then
 		PATCHES+=(
 			"${FILESDIR}/0001-force-enable-claude-agent-acp-plus.patch"

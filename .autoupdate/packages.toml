@@ -2083,7 +2083,7 @@ base_from = "file"
 base_url = "https://api.github.com/repos/zed-industries/zed/contents/crates/zed/Cargo.toml?ref=main"
 base_pattern = '(?m)^version = "([0-9][0-9.]*)"'
 headers = { "User-Agent" = "bentoo-autoupdate", "Accept" = "application/vnd.github.raw" }
-version = "1.20.0_pre20260904-r1"
+version = "1.20.0_pre20260904-r2"
 comments = """
 zed — commit-tracked on main; _pre suffix preserved from current ebuild.
 2026-08-06: 2 commits landed same UTC day (d61e80b -> 6b2aa1c), so the date
@@ -2185,6 +2185,16 @@ USE-flag seds produce valid TOML in all sixteen wayland/X/screen-capture/neovim
 combinations; `cargo metadata --offline` resolves the whole graph (exit 0);
 md5-cache _md5_ matches the ebuild; pkgcheck reports only the pre-existing
 deprecated-llvm-r1 finding.
+2026-09-06 (-r2): not an upstream move -- same commit 5a9b9558, revbumped only
+because a sixteenth patch was added. 0018 makes a dropped folder open as its own
+project, restoring the session saved for it, behind a new drop_folder_behavior
+setting that defaults to the behaviour Zed already had. It is the first patch in
+this series with NO USE flag: the default changes nothing for anyone who does
+not set it, so gating it would only hide a setting behind a rebuild. In the
+zed-patches series it sits UNGROUPED, ahead of the first "# @feature:" line.
+Because SRC_URI renames the tarball after ${PF}, the -r2 needed its own DIST
+entry; the distfile was copied from the -r1 rather than refetched, the two being
+byte-identical (`cmp` clean) since the commit did not move.
 """
 # END
 
