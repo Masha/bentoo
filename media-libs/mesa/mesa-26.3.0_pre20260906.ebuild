@@ -261,6 +261,26 @@ src_unpack() {
 			die "VENUS_PROTOCOL_COMMIT declares ${vn_have}, mesa requires ${vn_want}"
 
 		mv "${WORKDIR}/${VENUS_PROTOCOL_P}" "${S}/subprojects/${vn_dir}" || die
+
+		# The subproject installs a venus-protocol.pc that promises headers it
+		# does not install: pkg.generate() runs unconditionally, while the
+		# custom_targets that generate the headers carry "install: not_subproj".
+		# Merged, that .pc poisons the NEXT mesa build -- dependency() finds it
+		# by name, skips the fallback, and hands the compiler
+		# -I/usr/include/venus-protocol, a directory nobody created.  The build
+		# then dies far from the cause, on a missing vn_protocol_driver_*.h.
+		#
+		# It only bites when the .pc left behind matches the "== <ver>" mesa
+		# asks for, so it fires on the second consecutive snapshot to keep the
+		# same venus-protocol version and looks intermittent.  Measured
+		# 2026-09-06: 26.3.0_pre20260905 installed a 1.1.2 .pc, and
+		# 26.3.0_pre20260906, which also wants == 1.1.2, failed to compile.
+		local vn_meson="${S}/subprojects/${vn_dir}/meson.build"
+		grep -qF "pkg.generate(" "${vn_meson}" ||
+			die "venus-protocol no longer calls pkg.generate(); drop this hunk"
+		sed -i -e "/^pkg = import('pkgconfig')$/,/^)$/d" "${vn_meson}" || die
+		! grep -qF "pkg.generate(" "${vn_meson}" ||
+			die "failed to drop pkg.generate() from ${vn_meson}"
 	fi
 
 	# We need this because we cannot tell meson to use DISTDIR yet
@@ -458,6 +478,14 @@ multilib_src_configure() {
 	if use video_cards_asahi ||
 	   use video_cards_panfrost; then
 	    emesonargs+=(-Dprecomp-compiler=system)
+	fi
+
+	# Never resolve venus-protocol from the system.  Nothing packages it --
+	# upstream only generates headers at build time -- so any .pc on the host
+	# is the stray one an older mesa left behind (see src_unpack), and it
+	# would win over the subproject purely by being found first.
+	if use vulkan && use video_cards_virgl; then
+		emesonargs+=(--force-fallback-for=venus-protocol)
 	fi
 
 	use debug && EMESON_BUILDTYPE=debug
