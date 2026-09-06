@@ -295,6 +295,10 @@ PARITY_ECLASS_DEFINITIONAL=()
 # the harness instead - which is a broken test, not a red one, and would prove
 # nothing about the rule being absent.
 
+PARITY_FILES_SUPPRESSED=()  # <category>/<pn> TAB <axis> TAB <count> TAB <why>
+                           # R1.5 again: a files/ row is dropped only when
+                           # every name in it is reachable from an ebuild, and
+                           # the record says which axis and how many.
 PARITY_SLOT_SUPPRESSED=()  # <category>/<pn>-<PV> TAB <overlay SLOT> TAB
                            # <::gentoo SLOT> TAB <why it was suppressed>
                            # R1.5: a suppression nobody can audit is
@@ -1403,10 +1407,13 @@ PACKAGE_ROW_DISTANCE='package'
 # Sub-task 5.2 wants the same list for the opposite reason: a row on one of
 # these axes must not be promoted to UNDOCUMENTED for lacking a tag it cannot
 # carry. Both consume the array, so neither has to restate the list of axes.
+# files/overlay-only and files/gentoo-only WERE here until 2026-09-06. They are
+# no longer emitted at all: the first is partitioned into a suppression and the
+# new files/unreferenced axis, the second is suppressed whole. See the files
+# stage for the measurement that justified it. What remains are the two axes
+# that are genuinely reported and genuinely cannot carry a tag.
 PARITY_UNJUSTIFIABLE_AXES=(
 	'metadata.xml'
-	'files/overlay-only'
-	'files/gentoo-only'
 	'files/content'
 )
 PARITY_UNJUSTIFIABLE_NOTE='no justification mechanism on this axis: the difference is in a file that holds no ebuild code, so it cannot carry a # BENTOO-DIVERGENCE: tag. Rows here are ALIGN because no reason COULD be recorded, not because none was found - and they are never promoted to UNDOCUMENTED or JUSTIFIED.'
@@ -1605,6 +1612,98 @@ digest_tree() {
 	DIGEST_NAMES=${DIGEST_NAMES% }
 }
 
+FILESDIR_REFS=""
+
+# filesdir_refs <repo root> <category/pn>
+# Every files/ name the package's ebuilds reach through ${FILESDIR}, into
+# FILESDIR_REFS as a space-separated list of GLOB patterns.
+#
+# WHY THIS EXISTS. Measured on 2026-09-06: 62 of 66 files/overlay-only names and
+# 123 of 132 files/gentoo-only names are reached from an ebuild in their own
+# package. So neither axis measures an independent divergence - both are shadows
+# of PATCHES and the phase functions, which already carry a
+# # BENTOO-DIVERGENCE: tag. Reporting them as ALIGN made half of all ALIGN rows
+# noise that no action could ever clear.
+#
+# THREE WAYS TO GET THIS WRONG, all of them hit before this was right:
+#   - a row's value is a SPACE-SEPARATED LIST of names, not one name;
+#   - ebuilds name patches through interpolation (${P}-nettle-4.patch), so
+#     matching the literal filename under-counts badly;
+#   - "${FILESDIR}"/x puts a quote BETWEEN the variable and the path, so a
+#     pattern that stops at the quote sees a bare ${FILESDIR} and misses the
+#     reference entirely.
+# Hence: read the expression past an optional quote, expand PN/P/PV/PF, and turn
+# any remaining ${VAR} into a wildcard rather than guessing its value.
+filesdir_refs() {
+	local root=$1 key=$2 pn=${2#*/}
+	local eb base pv expr
+
+	FILESDIR_REFS=""
+	for eb in "${root}/${key}"/*.ebuild; do
+		[[ -f ${eb} ]] || continue
+		base=${eb##*/}
+		base=${base%.ebuild}
+		pv=${base#"${pn}-"}
+		while IFS= read -r expr; do
+			expr=${expr//\$\{PF\}/${base}}
+			expr=${expr//\$\{P\}/${pn}-${pv}}
+			expr=${expr//\$\{PN\}/${pn}}
+			expr=${expr//\$\{PV\}/${pv}}
+			expr=$(printf '%s' "${expr}" |
+				sed -E 's/\$\{[A-Za-z_][A-Za-z0-9_]*\}/*/g')
+			FILESDIR_REFS+="${expr} "
+		done < <(grep -hoE '\$\{FILESDIR\}"?/[^[:space:])"'"'"';]+' "${eb}" 2>/dev/null |
+			sed -E 's|^\$\{FILESDIR\}"?/||')
+	done
+	FILESDIR_REFS=${FILESDIR_REFS% }
+}
+
+# split_by_reference <names> <patterns>
+# Partition a row's names into SPLIT_REFERENCED and SPLIT_ORPHAN. `case` rather
+# than [[ == ]] so the glob works without a shellcheck suppression.
+SPLIT_REFERENCED=""
+SPLIT_ORPHAN=""
+split_by_reference() {
+	local names=$1 patterns=$2
+	local -a name_list=() pattern_list=()
+	local name pattern hit regex
+
+	SPLIT_REFERENCED=""
+	SPLIT_ORPHAN=""
+	read -r -a name_list <<<"${names}"
+	read -r -a pattern_list <<<"${patterns}"
+	for name in "${name_list[@]}"; do
+		hit=""
+		for pattern in "${pattern_list[@]}"; do
+			# Glob translated to a regex rather than matched as a
+			# `case` pattern or with [[ == ]]. Both of those need an
+			# UNQUOTED expansion to keep the glob alive, which raises
+			# SC2254 and SC2053, and this file carries no
+			# suppressions -- so the check has to pass on its own
+			# terms rather than be silenced.
+			#
+			# Do NOT start a comment line here with the linter's own
+			# name: a line beginning "# <that name>" is parsed as a
+			# DIRECTIVE, and an unparseable one turns the whole
+			# function into SC1009/SC1072/SC1073 parse errors while
+			# bash -n still reports the file as fine.
+			regex=${pattern//./\\.}
+			regex=${regex//\*/.*}
+			if [[ ${name} =~ ^${regex}$ ]]; then
+				hit=yes
+				break
+			fi
+		done
+		if [[ -n ${hit} ]]; then
+			SPLIT_REFERENCED+="${name} "
+		else
+			SPLIT_ORPHAN+="${name} "
+		fi
+	done
+	SPLIT_REFERENCED=${SPLIT_REFERENCED% }
+	SPLIT_ORPHAN=${SPLIT_ORPHAN% }
+}
+
 # Sub-task 4.2. files/ as a set of names and SHA256 digests (R4.2).
 #
 # THREE CASES, THREE AXES, ON PURPOSE. A file only the overlay has is a
@@ -1629,6 +1728,7 @@ compare_files_dirs() {
 	local content_overlay content_gentoo
 	local -a surplus=() shared_names=()
 	local packages=0 n_overlay=0 n_gentoo=0 n_content=0
+	local n_suppressed=0 n_orphan=0
 
 	for key in "${PARITY_SHARED_PACKAGES[@]}"; do
 		overlay_dir="${OVERLAY_ROOT}/${key}/files"
@@ -1668,19 +1768,42 @@ compare_files_dirs() {
 			n_content=$(( n_content + 1 ))
 		done
 
+		# An overlay-only file whose name an ebuild here reaches is not an
+		# independent divergence: it exists BECAUSE a PATCHES or newinitd
+		# line names it, and that line sits on an axis which already
+		# carries a # BENTOO-DIVERGENCE: tag. Suppressed with its reason
+		# recorded (R1.5). What survives is the file no ebuild names --
+		# dead weight in the tree, which nothing measured before.
 		if [[ -n ${only_overlay} ]]; then
 			read -r -a surplus <<<"${only_overlay}"
 			n_overlay=$(( n_overlay + ${#surplus[@]} ))
-			parity_row "${key}" "${PACKAGE_ROW_PV}" "${PACKAGE_ROW_PV}" \
-				"${PACKAGE_ROW_DISTANCE}" 'files/overlay-only' \
-				"${only_overlay}" ''
+			filesdir_refs "${OVERLAY_ROOT}" "${key}"
+			split_by_reference "${only_overlay}" "${FILESDIR_REFS}"
+			if [[ -n ${SPLIT_REFERENCED} ]]; then
+				read -r -a surplus <<<"${SPLIT_REFERENCED}"
+				n_suppressed=$(( n_suppressed + ${#surplus[@]} ))
+				PARITY_FILES_SUPPRESSED+=( "${key}"$'\t''files/overlay-only'$'\t'"${#surplus[@]}"$'\t'"reached from an ebuild through \${FILESDIR}: ${SPLIT_REFERENCED}" )
+			fi
+			if [[ -n ${SPLIT_ORPHAN} ]]; then
+				read -r -a surplus <<<"${SPLIT_ORPHAN}"
+				n_orphan=$(( n_orphan + ${#surplus[@]} ))
+				parity_row "${key}" "${PACKAGE_ROW_PV}" "${PACKAGE_ROW_PV}" \
+					"${PACKAGE_ROW_DISTANCE}" 'files/unreferenced' \
+					"${SPLIT_ORPHAN}" ''
+			fi
 		fi
+		# files/gentoo-only is suppressed whole, and for a different reason
+		# than the above: it is not actionable in this overlay AT ALL. It
+		# says ::gentoo carries patch files we do not, which follows from
+		# shipping different versions with different patch sets. If we ever
+		# needed one of them, the PATCHES axis is where that would show,
+		# with a mechanism to justify it. 123 of its 132 names were reached
+		# from a ::gentoo ebuild when this was measured; the other nine are
+		# dead weight on their side, not ours.
 		if [[ -n ${only_gentoo} ]]; then
 			read -r -a surplus <<<"${only_gentoo}"
 			n_gentoo=$(( n_gentoo + ${#surplus[@]} ))
-			parity_row "${key}" "${PACKAGE_ROW_PV}" "${PACKAGE_ROW_PV}" \
-				"${PACKAGE_ROW_DISTANCE}" 'files/gentoo-only' \
-				'' "${only_gentoo}"
+			PARITY_FILES_SUPPRESSED+=( "${key}"$'\t''files/gentoo-only'$'\t'"${#surplus[@]}"$'\t'"::gentoo's own patch set for its own versions; the PATCHES axis is where a missing fix would show" )
 		fi
 		if [[ -n ${content_overlay} ]]; then
 			parity_row "${key}" "${PACKAGE_ROW_PV}" "${PACKAGE_ROW_PV}" \
@@ -1691,6 +1814,8 @@ compare_files_dirs() {
 
 	printf '  [files]    %d package(s) with a files/ directory on some side: %d file(s) overlay-only, %d ::gentoo-only, %d same name and different content\n' \
 		"${packages}" "${n_overlay}" "${n_gentoo}" "${n_content}"
+	printf '  [files]    %d name(s) suppressed as reachable from an ebuild, each recorded with its reason; %d overlay file(s) no ebuild references\n' \
+		"${n_suppressed}" "${n_orphan}"
 }
 
 ECLASSES_FIELD=""
@@ -2474,6 +2599,35 @@ write_parity_report() {
 			for name in "${PARITY_SLOT_SUPPRESSED[@]}"; do
 				IFS=$'\t' read -r key overlay gentoo verdict <<<"${name}"
 				printf -- "| \`%s\` | \`%s\` | \`%s\` | %s |\n" \
+					"${key}" "${overlay}" "${gentoo}" "${verdict}"
+			done
+		else
+			printf -- '- none\n'
+		fi
+		printf '\n'
+
+		# Same obligation as the SLOT block above, for a suppression that
+		# removes far more: 68 of the 338 rows this report used to carry.
+		# A drop that large is exactly the one a reader must be able to
+		# audit line by line, or the guard has quietly stopped measuring
+		# two of its axes and looks like it got better.
+		printf "## Suppressed \`files/\` rows\n\n"
+		printf -- 'A `files/` difference is not an independent divergence. An\n'
+		printf -- 'overlay-only file is there BECAUSE a `PATCHES` or `newinitd` line\n'
+		printf -- 'names it, and that line already sits on an axis with a\n'
+		printf -- '`# BENTOO-DIVERGENCE:` mechanism; a `::gentoo`-only file is their\n'
+		printf -- 'patch set for their versions, which nothing here can act on.\n'
+		printf -- 'Measured on 2026-09-06 before suppressing anything: 62 of 66\n'
+		printf -- 'overlay-only names and 123 of 132 `::gentoo`-only names were\n'
+		printf -- 'reachable from an ebuild. What survives suppression is the\n'
+		printf -- '`files/unreferenced` axis above - an overlay file NO ebuild names,\n'
+		printf -- 'which nothing measured before this.\n\n'
+		if (( ${#PARITY_FILES_SUPPRESSED[@]} )); then
+			printf "| Package | Axis | Names | Why it was suppressed |\n"
+			printf '|---|---|---|---|\n'
+			for name in "${PARITY_FILES_SUPPRESSED[@]}"; do
+				IFS=$'\t' read -r key overlay gentoo verdict <<<"${name}"
+				printf -- "| \`%s\` | \`%s\` | %s | %s |\n" \
 					"${key}" "${overlay}" "${gentoo}" "${verdict}"
 			done
 		else
@@ -3602,10 +3756,18 @@ self_test_assertions() {
 	# nettle takes their place. Its 0/9-7 against ::gentoo's 0/8-6 is a soname
 	# pair, not a version pair, so it must survive - which is the property the
 	# two departing subjects were there to pin.
+	# RE-MEASURED 2026-09-06: the blender probe named 5.2.1 and the package was
+	# revbumped to 5.2.1-r1 the same day (uninstallable PYTHON_COMPAT, three
+	# dependency floors copied from upstream's bundled-library version list).
+	# A probe that names a version stops finding its subject the moment that
+	# version is revbumped, and reports compared=no, which reads like the SLOT
+	# stage failing rather than the fixture moving. Pinning the exact PVR is
+	# deliberate -- the assertion is about THIS package's subslot -- so the
+	# maintenance cost is real and belongs here rather than in a looser probe.
 	assert_eq A15 \
 		'SLOT: a version in the slot itself goes; a soname stays' \
 		'lua[compared=yes slot=none] blender[compared=yes slot=none] nettle[compared=yes slot=ALIGN]' \
-		"lua[$(slot_outcome dev-lang/lua 5.5.1)] blender[$(slot_outcome media-gfx/blender 5.2.1)] nettle[$(slot_outcome dev-libs/nettle 4.0)]"
+		"lua[$(slot_outcome dev-lang/lua 5.5.1)] blender[$(slot_outcome media-gfx/blender 5.2.1-r1)] nettle[$(slot_outcome dev-libs/nettle 4.0)]"
 
 	# R1.2's revision case. ::gentoo carries binutils at PV 2.46.1-r1 and
 	# its slot reads 2.46: derivability has to strip the -r1 and then accept
@@ -3724,9 +3886,18 @@ self_test_assertions() {
 	# revbumped (gstreamer-editing-services, sentry-native, freecad), which
 	# retires their old rows. The invariant is untouched - the two halves still
 	# move together, 338 against 338.
+	#
+	# RE-MEASURED AGAIN 2026-09-06, from 338 to 268, and this is the largest
+	# single drop the number has taken. It is entirely the files/ stage: 68
+	# rows stopped being emitted when files/overlay-only was partitioned into a
+	# suppression plus the new files/unreferenced axis, and files/gentoo-only
+	# was suppressed whole. Both are recorded in PARITY_FILES_SUPPRESSED, so
+	# nothing was dropped unaudited. The invariant is again untouched - what
+	# this assertion guards is that the two halves move TOGETHER, and 268
+	# against 268 is exactly as true as 338 against 338 was.
 	assert_eq A20 \
 		'the four verdicts still sum to the row total, with the stale cache outside both' \
-		'rows=338 verdict-sum=338 stale=0' \
+		'rows=268 verdict-sum=268 stale=0' \
 		"$(row_arithmetic)"
 
 	# --- story 008: what a stale cache does to the exit code ----------
