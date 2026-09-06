@@ -117,6 +117,14 @@ BDEPEND="
 	>=net-libs/nodejs-24:*[npm]
 "
 
+# The service account only. Nothing else is linked in: CGO_ENABLED=0 makes the
+# binary static, and the inference backends are OCI artifacts fetched at
+# runtime rather than libraries resolved at build time.
+RDEPEND="
+	acct-group/localai
+	acct-user/localai
+"
+
 # NOTE: src_unpack is deliberately NOT defined. go-module.eclass exports it,
 # and go-module_src_unpack ends by calling go-env_set_compile_environment;
 # a local `src_unpack() { default; }` would override the eclass and drop that
@@ -213,4 +221,42 @@ src_compile() {
 src_install() {
 	dobin local-ai
 	einstalldocs
+
+	# Upstream ships no service files of any kind, so the project rule about
+	# mirroring a systemd unit with an OpenRC script does not apply -- there is
+	# no unit to mirror. This installs the OpenRC pair anyway, because local-ai
+	# IS a daemon and without it the only way to run one is by hand, as root,
+	# in whatever directory happens to be current.
+	newinitd "${FILESDIR}"/local-ai.initd local-ai
+	newconfd "${FILESDIR}"/local-ai.confd local-ai
+
+	# 0640 root:root, not the 0644 newconfd leaves behind: this file is where
+	# LOCALAI_API_KEY, the OIDC client secret and HF_TOKEN belong. root:root
+	# rather than root:localai is deliberate and sufficient -- OpenRC sources
+	# conf.d as root and only then drops to the localai user, so the daemon
+	# never reads the file, and naming the group here would need the account to
+	# exist on the BUILD host, which it need not.
+	fperms 0640 /etc/conf.d/local-ai
+
+	# Created by the init script at first start rather than here: fowners by
+	# name would need the localai account on the build host.
+	keepdir /var/lib/localai
+}
+
+pkg_postinst() {
+	elog "Start the server with:"
+	elog "    rc-service local-ai start"
+	elog
+	elog "It binds 127.0.0.1:8080 by default. That is not just hardening:"
+	elog "local-ai's own default is the wildcard \":8080\", and it REFUSES to"
+	elog "start on a wildcard or public address unless"
+	elog "--allow-insecure-public-bind is passed. Configure authentication"
+	elog "(LOCALAI_API_KEY or OIDC) in /etc/conf.d/local-ai before widening"
+	elog "LOCALAI_ADDRESS."
+	elog
+	elog "Models, backends and generated content live under /var/lib/localai."
+	elog "Inference backends are NOT built here: local-ai downloads them as OCI"
+	elog "artifacts at runtime, picking one that matches the hardware it finds,"
+	elog "so the server needs outbound network the first time a model is used"
+	elog "and a CPU-only machine needs nothing extra."
 }

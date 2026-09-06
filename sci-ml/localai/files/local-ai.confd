@@ -1,0 +1,23 @@
+# Configuration for the local-ai service.
+#
+# This file is installed 0640 root:root because it is where credentials belong.
+# OpenRC sources it as root and only then drops to the localai user, so the
+# daemon never needs to read the file itself.
+#
+# Anything the DAEMON must see has to be exported: a bare assignment is only a
+# shell variable of the init script, and the daemon will not inherit it.
+#
+#export LOCALAI_API_KEY=""
+#export LOCALAI_AUTH_HMAC_SECRET=""
+#export LOCALAI_OIDC_CLIENT_SECRET=""
+#export LOCALAI_STORAGE_SECRET_KEY=""
+#export HF_TOKEN=""
+
+# Bind address for the API server.  Loopback by default -- see the comment in
+# the init script: upstream's own default is the wildcard ":8080", on which
+# local-ai refuses to start without --allow-insecure-public-bind.  Before
+# widening this, configure authentication (LOCALAI_API_KEY or OIDC above).
+LOCALAI_ADDRESS="127.0.0.1:8080"
+
+# Extra arguments appended to the `local-ai run` command line.
+LOCALAI_OPTS=""
