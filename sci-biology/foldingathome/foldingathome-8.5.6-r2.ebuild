@@ -61,6 +61,10 @@ KEYWORDS="-* ~amd64 ~arm64"
 # installs a systemd unit unconditionally. This overlay requires every daemon to
 # be startable without systemd, so the two init systems are a choice here.
 #
+# BENTOO-DIVERGENCE: DEPEND - no dev-util/patchelf, because it moved to
+# BDEPEND where a build-time tool belongs. ::gentoo has it in DEPEND, so the
+# single move shows up as TWO divergences, one on each axis; this tag covers
+# the axis it left and the one below covers the axis it landed on.
 # BENTOO-DIVERGENCE: BDEPEND - dev-util/patchelf, needed only by the elogind
 # path: the prebuilt .deb links libsystemd, so the elogind build rewrites that
 # NEEDED entry rather than shipping a binary that pulls systemd in anyway.

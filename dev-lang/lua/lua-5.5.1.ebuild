@@ -10,6 +10,10 @@ EAPI=8
 # BENTOO-DIVERGENCE: INHERIT - toolchain-funcs where ::gentoo has libtool. No
 # Gentoo autotools-patched tarball exists for 5.5, so this drives upstream's
 # Makefile with tc-getCC and friends instead of running elibtoolize.
+# BENTOO-DIVERGENCE: BDEPEND - no app-portage/elt-patches, which is not a
+# second decision: libtool.eclass is what puts it there, so dropping the
+# inherit above drops the dependency with it. Nothing here runs elibtoolize,
+# and elt-patches exists only to feed it.
 inherit flag-o-matic toolchain-funcs optfeature
 
 DESCRIPTION="A powerful light-weight programming language designed for extending applications"

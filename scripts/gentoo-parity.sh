@@ -4318,10 +4318,24 @@ self_test_assertions() {
 	# EXPECT THIS ASSERTION TO MOVE ON EVERY REMEDIATION PASS. It pins the
 	# absolute total, and closing a divergence is exactly what lowers it - the
 	# number going down is the work succeeding. What must never move is the
-	# equality of the two halves: 235 against 235.
+	# equality of the two halves.
+	#
+	# RE-MEASURED 2026-09-06 (third pass), 235 -> 232, and it splits the same
+	# way the gstreamer block did - two real lags fixed, two decisions recorded:
+	#
+	#    -3  libreoffice-l10n gained RPM_COMPRESS_TYPE=xz on both ebuilds, which
+	#        widens BDEPEND back to ::gentoo's, and vulkan-tools got back the
+	#        test? ( dev-cpp/gtest ) a pin rewrite had deleted
+	#    +-0  lua's missing app-portage/elt-patches and foldingathome's missing
+	#        dev-util/patchelf are both consequences of divergences ALREADY
+	#        tagged on another axis - a dropped libtool inherit and a DEPEND to
+	#        BDEPEND move. Tagged on the axis they surface on, so they moved
+	#        ALIGN -> JUSTIFIED and stay in the total
+	#
+	# 232 against 232.
 	assert_eq A20 \
 		'the four verdicts still sum to the row total, with the stale cache outside both' \
-		'rows=235 verdict-sum=235 stale=0' \
+		'rows=232 verdict-sum=232 stale=0' \
 		"$(row_arithmetic)"
 
 	# --- story 008: what a stale cache does to the exit code ----------

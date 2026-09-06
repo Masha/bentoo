@@ -3,6 +3,12 @@
 
 EAPI=8
 
+# Measured 2026-09-06: every langpack/helppack RPM the TDF mirror serves is
+# "PayloadIsXz". Without this, rpm.eclass takes its unset branch and narrows
+# BDEPEND to app-arch/rpm2targz alone, forcing that package on anyone who
+# already has app-arch/rpm. It is @PRE_INHERIT, so it must precede the inherit.
+RPM_COMPRESS_TYPE=xz
+
 inherit rpm
 
 BASE_PV=$(ver_cut 1-3)
