@@ -51,6 +51,13 @@ shopt -s nullglob
 SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
 OVERLAY_ROOT=$(cd -- "${SCRIPT_DIR}/.." && pwd -P)
 
+# This file, absolutely. BASH_SOURCE is whatever the caller typed, so it is
+# usually relative - and a relative path is resolved against the CALLER's
+# directory, not against wherever it is later used. prepare_stale_scratch
+# symlinks this script into a fixture tree, where a relative target would dangle
+# and the run would die with exit 127.
+SCRIPT_PATH="${SCRIPT_DIR}/${BASH_SOURCE[0]##*/}"
+
 # Overridable so the sweep can run against a checkout somewhere else - a
 # container, a second sync, a machine that keeps its trees elsewhere.
 GENTOO_REPO=${GENTOO_REPO:-/var/db/repos/gentoo}
@@ -3119,9 +3126,11 @@ run_sweep() {
 
 ### self-test ########################################################
 #
-# Everything --self-test writes: one copy of one ebuild, under $TMPDIR, removed
-# again before it returns. No report, and nothing anywhere near either package
-# tree - see prepare_tag_scratch for why the copy has to exist at all.
+# Everything --self-test writes lives under $TMPDIR and is removed again before
+# it returns: one copy of one ebuild (see prepare_tag_scratch), the two-tree
+# stale-cache fixture (see prepare_stale_scratch), and the reports the two
+# subprocess runs publish into it. No report anywhere else, and nothing at all
+# near either package tree.
 
 ASSERT_TOTAL=0
 FAILURES=()
@@ -3144,17 +3153,38 @@ SELF_TEST_TAGGED_PV='6.7.4-r1'
 # guard nobody re-runs.
 SELF_TEST_CLEAN_FILTER='app-dicts'
 
-# The scope A21 drives a whole sweep through, for story 008's R2.4. Pinned for
-# the same reason as the two above: dev-ruby/erb is the tree's ONLY stale
-# md5-cache entry (measured 2026-08-06, story 008's Task 1), so it is the one
-# filter that produces a scope whose only observation is a stale cache and whose
-# divergence row count is zero. That is the exact state R2.4 is about - the run
-# must exit 0 having still reported something.
+# The scope A18, A19 and A21 are measured against, and it is BUILT rather than
+# pinned - the one place in this harness where that is the right answer.
 #
-# If erb is ever regenerated with egencache the assertion goes red as a stale
-# measurement: repin it on whichever entry is stale then, or retire it with the
-# reason recorded. Never loosen it to accept a non-zero exit.
-SELF_TEST_STALE_FILTER='dev-ruby/erb'
+# It used to be dev-ruby/erb, the tree's only stale md5-cache entry when story
+# 008 measured it. That worked exactly once. A stale cache is a TRANSIENT STATE
+# of the tree, not a property of a package: on 2026-09-05 a remediation pass ran
+# egencache, erb's ruby-fakegem hash caught up with ::gentoo's, and all three
+# assertions went red having lost their subject - not because the rule broke,
+# but because the tree stopped exhibiting it. Repinning on whichever entry is
+# stale today only schedules the same failure for the next egencache run.
+#
+# So the fixture manufactures the state instead. prepare_stale_scratch writes a
+# two-tree pair under $TMPDIR carrying BOTH cases the rule has to tell apart:
+#
+#   fixture-shared   an eclass the overlay does NOT ship, hashes differing.
+#                    Both trees resolved the same ::gentoo file, so this can
+#                    only be a stale cache - R2.1
+#   fixture-local    an eclass the overlay DOES ship, hashes differing. A
+#                    deliberate override, definitional - story 007's R1.6
+#
+# Neither can be regenerated away, and neither depends on what the overlay is
+# carrying this week. The names are deliberately not real eclasses: a fixture
+# that borrowed one would pass by accident on a tree that happens to ship it.
+SELF_TEST_STALE_FILTER='dev-fixture'
+SELF_TEST_STALE_PKG='dev-fixture/staleness'
+SELF_TEST_STALE_PV='1.0'
+SELF_TEST_STALE_LOCAL_ECLASS='fixture-local'
+SELF_TEST_STALE_SHARED_ECLASS='fixture-shared'
+
+# Where prepare_stale_scratch put the pair. Empty until it runs, which is what
+# the pass below checks before reporting anything.
+SELF_TEST_STALE_ROOT=''
 
 # q <value>
 # Render a value for a report line: newlines flattened, empty made visible. On
@@ -3495,8 +3525,18 @@ stale_cache_run() {
 
 	mkdir -p -- "${dir}"
 
-	GENTOO_REPO="${GENTOO_REPO}" PARITY_REPORT_DIR="${dir}" \
-		bash -- "${BASH_SOURCE[0]}" "${SELF_TEST_STALE_FILTER}" \
+	if [[ -z ${SELF_TEST_STALE_ROOT} ]]; then
+		printf 'exit=- rows=-1 stale=(fixture not built)'
+		return 0
+	fi
+
+	# Started through the SYMLINK inside the fixture, not through this file:
+	# that is what makes the subprocess treat the fixture as its overlay,
+	# without an env var that could repoint a real sweep. See
+	# prepare_stale_scratch.
+	GENTOO_REPO="${SELF_TEST_STALE_ROOT}/gentoo" PARITY_REPORT_DIR="${dir}" \
+		bash -- "${SELF_TEST_STALE_ROOT}/overlay/scripts/gentoo-parity.sh" \
+		"${SELF_TEST_STALE_FILTER}" \
 		>/dev/null 2>&1 || rc=$?
 
 	if [[ -f ${data} ]]; then
@@ -3595,6 +3635,176 @@ prepare_tag_scratch() {
 		"${category}/${pf}" "${PARITY_TAG_SOURCE["${category}/${pf}"]}"
 }
 
+# prepare_stale_scratch <scratch dir>
+# Build the two-tree fixture A18, A19 and A21 are measured against, and record
+# where it went in SELF_TEST_STALE_ROOT. See the constants above for why the
+# state is manufactured rather than found in the tree.
+#
+# WHY THE SCRIPT IS SYMLINKED INTO IT. OVERLAY_ROOT is derived from the script's
+# own location and is deliberately NOT overridable - an env var that repoints
+# what the sweep measures is one typo away from a report about the wrong tree.
+# A symlink at <fixture>/overlay/scripts/gentoo-parity.sh needs no such var:
+# dirname resolves to the fixture's scripts/, so a subprocess started through
+# the symlink treats the fixture as its overlay and nothing else changes. There
+# is no second copy of the script to drift from this one.
+#
+# WHAT EACH FILE IS FOR, because every one of them is load-bearing:
+#
+#   the two md5-cache entries  identical on every compared axis except
+#                              _eclasses_, so the ONLY observation the run can
+#                              make is the stale cache. That is R2.4's exact
+#                              state and what lets A21 expect rows=0
+#   the two ebuilds            differ by their comment line. Byte-identical
+#                              ones would be classified REDUNDANT, which is a
+#                              row, and rows=0 is the point
+#   the two metadata.xml       identical, and present on BOTH sides. A package
+#                              missing one on either side emits a metadata.xml
+#                              row of its own, and that row is not what is
+#                              under test here
+#   no SRC_URI                 so the digest check has nothing to look for. A
+#                              fixture that failed the run on a missing DIST
+#                              line would fail A21 for the wrong reason
+prepare_stale_scratch() {
+	local scratch=$1
+	local root="${scratch}/stale-fixture"
+	local category=${SELF_TEST_STALE_PKG%%/*}
+	local pn=${SELF_TEST_STALE_PKG##*/}
+	local pf="${pn}-${SELF_TEST_STALE_PV}"
+	local side dir
+
+	mkdir -p -- \
+		"${root}/overlay/scripts" \
+		"${root}/overlay/eclass" \
+		"${root}/overlay/metadata/md5-cache/${category}" \
+		"${root}/overlay/${category}/${pn}" \
+		"${root}/gentoo/profiles" \
+		"${root}/gentoo/metadata/md5-cache/${category}" \
+		"${root}/gentoo/${category}/${pn}"
+
+	ln -sf -- "${SCRIPT_PATH}" "${root}/overlay/scripts/gentoo-parity.sh"
+
+	# check_preconditions refuses a directory with no repo_name: without it a
+	# fixture typo would read as "::gentoo carries nothing", which is the one
+	# failure that looks like total divergence.
+	printf 'gentoo\n' >"${root}/gentoo/profiles/repo_name"
+
+	# The overlay-local half of the pair. Empty on purpose - compare_eclass_
+	# hashes asks only whether eclass/<name>.eclass EXISTS, never what is in it.
+	: >"${root}/overlay/eclass/${SELF_TEST_STALE_LOCAL_ECLASS}.eclass"
+
+	for side in overlay gentoo; do
+		dir="${root}/${side}/${category}/${pn}"
+
+		printf '# %s copy of the stale-cache fixture\nEAPI=8\n' "${side}" \
+			>"${dir}/${pf}.ebuild"
+
+		cat >"${dir}/metadata.xml" <<-'EOF'
+			<?xml version="1.0" encoding="UTF-8"?>
+			<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+			<pkgmetadata>
+				<longdescription>stale-md5-cache fixture</longdescription>
+			</pkgmetadata>
+		EOF
+	done
+
+	stale_fixture_cache overlay 1111111111111111 aaaaaaaaaaaaaaaa \
+		>"${root}/overlay/metadata/md5-cache/${category}/${pf}"
+	stale_fixture_cache gentoo 2222222222222222 bbbbbbbbbbbbbbbb \
+		>"${root}/gentoo/metadata/md5-cache/${category}/${pf}"
+
+	SELF_TEST_STALE_ROOT=${root}
+
+	printf '  [SEAM] stale-cache fixture %s -> %s\n' \
+		"${SELF_TEST_STALE_PKG}" "${SELF_TEST_STALE_ROOT}"
+}
+
+# stale_fixture_cache <side> <shared eclass hash> <local eclass hash>
+# One md5-cache entry for the fixture. Every axis the comparator reads is the
+# same string on both sides; only _eclasses_ takes the two hashes.
+stale_fixture_cache() {
+	local side=$1 shared_hash=$2 local_hash=$3
+
+	cat <<-EOF
+		DEFINED_PHASES=install
+		DESCRIPTION=fixture for the stale md5-cache assertions
+		EAPI=8
+		HOMEPAGE=https://example.invalid/
+		INHERIT=${SELF_TEST_STALE_LOCAL_ECLASS} ${SELF_TEST_STALE_SHARED_ECLASS}
+		KEYWORDS=~amd64
+		LICENSE=GPL-2
+		SLOT=0
+	EOF
+	printf '_eclasses_=%s\t%s\t%s\t%s\n' \
+		"${SELF_TEST_STALE_LOCAL_ECLASS}" "${local_hash}" \
+		"${SELF_TEST_STALE_SHARED_ECLASS}" "${shared_hash}"
+	printf '_md5_=%s\n' "$(printf '%s' "${side}" | md5sum | cut -d' ' -f1)"
+}
+
+# stale_fixture_pass <classification|override>
+# Run the real stages against the fixture and report what they concluded.
+#
+# A SUBSHELL, not a second call into the stages. A18 and A19 read the arrays of
+# the CURRENT process - that is the harness's first rule, "read the pipeline,
+# not the trees" - and the fixture needs those same arrays to hold the fixture's
+# results rather than the sweep's. A subshell gets a copy of every global, so
+# repointing the two roots and emptying the arrays inside it is invisible to the
+# twenty-one assertions measured against the real tree. Doing it in-process and
+# restoring afterwards would be one forgotten array away from a silent wrong
+# answer in some other assertion.
+#
+# Every array a stage appends to is emptied, including the ones this pass does
+# not read: leaving one populated would let the sweep's contents leak into an
+# answer about the fixture, which is the failure this whole redesign exists to
+# stop.
+stale_fixture_pass() {
+	local report=$1
+
+	if [[ -z ${SELF_TEST_STALE_ROOT} ]]; then
+		printf '(fixture not built)'
+		return 0
+	fi
+
+	(
+		OVERLAY_ROOT="${SELF_TEST_STALE_ROOT}/overlay"
+		GENTOO_REPO="${SELF_TEST_STALE_ROOT}/gentoo"
+		FILTER=''
+
+		PARITY_SHARED_PACKAGES=() PARITY_SCOPE_EBUILDS=() PARITY_EXCLUDED=()
+		PARITY_BASELINES=() PARITY_BEHIND=() PARITY_MD5_COVERED=()
+		PARITY_IDENTICAL=() PARITY_ROWS=() PARITY_ECLASS_DEFINITIONAL=()
+		PARITY_METADATA_SUPPRESSED=() PARITY_FILES_SUPPRESSED=()
+		PARITY_SLOT_SUPPRESSED=() PARITY_STALE_CACHE=()
+		PARITY_MISSING_DIGEST=() PARITY_STALE_TAGS=()
+		PARITY_EBUILD_PN=() PARITY_TAG_SOURCE=() PARITY_TAGGED_AXES=()
+		MD5_FIELDS=() FILE_DIGESTS=() ECLASS_HASH=()
+
+		build_package_sets >/dev/null || true
+		select_baseline >/dev/null
+		verify_md5_cache >/dev/null || true
+		compare_axes >/dev/null
+		compare_auxiliary_files >/dev/null
+		assign_verdicts >/dev/null
+
+		case ${report} in
+		classification)
+			printf 'compared=%s row=%s stale=%s' \
+				"$(in_md5_scope "${SELF_TEST_STALE_PKG}" "${SELF_TEST_STALE_PV}")" \
+				"$(eclass_row_verdict "${SELF_TEST_STALE_PKG}" "${SELF_TEST_STALE_PV}")" \
+				"$(stale_cache_for "${SELF_TEST_STALE_PKG}")"
+			;;
+		override)
+			printf 'definitional=%s local-in-stale=%s stale=%d' \
+				"$(definitional_eclasses)" \
+				"$(local_eclasses_in_stale)" \
+				"${#PARITY_STALE_CACHE[@]}"
+			;;
+		*)
+			printf '(stale_fixture_pass: no report named %s)' "${report}"
+			;;
+		esac
+	)
+}
+
 # self_test_pipeline
 # Drives the real stages, in the sweep's order. write_reports is deliberately
 # not called: the self-test proves the numbers, it does not publish them.
@@ -3663,6 +3873,7 @@ self_test_assertions() {
 	printf '\npipeline\n'
 
 	prepare_tag_scratch "${scratch}"
+	prepare_stale_scratch "${scratch}"
 	self_test_pipeline
 
 	printf '\nassertions\n'
@@ -3760,29 +3971,36 @@ self_test_assertions() {
 		'REDUNDANT verdicts: one per byte-identical ebuild, its axis rows suppressed' \
 		'0/5' "$(verdict_count REDUNDANT)/$(baselines_at_distance exact)"
 
-	# PYTHON_COMPAT never reaches md5-cache under that name - python-any-r1
-	# expands it into the BDEPEND any-of block - so at kwin-6.7.4 the only
-	# trace is dev-lang/python:3.15, which ::gentoo requires and the overlay
-	# does not (verified 2026-08-06; it is the ONLY md5-cache difference the
-	# two copies have). Matched on the value rather than on an axis name so
-	# the assertion survives whichever axis sub-task 3.3 files it under.
-	# ORPHANED 2026-09-05, AND LEFT RED ON PURPOSE.
+	# What this assertion has always been about: a constraint the overlay is
+	# merely BEHIND on must read ALIGN, never as a customisation. ALIGN is the
+	# verdict that says "no reason was recorded, so the default is to catch up",
+	# and misfiling a lag as a deliberate difference is how drift becomes
+	# permanent.
 	#
-	# kde-plasma/kwin was one of the 72 kde-plasma packages that left the
-	# overlay (see A01). The assertion therefore has no ebuild to read, and
-	# there is no replacement: a sweep of the current data finds NO other row
-	# where a verdict of ALIGN rests on a dev-lang/python value, so nothing in
-	# the tree has this shape today.
+	# RE-PINNED 2026-09-06. The original subject was kde-plasma/kwin-6.7.4,
+	# whose PYTHON_COMPAT lag surfaced in md5-cache as a dev-lang/python:3.15
+	# that ::gentoo required and the overlay did not. kwin was one of the 72
+	# kde-plasma packages that left the overlay (see A01), and no row of that
+	# exact shape - an ALIGN verdict resting on a dev-lang/python value -
+	# exists in the tree any more.
 	#
-	# Not deleted, because what it guards is still true and still wanted: a
-	# PYTHON_COMPAT the overlay is merely BEHIND on must read ALIGN, never as a
-	# customisation. Not loosened either - a version of this that goes green
-	# without a subject would be the "0 out of nothing" the header forbids.
-	# It stays red, naming what it lost, until a subject with this shape exists
-	# or someone builds it a fixture the way A22-A24 have one.
+	# media-gfx/freecad-1.1.3-r1 has the same SHAPE on a different axis:
+	# ::gentoo's REQUIRED_USE carries test? ( techdraw ) and the overlay's does
+	# not. Nothing in the ebuild says why, so it is a lag, not a choice.
+	#
+	# Chosen at SAME-SERIES distance, which is the part worth keeping. At
+	# cross-series a missing constraint is mostly the version having moved, and
+	# the tree is full of those - the assertion would be pinning noise. Here the
+	# two copies are 1.1.3-r1 against 1.1.1, close enough that the difference is
+	# about the ebuilds rather than about the release.
+	#
+	# The distance is asserted BESIDE the verdict for that reason: a repin that
+	# quietly landed on a cross-series row would still read ALIGN and would
+	# still be green, while no longer testing what this is for.
 	assert_eq A08 \
-		'kwin-6.7.4 PYTHON_COMPAT drift is ALIGN: the overlay is behind, not customised' \
-		'ALIGN' "$(select_rows kde-plasma/kwin 6.7.4 '' dev-lang/python verdict)"
+		'freecad-1.1.3-r1 REQUIRED_USE drift is ALIGN: the overlay is behind, not customised' \
+		'distance=same-series verdict=ALIGN' \
+		"distance=$(select_rows media-gfx/freecad 1.1.3-r1 REQUIRED_USE 'test? ( techdraw )' distance) verdict=$(select_rows media-gfx/freecad 1.1.3-r1 REQUIRED_USE 'test? ( techdraw )' verdict)"
 
 	# The one verdict that needs a tag, and the tag lives on the scratch copy
 	# prepare_tag_scratch made. PATCHES is an ebuild-level axis on purpose: it
@@ -3964,46 +4182,57 @@ self_test_assertions() {
 
 	# --- story 008: instrument error is not divergence ----------------
 
-	# dev-ruby/erb reports a differing ruby-fakegem hash, and the overlay's
-	# eclass/ holds no ruby-fakegem at all - there is no overlay copy that
-	# COULD differ. The overlay's md5-cache entry was generated against an
-	# older ::gentoo eclass. It is the instrument reporting itself, and it is
-	# classified UNDOCUMENTED today, which asks a human to decide about a
-	# measurement error.
-	# RED SINCE 2026-09-05, AND THE CAUSE IS KNOWN - read this before touching
-	# A18, A19, A20 or A21, which all fail on the same missing signal.
+	# An _eclasses_ hash differs for an eclass the overlay does NOT ship. Both
+	# trees resolved the same ::gentoo file, so the two hashes cannot describe
+	# different content - only different moments. The overlay's md5-cache entry
+	# was generated against an older ::gentoo eclass. It is the instrument
+	# reporting itself, and left as a divergence row it is classified
+	# UNDOCUMENTED, which asks a human to decide about a measurement error the
+	# guard made.
 	#
-	# dev-ruby/erb still exists and is still compared (the assertion observes
-	# compared=yes row=none, which is two thirds of what it wants). What
-	# vanished is the stale signal itself: erb's md5-cache entry used to carry
-	# a ruby-fakegem hash generated against an older ::gentoo eclass, and last
-	# session's egencache runs regenerated it against the current one. The
-	# hashes agree now, so there is nothing stale to report.
+	# MEASURED AGAINST A FIXTURE SINCE 2026-09-06, and the history is the whole
+	# argument for it. This assertion was pinned on dev-ruby/erb, which was the
+	# tree's only stale entry when story 008 measured it. On 2026-09-05 a
+	# remediation pass ran egencache, erb's hash caught up, and A18, A19 and A21
+	# all went red having lost their subject - while the rule they guard was
+	# working perfectly. The signal was gone, not the logic.
 	#
-	# That is remediation working, not the instrument breaking - and it is why
-	# a previous reading of these four as "the stale pipeline went offline" was
-	# wrong. A19 confirms it: its definitional half still lists all three
-	# overlay eclasses correctly, and only its stale=1 denominator is missing.
+	# So it is manufactured now. prepare_stale_scratch builds a two-tree pair
+	# that exhibits both cases by construction; the three assertions read that
+	# instead of whatever the tree happens to be carrying. A stale cache is a
+	# transient state of a tree and can never be a durable subject.
 	#
-	# THE FIX IS A FIXTURE, NOT A NUMBER. A stale cache is a transient state of
-	# the tree, so pinning these to whatever package happens to be stale today
-	# only defers the same failure. They need a synthetic stale entry built in
-	# the scratch dir, the way A22-A24 build theirs. That is a redesign and was
-	# deliberately not done in the same pass as a re-measurement.
+	# Read the whole line, not the last third. compared=yes says the pair
+	# reached the comparison at all, row=none says no divergence row was
+	# emitted, and stale=<eclass> says the observation was kept somewhere. Drop
+	# either of the first two and a run that compared NOTHING reads identically.
 	assert_eq A18 \
-		'_eclasses_: erb is reported as a stale cache, not as a divergence' \
-		'compared=yes row=none stale=ruby-fakegem' \
-		"compared=$(in_md5_scope dev-ruby/erb 6.0.7) row=$(eclass_row_verdict dev-ruby/erb 6.0.7) stale=$(stale_cache_for dev-ruby/erb)"
+		'_eclasses_: a hash differing for an eclass the overlay lacks is a stale cache, not a divergence' \
+		'compared=yes row=none stale=fixture-shared' \
+		"$(stale_fixture_pass classification)"
 
-	# THE CONVERSE, so the rule cannot be a blanket suppression of the axis.
-	# The overlay ships three eclasses of its own; those are deliberate
-	# overrides, recorded as definitionally divergent by story 007's R1.6,
-	# and not one of them may be filed as a stale cache. Calling an override
-	# a measurement error is the failure mode that would hide a real one.
+	# THE CONVERSE, so the rule cannot be a blanket suppression of the axis. An
+	# eclass the overlay SHIPS differs from ::gentoo's by construction - that is
+	# the decision to ship a copy, recorded as definitional by story 007's R1.6.
+	# Filing one as a stale cache would be calling a deliberate override a
+	# measurement error, which is the failure mode that hides a real one.
+	#
+	# TWO SOURCES ON ONE LINE, each labelled, and both are needed.
+	#
+	# The real tree half is what actually matters: the overlay's three eclasses
+	# must still be recorded as definitional, and no fixture can prove that
+	# about them. If a fourth is added it belongs here, not in a widened rule.
+	#
+	# The fixture half is the one that needs manufacturing, because it is the
+	# only way local-in-stale=0 means anything. Against the real tree today the
+	# stale bucket is EMPTY, so "none of the overlay's eclasses is in it" is
+	# true of a bucket with nothing in it at all - the "0 out of nothing" the
+	# header forbids. The fixture puts exactly one entry in that bucket and
+	# demands the local eclass not be the one, which is the claim being made.
 	assert_eq A19 \
 		'_eclasses_: an eclass the overlay ships stays an override, never a stale cache' \
-		'definitional=brave gstreamer-meson rpm local-in-stale=0 stale=1' \
-		"definitional=$(definitional_eclasses) local-in-stale=$(local_eclasses_in_stale) stale=${#PARITY_STALE_CACHE[@]}"
+		'real-tree=brave gstreamer-meson rpm | fixture: definitional=fixture-local local-in-stale=0 stale=1' \
+		"real-tree=$(definitional_eclasses) | fixture: $(stale_fixture_pass override)"
 
 	# R2.2, as arithmetic. 472 rows less the ten SLOT artifacts less the one
 	# reclassified _eclasses_ row is 461, and the four verdicts must still
@@ -4024,8 +4253,10 @@ self_test_assertions() {
 	# stale went 1 -> 0 for a different reason, and it is NOT an invariant that
 	# weakened: the tree simply holds no stale cache today, because last
 	# session's remediation regenerated the md5-cache that was carrying the one
-	# signal. Detection of stale caches is guarded by A18, A19 and A21, and all
-	# three are red for exactly this reason - see the note on A18.
+	# signal. This term is the real tree's count and stays that way - detection
+	# is guarded by A18, A19 and A21, which measure a fixture precisely so that
+	# a tree with nothing stale in it is a clean tree rather than a blind guard.
+	# See the note on A18.
 	#
 	# RE-MEASURED AGAIN 2026-09-05, from 350, and this time the cause is the
 	# remediation itself rather than the tree moving underneath: sci-ml/ollama
@@ -4054,17 +4285,43 @@ self_test_assertions() {
 	# align or a USE flag description that follows its own side's IUSE. Both
 	# are recorded in PARITY_METADATA_SUPPRESSED. The invariant holds again --
 	# 244 against 244.
+	#
+	# RE-MEASURED 2026-09-06, 244 -> 245, and the delta is a single row that
+	# came from the OTHER tree:
+	#
+	#     dev-util/vulkan-tools  PATCHES  (none) | vulkan-tools-1.4.357.0-libcxx-23.patch  ALIGN
+	#
+	# ::gentoo synced at 17:49 that day and added that patch to its 1.4.357.0,
+	# which is the baseline the overlay's snapshot is compared against. No
+	# bentoo commit is involved: diffing the 244-row report against a fresh
+	# sweep shows every other line either unchanged or following a PV that was
+	# bumped. Worth recording as its own kind of movement - the count drifts
+	# when ::gentoo moves too, and a reader who only checks the overlay's log
+	# will not find the cause there.
+	#
+	# The invariant is untouched: 245 against 245.
 	assert_eq A20 \
 		'the four verdicts still sum to the row total, with the stale cache outside both' \
-		'rows=244 verdict-sum=244 stale=0' \
+		'rows=245 verdict-sum=245 stale=0' \
 		"$(row_arithmetic)"
 
 	# --- story 008: what a stale cache does to the exit code ----------
 
 	# R2.4. A scope whose only observation is the stale cache must exit 0:
 	# there is nothing for a human to decide, and a guard that fails on its
-	# own measurement error is a guard nobody re-runs. Today erb is
-	# UNDOCUMENTED, so this scope exits 1.
+	# own measurement error is a guard nobody re-runs.
+	#
+	# Driven through the FIXTURE since 2026-09-06, for the reason A18 gives.
+	# This is the one of the three that was already a subprocess, and it stays
+	# one: what is under test is the whole path through write_reports to the
+	# exit code, which an in-process run cannot exercise. The only change is
+	# which overlay the subprocess starts in - the symlink prepare_stale_scratch
+	# planted, rather than this file.
+	#
+	# rows=0 is only reachable because the fixture's two md5-cache entries agree
+	# on every axis but _eclasses_. If a future edit gives them a second
+	# difference this goes red with rows=1, which is the fixture drifting, not
+	# the contract breaking - fix the fixture, never the expectation.
 	assert_eq A21 \
 		'a scope whose only observation is a stale cache exits 0 and still reports it' \
 		'exit=0 rows=0 stale=present' \
