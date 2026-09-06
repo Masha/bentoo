@@ -18,7 +18,7 @@
 
 EAPI=8
 
-PYTHON_COMPAT=( python3_{11..13} )
+PYTHON_COMPAT=( python3_{12..14} )
 # NOTE must match media-libs/osl
 LLVM_COMPAT=( {20..20} )
 LLVM_OPTIONAL=1
@@ -102,17 +102,64 @@ REQUIRED_USE="${PYTHON_REQUIRED_USE}
 # Library versions for official builds can be found in the blender source directory in:
 # build_files/build_environment/cmake/versions.cmake
 
-# BENTOO-DIVERGENCE: RDEPEND - sci-libs/ceres-solver, and this one is NOT
-# settled. blender exposes WITH_SYSTEM_ for bullet, eigen3, freetype, gflags
-# and glog, all of which this ebuild passes; there is no WITH_SYSTEM_CERES to
-# pass, and ::gentoo takes gflags and glog from the system without declaring
-# ceres at all. So the dependency looks inert -- installed for the user, never
-# reached by the build. Left in place rather than dropped on inference:
-# confirming it needs the 5.2 tarball, which is not cached here.
+# DEPENDENCY FLOORS, corrected 2026-09-06. opencolorio and openvdb carried
+# >=2.5.0 and >=13.0.0, which made this ebuild unsolvable on EVERY arch: neither
+# version exists in ::gentoo (2.4.2 and 12.0.1 are the newest). Both numbers came
+# from build_files/build_environment/cmake/versions.cmake -- OPENCOLORIO_VERSION
+# 2.5.0 at line 263, OPENVDB_VERSION 13.0.0 at line 430 -- which is the list of
+# versions blender builds for its OWN precompiled library bundle, not a minimum
+# the source enforces. The same file pins PYTHON_VERSION 3.13.13 while ::gentoo
+# builds 5.0.0 against 3.14, so it is a known-bad source for ebuild floors.
 #
-# It is not free to leave, either: pkgcheck reports ceres-solver among the
-# solutions for NonsolvableDepsInDev on ~arm64, so a dependency that may do
-# nothing is helping to cost an arch the overlay is supposed to cover.
+# What the source actually asks for, in build_files/cmake/platform/platform_unix.cmake:
+#   :455  find_package_wrapper(OpenColorIO 2.0.0 REQUIRED)   -> >=2.0.0
+#   :400  find_package(OpenVDB)                              -> no version at all
+#   :265  find_package_wrapper(OpenEXR REQUIRED)             -> no version at all
+# openvdb and openexr are set to >=11.0.0 and >=3.3.5, the floors ::gentoo proves
+# for blender-5.0.0, rather than dropping the bounds entirely. openexr had the
+# same defect for a second reason: >=3.4.0 could only be met by openexr-3.4.4,
+# which ::gentoo package.masks (needs media-libs/openjph, Gentoo bug #966735), so
+# the floor selected a version nobody can install.
+#
+# VERIFIED TO THE RESOLUTION RUNG ONLY: `emerge -pv` now resolves the package,
+# which it could not do before. A real compile against opencolorio 2.4.x and
+# openvdb 12.x has NOT been run -- blender is a multi-hour build and this host
+# cannot merge its dependencies. If 5.2 turns out to use an API newer than these
+# floors, the failure moves from "no ebuilds to satisfy" to a compile error,
+# which is worse to hit but better to diagnose than a package nobody can select.
+
+# BENTOO-DIVERGENCE: RDEPEND - sci-libs/ceres-solver, and it is REQUIRED here
+# even though ::gentoo declares no ceres at all. SETTLED 2026-09-06 against the
+# 5.2.1 tarball, which an earlier note here could not read and therefore guessed
+# wrong about: the dependency is not inert.
+#
+#   build_files/cmake/platform/platform_unix.cmake:657
+#       if(WITH_LIBMV)
+#         find_package_wrapper(Ceres REQUIRED)
+#
+# and CMakeLists.txt:504 sets WITH_LIBMV ON by default. Neither this ebuild nor
+# ::gentoo's passes -DWITH_LIBMV=OFF -- every mention on both sides is commented
+# out -- so Ceres is looked up, REQUIRED, on Linux.
+#
+# ::gentoo is not wrong for its own versions; it is on 5.0.0, and blender
+# REMOVED its bundled copy between the two releases. Counted in the tarballs:
+# 5.0.0 carries 362 entries under extern/ceres, 5.2.1 carries one, and that one
+# is build_files/build_environment/cmake/ceres.cmake, the recipe for blender's
+# own precompiled library bundle rather than vendored source. There is no
+# WITH_SYSTEM_CERES because from 5.2 there is no bundled Ceres to switch away
+# from.
+#
+# Dropping it to buy ~arm64 would not have worked anyway. pkgcheck lists FOUR
+# solutions for the ~arm64 NonsolvableDeps, and ceres is only one of them:
+# >=media-gfx/openvdb-13.0.0[nanovdb] (::gentoo has 12.0.1),
+# >=media-libs/opencolorio-2.5.0 (::gentoo has 2.4.2), >=media-libs/openexr-3.4.0
+# (satisfiable) and this. The first two are also why NonsolvableDepsInStable
+# fires on plain amd64 -- they are too old everywhere, not just on arm64.
+#
+# ceres-solver is KEYWORDS="amd64 ~x86" in ::gentoo and this overlay does not
+# carry a copy. Copying it here to add one keyword would recreate the
+# duplication that cost sci-ml/ollama its place; the keyword has to come from
+# ::gentoo.
 # BENTOO-DIVERGENCE: DEPEND - same ceres-solver, through RDEPEND below.
 RDEPEND="${PYTHON_DEPS}
 	app-arch/zstd
@@ -139,7 +186,7 @@ RDEPEND="${PYTHON_DEPS}
 	virtual/zlib:=
 	alembic? ( >=media-gfx/alembic-1.8.3-r2[boost(+),hdf(+)] )
 	bullet? ( sci-physics/bullet:=[double-precision] )
-	color-management? ( >=media-libs/opencolorio-2.5.0:= )
+	color-management? ( >=media-libs/opencolorio-2.0.0:= )
 	cuda? ( dev-util/nvidia-cuda-toolkit:= )
 	embree? ( media-libs/embree:=[raymask] )
 	ffmpeg? ( media-video/ffmpeg:=[encode(+),lame(-),jpeg2k?,opus,theora,vorbis,vpx,x264,xvid] )
@@ -165,12 +212,12 @@ RDEPEND="${PYTHON_DEPS}
 	oidn? ( >=media-libs/oidn-2.1.0:= )
 	openexr? (
 		>=dev-libs/imath-3.2.0:=
-		>=media-libs/openexr-3.4.0:0=
+		>=media-libs/openexr-3.3.5:0=
 	)
 	openpgl? ( media-libs/openpgl:= )
 	opensubdiv? ( >=media-libs/opensubdiv-3.6.0-r2:=[opengl,cuda?,tbb?] )
 	openvdb? (
-		>=media-gfx/openvdb-13.0.0:=[nanovdb?]
+		>=media-gfx/openvdb-11.0.0:=[nanovdb?]
 		dev-libs/c-blosc:=
 	)
 	optix? (
