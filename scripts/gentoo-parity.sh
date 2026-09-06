@@ -1636,16 +1636,25 @@ FILESDIR_REFS=""
 # any remaining ${VAR} into a wildcard rather than guessing its value.
 filesdir_refs() {
 	local root=$1 key=$2 pn=${2#*/}
-	local eb base pv expr
+	local eb base pv pvr expr
 
 	FILESDIR_REFS=""
 	for eb in "${root}/${key}"/*.ebuild; do
 		[[ -f ${eb} ]] || continue
 		base=${eb##*/}
 		base=${base%.ebuild}
-		pv=${base#"${pn}-"}
+		# PVR carries the revision, PV does NOT, and ${P} is ${PN}-${PV}.
+		# Deriving one number from the filename and using it for both was a
+		# real false-positive source: dev-util/breakpad-2024.02.16-r1
+		# references "${FILESDIR}"/${P}-gcc16-vtable.patch, which expands to
+		# breakpad-2024.02.16-gcc16-vtable.patch. Substituting the revision
+		# too produced breakpad-2024.02.16-r1-gcc16-vtable.patch, matched
+		# nothing, and reported a live patch as an unreferenced file.
+		pvr=${base#"${pn}-"}
+		pv=${pvr%-r[0-9]*}
 		while IFS= read -r expr; do
 			expr=${expr//\$\{PF\}/${base}}
+			expr=${expr//\$\{PVR\}/${pvr}}
 			expr=${expr//\$\{P\}/${pn}-${pv}}
 			expr=${expr//\$\{PN\}/${pn}}
 			expr=${expr//\$\{PV\}/${pv}}
@@ -3895,9 +3904,15 @@ self_test_assertions() {
 	# nothing was dropped unaudited. The invariant is again untouched - what
 	# this assertion guards is that the two halves move TOGETHER, and 268
 	# against 268 is exactly as true as 338 against 338 was.
+	#
+	# RE-MEASURED SAME DAY, 268 -> 264, for two reasons that both belong to the
+	# files/ work above. Two rows went because filesdir_refs was confusing PV
+	# with PVR and reporting live patches as unreferenced (see the note there),
+	# and two more because the files those rows named -- the only genuinely
+	# dead ones -- were deleted from the tree.
 	assert_eq A20 \
 		'the four verdicts still sum to the row total, with the stale cache outside both' \
-		'rows=268 verdict-sum=268 stale=0' \
+		'rows=264 verdict-sum=264 stale=0' \
 		"$(row_arithmetic)"
 
 	# --- story 008: what a stale cache does to the exit code ----------
