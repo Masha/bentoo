@@ -1,7 +1,9 @@
-# This file is deprecated as per GLEP 56 in favor of metadata.xml.
-# Please add your descriptions to your package's metadata.xml ONLY.
-# * generated automatically using pmaint *
+# This file is deprecated as per GLEP 56 in favor of metadata.xml. Please add
+# your descriptions to your package's metadata.xml ONLY.
+# * generated automatically using egencache *
 
+app-backup/kopia:webui - Embed the kopia server HTML web UI. Disable for headless, container or edge deployments that only need the CLI or the server API (smaller binary via the upstream nohtmlui build tag).
+app-containers/runc:kmem - Enable Kernel Memory Accounting.
 app-editors/antigravity-bin:libsecret - Enable password storage support using libsecret for storing credentials securely in the system keyring (GNOME Keyring, KWallet)
 app-editors/antigravity-bin:wayland - Enable native Wayland support for better performance and security on Wayland compositors. Eliminates XWayland overhead.
 app-editors/cursor:egl - Use EGL for smooth rendering on high refresh rate monitors
@@ -14,7 +16,7 @@ app-editors/vim:racket - Enable support for Scheme using dev-scheme/racket
 app-editors/vim:terminal - Enable terminal emulation support
 app-editors/vim:vim-pager - Install vimpager and vimmanpager links
 app-editors/zed:X - Enable X11 display server support
-app-editors/zed:claude-agent-acp-plus - Install the claude-agent-acp-plus ACP agent and apply source patches that force-enable Zed's acp-beta feature flag (advertising ACP elicitation form/url support) plus agent panel UI improvements: multiline elicitation fields, collapsible markdown option previews, a manual-mode badge, clickable file mentions in replayed messages, and adoption of the agent's config-option response
+app-editors/zed:claude-agent-acp-plus - Install the claude-agent-acp-plus ACP agent and apply source patches that force-enable Zed's acp-beta feature flag (which now gates the per-turn token count and stabilized terminal authentication) plus agent panel UI improvements: multiline elicitation fields, collapsible markdown option previews, a manual-mode badge, clickable file mentions in replayed messages, and adoption of the agent's config-option response; also makes a thread menu choice (permission mode, model, thinking effort, agent config option) apply to that thread only, with Shift to make it the default for new threads
 app-editors/zed:claude-agent-acp-tui - Install the claude-agent-acp-tui ACP bridge to run the Claude Code TUI in Zed's agent panel
 app-editors/zed:claude-code-ide - Native Claude Code CLI editor integration (unofficial reverse-engineered IDE protocol, WebSocket MCP server) via a source patch
 app-editors/zed:collab - Build the collaboration server
@@ -27,6 +29,8 @@ app-editors/zed:tracy - Enable Tracy profiler integration for performance analys
 app-editors/zed:wayland - Enable Wayland display server support
 app-editors/zed-bin:claude-agent-acp-plus - Install the claude-agent-acp-plus ACP adapter (VS Code-parity Claude Agent SDK fork) for Zed's agent panel
 app-editors/zed-bin:claude-agent-acp-tui - Install the claude-agent-acp-tui ACP bridge to run the Claude Code TUI in Zed's agent panel
+app-emulation/cloud-utils:guest-utils - Installs utilities useful within a guest VM
+app-emulation/cloud-utils:image-utils - Installs utilities useful for manipulating guest images from outside a guest VM
 app-emulation/crossover-bin:capi - Enable ISDN support via CAPI
 app-emulation/crossover-bin:osmesa - Add support for OpenGL in bitmaps using libOSMesa
 app-emulation/crossover-bin:pcap - Support packet capture software (e.g. wireshark)
@@ -38,6 +42,14 @@ app-emulation/d7vk:d3d9 - Enable support for DirectX 9 (d3d9.dll)
 app-emulation/d7vk:ddraw - Enable support for DirectDraw and Direct3D 1-7 (ddraw.dll)
 app-emulation/d7vk:dxgi - Enable support for the DirectX Graphics Infrastructure (dxgi.dll)
 app-emulation/dxvk-nvapi:crossdev-mingw - Use sys-devel/crossdev for the toolchain rather than dev-util/mingw64-toolchain (requires manual setup and is mostly unsupported, try disabling if you have issues)
+app-emulation/open-vm-tools:deploypkg - Build deploypkg plugin
+app-emulation/open-vm-tools:dnet - Enable support for nicinfo
+app-emulation/open-vm-tools:doc - Generate API documentation
+app-emulation/open-vm-tools:fuse - Enable vmblock-fuse/vmhgfs-fuse
+app-emulation/open-vm-tools:gtkmm - Compile with Gtkmm and sigc++ (Recommended)
+app-emulation/open-vm-tools:multimon - Enable multimon (Requires X)
+app-emulation/open-vm-tools:resolutionkms - Build the linux/unix resolutionkms module
+app-emulation/open-vm-tools:vgauth - Build vgauth
 app-emulation/qemu:accessibility - Adds support for braille displays using brltty
 app-emulation/qemu:aio - Enables support for Linux's Async IO
 app-emulation/qemu:alsa - Enable alsa output for sound emulation
@@ -46,7 +58,6 @@ app-emulation/qemu:capstone - Enable disassembly support with dev-libs/capstone
 app-emulation/qemu:curl - Support ISOs / -cdrom directives via HTTP or HTTPS.
 app-emulation/qemu:fdt - Enables firmware device tree support
 app-emulation/qemu:fuse - Enables FUSE block device export
-app-emulation/qemu:glusterfs - Enables GlusterFS cluster fileystem via sys-cluster/glusterfs
 app-emulation/qemu:gnutls - Enable TLS support for the VNC console server. For 1.4 and newer this also enables WebSocket support. For 2.0 through 2.3 also enables disk quorum support.
 app-emulation/qemu:iscsi - Enable direct iSCSI support via net-libs/libiscsi instead of indirectly via the Linux block layer that sys-block/open-iscsi does.
 app-emulation/qemu:jpeg - Enable jpeg image support for the VNC console server
@@ -81,9 +92,12 @@ app-emulation/qemu:xdp - Enable support for XDP through net-libs/xdp-tools
 app-emulation/qemu:xen - Enables support for Xen backends
 app-misc/claude-desktop-bin:egl - Use EGL for smooth rendering on high refresh rate monitors
 app-misc/claude-desktop-bin:wayland - Run in wayland mode under wayland sessions, xwayland otherwise. This flag doesn't affect x11 sessions.
+app-misc/tmux:sixel - Enable sixel support
+app-misc/tmux:utempter - Include libutempter support
 app-office/freeoffice:pax_kernel - Triggers a paxmarking of the binary
 app-office/libreoffice:base - Enable full support for LibreOffice Base databases (involves additional bundled libs)
 app-office/libreoffice:coinmp - Use sci-libs/coinor-mp as alternative solver
+app-office/libreoffice:eot - Use the system media-libs/libeot instead of the bundled copy for Embedded OpenType fonts. Off by default because libeot is keyworded on fewer arches than this package.
 app-office/libreoffice:googledrive - Enable support for remote files on Google Drive
 app-office/libreoffice:gtk3 - Enable support for x11-libs/gtk+:3
 app-office/libreoffice:gtk4 - Enable support for gui-libs/gtk:4
@@ -100,29 +114,26 @@ app-portage/bentoolkit:playwright - Build the headless-browser ("script") versio
 app-portage/bentoolkit:secure - Install interactive-shell safety guards (/etc/bash/bashrc.d/30-bentoo-safety.bash) that add a confirmation delay/block to destructive commands (rm -rf, reboot, poweroff, etc.)
 app-portage/bentoolkit:system-snapshot - Pull in the full set of runtime backends for app-backup/btrbk and app-backup/snapper (snapshot engines) plus app-backup/restic and net-misc/rclone (cloud-ship) used by bentoo snapshot. The binary degrades gracefully and 'bentoo snapshot detect' names any absent backend at runtime
 app-portage/bentoolkit:systemd - Pull in sys-apps/systemd for bentoo snapshot scheduling via systemd timers
+app-text/calibre:font-subsetting - Enable font subsetting support
+app-text/calibre:system-mathjax - Use a system copy of mathjax
+app-text/calibre:unrar - Enable support for comic books compressed with the non-free Rar format
+dev-db/redis:tcmalloc - Use tcmalloc from dev-util/google-perftools for allocations.
 dev-db/sqlitebrowser:sqlcipher - Allow to open and to edit databases encrypted using dev-db/sqlcipher
 dev-games/godot:deprecated - Enable support for deprecated features
 dev-games/godot:double-precision - Use double-precision floats (default: single-precision)
 dev-games/godot:raycast - Enable the raycast Editor module using media-libs/embree
 dev-games/godot:tools - Enable the Godot Editor for game development
 dev-lang/flutter:examples - Install example projects
+dev-lang/ghc:binary - Install the binary version directly, rather than using it to build the source version.
+dev-lang/ghc:elfutils - Enable DWARF-based backtraces using dev-libs/elfutils.
+dev-lang/ghc:ghcbootstrap - Internal: Bootstrap GHC from an existing GHC installation.
+dev-lang/ghc:ghcmakebinary - Internal: Build binary friendly for redistribution.
+dev-lang/ghc:gmp - Use dev-libs/gmp for integer operations (works faster, but an external depend).
+dev-lang/ghc:llvm - Pull in dependencies for the llvm-core/llvm codegen backend.
+dev-lang/ghc:numa - Enable NUMA thread balancing policy using sys-process/numactl.
+dev-lang/ghc:unregisterised - Create an unregisterised build in which only the C codegen backend will be available.
 dev-lang/lua:deprecated - Enable deprecated features for compatibility with older Lua versions
 dev-lang/lua:readline - Enable readline support for the Lua command line interpreter
-dev-lang/rust:clippy - Install clippy, Rust code linter
-dev-lang/rust:dist - Install dist tarballs (used for bootstrapping)
-dev-lang/rust:miri - Install miri, an interpreter for Rust's mid-level intermediate representation (requires USE=nightly, sometimes is broken)
-dev-lang/rust:mrustc-bootstrap - Use dev-lang/mrustc to build the bootstrap Rust sysroot from this package's source
-dev-lang/rust:nightly - Enable nightly (UNSTABLE) features (NOTE: it does not install nightly version, just enables features marked as nightly at time of release)
-dev-lang/rust:parallel-compiler - Build a multi-threaded rustc (experimental, not tested by upstream)
-dev-lang/rust:rust-analyzer - Install rust-analyzer, A Rust compiler front-end for IDEs (language server)
-dev-lang/rust:rust-src - Install rust-src, needed by developer tools and for build-std (cross)
-dev-lang/rust:rustfmt - Install rustfmt, Rust code formatter
-dev-lang/rust:system-llvm - Use the system LLVM installation
-dev-lang/rust:wasm - Build support for the wasm32-unknown-unknown target
-dev-lang/rust-bin:clippy - Install clippy, Rust code linter
-dev-lang/rust-bin:rust-analyzer - Install rust-analyzer, A Rust compiler front-end for IDEs (language server)
-dev-lang/rust-bin:rust-src - Install rust-src, needed by developer tools and for build-std (cross)
-dev-lang/rust-bin:rustfmt - Install rustfmt, Rust code formatter
 dev-libs/imath:large-stack - Enables code to take advantage of large stack support
 dev-libs/libayatana-appindicator-glib:test - Build and run the upstream test suite (requires dbus-test-runner)
 dev-libs/liborcus:spreadsheet-model - Enable the spreadsheet model implementation
@@ -131,7 +142,12 @@ dev-libs/sentry-native:breakpad - Use dev-util/breakpad as the crash handler
 dev-libs/sentry-native:curl - Enable support for automated uploading of crash reports
 dev-python/conda:mamba - enable libmamba resolver
 dev-python/conda:user - use user's home directory as default pkgs and envs prefix
+dev-python/openai:aiohttp - Enable the aiohttp-backed async HTTP transport (dev-python/aiohttp) as an alternative to the default httpx2 transport
+dev-python/openai:bedrock - Enable the Amazon Bedrock provider, which signs requests with SigV4 via dev-python/botocore
 dev-util/breakpad:tools - Build tools
+dev-util/codex-desktop-bin:apparmor - Install the upstream AppArmor profile, which grants the app the user-namespace access its renderer sandbox needs
+dev-util/codex-desktop-bin:egl - Use EGL for smooth rendering on high refresh rate monitors
+dev-util/codex-desktop-bin:wayland - Run in wayland mode under wayland sessions, xwayland otherwise. This flag doesn't affect x11 sessions.
 dev-util/nvidia-cuda-toolkit:clang - Depend on llvm-core/clang as host compiler
 dev-util/nvidia-cuda-toolkit:debugger - Install the CUDA debugger
 dev-util/nvidia-cuda-toolkit:nsight - Install profiling and optimizing tools (nsight-compute, nsight-systems)
@@ -198,15 +214,11 @@ media-gfx/imagemagick:lqr - Enable experimental liquid rescale support using med
 media-gfx/imagemagick:pango - Enable Pango support using x11-libs/pango
 media-gfx/imagemagick:q32 - Set quantum depth value to 32
 media-gfx/imagemagick:q8 - Set quantum depth value to 8
-media-gfx/inkscape:cdr - Enable support for CorelDRAW files via media-libs/libcdr
-media-gfx/inkscape:dia - Enable DIA flow chart import via app-office/dia
-media-gfx/inkscape:inkjar - Enable support for OpenOffice.org SVG jar files
-media-gfx/inkscape:sourceview - Enable syntax highlighting support via x11-libs/gtksourceview
-media-gfx/inkscape:svg2 - Enable support for new SVG2 features
-media-gfx/inkscape:visio - Enable support for Microsoft Visio diagrams via media-libs/libvisio
-media-gfx/inkscape:wpg - Enable support for WordPerfect graphics via app-text/libwpg
 media-gfx/pixieditor-bin:opengl - Ensure OpenGL support is available (requires graphics drivers)
 media-gfx/pixieditor-bin:vulkan - Install Vulkan loader for hardware-accelerated rendering (requires compatible GPU and drivers)
+media-libs/dav1d:10bit - Add support for building 10-bit and 12-bit AV1.
+media-libs/dav1d:8bit - Add support for decoding 8-bit AV1.
+media-libs/dav1d:xxhash - Enable dev-libs/xxhash support for hashing muxer
 media-libs/dav2d:10bit - Add support for building 10-bit and 12-bit AV2.
 media-libs/dav2d:8bit - Add support for decoding 8-bit AV2.
 media-libs/dav2d:asm - Build optimized assembly (nasm) routines where available.
@@ -224,6 +236,7 @@ media-libs/gstreamer:unwind - Enable sys-libs/libunwind usage for better backtra
 media-libs/harfbuzz:experimental - Enable experimental APIs
 media-libs/harfbuzz:glib - Enable dev-libs/glib unicode functions
 media-libs/harfbuzz:graphite - Enable media-gfx/graphite2 complementary shaper
+media-libs/kquickimageeditor:opencv - Enable better blur performance using media-libs/opencv
 media-libs/libcamera:drm - Build with drm support for cam tool
 media-libs/libcamera:elfutils - Build with improved debugging using dev-libs/elfutils
 media-libs/libcamera:gui - Build QCam extra tool
@@ -232,26 +245,27 @@ media-libs/libcamera:sdl - Build Cam extra tool with SDL sink support (requires 
 media-libs/libcamera:tools - Build extra tools (including cam, qcam and lc-compliance). Note: 'qcam' requires also USE="gui"
 media-libs/libcamera:trace - Build with tracing capabilities
 media-libs/libcamera:unwind - Build with improved debugging using sys-libs/libunwind (has no effect if USE=elfutils is set)
-media-libs/libffado:test-programs - Install standalone test programs
-media-libs/mesa:d3d9 - Enable Direct 3D9 API through Nine state tracker. Can be used together with patched wine.
+media-libs/libopenshot:babl - Use media-libs/babl for the advanced chroma key colourspace conversions
+media-libs/libopenshot:imagemagick - Use media-gfx/imagemagick for image reading and writing
+media-libs/libopenshot:opencv - Build the OpenCV effects: motion tracking, stabilization and object detection
+media-libs/libopenshot:ruby - Build the SWIG Ruby bindings
+media-libs/libopenshot:wayland - Build the screen capture module using xdg-desktop-portal and media-video/pipewire
+media-libs/libopenshot-audio:doc - Build the Doxygen API documentation for the library. Upstream enables this by default; here it is opt-in so that installing the library does not pull in app-text/doxygen and Graphviz.
 media-libs/mesa:llvm - Enable LLVM backend for Gallium3D.
 media-libs/mesa:lm-sensors - Enable Gallium HUD lm-sensors support.
 media-libs/mesa:opencl - Enable the Rusticl Gallium OpenCL state tracker.
-media-libs/mesa:osmesa - Build the Mesa library for off-screen rendering.
 media-libs/mesa:proprietary-codecs - Enable codecs for patent-encumbered audio and video formats.
-media-libs/mesa:vdpau - Enable the VDPAU acceleration interface for the Gallium3D Video Layer.
-media-libs/mesa:vulkan-overlay - Build vulkan-overlay-layer which displays Frames Per Second and other statistics
+media-libs/mesa:sysprof - Enable profiling data capture support using dev-util/sysprof-capture
 media-libs/mesa:wayland - Enable support for dev-libs/wayland
-media-libs/mesa:xa - Enable the XA (X Acceleration) API for Gallium3D.
 media-libs/opencv:atlas - Use sci-libs/atlas for blas, lapack and sparse blas routines (Experimental!)
 media-libs/opencv:contrib - Install user contributed scripts from opencv_contrib (Experimental!)
 media-libs/opencv:contribcvv - Enable CVV in contrib
-media-libs/opencv:contribdnn - Enable DNN module
+media-libs/opencv:contribdnn - Enable DNN module contrib (requires tinydnn)
 media-libs/opencv:contribfreetype - Enable Drawing UTF-8 strings with media-libs/freetype&media-libs/harfbuzz
 media-libs/opencv:contribhdf - Enable HDF module (requires sci-libs/hdf5)
 media-libs/opencv:contribovis - Enable OGRE vision module support (dev-games/ogre)
 media-libs/opencv:contribsfm - Enable SFM module (requires USE="eigen gflags glog")
-media-libs/opencv:contribxfeatures2d - Enables xfeatures2d and autodownload of samples in contrib
+media-libs/opencv:contribxfeatures2d - Enable xfeatures2d in contrib
 media-libs/opencv:cuda - Enable NVIDIA Cuda computations support (Experimental!)
 media-libs/opencv:cudnn - Enable support for nVidia cuDNN library
 media-libs/opencv:dnnsamples - Enable dnn caffeemodel samples
@@ -293,8 +307,8 @@ net-analyzer/netdata:nodejs - Enable use of nodejs (which some plugins use)
 net-analyzer/netdata:prometheus - Enable support for the Prometheus remote write backend
 net-analyzer/netdata:xen - Enable monitoring of xen
 net-dns/bind-tools:gssapi - Enable gssapi support
-net-firewall/ufw:examples - Example ufw config files
-net-firewall/ufw:ipv6 - IPv6 support for iptables
+net-im/telegram-desktop:enchant - Use the app-text/enchant spell-checking backend instead of app-text/hunspell
+net-im/telegram-desktop:fonts - Use builtin patched copy of open-sans fonts (overrides fontconfig)
 net-libs/bun-bin:cpu_flags_x86_avx2 - Select the AVX2-optimized binary on amd64 (default on modern CPUs).
 net-libs/libqmi:mbim - Support QMI over Mobile Broadband Interface Model (MBIM)
 net-libs/libqmi:qrtr - Support QMI over IPC Router bus (QRTR)
@@ -312,9 +326,9 @@ net-libs/webkit-gtk:webdriver - Build and install the WebKitWebDriver binary for
 net-misc/modemmanager:mbim - Enable MBIM modem protocol
 net-misc/modemmanager:qmi - Enable support for the QMI modem protocol used by devices with Qualcomm chipsets
 net-misc/modemmanager:qrtr - Enable support for the QMI over IPC Router bus (QRTR) protocol
-net-misc/networkmanager:concheck - Enable connectivity checking support
+net-misc/networkmanager:clat - Enable CLAT (464XLAT) support for IPv4 connectivity on IPv6-only networks, via dev-libs/libbpf
+net-misc/networkmanager:concheck - Enable connectivity checking support (needed for Captive portals detection)
 net-misc/networkmanager:connection-sharing - Support connection sharing (uses net-dns/dnsmasq)
-net-misc/networkmanager:dhclient - Use dhclient from net-misc/dhcp for getting an IP via DHCP
 net-misc/networkmanager:dhcpcd - Use net-misc/dhcpcd for getting an IP
 net-misc/networkmanager:elogind - Use sys-auth/elogind for session tracking
 net-misc/networkmanager:iptables - Use net-firewall/iptables for connection sharing
@@ -337,22 +351,49 @@ net-misc/rustdesk:hwaccel - enable hardware-accelerated rendering support
 net-misc/rustdesk:wayland - enable wayland support
 net-p2p/qbittorrent:dbus - Enable support for notifications and power-management features via D-Bus
 net-p2p/qbittorrent:webui - Install qBittorrent Web UI (qbittorrent-nox)
+net-wireless/mt7927-dkms:btmtk - Rebuild the btusb/btmtk Bluetooth modules out of tree. Only needed for the HP EliteMini adapter (USB ID 0489:e156), which is absent from the in-tree tables; every other MT6639 works with the native Bluetooth stack from kernel 7.1 on. Enabling this replaces the in-tree btusb for every Bluetooth device on the system. The proprietary MT6639 Bluetooth firmware is installed either way, since the in-tree driver needs it too and no other package provides it.
+sci-ml/amd-gaia:api - Pull in dev-python/fastapi, dev-python/uvicorn and dev-python/httpx, required by the local REST server (the "gaia api" command) and by the browser UI it serves
+sci-ml/ik_llama-cpp:hip - Build a HIP (ROCm) backend
+sci-ml/koboldcpp:cuda - Build the CUDA/cuBLAS backend (koboldcpp_cublas) for NVIDIA GPUs, for every architecture the installed toolkit supports
+sci-ml/koboldcpp:rocm - Build the ROCm/hipBLAS backend (koboldcpp_hipblas) for AMD GPUs, for the architectures selected in AMDGPU_TARGETS
+sci-ml/koboldcpp:vulkan - Build the Vulkan backend (koboldcpp_vulkan), upstream's officially supported GPU path for both AMD and NVIDIA
+sci-ml/lemonade:caps - Link against sys-libs/libcap so lemond can pass capabilities on to the backend processes it spawns
+sci-ml/lemonade:webapp - Bundle the browser UI that lemond serves, using a pre-populated node_modules distfile instead of a networked npm install
+sci-ml/lemonade-bin:systemd - Install the system and user systemd units for the lemond daemon, plus the sysusers.d snippet. Upstream provides no OpenRC service and the units use systemd-only directives, so they are omitted on non-systemd installs.
 sci-ml/llama-cpp:blis - Build a BLIS backend
 sci-ml/llama-cpp:flexiblas - Build a FlexiBLAS backend
+sci-ml/llama-cpp:hip - Build a HIP (ROCm) backend
 sci-ml/llama-cpp:openblas - Build an OpenBLAS backend
 sci-ml/llama-cpp:opencl - Build an OpenCL backend, so far only works on Adreno and Intel GPUs
-sci-ml/llama-cpp:rocm - Build a HIP (ROCm) backend
 sci-ml/llama-cpp:rpc - Build with rpc-server
 sci-ml/llama-cpp:server - Build with example server
-sci-ml/llama-cpp:spacemit - Build with SpacemiT IME instruction support
 sci-ml/llama-cpp:webui - Build server with embedded WebUI
 sci-ml/llama-cpp:wmma - Use rocWMMA to enhance flash attention performance
+sci-ml/llama-swap:ui - Build and embed the Svelte web interface. Requires npm at build time; without this flag the binary serves the API only and /ui returns nothing
 sci-ml/ollama-bin:cuda - Enable NVIDIA CUDA GPU acceleration support. Requires compatible NVIDIA GPU (compute capability 6.0+, Pascal architecture or newer) and nvidia-cuda-toolkit. Significantly improves inference performance for large models.
 sci-ml/ollama-bin:rocm - Enable AMD ROCm GPU acceleration support. Requires compatible AMD GPU (Radeon RX 6000 series or newer, or Radeon VII) and ROCm libraries. May require HSA_OVERRIDE_GFX_VERSION environment variable for optimal compatibility. This is experimental and not all GPU models are supported.
+sci-ml/sherpa-onnx:cuda - Build the NVIDIA CUDA execution provider (requires the CUDA Toolkit; the nvcc host compiler is resolved from the installed toolkit, not hardcoded)
+sci-ml/sherpa-onnx:portaudio - Build the example CLI tools that record and play audio. Adds no system dependency: upstream vendors and statically links portaudio
+sci-ml/sherpa-onnx:python - Build and install the Python bindings (pybind11) into site-packages
+sci-ml/sherpa-onnx:tts - Build text-to-speech support, which pulls the vendored espeak-ng and piper-phonemize sources
+sci-ml/sherpa-onnx:websocket - Build the WebSocket server and client examples
+sci-ml/stable-diffusion-cpp:blis - Build a BLIS backend
+sci-ml/stable-diffusion-cpp:flexiblas - Build a FlexiBLAS backend
+sci-ml/stable-diffusion-cpp:hip - Build a HIP (ROCm) backend
+sci-ml/stable-diffusion-cpp:openblas - Build an OpenBLAS backend
+sci-ml/stable-diffusion-cpp:webm - Support the webm audiovisual media file format
+sci-ml/stable-diffusion-cpp:wmma - Use rocWMMA to enhance flash attention performance
+sci-ml/whisper-cpp:blas - Build a BLAS backend against sci-libs/openblas, whose cblas interface ggml-blas requires
+sci-ml/whisper-cpp:ffmpeg - Link the examples against media-video/ffmpeg so they accept audio formats other than WAV
+sci-ml/whisper-cpp:hip - Build a HIP (ROCm) backend
+sci-ml/whisper-cpp:opencl - Build an OpenCL backend, so far only works on Adreno and Intel GPUs
+sci-ml/whisper-cpp:sdl2 - Build the real-time capture examples that use media-libs/libsdl2
 sys-apps/ai-jail:chromium-launcher - Install the ai-jail-chromium wrapper script and its desktop entry, which start www-client/chromium inside an ai-jail sandbox with an isolated persistent browser profile
 sys-apps/ai-jail-bin:chromium-launcher - Install the ai-jail-chromium wrapper and its desktop entry, which launch www-client/chromium inside the sandbox with an isolated, persistent browser profile
+sys-apps/uutils-coreutils-bin:l10n_fr - Install the French translations, which are shipped in the source tree rather than in the binary tarballs and therefore require fetching an extra archive. English is compiled into the binary and always available.
 sys-apps/xdg-desktop-portal:flatpak - Enable sys-apps/flatpak integration
 sys-apps/xdg-desktop-portal:seccomp - Use sys-apps/bubblewrap (which requires seccomp) to sandbox some functionality like icon handling
+sys-cluster/minikube:libvirt - Pull in app-emulation/libvirt at runtime, which the built-in kvm2 driver loads through dlopen
 sys-kernel/linux-firmware:compress-xz - Compress firmware using xz (app-arch/xz-utils) before installation
 sys-kernel/linux-firmware:compress-zstd - Compress firmware using zstd (app-arch/zstd) before installation
 sys-kernel/linux-firmware:deduplicate - Create symlinks for all firmware that is duplicate using rdfind
@@ -361,9 +402,25 @@ sys-kernel/linux-firmware:initramfs - Create and install initramfs for early mic
 sys-kernel/linux-firmware:redistributable - Install also non-free (but redistributable) firmware files
 sys-kernel/linux-firmware:savedconfig - Allows individual selection of firmware files
 sys-kernel/linux-firmware:unknown-license - Install firmware files whose license is unknown
+sys-process/nohang:desktop - Pull in x11-libs/libnotify and app-admin/sudo, needed by the nohang-desktop profile to send GUI warnings to the logged-in user
 www-client/brave-browser:qt6 - Enable Qt6 integration for better KDE/Qt desktop environment support. Provides native look and feel on KDE Plasma and other Qt-based desktops.
 www-client/brave-browser:selinux - Enable SELinux policy support for enhanced security in SELinux-enabled systems. Required for proper operation on systems with SELinux in enforcing mode.
 www-client/brave-browser:verify-sig - Verify the release checksum using Brave's OpenPGP signature. Ensures the integrity and authenticity of the downloaded package.
+www-client/chromium:bundled-toolchain - Download and use the upstream binary toolchain(s) to build Chromium
+www-client/chromium:debug - Enable DCHECK feature with severity configurable at runtime. Mostly intended for debugging and development, NOT RECOMMENDED for general use.
+www-client/chromium:ffmpeg-chromium - (binpkg only) Use Chromium FFmpeg fork (media-video/ffmpeg-chromium) rather than mainline FFmpeg (media-video/ffmpeg)
+www-client/chromium:gtk4 - Build with GTK4 headers.
+www-client/chromium:hangouts - Enable support for Google Hangouts features such as screen sharing
+www-client/chromium:headless - Build Ozone only with headless backend, NOT RECOMMENDED for general use.
+www-client/chromium:official - Enable Official build instead of Developer build.
+www-client/chromium:pax-kernel - Allow building on a PaX-enabled kernel
+www-client/chromium:pgo - Build with Profile Guided Optimizations (2-stage compilation)
+www-client/chromium:proprietary-codecs - Enable codecs for patent-encumbered audio and video formats.
+www-client/chromium:rar - Enable the Safe Browsing feature to inspect RAR files.
+www-client/chromium:system-harfbuzz - Use system media-libs/harfbuzz instead of the bundled library.
+www-client/chromium:system-icu - Use system dev-libs/icu instead of the bundled one
+www-client/chromium:system-zstd - Use system app-arch/zstd instead of the bundled one.
+www-client/chromium:widevine - Unsupported closed-source DRM capability (required by Netflix VOD)
 www-client/librewolf:clang - Use Clang compiler instead of GCC
 www-client/librewolf:eme-free - Disable EME (DRM plugin) capability at build time
 www-client/librewolf:gmp-autoupdate - Allow Gecko Media Plugins (binary blobs) to be automatically downloaded and kept up-to-date in user profiles
@@ -386,4 +443,7 @@ www-client/librewolf:system-webp - Use the system-wide media-libs/libwebp instea
 www-client/librewolf:wasm-sandbox - Sandbox certain third-party libraries through WebAssembly using RLBox
 www-client/librewolf:wifi - Enable necko-wifi for NetworkManager integration, and access point MAC address scanning for better precision with opt-in geolocation services
 www-client/servo:gstreamer - Enable HTML media (audio/video) playback support via GStreamer (servo/media-gstreamer feature)
+x11-base/xwayland:libei - Enable emulated input using dev-libs/libei
+x11-base/xwayland:unwind - Enable libunwind usage for backtraces
+x11-base/xwayland:xcsecurity - Build Security extension
 x11-drivers/xf86-video-qxl:xspice - Include Xspice, a standard X server that is also a Spice server
