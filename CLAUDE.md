@@ -95,6 +95,23 @@ runs their assertions without touching the tree.
 why it is deliberately absent from `.git/hooks/pre-commit`: a guard that turns
 red offline is a guard people learn to skip. Run it in upstream sweeps.
 
+`gentoo-parity.sh` is absent from the hook for a different reason, and it is
+not cost — a full sweep is ~7s. It is scope. The sweep compares against
+`/var/db/repos/gentoo`, which moves independently of anything being committed
+here, so the most common way a new row appears is `::gentoo` bumping a package,
+not an edit in this tree. A hook that fails the commit for that blames the
+wrong change, and the hook is `--staged` anyway. Run it at the two moments
+where the comparison actually means something:
+
+- **after `emaint sync -r gentoo`** — the `::gentoo` half of the divergence,
+  the half no commit here can produce; and
+- **after a batch of bumps**, before pushing them.
+
+Since 2026-09-07 the sweep exits `0` with all 222 lines `JUSTIFIED`. That
+changes how a red reads: any `ALIGN` is divergence that *arrived*, not backlog
+that was never worked down. `--self-test` (26 assertions) covers the script
+itself and needs neither the tree nor the network.
+
 ## Working rules
 
 - **The checkout is not what Portage reads.** Portage reads
