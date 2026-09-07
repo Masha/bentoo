@@ -56,7 +56,7 @@ src_install() {
 
 	dosym "${appdir}/antigravity" /usr/bin/antigravity-hub
 
-	newicon "${FILESDIR}/${PN}.png" antigravity-hub.png
+	newicon "${FILESDIR}"/antigravity-hub.png antigravity-hub.png
 
 	cat > "${T}/${PN}.desktop" <<-EOF || die "Failed to write desktop file"
 		[Desktop Entry]
