@@ -107,9 +107,22 @@ where the comparison actually means something:
   the half no commit here can produce; and
 - **after a batch of bumps**, before pushing them.
 
+Two of the sweep's sections report litter rather than divergence, and neither
+fails the run. Both were emptied on 2026-09-07 and both have a floor worth
+knowing:
+
+- **orphan files** under `files/` that no ebuild names -- went 50 to 4. It will
+  not reach 0: `app-office/libreoffice-l10n/files/lo_gen_langs.sh` is a
+  maintainer tool, never referenced by design, and the three LibreWolf entries
+  sit beside `## Disabled for` blocks that document why they are kept. **Treat
+  4 as the floor, not as a backlog.**
+- **md5-cache entries with no ebuild** -- went 548 of 916 to 0. This one's
+  floor IS 0, and it climbs on its own: every bump leaves the previous entry
+  behind unless `egencache` is re-run for that package.
+
 Since 2026-09-07 the sweep exits `0` with all 222 lines `JUSTIFIED`. That
 changes how a red reads: any `ALIGN` is divergence that *arrived*, not backlog
-that was never worked down. `--self-test` (27 assertions) covers the script
+that was never worked down. `--self-test` (28 assertions) covers the script
 itself and needs neither the tree nor the network -- except for the handful of
 SLOT probes that pin an exact PVR on purpose. When one of those subjects is not
 in the tree, the assertion reports **SKIP**, never FAIL: a vanished subject says
