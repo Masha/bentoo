@@ -3,6 +3,17 @@
 
 EAPI="7"
 
+# "none", not xz, and this one had to be measured rather than copied from its
+# neighbours. All nineteen RPMs inside the 4.1.16 tarball are legacy RPM v3 and
+# carry NO PayloadIs tag at all - checked 2026-09-07 by pulling the first 40 MB
+# of the SourceForge tarball and running strings over every .rpm in it. That is
+# exactly the case rpm.eclass calls "none": supported by app-arch/rpm, payload
+# uncompressed or on builtin zlib.
+#
+# Without the variable the eclass takes its unset branch and BDEPEND loses
+# app-arch/rpm entirely. @PRE_INHERIT, so it goes above the inherit.
+RPM_COMPRESS_TYPE=none
+
 inherit desktop multilib gnome2-utils pax-utils prefix rpm xdg
 
 IUSE="gnome java"

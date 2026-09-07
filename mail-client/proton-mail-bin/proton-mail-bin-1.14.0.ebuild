@@ -3,6 +3,13 @@
 
 EAPI=8
 
+# Measured 2026-09-07: the .rpm Proton serves reads "PayloadIsXz" (read from the
+# header via a range request, not inferred). Without this, rpm.eclass takes its
+# unset branch and narrows BDEPEND to app-arch/rpm2targz alone, forcing that
+# package on anyone who already has app-arch/rpm. @PRE_INHERIT, so it must
+# precede the inherit.
+RPM_COMPRESS_TYPE=xz
+
 inherit rpm xdg
 
 MY_PV=$(ver_cut 1-3)

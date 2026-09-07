@@ -9,6 +9,11 @@ CHROMIUM_LANGS="
 	sw ta te th tr uk ur vi zh-CN zh-TW
 "
 
+# Measured 2026-09-07 the same way: the release .rpm reads "PayloadIsXz".
+# Without it rpm.eclass narrows BDEPEND to app-arch/rpm2targz alone. It is
+# @PRE_INHERIT and must come before the inherit line.
+RPM_COMPRESS_TYPE=xz
+
 inherit chromium-2 desktop rpm xdg
 
 DESCRIPTION="Linux fork of GitHub Desktop"
