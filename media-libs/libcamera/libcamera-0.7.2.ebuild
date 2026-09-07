@@ -7,6 +7,12 @@ PYTHON_COMPAT=( python3_{11..14} )
 
 inherit meson python-any-r1
 
+# BENTOO-DIVERGENCE: files/content - libcamera-no-automagic-flags.patch is much
+# smaller than ::gentoo's. Upstream de-automagicked most of the optional
+# dependencies in 0.7.x - cam-output-kms, cam-output-sdl2, cam-jpeg,
+# apps-output-dng, libdw - so those hunks are dead here. What remains is the one
+# thing still auto-detected, IPA module signing via gnutls, and the patch header
+# says so.
 DESCRIPTION="Complex camera support library"
 HOMEPAGE="https://libcamera.org"
 SRC_URI="https://gitlab.freedesktop.org/camera/libcamera/-/archive/v${PV}/libcamera-v${PV}.tar.bz2"

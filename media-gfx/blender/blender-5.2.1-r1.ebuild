@@ -29,6 +29,12 @@ inherit cuda rocm llvm-r2 edo
 inherit eapi9-pipestatus check-reqs flag-o-matic multiprocessing pax-utils python-single-r1 toolchain-funcs virtualx
 inherit cmake xdg-utils
 
+# BENTOO-DIVERGENCE: files/content - blender-4.0.2-FindClang.patch and
+# blender-4.1.1-FindLLVM.patch differ from ::gentoo's copies. They are the same
+# patches REBASED onto this series: upstream CMake renamed the find-module
+# variables (_CLANG_FIND_COMPONENTS became _clang_FIND_COMPONENTS and so on), so
+# ::gentoo's copies no longer apply here. The filenames keep their historical
+# versions because the applier never renames files/ on a bump.
 DESCRIPTION="3D Creation/Animation/Publishing System"
 HOMEPAGE="https://www.blender.org"
 

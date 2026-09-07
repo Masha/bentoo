@@ -32,6 +32,11 @@ EAPI=8
 PLOCALES="de es fr nl pt ro sv"
 inherit autotools flag-o-matic plocale
 
+# BENTOO-DIVERGENCE: metadata.xml - a <longdescription> and an upstream
+# <bugs-to> pointing at the Debian BTS, where fakeroot is actually developed.
+# The description also records WHY this package is here at all: it mirrors
+# ::gentoo's 1.33 forward to the 2.x series and is meant to be deleted once
+# ::gentoo catches up. That note has nowhere else to live.
 DESCRIPTION="A fake root environment by means of LD_PRELOAD and SysV IPC (or TCP) trickery"
 HOMEPAGE="https://tracker.debian.org/pkg/fakeroot"
 SRC_URI="mirror://debian/pool/main/${PN:0:1}/${PN}/${P/-/_}.orig.tar.xz"

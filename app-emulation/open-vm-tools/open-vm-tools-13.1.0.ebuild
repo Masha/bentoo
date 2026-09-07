@@ -12,6 +12,11 @@ inherit autotools linux-info pam systemd udev
 MY_BUILD="25218885"
 MY_P="${P}-${MY_BUILD}"
 
+# BENTOO-DIVERGENCE: files/content - open-vm-tools.initd gains a "use vgauthd"
+# line. It follows from this overlay shipping a vgauthd init script at all,
+# which ::gentoo does not. "use" rather than "need" on purpose: it degrades to a
+# no-op when the service is absent, where "need" would fail the start for anyone
+# building without USE=vgauth.
 DESCRIPTION="Tools for VMware guests"
 HOMEPAGE="https://github.com/vmware/open-vm-tools"
 SRC_URI="https://github.com/vmware/open-vm-tools/releases/download/stable-${PV}/${MY_P}.tar.gz"

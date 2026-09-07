@@ -9,6 +9,11 @@ inherit go-module shell-completion toolchain-funcs
 GIT_COMMIT=c93a4cb9311efc66b90d33ea03f75f2c4120e9b0
 GIT_COMMIT_SHORT=${GIT_COMMIT:0:9}
 
+# BENTOO-DIVERGENCE: metadata.xml - a <longdescription>, an upstream <bugs-to>,
+# and a longer description of the libvirt flag. The flag text is not decoration:
+# ::gentoo says "Build plugin for kvm", which stopped being true when the kvm2
+# driver moved into the binary and reached libvirt through dlopen (see the
+# DEPEND tag above). The description had to follow the dependency.
 DESCRIPTION="Local kubernetes clusters for learning and development"
 HOMEPAGE="https://github.com/kubernetes/minikube https://kubernetes.io"
 

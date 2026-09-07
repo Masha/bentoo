@@ -5,6 +5,9 @@ EAPI=8
 
 inherit go-module
 
+# BENTOO-DIVERGENCE: metadata.xml - a <longdescription> and an upstream
+# <bugs-to>, neither of which ::gentoo's file carries. Added documentation, not
+# drift; there is nothing to align back to.
 DESCRIPTION="run github workflows locally"
 HOMEPAGE="https://nektosact.com"
 SRC_URI="https://github.com/nektos/act/archive/v${PV}.tar.gz -> ${P}.tar.gz"

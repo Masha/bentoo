@@ -86,6 +86,13 @@ RUST_REQ_USE="rustfmt" # Upstream run rustfmt on bindgen output, so we need it t
 inherit check-reqs chromium-2 desktop flag-o-matic llvm-r1 multiprocessing ninja-utils pax-utils
 inherit python-any-r1 readme.gentoo-r1 rust systemd toolchain-funcs virtualx xdg-utils
 
+# BENTOO-DIVERGENCE: files/content - bin-finder.py and generate-support-files.py
+# differ from ::gentoo's. bin-finder.py carries this overlay's observability work
+# (an unreadable directory is reported and skipped rather than silently swallowed
+# by a bare except), and generate-support-files.py tracks template variables the
+# Chromium series added. Both are permanent: ::gentoo does not accept
+# AI-assisted contributions, so these cannot be upstreamed - see
+# .autoupdate/not-packageable.md and the project's no-upstream policy.
 DESCRIPTION="Open-source version of Google Chrome web browser"
 HOMEPAGE="https://www.chromium.org/"
 PPC64_HASH="7aae8a84e327fc2078ce1625c9c70bfda77d626f"

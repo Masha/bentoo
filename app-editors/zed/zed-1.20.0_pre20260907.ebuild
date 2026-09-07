@@ -1585,6 +1585,11 @@ WEBRTC_COMMIT="0001d84-4"
 # claude-agent-acp integrations; ::gentoo carries none.
 inherit cargo check-reqs desktop flag-o-matic llvm-r1 toolchain-funcs xdg
 
+# BENTOO-DIVERGENCE: metadata.xml - a <use> block describing thirteen flags,
+# where ::gentoo's file has none. Every one of them is a flag this overlay adds
+# (see the IUSE tag): X, wayland, collab, neovim, mimalloc, tracy, the three
+# claude-agent ones and the rest. ::gentoo has nothing to describe because it
+# exposes none of them.
 DESCRIPTION="The fast, collaborative code editor"
 HOMEPAGE="https://zed.dev https://github.com/zed-industries/zed"
 SRC_URI="

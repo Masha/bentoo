@@ -1418,13 +1418,32 @@ PACKAGE_ROW_DISTANCE='package'
 # files/overlay-only and files/gentoo-only WERE here until 2026-09-06. They are
 # no longer emitted at all: the first is partitioned into a suppression and the
 # new files/unreferenced axis, the second is suppressed whole. See the files
-# stage for the measurement that justified it. What remains are the two axes
-# that are genuinely reported and genuinely cannot carry a tag.
+# stage for the measurement that justified it.
+#
+# WHAT THIS LIST MEANS CHANGED ON 2026-09-06, and the old reading was a mistake
+# worth recording. It used to be "these rows can never be JUSTIFIED either",
+# argued from "the file holds no ebuild code, so it cannot carry a tag". That
+# confuses WHERE THE DIFFERENCE IS with WHERE THE REASON CAN BE WRITTEN. A patch
+# under files/ exists because an ebuild applies it, and a metadata.xml describes
+# a package whose ebuilds are right there; the ebuild is the natural place for
+# the reason, and collect_tags now registers a package-level key so a tag can
+# reach these rows.
+#
+# The old reading had a cost. Every row on these two axes was ALIGN FOREVER, by
+# construction, however deliberate the divergence - chromium's patched
+# bin-finder.py, open-vm-tools' overlay-only init script, thirteen zed USE flags
+# ::gentoo does not have. Eleven permanently red rows in a guard is how a guard
+# becomes one people stop reading.
+#
+# What the list still does, and correctly: it keeps these axes from being
+# promoted to UNDOCUMENTED. That verdict means "somebody added this to the
+# overlay and recorded no reason", and it is a claim about ebuild content that
+# a file-level difference cannot support.
 PARITY_UNJUSTIFIABLE_AXES=(
 	'metadata.xml'
 	'files/content'
 )
-PARITY_UNJUSTIFIABLE_NOTE='no justification mechanism on this axis: the difference is in a file that holds no ebuild code, so it cannot carry a # BENTOO-DIVERGENCE: tag. Rows here are ALIGN because no reason COULD be recorded, not because none was found - and they are never promoted to UNDOCUMENTED or JUSTIFIED.'
+PARITY_UNJUSTIFIABLE_NOTE='never promoted to UNDOCUMENTED on this axis: the difference is in a file that holds no ebuild code, so nobody can have written an addition INTO it the way the UNDOCUMENTED rule means. A tag in any ebuild of the package still justifies the row - the file cannot carry the reason, but the package can.'
 
 OVERLAY_EBUILD=""
 
@@ -2409,17 +2428,26 @@ declare -A PARITY_TAGGED_AXES=()
 # away from silently failing to justify a correctly-tagged divergence.
 collect_tags() {
 	local entry=$1 pn=$2
-	local line axis
+	local line axis pkg_key
 
 	resolve_overlay_ebuild "${entry}" "${pn}"
 	if [[ ! -f ${OVERLAY_EBUILD} ]]; then
 		return 0
 	fi
 
+	# The package-level key, alongside the per-ebuild one. metadata.xml and
+	# files/content are compared for the PACKAGE, so their rows carry the
+	# literal "(package)" where a PV would go and assign_verdicts looks them up
+	# under "<category>/<pn>-(package)|<axis>". Registering only the per-ebuild
+	# key left those two axes unreachable by any tag - see the note beside
+	# PARITY_UNJUSTIFIABLE_AXES for why that was wrong.
+	pkg_key="${entry%%/*}/${pn}-(package)"
+
 	while IFS= read -r line; do
 		if [[ ${line} =~ ^[[:space:]]*#[[:space:]]*BENTOO-DIVERGENCE:[[:space:]]*([^[:space:]]+) ]]; then
 			axis=${BASH_REMATCH[1]}
 			PARITY_TAGGED_AXES["${entry}|${axis}"]=1
+			PARITY_TAGGED_AXES["${pkg_key}|${axis}"]=1
 		fi
 	done <"${OVERLAY_EBUILD}"
 }
@@ -3806,11 +3834,15 @@ prepare_verdict_scratch() {
 
 	for side in overlay gentoo; do
 		dir="${root}/${side}/${category}/${pn}"
-		cat >"${dir}/metadata.xml" <<-'EOF'
+		# DIFFERENT ON THE TWO SIDES, on purpose: metadata.xml is compared
+		# for the package rather than per ebuild, so its row is the one that
+		# exercises the package-level tag key. Identical files here would
+		# emit no row and the fifth case would silently test nothing.
+		cat >"${dir}/metadata.xml" <<-EOF
 			<?xml version="1.0" encoding="UTF-8"?>
 			<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
 			<pkgmetadata>
-				<longdescription>three-verdict fixture</longdescription>
+				<longdescription>verdict fixture, ${side} side</longdescription>
 			</pkgmetadata>
 		EOF
 	done
@@ -3821,8 +3853,11 @@ prepare_verdict_scratch() {
 	# green on two thirds of the rule - which is why it is not there.
 	cat >"${root}/overlay/${category}/${pn}/${pf}.ebuild" <<-'EOF'
 		# overlay copy of the three-verdict fixture
-		# BENTOO-DIVERGENCE: DEPEND - the tagged addition. This is the only tag
-		# in the file, and IUSE deliberately has none.
+		# BENTOO-DIVERGENCE: DEPEND - the tagged addition.
+		# BENTOO-DIVERGENCE: metadata.xml - the package-level axis. This tag
+		# lives in an ebuild but justifies a row keyed on the package, which
+		# is the whole point of the package-level key in collect_tags.
+		# IUSE deliberately carries no tag at all.
 		EAPI=8
 	EOF
 	printf '# gentoo copy of the three-verdict fixture\nEAPI=8\n' \
@@ -3941,11 +3976,12 @@ report_stale_override() {
 report_verdict_triple() {
 	local pkg=${SELF_TEST_VERDICT_PKG} pv=${SELF_TEST_VERDICT_PV}
 
-	printf 'behind=%s untagged-addition=%s tagged-addition=%s single-valued=%s' \
+	printf 'behind=%s untagged-addition=%s tagged-addition=%s single-valued=%s package-level=%s' \
 		"$(select_rows "${pkg}" "${pv}" RDEPEND '' verdict)" \
 		"$(select_rows "${pkg}" "${pv}" IUSE '' verdict)" \
 		"$(select_rows "${pkg}" "${pv}" DEPEND '' verdict)" \
-		"$(select_rows "${pkg}" "${pv}" REQUIRED_USE '' verdict)"
+		"$(select_rows "${pkg}" "${pv}" REQUIRED_USE '' verdict)" \
+		"$(select_rows "${pkg}" '(package)' metadata.xml '' verdict)"
 }
 
 # self_test_pipeline
@@ -4140,8 +4176,8 @@ self_test_assertions() {
 	# exactly like "the rule stopped working". prepare_verdict_scratch builds one
 	# package exhibiting all three, differing only in the criterion above.
 	assert_eq A08 \
-		'verdicts: the four ways assign_verdicts can decide, on one package' \
-		'behind=ALIGN untagged-addition=UNDOCUMENTED tagged-addition=JUSTIFIED single-valued=ALIGN' \
+		'verdicts: the five ways assign_verdicts can decide, on one package' \
+		'behind=ALIGN untagged-addition=UNDOCUMENTED tagged-addition=JUSTIFIED single-valued=ALIGN package-level=JUSTIFIED' \
 		"$(fixture_pass "${SELF_TEST_VERDICT_FILTER}" report_verdict_triple)"
 
 	# The one verdict that needs a tag, and the tag lives on the scratch copy

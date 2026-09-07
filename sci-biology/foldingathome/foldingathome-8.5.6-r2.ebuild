@@ -21,6 +21,9 @@ PYTHON_COMPAT=( python3_{12..15} )
 # control panel is Python.
 inherit desktop python-single-r1 systemd unpacker xdg
 
+# BENTOO-DIVERGENCE: metadata.xml - an <upstream> block with the github
+# remote-id and bugs-to, plus a <longdescription> naming the v8 "Bastet" client.
+# ::gentoo's file describes its 7.6.21 and has neither.
 DESCRIPTION="Folding@Home distributed computing client for protein folding research"
 HOMEPAGE="https://foldingathome.org/"
 
