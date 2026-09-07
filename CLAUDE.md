@@ -109,8 +109,12 @@ where the comparison actually means something:
 
 Since 2026-09-07 the sweep exits `0` with all 222 lines `JUSTIFIED`. That
 changes how a red reads: any `ALIGN` is divergence that *arrived*, not backlog
-that was never worked down. `--self-test` (26 assertions) covers the script
-itself and needs neither the tree nor the network.
+that was never worked down. `--self-test` (27 assertions) covers the script
+itself and needs neither the tree nor the network -- except for the handful of
+SLOT probes that pin an exact PVR on purpose. When one of those subjects is not
+in the tree, the assertion reports **SKIP**, never FAIL: a vanished subject says
+nothing about the rule. A skip is printed even on the success path and counted
+apart from the passes, because it IS lost coverage.
 
 ## Working rules
 

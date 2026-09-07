@@ -3322,6 +3322,10 @@ run_sweep() {
 
 ASSERT_TOTAL=0
 FAILURES=()
+# An assertion whose PINNED subject is not in the tree. Kept apart from
+# FAILURES because the two mean opposite things about the RULE: a failure says
+# the rule broke, a skip says the rule was never exercised.
+SKIPPED=()
 
 # The one ebuild A09 needs a tag on. Pinned rather than discovered: the
 # assertion is about a specific hand-inspected divergence, so a version that
@@ -3409,6 +3413,24 @@ assert_eq() {
 
 	if [[ ${actual} == "${expected}" ]]; then
 		printf '  [PASS] (%s) %s\n' "${id}" "${desc}"
+		return 0
+	fi
+
+	# A probe that pins an exact PVR stops finding its subject the moment that
+	# ebuild is bumped, revbumped, or -- as happened on 2026-09-07 -- simply
+	# deleted by a CONCURRENT SESSION mid-bump, with the replacement still
+	# untracked. Reporting that as FAIL says the rule broke, which is false and
+	# is how a suite teaches people to ignore it.
+	#
+	# It is NOT downgraded to a pass. A skip is an assertion that did not run,
+	# printed as such and counted separately, because a pinned subject that
+	# vanished is a real loss of coverage -- the same call the SLOT comments
+	# make when they record a half as UNCOVERED rather than reword it into
+	# something weaker that would look green.
+	if [[ ${actual} == *subject-missing* ]]; then
+		printf '  [SKIP] (%s) %s\n' "${id}" "${desc}"
+		printf '         subject absent: %s\n' "$(q "${actual}")"
+		SKIPPED+=( "(${id}) ${desc} | subject absent: $(q "${actual}")" )
 		return 0
 	fi
 
@@ -3578,7 +3600,15 @@ in_md5_scope() {
 # slot_outcome <category/pn> <PV>
 # What the SLOT axis concluded for one ebuild, with its denominator attached.
 slot_outcome() {
-	local verdict
+	local verdict pn=${1#*/}
+
+	# Absent subject before absent row. in_md5_scope answers `no` for both an
+	# ebuild that is gone and an ebuild the cache never covered, and those are
+	# not the same claim -- the first says nothing about the SLOT rule.
+	if [[ ! -f ${OVERLAY_ROOT}/$1/${pn}-$2.ebuild ]]; then
+		printf 'subject-missing'
+		return 0
+	fi
 
 	verdict=$(select_rows "$1" "$2" SLOT '' verdict)
 	if [[ ${verdict} == '(no matching divergence row)' ]]; then
@@ -4927,7 +4957,49 @@ self_test_assertions() {
 		'packages=1 orphans=commented-only.conf orphan.patch' \
 		"$(fixture_pass "${SELF_TEST_VERDICT_FILTER}" report_orphan_files)"
 
+	# --- 2026-09-07: the skip, and why it needs its own assertion ------
+	#
+	# Pinning an exact PVR is a DELIBERATE choice here -- A15 records the
+	# reasoning -- and its price is that the subject disappears whenever that
+	# ebuild is bumped, revbumped, or deleted by a concurrent session mid-bump.
+	# Until now that printed FAIL, which claims the rule broke. It had already
+	# taught one reader to dismiss a red as ambient, which is the failure mode
+	# the whole suite exists to avoid.
+	#
+	# The danger of the fix is the opposite one: a skip that quietly becomes a
+	# pass turns lost coverage into a green. So the two outcomes are asserted
+	# TOGETHER against the same shape of mismatch -- only the marker differs --
+	# because a regression that turned every mismatch into a skip would satisfy
+	# either half alone.
+	assert_eq A27 \
+		'an absent pinned subject SKIPs; every other mismatch still FAILs' \
+		'absent[fail=0 skip=1] present[fail=1 skip=0]' \
+		"$(skip_vs_fail_run)"
+
 	rm -rf -- "${scratch}"
+}
+
+# Run assert_eq twice over the same mismatch, changing only whether the observed
+# value carries the absent-subject marker, and report where each landed. A
+# subshell per run: assert_eq appends to the very globals the suite is counting.
+skip_vs_fail_run() {
+	local absent present
+
+	absent=$(
+		ASSERT_TOTAL=0
+		FAILURES=()
+		SKIPPED=()
+		assert_eq A27probe 'fixture' 'expected' 'glslang[subject-missing]' >/dev/null
+		printf 'fail=%d skip=%d' "${#FAILURES[@]}" "${#SKIPPED[@]}"
+	)
+	present=$(
+		ASSERT_TOTAL=0
+		FAILURES=()
+		SKIPPED=()
+		assert_eq A27probe 'fixture' 'expected' 'glslang[compared=yes slot=none]' >/dev/null
+		printf 'fail=%d skip=%d' "${#FAILURES[@]}" "${#SKIPPED[@]}"
+	)
+	printf 'absent[%s] present[%s]' "${absent}" "${present}"
 }
 
 # Run check_stale_tags twice over the same tagged axis, changing only the
@@ -4999,16 +5071,40 @@ run_self_test() {
 		return 1
 	fi
 
+	# Same reasoning as the zero-assertion guard above, one level in: a suite
+	# where every subject has vanished is green about nothing.
+	if (( ${#SKIPPED[@]} == ASSERT_TOTAL )); then
+		printf 'every assertion skipped for a missing subject, so this proved nothing\n' >&2
+		return 1
+	fi
+
+	local entry
 	if (( ${#FAILURES[@]} == 0 )); then
-		printf '\n%d assertions, all passed\n' "${ASSERT_TOTAL}"
+		if (( ${#SKIPPED[@]} == 0 )); then
+			printf '\n%d assertions, all passed\n' "${ASSERT_TOTAL}"
+			return 0
+		fi
+		# Printed on the SUCCESS path too, and deliberately: a skip is the
+		# one outcome that disappears if nobody prints it, and what
+		# disappears with it is the knowledge that the rule went unchecked.
+		printf '\n%d assertions, %d passed, %d SKIPPED (subject absent -- NOT covered):\n' \
+			"${ASSERT_TOTAL}" "$(( ASSERT_TOTAL - ${#SKIPPED[@]} ))" "${#SKIPPED[@]}"
+		for entry in "${SKIPPED[@]}"; do
+			printf '  - %s\n' "${entry}"
+		done
 		return 0
 	fi
 
 	printf '\n%d assertions, %d FAILED:\n' "${ASSERT_TOTAL}" "${#FAILURES[@]}"
-	local failure
-	for failure in "${FAILURES[@]}"; do
-		printf '  - %s\n' "${failure}"
+	for entry in "${FAILURES[@]}"; do
+		printf '  - %s\n' "${entry}"
 	done
+	if (( ${#SKIPPED[@]} )); then
+		printf '%d SKIPPED (subject absent -- NOT covered):\n' "${#SKIPPED[@]}"
+		for entry in "${SKIPPED[@]}"; do
+			printf '  - %s\n' "${entry}"
+		done
+	fi
 	return 1
 }
 
