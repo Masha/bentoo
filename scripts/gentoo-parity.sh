@@ -4553,9 +4553,18 @@ self_test_assertions() {
 	# is left is PATCHES, INHERIT, SLOT and IUSE.
 	#
 	# 225 against 225.
+	#
+	# RE-MEASURED 2026-09-07, 225 -> 224. One row left, and it is a fix:
+	# sys-firmware/edk2 inherits multiprocessing again, which is what its
+	# my_build needs for -n "$(get_makeopts_jobs)". Fourteen more rows moved
+	# ALIGN -> JUSTIFIED in the same pass and stay in the total.
+	#
+	# INHERIT now holds no ALIGN row. PATCHES is the last axis that does.
+	#
+	# 224 against 224.
 	assert_eq A20 \
 		'the four verdicts still sum to the row total, with the stale cache outside both' \
-		'rows=225 verdict-sum=225 stale=0' \
+		'rows=224 verdict-sum=224 stale=0' \
 		"$(row_arithmetic)"
 
 	# --- story 008: what a stale cache does to the exit code ----------

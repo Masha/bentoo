@@ -11,6 +11,12 @@ PYTHON_REQ_USE="threads(+)"
 # newbashcomp, and the npm completion now goes inside the slot prefix (see
 # src_install) instead of into the shared /usr/share/bash-completion/completions
 # that eclass installs to. Nothing else in this ebuild uses shell-completion.
+# BENTOO-DIVERGENCE: INHERIT - no shell-completion, which ::gentoo inherits to
+# install npm's bash completion into the shared
+# /usr/share/bash-completion/completions. This overlay slots nodejs by major, so
+# a shared path would have every slot fighting over one file; the completion is
+# written inside the slot prefix by src_install instead. Nothing else here needs
+# the eclass.
 inherit check-reqs flag-o-matic linux-info
 inherit ninja-utils pax-utils python-any-r1 toolchain-funcs xdg-utils
 

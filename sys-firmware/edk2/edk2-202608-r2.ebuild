@@ -6,7 +6,7 @@ EAPI=8
 PYTHON_REQ_USE="sqlite"
 PYTHON_COMPAT=( python3_{12..15} )
 
-inherit edo prefix python-any-r1 readme.gentoo-r1 secureboot toolchain-funcs
+inherit edo multiprocessing prefix python-any-r1 readme.gentoo-r1 secureboot toolchain-funcs
 
 DESCRIPTION="TianoCore EDK II UEFI firmware for virtual machines"
 HOMEPAGE="https://github.com/tianocore/edk2"
@@ -188,7 +188,11 @@ src_prepare() {
 }
 
 my_build() {
+	# -n restored 2026-09-07: without it edk2's build driver falls back to the
+	# single thread in target.txt, so the whole firmware compiled serially. The
+	# line exists in ::gentoo and was lost here, not dropped on purpose.
 	edo build \
+		-n "$(get_makeopts_jobs)" \
 		-t "${TOOLCHAIN}" \
 		-b "${BUILD_TARGET}" \
 		-a "${TARGET_ARCH}" \

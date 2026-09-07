@@ -4,6 +4,12 @@
 EAPI=8
 GST_ORG_MODULE="gst-plugins-base"
 
+# BENTOO-DIVERGENCE: INHERIT - no virtualx in this ebuild's inherit line, where
+# ::gentoo lists it. Cosmetic, and checked rather than assumed: gstreamer-meson
+# .eclass does "inherit virtualx" itself, in the branch taken by a top-level
+# module (not a split plugin), on both sides. virtualx appears in _eclasses_ of
+# both md5-cache entries, so the same eclass is loaded either way - ::gentoo
+# simply restates in the ebuild what its eclass already did.
 inherit flag-o-matic meson-multilib gstreamer-meson verify-sig
 
 DESCRIPTION="Basepack of plugins for gstreamer"

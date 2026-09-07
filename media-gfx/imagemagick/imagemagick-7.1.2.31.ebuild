@@ -5,6 +5,9 @@ EAPI=8
 
 GENTOO_DEPEND_ON_PERL="no"
 QA_PKGCONFIG_VERSION=$(ver_cut 1-3)
+# BENTOO-DIVERGENCE: INHERIT - no verify-sig. Same root as the SRC_URI and
+# BDEPEND tags below: this ebuild fetches the release asset plus an R2 mirror
+# rather than mirror://imagemagick, so there is no .asc for the eclass to check.
 inherit autotools flag-o-matic perl-module toolchain-funcs
 
 # BENTOO-DIVERGENCE: DEFINED_PHASES - no unpack phase, where ::gentoo has one.

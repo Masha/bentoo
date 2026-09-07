@@ -5,6 +5,12 @@ EAPI=8
 
 RUST_OPTIONAL=1
 RUST_MIN_VER=1.48
+# BENTOO-DIVERGENCE: INHERIT - no virtualx in this ebuild's inherit line, where
+# ::gentoo lists it. Cosmetic, and checked rather than assumed: gstreamer-meson
+# .eclass does "inherit virtualx" itself, in the branch taken by a top-level
+# module (not a split plugin), on both sides. virtualx appears in _eclasses_ of
+# both md5-cache entries, so the same eclass is loaded either way - ::gentoo
+# simply restates in the ebuild what its eclass already did.
 inherit gstreamer-meson rust verify-sig
 
 DESCRIPTION="Open source multimedia framework"
