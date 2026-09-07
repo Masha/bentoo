@@ -75,6 +75,14 @@ RDEPEND="
 
 DOCS=( README.md docs )
 
+# Upstream's desktop launcher runs `ai-jail --browser=soft chromium` and nothing
+# else, which on Linux leaves the sandbox with an unshared network namespace and
+# no display socket -- a browser that cannot open a window or load a page.  The
+# patch grants both explicitly and picks --display or --x11 from the session in
+# use.  Named without a version so a bump cannot orphan it: the autoupdate
+# applier renames ebuilds, never files/.
+PATCHES=( "${FILESDIR}"/${PN}-chromium-launcher-caps.patch )
+
 src_prepare() {
 	default
 

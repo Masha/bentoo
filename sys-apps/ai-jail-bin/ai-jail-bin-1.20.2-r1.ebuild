@@ -71,9 +71,30 @@ RDEPEND="
 src_unpack() {
 	# With USE=chromium-launcher, ${A} also carries the two launcher files,
 	# which are a shell script and a desktop entry -- unpack() would fail on
-	# them.  Only the tarball is unpacked; the pair is installed straight from
-	# ${DISTDIR} in src_install().
+	# them.  Only the tarball is unpacked; the pair is copied into ${S} so the
+	# launcher can be patched in src_prepare like any other source file.
 	unpack "${P}-amd64.tar.gz"
+
+	if use chromium-launcher; then
+		cp "${DISTDIR}/${P}-chromium-launcher.sh" "${S}"/ai-jail-chromium || die
+		cp "${DISTDIR}/${P}-chromium-launcher.desktop" \
+			"${S}"/ai-jail-chromium.desktop || die
+	fi
+}
+
+src_prepare() {
+	# Upstream's launcher runs `ai-jail --browser=soft chromium` and nothing
+	# else, leaving the sandbox with an unshared network namespace and no
+	# display socket -- a browser that can neither open a window nor load a
+	# page.  The patch grants both and picks --display or --x11 from the session
+	# in use.  Only fetched, so only patched, when the flag is on.  Named
+	# without a version because the autoupdate applier renames ebuilds, never
+	# files/.
+	if use chromium-launcher; then
+		PATCHES=( "${FILESDIR}"/${PN}-chromium-launcher-caps.patch )
+	fi
+
+	default
 }
 
 src_install() {
@@ -84,7 +105,7 @@ src_install() {
 	# distfile just for documentation.
 
 	if use chromium-launcher; then
-		newbin "${DISTDIR}/${P}-chromium-launcher.sh" ai-jail-chromium
-		newmenu "${DISTDIR}/${P}-chromium-launcher.desktop" ai-jail-chromium.desktop
+		dobin ai-jail-chromium
+		domenu ai-jail-chromium.desktop
 	fi
 }

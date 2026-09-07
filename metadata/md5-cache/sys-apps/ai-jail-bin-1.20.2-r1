@@ -1,4 +1,4 @@
-DEFINED_PHASES=install unpack
+DEFINED_PHASES=install prepare unpack
 DESCRIPTION=Sandbox for AI coding agents, built on bwrap (upstream prebuilt binary)
 EAPI=8
 HOMEPAGE=https://github.com/akitaonrails/ai-jail
@@ -11,4 +11,4 @@ RESTRICT=strip
 SLOT=0
 SRC_URI=https://github.com/akitaonrails/ai-jail/releases/download/v1.20.2/ai-jail-linux-x86_64.tar.gz -> ai-jail-bin-1.20.2-amd64.tar.gz chromium-launcher? ( https://raw.githubusercontent.com/akitaonrails/ai-jail/v1.20.2/dist/desktop/ai-jail-chromium -> ai-jail-bin-1.20.2-chromium-launcher.sh https://raw.githubusercontent.com/akitaonrails/ai-jail/v1.20.2/dist/desktop/ai-jail-chromium.desktop -> ai-jail-bin-1.20.2-chromium-launcher.desktop )
 _eclasses_=desktop	e447b5f77146d69797e9f03ff177f3f1
-_md5_=bcb542fd6efe0425d73b67d89de18421
+_md5_=34e1583a9fa5c81b987f5640a11f8ac2

@@ -1,0 +1,30 @@
+--- a/dist/desktop/ai-jail-chromium
++++ b/dist/desktop/ai-jail-chromium
+@@ -11,8 +11,26 @@
+ # mise shims explicitly so mise-installed ai-jail resolves correctly.
+ export PATH="$data_home/mise/shims:$HOME/.local/bin:/usr/local/bin:/usr/bin:/bin${PATH:+:$PATH}"
+ 
++# --browser only arranges the isolated profile.  On Linux the sandbox still
++# unshares the network namespace and mounts no display socket, so without the
++# two flags below the browser can neither open a window nor load a page --
++# upstream's own README says as much.  Verified with `ai-jail --dry-run`:
++# plain `--browser=soft` yields `--unshare-net` and no wayland/X11 bind.
++#
++# --network is unrestricted network for everything inside the sandbox.  That is
++# the point for a browser, and the isolation that remains is the filesystem one:
++# a private $HOME, with only the launcher directory writable.
++if [ -n "${WAYLAND_DISPLAY:-}" ]; then
++  display_flag=--display
++elif [ -n "${DISPLAY:-}" ]; then
++  display_flag=--x11
++else
++  echo "ai-jail-chromium: no graphical session found (WAYLAND_DISPLAY and DISPLAY are both unset)." >&2
++  exit 1
++fi
++
+ if command -v ai-jail >/dev/null 2>&1; then
+-  exec ai-jail --browser=soft chromium "$@"
++  exec ai-jail --browser=soft --network "$display_flag" chromium "$@"
+ fi
+ 
+ echo "ai-jail not found. Install it with 'cargo install ai-jail' or 'mise use -g ubi:akitaonrails/ai-jail'." >&2
