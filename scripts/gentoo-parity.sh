@@ -1854,8 +1854,27 @@ filesdir_refs() {
 			# After the variable substitutions, so {50-${PN},...} has
 			# already become {50-openoffice-bin,...} by the time it splits.
 			FILESDIR_REFS+="$(expand_braces "${expr}") "
-		done < <(grep -hoE '\$\{FILESDIR\}"?/[^[:space:])"'"'"';]+' "${eb}" 2>/dev/null |
+		done < <(grep -v '^[[:space:]]*#' "${eb}" 2>/dev/null |
+			grep -hoE '\$\{FILESDIR\}"?/[^[:space:])"'"'"';]+' |
 			sed -E 's|^\$\{FILESDIR\}"?/||')
+
+		# readme.gentoo-r1.eclass reads the file out of FILESDIR itself and
+		# the ebuild never names it: readme.gentoo_create_doc falls back to
+		# ${FILESDIR}/README.gentoo${README_GENTOO_SUFFIX}, and to
+		# README.gentoo-${SLOT}, whenever DOC_CONTENTS is unset -- then dies
+		# if neither exists. www-client/librewolf is exactly that shape, so
+		# its README.gentoo was reported as an orphan and deleting it would
+		# have broken src_install.
+		#
+		# Matched anywhere in the file rather than anchored to a line
+		# starting with `inherit`, because a long inherit wraps with a
+		# backslash and the eclass routinely lands on the continuation --
+		# it does in librewolf. Crediting the whole README.gentoo* family
+		# errs toward silence, which is the right direction here: the
+		# remediation this check suggests is deletion.
+		if grep -q 'readme\.gentoo-r1' "${eb}"; then
+			FILESDIR_REFS+="README.gentoo* "
+		fi
 	done
 	FILESDIR_REFS=${FILESDIR_REFS% }
 }
@@ -4044,14 +4063,26 @@ prepare_verdict_scratch() {
 	# coming back.
 	mkdir -p -- "${root}/overlay/${category}/${pn}/files"
 	local f
-	for f in referenced.patch braced-one.conf braced-two.conf orphan.patch; do
+	#
+	# Two more names pin the two ways a reference can be misread.
+	# commented-only.conf is named ONLY on a line that is entirely a
+	# comment: harvesting it credited a file nothing installs, so litter
+	# stayed invisible. README.gentoo is named by NO line at all, and must
+	# still be spared, because readme.gentoo-r1.eclass reads it straight out
+	# of FILESDIR -- the two cases pull in opposite directions, so both are
+	# asserted rather than one.
+	for f in referenced.patch braced-one.conf braced-two.conf orphan.patch \
+		commented-only.conf README.gentoo; do
 		printf 'fixture file %s\n' "${f}" \
 			>"${root}/overlay/${category}/${pn}/files/${f}"
 	done
 	cat >>"${root}/overlay/${category}/${pn}/${pf}.ebuild" <<-'EOF'
+		inherit readme.gentoo-r1
 		src_install() {
 			eapply "${FILESDIR}"/referenced.patch
 			doins "${FILESDIR}"/braced-{one,two}.conf
+			# doins "${FILESDIR}"/commented-only.conf
+			readme.gentoo_create_doc
 		}
 	EOF
 
@@ -4892,8 +4923,8 @@ self_test_assertions() {
 	# here is an invitation to break a build, so the case that produced it is
 	# pinned rather than left to a future reader to rediscover.
 	assert_eq A26 \
-		'orphan files: only the name no ebuild reaches, brace expansions included' \
-		'packages=1 orphans=orphan.patch' \
+		'orphan files: braces expand, a commented reference does not count, an eclass-read name is spared' \
+		'packages=1 orphans=commented-only.conf orphan.patch' \
 		"$(fixture_pass "${SELF_TEST_VERDICT_FILTER}" report_orphan_files)"
 
 	rm -rf -- "${scratch}"
