@@ -48,6 +48,9 @@ IUSE="+font-subsetting ios speech +system-mathjax test +udisks unrar"
 
 RESTRICT="!test? ( test )"
 
+# BENTOO-DIVERGENCE: REQUIRED_USE - python3_14 alone, where ::gentoo still
+# accepts 3.12 and 3.13. Not a narrowing taken for its own sake: the calibre 9
+# series requires Python 3.14, so the older targets cannot build it at all.
 REQUIRED_USE="${PYTHON_REQUIRED_USE}"
 
 # Qt slotted dependencies are used because the libheadless.so plugin links to

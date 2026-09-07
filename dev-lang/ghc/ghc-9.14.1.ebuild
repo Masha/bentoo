@@ -167,6 +167,10 @@ needs_python() {
 }
 
 # we build binaries without profiling support
+# BENTOO-DIVERGENCE: REQUIRED_USE - the ^^ ( llvm_slot_* ) group is gated behind
+# llvm? ( ), where ::gentoo leaves it unconditional. An unconditional ^^ with no
+# default forces every profile to pick an LLVM slot even with USE=-llvm, which
+# stops a headless or minimal emerge dead. Gating it costs an llvm user nothing.
 REQUIRED_USE="
 	?? ( llvm unregisterised )
 	llvm? ( ${LLVM_REQUIRED_USE} )

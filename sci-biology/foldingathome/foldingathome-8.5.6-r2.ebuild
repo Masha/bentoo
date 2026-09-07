@@ -69,6 +69,9 @@ KEYWORDS="-* ~amd64 ~arm64"
 # path: the prebuilt .deb links libsystemd, so the elogind build rewrites that
 # NEEDED entry rather than shipping a binary that pulls systemd in anyway.
 IUSE="+elogind systemd"
+# BENTOO-DIVERGENCE: REQUIRED_USE - ::gentoo declares none at all, because its
+# 7.6.21 has neither the elogind/systemd choice nor a python target. Both come
+# from this ebuild's own IUSE, already tagged above.
 REQUIRED_USE="^^ ( elogind systemd ) ${PYTHON_REQUIRED_USE}"
 RESTRICT="bindist mirror strip"
 

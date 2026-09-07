@@ -96,6 +96,8 @@ IUSE="${IUSE_VIDEO_CARDS}
 	sysprof test unwind vaapi valgrind vulkan
 	wayland +X +zstd"
 RESTRICT="!test? ( test )"
+# BENTOO-DIVERGENCE: REQUIRED_USE - llvm_slot_23 in the ^^ group, the same slot
+# the IUSE tag above adds. One LLVM_COMPAT edit, two divergent axes.
 REQUIRED_USE="
 	llvm? ( ${LLVM_REQUIRED_USE} )
 	video_cards_i915? ( llvm )

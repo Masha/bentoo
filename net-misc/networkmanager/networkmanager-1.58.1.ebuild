@@ -30,6 +30,9 @@ KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~loong ~ppc ~ppc64 ~riscv ~sparc ~x86"
 IUSE="audit bluetooth clat +concheck connection-sharing debug dhcpcd elogind gnutls gtk-doc +introspection iptables iwd libedit +modemmanager nbft +nss nftables ofono ovs policykit +ppp psl resolvconf selinux syslog systemd teamd test +tools vala +wext +wifi"
 RESTRICT="!test? ( test )"
 
+# BENTOO-DIVERGENCE: REQUIRED_USE - no ?? ( dhclient dhcpcd ) clause. Upstream
+# removed dhclient (see the IUSE tag above), so dhcpcd is the only DHCP flag
+# left and there is nothing for a mutual exclusion to exclude.
 REQUIRED_USE="
 	bluetooth? ( modemmanager )
 	connection-sharing? ( || ( iptables nftables ) )

@@ -47,6 +47,12 @@ IUSE="debug designer +gui netgen pcl +smesh spacenav test X"
 # under cloud? ( ) and configure passes -DBUILD_CLOUD=$(usex cloud).
 IUSE+=" addonmgr assembly +bim cam cloud fem idf inspection +mesh openscad points reverse robot surface"
 
+# BENTOO-DIVERGENCE: REQUIRED_USE - no test? ( techdraw ) clause, because there
+# is no techdraw flag to name. This ebuild builds TechDraw unconditionally
+# (-DBUILD_TECHDRAW=ON, beside SKETCHER, SPREADSHEET and WEB) where ::gentoo
+# passes $(usex techdraw). With the workbench always present the constraint is
+# satisfied by construction; restoring it would reference a flag that does not
+# exist and kill the ebuild outright.
 REQUIRED_USE="
 	${PYTHON_REQUIRED_USE}
 	bim? ( mesh )

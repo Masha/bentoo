@@ -6,6 +6,10 @@ EAPI=8
 # BENTOO-DIVERGENCE: IUSE - llvm_slot_23, kept in lockstep with media-libs/mesa.
 # The slot is opt-in downstream: above _LLVM_NEWEST_STABLE the eclass will not
 # make it a default.
+# BENTOO-DIVERGENCE: REQUIRED_USE - llvm_slot_23 in the ^^ group. This ebuild
+# declares no REQUIRED_USE of its own; llvm-r2.eclass builds it out of the
+# LLVM_COMPAT below, so the extra slot the IUSE tag records shows up on this
+# axis too. One LLVM_COMPAT edit, two divergent axes.
 LLVM_COMPAT=( {18..23} )
 PYTHON_COMPAT=( python3_{12..14} )
 

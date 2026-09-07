@@ -110,6 +110,9 @@ IUSE="accessibility base bluetooth +branding coinmp +cups custom-cflags +dbus de
 googledrive gstreamer +gtk3 gtk4 kde ldap +mariadb odk pdfimport postgres qt6 test valgrind vulkan
 $(printf 'libreoffice_extensions_%s ' ${LO_EXTS})"
 
+# BENTOO-DIVERGENCE: REQUIRED_USE - no python_single_target_python3_12 in the ^^
+# group. It follows from PYTHON_COMPAT dropping 3.12, which the IUSE tag above
+# records; the overlay is AHEAD of ::gentoo here, not behind it.
 REQUIRED_USE="${PYTHON_REQUIRED_USE}
 	base? ( java )
 	bluetooth? ( dbus )

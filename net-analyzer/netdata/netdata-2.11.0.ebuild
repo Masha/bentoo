@@ -37,6 +37,9 @@ HOMEPAGE="https://github.com/netdata/netdata https://my-netdata.io/"
 LICENSE="GPL-3+ MIT BSD public-domain"
 SLOT="0"
 IUSE="cups +dbengine ipmi jemalloc mongodb mysql nfacct nodejs prometheus +python systemd xen"
+# BENTOO-DIVERGENCE: REQUIRED_USE - python_single_target_python3_14 in the ^^
+# group, arriving through ${PYTHON_REQUIRED_USE} from the PYTHON_COMPAT the IUSE
+# tag above already covers. One edit, two divergent axes.
 REQUIRED_USE="
 	mysql? ( python )
 	python? ( ${PYTHON_REQUIRED_USE} )"

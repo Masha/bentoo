@@ -131,6 +131,10 @@ RESTRICT="!test? ( test )"
 # in configs/targets/*.mak (meson hard-errors on those without libfdt when the
 # target is requested explicitly), plus a few historical entries kept from the
 # ::gentoo ebuild.
+# BENTOO-DIVERGENCE: REQUIRED_USE - qemu_softmmu_targets_hexagon gained and
+# qemu_softmmu_targets_microblazeel gone. Neither is a decision taken here: the
+# softmmu target list is upstream's and moved between ::gentoo's 10.2.3-r1 and
+# this 11.1.1. It travels with the IUSE tag above.
 REQUIRED_USE="
 	${PYTHON_REQUIRED_USE}
 	qemu_softmmu_targets_aarch64? ( fdt )

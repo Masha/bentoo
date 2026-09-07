@@ -1623,6 +1623,9 @@ KEYWORDS="~amd64"
 # claude-code-ide gate integrations with overlay-only packages; X is exposed
 # separately from wayland here.
 IUSE="+X +claude-agent-acp-plus +claude-agent-acp-tui +claude-code-ide collab extensions-cli +mimalloc neovim +pulseaudio screen-capture tracy +wayland"
+# BENTOO-DIVERGENCE: REQUIRED_USE - the || ( X wayland ) clause, which follows
+# from the X and wayland flags this overlay adds (see the IUSE tag). ::gentoo
+# exposes neither, so it has nothing to constrain.
 REQUIRED_USE="|| ( X wayland )"
 CHECKREQS_DISK_BUILD="18G"
 CHECKREQS_MEMORY="8G"
