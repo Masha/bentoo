@@ -7,6 +7,10 @@ GENTOO_DEPEND_ON_PERL="no"
 QA_PKGCONFIG_VERSION=$(ver_cut 1-3)
 inherit autotools flag-o-matic perl-module toolchain-funcs
 
+# BENTOO-DIVERGENCE: DEFINED_PHASES - no unpack phase, where ::gentoo has one.
+# Not a phase that was deleted: ::gentoo's comes from verify-sig.eclass, which
+# defines src_unpack to check the .asc. This ebuild does not inherit it, for the
+# SRC_URI reason recorded above, so there is no phase to define.
 DESCRIPTION="A collection of tools and libraries for many image formats"
 HOMEPAGE="https://imagemagick.org"
 

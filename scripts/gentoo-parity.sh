@@ -4526,9 +4526,21 @@ self_test_assertions() {
 	# debt rather than drift. ALIGN is "no reason RECORDED", never "no reason".
 	#
 	# 230 against 230.
+	#
+	# RE-MEASURED 2026-09-07, 230 -> 225, and the five that left were all real
+	# fixes rather than reclassifications: nvidia-cuda-toolkit got back a
+	# pkg_info phase, vulkan-headers gained ~sparc, sane-backends and
+	# linux-firmware were widened to the arch set ::gentoo keywords, and mesa's
+	# HOMEPAGE was collapsed onto the one URL the other two redirect to. Six
+	# more rows moved ALIGN -> JUSTIFIED in the same pass and stay in the total.
+	#
+	# KEYWORDS, HOMEPAGE and DEFINED_PHASES now hold no ALIGN row at all. What
+	# is left is PATCHES, INHERIT, SLOT and IUSE.
+	#
+	# 225 against 225.
 	assert_eq A20 \
 		'the four verdicts still sum to the row total, with the stale cache outside both' \
-		'rows=230 verdict-sum=230 stale=0' \
+		'rows=225 verdict-sum=225 stale=0' \
 		"$(row_arithmetic)"
 
 	# --- story 008: what a stale cache does to the exit code ----------

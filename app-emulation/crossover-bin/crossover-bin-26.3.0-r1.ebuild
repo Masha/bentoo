@@ -6,6 +6,10 @@ PYTHON_COMPAT=( python3_{11..14} )
 
 inherit python-single-r1 unpacker
 
+# BENTOO-DIVERGENCE: KEYWORDS - no ~x86, where ::gentoo has it. It follows from
+# the SRC_URI divergence above: ::gentoo unpacks the generic install-crossover
+# .bin, while this ebuild takes the .deb, whose control file reads
+# "Architecture: amd64" (measured 2026-09-07). There is no x86 payload to keyword.
 DESCRIPTION="Commercial version of app-emulation/wine with paid support"
 HOMEPAGE="https://www.codeweavers.com/products/"
 SRC_URI="https://media.codeweavers.com/pub/crossover/cxlinux/demo/crossover_${PV}-1.deb -> ${P}.deb"

@@ -37,6 +37,9 @@ inherit autotools flag-o-matic plocale
 # The description also records WHY this package is here at all: it mirrors
 # ::gentoo's 1.33 forward to the 2.x series and is meant to be deleted once
 # ::gentoo catches up. That note has nowhere else to live.
+# BENTOO-DIVERGENCE: HOMEPAGE - tracker.debian.org, where ::gentoo still points
+# at packages.qa.debian.org. Not a preference: probed 2026-09-07, their URL
+# answers 301 and redirects to exactly this one. The overlay is ahead.
 DESCRIPTION="A fake root environment by means of LD_PRELOAD and SysV IPC (or TCP) trickery"
 HOMEPAGE="https://tracker.debian.org/pkg/fakeroot"
 SRC_URI="mirror://debian/pool/main/${PN:0:1}/${PN}/${P/-/_}.orig.tar.xz"

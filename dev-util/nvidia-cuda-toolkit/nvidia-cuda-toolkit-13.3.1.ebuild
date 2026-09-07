@@ -383,3 +383,26 @@ pkg_postinst() {
 		einfo
 	fi
 }
+
+# Restored from ::gentoo 2026-09-07: emerge --info <pkg> prints nothing useful
+# for CUDA without it, and every variable below is one a user reporting a
+# broken nvcc invocation would be asked for. It was lost when this ebuild was
+# forked forward to the 13.x series, not dropped on purpose.
+pkg_info () {
+	debugvar () {
+		for i in "$@"; do
+			[[ -v "${i}" ]] && echo "${i}=\"${!i}\""
+		done
+	}
+	debugvar \
+		CUDACXX \
+		CUDAHOSTCXX \
+		CUDAHOSTLD \
+		CUDAARCHS \
+		CUDAFLAGS \
+		CUDA_PATH \
+		CUDA_VERBOSE \
+		NVCCFLAGS \
+		NVCC_PREPEND_FLAGS \
+		NVCC_APPPEND_FLAGS
+}

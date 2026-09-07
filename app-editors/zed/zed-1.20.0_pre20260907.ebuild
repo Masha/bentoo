@@ -1590,6 +1590,13 @@ inherit cargo check-reqs desktop flag-o-matic llvm-r1 toolchain-funcs xdg
 # (see the IUSE tag): X, wayland, collab, neovim, mimalloc, tracy, the three
 # claude-agent ones and the rest. ::gentoo has nothing to describe because it
 # exposes none of them.
+# BENTOO-DIVERGENCE: KEYWORDS - no ~arm64, where ::gentoo has it. Measured
+# 2026-09-07 by keywording it and running pkgcheck: dev-util/claude-agent-acp-plus
+# and dev-util/claude-agent-acp-tui are both DEFAULT-ON here and both ship a
+# prebuilt x64 binary (claude-agent-sdk-linux-x64/claude, node-pty's pty.node),
+# so an arm64 user would get an uninstallable package out of the box.
+# Arch-guarding the IUSE is not the answer - that poisons md5-cache. Reopen this
+# when those two gain an arm64 build; nothing else here is amd64-bound.
 DESCRIPTION="The fast, collaborative code editor"
 HOMEPAGE="https://zed.dev https://github.com/zed-industries/zed"
 SRC_URI="

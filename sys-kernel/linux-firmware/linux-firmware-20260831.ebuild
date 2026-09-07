@@ -15,7 +15,7 @@ EGIT_REPO_URI="https://git.kernel.org/pub/scm/linux/kernel/git/firmware/${PN}.gi
 EGIT_COMMIT="ead6ec47a808947d6a87e9fd7572beeb373e7b3b"
 EGIT_CLONE_TYPE="shallow"
 
-KEYWORDS="~amd64 ~arm64"
+KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~loong ~m68k ~mips ~ppc ~ppc64 ~riscv ~s390 ~sparc ~x86"
 
 DESCRIPTION="Linux firmware files"
 HOMEPAGE="https://git.kernel.org/?p=linux/kernel/git/firmware/linux-firmware.git"
