@@ -3,7 +3,7 @@
 
 EAPI=8
 
-PYTHON_COMPAT=( python3_{11..13} )
+PYTHON_COMPAT=( python3_{11..14} )
 
 # BENTOO-DIVERGENCE: PATCHES - one, where ::gentoo carries two.
 #
@@ -29,6 +29,22 @@ KEYWORDS="~amd64 ~arm ~arm64 ~loong ~ppc ~ppc64 ~riscv ~x86"
 # comes from ::gentoo's own 1.20.4-optional-gstreamer.patch, which this overlay
 # does not carry. Here the dependency is what upstream makes it, unconditional -
 # see media-libs/gst-plugins-base in DEPEND below.
+#
+# sys-apps/bubblewrap travels with it, and dropping the flag is exactly how it
+# went missing. ::gentoo declares it TWICE -- once in that gstreamer? block and
+# once in seccomp? -- so folding the block in unconditionally took the
+# gst-plugins-base half and left the bwrap half behind, under a USE flag a user
+# can turn off.
+#
+# It is not optional in practice. src/meson.build compiles the bwrap path into
+# xdg-desktop-portal-validate-{icon,sound} as -DHELPER only `if bwrap.found()`,
+# and both binaries are built and installed unconditionally. Without it the
+# #ifdef HELPER vanishes and the validator runs validate_icon(fd) directly --
+# still working, still installed, but parsing untrusted payloads with no
+# sandbox at all. Nothing fails; the isolation is just gone.
+#
+# So it is declared unconditionally and the seccomp? copy is dropped as
+# redundant rather than kept alongside.
 IUSE="geolocation flatpak seccomp systemd test udev"
 RESTRICT="!test? ( test )"
 # Upstream expect flatpak to be used w/ seccomp and flatpak needs bwrap anyway
@@ -41,9 +57,9 @@ DEPEND="
 	>=sys-fs/fuse-3.10.0:3=[suid]
 	x11-libs/gdk-pixbuf
 	media-libs/gst-plugins-base:1.0
+	sys-apps/bubblewrap
 	geolocation? ( >=app-misc/geoclue-2.5.3:2.0 )
 	flatpak? ( sys-apps/flatpak )
-	seccomp? ( sys-apps/bubblewrap )
 	systemd? ( sys-apps/systemd )
 	udev? ( dev-libs/libgudev )
 "

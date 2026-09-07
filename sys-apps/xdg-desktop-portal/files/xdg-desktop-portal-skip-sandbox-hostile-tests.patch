@@ -7,6 +7,17 @@ One of their two hunks is dropped: the trailing-newline fix is already in
 unchanged -- these two want a pipewire connection, network access and /dev/fuse,
 none of which a portage sandbox provides.
 
+The third hunk is this overlay's own, added 2026-09-07 after running the suite
+for the first time. Eight cases in test_notification.py fail with "the sound
+data is invalid" / "invalid icon": the portal validates untrusted icon and sound
+payloads by re-executing xdg-desktop-portal-validate-{icon,sound} under bwrap
+with --unshare-ipc/net/pid, and a portage sandbox cannot nest those namespaces.
+It is the same class as the two files above, not a defect in the package.
+
+Skipped PER TEST rather than by dropping the file, which is what the two entries
+above do: only 3 of the 21 tests in test_notification.py need bwrap, and
+removing the file would forfeit the other 18.
+
 --- a/tests/meson.build
 +++ b/tests/meson.build
 @@ -87,13 +87,11 @@
@@ -23,3 +34,38 @@ none of which a portage sandbox provides.
    'test_notification.py',
    'test_openuri.py',
    'test_permission_store.py',
+--- a/tests/test_notification.py
++++ b/tests/test_notification.py
+@@ -424,6 +424,10 @@
+             expected,
+         )
+ 
++    @pytest.mark.skip(
++        reason="validate-icon/validate-sound re-exec under bwrap, which "
++        "cannot unshare namespaces inside a build sandbox"
++    )
+     @pytest.mark.parametrize("template_params", ALL_VERSIONS_PARAMS)
+     def test_icon_bytes(self, portals, dbus_con, xdp_app_info, template_params):
+         image_bytes = SVG_IMAGE_DATA.encode("utf-8")
+@@ -479,6 +483,10 @@
+ 
+         assert "icon" not in added_notification
+ 
++    @pytest.mark.skip(
++        reason="validate-icon/validate-sound re-exec under bwrap, which "
++        "cannot unshare namespaces inside a build sandbox"
++    )
+     def test_icon_fd(self, portals, dbus_con, xdp_app_info):
+         svg_image_bytes = SVG_IMAGE_DATA.encode("utf-8")
+ 
+@@ -600,6 +608,10 @@
+ 
+         assert "sound" not in mock_notification
+ 
++    @pytest.mark.skip(
++        reason="validate-icon/validate-sound re-exec under bwrap, which "
++        "cannot unshare namespaces inside a build sandbox"
++    )
+     def test_sound_fd(self, portals, dbus_con, xdp_app_info):
+         fd = os.memfd_create("notification_sound_test", os.MFD_ALLOW_SEALING)
+         os.write(fd, SOUND_DATA)
