@@ -4609,7 +4609,7 @@ self_test_assertions() {
 	# the denominator of A04 and A05). One removal, seven counters, all -1.
 	assert_eq A01 \
 		'shared packages: the overlay packages ::gentoo also carries' \
-		'164' "${#PARITY_SHARED_PACKAGES[@]}"
+		'163' "${#PARITY_SHARED_PACKAGES[@]}"
 
 	# RE-MEASURED TWICE during story 008, and left where it started - which is
 	# worth recording, because the second measurement is the one that says
@@ -4628,12 +4628,12 @@ self_test_assertions() {
 	# that it stops noticing.
 	assert_eq A02 \
 		'ebuilds in scope: every overlay ebuild inside a shared package' \
-		'251' "${#PARITY_SCOPE_EBUILDS[@]}"
+		'250' "${#PARITY_SCOPE_EBUILDS[@]}"
 
 	# Paired with its denominator: 0/0 and 321/321 must not read alike.
 	assert_eq A07 \
 		'md5-cache coverage: an entry exists on both sides for every ebuild in scope' \
-		'251/251' "${#PARITY_MD5_COVERED[@]}/${#PARITY_SCOPE_EBUILDS[@]}"
+		'250/250' "${#PARITY_MD5_COVERED[@]}/${#PARITY_SCOPE_EBUILDS[@]}"
 
 	# --- what each ebuild is compared against -------------------------
 
@@ -4647,7 +4647,7 @@ self_test_assertions() {
 	# selected is the bug looking exactly like the fix.
 	assert_eq A06 \
 		'packages behind ::gentoo: none, once live ebuilds leave the version sort' \
-		'behind=0 baselines=251' \
+		'behind=0 baselines=250' \
 		"behind=${#PARITY_BEHIND[@]} baselines=${#PARITY_BASELINES[@]}"
 
 	# --- what the comparison concluded --------------------------------
@@ -4797,17 +4797,28 @@ self_test_assertions() {
 	# normalised forms without checking the count first calls them equal and
 	# deletes the finding while looking like a success.
 	#
-	# Paired with redis, whose shape it must NOT be confused with: same axis,
-	# same kind of value, opposite answer.
+	# Paired with a package whose shape it must NOT be confused with: same
+	# axis, same kind of value, opposite answer.
+	#
+	# RE-PINNED 2026-09-07. That partner was dev-db/redis, whose 0/8.10 is
+	# ver_cut 1-2 of its own PV. The package was REMOVED from the overlay that
+	# day -- ::gentoo had caught up and then passed it -- so the probe lost its
+	# subject and reported subject-missing. dev-libs/liborcus takes its place
+	# because the shape is the same one: 0/0.21 against ::gentoo's 0/0.20, a
+	# subslot that is nothing but the version.
+	#
+	# The skip is what made this legible rather than alarming: A14 printed SKIP
+	# naming redis, not FAIL naming the SLOT stage, so the cause was the
+	# removal and not the rule.
 	# RE-MEASURED 2026-09-07: the surviving rows moved ALIGN -> JUSTIFIED when
 	# the remediation tagged them. Nothing about the SLOT stage changed - what
 	# these three assert is that the row SURVIVES rather than being folded away
 	# as a version artifact, and "none" is still the value that would mean it
 	# was. A16 already mixed the two verdicts for exactly this reason.
 	assert_eq A14 \
-		'SLOT: nodejs keeps its missing subslot where redis loses its version-only one' \
-		'nodejs@24[compared=yes slot=JUSTIFIED] nodejs@26[compared=yes slot=JUSTIFIED] redis[compared=yes slot=none]' \
-		"nodejs@24[$(slot_outcome net-libs/nodejs 24.20.0)] nodejs@26[$(slot_outcome net-libs/nodejs 26.8.1)] redis[$(slot_outcome dev-db/redis 8.10.1)]"
+		'SLOT: nodejs keeps its missing subslot where a version-only one is dropped' \
+		'nodejs@24[compared=yes slot=JUSTIFIED] nodejs@26[compared=yes slot=JUSTIFIED] liborcus[compared=yes slot=none]' \
+		"nodejs@24[$(slot_outcome net-libs/nodejs 24.20.0)] nodejs@26[$(slot_outcome net-libs/nodejs 26.8.1)] liborcus[$(slot_outcome dev-libs/liborcus 0.21.0)]"
 
 	# The shape findings.md's rule walks straight past: the version is the
 	# SLOT, not the subslot. Paired with the two slots that are not versions
@@ -4889,7 +4900,7 @@ self_test_assertions() {
 	# at 6 through the churn.
 	assert_eq A17 \
 		'SLOT: every suppressed row is recorded with a reason' \
-		'recorded=8 with-reason=8 survivors=6' \
+		'recorded=7 with-reason=7 survivors=6' \
 		"$(slot_suppression_record) survivors=$(slot_survivors_count)"
 
 	# --- story 008: instrument error is not divergence ----------------
