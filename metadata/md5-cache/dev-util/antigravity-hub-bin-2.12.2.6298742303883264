@@ -12,4 +12,4 @@ RESTRICT=bindist mirror strip
 SLOT=0
 SRC_URI=amd64? ( https://storage.googleapis.com/antigravity-public/antigravity-hub/2.12.2-6298742303883264/linux-x64/Antigravity.tar.gz -> antigravity-hub-bin-2.12.2-6298742303883264.tar.gz )
 _eclasses_=desktop	e447b5f77146d69797e9f03ff177f3f1	xdg-utils	42869b3c8d86a70ef3cf75165a395e09	xdg	3ef49a87c52c8b77c476351195dfe575
-_md5_=47719b1ad10f3a0fe9174ff297a41c25
+_md5_=997034fc74576fd43df376d51da546a4
