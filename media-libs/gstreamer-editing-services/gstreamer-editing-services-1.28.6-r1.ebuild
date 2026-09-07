@@ -4,6 +4,10 @@
 EAPI=8
 PYTHON_COMPAT=( python3_{12..14} )
 
+# BENTOO-DIVERGENCE: PATCHES - none, where ::gentoo carries a pygobject-3.52 patch. Those are
+# backports onto THEIR 1.26.11; upstream shipped the same fixes in the series
+# this ebuild tracks. Verified 2026-09-07 rather than assumed: it reverse-applies cleanly against the
+# 1.28.6 tarball.
 inherit meson python-r1 verify-sig
 
 DESCRIPTION="SDK for making video editors and more"

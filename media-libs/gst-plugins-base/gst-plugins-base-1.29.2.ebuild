@@ -10,6 +10,13 @@ GST_ORG_MODULE="gst-plugins-base"
 # module (not a split plugin), on both sides. virtualx appears in _eclasses_ of
 # both md5-cache entries, so the same eclass is loaded either way - ::gentoo
 # simply restates in the ebuild what its eclass already did.
+# BENTOO-DIVERGENCE: PATCHES - none, where ::gentoo carries three GStreamer security patches
+# (SA-2026-0014, -0019, -0023). Those are
+# backports onto THEIR 1.26.11; upstream shipped the same fixes in the series
+# this ebuild tracks. Verified 2026-09-07 rather than assumed: -0019 reverse-applies cleanly against the
+# 1.28.6 tarball, and the other two were read in the source - av1_leb128 already
+# uses (guint64) and a GstByteReader, and gstsubparse.c already has the rewritten
+# webvtt settings loop.
 inherit flag-o-matic meson-multilib gstreamer-meson verify-sig
 
 DESCRIPTION="Basepack of plugins for gstreamer"

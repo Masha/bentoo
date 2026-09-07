@@ -10,6 +10,12 @@ GST_ORG_MODULE="gst-plugins-good"
 # module (not a split plugin), on both sides. virtualx appears in _eclasses_ of
 # both md5-cache entries, so the same eclass is loaded either way - ::gentoo
 # simply restates in the ebuild what its eclass already did.
+# BENTOO-DIVERGENCE: PATCHES - none, where ::gentoo carries four GStreamer security patches
+# (SA-2026-0016, -0018, -0021, -0022). Those are
+# backports onto THEIR 1.26.11; upstream shipped the same fixes in the series
+# this ebuild tracks. Verified 2026-09-07 rather than assumed: -0018, -0021 and -0022 reverse-apply
+# cleanly against the 1.28.6 tarball, and -0016's guard is present verbatim -
+# qtdemux.c line 12325 already refuses a cmpd component_count above 16.
 inherit gstreamer-meson verify-sig
 
 DESCRIPTION="Basepack of plugins for GStreamer"

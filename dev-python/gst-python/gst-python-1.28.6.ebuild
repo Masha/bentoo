@@ -31,6 +31,21 @@ BDEPEND="
 BDEPEND+=" verify-sig? ( sec-keys/openpgp-keys-tpm )"
 VERIFY_SIG_OPENPGP_KEY_PATH=/usr/share/openpgp-keys/tpm.asc
 
+# BENTOO-DIVERGENCE: PATCHES - one patch where ::gentoo has two. Their
+# pygobject-3.52 patch is a backport onto 1.26.11 and reverse-applies cleanly
+# against 1.28.6, so the plugins_install_dir work it adds is already upstream
+# here. Their skip-test one is NOT upstream and IS needed - it is the patch
+# above.
+# Taken from ::gentoo 2026-09-07 and renamed version-agnostic, because the
+# autoupdate applier never renames anything under files/. Upstream has not
+# applied it: testsuite/test_gst_init.py still carries both tests unskipped in
+# 1.28.6 and 1.29.2, and neither side declares IUSE=test or RESTRICT, so
+# FEATURES=test runs them and they fail against >=dev-python/pygobject-3.54.
+# Verified to apply -p1 to both tarballs before adding.
+PATCHES=(
+	"${FILESDIR}"/${PN}-skip-pygobject-broken-tests.patch
+)
+
 src_prepare() {
 	default
 
