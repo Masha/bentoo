@@ -4,15 +4,24 @@
 EAPI=8
 
 # BENTOO-DIVERGENCE: PATCHES - none, where ::gentoo wraps sentry_fuzz_json in
-# if(0) via sentry-native-0.6.5_no-fuzz-test.patch. Not copied because it does
-# not apply: measured 2026-09-07 against the 0.16.5 tarball, hunk 1 lands with
-# fuzz at a 33-line offset and hunk 2 fails outright - tests/unit/CMakeLists.txt
-# has been restructured since 0.6.5.
+# if(0) via sentry-native-0.6.5_no-fuzz-test.patch. Deliberately not copied, and
+# the reason changed once the upstream file was actually read.
 #
-# WHAT THAT LEAVES OPEN, stated rather than glossed: the fuzz target is still
-# built and registered under USE=test here, and ::gentoo's reason for disabling
-# it (it needs a special, performance-killing build to work at all) has not gone
-# away. Rebasing the patch is the fix; it was out of scope for a parity pass.
+# ::gentoo's rationale is about RUNNING the fuzzer: their patch drops both the
+# target and the add_test that registered it, because sentry_fuzz_json needs a
+# special, performance-killing build to work at all. In 0.16.5 that add_test is
+# GONE - checked 2026-09-07 in tests/unit/CMakeLists.txt, where the only
+# add_test calls are sentry/unit-tests and the per-case sentry/* ones. The
+# fuzz target is compiled under USE=test and never executed.
+#
+# So the patch would buy one fewer compiled target, not a test that stops
+# failing, and it does not apply as written either (hunk 2 fails; the file was
+# restructured since 0.6.5). Carrying a rebased downstream patch to skip a build
+# target is maintenance cost with no correctness behind it.
+#
+# CORRECTED 2026-09-07: an earlier version of this tag claimed the target was
+# "built and registered", which was wrong on the second half and made ::gentoo's
+# reason look like it still applied here.
 inherit cmake
 
 DESCRIPTION="Sentry SDK for C, C++ and native applications"

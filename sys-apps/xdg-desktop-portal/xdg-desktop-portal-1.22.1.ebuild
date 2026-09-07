@@ -5,18 +5,17 @@ EAPI=8
 
 PYTHON_COMPAT=( python3_{11..13} )
 
-# BENTOO-DIVERGENCE: PATCHES - none, where ::gentoo carries two.
+# BENTOO-DIVERGENCE: PATCHES - one, where ::gentoo carries two.
 #
 # optional-gstreamer is deliberately absent and must stay absent: it invents a
 # gstreamer USE flag upstream does not have, and this ebuild takes the
 # dependency unconditionally as upstream declares it (see DEPEND below).
 #
-# sandbox-disable-failing-tests does not apply - measured 2026-09-07, both hunks
-# fail against 1.22.1 because the pytest_files list was rewritten since 1.20.0.
-# OPEN, not resolved: test_dynamiclauncher.py and test_location.py are still
-# listed here, and they are the two ::gentoo removes because they want pipewire,
-# network and /dev/fuse. Under USE=test they will still be attempted. Rebasing
-# that patch is the fix.
+# sandbox-disable-failing-tests IS carried, rebased onto 1.22.1 and renamed
+# version-agnostic - see the PATCHES block below. It was recorded as "does not
+# apply, open" on 2026-09-07 and resolved the same day: their two hunks were
+# reduced to one, because the trailing-newline fix they also carry is already
+# upstream here.
 inherit meson python-any-r1 systemd
 
 DESCRIPTION="Desktop integration portal"
@@ -80,6 +79,15 @@ python_check_deps() {
 	python_has_version "dev-python/python-dbusmock[${PYTHON_USEDEP}]"
 }
 
+PATCHES=(
+	# ::gentoo's sandbox-disable-failing-tests, rebased onto 1.22.1. Their
+	# trailing-newline hunk is already upstream here, so only the two
+	# pytest_files removals remain: test_dynamiclauncher.py and
+	# test_location.py want a pipewire connection, network access and
+	# /dev/fuse, and a portage sandbox gives none of the three.
+	"${FILESDIR}"/${PN}-skip-sandbox-hostile-tests.patch
+)
+
 src_configure() {
 	# gst-plugin-scanner writes to /proc/self/task/*/comm for thread naming
 	addpredict /proc/self/task
@@ -108,6 +116,27 @@ src_configure() {
 	)
 
 	meson_src_configure
+}
+
+src_test() {
+	# TAKEN FROM ::gentoo, and it is a real failure mode rather than a style
+	# preference. A unix socket path is capped at 108 bytes, of which dbus
+	# uses at most 99, and the test suite opens its bus under $TMPDIR - which
+	# during a build is PORTAGE_TMPDIR/portage/<category>/<PF>/temp. That is
+	# 56 bytes here before dbus appends anything, and a longer PORTAGE_TMPDIR
+	# or a longer PF pushes it over; the same shape as the sccache SUN_LEN
+	# failure this overlay has already been bitten by.
+	#
+	# So the suite runs under a short TMPDIR of its own, which is removed
+	# afterwards. nonfatal + an explicit die keeps the cleanup on the failure
+	# path: a bare meson_src_test would abort before the rm.
+	local -x TMPDIR="$(mktemp -d --tmpdir=/tmp ${PF}-XXX || die)"
+	nonfatal meson_src_test
+	local ret="${?}"
+	rm -r "${TMPDIR}" || die
+	if [[ "${ret}" != 0 ]]; then
+		die "tests failed"
+	fi
 }
 
 src_install() {
