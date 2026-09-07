@@ -1,0 +1,88 @@
+#!/sbin/openrc-run
+# Copyright 1999-2026 Gentoo Authors
+# Distributed under the terms of the GNU General Public License v2
+
+# SYSTEM-SCOPE service: the OpenRC counterpart of upstream's
+# packaging/systemd/ai-memory.service, which the ebuild installs with
+# systemd_dounit under USE=systemd.  This file is installed UNCONDITIONALLY --
+# it costs a systemd user nothing, and it is the only way to run the daemon on
+# a host without systemd.  The USER-scope service is a separate file
+# (ai-memory-user.initd, installed into /etc/user/init.d); do not merge the
+# two, they deliberately run as different accounts over different data
+# directories.
+#
+# WHAT THIS TRANSLATION LOSES.  The system unit carries seven confinement
+# directives.  Three have an OpenRC counterpart and are mapped below:
+#
+#   NoNewPrivileges=true       -> no_new_privs="yes"
+#   StateDirectory=ai-memory   -> checkpath -d in start_pre()
+#   StateDirectoryMode=0750    -> the -m 0750 on that same checkpath
+#
+# The other four have nothing in OpenRC to map onto, because OpenRC has no
+# mount-namespace or filesystem-protection layer at all:
+#
+#   PrivateTmp=true            -- the daemon shares the host /tmp and /var/tmp
+#   ProtectHome=true           -- /home, /root and /run/user stay readable
+#   ProtectSystem=strict       -- the whole filesystem stays writable to it,
+#                                 subject only to DAC as ai-memory:ai-memory
+#   ReadWritePaths=/var/lib/ai-memory
+#                              -- meaningless without ProtectSystem; the
+#                                 unprivileged account is the only limit here
+#
+# A host running this under OpenRC is therefore LESS confined than the same
+# host running the unit under systemd.  That is recorded rather than papered
+# over, and it is deliberately NOT emulated with ad-hoc unshare/chroot tricks
+# in an init script: a hand-rolled namespace here would be a second, untested
+# security boundary that nobody audits.  An admin who wants the real thing
+# should reach for a container or a systemd host.
+
+description="ai-memory MCP server"
+
+# ExecStart= from the unit, verbatim, in an overridable variable.  Override it
+# in /etc/conf.d/ai-memory rather than editing this file, which a package
+# update replaces.
+: "${AI_MEMORY_OPTS:=--data-dir /var/lib/ai-memory --config /etc/ai-memory/config.toml serve --transport http --enable-web}"
+
+# EnvironmentFile=-/etc/ai-memory/env  (the leading - means "optional")
+: "${AI_MEMORY_ENVFILE:=/etc/ai-memory/env}"
+
+command="/usr/bin/ai-memory"
+command_args="${AI_MEMORY_OPTS}"
+# User=ai-memory / Group=ai-memory
+command_user="ai-memory:ai-memory"
+directory="/var/lib/ai-memory"
+supervisor="supervise-daemon"
+
+# Restart=on-failure / RestartSec=5s
+respawn_delay=5
+
+# NoNewPrivileges=true
+no_new_privs="yes"
+
+depend() {
+	# After=network-online.target / Wants=network-online.target
+	need net
+	use dns logger
+}
+
+start_pre() {
+	# StateDirectory=ai-memory + StateDirectoryMode=0750.  Repeated here on
+	# purpose even though the package also ships a tmpfiles.d entry: the
+	# service must come up on a host where nothing ever ran tmpfiles.
+	checkpath -d -o ai-memory:ai-memory -m 0750 /var/lib/ai-memory
+
+	# EnvironmentFile=.  systemd's EnvironmentFile is NOT a shell script, so
+	# this parses KEY=value lines instead of sourcing the file -- sourcing
+	# would execute anything an operator pasted in, and would also swallow
+	# values containing shell metacharacters differently from systemd.
+	# Blank lines and # comments are skipped, matching systemd.
+	if [ -r "${AI_MEMORY_ENVFILE}" ]; then
+		while IFS= read -r _line; do
+			case "${_line}" in
+				''|'#'*) continue ;;
+				*=*) export "${_line}" ;;
+			esac
+		done < "${AI_MEMORY_ENVFILE}"
+		unset _line
+	fi
+}

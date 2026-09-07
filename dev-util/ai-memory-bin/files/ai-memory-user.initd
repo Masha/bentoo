@@ -1,0 +1,78 @@
+#!/sbin/openrc-run
+# Copyright 1999-2026 Gentoo Authors
+# Distributed under the terms of the GNU General Public License v2
+
+# USER-SCOPE service: this file belongs in /etc/user/init.d, not /etc/init.d,
+# and is started per login session by openrc-user.  It is the OpenRC
+# counterpart of upstream's packaging/systemd/ai-memory-user.service, which the
+# ebuild installs with systemd_newuserunit under USE=systemd.  The SYSTEM
+# service is a separate file (ai-memory.initd) driving the same binary under
+# acct-user/ai-memory against /var/lib/ai-memory; do not merge the two -- a
+# user-scope service deliberately runs as the logged-in user with its database
+# under $HOME.
+#
+# newinitd has no user-scope variant, which is why the ebuild installs this
+# with `exeinto /etc/user/init.d` + `newexe`, following the precedents in this
+# overlay: sys-apps/xdg-desktop-portal and sci-ml/lemonade-bin.
+#
+# WHAT THIS TRANSLATION LOSES.  The user unit carries two confinement
+# directives.  Exactly one has an OpenRC counterpart:
+#
+#   NoNewPrivileges=true  -> no_new_privs="yes"
+#
+# The other, PrivateTmp=true, has nothing to map onto: OpenRC has no
+# mount-namespace layer, so this service shares the session's /tmp and
+# /var/tmp.  An OpenRC user is therefore less confined than a systemd user is.
+# That is recorded rather than emulated with ad-hoc unshare tricks here.
+#
+# Note the user unit is already the weaker of upstream's two: it has no
+# ProtectHome/ProtectSystem to begin with, since its whole job is to write
+# under $HOME.
+
+description="ai-memory MCP server (user session)"
+
+# %h in the unit is the user's home directory.
+: "${AI_MEMORY_DATA_DIR:=${HOME}/.local/share/ai-memory}"
+: "${AI_MEMORY_CONFIG:=${HOME}/.config/ai-memory/config.toml}"
+
+# ExecStart= from the user unit, with %h expanded.
+: "${AI_MEMORY_OPTS:=--data-dir ${AI_MEMORY_DATA_DIR} --config ${AI_MEMORY_CONFIG} serve --transport http --enable-web}"
+
+# EnvironmentFile=-%h/.config/ai-memory/env  (the leading - means "optional")
+: "${AI_MEMORY_ENVFILE:=${HOME}/.config/ai-memory/env}"
+
+command="/usr/bin/ai-memory"
+command_args="${AI_MEMORY_OPTS}"
+directory="${HOME}"
+supervisor="supervise-daemon"
+
+# Restart=on-failure / RestartSec=5s
+respawn_delay=5
+
+# NoNewPrivileges=true
+no_new_privs="yes"
+
+# No depend() on purpose.  The system script's After=network-online.target has
+# no user-scope counterpart: OpenRC user services live in their own tree and
+# cannot order themselves against system services such as net.
+
+start_pre() {
+	# The user unit has no StateDirectory= -- systemd's user manager does not
+	# create %h/.local/share/ai-memory either; the daemon does it on first
+	# run.  Created here anyway so the two scopes behave the same way, and
+	# 0700 because it is inside $HOME.
+	checkpath -d -m 0700 "${AI_MEMORY_DATA_DIR}"
+
+	# EnvironmentFile=.  Parsed as KEY=value lines rather than sourced, for
+	# the same reason as in the system script: systemd's EnvironmentFile is
+	# not a shell script, and sourcing it would execute its contents.
+	if [ -r "${AI_MEMORY_ENVFILE}" ]; then
+		while IFS= read -r _line; do
+			case "${_line}" in
+				''|'#'*) continue ;;
+				*=*) export "${_line}" ;;
+			esac
+		done < "${AI_MEMORY_ENVFILE}"
+		unset _line
+	fi
+}

@@ -1,0 +1,17 @@
+# Configuration for the system-wide ai-memory service.
+#
+# Secrets do NOT belong here.  API keys and the auth token go in
+# /etc/ai-memory/env, which is 0640 root:ai-memory so only the service account
+# can read them; this file is world-readable.  The init script reads that file
+# the way systemd's EnvironmentFile= does (KEY=value lines, no shell).
+#
+# Server settings -- listen address, port, storage, provider selection --
+# live in /etc/ai-memory/config.toml, not here.
+
+# Full argument vector for /usr/bin/ai-memory.  The default reproduces
+# ExecStart= from upstream's packaging/systemd/ai-memory.service:
+#
+#AI_MEMORY_OPTS="--data-dir /var/lib/ai-memory --config /etc/ai-memory/config.toml serve --transport http --enable-web"
+
+# Path to the systemd-style environment file the init script reads.
+#AI_MEMORY_ENVFILE="/etc/ai-memory/env"

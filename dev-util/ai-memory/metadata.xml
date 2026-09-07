@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@proton.me</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<upstream>
+		<remote-id type="github">akitaonrails/ai-memory</remote-id>
+		<bugs-to>https://github.com/akitaonrails/ai-memory/issues</bugs-to>
+	</upstream>
+	<longdescription lang="en">
+		ai-memory is a long-term memory server for AI coding agents, spoken to
+		over the Model Context Protocol (MCP). It keeps everything on the
+		machine it runs on: pages live in a bundled SQLite database with FTS5
+		full-text search, a git-versioned wiki records how they changed, and
+		embeddings for semantic search are computed in-process by a pure-Rust
+		BERT model on the CPU, so no text has to leave the host to make search
+		work. Optional providers (Anthropic, OpenAI, Gemini, GitHub Copilot and
+		any OpenAI-compatible endpoint) can be configured for consolidation and
+		hosted embeddings when that trade is wanted.
+
+		It ships a single ai-memory binary that serves MCP over stdio or HTTP,
+		exposes a small web UI, and installs per-vendor hook scripts under
+		/usr/share/ai-memory/hooks for Claude Code, Codex, Cursor, Gemini CLI,
+		opencode and others. The daemon can run system-wide under the dedicated
+		ai-memory account or per user session; this package provides both an
+		OpenRC service and, with USE=systemd, the upstream units for each scope.
+	</longdescription>
+</pkgmetadata>
