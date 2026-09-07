@@ -1021,7 +1021,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.28.2"
+version = "0.30.0"
 comments = """
 bentoolkit — releases/latest devolve tag_name "vX.Y.Z"; o transform tira o "v",
 senao o bump gera um PV invalido (bentoolkit-v0.17.0).
@@ -2380,7 +2380,7 @@ base_from = "tag"
 base_url = "https://api.github.com/repos/KhronosGroup/SPIRV-Tools/git/refs/tags"
 base_tag_pattern = '^vulkan-sdk-([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)$'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.357.0_p20260904"
+version = "1.4.357.0_p20260907"
 comments = """
 spirv-tools — commit-tracked on main; scans titles for vulkan-sdk-X.Y.Z.W to detect base bump.
 """
@@ -8886,7 +8886,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.20.2"
+version = "1.20.2-r1"
 comments = """
 ai-jail — releases/latest on akitaonrails/ai-jail; tag_name is "vX.Y.Z" and the
 transform strips the v.  Verified by real download on 2026-09-07: tag_name
@@ -8904,7 +8904,7 @@ crate list, and a stale one fails at fetch time with "no matching package".
 
 Two more things travel with the version and must be re-read on every bump:
 rust-toolchain.toml, whose pinned channel is what RUST_MIN_VER mirrors, and
-[profile.release] in Cargo.toml, whose "strip = true" src_prepare deletes so
+Cargo.toml's [profile.release], whose "strip = true" src_prepare deletes so
 Portage can do the stripping.  That sed is guarded by a grep -qF, so it dies
 loudly if upstream drops the line rather than silently becoming a no-op.
 
@@ -8920,7 +8920,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.20.2"
+version = "1.20.2-r1"
 comments = """
 ai-jail-bin — same endpoint and same release as sys-apps/ai-jail; this record
 exists separately only because the two are separate packages.  Bump them
