@@ -5,7 +5,7 @@ EAPI=8
 
 inherit go-module systemd
 
-DESCRIPTION="Transparent model-swapping proxy for llama.cpp, vLLM and other OpenAI-compatible servers"
+DESCRIPTION="Model-swapping proxy for llama.cpp, vLLM and OpenAI-compatible servers"
 HOMEPAGE="https://github.com/mostlygeek/llama-swap"
 
 # Upstream tarball only.
@@ -23,15 +23,28 @@ LICENSE="MIT"
 # Dependent (bundled, statically linked) Go module licenses. Go links
 # statically, so every one of these ships inside the installed binary.
 #
-# Surveyed at v250 on 2026-08-16 by running `go mod vendor` and classifying all
-# 85 license files across the 80 vendored modules: 50 MIT, 15 BSD-2,
-# 12 Apache-2.0, 6 BSD (3-clause), 1 ISC. The only unclassified file was
-# modernc.org/memory/LICENSE-LOGO, which is a Wikimedia URL for a logo, not a
-# code license; that module carries its real LICENSE separately.
+# RE-SURVEYED at v255 on 2026-09-07, the same way: `go mod vendor`, then every
+# license file classified. 131 files across 125 modules -- 66 MIT, 35 BSD
+# (3-clause), 19 Apache-2.0, 7 BSD-2, 2 ISC, and 2 that are not licences at all
+# (modernc.org/memory/LICENSE-LOGO is a Wikimedia URL for a logo, and
+# tailscale.com/licenses/licenses.go is source whose name merely starts with
+# "licens"; both modules carry their real LICENSE separately).
+#
+# THE SET IS UNCHANGED, THE COUNTS ARE NOT. v250 had 85 files across 80 modules;
+# 45 modules arrived across v251..v255 without adding a single new licence. That
+# is the outcome worth recording, because it is the one that makes skipping the
+# survey feel safe -- and the internal shift was large (BSD-2 15 -> 7, BSD 6 ->
+# 35), so a survey that had only counted totals would have looked stable while
+# the classification moved underneath it.
 #
 # MPL-2.0 is deliberately absent. An earlier draft listed it, copied from
-# dev-util/trivy's set rather than surveyed — no vendored module here is under
-# it. Re-run the survey at each bump instead of carrying this list forward.
+# dev-util/trivy's set rather than surveyed -- no vendored module here is under
+# it, still true at v255. No GPL or LGPL either.
+#
+# Re-run the survey at each bump instead of carrying this list forward. NOTE
+# that the autoupdate applier does NOT do this: v251, v252, v253 and v255 all
+# landed as plain PV bumps, so this comment sat four releases stale before
+# anyone checked. The survey is a manual step or it does not happen.
 LICENSE+=" Apache-2.0 BSD BSD-2 ISC"
 SLOT="0"
 # ~arm64 ships here, unlike the ggml family in this overlay, and the difference
@@ -82,6 +95,15 @@ BDEPEND="
 #
 # USE=ui adds a second network consumer (npm), which is why it is named here
 # too: the flag does not toggle the restriction, it only widens what uses it.
+# EXPECTED pkgcheck finding: UnknownRestrict. `network-sandbox` is a PORTAGE
+# extension, not a PMS token, so pkgcheck does not recognise it -- and ::gentoo
+# has no ebuild using it either (the three greps that look like it are
+# comments), so there is no precedent to point at. It is honoured all the same:
+# doebuild.py computes `networked` as true when "network-sandbox" appears in
+# PORTAGE_RESTRICT, for every phase except depend.
+#
+# Do NOT "fix" this by deleting the line. Without it `ego mod download` in
+# src_unpack has no network and the build cannot start.
 RESTRICT="network-sandbox"
 
 src_unpack() {
