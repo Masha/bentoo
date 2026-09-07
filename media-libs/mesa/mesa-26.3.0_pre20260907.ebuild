@@ -11,6 +11,11 @@ LLVM_OPTIONAL=1
 CARGO_OPTIONAL=1
 PYTHON_COMPAT=( python3_{12..14} )
 
+# BENTOO-DIVERGENCE: INHERIT - no toolchain-funcs, which ::gentoo inherits for
+# tc-check-openmp. Nothing here calls a tc-* function at all: get_libdir comes
+# from multilib and get_llvm_prefix from llvm-r2. Inheriting an eclass nothing
+# uses is noise, and _eclasses_ confirms it is genuinely absent rather than
+# arriving by another route.
 inherit flag-o-matic llvm-r2 meson-multilib python-any-r1 linux-info
 
 # Note: ${P}, not ${PF} -- this names the distfile, which does not change
@@ -60,15 +65,15 @@ SRC_URI+="
 # only consumable form.  Keep VENUS_PROTOCOL_REV in sync with the "revision"
 # field of that wrap file on every bump; src_unpack hard-fails when it drifts,
 # because meson only checks the *declared* version of whatever is on disk
-# (== 1.1.1 here) and a stale pin silently builds against wrong headers.
+# (== 1.1.3 here) and a stale pin silently builds against wrong headers.
 #
 # The wrap pins by tag since 26.3.0_pre20260901 (it used to name a bare sha),
 # so the two are separate variables: REV is whatever the wrap literally says
 # and is what the drift check compares against, COMMIT is the sha that tag
 # resolved to.  SRC_URI must fetch the sha -- a tag can be moved upstream, and
 # a moved tag would change the distfile under a Manifest that still verifies.
-VENUS_PROTOCOL_REV="v1.1.2"
-VENUS_PROTOCOL_COMMIT="39f5e7c0b288458671aa5eeb46c44c93bf173291"
+VENUS_PROTOCOL_REV="v1.1.3"
+VENUS_PROTOCOL_COMMIT="ca19b6358d7cc491bc3e4de76f04c6700876a8fa"
 VENUS_PROTOCOL_P="venus-protocol-${VENUS_PROTOCOL_COMMIT}"
 # Only the virtio Vulkan driver needs it (with_virtio_vk in meson.build).
 SRC_URI+="
@@ -264,25 +269,32 @@ src_unpack() {
 
 		mv "${WORKDIR}/${VENUS_PROTOCOL_P}" "${S}/subprojects/${vn_dir}" || die
 
-		# The subproject installs a venus-protocol.pc that promises headers it
-		# does not install: pkg.generate() runs unconditionally, while the
-		# custom_targets that generate the headers carry "install: not_subproj".
-		# Merged, that .pc poisons the NEXT mesa build -- dependency() finds it
-		# by name, skips the fallback, and hands the compiler
-		# -I/usr/include/venus-protocol, a directory nobody created.  The build
-		# then dies far from the cause, on a missing vn_protocol_driver_*.h.
+		# venus-protocol used to install a venus-protocol.pc advertising headers
+		# it never installed: pkg.generate() ran unconditionally, while the
+		# custom_targets that generate those headers carry "install: not_subproj".
+		# Merged, that .pc poisoned the NEXT mesa build -- dependency() found it
+		# by name, skipped the fallback, and handed the compiler
+		# -I/usr/include/venus-protocol, a directory nobody created, so the build
+		# died far from the cause on a missing vn_protocol_driver_*.h.  It only
+		# bit when the leftover .pc matched the "== <ver>" mesa asks for, which
+		# made it look intermittent: measured 2026-09-06, 26.3.0_pre20260905
+		# installed a 1.1.2 .pc and 26.3.0_pre20260906, which also wants
+		# == 1.1.2, failed to compile.
 		#
-		# It only bites when the .pc left behind matches the "== <ver>" mesa
-		# asks for, so it fires on the second consecutive snapshot to keep the
-		# same venus-protocol version and looks intermittent.  Measured
-		# 2026-09-06: 26.3.0_pre20260905 installed a 1.1.2 .pc, and
-		# 26.3.0_pre20260906, which also wants == 1.1.2, failed to compile.
+		# v1.1.3 moved pkg.generate() inside "if not_subproj", so a subproject
+		# build now installs nothing and the sed that used to strip the call is
+		# gone.  What replaces it is an assertion, not blind trust: a regression
+		# would leave no trace in THIS build and would only surface one snapshot
+		# later, as that same missing-header compile error.  Counting is what
+		# makes it hold -- a second, ungated call added next to the gated one
+		# would still satisfy a plain "is it inside the block" test.
 		local vn_meson="${S}/subprojects/${vn_dir}/meson.build"
-		grep -qF "pkg.generate(" "${vn_meson}" ||
-			die "venus-protocol no longer calls pkg.generate(); drop this hunk"
-		sed -i -e "/^pkg = import('pkgconfig')$/,/^)$/d" "${vn_meson}" || die
-		! grep -qF "pkg.generate(" "${vn_meson}" ||
-			die "failed to drop pkg.generate() from ${vn_meson}"
+		local vn_pkg_all vn_pkg_gated
+		vn_pkg_all=$(grep -cF "pkg.generate(" "${vn_meson}")
+		vn_pkg_gated=$(sed -n '/^if not_subproj$/,/^endif$/p' "${vn_meson}" |
+			grep -cF "pkg.generate(")
+		[[ ${vn_pkg_all} == "${vn_pkg_gated}" ]] ||
+			die "venus-protocol calls pkg.generate() outside 'if not_subproj'"
 	fi
 
 	# We need this because we cannot tell meson to use DISTDIR yet
