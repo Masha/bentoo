@@ -61,12 +61,6 @@ a place in the UI; expensive to carry through every rebase before then.
 
 Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>
 ---
- assets/settings/default.json               |  11 +++
- crates/settings/src/vscode_import.rs       |   1 +
- crates/settings_content/src/workspace.rs   |  33 +++++++
- crates/workspace/src/pane.rs               | 100 ++++++++++++++++++++-
- crates/workspace/src/workspace_settings.rs |   2 +
- 5 files changed, 145 insertions(+), 2 deletions(-)
 
 diff --git a/assets/settings/default.json b/assets/settings/default.json
 index 63c16cf..b8faf19 100644

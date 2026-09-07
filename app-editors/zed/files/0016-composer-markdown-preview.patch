@@ -67,9 +67,6 @@ appears, that the button is where a hand expects it, and that the rendered
 markdown reads correctly are observations for a running editor. The first version
 of this patch said the same sentence, and it was right.
 ---
- .../src/conversation_view/thread_view.rs      |   4 +
- crates/agent_ui/src/message_editor.rs         | 305 +++++++++++++++++-
- 2 files changed, 302 insertions(+), 7 deletions(-)
 
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
 index 0a1fed0..549baa5 100644
@@ -479,6 +476,3 @@ index 044e788..f770b48 100644
 +        assert!(showing_tooltip.starts_with("Hide"));
 +    }
  }
--- 
-2.55.0
-
