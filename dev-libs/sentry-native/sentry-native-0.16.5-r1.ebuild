@@ -3,6 +3,16 @@
 
 EAPI=8
 
+# BENTOO-DIVERGENCE: PATCHES - none, where ::gentoo wraps sentry_fuzz_json in
+# if(0) via sentry-native-0.6.5_no-fuzz-test.patch. Not copied because it does
+# not apply: measured 2026-09-07 against the 0.16.5 tarball, hunk 1 lands with
+# fuzz at a 33-line offset and hunk 2 fails outright - tests/unit/CMakeLists.txt
+# has been restructured since 0.6.5.
+#
+# WHAT THAT LEAVES OPEN, stated rather than glossed: the fuzz target is still
+# built and registered under USE=test here, and ::gentoo's reason for disabling
+# it (it needs a special, performance-killing build to work at all) has not gone
+# away. Rebasing the patch is the fix; it was out of scope for a parity pass.
 inherit cmake
 
 DESCRIPTION="Sentry SDK for C, C++ and native applications"

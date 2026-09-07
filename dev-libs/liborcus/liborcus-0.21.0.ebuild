@@ -4,6 +4,10 @@
 EAPI=8
 
 PYTHON_COMPAT=( python3_{11..14} )
+# BENTOO-DIVERGENCE: PATCHES - none, where ::gentoo carries
+# liborcus-0.19.2-boost-m4.patch. Verified 2026-09-07: it reverse-applies
+# cleanly against the 0.21.0 tarball, so upstream shipped the same change and
+# their copy is a backport onto 0.19.2.
 inherit autotools python-single-r1
 
 DESCRIPTION="Standalone file import filter library for spreadsheet documents"

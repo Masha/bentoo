@@ -6,6 +6,14 @@ EAPI=8
 # Please bump with app-editors/vim and app-editors/gvim
 
 VIM_VERSION="9.2"
+# BENTOO-DIVERGENCE: PATCHES - one local patch where ::gentoo applies the whole
+# ${WORKDIR}/vim-patches-* directory. Those six are Gentoo distro patches, not
+# upstream fixes: xorg-75816, apache-83565, automake-substitutions-93378,
+# grub-splash-96155, ada-default-compiler and python3-shared-lib. They are
+# pinned to VIM_PATCHES_VERSION 9.1.1432, four hundred patchlevels behind the
+# 9.2.1037 this ebuild ships, and carrying them would mean tracking a second,
+# independently versioned tarball. What is given up with them is Gentoo's
+# apache and grub-splash syntax defaults.
 inherit desktop flag-o-matic prefix toolchain-funcs vim-doc xdg-utils
 
 if [[ ${PV} == 9999* ]] ; then

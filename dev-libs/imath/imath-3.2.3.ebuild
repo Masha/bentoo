@@ -5,6 +5,11 @@ EAPI=8
 
 PYTHON_COMPAT=( python3_{12..14} )
 
+# BENTOO-DIVERGENCE: PATCHES - none, where ::gentoo carries
+# imath-3.1.11-fix_cmake_module_export.patch. It edits
+# src/python/config/ModuleDefine.cmake, and Imath 3.2 has no src/ directory at
+# all - the layout was reorganised upstream. The patch cannot apply, and there
+# is nothing for it to fix.
 inherit cmake python-single-r1
 
 MY_PN=${PN^}

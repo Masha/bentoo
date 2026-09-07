@@ -65,6 +65,23 @@ pkg_setup() {
 	python-any-r1_pkg_setup
 }
 
+# BENTOO-DIVERGENCE: PATCHES - the same patch as ::gentoo's under a different
+# name. Their file is version-stamped (vulkan-tools-1.4.357.0-libcxx-23.patch);
+# this copy is ${PN}-ctime-include.patch because the autoupdate applier never
+# renames anything under files/, so a version in the name rots at the next bump.
+# Byte-identical content, taken from ::gentoo on 2026-09-07.
+# Taken from ::gentoo 2026-09-07 and renamed version-agnostic (the autoupdate
+# applier never renames files/). Upstream commit 462d9819 "vulkaninfo: add
+# missing <ctime> include" landed 2026-09-04T18:35Z; EGIT_COMMIT below is
+# 532e2c0e from 02:24Z the same day, sixteen hours earlier, so vulkaninfo.cpp
+# here still has no <ctime> and fails to build against libc++ 23.
+#
+# DELETE THIS ON THE NEXT BUMP: any snapshot after 462d9819 already has the
+# include and eapply will fail loudly, which is the intended way to notice.
+PATCHES=(
+	"${FILESDIR}"/${PN}-ctime-include.patch
+)
+
 multilib_src_configure() {
 	local mycmakeargs=(
 		-DCMAKE_C_FLAGS="${CFLAGS} -DNDEBUG"

@@ -5,6 +5,18 @@ EAPI=8
 
 PYTHON_COMPAT=( python3_{11..13} )
 
+# BENTOO-DIVERGENCE: PATCHES - none, where ::gentoo carries two.
+#
+# optional-gstreamer is deliberately absent and must stay absent: it invents a
+# gstreamer USE flag upstream does not have, and this ebuild takes the
+# dependency unconditionally as upstream declares it (see DEPEND below).
+#
+# sandbox-disable-failing-tests does not apply - measured 2026-09-07, both hunks
+# fail against 1.22.1 because the pytest_files list was rewritten since 1.20.0.
+# OPEN, not resolved: test_dynamiclauncher.py and test_location.py are still
+# listed here, and they are the two ::gentoo removes because they want pipewire,
+# network and /dev/fuse. Under USE=test they will still be attempted. Rebasing
+# that patch is the fix.
 inherit meson python-any-r1 systemd
 
 DESCRIPTION="Desktop integration portal"

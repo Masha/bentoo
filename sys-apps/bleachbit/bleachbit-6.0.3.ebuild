@@ -9,6 +9,11 @@ DISTUTILS_USE_PEP517=setuptools
 PYTHON_COMPAT=( python3_{12..14} )
 PYTHON_REQ_USE="sqlite(+)"
 
+# BENTOO-DIVERGENCE: PATCHES - none, where ::gentoo carries
+# bleachbit-6.0.0-fix_locale_test.patch. Upstream went FURTHER than the patch:
+# tests/common.py in 6.0.3 matches locales with
+# ^[a-z]{2,3}([_-]([A-Z][A-Za-z]{1,3}|[0-9]{3}))?... , which also accepts the
+# three-digit region codes the Gentoo patch does not.
 inherit desktop distutils-r1 toolchain-funcs verify-sig virtualx
 
 DESCRIPTION="Clean junk to free disk space and to maintain privacy"

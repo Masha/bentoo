@@ -4562,9 +4562,23 @@ self_test_assertions() {
 	# INHERIT now holds no ALIGN row. PATCHES is the last axis that does.
 	#
 	# 224 against 224.
+	#
+	# RE-MEASURED 2026-09-07, 224 -> 222, and the two that left are the four
+	# orphan patches deleted from net-im/telegram-desktop and net-libs/nodejs -
+	# files no ebuild referenced, naming versions long gone from the tree. They
+	# were the tree's only UNDOCUMENTED rows.
+	#
+	# THIS IS THE PASS WHERE ALIGN REACHED ZERO. All 222 rows are JUSTIFIED, so
+	# a full sweep now exits 0 for the first time. That changes what this
+	# assertion is worth watching for: until now a rising ALIGN count was
+	# ordinary, and from here any ALIGN at all is a NEW divergence that arrived
+	# since 2026-09-07 - either a bump that changed an axis, or ::gentoo moving
+	# underneath. The sweep is finally usable as a gate.
+	#
+	# 222 against 222.
 	assert_eq A20 \
 		'the four verdicts still sum to the row total, with the stale cache outside both' \
-		'rows=224 verdict-sum=224 stale=0' \
+		'rows=222 verdict-sum=222 stale=0' \
 		"$(row_arithmetic)"
 
 	# --- story 008: what a stale cache does to the exit code ----------

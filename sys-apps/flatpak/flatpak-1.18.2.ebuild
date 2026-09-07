@@ -83,6 +83,18 @@ pkg_setup() {
 	python-any-r1_pkg_setup
 }
 
+# BENTOO-DIVERGENCE: PATCHES - the same patch as ::gentoo's flatpak-1.18.1-test
+# .patch, renamed ${PN}-test-runtime-locale-nonfatal.patch for the reason the
+# applier forces: it never renames files/, so a version-stamped name rots.
+# Byte-identical content.
+# Taken from ::gentoo 2026-09-07, renamed version-agnostic. tests/
+# make-test-runtime.sh copies /usr/lib/locale/C.* without a guard, so the test
+# runtime build dies on a host where that glob matches nothing. Checked in both
+# tarballs: 1.18.2 and 1.19.0 still lack the "|| true".
+PATCHES=(
+	"${FILESDIR}"/${PN}-test-runtime-locale-nonfatal.patch
+)
+
 src_prepare() {
 	default
 	# This line fails because locales are in /usr/lib/locale/locale-archive.

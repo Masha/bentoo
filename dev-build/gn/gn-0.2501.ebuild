@@ -4,6 +4,9 @@
 EAPI=8
 PYTHON_COMPAT=( python3_{11..14} )
 
+# BENTOO-DIVERGENCE: PATCHES - none, where ::gentoo carries
+# gn-0.2374-test-iwyu.patch. Verified 2026-09-07: it reverse-applies cleanly
+# against the 0.2501 tarball this overlay hosts, so the change is already in.
 inherit edo ninja-utils python-any-r1 toolchain-funcs
 
 DESCRIPTION="GN is a meta-build system that generates build files for Ninja"

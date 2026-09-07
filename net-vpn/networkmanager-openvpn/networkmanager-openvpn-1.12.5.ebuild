@@ -5,6 +5,9 @@ EAPI=8
 
 GNOME_ORG_MODULE="NetworkManager-${PN##*-}"
 
+# BENTOO-DIVERGENCE: PATCHES - none, where ::gentoo carries
+# networkmanager-openvpn-1.12.3-locale-h.patch. Verified 2026-09-07: it
+# reverse-applies cleanly against the 1.12.5 tarball - upstream took it.
 inherit flag-o-matic gnome2
 
 DESCRIPTION="NetworkManager OpenVPN plugin"
