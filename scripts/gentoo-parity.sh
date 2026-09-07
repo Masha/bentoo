@@ -3290,6 +3290,39 @@ verdict_count() {
 	printf '%d' "${count}"
 }
 
+# align_survivors
+# Every package still carrying an ALIGN row, named and sorted, with the count
+# beside it.
+#
+# A SECOND IMPLEMENTATION of the count verdict_count already produces, and
+# deliberately so - the same reasoning arch_set carries. A25 asking
+# verdict_count how many ALIGN rows there are is the harness asking the code
+# under test to grade itself: a mutant that made verdict_count return 0
+# unconditionally left A25 green, which was measured, not imagined. This reads
+# column 8 of PARITY_ROWS itself.
+#
+# NAMED, not just counted, for the reason slot_survivors is: when this goes red
+# the next question is always "which package", and a bare number sends the
+# reader back to the report to find out.
+align_survivors() {
+	local row verdict pkg out count=0
+	local -a hits=()
+
+	for row in "${PARITY_ROWS[@]}"; do
+		verdict=${row##*$'\t'}
+		[[ ${verdict} == ALIGN ]] || continue
+		count=$(( count + 1 ))
+		hits+=( "${row%%$'\t'*}" )
+	done
+
+	if (( count == 0 )); then
+		printf 'align=0 packages=(none)'
+		return 0
+	fi
+	out=$(printf '%s\n' "${hits[@]}" | sort -u | tr '\n' ' ')
+	printf 'align=%d packages=%s' "${count}" "${out% }"
+}
+
 # select_rows <category/pn> <PV> <axis> <value> <column>
 # Query the divergence table. An empty <PV>, <axis> or <value> matches
 # anything. <value> is matched as a substring of the overlay and ::gentoo
@@ -4648,6 +4681,31 @@ self_test_assertions() {
 		'a stale tag is reported at exact distance and NEVER at same-series' \
 		'exact=stale same-series=silent' \
 		"$(stale_tag_distance_run)"
+
+	# --- 2026-09-07: the invariant the sweep finally has ---------------
+
+	# ALIGN reached zero on 2026-09-07 and the sweep exits 0. This is the
+	# assertion that keeps it there, and it is the one to read first when the
+	# guard goes red: an ALIGN row means a divergence arrived with no reason
+	# recorded, either from a bump here or from ::gentoo moving underneath.
+	#
+	# WHY THIS EXISTS BESIDE A20 RATHER THAN INSTEAD OF IT. A20 pins the
+	# absolute row total, so it moves whenever the tree does - it was
+	# re-measured five times in the two days this remediation took, and every
+	# one of those was bookkeeping rather than a finding. This one does not
+	# move: closing a divergence by tagging it leaves the row in place and the
+	# count at zero, and only a NEW divergence disturbs it.
+	#
+	# THE DENOMINATOR IS DELIBERATELY NOT A NUMBER. "align=0" alone is what a
+	# run that compared nothing also prints, so the header's rule demands a
+	# denominator - but pinning "of 222" would import exactly the drift that
+	# makes A20 expensive. Non-emptiness is the weakest claim that still
+	# distinguishes "nothing diverges" from "nothing was examined", and it is
+	# the one that survives a bump.
+	assert_eq A25 \
+		'no ALIGN survives: every divergence carries a reason, against a non-empty population' \
+		'align=0 packages=(none) rows=non-empty' \
+		"$(align_survivors) rows=$( (( ${#PARITY_ROWS[@]} )) && printf non-empty || printf EMPTY )"
 
 	rm -rf -- "${scratch}"
 }
