@@ -3441,6 +3441,31 @@ assert_eq() {
 	return 0
 }
 
+# assert_eq_direct <id> <desc> <expected> <actual>
+# assert_eq WITHOUT the skip branch, for the one assertion that pins the skip
+# branch. Routing that assertion through the mechanism it tests is circular, and
+# the circularity is not theoretical: a mutant that turned EVERY mismatch into a
+# skip silenced its own detector, and the suite exited 0 reporting a skip where
+# a clean tree must have none. The mutant survived until this function existed.
+#
+# Nothing else should use it. A real subject can vanish; this one is a literal.
+assert_eq_direct() {
+	local id=$1 desc=$2 expected=$3 actual=$4
+
+	ASSERT_TOTAL=$(( ASSERT_TOTAL + 1 ))
+
+	if [[ ${actual} == "${expected}" ]]; then
+		printf '  [PASS] (%s) %s\n' "${id}" "${desc}"
+		return 0
+	fi
+
+	printf '  [FAIL] (%s) %s\n' "${id}" "${desc}"
+	printf '         expected: %s\n' "$(q "${expected}")"
+	printf '         observed: %s\n' "$(q "${actual}")"
+	FAILURES+=( "(${id}) ${desc} | expected: $(q "${expected}") | observed: $(q "${actual}")" )
+	return 0
+}
+
 ### querying what the pipeline published ##############################
 
 # baselines_at_distance <distance>
@@ -4971,7 +4996,7 @@ self_test_assertions() {
 	# TOGETHER against the same shape of mismatch -- only the marker differs --
 	# because a regression that turned every mismatch into a skip would satisfy
 	# either half alone.
-	assert_eq A27 \
+	assert_eq_direct A27 \
 		'an absent pinned subject SKIPs; every other mismatch still FAILs' \
 		'absent[fail=0 skip=1] present[fail=1 skip=0]' \
 		"$(skip_vs_fail_run)"
