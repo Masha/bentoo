@@ -4880,10 +4880,18 @@ self_test_assertions() {
 	# these three assert is that the row SURVIVES rather than being folded away
 	# as a version artifact, and "none" is still the value that would mean it
 	# was. A16 already mixed the two verdicts for exactly this reason.
+	# RE-PINNED 2026-09-07 (second time today): the snapshot moved
+	# _p20260903 -> _p20260907. glslang is a dated snapshot, so this pin ages
+	# out on every bump of it -- the cost that A15 records as deliberate for
+	# exact-PVR probes, landing here roughly weekly.
+	#
+	# Both times the suite said SKIP naming glslang[subject-missing] rather
+	# than FAIL naming the SLOT stage. The first time cost a scratch worktree
+	# to diagnose, before the skip existed; this time it named itself.
 	assert_eq A16 \
 		'SLOT: an ABI counter and a soname are not versions, and all three survive' \
 		'imath[compared=yes slot=JUSTIFIED] glslang[compared=yes slot=JUSTIFIED] libqmi[compared=yes slot=JUSTIFIED]' \
-		"imath[$(slot_outcome dev-libs/imath 3.2.3)] glslang[$(slot_outcome dev-util/glslang 1.4.357.0_p20260903)] libqmi[$(slot_outcome net-libs/libqmi 1.39.1_pre20260816-r1)]"
+		"imath[$(slot_outcome dev-libs/imath 3.2.3)] glslang[$(slot_outcome dev-util/glslang 1.4.357.0_p20260907)] libqmi[$(slot_outcome net-libs/libqmi 1.39.1_pre20260816-r1)]"
 
 	# R1.5. A suppression nobody can audit is indistinguishable from a
 	# comparison that silently broke, and telling those two apart is the
