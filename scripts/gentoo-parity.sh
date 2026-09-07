@@ -3524,6 +3524,10 @@ SELF_TEST_STALE_SHARED_ECLASS='fixture-shared'
 # rule stopped working" print the same. One package now exhibits all three
 # reachable verdicts at once, so each is asserted against a real signal.
 SELF_TEST_VERDICT_FILTER='dev-verdict'
+# A SECOND fixture package, in its own category so it perturbs no existing
+# assertion. It inherits readme.gentoo-r1 and ships NO README.gentoo -- the one
+# shape the verdict fixture cannot hold, because A26 needs that file present.
+SELF_TEST_ECLASS_FILTER='dev-eclassreader'
 SELF_TEST_VERDICT_PKG='dev-verdict/triple'
 SELF_TEST_VERDICT_PV='1.0'
 
@@ -4296,6 +4300,47 @@ prepare_verdict_scratch() {
 		"${SELF_TEST_VERDICT_PKG}" "${root}/${category}"
 }
 
+# prepare_eclass_reader_scratch
+# One package that inherits readme.gentoo-r1 and ships no README.gentoo.
+#
+# WHY IT IS A SEPARATE PACKAGE IN A SEPARATE CATEGORY. A29 pins that a
+# ${FILESDIR} reference with no file is reported. The opposite mistake --
+# check_missing_filesdir_refs consulting FILESDIR_REFS_ECLASS and so demanding a
+# README.gentoo from every package that merely inherits the eclass -- could not
+# be pinned against the verdict fixture at all: A26 needs README.gentoo PRESENT
+# there to prove the sparing works, and this needs it ABSENT. One fixture cannot
+# hold a file that is both.
+#
+# Its own category keeps every existing assertion untouched: they all run under
+# SELF_TEST_VERDICT_FILTER and never see this one.
+#
+# It DOES name a real file. filesdir_refs must produce a non-empty
+# FILESDIR_REFS or the check skips the package early and the assertion would be
+# green for the wrong reason -- dev-lang/flutter escapes the real-tree version
+# of this mistake for exactly that reason, so the fixture must not repeat it.
+prepare_eclass_reader_scratch() {
+	local root=${SELF_TEST_FIXTURE_ROOT}
+	local category=${SELF_TEST_ECLASS_FILTER}
+	local dir="${root}/overlay/${category}/reader"
+
+	[[ -n ${root} ]] || return 0
+
+	mkdir -p -- "${dir}/files" "${root}/overlay/metadata/md5-cache/${category}"
+	printf 'fixture file\n' >"${dir}/files/real.patch"
+
+	cat >"${dir}/reader-1.0.ebuild" <<-'EOF'
+		EAPI=8
+		inherit readme.gentoo-r1
+		src_install() {
+			eapply "${FILESDIR}"/real.patch
+			readme.gentoo_create_doc
+		}
+	EOF
+
+	printf '  [SEAM] eclass-reader fixture %s/reader -> %s\n' \
+		"${category}" "${dir}"
+}
+
 # verdict_fixture_cache <side>
 # One md5-cache entry for the verdict fixture. Every axis is identical on both
 # sides except the three named above, so exactly three rows are emitted.
@@ -4527,6 +4572,7 @@ self_test_assertions() {
 	prepare_tag_scratch "${scratch}"
 	prepare_stale_scratch "${scratch}"
 	prepare_verdict_scratch
+	prepare_eclass_reader_scratch
 	self_test_pipeline
 
 	printf '\nassertions\n'
@@ -5196,24 +5242,30 @@ self_test_assertions() {
 	# both read one fixture, because they fail independently: a change that
 	# broke brace expansion would take A26 down while this stayed green.
 	#
-	# WHAT THIS DOES NOT COVER, recorded rather than papered over. The other
-	# direction -- this check consulting FILESDIR_REFS_ECLASS, which would
-	# demand a README.gentoo from every package that merely inherits the
-	# eclass -- CANNOT be caught by this fixture, and the mutant proved it:
-	# the fixture ships a README.gentoo (A26 needs it present to prove the
-	# sparing), so the eclass pattern matches and never reports missing. The
-	# two assertions want the same file present and absent at once.
-	#
-	# Against the real overlay that mutant produces 4 false positives at once
-	# (qemu, networkmanager, edk2, chromium -- five packages inherit the
-	# eclass without shipping the file, and flutter escapes only because it
-	# names no ${FILESDIR} at all). Loud, but not pinned here. Covering it
-	# needs a SECOND fixture package that inherits and ships nothing, which is
-	# the honest fix whenever someone adds one.
+	# The opposite direction -- this check consulting FILESDIR_REFS_ECLASS, so
+	# every package merely inheriting the eclass is asked for a README.gentoo
+	# -- cannot be pinned HERE: the verdict fixture ships that file because
+	# A26 needs it present. A30 holds that half against a fixture of its own.
+	# The pair was split for that reason and not for tidiness.
 	assert_eq A29 \
 		'${FILESDIR} references: the one with no file is named, the ones with files are not' \
 		'missing=1 names=missing.patch' \
 		"$(fixture_pass "${SELF_TEST_VERDICT_FILTER}" report_missing_filesdir_refs)"
+
+	# The half A29 cannot hold, now held -- see prepare_eclass_reader_scratch
+	# for why it needed a package of its own. dev-eclassreader/reader inherits
+	# readme.gentoo-r1 and ships no README.gentoo, which is NOT a defect: the
+	# eclass only reads that file when DOC_CONTENTS is unset. If this check
+	# ever consults FILESDIR_REFS_ECLASS, the synthesised README.gentoo*
+	# pattern matches nothing here and this goes red.
+	#
+	# Green means "reported nothing", so it could also be green for a check
+	# that examined no package at all -- which is why the fixture names a real
+	# file it DOES reach. A29 covers the reporting half against the same code.
+	assert_eq A30 \
+		'a package inheriting readme.gentoo-r1 without the file is not a missing reference' \
+		'missing=0 names=(none)' \
+		"$(fixture_pass "${SELF_TEST_ECLASS_FILTER}" report_missing_filesdir_refs)"
 
 	rm -rf -- "${scratch}"
 }
