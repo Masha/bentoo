@@ -5,11 +5,13 @@ EAPI=8
 
 inherit desktop xdg
 
-DESCRIPTION="Google Antigravity 2.0 standalone agent orchestration desktop app (binary release)"
+DESCRIPTION="Google Antigravity 2.0 agent orchestration desktop app (binary)"
 HOMEPAGE="https://antigravity.google/"
 
 MY_PV="${PV%.*}-${PV##*.}"
 SRC_URI="amd64? ( https://storage.googleapis.com/antigravity-public/antigravity-hub/${MY_PV}/linux-x64/Antigravity.tar.gz -> ${PN}-${MY_PV}.tar.gz )"
+
+S="${WORKDIR}/Antigravity-x64"
 
 LICENSE="all-rights-reserved"
 SLOT="0"
@@ -39,9 +41,6 @@ RDEPEND="
 	x11-misc/xdg-utils
 "
 DEPEND="${RDEPEND}"
-BDEPEND=""
-
-S="${WORKDIR}/Antigravity-x64"
 
 QA_PREBUILT="*"
 
@@ -70,8 +69,7 @@ src_install() {
 		StartupWMClass=antigravity
 	EOF
 
-	insinto /usr/share/applications
-	doins "${T}/${PN}.desktop"
+	domenu "${T}/${PN}.desktop"
 
 	dodoc LICENSE.electron.txt
 }
