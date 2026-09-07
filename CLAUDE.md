@@ -120,9 +120,16 @@ knowing:
   floor IS 0, and it climbs on its own: every bump leaves the previous entry
   behind unless `egencache` is re-run for that package.
 
+A third section reports the opposite of the orphan one and is **not** litter:
+**`${FILESDIR}` references matching no file**, on the `[missing]` line. Those
+die at install under EAPI 8, so the package cannot merge at all. It is at 0 and
+must stay there -- `dev-util/antigravity-hub-bin` sat broken with exactly this
+until 2026-09-07, and was found only because the mismatch happened to leave an
+orphan behind on the other side.
+
 Since 2026-09-07 the sweep exits `0` with all 222 lines `JUSTIFIED`. That
 changes how a red reads: any `ALIGN` is divergence that *arrived*, not backlog
-that was never worked down. `--self-test` (28 assertions) covers the script
+that was never worked down. `--self-test` (29 assertions) covers the script
 itself and needs neither the tree nor the network -- except for the handful of
 SLOT probes that pin an exact PVR on purpose. When one of those subjects is not
 in the tree, the assertion reports **SKIP**, never FAIL: a vanished subject says
