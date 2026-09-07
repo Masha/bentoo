@@ -323,6 +323,7 @@ PARITY_STALE_CACHE=()      # <category>/<pn> TAB <PV> TAB <eclass> TAB <note>
 
 PARITY_ORPHAN_FILES=()     # <category>/<pn> TAB <count> TAB <names>
 PARITY_CACHE_NO_EBUILD=()  # <category> TAB <name>  (md5-cache entry, no ebuild)
+PARITY_MISSING_FILES=()    # <category>/<pn> TAB <ebuilds> TAB <pattern>
                            # A file under files/ that no ebuild of the package
                            # reaches through ${FILESDIR}. Dead weight: it does
                            # not break anything, so it does NOT fail the run -
@@ -1769,6 +1770,12 @@ digest_tree() {
 }
 
 FILESDIR_REFS=""
+# Patterns NO ebuild text names -- an eclass reads them straight out of
+# FILESDIR. Kept apart from FILESDIR_REFS because they answer opposite
+# questions: they must SUPPRESS an orphan, but they must never be treated as a
+# reference whose target has to exist. A package that inherits the eclass and
+# has no README.gentoo is not broken.
+FILESDIR_REFS_ECLASS=""
 
 # filesdir_refs <repo root> <category/pn>
 # Every files/ name the package's ebuilds reach through ${FILESDIR}, into
@@ -1831,6 +1838,7 @@ filesdir_refs() {
 	local eb base pv pvr expr
 
 	FILESDIR_REFS=""
+	FILESDIR_REFS_ECLASS=""
 	for eb in "${root}/${key}"/*.ebuild; do
 		[[ -f ${eb} ]] || continue
 		base=${eb##*/}
@@ -1874,10 +1882,11 @@ filesdir_refs() {
 		# errs toward silence, which is the right direction here: the
 		# remediation this check suggests is deletion.
 		if grep -q 'readme\.gentoo-r1' "${eb}"; then
-			FILESDIR_REFS+="README.gentoo* "
+			FILESDIR_REFS_ECLASS+="README.gentoo* "
 		fi
 	done
 	FILESDIR_REFS=${FILESDIR_REFS% }
+	FILESDIR_REFS_ECLASS=${FILESDIR_REFS_ECLASS% }
 }
 
 # split_by_reference <names> <patterns>
@@ -2000,7 +2009,7 @@ compare_files_dirs() {
 			read -r -a surplus <<<"${only_overlay}"
 			n_overlay=$(( n_overlay + ${#surplus[@]} ))
 			filesdir_refs "${OVERLAY_ROOT}" "${key}"
-			split_by_reference "${only_overlay}" "${FILESDIR_REFS}"
+			split_by_reference "${only_overlay}" "${FILESDIR_REFS} ${FILESDIR_REFS_ECLASS}"
 			if [[ -n ${SPLIT_REFERENCED} ]]; then
 				read -r -a surplus <<<"${SPLIT_REFERENCED}"
 				n_suppressed=$(( n_suppressed + ${#surplus[@]} ))
@@ -3109,6 +3118,68 @@ check_manifest_digests() {
 		"${#PARITY_MISSING_DIGEST[@]}"
 }
 
+# Every ${FILESDIR} reference that matches no file -- the ORPHAN CHECK RUN
+# BACKWARDS, and the more dangerous of the two directions.
+#
+# An orphan is litter: it misleads a reader and breaks nothing. A reference with
+# no file behind it is FATAL -- under EAPI 8 the install helpers die, so the
+# package cannot install at all.
+#
+# WHY IT EXISTS. dev-util/antigravity-hub-bin carried exactly this: newicon read
+# "${FILESDIR}/${PN}.png", PN is antigravity-hub-bin, and the file is named
+# antigravity-hub.png. The package had never installed once. It was found ONLY
+# because the unreferenced png surfaced in the orphan list -- from the other
+# direction, by luck, and only because the mismatch happened to leave litter
+# behind. Rename both halves consistently and nothing would have shown at all.
+#
+# Reuses filesdir_refs, so brace expansion and PN/PV/PF substitution are the
+# same code the suppression side uses. FILESDIR_REFS_ECLASS is deliberately NOT
+# consulted: those patterns are read by an eclass, and a package inheriting
+# readme.gentoo-r1 without shipping a README.gentoo is not broken.
+check_missing_filesdir_refs() {
+	local pkg_dir key category pn pattern eb_names
+	local -a patterns=() ebuilds=()
+
+	for pkg_dir in "${OVERLAY_ROOT}"/*/*/; do
+		pkg_dir=${pkg_dir%/}
+		pn=${pkg_dir##*/}
+		category=${pkg_dir%/*}
+		category=${category##*/}
+		key="${category}/${pn}"
+
+		if [[ -n ${FILTER} ]]; then
+			case ${FILTER} in
+				*/*) [[ ${key} == "${FILTER}" ]] || continue ;;
+				*)   [[ ${category} == "${FILTER}" ]] || continue ;;
+			esac
+		fi
+
+		ebuilds=( "${pkg_dir}"/*.ebuild )
+		(( ${#ebuilds[@]} )) || continue
+		[[ -f ${ebuilds[0]} ]] || continue
+
+		filesdir_refs "${OVERLAY_ROOT}" "${key}"
+		[[ -n ${FILESDIR_REFS} ]] || continue
+
+		read -r -a patterns <<<"${FILESDIR_REFS}"
+		for pattern in "${patterns[@]}"; do
+			[[ -n ${pattern} ]] || continue
+			if ! compgen -G "${pkg_dir}/files/${pattern}" >/dev/null; then
+				# Recorded per PACKAGE, not per ebuild: filesdir_refs pools
+				# every ebuild of the package, so blaming one of them would
+				# be a guess.
+				eb_names=${ebuilds[*]##*/}
+				PARITY_MISSING_FILES+=(
+					"${key}"$'\t'"${eb_names}"$'\t'"${pattern}"
+				)
+			fi
+		done
+	done
+
+	printf '  [missing]  %d ${FILESDIR} reference(s) matching no file -- these DIE at install\n' \
+		"${#PARITY_MISSING_FILES[@]}"
+}
+
 # Every md5-cache entry naming an ebuild that is not in the tree.
 #
 # Publishes PARITY_CACHE_NO_EBUILD. Overlay-wide like the orphan check, and for
@@ -3217,7 +3288,7 @@ check_orphan_files() {
 		packages=$(( packages + 1 ))
 
 		filesdir_refs "${OVERLAY_ROOT}" "${key}"
-		split_by_reference "${DIGEST_NAMES}" "${FILESDIR_REFS}"
+		split_by_reference "${DIGEST_NAMES}" "${FILESDIR_REFS} ${FILESDIR_REFS_ECLASS}"
 		[[ -n ${SPLIT_ORPHAN} ]] || continue
 
 		surplus=()
@@ -3370,6 +3441,7 @@ run_sweep() {
 	check_manifest_digests
 	check_orphan_files
 	check_cache_without_ebuild
+	check_missing_filesdir_refs
 	check_stale_tags
 	write_reports
 
@@ -4201,6 +4273,12 @@ prepare_verdict_scratch() {
 		src_install() {
 			eapply "${FILESDIR}"/referenced.patch
 			doins "${FILESDIR}"/braced-{one,two}.conf
+			# A reference with NO file behind it, for
+			# check_missing_filesdir_refs. It must not disturb the
+			# orphan count: a name nothing provides cannot suppress
+			# anything, so A26 and A29 read the same fixture from
+			# opposite ends.
+			eapply "${FILESDIR}"/missing.patch
 			# doins "${FILESDIR}"/commented-only.conf
 			readme.gentoo_create_doc
 		}
@@ -4289,6 +4367,7 @@ fixture_pass() {
 		PARITY_SLOT_SUPPRESSED=() PARITY_STALE_CACHE=()
 		PARITY_MISSING_DIGEST=() PARITY_STALE_TAGS=()
 		PARITY_ORPHAN_FILES=() PARITY_CACHE_NO_EBUILD=()
+		PARITY_MISSING_FILES=()
 		PARITY_EBUILD_PN=() PARITY_TAG_SOURCE=() PARITY_TAGGED_AXES=()
 		MD5_FIELDS=() FILE_DIGESTS=() ECLASS_HASH=()
 
@@ -4300,6 +4379,7 @@ fixture_pass() {
 		assign_verdicts >/dev/null
 		check_orphan_files >/dev/null
 		check_cache_without_ebuild >/dev/null
+		check_missing_filesdir_refs >/dev/null
 
 		"${reporter}"
 	)
@@ -4332,6 +4412,21 @@ report_orphan_files() {
 	entry=${PARITY_ORPHAN_FILES[0]}
 	names=${entry##*$'\t'}
 	printf 'packages=%d orphans=%s' "${#PARITY_ORPHAN_FILES[@]}" "${names}"
+}
+
+# ${FILESDIR} references matching no file. Named, for the same reason as every
+# other reporter here: a count cannot tell a fix from a different breakage.
+report_missing_filesdir_refs() {
+	local entry names=""
+
+	if (( ${#PARITY_MISSING_FILES[@]} == 0 )); then
+		printf 'missing=0 names=(none)'
+		return 0
+	fi
+	for entry in "${PARITY_MISSING_FILES[@]}"; do
+		names+="${entry##*$'\t'} "
+	done
+	printf 'missing=%d names=%s' "${#PARITY_MISSING_FILES[@]}" "${names% }"
 }
 
 # md5-cache entries with no ebuild, NAMED rather than counted: a count is green
@@ -5096,6 +5191,29 @@ self_test_assertions() {
 		'md5-cache: the entry with no ebuild is named, the entry with one is not' \
 		'entries=1 names=ghost-9.9.9' \
 		"$(fixture_pass "${SELF_TEST_VERDICT_FILTER}" report_cache_without_ebuild)"
+
+	# The orphan check run backwards. Pinned separately from A26 even though
+	# both read one fixture, because they fail independently: a change that
+	# broke brace expansion would take A26 down while this stayed green.
+	#
+	# WHAT THIS DOES NOT COVER, recorded rather than papered over. The other
+	# direction -- this check consulting FILESDIR_REFS_ECLASS, which would
+	# demand a README.gentoo from every package that merely inherits the
+	# eclass -- CANNOT be caught by this fixture, and the mutant proved it:
+	# the fixture ships a README.gentoo (A26 needs it present to prove the
+	# sparing), so the eclass pattern matches and never reports missing. The
+	# two assertions want the same file present and absent at once.
+	#
+	# Against the real overlay that mutant produces 4 false positives at once
+	# (qemu, networkmanager, edk2, chromium -- five packages inherit the
+	# eclass without shipping the file, and flutter escapes only because it
+	# names no ${FILESDIR} at all). Loud, but not pinned here. Covering it
+	# needs a SECOND fixture package that inherits and ships nothing, which is
+	# the honest fix whenever someone adds one.
+	assert_eq A29 \
+		'${FILESDIR} references: the one with no file is named, the ones with files are not' \
+		'missing=1 names=missing.patch' \
+		"$(fixture_pass "${SELF_TEST_VERDICT_FILTER}" report_missing_filesdir_refs)"
 
 	rm -rf -- "${scratch}"
 }
