@@ -7052,7 +7052,7 @@ pattern = 'nomachine-personal-edition_([0-9]+\.[0-9]+\.[0-9]+)_[0-9]+_amd64\.deb
 type = "bin"
 aux_var = "MY_BUILD"
 aux_pattern = 'nomachine-personal-edition_[0-9.]+_([0-9]+)_amd64\.deb'
-version = "10.0.59"
+version = "10.0.60"
 comments = """
 nxplayer — NoMachine download page is SSR; regex on the .deb filename gives the
 current version (single version on page → deterministic first match).
