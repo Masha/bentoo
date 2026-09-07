@@ -7456,6 +7456,8 @@ from the same release. Live=0.3.0. (A bump must re-check the mozjs/xargs build g
 # END
 
 ["dev-db/redis"]
+enabled = false
+disabled_by = "removed 2026-09-07: ::gentoo caught up to 8.10.1, the exact version this overlay carried, and then went past it -- the ::gentoo ebuild gained a zstd USE flag the overlay copy never had. At equal versions repo priority wins, so the overlay was actively serving the poorer ebuild."
 url = "https://api.github.com/repos/redis/redis/releases/latest"
 parser = "json"
 path = "tag_name"

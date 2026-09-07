@@ -117,7 +117,6 @@ app-portage/bentoolkit:systemd - Pull in sys-apps/systemd for bentoo snapshot sc
 app-text/calibre:font-subsetting - Enable font subsetting support
 app-text/calibre:system-mathjax - Use a system copy of mathjax
 app-text/calibre:unrar - Enable support for comic books compressed with the non-free Rar format
-dev-db/redis:tcmalloc - Use tcmalloc from dev-util/google-perftools for allocations.
 dev-db/sqlitebrowser:sqlcipher - Allow to open and to edit databases encrypted using dev-db/sqlcipher
 dev-games/godot:deprecated - Enable support for deprecated features
 dev-games/godot:double-precision - Use double-precision floats (default: single-precision)
