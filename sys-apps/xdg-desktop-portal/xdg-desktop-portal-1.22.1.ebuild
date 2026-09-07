@@ -14,6 +14,10 @@ SRC_URI="https://github.com/flatpak/${PN}/releases/download/${PV}/${P}.tar.xz"
 LICENSE="LGPL-2.1"
 SLOT="0"
 KEYWORDS="~amd64 ~arm ~arm64 ~loong ~ppc ~ppc64 ~riscv ~x86"
+# BENTOO-DIVERGENCE: IUSE - no gstreamer flag. That flag is not upstream's: it
+# comes from ::gentoo's own 1.20.4-optional-gstreamer.patch, which this overlay
+# does not carry. Here the dependency is what upstream makes it, unconditional -
+# see media-libs/gst-plugins-base in DEPEND below.
 IUSE="geolocation flatpak seccomp systemd test udev"
 RESTRICT="!test? ( test )"
 # Upstream expect flatpak to be used w/ seccomp and flatpak needs bwrap anyway

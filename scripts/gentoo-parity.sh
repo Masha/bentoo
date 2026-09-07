@@ -4280,9 +4280,14 @@ self_test_assertions() {
 	#
 	# Paired with redis, whose shape it must NOT be confused with: same axis,
 	# same kind of value, opposite answer.
+	# RE-MEASURED 2026-09-07: the surviving rows moved ALIGN -> JUSTIFIED when
+	# the remediation tagged them. Nothing about the SLOT stage changed - what
+	# these three assert is that the row SURVIVES rather than being folded away
+	# as a version artifact, and "none" is still the value that would mean it
+	# was. A16 already mixed the two verdicts for exactly this reason.
 	assert_eq A14 \
 		'SLOT: nodejs keeps its missing subslot where redis loses its version-only one' \
-		'nodejs@24[compared=yes slot=ALIGN] nodejs@26[compared=yes slot=ALIGN] redis[compared=yes slot=none]' \
+		'nodejs@24[compared=yes slot=JUSTIFIED] nodejs@26[compared=yes slot=JUSTIFIED] redis[compared=yes slot=none]' \
 		"nodejs@24[$(slot_outcome net-libs/nodejs 24.20.0)] nodejs@26[$(slot_outcome net-libs/nodejs 26.8.1)] redis[$(slot_outcome dev-db/redis 8.10.1)]"
 
 	# The shape findings.md's rule walks straight past: the version is the
@@ -4307,9 +4312,14 @@ self_test_assertions() {
 	# stage failing rather than the fixture moving. Pinning the exact PVR is
 	# deliberate -- the assertion is about THIS package's subslot -- so the
 	# maintenance cost is real and belongs here rather than in a looser probe.
+	# RE-MEASURED 2026-09-07: the surviving rows moved ALIGN -> JUSTIFIED when
+	# the remediation tagged them. Nothing about the SLOT stage changed - what
+	# these three assert is that the row SURVIVES rather than being folded away
+	# as a version artifact, and "none" is still the value that would mean it
+	# was. A16 already mixed the two verdicts for exactly this reason.
 	assert_eq A15 \
 		'SLOT: a version in the slot itself goes; a soname stays' \
-		'lua[compared=yes slot=none] blender[compared=yes slot=none] nettle[compared=yes slot=ALIGN]' \
+		'lua[compared=yes slot=none] blender[compared=yes slot=none] nettle[compared=yes slot=JUSTIFIED]' \
 		"lua[$(slot_outcome dev-lang/lua 5.5.1)] blender[$(slot_outcome media-gfx/blender 5.2.1-r1)] nettle[$(slot_outcome dev-libs/nettle 4.0)]"
 
 	# R1.2's revision case. ::gentoo carries binutils at PV 2.46.1-r1 and
@@ -4335,9 +4345,14 @@ self_test_assertions() {
 	# The second half kept its subjects and gained one. imath's 30/29 is an ABI
 	# counter, glslang's 16.5/16.4 a soname, and libqmi's 5.12/5.11 a third
 	# soname; none derives from its own PV, and all three must survive.
+	# RE-MEASURED 2026-09-07: the surviving rows moved ALIGN -> JUSTIFIED when
+	# the remediation tagged them. Nothing about the SLOT stage changed - what
+	# these three assert is that the row SURVIVES rather than being folded away
+	# as a version artifact, and "none" is still the value that would mean it
+	# was. A16 already mixed the two verdicts for exactly this reason.
 	assert_eq A16 \
 		'SLOT: an ABI counter and a soname are not versions, and all three survive' \
-		'imath[compared=yes slot=ALIGN] glslang[compared=yes slot=JUSTIFIED] libqmi[compared=yes slot=ALIGN]' \
+		'imath[compared=yes slot=JUSTIFIED] glslang[compared=yes slot=JUSTIFIED] libqmi[compared=yes slot=JUSTIFIED]' \
 		"imath[$(slot_outcome dev-libs/imath 3.2.3)] glslang[$(slot_outcome dev-util/glslang 1.4.357.0_p20260903)] libqmi[$(slot_outcome net-libs/libqmi 1.39.1_pre20260816-r1)]"
 
 	# R1.5. A suppression nobody can audit is indistinguishable from a

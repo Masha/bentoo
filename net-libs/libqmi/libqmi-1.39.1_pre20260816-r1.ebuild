@@ -30,6 +30,8 @@ LICENSE="LGPL-2"
 # The revision bump is not cosmetic. Correcting the subslot alone changes what
 # FUTURE consumers record; only a new revision makes portage re-emerge the ones
 # already installed against the wrong value.
+# BENTOO-DIVERGENCE: SLOT - subslot 0/5.12 where ::gentoo has 0/5.11. It tracks
+# the libqmi-glib soname, which moved in this snapshot. Follows the version.
 SLOT="0/5.12"
 IUSE="gtk-doc introspection +mbim +qrtr"
 

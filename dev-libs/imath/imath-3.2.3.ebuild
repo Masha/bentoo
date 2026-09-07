@@ -15,6 +15,10 @@ SRC_URI="https://github.com/AcademySoftwareFoundation/${MY_PN}/archive/refs/tags
 S="${WORKDIR}/${MY_PN}-${PV}"
 
 LICENSE="BSD"
+# BENTOO-DIVERGENCE: SLOT - subslot 3/30 where ::gentoo's 3.1.x has 3/29. The
+# subslot IS the library ABI, so it moves with the release; it cannot be aligned
+# without shipping their version. Deliberately not suppressed as a version
+# artifact: a real subslot bump is exactly what consumers must rebuild for.
 SLOT="3/30"
 KEYWORDS="amd64 ~arm arm64 ~hppa ~loong ~ppc ~ppc64 ~riscv ~sparc x86"
 IUSE="doc large-stack python test"

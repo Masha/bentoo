@@ -26,6 +26,11 @@ LICENSE="Apache-1.1 Apache-2.0 BlueOak-1.0.0 BSD BSD-2 MIT npm? ( Artistic-2 )"
 # scripts/check-slot-naming-contract.sh asserts this literal matches the major in
 # the filename, which is what a computed value used to guarantee: copy this file
 # to a new major and forget to change the line, and that check fails.
+# BENTOO-DIVERGENCE: SLOT - a bare major, where ::gentoo uses 0/<major>. This
+# overlay slots nodejs BY MAJOR so several can be installed side by side, with
+# app-eselect/eselect-nodejs choosing between them; ::gentoo ships one at a time
+# in slot 0 and uses the subslot only to trigger rebuilds. Aligning the string
+# would collapse the multislot layout the eselect module depends on.
 SLOT="24"
 if [[ ${PV} == *9999 ]]; then
 	inherit git-r3

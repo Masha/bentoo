@@ -76,6 +76,9 @@ LICENSE="Apache-2.0"
 SLOT="0/${PV}" # subslot = libopencv* soname version
 
 # general options
+# BENTOO-DIVERGENCE: IUSE - no quirc flag. OpenCV 5 folded QR decoding into
+# objdetect and dropped the bundled quirc, so there is nothing left to switch;
+# see the DEPEND tag below for the dependency that went with it.
 IUSE="debug doc +eigen gflags glog java non-free opencvapps python test testprograms"
 
 # modules

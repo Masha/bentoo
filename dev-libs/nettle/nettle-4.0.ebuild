@@ -13,6 +13,9 @@ SRC_URI+=" verify-sig? ( mirror://gnu/${PN}/${P}.tar.gz.sig )"
 
 LICENSE="|| ( GPL-2+ LGPL-3+ )"
 # Subslot = libnettle - libhogweed soname version
+# BENTOO-DIVERGENCE: SLOT - subslot 0/9-7 where ::gentoo's 3.10 has 0/8-6. Those
+# are the libnettle and libhogweed sonames, which upstream bumped for the 4.0
+# release. The overlay is ahead; the subslot follows the ABI, not a choice.
 SLOT="0/9-7"
 KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~loong ~m68k ~mips ~ppc ~ppc64 ~riscv ~s390 ~sparc ~x86 ~arm64-macos ~x64-macos ~x64-solaris"
 IUSE="+asm doc +gmp static-libs cpu_flags_arm_neon cpu_flags_arm_aes cpu_flags_arm_sha1 cpu_flags_arm_sha2 cpu_flags_ppc_altivec cpu_flags_ppc_vsx2 cpu_flags_ppc_vsx3 cpu_flags_x86_aes cpu_flags_x86_sha cpu_flags_x86_pclmul"

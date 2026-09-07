@@ -61,6 +61,9 @@ LICENSE="imagemagick"
 # Please check this on bumps, SONAME is often not updated! Use abidiff on old/new.
 # If ABI is broken, change the bit after the '-'.
 SLOT="0/$(ver_cut 1-3)-18"
+# BENTOO-DIVERGENCE: IUSE - no verify-sig flag. verify-sig.eclass is what
+# declares it, and this ebuild does not inherit it for the SRC_URI reason
+# recorded above. A flag with no eclass behind it would do nothing.
 IUSE="bzip2 corefonts +cxx djvu fftw fontconfig fpx graphviz hardened hdri heif"
 IUSE+=" jbig jpeg jpeg2k jpegxl lcms lqr lzma opencl openexr openmp pango perl ${GENTOO_PERL_USESTRING}"
 IUSE+=" +png postscript q32 q8 raw static-libs svg test tiff truetype webp wmf"

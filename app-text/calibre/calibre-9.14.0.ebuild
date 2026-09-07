@@ -44,6 +44,10 @@ LICENSE="
 "
 SLOT="0"
 KEYWORDS="~amd64 ~arm64"
+# BENTOO-DIVERGENCE: IUSE - no python_single_target_python3_12 or _13, which
+# ::gentoo's 8.15 still exposes. Same cause as the REQUIRED_USE tag below: the
+# calibre 9 series needs Python 3.14, so those two targets cannot build it and
+# there is no flag to offer.
 IUSE="+font-subsetting ios speech +system-mathjax test +udisks unrar"
 
 RESTRICT="!test? ( test )"
