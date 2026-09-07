@@ -27,7 +27,14 @@ NM="openoffice"
 NM1="${NM}-brand"
 NM2="${NM}4"
 NM3="${NM2}.$(ver_cut 2-3)"
-FILEPATH="mirror://sourceforge/openofficeorg.mirror/${PV}/binaries"
+# A literal downloads.sourceforge.net URL, not "mirror://sourceforge". The
+# sourceforge alias no longer exists in ::gentoo's profiles/thirdpartymirrors
+# -- the file lists only sourceforge.jp -- so Portage aborts every fetch with
+# "No known mirror by the name: sourceforge" and never tries a single host.
+# ::gentoo converted its whole tree already (0 ebuilds left using the alias,
+# 1720 SRC_URIs on https://downloads.sourceforge.net/), and it dropped this
+# package outright, so nothing upstream was going to fix this one.
+FILEPATH="https://downloads.sourceforge.net/openofficeorg.mirror/${PV}/binaries"
 if [ "${ARCH}" = "amd64" ] ; then
 	XARCH="x86_64"
 else
