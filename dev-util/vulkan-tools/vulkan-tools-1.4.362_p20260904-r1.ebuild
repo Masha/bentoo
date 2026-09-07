@@ -12,12 +12,18 @@ if [[ ${PV} == *9999* ]]; then
 	EGIT_SUBMODULES=()
 	inherit git-r3
 else
-	EGIT_COMMIT="532e2c0e1bce627c5188ed2c90819af2f52a12e1"
-	SRC_URI="https://github.com/KhronosGroup/${MY_PN}/archive/${EGIT_COMMIT}.tar.gz -> ${P}.tar.gz"
+	EGIT_COMMIT="462d9819e5953e064e1dcdc04d3edc5fc6bc9431"
+	SRC_URI="https://github.com/KhronosGroup/${MY_PN}/archive/${EGIT_COMMIT}.tar.gz -> ${PF}.tar.gz"
 	KEYWORDS="~amd64 ~arm ~arm64 ~loong ~ppc ~ppc64 ~riscv"
 	S="${WORKDIR}"/${MY_PN}-${EGIT_COMMIT}
 fi
 
+# BENTOO-DIVERGENCE: PATCHES - none, where ::gentoo carries
+# vulkan-tools-1.4.357.0-libcxx-23.patch. That patch backports upstream commit
+# 462d9819 "vulkaninfo: add missing <ctime> include" onto their 1.4.357.0.
+# EGIT_COMMIT below IS 462d9819, so the fix is in the source rather than applied
+# on top: verified 2026-09-07 by extracting the fetched tarball and finding
+# #include <ctime> at vulkaninfo/vulkaninfo.cpp:31.
 DESCRIPTION="Official Vulkan Tools and Utilities for Windows, Linux, Android, and MacOS"
 HOMEPAGE="https://github.com/KhronosGroup/Vulkan-Tools"
 
@@ -64,23 +70,6 @@ pkg_setup() {
 
 	python-any-r1_pkg_setup
 }
-
-# BENTOO-DIVERGENCE: PATCHES - the same patch as ::gentoo's under a different
-# name. Their file is version-stamped (vulkan-tools-1.4.357.0-libcxx-23.patch);
-# this copy is ${PN}-ctime-include.patch because the autoupdate applier never
-# renames anything under files/, so a version in the name rots at the next bump.
-# Byte-identical content, taken from ::gentoo on 2026-09-07.
-# Taken from ::gentoo 2026-09-07 and renamed version-agnostic (the autoupdate
-# applier never renames files/). Upstream commit 462d9819 "vulkaninfo: add
-# missing <ctime> include" landed 2026-09-04T18:35Z; EGIT_COMMIT below is
-# 532e2c0e from 02:24Z the same day, sixteen hours earlier, so vulkaninfo.cpp
-# here still has no <ctime> and fails to build against libc++ 23.
-#
-# DELETE THIS ON THE NEXT BUMP: any snapshot after 462d9819 already has the
-# include and eapply will fail loudly, which is the intended way to notice.
-PATCHES=(
-	"${FILESDIR}"/${PN}-ctime-include.patch
-)
 
 multilib_src_configure() {
 	local mycmakeargs=(
