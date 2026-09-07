@@ -322,6 +322,7 @@ PARITY_STALE_CACHE=()      # <category>/<pn> TAB <PV> TAB <eclass> TAB <note>
 # a human has to judge. One is a broken ebuild, the other is stale prose.
 
 PARITY_ORPHAN_FILES=()     # <category>/<pn> TAB <count> TAB <names>
+PARITY_CACHE_NO_EBUILD=()  # <category> TAB <name>  (md5-cache entry, no ebuild)
                            # A file under files/ that no ebuild of the package
                            # reaches through ${FILESDIR}. Dead weight: it does
                            # not break anything, so it does NOT fail the run -
@@ -3108,6 +3109,69 @@ check_manifest_digests() {
 		"${#PARITY_MISSING_DIGEST[@]}"
 }
 
+# Every md5-cache entry naming an ebuild that is not in the tree.
+#
+# Publishes PARITY_CACHE_NO_EBUILD. Overlay-wide like the orphan check, and for
+# the same reason: this is litter in THIS repository, not a difference from
+# ::gentoo, so restricting it to the shared set would skip the packages nobody
+# compares against anything.
+#
+# WHY IT EXISTS. On 2026-09-07 this was 548 of 916 entries -- sixty percent of
+# the directory -- across 221 packages. Two mechanical sources: a bump writes
+# the new entry and leaves the old one, and a package removed from the overlay
+# leaves its entire set behind. Nothing reads them, so nothing breaks; they
+# describe a tree that is not there. Without a check the count just climbs
+# again, which is how it reached 548.
+#
+# Does NOT fail the run, matching the orphan and stale-tag sections.
+check_cache_without_ebuild() {
+	local cache_dir cat_dir category entry name cats
+	local -a categories=()
+
+	cache_dir="${OVERLAY_ROOT}/metadata/md5-cache"
+	if [[ ! -d ${cache_dir} ]]; then
+		printf '  [cache]    no md5-cache directory to check\n'
+		return 0
+	fi
+
+	for cat_dir in "${cache_dir}"/*/; do
+		[[ -d ${cat_dir} ]] || continue
+		cat_dir=${cat_dir%/}
+		category=${cat_dir##*/}
+
+		if [[ -n ${FILTER} ]]; then
+			case ${FILTER} in
+				*/*) [[ ${category} == "${FILTER%%/*}" ]] || continue ;;
+				*)   [[ ${category} == "${FILTER}" ]] || continue ;;
+			esac
+		fi
+
+		for entry in "${cat_dir}"/*; do
+			[[ -f ${entry} ]] || continue
+			name=${entry##*/}
+
+			# A cache entry is named like its ebuild minus the extension,
+			# but PN cannot be split back out unambiguously -- so glob the
+			# category for the filename rather than guess where the
+			# boundary between PN and PV falls.
+			if ! compgen -G "${OVERLAY_ROOT}/${category}/*/${name}.ebuild" >/dev/null; then
+				PARITY_CACHE_NO_EBUILD+=( "${category}"$'\t'"${name}" )
+				categories+=( "${category}" )
+			fi
+		done
+	done
+
+	cats=0
+	if (( ${#categories[@]} )); then
+		cats=$(printf '%s\n' "${categories[@]}" | sort -u | grep -c .)
+	fi
+	printf '  [cache]    %d md5-cache entr%s naming an ebuild that is not in the tree, across %d categor%s\n' \
+		"${#PARITY_CACHE_NO_EBUILD[@]}" \
+		"$( (( ${#PARITY_CACHE_NO_EBUILD[@]} == 1 )) && printf 'y' || printf 'ies' )" \
+		"${cats}" \
+		"$( (( cats == 1 )) && printf 'y' || printf 'ies' )"
+}
+
 # Every file under a package's files/ that no ebuild of that package names.
 #
 # Publishes PARITY_ORPHAN_FILES. Scans the whole overlay rather than the shared
@@ -3305,6 +3369,7 @@ run_sweep() {
 	assign_verdicts
 	check_manifest_digests
 	check_orphan_files
+	check_cache_without_ebuild
 	check_stale_tags
 	write_reports
 
@@ -4141,6 +4206,11 @@ prepare_verdict_scratch() {
 		}
 	EOF
 
+	# A cache entry with nothing behind it, for check_cache_without_ebuild.
+	# Placed in the SAME category as the real one on purpose: the check must
+	# compare per file, and a version that merely noticed the category exists
+	# would pass against a fixture that kept them apart.
+	verdict_fixture_cache overlay >"${root}/overlay/metadata/md5-cache/${category}/ghost-9.9.9"
 	verdict_fixture_cache overlay >"${root}/overlay/metadata/md5-cache/${category}/${pf}"
 	verdict_fixture_cache gentoo  >"${root}/gentoo/metadata/md5-cache/${category}/${pf}"
 
@@ -4218,7 +4288,7 @@ fixture_pass() {
 		PARITY_METADATA_SUPPRESSED=() PARITY_FILES_SUPPRESSED=()
 		PARITY_SLOT_SUPPRESSED=() PARITY_STALE_CACHE=()
 		PARITY_MISSING_DIGEST=() PARITY_STALE_TAGS=()
-		PARITY_ORPHAN_FILES=()
+		PARITY_ORPHAN_FILES=() PARITY_CACHE_NO_EBUILD=()
 		PARITY_EBUILD_PN=() PARITY_TAG_SOURCE=() PARITY_TAGGED_AXES=()
 		MD5_FIELDS=() FILE_DIGESTS=() ECLASS_HASH=()
 
@@ -4229,6 +4299,7 @@ fixture_pass() {
 		compare_auxiliary_files >/dev/null
 		assign_verdicts >/dev/null
 		check_orphan_files >/dev/null
+		check_cache_without_ebuild >/dev/null
 
 		"${reporter}"
 	)
@@ -4261,6 +4332,21 @@ report_orphan_files() {
 	entry=${PARITY_ORPHAN_FILES[0]}
 	names=${entry##*$'\t'}
 	printf 'packages=%d orphans=%s' "${#PARITY_ORPHAN_FILES[@]}" "${names}"
+}
+
+# md5-cache entries with no ebuild, NAMED rather than counted: a count is green
+# for a check that found the wrong file, and the remediation here is deletion.
+report_cache_without_ebuild() {
+	local entry names=""
+
+	if (( ${#PARITY_CACHE_NO_EBUILD[@]} == 0 )); then
+		printf 'entries=0 names=(none)'
+		return 0
+	fi
+	for entry in "${PARITY_CACHE_NO_EBUILD[@]}"; do
+		names+="${entry##*$'\t'} "
+	done
+	printf 'entries=%d names=%s' "${#PARITY_CACHE_NO_EBUILD[@]}" "${names% }"
 }
 
 # The three verdicts a divergent ebuild can be given, read off one package that
@@ -5000,6 +5086,16 @@ self_test_assertions() {
 		'an absent pinned subject SKIPs; every other mismatch still FAILs' \
 		'absent[fail=0 skip=1] present[fail=1 skip=0]' \
 		"$(skip_vs_fail_run)"
+
+	# The fixture holds two cache entries in one category: the real ebuild's,
+	# and ghost-9.9.9 with nothing behind it. BOTH directions matter -- naming
+	# the ghost proves the check finds litter, and not naming the real one
+	# proves it will never tell someone to delete a live entry, which is the
+	# expensive mistake here.
+	assert_eq A28 \
+		'md5-cache: the entry with no ebuild is named, the entry with one is not' \
+		'entries=1 names=ghost-9.9.9' \
+		"$(fixture_pass "${SELF_TEST_VERDICT_FILTER}" report_cache_without_ebuild)"
 
 	rm -rf -- "${scratch}"
 }
