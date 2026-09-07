@@ -349,6 +349,8 @@ sci-ml/llama-cpp:webui - Build server with embedded WebUI
 sci-ml/llama-cpp:wmma - Use rocWMMA to enhance flash attention performance
 sci-ml/ollama-bin:cuda - Enable NVIDIA CUDA GPU acceleration support. Requires compatible NVIDIA GPU (compute capability 6.0+, Pascal architecture or newer) and nvidia-cuda-toolkit. Significantly improves inference performance for large models.
 sci-ml/ollama-bin:rocm - Enable AMD ROCm GPU acceleration support. Requires compatible AMD GPU (Radeon RX 6000 series or newer, or Radeon VII) and ROCm libraries. May require HSA_OVERRIDE_GFX_VERSION environment variable for optimal compatibility. This is experimental and not all GPU models are supported.
+sys-apps/ai-jail:chromium-launcher - Install the ai-jail-chromium wrapper script and its desktop entry, which start www-client/chromium inside an ai-jail sandbox with an isolated persistent browser profile
+sys-apps/ai-jail-bin:chromium-launcher - Install the ai-jail-chromium wrapper and its desktop entry, which launch www-client/chromium inside the sandbox with an isolated, persistent browser profile
 sys-apps/xdg-desktop-portal:flatpak - Enable sys-apps/flatpak integration
 sys-apps/xdg-desktop-portal:seccomp - Use sys-apps/bubblewrap (which requires seccomp) to sandbox some functionality like icon handling
 sys-kernel/linux-firmware:compress-xz - Compress firmware using xz (app-arch/xz-utils) before installation

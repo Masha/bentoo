@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@protonmail.com</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<use>
+		<flag name="chromium-launcher">Install the ai-jail-chromium wrapper and its desktop entry, which
+			launch www-client/chromium inside the sandbox with an isolated,
+			persistent browser profile</flag>
+	</use>
+	<upstream>
+		<remote-id type="github">akitaonrails/ai-jail</remote-id>
+		<bugs-to>https://github.com/akitaonrails/ai-jail/issues</bugs-to>
+		<changelog>https://github.com/akitaonrails/ai-jail/releases</changelog>
+	</upstream>
+	<longdescription lang="en">
+		ai-jail runs AI coding agents (Claude Code, Codex, Gemini, opencode and
+		others) inside an unprivileged sandbox, so an agent can only reach the
+		files and network the user granted it. On Linux the sandbox is bwrap
+		from sys-apps/bubblewrap; paths are mapped read-only, read-write or
+		copy-on-write, home dotdirs are hidden by default, and individual paths
+		can be masked or denied outright.
+
+		This package installs the prebuilt x86_64 executable published by
+		upstream on GitHub Releases. It is mutually exclusive with the
+		from-source sys-apps/ai-jail: both install /usr/bin/ai-jail.
+	</longdescription>
+</pkgmetadata>

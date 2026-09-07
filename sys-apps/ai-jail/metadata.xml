@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@protonmail.com</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<use>
+		<flag name="chromium-launcher">Install the ai-jail-chromium wrapper script and its desktop entry, which start <pkg>www-client/chromium</pkg> inside an ai-jail sandbox with an isolated persistent browser profile</flag>
+	</use>
+	<upstream>
+		<remote-id type="github">akitaonrails/ai-jail</remote-id>
+		<bugs-to>https://github.com/akitaonrails/ai-jail/issues</bugs-to>
+	</upstream>
+	<longdescription lang="en">
+		ai-jail runs AI coding agents inside a restricted sandbox so that an
+		agent can only touch the project directory it was pointed at. On Linux
+		it wraps bubblewrap (bwrap) and additionally applies Landlock and
+		seccomp filters; on macOS it uses sandbox-exec. It is a single static
+		command-line tool with no daemon: you prefix the agent invocation with
+		ai-jail and it sets up the mount, filesystem and syscall restrictions
+		before exec'ing the agent.
+	</longdescription>
+</pkgmetadata>

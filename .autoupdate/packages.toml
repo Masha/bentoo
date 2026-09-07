@@ -8879,3 +8879,61 @@ aborts the launch with "PyQt6 QtStateMachine module not available" without it,
 and scxml is not default-on in pyqt6.
 """
 # END
+
+["sys-apps/ai-jail"]
+url = "https://api.github.com/repos/akitaonrails/ai-jail/releases/latest"
+parser = "json"
+path = "tag_name"
+transform = [['^v', ""]]
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "1.20.2"
+comments = """
+ai-jail — releases/latest on akitaonrails/ai-jail; tag_name is "vX.Y.Z" and the
+transform strips the v.  Verified by real download on 2026-09-07: tag_name
+"v1.20.2", published 2026-09-02.
+
+releases/latest rather than ranking refs/tags, for the ordinary reason: the tag
+list is a flat "vX.Y.Z" space with no prerelease marker to filter on, so a tag
+cut ahead of its release would be picked up as current.  Upstream has marked
+every release so far prerelease=false, which is precisely why /latest is
+reliable here.
+
+A bump is NOT complete until CRATES is regenerated with pycargoebuild against
+the new Cargo.lock — the applier rewrites PV and SRC_URI but is blind to the
+crate list, and a stale one fails at fetch time with "no matching package".
+
+Two more things travel with the version and must be re-read on every bump:
+rust-toolchain.toml, whose pinned channel is what RUST_MIN_VER mirrors, and
+[profile.release] in Cargo.toml, whose "strip = true" src_prepare deletes so
+Portage can do the stripping.  That sed is guarded by a grep -qF, so it dies
+loudly if upstream drops the line rather than silently becoming a no-op.
+
+Bump this record together with sys-apps/ai-jail-bin: the two track the same
+upstream release and are mutually blocked, so leaving one behind means the
+overlay ships two different versions of the same program.
+"""
+# END
+
+["sys-apps/ai-jail-bin"]
+url = "https://api.github.com/repos/akitaonrails/ai-jail/releases/latest"
+parser = "json"
+path = "tag_name"
+transform = [['^v', ""]]
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "1.20.2"
+comments = """
+ai-jail-bin — same endpoint and same release as sys-apps/ai-jail; this record
+exists separately only because the two are separate packages.  Bump them
+together.
+
+The distfile is the release asset ai-jail-linux-x86_64.tar.gz.  Upstream ships
+exactly two assets, linux-x86_64 and macos-aarch64, so there is no Linux arm64
+build to package and KEYWORDS stays "-* ~amd64".  If a linux-aarch64 asset ever
+appears, that is the moment to widen it — check the asset list, not the tag.
+
+With USE=chromium-launcher the ebuild also fetches two files from
+raw.githubusercontent.com pinned to the same tag (dist/desktop/ai-jail-chromium
+and its .desktop).  They are version-pinned distfiles, so the Manifest has to be
+regenerated on every bump even though those two files rarely change content.
+"""
+# END
