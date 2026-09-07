@@ -321,6 +321,21 @@ PARITY_STALE_CACHE=()      # <category>/<pn> TAB <PV> TAB <eclass> TAB <note>
 # verdicts for the same reason PARITY_STALE_CACHE does: neither is a divergence
 # a human has to judge. One is a broken ebuild, the other is stale prose.
 
+PARITY_ORPHAN_FILES=()     # <category>/<pn> TAB <count> TAB <names>
+                           # A file under files/ that no ebuild of the package
+                           # reaches through ${FILESDIR}. Dead weight: it does
+                           # not break anything, so it does NOT fail the run -
+                           # the same call PARITY_STALE_TAGS makes.
+                           #
+                           # OVERLAY-WIDE, like the digest check below and
+                           # unlike every axis above. This used to be the
+                           # files/unreferenced divergence axis, which meant it
+                           # only ever looked at the 164 packages ::gentoo also
+                           # carries - and an orphan file is not a divergence
+                           # from ::gentoo at all, it is litter here. The 104
+                           # overlay-only packages are exactly where nobody
+                           # would look.
+
 PARITY_MISSING_DIGEST=()   # <category>/<pn> TAB <PV> TAB <distfile> TAB <note>
                            # A distfile named in SRC_URI with no DIST line in
                            # the package Manifest. The ebuild cannot be merged
@@ -1774,6 +1789,42 @@ FILESDIR_REFS=""
 #     reference entirely.
 # Hence: read the expression past an optional quote, expand PN/P/PV/PF, and turn
 # any remaining ${VAR} into a wildcard rather than guessing its value.
+# expand_braces <string>
+# One level of brace expansion, space separated. Bash does this for a literal
+# but NOT for the contents of a variable, and eval on text lifted out of an
+# ebuild is not a trade worth making.
+#
+# WHY IT IS NEEDED. Three ebuilds reference files this way today -
+# flatpak-update.{service,timer}, rustdesk{,-link}.desktop and
+# {50-${PN},wrapper.in} - and without expansion the reference matches nothing,
+# so six files in active use were reported as orphans. That is the worst kind of
+# false positive here: it invites someone to delete a file the build needs.
+#
+# The empty element matters: rustdesk{,-link} means rustdesk.desktop AND
+# rustdesk-link.desktop, so the split has to preserve an empty field, which is
+# why this reads with IFS into an array rather than looping over an unquoted
+# expansion.
+expand_braces() {
+	local s=$1 pre mid post part out=""
+	local -a parts=()
+
+	if [[ ${s} != *\{*\}* ]]; then
+		printf '%s' "${s}"
+		return 0
+	fi
+
+	pre=${s%%\{*}
+	mid=${s#*\{}
+	mid=${mid%%\}*}
+	post=${s#*\}}
+
+	IFS=, read -r -a parts <<<"${mid}"
+	for part in "${parts[@]}"; do
+		out+="${pre}${part}${post} "
+	done
+	printf '%s' "${out% }"
+}
+
 filesdir_refs() {
 	local root=$1 key=$2 pn=${2#*/}
 	local eb base pv pvr expr
@@ -1800,7 +1851,9 @@ filesdir_refs() {
 			expr=${expr//\$\{PV\}/${pv}}
 			expr=$(printf '%s' "${expr}" |
 				sed -E 's/\$\{[A-Za-z_][A-Za-z0-9_]*\}/*/g')
-			FILESDIR_REFS+="${expr} "
+			# After the variable substitutions, so {50-${PN},...} has
+			# already become {50-openoffice-bin,...} by the time it splits.
+			FILESDIR_REFS+="$(expand_braces "${expr}") "
 		done < <(grep -hoE '\$\{FILESDIR\}"?/[^[:space:])"'"'"';]+' "${eb}" 2>/dev/null |
 			sed -E 's|^\$\{FILESDIR\}"?/||')
 	done
@@ -1933,12 +1986,15 @@ compare_files_dirs() {
 				n_suppressed=$(( n_suppressed + ${#surplus[@]} ))
 				PARITY_FILES_SUPPRESSED+=( "${key}"$'\t''files/overlay-only'$'\t'"${#surplus[@]}"$'\t'"reached from an ebuild through \${FILESDIR}: ${SPLIT_REFERENCED}" )
 			fi
+			# The orphans are NOT emitted here any more. They moved to
+			# check_orphan_files, which scans the whole overlay: a file
+			# no ebuild names is litter in THIS tree, not a divergence
+			# from ::gentoo, and keying it to the shared set meant the
+			# 104 overlay-only packages were never looked at. Counted
+			# here only for the stage line below.
 			if [[ -n ${SPLIT_ORPHAN} ]]; then
 				read -r -a surplus <<<"${SPLIT_ORPHAN}"
 				n_orphan=$(( n_orphan + ${#surplus[@]} ))
-				parity_row "${key}" "${PACKAGE_ROW_PV}" "${PACKAGE_ROW_PV}" \
-					"${PACKAGE_ROW_DISTANCE}" 'files/unreferenced' \
-					"${SPLIT_ORPHAN}" ''
 			fi
 		fi
 		# files/gentoo-only is suppressed whole, and for a different reason
@@ -2867,6 +2923,32 @@ write_parity_report() {
 			printf -- '- none\n\n'
 		fi
 
+		printf "## Files no ebuild names\n\n"
+		printf -- 'A file under a package `files/` directory that no ebuild of\n'
+		printf -- 'that package reaches through `${FILESDIR}`. Usually a patch\n'
+		printf -- 'left behind by a bump: the ebuild that applied it is gone and\n'
+		printf -- 'the file stayed.\n\n'
+		printf -- 'Overlay-wide, like the digest check above -- an orphan is litter\n'
+		printf -- 'in this tree, not a difference from `::gentoo`, so restricting it\n'
+		printf -- 'to shared packages would have skipped the ones nobody reviews. It\n'
+		printf -- 'does **not** fail the run: it misleads a reader and breaks\n'
+		printf -- 'nothing, the same call the stale-tag section makes.\n\n'
+		if (( ${#PARITY_ORPHAN_FILES[@]} )); then
+			printf "| Package | Count | Names |\n"
+			printf '|---|---|---|\n'
+			for name in "${PARITY_ORPHAN_FILES[@]}"; do
+				IFS=$'\t' read -r key overlay gentoo <<<"${name}"
+				printf -- "| \`%s\` | %s | \`%s\` |\n" \
+					"${key}" "${overlay}" "${gentoo}"
+			done
+			printf '\n'
+			printf -- 'Remediation: delete them, or restore the ebuild that used\n'
+			printf -- 'them. Check `git log` before deleting -- a file can be\n'
+			printf -- 'orphaned by a bump that is about to be reverted.\n\n'
+		else
+			printf -- '- none\n\n'
+		fi
+
 		printf "## Divergence tags whose reason evaporated\n\n"
 		printf -- 'A `# BENTOO-DIVERGENCE:` tag naming an axis on which the two\n'
 		printf -- 'trees no longer differ. `::gentoo` caught up; the tag now\n'
@@ -3007,6 +3089,64 @@ check_manifest_digests() {
 		"${#PARITY_MISSING_DIGEST[@]}"
 }
 
+# Every file under a package's files/ that no ebuild of that package names.
+#
+# Publishes PARITY_ORPHAN_FILES. Scans the whole overlay rather than the shared
+# set, for the reason recorded beside the array.
+#
+# It reuses filesdir_refs and split_by_reference unchanged - the same pair the
+# files/ stage uses to decide which overlay-only names to suppress. That is
+# deliberate: the question "does an ebuild reach this name" has exactly one
+# right answer, and two implementations of it would drift.
+check_orphan_files() {
+	local pkg_dir key category pn files_dir name
+	local -a names=() surplus=()
+	local packages=0 total=0
+
+	for pkg_dir in "${OVERLAY_ROOT}"/*/*/; do
+		pkg_dir=${pkg_dir%/}
+		pn=${pkg_dir##*/}
+		category=${pkg_dir%/*}
+		category=${category##*/}
+		key="${category}/${pn}"
+
+		files_dir="${pkg_dir}/files"
+		[[ -d ${files_dir} ]] || continue
+
+		# Same filter shape the sweep and the digest check use, so a
+		# targeted run stays targeted.
+		if [[ -n ${FILTER} ]]; then
+			case ${FILTER} in
+				*/*) [[ ${key} == "${FILTER}" ]] || continue ;;
+				*)   [[ ${category} == "${FILTER}" ]] || continue ;;
+			esac
+		fi
+
+		# A directory holding no ebuild is not a package; files/ under one
+		# is unreachable by definition and saying so per entry would be
+		# noise, not a finding.
+		names=( "${pkg_dir}"/*.ebuild )
+		(( ${#names[@]} )) || continue
+
+		FILE_DIGESTS=()
+		digest_tree "${files_dir}" overlay
+		[[ -n ${DIGEST_NAMES} ]] || continue
+		packages=$(( packages + 1 ))
+
+		filesdir_refs "${OVERLAY_ROOT}" "${key}"
+		split_by_reference "${DIGEST_NAMES}" "${FILESDIR_REFS}"
+		[[ -n ${SPLIT_ORPHAN} ]] || continue
+
+		surplus=()
+		read -r -a surplus <<<"${SPLIT_ORPHAN}"
+		total=$(( total + ${#surplus[@]} ))
+		PARITY_ORPHAN_FILES+=( "${key}"$'\t'"${#surplus[@]}"$'\t'"${SPLIT_ORPHAN}" )
+	done
+
+	printf '  [orphans]  %d file(s) under files/ that no ebuild names, across %d package(s) with a files/ dir\n' \
+		"${total}" "${packages}"
+}
+
 # Which tagged axes no longer name a real divergence.
 #
 # Reads two things stage 5 and stage 6 already published - PARITY_TAGGED_AXES
@@ -3145,6 +3285,7 @@ run_sweep() {
 	compare_auxiliary_files
 	assign_verdicts
 	check_manifest_digests
+	check_orphan_files
 	check_stale_tags
 	write_reports
 
@@ -3896,6 +4037,24 @@ prepare_verdict_scratch() {
 	printf '# gentoo copy of the three-verdict fixture\nEAPI=8\n' \
 		>"${root}/gentoo/${category}/${pn}/${pf}.ebuild"
 
+	# files/ for check_orphan_files: one name the ebuild reaches directly, two
+	# it reaches through a brace expansion, and one nothing names. The brace
+	# pair is not decoration - six files in active use were reported as
+	# orphans until expand_braces existed, and nothing would have caught that
+	# coming back.
+	mkdir -p -- "${root}/overlay/${category}/${pn}/files"
+	local f
+	for f in referenced.patch braced-one.conf braced-two.conf orphan.patch; do
+		printf 'fixture file %s\n' "${f}" \
+			>"${root}/overlay/${category}/${pn}/files/${f}"
+	done
+	cat >>"${root}/overlay/${category}/${pn}/${pf}.ebuild" <<-'EOF'
+		src_install() {
+			eapply "${FILESDIR}"/referenced.patch
+			doins "${FILESDIR}"/braced-{one,two}.conf
+		}
+	EOF
+
 	verdict_fixture_cache overlay >"${root}/overlay/metadata/md5-cache/${category}/${pf}"
 	verdict_fixture_cache gentoo  >"${root}/gentoo/metadata/md5-cache/${category}/${pf}"
 
@@ -3973,6 +4132,7 @@ fixture_pass() {
 		PARITY_METADATA_SUPPRESSED=() PARITY_FILES_SUPPRESSED=()
 		PARITY_SLOT_SUPPRESSED=() PARITY_STALE_CACHE=()
 		PARITY_MISSING_DIGEST=() PARITY_STALE_TAGS=()
+		PARITY_ORPHAN_FILES=()
 		PARITY_EBUILD_PN=() PARITY_TAG_SOURCE=() PARITY_TAGGED_AXES=()
 		MD5_FIELDS=() FILE_DIGESTS=() ECLASS_HASH=()
 
@@ -3982,6 +4142,7 @@ fixture_pass() {
 		compare_axes >/dev/null
 		compare_auxiliary_files >/dev/null
 		assign_verdicts >/dev/null
+		check_orphan_files >/dev/null
 
 		"${reporter}"
 	)
@@ -4002,6 +4163,18 @@ report_stale_override() {
 		"$(definitional_eclasses)" \
 		"$(local_eclasses_in_stale)" \
 		"${#PARITY_STALE_CACHE[@]}"
+}
+
+report_orphan_files() {
+	local entry names
+
+	if (( ${#PARITY_ORPHAN_FILES[@]} == 0 )); then
+		printf 'packages=0 orphans=(none)'
+		return 0
+	fi
+	entry=${PARITY_ORPHAN_FILES[0]}
+	names=${entry##*$'\t'}
+	printf 'packages=%d orphans=%s' "${#PARITY_ORPHAN_FILES[@]}" "${names}"
 }
 
 # The three verdicts a divergent ebuild can be given, read off one package that
@@ -4706,6 +4879,22 @@ self_test_assertions() {
 		'no ALIGN survives: every divergence carries a reason, against a non-empty population' \
 		'align=0 packages=(none) rows=non-empty' \
 		"$(align_survivors) rows=$( (( ${#PARITY_ROWS[@]} )) && printf non-empty || printf EMPTY )"
+
+
+	# check_orphan_files, both directions at once. The fixture's files/ holds
+	# four names: one the ebuild eapply's, two it reaches through a brace
+	# expansion, and one nothing mentions. Only the last may be reported.
+	#
+	# THE BRACE PAIR IS THE POINT, not padding. Before expand_braces existed
+	# the check called flatpak-update.{service,timer}, rustdesk{,-link}.desktop
+	# and {50-${PN},wrapper.in} orphans - six files in active use - and the
+	# suggested remediation for an orphan is to delete it. A false positive
+	# here is an invitation to break a build, so the case that produced it is
+	# pinned rather than left to a future reader to rediscover.
+	assert_eq A26 \
+		'orphan files: only the name no ebuild reaches, brace expansions included' \
+		'packages=1 orphans=orphan.patch' \
+		"$(fixture_pass "${SELF_TEST_VERDICT_FILTER}" report_orphan_files)"
 
 	rm -rf -- "${scratch}"
 }
