@@ -3182,9 +3182,25 @@ SELF_TEST_STALE_PV='1.0'
 SELF_TEST_STALE_LOCAL_ECLASS='fixture-local'
 SELF_TEST_STALE_SHARED_ECLASS='fixture-shared'
 
+# The second fixture, and the reason it exists is A08's history. That assertion
+# was pinned on kde-plasma/kwin until kwin left the overlay, then on
+# media-gfx/freecad - a package the parity remediation is actively working to
+# fix. Pinning a guard on a divergence you intend to CLOSE is the same mistake
+# the stale-cache fixture above was built to end: the subject is transient by
+# construction, and the assertion goes red when the work succeeds.
+#
+# It also fills a hole A08 never covered. UNDOCUMENTED is the verdict that asks
+# a human to decide, and the tree has held ZERO of them since 2026-09-05 with no
+# assertion anywhere proving the rule still fires. "0 undocumented" and "the
+# rule stopped working" print the same. One package now exhibits all three
+# reachable verdicts at once, so each is asserted against a real signal.
+SELF_TEST_VERDICT_FILTER='dev-verdict'
+SELF_TEST_VERDICT_PKG='dev-verdict/triple'
+SELF_TEST_VERDICT_PV='1.0'
+
 # Where prepare_stale_scratch put the pair. Empty until it runs, which is what
 # the pass below checks before reporting anything.
-SELF_TEST_STALE_ROOT=''
+SELF_TEST_FIXTURE_ROOT=''
 
 # q <value>
 # Render a value for a report line: newlines flattened, empty made visible. On
@@ -3525,7 +3541,7 @@ stale_cache_run() {
 
 	mkdir -p -- "${dir}"
 
-	if [[ -z ${SELF_TEST_STALE_ROOT} ]]; then
+	if [[ -z ${SELF_TEST_FIXTURE_ROOT} ]]; then
 		printf 'exit=- rows=-1 stale=(fixture not built)'
 		return 0
 	fi
@@ -3534,8 +3550,8 @@ stale_cache_run() {
 	# that is what makes the subprocess treat the fixture as its overlay,
 	# without an env var that could repoint a real sweep. See
 	# prepare_stale_scratch.
-	GENTOO_REPO="${SELF_TEST_STALE_ROOT}/gentoo" PARITY_REPORT_DIR="${dir}" \
-		bash -- "${SELF_TEST_STALE_ROOT}/overlay/scripts/gentoo-parity.sh" \
+	GENTOO_REPO="${SELF_TEST_FIXTURE_ROOT}/gentoo" PARITY_REPORT_DIR="${dir}" \
+		bash -- "${SELF_TEST_FIXTURE_ROOT}/overlay/scripts/gentoo-parity.sh" \
 		"${SELF_TEST_STALE_FILTER}" \
 		>/dev/null 2>&1 || rc=$?
 
@@ -3637,7 +3653,7 @@ prepare_tag_scratch() {
 
 # prepare_stale_scratch <scratch dir>
 # Build the two-tree fixture A18, A19 and A21 are measured against, and record
-# where it went in SELF_TEST_STALE_ROOT. See the constants above for why the
+# where it went in SELF_TEST_FIXTURE_ROOT. See the constants above for why the
 # state is manufactured rather than found in the tree.
 #
 # WHY THE SCRIPT IS SYMLINKED INTO IT. OVERLAY_ROOT is derived from the script's
@@ -3712,10 +3728,10 @@ prepare_stale_scratch() {
 	stale_fixture_cache gentoo 2222222222222222 bbbbbbbbbbbbbbbb \
 		>"${root}/gentoo/metadata/md5-cache/${category}/${pf}"
 
-	SELF_TEST_STALE_ROOT=${root}
+	SELF_TEST_FIXTURE_ROOT=${root}
 
 	printf '  [SEAM] stale-cache fixture %s -> %s\n' \
-		"${SELF_TEST_STALE_PKG}" "${SELF_TEST_STALE_ROOT}"
+		"${SELF_TEST_STALE_PKG}" "${SELF_TEST_FIXTURE_ROOT}"
 }
 
 # stale_fixture_cache <side> <shared eclass hash> <local eclass hash>
@@ -3740,34 +3756,148 @@ stale_fixture_cache() {
 	printf '_md5_=%s\n' "$(printf '%s' "${side}" | md5sum | cut -d' ' -f1)"
 }
 
-# stale_fixture_pass <classification|override>
-# Run the real stages against the fixture and report what they concluded.
+# prepare_verdict_scratch
+# Extend the fixture trees with one package that exhibits all three verdicts
+# assign_verdicts can reach without a byte-identical ebuild. Runs after
+# prepare_stale_scratch and reuses its trees; a separate CATEGORY is what keeps
+# the two apart, because fixture_pass and A21 both scope by one.
 #
-# A SUBSHELL, not a second call into the stages. A18 and A19 read the arrays of
-# the CURRENT process - that is the harness's first rule, "read the pipeline,
-# not the trees" - and the fixture needs those same arrays to hold the fixture's
+# HOW EACH VERDICT IS PRODUCED, and each is one line of md5-cache:
+#
+#   RDEPEND       only ::gentoo has it. The overlay's surplus is empty, so the
+#                 overlay adds nothing and is merely BEHIND - residue, ALIGN
+#   IUSE          only the overlay has it, and no tag names IUSE. Somebody put
+#                 it there and no reason is recorded - UNDOCUMENTED
+#   DEPEND        only the overlay has it, and a tag names DEPEND - JUSTIFIED
+#   REQUIRED_USE  only the overlay has it and no tag names it either, so by the
+#                 rule above it would be UNDOCUMENTED - except REQUIRED_USE is
+#                 in PARITY_SINGLE_VALUED_AXES and can never be promoted. ALIGN
+#
+# WHY THE FIRST CASE IS RDEPEND AND NOT REQUIRED_USE, which is what it was for
+# one draft. REQUIRED_USE cannot reach UNDOCUMENTED on ANY input, so asserting
+# ALIGN on it proves nothing about the residue rule - a mutant that deleted the
+# surplus test outright still passed. Found by mutation, not by reading.
+#
+# The same flaw was in BOTH of A08's previous subjects: kwin's PYTHON_COMPAT
+# surfaced on a single-valued axis, and freecad's divergence IS REQUIRED_USE. So
+# for its whole life this assertion was documented as guarding the residue rule
+# while never once exercising it.
+#
+# The four cases differ only in the criterion each is meant to exercise. A case
+# that differed on several things at once would stay green under a rule that
+# read the wrong one - which is exactly what happened.
+prepare_verdict_scratch() {
+	local root=${SELF_TEST_FIXTURE_ROOT}
+	local category=${SELF_TEST_VERDICT_PKG%%/*}
+	local pn=${SELF_TEST_VERDICT_PKG##*/}
+	local pf="${pn}-${SELF_TEST_VERDICT_PV}"
+	local side dir
+
+	if [[ -z ${root} ]]; then
+		printf '  [NOTE] no fixture tree, so A08 can only fail\n'
+		return 0
+	fi
+
+	mkdir -p -- \
+		"${root}/overlay/metadata/md5-cache/${category}" \
+		"${root}/overlay/${category}/${pn}" \
+		"${root}/gentoo/metadata/md5-cache/${category}" \
+		"${root}/gentoo/${category}/${pn}"
+
+	for side in overlay gentoo; do
+		dir="${root}/${side}/${category}/${pn}"
+		cat >"${dir}/metadata.xml" <<-'EOF'
+			<?xml version="1.0" encoding="UTF-8"?>
+			<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+			<pkgmetadata>
+				<longdescription>three-verdict fixture</longdescription>
+			</pkgmetadata>
+		EOF
+	done
+
+	# The tag lives on the OVERLAY ebuild, where the parser looks for it, and
+	# names exactly one axis. A second tag naming IUSE would turn the
+	# UNDOCUMENTED case into a JUSTIFIED one and the assertion would still be
+	# green on two thirds of the rule - which is why it is not there.
+	cat >"${root}/overlay/${category}/${pn}/${pf}.ebuild" <<-'EOF'
+		# overlay copy of the three-verdict fixture
+		# BENTOO-DIVERGENCE: DEPEND - the tagged addition. This is the only tag
+		# in the file, and IUSE deliberately has none.
+		EAPI=8
+	EOF
+	printf '# gentoo copy of the three-verdict fixture\nEAPI=8\n' \
+		>"${root}/gentoo/${category}/${pn}/${pf}.ebuild"
+
+	verdict_fixture_cache overlay >"${root}/overlay/metadata/md5-cache/${category}/${pf}"
+	verdict_fixture_cache gentoo  >"${root}/gentoo/metadata/md5-cache/${category}/${pf}"
+
+	printf '  [SEAM] verdict fixture %s -> %s\n' \
+		"${SELF_TEST_VERDICT_PKG}" "${root}/${category}"
+}
+
+# verdict_fixture_cache <side>
+# One md5-cache entry for the verdict fixture. Every axis is identical on both
+# sides except the three named above, so exactly three rows are emitted.
+verdict_fixture_cache() {
+	local side=$1
+
+	cat <<-EOF
+		DEFINED_PHASES=install
+		DESCRIPTION=fixture for the three divergence verdicts
+		EAPI=8
+		HOMEPAGE=https://example.invalid/
+		KEYWORDS=~amd64
+		LICENSE=GPL-2
+		SLOT=0
+	EOF
+
+	if [[ ${side} == overlay ]]; then
+		printf 'DEPEND=dev-verdict/tagged-addition\n'
+		printf 'IUSE=untagged-addition\n'
+		printf 'REQUIRED_USE=single_valued? ( axis )\n'
+	else
+		printf 'RDEPEND=dev-verdict/only-in-gentoo\n'
+	fi
+	printf '_md5_=%s\n' "$(printf 'verdict-%s' "${side}" | md5sum | cut -d' ' -f1)"
+}
+
+# fixture_pass <filter> <reporter function>
+# Run the real stages against one fixture package and let <reporter> read what
+# they concluded.
+#
+# A SUBSHELL, not a second call into the stages. The assertions read the arrays
+# of the CURRENT process - that is the harness's first rule, "read the pipeline,
+# not the trees" - and a fixture needs those same arrays to hold the fixture's
 # results rather than the sweep's. A subshell gets a copy of every global, so
 # repointing the two roots and emptying the arrays inside it is invisible to the
-# twenty-one assertions measured against the real tree. Doing it in-process and
-# restoring afterwards would be one forgotten array away from a silent wrong
-# answer in some other assertion.
+# assertions measured against the real tree. Doing it in-process and restoring
+# afterwards would be one forgotten array away from a silent wrong answer in
+# some other assertion.
 #
-# Every array a stage appends to is emptied, including the ones this pass does
-# not read: leaving one populated would let the sweep's contents leak into an
-# answer about the fixture, which is the failure this whole redesign exists to
-# stop.
-stale_fixture_pass() {
-	local report=$1
+# The reporter runs INSIDE that subshell, which is why it is passed by name
+# rather than returning data: it has to see the fixture's arrays through the
+# same accessors every other assertion uses.
+#
+# Every array a stage appends to is emptied, including the ones a given reporter
+# does not read: leaving one populated would let the sweep's contents leak into
+# an answer about the fixture, which is the failure this design exists to stop.
+fixture_pass() {
+	local filter=$1 reporter=$2
 
-	if [[ -z ${SELF_TEST_STALE_ROOT} ]]; then
+	if [[ -z ${SELF_TEST_FIXTURE_ROOT} ]]; then
 		printf '(fixture not built)'
 		return 0
 	fi
 
 	(
-		OVERLAY_ROOT="${SELF_TEST_STALE_ROOT}/overlay"
-		GENTOO_REPO="${SELF_TEST_STALE_ROOT}/gentoo"
-		FILTER=''
+		OVERLAY_ROOT="${SELF_TEST_FIXTURE_ROOT}/overlay"
+		GENTOO_REPO="${SELF_TEST_FIXTURE_ROOT}/gentoo"
+
+		# SCOPED TO ONE CATEGORY, always. Two fixtures share these trees and
+		# they want opposite things - the stale one needs a scope whose ONLY
+		# observation is the stale cache, the verdict one needs three
+		# divergence rows. An unfiltered pass would hand each the other's.
+		FILTER=${filter}
 
 		PARITY_SHARED_PACKAGES=() PARITY_SCOPE_EBUILDS=() PARITY_EXCLUDED=()
 		PARITY_BASELINES=() PARITY_BEHIND=() PARITY_MD5_COVERED=()
@@ -3785,24 +3915,37 @@ stale_fixture_pass() {
 		compare_auxiliary_files >/dev/null
 		assign_verdicts >/dev/null
 
-		case ${report} in
-		classification)
-			printf 'compared=%s row=%s stale=%s' \
-				"$(in_md5_scope "${SELF_TEST_STALE_PKG}" "${SELF_TEST_STALE_PV}")" \
-				"$(eclass_row_verdict "${SELF_TEST_STALE_PKG}" "${SELF_TEST_STALE_PV}")" \
-				"$(stale_cache_for "${SELF_TEST_STALE_PKG}")"
-			;;
-		override)
-			printf 'definitional=%s local-in-stale=%s stale=%d' \
-				"$(definitional_eclasses)" \
-				"$(local_eclasses_in_stale)" \
-				"${#PARITY_STALE_CACHE[@]}"
-			;;
-		*)
-			printf '(stale_fixture_pass: no report named %s)' "${report}"
-			;;
-		esac
+		"${reporter}"
 	)
+}
+
+# The reporters. Each is a plain function so it can be named on a fixture_pass
+# call and still read the arrays the stages just filled.
+
+report_stale_classification() {
+	printf 'compared=%s row=%s stale=%s' \
+		"$(in_md5_scope "${SELF_TEST_STALE_PKG}" "${SELF_TEST_STALE_PV}")" \
+		"$(eclass_row_verdict "${SELF_TEST_STALE_PKG}" "${SELF_TEST_STALE_PV}")" \
+		"$(stale_cache_for "${SELF_TEST_STALE_PKG}")"
+}
+
+report_stale_override() {
+	printf 'definitional=%s local-in-stale=%s stale=%d' \
+		"$(definitional_eclasses)" \
+		"$(local_eclasses_in_stale)" \
+		"${#PARITY_STALE_CACHE[@]}"
+}
+
+# The three verdicts a divergent ebuild can be given, read off one package that
+# exhibits all three at once. See prepare_verdict_scratch for how each arises.
+report_verdict_triple() {
+	local pkg=${SELF_TEST_VERDICT_PKG} pv=${SELF_TEST_VERDICT_PV}
+
+	printf 'behind=%s untagged-addition=%s tagged-addition=%s single-valued=%s' \
+		"$(select_rows "${pkg}" "${pv}" RDEPEND '' verdict)" \
+		"$(select_rows "${pkg}" "${pv}" IUSE '' verdict)" \
+		"$(select_rows "${pkg}" "${pv}" DEPEND '' verdict)" \
+		"$(select_rows "${pkg}" "${pv}" REQUIRED_USE '' verdict)"
 }
 
 # self_test_pipeline
@@ -3874,6 +4017,7 @@ self_test_assertions() {
 
 	prepare_tag_scratch "${scratch}"
 	prepare_stale_scratch "${scratch}"
+	prepare_verdict_scratch
 	self_test_pipeline
 
 	printf '\nassertions\n'
@@ -3971,36 +4115,34 @@ self_test_assertions() {
 		'REDUNDANT verdicts: one per byte-identical ebuild, its axis rows suppressed' \
 		'0/5' "$(verdict_count REDUNDANT)/$(baselines_at_distance exact)"
 
-	# What this assertion has always been about: a constraint the overlay is
-	# merely BEHIND on must read ALIGN, never as a customisation. ALIGN is the
-	# verdict that says "no reason was recorded, so the default is to catch up",
-	# and misfiling a lag as a deliberate difference is how drift becomes
-	# permanent.
+	# THE VERDICT RULE ITSELF, all three cases at once, against a fixture.
 	#
-	# RE-PINNED 2026-09-06. The original subject was kde-plasma/kwin-6.7.4,
-	# whose PYTHON_COMPAT lag surfaced in md5-cache as a dev-lang/python:3.15
-	# that ::gentoo required and the overlay did not. kwin was one of the 72
-	# kde-plasma packages that left the overlay (see A01), and no row of that
-	# exact shape - an ALIGN verdict resting on a dev-lang/python value -
-	# exists in the tree any more.
+	# assign_verdicts decides between them on ONE criterion - whether the
+	# overlay's surplus on the axis is empty, and if not, whether a tag names
+	# that axis:
 	#
-	# media-gfx/freecad-1.1.3-r1 has the same SHAPE on a different axis:
-	# ::gentoo's REQUIRED_USE carries test? ( techdraw ) and the overlay's does
-	# not. Nothing in the ebuild says why, so it is a lag, not a choice.
+	#   behind             the overlay adds nothing, ::gentoo has more. Residue,
+	#                      and the default is to catch up          -> ALIGN
+	#   untagged addition  somebody wrote it into the overlay ebuild and no
+	#                      reason is recorded                      -> UNDOCUMENTED
+	#   tagged addition    the same, with a tag naming the axis    -> JUSTIFIED
 	#
-	# Chosen at SAME-SERIES distance, which is the part worth keeping. At
-	# cross-series a missing constraint is mostly the version having moved, and
-	# the tree is full of those - the assertion would be pinning noise. Here the
-	# two copies are 1.1.3-r1 against 1.1.1, close enough that the difference is
-	# about the ebuilds rather than about the release.
+	# MEASURED AGAINST A FIXTURE SINCE 2026-09-06, and this one is a repin with
+	# a history. A08 was kde-plasma/kwin's PYTHON_COMPAT lag until kwin left the
+	# overlay; it was then media-gfx/freecad's REQUIRED_USE, which is a row the
+	# parity remediation is actively working to CLOSE. Pinning a guard on a
+	# divergence you intend to fix guarantees it goes red when the work succeeds
+	# - the same defect the stale-cache fixture was built to end.
 	#
-	# The distance is asserted BESIDE the verdict for that reason: a repin that
-	# quietly landed on a cross-series row would still read ALIGN and would
-	# still be green, while no longer testing what this is for.
+	# IT ALSO FILLS A HOLE. Neither of those subjects covered UNDOCUMENTED, and
+	# the tree has held zero of them since 2026-09-05: no assertion anywhere
+	# proved the rule still fires, and "no package needs a decision" prints
+	# exactly like "the rule stopped working". prepare_verdict_scratch builds one
+	# package exhibiting all three, differing only in the criterion above.
 	assert_eq A08 \
-		'freecad-1.1.3-r1 REQUIRED_USE drift is ALIGN: the overlay is behind, not customised' \
-		'distance=same-series verdict=ALIGN' \
-		"distance=$(select_rows media-gfx/freecad 1.1.3-r1 REQUIRED_USE 'test? ( techdraw )' distance) verdict=$(select_rows media-gfx/freecad 1.1.3-r1 REQUIRED_USE 'test? ( techdraw )' verdict)"
+		'verdicts: the four ways assign_verdicts can decide, on one package' \
+		'behind=ALIGN untagged-addition=UNDOCUMENTED tagged-addition=JUSTIFIED single-valued=ALIGN' \
+		"$(fixture_pass "${SELF_TEST_VERDICT_FILTER}" report_verdict_triple)"
 
 	# The one verdict that needs a tag, and the tag lives on the scratch copy
 	# prepare_tag_scratch made. PATCHES is an ebuild-level axis on purpose: it
@@ -4209,7 +4351,7 @@ self_test_assertions() {
 	assert_eq A18 \
 		'_eclasses_: a hash differing for an eclass the overlay lacks is a stale cache, not a divergence' \
 		'compared=yes row=none stale=fixture-shared' \
-		"$(stale_fixture_pass classification)"
+		"$(fixture_pass "${SELF_TEST_STALE_FILTER}" report_stale_classification)"
 
 	# THE CONVERSE, so the rule cannot be a blanket suppression of the axis. An
 	# eclass the overlay SHIPS differs from ::gentoo's by construction - that is
@@ -4232,7 +4374,7 @@ self_test_assertions() {
 	assert_eq A19 \
 		'_eclasses_: an eclass the overlay ships stays an override, never a stale cache' \
 		'real-tree=brave gstreamer-meson rpm | fixture: definitional=fixture-local local-in-stale=0 stale=1' \
-		"real-tree=$(definitional_eclasses) | fixture: $(stale_fixture_pass override)"
+		"real-tree=$(definitional_eclasses) | fixture: $(fixture_pass "${SELF_TEST_STALE_FILTER}" report_stale_override)"
 
 	# R2.2, as arithmetic. 472 rows less the ten SLOT artifacts less the one
 	# reclassified _eclasses_ row is 461, and the four verdicts must still
