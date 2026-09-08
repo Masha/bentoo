@@ -3,13 +3,6 @@
 
 EAPI=7
 
-# BENTOO-DIVERGENCE: INHERIT - toolchain-funcs, which ::gentoo's ebuild does not
-# need.  src_configure() below uses tc-getCC to ask the compiler where it keeps
-# libatomic_asneeded.so, so that libtool can resolve it and stop degrading every
-# dlopen plugin to static-only.  Without that fix bochs merges cleanly and then
-# dies at startup with "no plugins found" (see the full note in src_configure).
-inherit toolchain-funcs
-
 DESCRIPTION="LGPL-ed pc emulator"
 HOMEPAGE="http://bochs.sourceforge.io/"
 MY_P="REL_$(ver_cut 1)_$(ver_cut 2)_FINAL"
@@ -95,38 +88,45 @@ src_configure() {
 		$(use_with X x) \
 		$(use_with X x11)
 
-	# THE REASON THIS REVISION EXISTS.
+	# BENTOO-DIVERGENCE: src_configure - THE REASON THIS REVISION EXISTS.
 	#
-	# Without this, bochs installs but cannot start:
+	# Without this, bochs merges cleanly and then cannot start at all:
 	#     >>PANIC<< bx_plugin_ctrl_init() failure: no plugins found
 	#
-	# GCC 16 announces "-latomic_asneeded" as an implicit link dependency of
-	# every C++ link.  That name is not a library: it is a linker script,
+	# GCC 16 reports "-latomic_asneeded" among the implicit dependencies of any
+	# C++ link.  That name is not a library: it is a linker script,
 	#     INPUT ( AS_NEEDED ( -latomic ) )
-	# living in GCC's private directory (/usr/lib/gcc/${CHOST}/${ver}/), which
-	# is not part of libtool's sys_lib_search_path.
+	# which is how GCC links libatomic only when something needs it.
 	#
-	# libtool records it in `postdeps` while probing the compiler, then fails to
-	# resolve it at link time and warns:
+	# libtool probes the compiler, records the flag in `postdeps`, and then
+	# cannot resolve it as a library.  It warns
 	#     linker path does not have real file for library -latomic_asneeded
-	# and QUIETLY falls back to building each dlopen module as static-only.  The
-	# .la files come out with dlname='' and only libbx_*.a is installed, so the
-	# 53 plugins the build produces are unloadable and PLUGDIR ends up with no
-	# .so at all.  Nothing in the build fails, which is why this reaches users.
+	# and QUIETLY falls back to a static-only build of every dlopen module: the
+	# .la files come out with dlname='' and only libbx_*.a is installed.  All 53
+	# plugins become unloadable, and nothing in the build reports an error --
+	# which is why this reaches users instead of the build log.
 	#
-	# Pointing libtool at GCC's directory keeps the as-needed semantics intact.
-	# Deleting the flag from postdeps also produces working .so files, but does
-	# so by hiding a real dependency: a package that does use atomics would then
-	# link with the symbols unresolved.
+	# Dropping the flag from postdeps only changes what libtool BELIEVES the
+	# compiler links implicitly.  The link itself is still driven by g++, which
+	# keeps applying its own implicit dependencies, so the as-needed behaviour is
+	# preserved: the resulting modules carry no unresolved __atomic/__sync
+	# symbols and no libatomic in DT_NEEDED (verified on 3.0 with GCC 16.2.0).
 	#
-	# Not fixable via elibtoolize: that patches the bundled ltmain.sh, not the
-	# compiler probing that produced postdeps.  Rebuilding dev-build/libtool
-	# does not help either, because this tarball ships a pre-generated configure
-	# and ltmain.sh and never consults the system's libtool macros.
-	local gcc_libdir
-	gcc_libdir=$(dirname "$($(tc-getCC) -print-file-name=libatomic_asneeded.so)") || die
-	sed -i "s|^sys_lib_search_path_spec=\"|sys_lib_search_path_spec=\"${gcc_libdir} |" \
-		libtool || die
+	# Adding GCC's directory to libtool's sys_lib_search_path does NOT help --
+	# measured.  That directory is already in the search path; libtool's problem
+	# is the linker script itself, not where it lives.
+	#
+	# Neither elibtoolize nor rebuilding dev-build/libtool fixes this: the first
+	# patches the bundled ltmain.sh rather than the compiler probing that filled
+	# postdeps, and the second is irrelevant because this tarball ships a
+	# pre-generated configure and never reads the system libtool macros.
+	#
+	# The grep is the guard, not decoration: `sed -i` exits 0 when its pattern
+	# matches nothing, so without it a GCC that stops emitting the flag would
+	# leave this revision silently doing nothing at all.
+	grep -q -- '-latomic_asneeded' libtool ||
+		die "libtool no longer records -latomic_asneeded; re-check whether this workaround is still needed"
+	sed -i 's/-latomic_asneeded//g' libtool || die
 }
 
 src_install() {
