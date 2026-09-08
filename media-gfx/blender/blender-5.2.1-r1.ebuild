@@ -160,6 +160,35 @@ REQUIRED_USE="${PYTHON_REQUIRED_USE}
 # (satisfiable) and this. The first two are also why NonsolvableDepsInStable
 # fires on plain amd64 -- they are too old everywhere, not just on arm64.
 #
+# THE OPENVDB FLOOR WAS RAISED AGAIN, and this time from a compiler, not a
+# resolver. >=11.0.0 took ::gentoo's proven 5.0.0 floor because 13.0.0 came
+# from versions.cmake, which describes blender's own precompiled bundle rather
+# than what the source enforces. That reasoning still holds in general -- but
+# for openvdb the number it named was a real constraint, and 11.0.0 was too
+# low. USE=nanovdb, which is default-on, does not build against openvdb 12.0.1:
+#
+#   nanovdb/util/Reduce.h:47: error: no matching function for call to
+#   'parallel_reduce(...)': binding reference of type 'util::Range1D&' to
+#   'const util::Range<1, long unsigned int>' discards qualifiers
+#
+# nanovdb/tools/CreateNanoGrid.h passes a lambda taking a NON-const Range1D& to
+# tbb::parallel_reduce, which calls its functor with const Range&. It is a
+# template, so it only fails once instantiated, and blender 5.2 is what
+# instantiates it -- intern/cycles/util/nanovdb.cpp:224 asks for
+# createNanoGrid<openvdb::FloatGrid, nanovdb::FpN>. That is why 5.0.0 never
+# tripped over it and why no resolver could have predicted this.
+#
+# The floor is 12.1.0, not 13.0.0, because 12.1.0 is where the const lands
+# upstream -- bisected across the tags: 12.0.1 has 'Range1D &r', 12.1.0,
+# 12.1.1, 13.0.0 and master all have 'const Range1D &r'. Naming 13.0.0 would
+# repeat the original mistake in the opposite direction: excluding a version
+# that works because a bundle manifest happened to say so.
+#
+# What is actually compiled against here is 13.0.0, which this overlay carries
+# because ::gentoo has nothing above 12.0.1. 12.1.x was never built by anyone
+# here; it is admitted by the floor on the strength of the header, not of a
+# build.
+#
 # ceres-solver is KEYWORDS="amd64 ~x86" in ::gentoo and this overlay does not
 # carry a copy. Copying it here to add one keyword would recreate the
 # duplication that cost sci-ml/ollama its place; the keyword has to come from
@@ -223,7 +252,7 @@ RDEPEND="${PYTHON_DEPS}
 	openpgl? ( media-libs/openpgl:= )
 	opensubdiv? ( >=media-libs/opensubdiv-3.6.0-r2:=[opengl,cuda?,tbb?] )
 	openvdb? (
-		>=media-gfx/openvdb-11.0.0:=[nanovdb?]
+		>=media-gfx/openvdb-12.1.0:=[nanovdb?]
 		dev-libs/c-blosc:=
 	)
 	optix? (
@@ -408,6 +437,16 @@ src_prepare() {
 		-e "s|org.blender.Blender.metainfo.xml|blender-${BV}.metainfo.xml|" \
 		-i source/creator/CMakeLists.txt || die
 
+	# 5.2 gave blender.svg a SECOND consumer, which source/creator no longer is
+	# alone in being: windowmanager runs it through data_to_c to embed the icon
+	# in the binary as blender_app_icon.svg.c, for the Wayland window icon.
+	# The pattern is anchored on the path on purpose -- the loose "blender.svg"
+	# used above also matches `datatoc_blender_svg`, an unrelated identifier
+	# three lines below the reference.
+	sed \
+		-e "s|apps/blender\.svg|apps/blender-${BV}.svg|" \
+		-i source/blender/windowmanager/CMakeLists.txt || die
+
 	sed \
 		-e "s|Name=Blender|Name=Blender ${BV}|" \
 		-e "s|Exec=blender|Exec=blender-${BV}|" \
@@ -439,6 +478,20 @@ src_prepare() {
 		"release/freedesktop/org.blender.Blender.metainfo.xml" \
 		"release/freedesktop/blender-${BV}.metainfo.xml" \
 		|| die
+
+	# Assert the rename above reached every consumer. This is a guard, not
+	# decoration: the windowmanager reference handled just above appeared in
+	# 5.2 and nothing caught it, because a missed one still CONFIGURES -- it
+	# dies much later in src_compile with "missing and no known rule to make
+	# it". Whatever the next release adds, it fails here, naming the file.
+	local stale
+	stale=$(grep -rl --include="CMakeLists.txt" --include="*.cmake" \
+		-e "apps/blender\.svg" \
+		-e "apps/blender-symbolic\.svg" \
+		-e "freedesktop/blender\.desktop" \
+		-e "org\.blender\.Blender\.metainfo\.xml" \
+		. || true)
+	[[ -z ${stale} ]] || die "unslotted resource name still referenced by: ${stale}"
 
 	sed \
 		-e "s#\(set(cycles_kernel_runtime_lib_target_path \)\${cycles_kernel_runtime_lib_target_path}\(/lib)\)#\1\${CYCLES_INSTALL_PATH}\2#" \
