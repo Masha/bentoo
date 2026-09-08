@@ -1451,7 +1451,7 @@ url = "https://api.github.com/repos/flatpak/xdg-desktop-portal/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.22.1"
+version = "1.22.1-r1"
 comments = """
 xdg-desktop-portal — releases/latest older; tags[0] tracks the newer line.
 """
@@ -1716,7 +1716,7 @@ url = "https://api.github.com/repos/vim/vim/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "9.2.1037"
+version = "9.2.1046"
 comments = """
 vim — no releases (404); tags[0] "vX.Y.ZZZZ".
 """
@@ -1727,7 +1727,7 @@ url = "https://api.github.com/repos/vim/vim/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "9.2.1037"
+version = "9.2.1046"
 comments = """
 vim-core — same upstream repo as vim.
 """
@@ -4297,7 +4297,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-libs/gst-plugins-bad — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -4329,7 +4329,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-libs/gst-plugins-base — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -4361,7 +4361,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-libs/gst-plugins-good — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -4393,7 +4393,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-libs/gst-plugins-ugly — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -4425,7 +4425,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-libs/gst-rtsp-server — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -4457,7 +4457,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-libs/gstreamer — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -4489,7 +4489,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6-r1"
+version = "1.28.7"
 comments = """
 media-libs/gstreamer-editing-services — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -4521,7 +4521,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 dev-python/gst-python — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -4553,7 +4553,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-a52dec — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -4585,7 +4585,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-adaptivedemux2 — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -4617,7 +4617,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-amr — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -4649,7 +4649,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-aom — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -4681,7 +4681,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-assrender — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -4713,7 +4713,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-bluez — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -4745,7 +4745,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-bs2b — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -4777,7 +4777,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-cairo — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -4809,7 +4809,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-cdio — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -4841,7 +4841,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-cdparanoia — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -4873,7 +4873,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-chromaprint — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -4905,7 +4905,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-colormanagement — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -4937,7 +4937,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-dash — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -4969,7 +4969,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-dtls — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -5001,7 +5001,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-dts — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -5033,7 +5033,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-dv — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -5065,7 +5065,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-dvb — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -5097,7 +5097,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-dvdread — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -5129,7 +5129,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-faac — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -5161,7 +5161,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-faad — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -5193,7 +5193,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-flac — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -5225,7 +5225,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-gdkpixbuf — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -5257,7 +5257,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-gtk — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -5289,7 +5289,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-hls — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -5321,7 +5321,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-jack — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -5353,7 +5353,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-jpeg — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -5385,7 +5385,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-ladspa — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -5417,7 +5417,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-lame — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -5449,7 +5449,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-ldac — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -5481,7 +5481,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-libav — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -5513,7 +5513,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-libde265 — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -5545,7 +5545,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-libpng — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -5577,7 +5577,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-libvisual — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -5609,7 +5609,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-lv2 — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -5641,7 +5641,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-meta — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -5673,7 +5673,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-modplug — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -5705,7 +5705,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-mpeg2dec — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -5757,7 +5757,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-mpeg2enc — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -5789,7 +5789,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-mpg123 — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -5821,7 +5821,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-mplex — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -5853,7 +5853,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-neon — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -5885,7 +5885,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-nvcodec — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -5917,7 +5917,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-openaptx — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -5949,7 +5949,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-opencv — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -5981,7 +5981,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-openh264 — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -6013,7 +6013,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-opus — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -6045,7 +6045,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-oss — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -6077,7 +6077,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-pulse — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -6109,7 +6109,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-qt6 — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -6141,7 +6141,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-raw1394 — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -6173,7 +6173,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-resindvd — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -6205,7 +6205,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-rtmp — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -6237,7 +6237,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-sbc — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -6269,7 +6269,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-sctp — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -6301,7 +6301,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-shout2 — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -6333,7 +6333,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-sidplay — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -6365,7 +6365,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-smoothstreaming — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -6397,7 +6397,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-soundtouch — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -6429,7 +6429,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-soup — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -6461,7 +6461,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-speex — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -6493,7 +6493,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-srt — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -6525,7 +6525,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-srtp — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -6557,7 +6557,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-taglib — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -6589,7 +6589,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-twolame — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -6621,7 +6621,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-uvch264 — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -6653,7 +6653,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-v4l2 — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -6685,7 +6685,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-va — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -6717,7 +6717,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-voaacenc — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -6749,7 +6749,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-voamrwbenc — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -6781,7 +6781,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-vpx — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -6813,7 +6813,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-wavpack — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -6845,7 +6845,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-webp — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -6877,7 +6877,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-webrtc — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -6909,7 +6909,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-x264 — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -6941,7 +6941,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-x265 — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -6973,7 +6973,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-ximagesrc — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
@@ -7005,7 +7005,7 @@ parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 series = '^[0-9]+\.[0-9]*[02468]\.'
-version = "1.28.6"
+version = "1.28.7"
 comments = """
 media-plugins/gst-plugins-zbar — linha ESTAVEL (minor par). O overlay carrega as duas linhas do
 GStreamer; esta entrada rastreia so a par. Sem `series` o checker pegaria o maior
