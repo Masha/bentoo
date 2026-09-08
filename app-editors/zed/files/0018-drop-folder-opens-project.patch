@@ -63,7 +63,7 @@ Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>
 ---
 
 diff --git a/assets/settings/default.json b/assets/settings/default.json
-index 63c16cf..b8faf19 100644
+index 86ddd62..417e7a6 100644
 --- a/assets/settings/default.json
 +++ b/assets/settings/default.json
 @@ -181,6 +181,17 @@
@@ -97,7 +97,7 @@ index fbf9df9..ae5d1f6 100644
              close_panel_on_toggle: None,
              command_aliases: Default::default(),
 diff --git a/crates/settings_content/src/workspace.rs b/crates/settings_content/src/workspace.rs
-index 4e27a8d..12ba311 100644
+index e38b902..7120254 100644
 --- a/crates/settings_content/src/workspace.rs
 +++ b/crates/settings_content/src/workspace.rs
 @@ -58,6 +58,13 @@ pub struct WorkspaceSettingsContent {
@@ -114,7 +114,7 @@ index 4e27a8d..12ba311 100644
      /// Whether to attempt to restore previous file's state when opening it again.
      /// The state is stored per pane.
      /// When disabled, defaults are applied instead of the state restoration.
-@@ -502,6 +509,32 @@ pub enum DefaultOpenBehavior {
+@@ -503,6 +510,32 @@ pub enum DefaultOpenBehavior {
      NewWindow,
  }
  

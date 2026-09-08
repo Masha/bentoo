@@ -92,7 +92,7 @@ index 5f0cf69..8ea6077 100644
              Task::ready(Ok(()))
          }
 diff --git a/crates/agent/src/agent.rs b/crates/agent/src/agent.rs
-index f26ca09..69b72ec 100644
+index 998c0e1..a6f0051 100644
 --- a/crates/agent/src/agent.rs
 +++ b/crates/agent/src/agent.rs
 @@ -2560,7 +2560,12 @@ impl acp_thread::AgentModelSelector for NativeAgentModelSelector {
@@ -623,7 +623,7 @@ index 196dc74..a93fea9 100644
          assert_eq!(
              config_options.set_values.borrow().as_slice(),
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
-index 7c4367e..ce9a342 100644
+index 2b51d18..7882baf 100644
 --- a/crates/agent_ui/src/conversation_view/thread_view.rs
 +++ b/crates/agent_ui/src/conversation_view/thread_view.rs
 @@ -24,6 +24,7 @@ use sandbox::{SandboxFsPolicy, SandboxNetPolicy, SandboxPolicy};
@@ -740,7 +740,7 @@ index 7c4367e..ce9a342 100644
                  }))
              })
              .with_handle(self.thinking_effort_menu_handle.clone())
-@@ -11998,7 +12043,9 @@ impl ThreadView {
+@@ -12018,7 +12063,9 @@ impl ThreadView {
          else {
              return;
          };

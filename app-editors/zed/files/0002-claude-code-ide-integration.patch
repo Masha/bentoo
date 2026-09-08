@@ -44,7 +44,7 @@ this work lives now, and where protocol breakage is reported first.
 ---
 
 diff --git a/Cargo.lock b/Cargo.lock
-index 2f63722..0daa422 100644
+index 35ef5bc..17e2fe2 100644
 --- a/Cargo.lock
 +++ b/Cargo.lock
 @@ -3084,6 +3084,31 @@ version = "0.7.6"
@@ -79,7 +79,7 @@ index 2f63722..0daa422 100644
  [[package]]
  name = "cli"
  version = "0.1.0"
-@@ -22743,6 +22768,7 @@ dependencies = [
+@@ -22741,6 +22766,7 @@ dependencies = [
   "channel",
   "chrono",
   "clap",
@@ -88,7 +88,7 @@ index 2f63722..0daa422 100644
   "client",
   "clock",
 diff --git a/Cargo.toml b/Cargo.toml
-index 8c4c71f..0132f8f 100644
+index f3d5d49..b9577a2 100644
 --- a/Cargo.toml
 +++ b/Cargo.toml
 @@ -26,6 +26,7 @@ members = [
@@ -1853,7 +1853,7 @@ index 0000000..2978e1b
 +    json!({ "content": [{ "type": "text", "text": payload.to_string() }] })
 +}
 diff --git a/crates/project/src/project.rs b/crates/project/src/project.rs
-index 3e8c279..f6973b9 100644
+index 7f46ab1..6b648ae 100644
 --- a/crates/project/src/project.rs
 +++ b/crates/project/src/project.rs
 @@ -254,6 +254,10 @@ pub struct Project {
@@ -1971,7 +1971,7 @@ index bcde4d5..842ab1a 100644
  cli.workspace = true
  client.workspace = true
 diff --git a/crates/zed/src/main.rs b/crates/zed/src/main.rs
-index c7e4eb6..974686d 100644
+index 4c2395d..303a48a 100644
 --- a/crates/zed/src/main.rs
 +++ b/crates/zed/src/main.rs
 @@ -696,6 +696,7 @@ fn main() {

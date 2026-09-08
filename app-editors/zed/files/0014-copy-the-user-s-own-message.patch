@@ -60,7 +60,7 @@ is checked in a running Zed, not here.
 ---
 
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
-index d2433f8..0a1fed0 100644
+index 013beec..625b071 100644
 --- a/crates/agent_ui/src/conversation_view/thread_view.rs
 +++ b/crates/agent_ui/src/conversation_view/thread_view.rs
 @@ -4761,7 +4761,7 @@ impl ThreadView {
@@ -109,7 +109,7 @@ index d2433f8..0a1fed0 100644
  
                                  let is_loading_contents = self.is_loading_contents;
                                  if is_editable {
-@@ -7835,8 +7863,14 @@ impl ThreadView {
+@@ -7855,8 +7883,14 @@ impl ThreadView {
          cx: &App,
      ) -> Option<String> {
          let entry = entries.get(entry_index)?;
@@ -126,7 +126,7 @@ index d2433f8..0a1fed0 100644
          }
  
          let start_index = (0..entry_index)
-@@ -12851,6 +12885,148 @@ mod tests {
+@@ -12871,6 +12905,148 @@ mod tests {
              acp_thread::CommandCategory::Mcp,
          ))
      }

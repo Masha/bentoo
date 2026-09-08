@@ -486,7 +486,7 @@ index 43dbed6..f5f05e3 100644
                  if let Some(thread_view) = self.thread_view(&session_id) {
                      let available_skills = thread
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
-index ce9a342..d2433f8 100644
+index 7882baf..013beec 100644
 --- a/crates/agent_ui/src/conversation_view/thread_view.rs
 +++ b/crates/agent_ui/src/conversation_view/thread_view.rs
 @@ -9,8 +9,9 @@ use agent_client_protocol::schema::v1 as acp;
