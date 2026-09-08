@@ -311,7 +311,7 @@ path = "version"
 headers = { "User-Agent" = "Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0" }
 aux_var = "BUILD_ID"
 aux_pattern = 'Claude-([0-9a-f]{40})\.deb'
-version = "1.46388.4"
+version = "1.49585.0"
 comments = """
 Claude Desktop — official download API behind the claude.ai/download button
 ({"version","url"}). claude.ai sits behind Cloudflare: a plain curl/wget UA gets
@@ -1033,7 +1033,7 @@ url = "https://api.github.com/repos/sqlcipher/sqlcipher/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "4.18.0"
+version = "4.19.0"
 comments = """
 SQLCipher — tag "vX.Y.Z".
 """
@@ -1403,7 +1403,7 @@ url = "https://api.github.com/repos/bleachbit/bleachbit/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "6.0.3"
+version = "6.0.4"
 comments = """
 bleachbit — tag "vX.Y.Z".
 """
@@ -1735,7 +1735,7 @@ url = "https://api.github.com/repos/vim/vim/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "9.2.1046"
+version = "9.2.1048"
 comments = """
 vim — no releases (404); tags[0] "vX.Y.ZZZZ".
 """
@@ -1746,7 +1746,7 @@ url = "https://api.github.com/repos/vim/vim/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "9.2.1046"
+version = "9.2.1048"
 comments = """
 vim-core — same upstream repo as vim.
 """
@@ -2362,7 +2362,7 @@ commit_sha_path = "[0].id"
 base_from = "file"
 base_url = "https://gitlab.freedesktop.org/mobile-broadband/ModemManager/-/raw/main/meson.build"
 base_pattern = "(?m)^  version: '([0-9][0-9.]*)'"
-version = "1.25.95_p20260904"
+version = "1.25.95_p20260908"
 comments = """
 modemmanager — commit-tracked on main (GitLab); date YYYYMMDD becomes _pDATE suffix.
 """
@@ -2424,7 +2424,7 @@ base_from = "tag"
 base_url = "https://api.github.com/repos/KhronosGroup/SPIRV-Tools/git/refs/tags"
 base_tag_pattern = '^vulkan-sdk-([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)$'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.357.0_p20260907"
+version = "1.4.357.0_p20260908"
 comments = """
 spirv-tools — commit-tracked on main; scans titles for vulkan-sdk-X.Y.Z.W to detect base bump.
 """
@@ -4329,7 +4329,7 @@ named ${PN}-opencv5.patch, not ${P}-, deliberately: it has been byte-identical \
 since 6.7.1, and a version in the filename would make every bump rename it by \
 hand. Drop this once ::gentoo carries the opencv5 fix itself.\
 """
-version = "6.7.4-r1"
+version = "6.7.5"
 comments = """
 spectacle -> KDE/plasma-workspace (anchor: overlay versions it as Plasma)
 """
@@ -7640,7 +7640,7 @@ is a workspace and pycargoebuild refuses it.
 url = "https://pypi.org/pypi/openai/json"
 parser = "json"
 path = "info.version"
-version = "3.8.0"
+version = "3.9.0"
 comments = """
 openai — official Python SDK; core dep of sci-ml/amd-gaia. info.version is
 clean X.Y.Z. Live=3.0.0 == current PV.
@@ -9045,7 +9045,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "2.1.0"
+version = "2.1.1"
 comments = """
 ai-memory — releases/latest on akitaonrails/ai-memory; tag_name is "vX.Y.Z" and
 the transform strips the v.  Verified by real request on 2026-09-07: tag_name
@@ -9094,7 +9094,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "2.1.0"
+version = "2.1.1"
 comments = """
 ai-memory-bin — same endpoint and same release as dev-util/ai-memory; this
 record exists separately only because the two are separate packages.  Bump them

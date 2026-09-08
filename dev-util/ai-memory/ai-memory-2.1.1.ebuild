@@ -19,10 +19,11 @@ EAPI=8
 # refuses the root with "The specified directory is a workspace root"):
 #
 #   cd crates/ai-memory-cli
-#   pycargoebuild -c --crate-tarball-path "${DISTDIR}/${P}-crates.tar.xz" \
+#   name="${PN}-${CRATES_PV}-crates.tar.xz"
+#   pycargoebuild -c --crate-tarball-path "${DISTDIR}/${name}" \
 #       -d "${DISTDIR}" -o /dev/null .
-#   npx --yes wrangler@latest r2 object put "obentoo-distfiles/${P}-crates.tar.xz" \
-#       --file="${DISTDIR}/${P}-crates.tar.xz" --content-type=application/x-xz --remote
+#   npx --yes wrangler@latest r2 object put "obentoo-distfiles/${name}" \
+#       --file="${DISTDIR}/${name}" --content-type=application/x-xz --remote
 #
 # The --remote is load-bearing: without it wrangler writes to local dev storage,
 # prints "Upload complete" and the object never reaches the bucket. Run it from
@@ -35,6 +36,22 @@ EAPI=8
 CRATES="
 "
 
+# Version of the crates tarball to fetch, which is NOT always ${PV}. The 2.1.1
+# bump changes nothing in the dependency graph: the whole Cargo.lock diff
+# against 2.1.0 is the twelve workspace members' own `version =` fields, and
+# the external set is the same 490 crates, name and version for name and
+# version -- verified by comparing every `source = "registry+..."` entry in
+# 2.1.1's lock against the cargo_home/gentoo/<crate>-<ver>/ directories in the
+# published 2.1.0 tarball, with no difference in either direction. So the
+# 2.1.0 artifact is reused verbatim instead of regenerating and re-uploading a
+# byte-identical 36 MiB file under a new name; both versions then share one
+# distfile rather than duplicating it.
+#
+# BUMP THIS to ${PV} (and run the recipe above) the moment the lock's external
+# packages change -- a stale tarball still FETCHES, so the failure would land
+# in src_compile as a missing crate rather than here.
+CRATES_PV="2.1.0"
+
 # Upstream pins channel 1.95 in rust-toolchain.toml; the workspace is
 # edition 2024 and declares rust-version = "1.95".
 RUST_MIN_VER="1.95"
@@ -45,7 +62,7 @@ DESCRIPTION="Local-first long-term memory MCP server for AI coding agents"
 HOMEPAGE="https://github.com/akitaonrails/ai-memory"
 SRC_URI="
 	https://github.com/akitaonrails/ai-memory/archive/refs/tags/v${PV}.tar.gz -> ${P}.tar.gz
-	https://distfiles.obentoo.org/${P}-crates.tar.xz
+	https://distfiles.obentoo.org/${PN}-${CRATES_PV}-crates.tar.xz
 	${CARGO_CRATE_URIS}
 "
 
