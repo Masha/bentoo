@@ -1,0 +1,91 @@
+From: Paul Zander <negril.nx+gentoo@gmail.com>
+
+remove redundant Find*.cmake files
+use CMake 3.20 GTest targets for nanovdb
+change vdb_ax_test WORKING_DIRECTORY so testfiles can be found
+fix syntax for OpenVDBCXX.cmake
+
+Rebased from openvdb-11.0.0-cmake_fixes.patch onto 13.0.0.  Three of the four
+files needed only new offsets.  The nanovdb unittest hunk had to be re-cut:
+13.0.0 inserted an if(MSVC) block above it and added a third gtest consumer,
+nanovdb_test_mgpu, so the GTest::GTest / GTest::Main rename now covers four
+target_link_libraries calls instead of three.
+
+All four changes were re-verified as still needed against the 13.0.0 tarball;
+none of them was fixed upstream.  (The sibling patch
+openvdb-12.0.0-remove-c-style-casts.patch WAS upstreamed and is dropped.)
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -321,9 +321,7 @@
+     cmake/FindBlosc.cmake
+     cmake/FindJemalloc.cmake
+     cmake/FindLog4cplus.cmake
+-    cmake/FindOpenEXR.cmake
+     cmake/FindOpenVDB.cmake
+-    cmake/FindTBB.cmake
+     cmake/OpenVDBGLFW3Setup.cmake
+     cmake/OpenVDBHoudiniSetup.cmake
+     cmake/OpenVDBMayaSetup.cmake
+--- a/nanovdb/nanovdb/unittest/CMakeLists.txt
++++ b/nanovdb/nanovdb/unittest/CMakeLists.txt
+@@ -20,7 +20,7 @@
+ 
+ ###############################################################################
+ # TODO: Benchmark should probably not require gtest.
+-if(NOT TARGET GTest::GTest)
++if(NOT TARGET GTest::gtest_main)
+   message(WARNING " - GTest required to build unittests. Skipping.")
+   return()
+ endif()
+@@ -42,19 +42,19 @@
+ # -----------------------------------------------------------------------------
+ 
+ add_executable(nanovdb_test_nanovdb "TestNanoVDB.cc")
+-target_link_libraries(nanovdb_test_nanovdb PRIVATE nanovdb GTest::GTest GTest::Main)
++target_link_libraries(nanovdb_test_nanovdb PRIVATE nanovdb GTest::gtest GTest::gtest_main)
+ add_test(nanovdb_unit_test nanovdb_test_nanovdb)
+ 
+ # -----------------------------------------------------------------------------
+ 
+ if(NANOVDB_USE_CUDA)
+   add_executable(nanovdb_test_cuda "TestNanoVDB.cu")
+-  target_link_libraries(nanovdb_test_cuda PRIVATE nanovdb GTest::GTest GTest::Main)
++  target_link_libraries(nanovdb_test_cuda PRIVATE nanovdb GTest::gtest GTest::gtest_main)
+   set_target_properties(nanovdb_test_cuda PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
+   add_test(nanovdb_cuda_unit_test nanovdb_test_cuda)
+ 
+   add_executable(nanovdb_test_mgpu "TestMultiGPU.cu")
+-  target_link_libraries(nanovdb_test_mgpu PRIVATE nanovdb GTest::GTest GTest::Main)
++  target_link_libraries(nanovdb_test_mgpu PRIVATE nanovdb GTest::gtest GTest::gtest_main)
+   set_target_properties(nanovdb_test_mgpu PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
+   add_test(nanovdb_mgpu_unit_test nanovdb_test_mgpu)
+ endif()
+@@ -67,5 +67,5 @@
+ endif()
+ 
+ add_executable(nanovdb_test_openvdb "TestOpenVDB.cc")
+-target_link_libraries(nanovdb_test_openvdb PRIVATE nanovdb GTest::GTest GTest::Main)
++target_link_libraries(nanovdb_test_openvdb PRIVATE nanovdb GTest::gtest GTest::gtest_main)
+ add_test(nanovdb_openvdb_unit_test nanovdb_test_openvdb)
+--- a/openvdb_ax/openvdb_ax/test/CMakeLists.txt
++++ b/openvdb_ax/openvdb_ax/test/CMakeLists.txt
+@@ -171,7 +171,7 @@
+   endif()
+ endif()
+ 
+-add_test(NAME vdb_ax_unit_test COMMAND vdb_ax_test -v WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/../)
++add_test(NAME vdb_ax_unit_test COMMAND vdb_ax_test -v WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+ 
+ # For the sanitizers, add the suppression files and additional options
+ get_filename_component(PATH_TO_PROJECT_ROOT ${CMAKE_CURRENT_LIST_DIR} DIRECTORY)
+--- a/cmake/config/OpenVDBCXX.cmake
++++ b/cmake/config/OpenVDBCXX.cmake
+@@ -255,7 +255,7 @@
+ # DebugNoInfo - An internal build type only used by the OpenVDB CI. no optimizations, no symbols, asserts enabled
+ set(CMAKE_CXX_FLAGS_DebugNoInfo "" CACHE STRING "Flags used by the C++ compiler during DebugNoInfo builds.")
+ 
+-foreach(TYPE ${EXTRA_BUILD_TYPES})
++foreach(TYPE IN LISTS EXTRA_BUILD_TYPES)
+   set(CMAKE_CXX_FLAGS_${U_TYPE} "" CACHE STRING "Flags used by the C++ compiler during ${TYPE} builds.")
+   set(CMAKE_SHARED_LINKER_FLAGS_${U_TYPE} "" CACHE STRING "Flags used by the linker during ${TYPE} builds.")
+   set(CMAKE_EXE_LINKER_FLAGS_${U_TYPE} "" CACHE STRING "Flags used by the linker during ${TYPE} builds.")

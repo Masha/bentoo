@@ -9132,3 +9132,39 @@ prerelease here. If that ever changes, anchor the series instead of widening
 the pattern.
 """
 # END
+
+["media-gfx/openvdb"]
+url = "https://api.github.com/repos/AcademySoftwareFoundation/openvdb/tags?per_page=100"
+parser = "regex"
+pattern = '"name":\s*"v([0-9.]+)"'
+select = "max"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "13.0.0"
+comments = """
+openvdb — /tags with select = "max", and the "v[0-9]" anchor is the whole
+reason this is not releases/latest. The repository hosts a SECOND product on
+its own release channel: fVDB, tagged fvdb_v0.2.1, which is published under
+/releases interleaved with the OpenVDB ones (it sits between v12.0.1 and
+v12.0.0 by date). The day fVDB cuts a release newer than the newest OpenVDB
+one, releases/latest returns fvdb_v0.2.1 and the applier would "bump"
+media-gfx/openvdb onto a different project's version number. Anchoring the
+pattern on a leading "v" followed by a digit excludes that channel outright;
+42 tags as of 2026-09-08, and fvdb_v0.2.1 is the only one it drops.
+
+Group 1 drops the "v" the ebuild's PV does not carry; SRC_URI rebuilds it as
+v${PV}. /tags is not version-sorted, hence select = "max".
+
+THE SUBSLOT DOES NOT FOLLOW FROM PV ALONE, and the applier cannot see it.
+SLOT is "0/$(ver_cut 1-2)", so a bump moves it (12.0 -> 13.0) and every ":="
+consumer must rebuild. More importantly, media-gfx/blender pins a floor that
+was derived from a COMPILE failure, not from a resolver: openvdb 12.0.1 ships
+a nanovdb header that cannot build blender 5.2's USE=nanovdb path. Re-read
+that floor's comment in the blender ebuild before dropping this version.
+
+This overlay carries openvdb ahead of ::gentoo, which has only 12.0.1. Two
+patches here are version-specific and expire on their own terms:
+openvdb-13.0.0-cmake_fixes.patch (rebased) and
+openvdb-13.0.0-nanovdb-python-bindings.patch (a backport of upstream master;
+it must be DROPPED, not forced, once a release carries the fix).
+"""
+# END

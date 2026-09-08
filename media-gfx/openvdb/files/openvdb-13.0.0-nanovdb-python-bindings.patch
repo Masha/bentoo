@@ -1,0 +1,44 @@
+Fix the nanovdb Python bindings against nanovdb's own 13.0.0 API.
+
+USE=python does not build without this: nanovdb_python fails on two files,
+both because the bindings were left behind by API changes in the same release.
+
+  PyIO.cc:42            'padding' is not a member of 'nanovdb::io::FileMetaData'
+  PyNanoToOpenVDB.cc:24 no matching function for call to
+                        'nanoToOpenVDB<HostBuffer>(GridHandle<HostBuffer>&, int&, uint32_t&)'
+
+FileMetaData (NanoVDB.h:5844) replaced the 'padding' field with
+'blindDataCount', and tools::nanoToOpenVDB (NanoToOpenVDB.h:87) is now
+(handle, gridID) with no 'verbose' argument.
+
+Both are already fixed in upstream master; this is a backport of just the API
+changes, without master's added docstrings, to keep the patch minimal.  Expect
+it to stop applying at the next release that carries the fix -- eapply dies on
+a context mismatch, which is the intended signal to drop this file rather than
+to force it.
+--- a/nanovdb/nanovdb/python/PyIO.cc
++++ b/nanovdb/nanovdb/python/PyIO.cc
+@@ -39,7 +39,7 @@
+         .def_prop_ro("tileCount",
+                      [](io::FileMetaData& metaData) { return std::make_tuple(metaData.tileCount[0], metaData.tileCount[1], metaData.tileCount[2]); })
+         .def_ro("codec", &io::FileMetaData::codec)
+-        .def_ro("padding", &io::FileMetaData::padding)
++        .def_ro("blindDataCount", &io::FileMetaData::blindDataCount)
+         .def_ro("version", &io::FileMetaData::version);
+ 
+     nb::bind_vector<std::vector<io::FileMetaData>>(m, "FileMetaDataVector");
+--- a/nanovdb/nanovdb/python/PyNanoToOpenVDB.cc
++++ b/nanovdb/nanovdb/python/PyNanoToOpenVDB.cc
+@@ -20,9 +20,9 @@
+ #ifdef NANOVDB_USE_OPENVDB
+     // Wrap nanoToOpenVDB into a lambda to workaround an MSVC compiler bug
+     m.def(
+-        "nanoToOpenVDB", [](GridHandle<BufferT>& handle, int verbose, uint32_t n){
+-            return tools::nanoToOpenVDB<BufferT>(handle, verbose, n);
+-        }, "handle"_a, "verbose"_a = 0, "n"_a = 0);
++        "nanoToOpenVDB", [](GridHandle<BufferT>& handle, uint32_t n){
++            return tools::nanoToOpenVDB<BufferT>(handle, n);
++        }, "handle"_a, "n"_a = 0);
+ #endif
+ }
+ 
