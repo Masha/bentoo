@@ -1036,12 +1036,27 @@ pkg_postinst() {
 		ewarn ""
 	fi
 
-	# NOTE build_files/cmake/Modules/FindPythonLibsUnix.cmake: set(_PYTHON_VERSION_SUPPORTED 3.11)
-	if ! use python_single_target_python3_11; then
-		elog "You are building Blender with a newer python version than"
-		elog "supported by this version upstream."
-		elog "If you experience breakages with e.g. plugins, please switch to"
-		elog "PYTHON_SINGLE_TARGET: python3_11 instead."
+	# build_files/cmake/Modules/FindPythonLibsUnix.cmake:39 --
+	# set(_PYTHON_VERSION_SUPPORTED 3.13). Re-read that line on a series bump;
+	# it moved from 3.11 to 3.13 without anything here noticing.
+	#
+	# Deliberately NOT `use python_single_target_python3_13`. `use` DIES on a
+	# flag that is not in IUSE, and PYTHON_COMPAT moves out from under a
+	# hardcoded one -- which is precisely how this block broke: it still tested
+	# python3_11 after PYTHON_COMPAT became ( python3_{12..14} ), so EVERY merge
+	# died here, after the package was already recorded as installed and before
+	# the xdg cache updates below could run. EPYTHON is exported into the saved
+	# environment, so it is readable in pkg_postinst and cannot fail that way.
+	#
+	# The comparison is inequality, not "newer than": PYTHON_COMPAT spans both
+	# sides of the supported version now, and 3.12 is as unsupported as 3.14.
+	local blender_python_supported="3.13"
+	if [[ ${EPYTHON#python} != "${blender_python_supported}" ]]; then
+		elog "You are building Blender against Python ${EPYTHON#python}, which is"
+		elog "not the version upstream supports for this release"
+		elog "(${blender_python_supported})."
+		elog "If you experience breakages with e.g. plugins, switch to"
+		elog "PYTHON_SINGLE_TARGET: python3_${blender_python_supported#3.} instead."
 		elog "Bug: https://bugs.gentoo.org/737388"
 		elog
 	fi
