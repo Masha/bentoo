@@ -19,8 +19,8 @@ SLOT="0"
 KEYWORDS="~amd64"
 IUSE="dbus enchant +fonts screencast wayland webkit +X"
 
-# BENTOO-DIVERGENCE: DEPEND - series 7.2 adds cmark-gfm and glibmm through
-# CDEPEND below; ::gentoo is on 7.1, whose dep set predates both.
+# BENTOO-DIVERGENCE: DEPEND - series 7.2 adds cmark-gfm, glibmm and tlottie
+# through CDEPEND below; ::gentoo is on 7.1, whose dep set predates all three.
 # BENTOO-DIVERGENCE: RDEPEND - same CDEPEND, same reason.
 CDEPEND="
 	!net-im/telegram-desktop-bin
@@ -46,6 +46,7 @@ CDEPEND="
 	media-libs/opus
 	media-libs/rnnoise
 	>=media-libs/tg_owt-0_pre20241202:=[screencast=,X=]
+	media-libs/tlottie
 	>=media-video/ffmpeg-6:=[opus,vpx]
 	net-libs/tdlib:=[tde2e]
 	sys-apps/hwloc:=
@@ -125,7 +126,6 @@ src_prepare() {
 	# Greedily remove ThirdParty directories, keep only ones that interest us
 	local keep=(
 		cmark-gfm  # Upstream dropped the packaged/system code path
-		rlottie  # Patched, not recommended to unbundle by upstream
 		libprisma  # Telegram-specific library, no stable releases
 		tgcalls  # Telegram-specific library, no stable releases
 		xdg-desktop-portal  # Only a few xml files are used with gdbus-codegen
@@ -154,7 +154,6 @@ src_prepare() {
 	fi
 
 	# Shut the CMake 4 QA checker up by removing unused CMakeLists files
-	rm Telegram/ThirdParty/rlottie/CMakeLists.txt || die
 	rm cmake/external/glib/cppgir/expected-lite/example/CMakeLists.txt || die
 	rm cmake/external/glib/cppgir/expected-lite/test/CMakeLists.txt || die
 	rm cmake/external/glib/cppgir/expected-lite/CMakeLists.txt || die
