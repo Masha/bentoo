@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@protonmail.com</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<use>
+		<flag name="gltfpack">Build the gltfpack command-line tool, a standalone glTF/GLB
+			optimizer that quantizes and compresses meshes and animations</flag>
+	</use>
+	<upstream>
+		<remote-id type="github">zeux/meshoptimizer</remote-id>
+		<bugs-to>https://github.com/zeux/meshoptimizer/issues</bugs-to>
+	</upstream>
+	<longdescription lang="en">
+		meshoptimizer is a C++ library with a plain C API that reorganizes
+		triangle meshes so a GPU renders them faster: it reorders indices for
+		the post-transform vertex cache, reduces overdraw, packs vertex data
+		for efficient fetch, generates meshlet clusters for mesh shaders, and
+		simplifies meshes while preserving their shape. It also implements the
+		vertex and index codecs behind the EXT_meshopt_compression glTF
+		extension.
+
+		The library has no dependencies of its own and no architecture-specific
+		backend beyond optional SIMD paths that are selected at compile time,
+		so it builds the same way on every arch this overlay keywords.
+
+		media-gfx/blender needs it as a system library from the 5.2 series on:
+		Blender unbundled its vendored copy, leaving only the thin
+		intern/meshoptimizer_bridge wrapper, and with WITH_STRICT_BUILD_OPTIONS
+		its CMake lookup becomes find_package(meshoptimizer REQUIRED) for the
+		imported target meshoptimizer::meshoptimizer.
+
+		With USE=gltfpack the package also installs gltfpack, upstream's
+		standalone command-line glTF optimizer. It is off by default because it
+		is an end-user tool rather than part of the library ABI, and no package
+		in this overlay depends on it.
+	</longdescription>
+</pkgmetadata>

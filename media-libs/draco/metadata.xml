@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@protonmail.com</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<upstream>
+		<remote-id type="github">google/draco</remote-id>
+		<bugs-to>https://github.com/google/draco/issues</bugs-to>
+		<doc>https://google.github.io/draco/</doc>
+	</upstream>
+	<longdescription lang="en">
+		Draco is Google's library for compressing and decompressing 3D
+		geometric meshes and point clouds.  It targets the transmission and
+		storage of 3D assets, shrinking them substantially while keeping
+		decode cheap, and is the compression scheme behind the glTF
+		KHR_draco_mesh_compression extension.
+
+		The package installs the shared library, its headers, a pkg-config
+		file and the draco_encoder / draco_decoder command line tools.  It
+		also installs the static archive libdraco.a, which is not optional:
+		upstream exports the static target unconditionally, so the CMake
+		package config references the archive even on a shared build and
+		find_package(draco) fails without it.
+
+		media-gfx/blender needs this package from the 5.2 series onwards,
+		where the vendored copy of Draco was dropped and only the
+		intern/draco_bridge/ glue remains.
+	</longdescription>
+</pkgmetadata>

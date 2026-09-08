@@ -11,8 +11,6 @@
 # 	https://github.com/PixarAnimationStudios/OpenUSD
 # - Package MaterialX
 # 	https://github.com/AcademySoftwareFoundation/MaterialX
-# - Package Draco
-# 	https://github.com/google/draco
 # - Package Audaspace
 # 	https://github.com/neXyon/audaspace
 
@@ -180,11 +178,13 @@ RDEPEND="${PYTHON_DEPS}
 		dev-python/requests[${PYTHON_USEDEP}]
 		dev-python/zstandard[${PYTHON_USEDEP}]
 	')
+	media-libs/draco:=
 	>=media-libs/freetype-2.13.3:=[brotli]
 	media-libs/libepoxy:=
 	media-libs/libjpeg-turbo:=
 	>=media-libs/libpng-1.6.50:=
 	media-libs/libsamplerate
+	media-libs/meshoptimizer:=
 	>=media-libs/openimageio-3.0.9.1:=
 	virtual/glu
 	virtual/libintl
@@ -466,11 +466,6 @@ src_prepare() {
 	fi
 
 	rm -rf extern/gflags || die
-
-	# Use slotted libhiprt64
-	sed \
-		-e "s|\"libhiprt64.so\"|\"${ESYSROOT}/usr/lib/hiprt/2.5/$(get_libdir)/libhiprt64.so\"|" \
-		-i extern/hipew/src/hiprtew.cc || die
 }
 
 src_configure() {
@@ -584,7 +579,14 @@ src_configure() {
 		-DPYTHON_INCLUDE_DIR="$(python_get_includedir)"
 		-DPYTHON_LIBRARY="$(python_get_library_path)"
 		-DPYTHON_VERSION="${EPYTHON/python/}"
-		-DWITH_DRACO="yes" # TODO: Package Draco # NOTE use bundled for now
+		# Both were vendored until 5.1 and are not any more: 5.2 ships only the
+		# intern/{draco,meshoptimizer}_bridge/ glue, so these now resolve to
+		# media-libs/draco and media-libs/meshoptimizer. WITH_STRICT_BUILD_OPTIONS
+		# above turns each lookup into find_package(... REQUIRED), which is why
+		# they are RDEPEND rather than optional -- without the system library the
+		# package does not configure at all.
+		-DWITH_DRACO="yes"
+		-DWITH_MESHOPTIMIZER="yes"
 
 		# Modifiers:
 		-DWITH_MOD_FLUID="$(usex fluid)"
@@ -684,6 +686,13 @@ src_configure() {
 
 		if use hiprt; then
 			mycmakeargs+=(
+				# 5.2 dropped extern/hipew's hiprtew.cc dlopen wrapper, whose
+				# hardcoded "libhiprt64.so" this ebuild used to rewrite in
+				# src_prepare; Cycles now links HIPRT_LIBRARIES directly.
+				# FindHIPRT.cmake searches HIPRT_ROOT_DIR under the lib64/lib/bin
+				# suffixes, which is what reaches dev-libs/hiprt's slotted prefix,
+				# and cmake.eclass's CMAKE_INSTALL_RPATH_USE_LINK_PATH puts that
+				# directory in the RPATH so it also resolves at run time.
 				-DHIPRT_ROOT_DIR="${ESYSROOT}/usr/lib/hiprt/2.5"
 				-DHIPRT_COMPILER_PARALLEL_JOBS="$(makeopts_jobs)"
 			)

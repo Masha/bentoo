@@ -1189,6 +1189,25 @@ FreeCAD — releases/latest bare "X.Y.Z" (avoids weekly-* snapshot tags).
 """
 # END
 
+["media-libs/draco"]
+url = "https://api.github.com/repos/google/draco/releases/latest"
+parser = "json"
+path = "tag_name"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "1.5.7"
+comments = """
+draco — releases/latest tag_name. The tag is a BARE semver with no "v" prefix
+("1.5.7"), so it needs no rewriting and SRC_URI uses archive/refs/tags/${PV}.
+
+releases/latest rather than ranking refs/tags: only this endpoint names the
+release upstream actually blessed, and it costs nothing over a tag listing.
+
+On every bump re-read cmake/draco_build_definitions.cmake. LT_CURRENT/LT_AGE
+there decide the SONAME (1.5.7 gives libdraco.so.9), which is the ebuild's
+subslot. The autoupdate pass moves ${PV} only and is blind to that.
+"""
+# END
+
 ["media-libs/harfbuzz"]
 url = "https://api.github.com/repos/harfbuzz/harfbuzz/releases/latest"
 parser = "json"
@@ -9086,5 +9105,30 @@ ai-memory-linux-aarch64.tar.gz, one per KEYWORDS arch.  Upstream also publishes
 macos and windows assets, which are not packaged.  If a Linux asset ever
 disappears from a release, that is the moment to narrow KEYWORDS — check the
 asset list, not the tag.
+"""
+# END
+
+["media-libs/meshoptimizer"]
+url = "https://api.github.com/repos/zeux/meshoptimizer/tags?per_page=100"
+parser = "regex"
+pattern = '"name":\s*"v([0-9.]+)"'
+select = "max"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "1.2"
+comments = """
+meshoptimizer — every tag is "vX.Y" or "vX.Y.Z" and nothing else lives in that
+tag space (v1.2, v1.1.1, v1.1, v1.0.1, v1.0, v0.25 ... as of 2026-09-08), so
+group 1 drops the "v" that the ebuild's PV does not carry; SRC_URI rebuilds it
+as v${PV}.
+
+/tags with select = "max", NOT releases/latest, and that is the whole point of
+this record: upstream tags point releases without always cutting a GitHub
+release. v1.1.1 and v1.0.1 are tags with no matching entry under /releases, so
+releases/latest would have reported v1.1 while v1.1.1 was already out. /tags is
+not version-sorted either, hence select = "max" rather than the first match.
+
+No series anchor: upstream keeps a single line and has never tagged a
+prerelease here. If that ever changes, anchor the series instead of widening
+the pattern.
 """
 # END

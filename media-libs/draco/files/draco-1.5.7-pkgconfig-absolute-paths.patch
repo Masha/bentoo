@@ -1,0 +1,36 @@
+Make draco.pc usable: emit absolute paths.
+
+cmake/draco_install.cmake fills the template from the *relative* GNUInstallDirs
+values (includes_path = "include", libs_path = "lib64"), so the installed
+draco.pc reads
+
+    Cflags: -Iinclude
+    Libs: -Llib64 -ldraco
+
+Those are relative to whatever directory the consumer happens to compile in, so
+`pkg-config --cflags --libs draco` hands the toolchain two paths that do not
+exist and the library is undiscoverable by pkg-config.  GNUInstallDirs also
+defines CMAKE_INSTALL_FULL_INCLUDEDIR / CMAKE_INSTALL_FULL_LIBDIR, which are the
+same directories anchored at CMAKE_INSTALL_PREFIX; use those instead, and expose
+them through the conventional prefix/libdir/includedir variables so the file can
+be relocated the way every other .pc can.
+
+Not filed upstream: 1.5.7 (2024-01-17) is still the newest release and this
+overlay does not submit patches upstream.
+
+--- a/cmake/draco.pc.template
++++ b/cmake/draco.pc.template
+@@ -1,6 +1,11 @@
++prefix=@CMAKE_INSTALL_PREFIX@
++exec_prefix=${prefix}
++libdir=@CMAKE_INSTALL_FULL_LIBDIR@
++includedir=@CMAKE_INSTALL_FULL_INCLUDEDIR@
++
+ Name: @PROJECT_NAME@
+ Description: Draco geometry de(com)pression library.
+ Version: @DRACO_VERSION@
+-Cflags: -I@includes_path@
+-Libs: -L@libs_path@ -ldraco
++Cflags: -I${includedir}
++Libs: -L${libdir} -ldraco
+ Libs.private: @CMAKE_THREAD_LIBS_INIT@
