@@ -1853,7 +1853,7 @@ index 0000000..2978e1b
 +    json!({ "content": [{ "type": "text", "text": payload.to_string() }] })
 +}
 diff --git a/crates/project/src/project.rs b/crates/project/src/project.rs
-index 7f46ab1..6b648ae 100644
+index 9cdfa00..4356df5 100644
 --- a/crates/project/src/project.rs
 +++ b/crates/project/src/project.rs
 @@ -254,6 +254,10 @@ pub struct Project {
