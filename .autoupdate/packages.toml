@@ -7199,11 +7199,22 @@ url = "https://developer.nvidia.com/cuda-downloads?target_os=Linux&target_arch=x
 parser = "regex"
 pattern = 'cuda_([0-9]+\.[0-9]+\.[0-9]+)_'
 type = "bin"
-version = "13.3.1"
+version = "13.4.1"
 comments = """
-nvidia-cuda-toolkit — the cuda-downloads page is SSR; the runfile link
-"cuda_X.Y.Z_<driver>_linux.run" carries the current toolkit version (distro in
-the query string only changes the installer, not the CUDA version).
+nvidia-cuda-toolkit — the cuda-downloads page is SSR; the runfile link carries
+the current toolkit version (distro in the query string only changes the
+installer, not the CUDA version).
+
+The link used to be "cuda_X.Y.Z_<driver>_linux.run". Since 13.4.1 it is
+"cuda_X.Y.Z_linux.run": NVIDIA took the driver out of the local runfile and
+sends it to a separate download. The pattern survived the change untouched --
+it anchors on the "_" that now belongs to "_linux" -- but the 13.4.1 bump still
+failed, because the applier copies the previous ebuild and 13.3.1 built its
+SRC_URI from a DRIVER_PV that no longer appears in any name. That variable was
+dropped in 13.4.1, so the next bump inherits the new scheme.
+
+Measured 2026-09-09: cuda_13.4.1_linux.run answers 200 (4.2 GB) and is listed in
+the official md5sum.txt, while cuda_13.4.1_610.43.02_linux.run answers 404.
 """
 # END
 
@@ -8811,6 +8822,15 @@ Upstream's pre-release axis is X.0.99.90N (21.0.99.901 -> 21.1.0,
 rules, so max moves rc1 -> rc2 -> final on its own with no record change. The
 overlay is deliberately on that RC axis right now (26.0.99.901, the 26.1.0 rc1),
 which is why nothing here filters pre-releases out.
+
+Since the 26 series these tags ship Xwayland ALONE: the other DDX were dropped
+upstream and meson_options.txt no longer declares xorg, xnest or xwayland. The
+26.0.99.902 bump first failed the options gate on exactly those three, which the
+ebuild carried in a dead `[[ ${PV} == "9999" ]]` branch -- the gate reads the
+ebuild text and does not evaluate the condition. The branch was removed rather
+than made conditional, because the options do not exist on any PV of this axis.
+Measured 2026-09-09: meson_options.txt is byte-identical between 901 and 902, so
+that failure was never about the new tag.
 """
 # END
 

@@ -117,14 +117,10 @@ src_configure() {
 		-Ddocs-pdf=false
 	)
 
-	if [[ ${PV} == "9999" ]]; then
-		emesonargs+=(
-			-Dxorg=false
-			-Dxnest=false
-			-Dxvfb=false
-			-Dxwayland=true
-		)
-	fi
+	# No -Dxorg/-Dxnest/-Dxwayland here, for any PV: since the 26 series the
+	# xwayland tags of xorg/xserver ship Xwayland alone -- the other DDX were
+	# dropped upstream and meson_options.txt no longer declares those options.
+	# Passing one is a hard configure error, not an ignored argument.
 
 	if use libei; then
 		emesonargs+=( -Dxwayland_ei=portal )

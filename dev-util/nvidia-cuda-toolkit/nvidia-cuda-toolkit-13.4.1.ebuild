@@ -9,7 +9,6 @@ PYTHON_COMPAT=( python3_{12..14} )
 inherit check-reqs edo toolchain-funcs
 inherit python-r1
 
-DRIVER_PV="610.43.02"
 GCC_MAX_VER="15"
 CLANG_MAX_VER="21"
 
@@ -17,10 +16,10 @@ DESCRIPTION="NVIDIA CUDA Toolkit (compiler and friends)"
 HOMEPAGE="https://developer.nvidia.com/cuda-zone"
 SRC_URI="
 	amd64? (
-		https://developer.download.nvidia.com/compute/cuda/${PV}/local_installers/cuda_${PV}_${DRIVER_PV}_linux.run
+		https://developer.download.nvidia.com/compute/cuda/${PV}/local_installers/cuda_${PV}_linux.run
 	)
 	arm64? (
-		https://developer.download.nvidia.com/compute/cuda/${PV}/local_installers/cuda_${PV}_${DRIVER_PV}_linux_sbsa.run
+		https://developer.download.nvidia.com/compute/cuda/${PV}/local_installers/cuda_${PV}_linux_sbsa.run
 	)
 "
 S="${WORKDIR}"
@@ -36,8 +35,11 @@ RESTRICT="bindist mirror strip test"
 
 REQUIRED_USE="${PYTHON_REQUIRED_USE}"
 
-# since CUDA 11, the bundled toolkit driver (== ${DRIVER_PV}) and the
-# actual required minimum driver version are different.
+# CUDA 13.4.1 dropped the driver from the local runfile: the distfile is named
+# cuda_${PV}_linux.run, with no driver component, and developer.nvidia.com sends
+# the driver to a separate download. Up to 13.3.1 the name carried it, which is
+# what the removed DRIVER_PV pinned. Anything installing a driver alongside this
+# toolkit now goes through x11-drivers/nvidia-drivers, as it should.
 RDEPEND="
 	!clang? (
 		<sys-devel/gcc-$(( GCC_MAX_VER + 1 ))_pre[cxx]
@@ -138,7 +140,10 @@ src_unpack() {
 	local exclude=(
 		"cuda-installer"
 		"*-uninstaller"
-		"NVIDIA-Linux-${narch}-${DRIVER_PV}.run"
+		# Glob, not an exact version: the runfile is not supposed to carry a
+		# driver since 13.4.1, and an exact PV here would silently stop matching
+		# -- shipping a 600 MB installer into the image -- if one ever returns.
+		"NVIDIA-Linux-${narch}-*.run"
 		"builds/cuda_documentation"
 		"builds/cuda_nsight"
 		"builds/cuda_nvvp"
