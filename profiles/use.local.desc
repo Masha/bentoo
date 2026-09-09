@@ -187,6 +187,8 @@ media-gfx/blender:renderdoc - Build Blender with renderdoc support
 media-gfx/blender:rubberband - Build with Rubber Band for audio time-stretching and pitch-scaling (used by Audaspace) via media-libs/rubberband
 media-gfx/blender:tbb - Use threading building blocks library from dev-cpp/tbb.
 media-gfx/blender:vulkan - Add support for the Vulkan viewport backend
+media-gfx/blender-bin:hip - Keep the AMD HIP denoising backend and depend on dev-util/hip (computation on GPU)
+media-gfx/blender-bin:oneapi - Keep the Intel oneAPI SYCL denoising backend and its Level Zero adapters, and depend on dev-libs/level-zero (computation on GPU)
 media-gfx/freecad:addonmgr - Build the addon manager module for automatic handling of 3rd party addons
 media-gfx/freecad:assembly - Build the assembly module to create 3D models composed of several distinguishable parts as a conformed machine.
 media-gfx/freecad:bim - Build the BIM module and workbench

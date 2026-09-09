@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@protonmail.com</email>
+		<name>Lucas Couto</name>
+	</maintainer>
+	<longdescription lang="en">
+		Blender, the open source software for 3D modeling, animation, rendering,
+		post-production, interactive creation and playback -- installed from the
+		official upstream binary build instead of compiled from source.
+
+		This exists beside media-gfx/blender rather than replacing it. Building
+		Blender from source pulls in OpenVDB, OpenImageIO, OSL, Embree, USD and
+		a CUDA or ROCm toolchain, which is hours of compilation and a large
+		dependency graph; the upstream build is a single self-contained tree
+		under /opt with the render backends already inside it. That makes it the
+		practical choice for a workstation that needs Blender working today, for
+		a headless render node, and for anyone who needs a specific upstream
+		version rather than whatever the source ebuild currently tracks.
+
+		SLOT is the major.minor series, so several Blender versions coexist --
+		which matters because .blend files are not forward compatible and addons
+		routinely pin a series. The binary is installed as blender-bin-VERSION,
+		never as plain "blender", so it never collides with the from-source
+		package.
+
+		The GPU backends ship inside the tarball; the USE flags do not build
+		anything, they decide which vendor libraries are kept and which runtime
+		dependency is pulled in. With all of them off the package still works on
+		CPU.
+	</longdescription>
+	<use>
+		<flag name="hip">
+			Keep the AMD HIP denoising backend and depend on dev-util/hip
+			(computation on GPU)
+		</flag>
+		<flag name="oneapi">
+			Keep the Intel oneAPI SYCL denoising backend and its Level Zero
+			adapters, and depend on dev-libs/level-zero (computation on GPU)
+		</flag>
+	</use>
+	<upstream>
+		<doc lang="en">https://docs.blender.org/manual/en/latest/</doc>
+		<bugs-to>https://projects.blender.org/blender/blender/issues</bugs-to>
+		<remote-id type="github">blender/blender</remote-id>
+	</upstream>
+</pkgmetadata>

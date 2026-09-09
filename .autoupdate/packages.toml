@@ -2037,6 +2037,31 @@ blender — download page; anchored to "blender-X.Y.Z".
 """
 # END
 
+["media-gfx/blender-bin"]
+url = "https://www.blender.org/download/"
+parser = "regex"
+pattern = 'blender-([0-9]+\.[0-9]+\.[0-9]+)'
+type = "bin"
+version = "5.2.1"
+comments = """
+blender-bin — deliberately the SAME endpoint and pattern as media-gfx/blender
+above, not a second probe for the same upstream. The two packages ship the same
+release from the same vendor, so they must move together; giving the binary its
+own source would let the two drift and would double what breaks when the page
+changes. Measured 2026-09-09: the page also carries the older 5.0.1, but it
+appears second, and the parser takes group 1 of the FIRST match.
+
+No series pin here, unlike dev-lang/dart or sys-apps/flatpak. This entry is
+supposed to follow the top of the line: SLOT is $(ver_cut 1-2) and SRC_URI is
+built from ${SLOT}, so a bump to a new series carries its own slot and its own
+download directory with it, and nothing has to be edited by hand. That is only
+safe because the overlay ships exactly one series of this package -- the day a
+second one is added (an LTS alongside the current release, say), BOTH need a
+series pin, or the applier will bump whichever ebuild it finds onto the newest
+version and collapse the two into one slot.
+"""
+# END
+
 ["media-libs/libffado"]
 enabled = false
 disabled_by = "auto"
