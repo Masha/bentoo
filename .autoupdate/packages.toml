@@ -284,7 +284,7 @@ url = "https://api2.cursor.sh/updates/api/download/stable/linux-x64/cursor"
 parser = "json"
 path = "version"
 commit_sha_path = "commitSha"
-version = "3.19.13"
+version = "3.19.19"
 comments = """
 Cursor — official download API; "version" is the full version. commitSha is the
 per-release BUILD_ID embedded in SRC_URI; the applier substitutes it into the
@@ -423,7 +423,7 @@ url = "https://nodejs.org/dist/latest-v24.x/SHASUMS256.txt"
 parser = "regex"
 pattern = 'node-v(24\.[0-9]+\.[0-9]+)\.tar\.xz'
 select = "max"
-version = "24.20.0"
+version = "24.21.0"
 comments = """
 Node.js SLOT 24 — the previous LTS line.
 
@@ -1276,14 +1276,61 @@ opencv — releases/latest bare semver (excludes 5.0.0-alpha prereleases).
 """
 # END
 
-["media-video/shotcut"]
+["media-video/shotcut@stable"]
 url = "https://api.github.com/repos/mltframework/shotcut/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+series = '^[0-9.]+$'
 version = "26.8.1"
 comments = """
-shotcut — tag "vX.Y.Z" ("v" stripped; releases/latest skips prereleases).
+shotcut (stable channel) — tag "vX.Y.Z" ("v" stripped); releases/latest is the
+stable release by definition, since it never returns a prerelease.
+
+series matches on the ABSENCE of a suffix, not on a version prefix, exactly as
+app-editors/zed-bin@stable does: the stable line advances 26.6 -> 26.8 -> …, so
+a numeric pin would freeze this entry on one of them. It is not decoration.
+The overlay carries shotcut-26.9.6_beta beside this one, and _beta sorts ABOVE
+26.8.1; without the series the scan would return the beta as "current" and
+every stable release below it would compare older and report "up to date" —
+the stable line would silently stop updating. That is the failure measured on
+zed-bin before its series was added.
+"""
+# END
+
+["media-video/shotcut@beta"]
+url = "https://api.github.com/repos/mltframework/shotcut/releases?per_page=20"
+parser = "regex"
+pattern = '"tag_name":"v([0-9.]+)","target_commitish":"[^"]*","name":"[^"]*","draft":false,"immutable":[a-z]+,"prerelease":true'
+transform = [['$', "_beta"]]
+select = "max"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+series = '_beta$'
+version = "26.9.6_beta"
+comments = """
+shotcut (beta channel) — the hard part here is that upstream gives the two
+channels IDENTICAL tag shapes: "v26.8.1" is stable and "v26.9.6" is the beta,
+both "vYY.M.D", no marker anywhere in the string. The only thing that tells
+them apart is the GitHub "prerelease" boolean, so neither releases/latest (it
+skips prereleases outright) nor a series over the version number can select
+this channel. The pattern reads the flag instead.
+
+It matches the flag through the release object's fixed field sequence
+(tag_name, target_commitish, name, draft, immutable, prerelease) rather than
+with a wildcard span, and that rigidity is the point: a lazy any-character
+span between tag_name and prerelease WOULD cross record boundaries and pair
+the stable tag_name with the NEXT release's prerelease=true — exactly the
+reading that was wrong between 2026-08-01 and 2026-09-06, when the newest
+release was the stable one. The API returns minified JSON on one line, so
+there is no newline to anchor against either. If GitHub ever changes that
+field order the record fails loudly with no match, which is the correct
+failure: it reports nothing rather than the wrong channel.
+
+transform appends the _beta suffix the overlay's PV carries; the ebuild strips
+it back with MY_PV="${PV%_beta}" for SRC_URI, S and SHOTCUT_VERSION. series
+then keeps this record on the beta ebuild, the mirror of the @stable entry.
+Same two-channel arrangement as app-editors/zed-bin — read that record before
+touching either half of this pair.
 """
 # END
 
@@ -1902,6 +1949,43 @@ xf86-video-qxl — tags carry "xf86-video-qxl-" prefix; regex extracts the versi
 """
 # END
 
+["x11-drivers/nvidia-drivers"]
+url = "https://www.nvidia.com/en-us/drivers/unix/"
+parser = "regex"
+pattern = 'Latest New Feature Branch Version:</span> <a href="[^"]+">([0-9][0-9.]*)</a>'
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "615.71.09"
+comments = """
+nvidia-drivers - the Unix Driver Archive page, NOT a directory index.  Verified
+2026-09-09: the raw HTML carries the versions with no JS, and the first match is
+the "Linux x86_64/AMD64/EM64T" block, which is the one this ebuild follows.
+aarch64 is the second block and has tracked the same version so far (615.71.09
+in both on the day this record was written).
+
+The two obvious probes are both wrong, and both fail SILENTLY, which is the
+reason this record points at a marketing page instead:
+
+  - https://download.nvidia.com/XFree86/Linux-x86_64/ is an auto-generated
+    directory index whose own header reads "Generated on Mon Aug  3 2026".  It
+    lists neither 595.99.02 nor 615.71.09, although both directories exist and
+    answer 200 when requested directly.  A regex over it would report 610.57.04
+    as the newest version forever and never once go red.
+  - .../Linux-x86_64/latest.txt tracks the PRODUCTION branch (595.99.02 on
+    2026-09-09), not the New Feature Branch this package follows.  It would read
+    as a permanent downgrade.
+
+This overlay carries the New Feature Branch because ::gentoo stops at the
+previous one (610.57.04).  The day ::gentoo ships 615 or newer, drop the ebuild
+and set enabled = false here -- never delete the record.
+
+A series bump (615 -> 620) also changes SLOT, since SLOT="0/${PV%%.*}".  That is
+expected and not a reason to hold, but the .manifest inside the new .run has to
+be re-checked against src_install before the bump lands: an unknown type there
+aborts the merge with "No known installation path".  Checked for 615.71.09 --
+all 57 types covered, nothing new since 610.57.04.
+"""
+# END
+
 ["net-misc/networkmanager"]
 url = "https://gitlab.freedesktop.org/api/v4/projects/NetworkManager%2FNetworkManager/repository/tags?order_by=version&sort=desc&per_page=40"
 parser = "regex"
@@ -2177,7 +2261,7 @@ base_from = "file"
 base_url = "https://api.github.com/repos/zed-industries/zed/contents/crates/zed/Cargo.toml?ref=main"
 base_pattern = '(?m)^version = "([0-9][0-9.]*)"'
 headers = { "User-Agent" = "bentoo-autoupdate", "Accept" = "application/vnd.github.raw" }
-version = "1.20.0_pre20260909-r1"
+version = "1.21.0_pre20260909"
 comments = """
 zed — commit-tracked on main; _pre suffix preserved from current ebuild.
 2026-08-06: 2 commits landed same UTC day (d61e80b -> 6b2aa1c), so the date
@@ -2340,6 +2424,50 @@ Verified: `cargo check --offline -p zed -p remote_server --features
 zed/inspector` finishes clean in 1m40 over 892 crates -- one pass covering the
 patch series' API drift and both new flags. Not merged with a build: this host
 has no sudo, so no emerge ran.
+2026-09-09 (1.21.0 series): base version rose 1.20.0 -> 1.21.0, so the date
+component alone carries the bump -- no -r1 -- and the ebuild had not been
+committed yet, so the commit was swapped IN PLACE rather than revbumped.
+284c7240 (14:55 UTC, the unpublished state found in the tree) -> 52b2927a
+(15:23 UTC): 3 commits, 5 files, Cargo.lock byte-identical. pycargoebuild
+re-run from crates/zed reproduced CRATES (1493) and GIT_CRATES (73) byte for
+byte; the only LICENSE difference is the manual `LICENSE+=" BSD"` for
+fuchsia-cprng-0.1.1, which pycargoebuild asks for by WARNING and never emits
+itself. The seven `local *_COMMIT` values needed nothing, and that follows from
+the lockfile rather than from luck -- each was re-checked against GIT_CRATES.
+What this bump actually exposed was the 1.20 -> 1.21 jump that preceded it: it
+had landed with files/ copied verbatim from 1.20.0_pre20260909-r1 and the
+series never refreshed. Two defects, both invisible until something compiled,
+and both PRE-EXISTING -- measured by replaying the same series against 284c7240,
+where they reproduce identically:
+  (a) 0011 hunk #1 conflicted. Upstream inserted `use settings::{Settings,
+      SettingsStore};` between `to_string_pretty` and `use
+      std::collections::HashMap;`, so the hunk that widens that import to
+      `{BTreeMap, HashMap}` lost its context. Loud: patch exits 1.
+  (b) The same upstream change added an EXHAUSTIVE match over AcpThreadEvent
+      (idle_sleep_event_subscription), and 0011 adds a variant to that enum,
+      AccountUsageUpdated. After (a) was rebased all 16 patches applied at zero
+      fuzz -- and `cargo check` still died with E0004, non-exhaustive patterns.
+      Silent to every patch tool there is. Resolved into the no-op arm beside
+      TokenUsageUpdated: a quota-window update does not change thread activity.
+The lesson generalises past this package: refresh.sh/verify.sh answer "does the
+series still apply", never "does the result still compile". A base-version jump
+needs the cargo check, and (b) is the shape of what only that catches.
+Fixed through zed-patches, the source of truth, and not by hand-editing @@
+counts: the conflict was resolved in the prepared tree, 0011's commit amended,
+the seven later patches replayed with `git rebase --onto`, and all 16
+regenerated from the chain. Three patch files changed in the overlay as a
+result (0011, 0013, 0017); the other thirteen came out byte-identical.
+One Manifest trap this shape of bump carries: SRC_URI names the tarball after
+${PF} and PF did not change, so the stale DIST line sat there under exactly the
+right filename with the wrong hash. It has to be deleted by hand before
+`pkgdev manifest`, which otherwise has no reason to look.
+Verified before publishing: 11/11 sed patterns match the new Cargo.toml exactly
+once and leave zero [patch.crates-io] entries on `git =`, with all ten WORKDIR
+targets present in the prepared tree; all sixteen patches apply through the real
+`ebuild ... prepare` (>>> Source prepared); `cargo check --offline -p zed -p
+remote_server --features zed/inspector` exits 0 in 2m03; md5-cache _md5_ matches
+the ebuild; pkgcheck reports only the pre-existing deprecated-llvm-r1 finding.
+Not merged with a build: this host has no sudo, so no emerge ran.
 """
 # END
 
@@ -2510,7 +2638,7 @@ base_from = "tag"
 base_url = "https://api.github.com/repos/KhronosGroup/SPIRV-Tools/git/refs/tags"
 base_tag_pattern = '^vulkan-sdk-([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)$'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.357.0_p20260908"
+version = "1.4.357.0_p20260909"
 comments = """
 spirv-tools — commit-tracked on main; scans titles for vulkan-sdk-X.Y.Z.W to detect base bump.
 """
@@ -2611,13 +2739,11 @@ vulkan-loader — commit-tracked on main; scans for "Update for Vulkan-Docs X.Y.
 # END
 
 ["kde-frameworks/attica"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fattica/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 attica — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -2633,13 +2759,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/baloo"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fbaloo/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 baloo — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -2655,13 +2779,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/bluez-qt"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fbluez-qt/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 bluez-qt — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -2677,13 +2799,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/breeze-icons"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fbreeze-icons/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 breeze-icons — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -2699,13 +2819,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/extra-cmake-modules"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fextra-cmake-modules/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 extra-cmake-modules — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -2721,13 +2839,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/frameworkintegration"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fframeworkintegration/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 frameworkintegration — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -2743,13 +2859,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/kapidox"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkapidox/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 kapidox — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -2765,13 +2879,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/karchive"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkarchive/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 karchive — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -2787,13 +2899,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/kauth"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkauth/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 kauth — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -2809,13 +2919,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/kbookmarks"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkbookmarks/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 kbookmarks — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -2831,13 +2939,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/kcalendarcore"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkcalendarcore/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 kcalendarcore — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -2853,13 +2959,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/kcmutils"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkcmutils/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 kcmutils — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -2875,13 +2979,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/kcodecs"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkcodecs/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 kcodecs — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -2897,13 +2999,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/kcolorscheme"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkcolorscheme/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 kcolorscheme — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -2919,13 +3019,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/kcompletion"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkcompletion/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 kcompletion — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -2941,13 +3039,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/kconfig"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkconfig/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 kconfig — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -2963,13 +3059,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/kconfigwidgets"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkconfigwidgets/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 kconfigwidgets — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -2985,13 +3079,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/kcontacts"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkcontacts/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 kcontacts — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -3007,13 +3099,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/kcoreaddons"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkcoreaddons/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 kcoreaddons — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -3029,13 +3119,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/kcrash"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkcrash/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 kcrash — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -3051,13 +3139,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/kdav"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkdav/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 kdav — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -3073,13 +3159,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/kdbusaddons"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkdbusaddons/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 kdbusaddons — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -3095,13 +3179,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/kdeclarative"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkdeclarative/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 kdeclarative — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -3117,13 +3199,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/kded"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkded/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 kded — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -3139,13 +3219,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/kdesu"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkdesu/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 kdesu — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -3161,13 +3239,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/kdnssd"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkdnssd/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 kdnssd — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -3183,13 +3259,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/kdoctools"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkdoctools/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 kdoctools — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -3205,13 +3279,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/kfilemetadata"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkfilemetadata/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 kfilemetadata — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -3227,13 +3299,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/kglobalaccel"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkglobalaccel/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 kglobalaccel — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -3249,13 +3319,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/kguiaddons"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkguiaddons/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 kguiaddons — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -3271,13 +3339,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/kholidays"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkholidays/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 kholidays — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -3293,13 +3359,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/ki18n"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fki18n/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 ki18n — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -3315,13 +3379,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/kiconthemes"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkiconthemes/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 kiconthemes — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -3337,13 +3399,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/kidletime"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkidletime/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 kidletime — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -3359,13 +3419,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/kimageformats"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkimageformats/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 kimageformats — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -3381,13 +3439,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/kio"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkio/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 kio — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -3403,13 +3459,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/kirigami"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkirigami/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 kirigami — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -3425,13 +3479,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/kitemmodels"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkitemmodels/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 kitemmodels — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -3447,13 +3499,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/kitemviews"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkitemviews/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 kitemviews — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -3469,13 +3519,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/kjobwidgets"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkjobwidgets/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 kjobwidgets — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -3491,13 +3539,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/kmime"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkmime/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 kmime — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -3513,13 +3559,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/knewstuff"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fknewstuff/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 knewstuff — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -3535,13 +3579,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/knotifications"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fknotifications/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 knotifications — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -3557,13 +3599,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/knotifyconfig"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fknotifyconfig/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 knotifyconfig — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -3579,13 +3619,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/kpackage"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkpackage/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 kpackage — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -3601,13 +3639,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/kparts"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkparts/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 kparts — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -3623,13 +3659,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/kpeople"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkpeople/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 kpeople — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -3645,13 +3679,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/kplotting"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkplotting/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 kplotting — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -3667,13 +3699,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/kpty"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkpty/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 kpty — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -3689,13 +3719,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/kquickcharts"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkquickcharts/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 kquickcharts — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -3711,13 +3739,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/krunner"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkrunner/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 krunner — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -3733,13 +3759,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/ksecretd-services"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkwallet/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 ksecretd-services -> frameworks/kwallet (sub-extracted: service files only).
 KDE Frameworks family (76) — one series, all released together (6.29.0).
@@ -3756,13 +3780,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/kservice"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkservice/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 kservice — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -3778,13 +3800,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/kstatusnotifieritem"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkstatusnotifieritem/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 kstatusnotifieritem — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -3800,13 +3820,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/ksvg"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fksvg/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 ksvg — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -3822,13 +3840,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/ktexteditor"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fktexteditor/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 ktexteditor — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -3844,13 +3860,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/ktexttemplate"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fktexttemplate/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 ktexttemplate — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -3866,13 +3880,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/ktextwidgets"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fktextwidgets/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 ktextwidgets — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -3888,13 +3900,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/kunitconversion"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkunitconversion/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 kunitconversion — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -3910,13 +3920,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/kuserfeedback"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkuserfeedback/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 kuserfeedback — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -3932,13 +3940,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/kwallet"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkwallet/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 kwallet — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -3954,13 +3960,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/kwallet-runtime"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkwallet/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 kwallet-runtime -> frameworks/kwallet (sub-extracted from the same tarball).
 KDE Frameworks family (76) — one series, all released together (6.29.0).
@@ -3977,13 +3981,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/kwidgetsaddons"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkwidgetsaddons/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 kwidgetsaddons — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -3999,13 +4001,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/kwindowsystem"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkwindowsystem/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 kwindowsystem — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -4021,13 +4021,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/kxmlgui"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fkxmlgui/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 kxmlgui — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -4043,13 +4041,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/modemmanager-qt"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fmodemmanager-qt/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 modemmanager-qt — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -4065,13 +4061,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/networkmanager-qt"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fnetworkmanager-qt/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 networkmanager-qt — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -4087,13 +4081,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/oxygen-icons"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Foxygen-icons/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 oxygen-icons — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -4109,13 +4101,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/prison"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fprison/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 prison — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -4131,13 +4121,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/purpose"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fpurpose/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 purpose — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -4153,13 +4141,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/qqc2-desktop-style"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fqqc2-desktop-style/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 qqc2-desktop-style — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -4175,13 +4161,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/solid"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fsolid/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 solid — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -4197,13 +4181,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/sonnet"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fsonnet/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 sonnet — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -4219,13 +4201,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/syndication"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fsyndication/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 syndication — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -4241,13 +4221,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/syntax-highlighting"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fsyntax-highlighting/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 syntax-highlighting — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -4263,13 +4241,11 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-frameworks/threadweaver"]
-enabled = false
-disabled_by = "auto"
 url = "https://invent.kde.org/api/v4/projects/frameworks%2Fthreadweaver/repository/tags?search=^v6&per_page=100"
 parser = "regex"
 pattern = '"name":"v(6\.[0-9]+\.[0-9]+)"'
 select = "max"
-version = "6.29.0"
+version = "6.30.0"
 comments = """
 threadweaver — KDE Frameworks family (76) — one series, all released together (6.29.0).
 Source is invent.kde.org (canonical), NOT the KDE/* GitHub mirror: on the mirror
@@ -9062,6 +9038,50 @@ paper over.
 dev-python/pyqt6[scxml] is load-bearing and easy to lose on a bump: qt_api.py
 aborts the launch with "PyQt6 QtStateMachine module not available" without it,
 and scxml is not default-on in pyqt6.
+"""
+# END
+
+["media-video/davinci-resolve"]
+hold = true
+url = "https://www.blackmagicdesign.com/api/support/latest-stable-version/davinci-resolve/linux"
+parser = "regex"
+pattern = '"major":([0-9]+,"minor":[0-9]+,"releaseNum":[0-9]+)'
+transform = [[',"minor":', "."], [',"releaseNum":', "."]]
+version = "21.1.0"
+comments = """
+davinci-resolve — Blackmagic's own version endpoint, the only machine-readable
+source they publish.  It answers with the release split across three integer
+fields rather than a version string:
+
+  {"linux":{"releaseId":"…","downloadId":"…","major":21,"minor":1,
+            "releaseNum":0,"build":14}}
+
+so parser=json cannot reach it — no single path holds the answer.  The regex
+captures the three numbers TOGETHER, separators and all, as one capture group
+('21,"minor":1,"releaseNum":0'), and the two transform rules rewrite those
+separators into dots to yield 21.1.0.  Verified against the live endpoint on
+2026-09-09.  The trailing "build" field is upstream's respin counter and is
+deliberately outside the capture: it moves without a release.
+
+HOLD is not caution here, it is arithmetic.  The ebuild carries
+RESTRICT="fetch": the 4.1 GiB archive sits behind a registration form, so the
+applier can neither download it nor regenerate the Manifest.  An unheld record
+would happily git-mv the ebuild to the new PV and leave the OLD version's DIST
+line in place — a package that cannot merge at all, produced silently.  Every
+bump of this package needs a human to fetch the archive first.
+
+The download IS scriptable, which is what makes the manual step bounded rather
+than open-ended.  POST to the register endpoint returns a time-limited signed
+CloudFront URL:
+
+  curl -X POST -H 'Content-Type: application/json' \
+    "https://www.blackmagicdesign.com/api/register/us/download/$(downloadId)" \
+    --data-raw '{"firstname":"…","lastname":"…","email":"…","country":"us",…}'
+
+The downloadId comes from the same JSON this record parses, so the two
+endpoints chain.  Note the archive is named after a TWO-component version
+(DaVinci_Resolve_21.1_Linux.zip) while this record emits three — see the
+ZIP_NAME comment in the ebuild before trusting a bumped file name.
 """
 # END
 

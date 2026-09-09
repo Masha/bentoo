@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@protonmail.com</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<longdescription lang="en">
+		DaVinci Resolve is Blackmagic Design's post-production suite, combining
+		editing, colour grading, visual effects, motion graphics and audio
+		post-production in one application.  This package installs the
+		proprietary Linux build; the archive is not redistributable and cannot
+		be fetched automatically, so it must be downloaded by hand from
+		Blackmagic Design and placed in DISTDIR.
+
+		The three video_cards_* flags select which compute runtime is pulled in
+		for OpenCL.  None of them is required to install the package: Resolve
+		will start without an accelerated runtime, it simply refuses to render.
+	</longdescription>
+	<upstream>
+		<doc lang="en">https://www.blackmagicdesign.com/products/davinciresolve</doc>
+	</upstream>
+</pkgmetadata>

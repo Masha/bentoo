@@ -36,19 +36,19 @@ regression and the percent normalisation.
 ---
 
 diff --git a/crates/acp_thread/src/acp_thread.rs b/crates/acp_thread/src/acp_thread.rs
-index 194a528..41af005 100644
+index c3ec880..a96a50d 100644
 --- a/crates/acp_thread/src/acp_thread.rs
 +++ b/crates/acp_thread/src/acp_thread.rs
-@@ -29,7 +29,7 @@ use project::{
- };
+@@ -31,7 +31,7 @@ use project::{
  use serde::{Deserialize, Serialize};
  use serde_json::to_string_pretty;
+ use settings::{Settings, SettingsStore};
 -use std::collections::HashMap;
 +use std::collections::{BTreeMap, HashMap};
  use std::error::Error;
  use std::fmt::{Formatter, Write};
  use std::ops::Range;
-@@ -2025,6 +2025,206 @@ pub struct SessionCost {
+@@ -2027,6 +2027,206 @@ pub struct SessionCost {
      pub currency: SharedString,
  }
  
@@ -255,7 +255,7 @@ index 194a528..41af005 100644
  pub const TOKEN_USAGE_WARNING_THRESHOLD: f32 = 0.8;
  
  impl TokenUsage {
-@@ -2104,6 +2304,7 @@ pub struct AcpThread {
+@@ -2106,6 +2306,7 @@ pub struct AcpThread {
      running_turn: Option<RunningTurn>,
      connection: Rc<dyn AgentConnection>,
      token_usage: Option<TokenUsage>,
@@ -263,7 +263,7 @@ index 194a528..41af005 100644
      cost: Option<SessionCost>,
      prompt_capabilities: acp::PromptCapabilities,
      available_commands: Vec<acp::AvailableCommand>,
-@@ -2158,6 +2359,7 @@ pub enum AcpThreadEvent {
+@@ -2169,6 +2370,7 @@ pub enum AcpThreadEvent {
      NewEntry,
      TitleUpdated,
      TokenUsageUpdated,
@@ -271,7 +271,15 @@ index 194a528..41af005 100644
      EntryUpdated(usize),
      EntriesRemoved(Range<usize>),
      ToolAuthorizationRequested(acp::ToolCallId),
-@@ -2317,6 +2519,7 @@ impl AcpThread {
+@@ -2309,6 +2511,7 @@ impl AcpThread {
+                 | AcpThreadEvent::NewEntry
+                 | AcpThreadEvent::TitleUpdated
+                 | AcpThreadEvent::TokenUsageUpdated
++                | AcpThreadEvent::AccountUsageUpdated
+                 | AcpThreadEvent::EntryUpdated(_)
+                 | AcpThreadEvent::Retry(_)
+                 | AcpThreadEvent::SubagentSpawned(_)
+@@ -2356,6 +2559,7 @@ impl AcpThread {
              connection,
              session_id,
              token_usage: None,
@@ -279,7 +287,7 @@ index 194a528..41af005 100644
              cost: None,
              prompt_capabilities,
              available_commands: Vec::new(),
-@@ -2483,6 +2686,15 @@ impl AcpThread {
+@@ -2527,6 +2731,15 @@ impl AcpThread {
          self.token_usage.as_ref()
      }
  
@@ -295,7 +303,7 @@ index 194a528..41af005 100644
      pub fn cost(&self) -> Option<&SessionCost> {
          self.cost.as_ref()
      }
-@@ -2647,7 +2859,18 @@ impl AcpThread {
+@@ -2691,7 +2904,18 @@ impl AcpThread {
                          currency: cost.currency.into(),
                      });
                  }
@@ -314,7 +322,7 @@ index 194a528..41af005 100644
              }
              _ => {}
          }
-@@ -4764,6 +4987,124 @@ fn markdown_for_raw_output(
+@@ -4862,6 +5086,124 @@ fn markdown_for_raw_output(
  
  #[cfg(test)]
  mod tests {
