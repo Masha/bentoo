@@ -1,0 +1,12 @@
+DEFINED_PHASES=install postinst prepare
+DESCRIPTION=Universal provider proxy: any LLM with Codex CLI/App/SDK and Claude Code
+EAPI=8
+HOMEPAGE=https://lidge-jun.github.io/opencodex/ https://github.com/lidge-jun/opencodex
+IUSE=+keyring
+KEYWORDS=~amd64 ~arm64
+LICENSE=MIT ISC BSD BSD-2 Apache-2.0
+RDEPEND=net-libs/bun-bin
+RESTRICT=strip
+SLOT=0
+SRC_URI=https://registry.npmjs.org/@bitkyc08/opencodex/-/opencodex-2.48.0.tgz https://distfiles.obentoo.org/opencodex-node_modules-2.48.0.tar.xz keyring? ( amd64? ( https://distfiles.obentoo.org/opencodex-keyring-1.3.0-linux-x64-gnu.tar.xz ) arm64? ( https://distfiles.obentoo.org/opencodex-keyring-1.3.0-linux-arm64-gnu.tar.xz ) )
+_md5_=ae4868439c2203fc3110899378d7e28d

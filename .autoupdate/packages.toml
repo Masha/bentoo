@@ -1155,6 +1155,41 @@ codex-bin — same upstream tag "rust-vX.Y.Z"; regex on tag_name.
 """
 # END
 
+["dev-util/opencodex"]
+hold = true
+url = "https://registry.npmjs.org/@bitkyc08/opencodex"
+parser = "json"
+path = "dist-tags.latest"
+version = "2.48.0"
+comments = """
+opencodex — probed on the npm registry rather than on GitHub, because npm is also
+where SRC_URI fetches. The ebuild ships the published @bitkyc08/opencodex tarball
+(the GitHub tag tarball lacks the prebuilt gui/dist), so "newest release" and
+"newest thing we can actually fetch" are the same question here, answered once.
+
+dist-tags.latest is the stable channel, and it is why this is not a tag probe.
+Upstream cuts a preview alongside nearly every release — 2.48.0 and
+2.48.0-preview.20260908 landed 18 minutes apart, both real tags. Ranking /tags would
+elect the preview and report a permanent false "outdated"; dist-tags separates the
+two channels at the source, with the preview parked under .preview.
+
+hold = true, and it is not provisional. SRC_URI carries distfiles no upstream
+produces: opencodex-node_modules-${PV}.tar.xz (the 93-package runtime dependency
+tree) and the two @napi-rs/keyring blobs, all generated here and hosted on
+distfiles.obentoo.org. An applied bump would move PV past a tarball that does not
+exist yet and leave the ebuild unfetchable. So every bump is two steps, in this
+order: regenerate and upload the vendor tarball FIRST — the recipe lives in the
+ebuild's own comment block — then release the hold for that one bump.
+
+The hold stops the applier, not the probe: an explicit `--check dev-util/opencodex`
+still arms the pending entry. Read a pending here as "a bump exists upstream", never
+as "a bump is ready to apply".
+
+Two more things that do not follow PV and go stale in silence: KEYRING_PV and the
+vendored LICENSE list. Re-derive both on a bump; the ebuild says how.
+"""
+# END
+
 ["dev-util/act"]
 url = "https://api.github.com/repos/nektos/act/releases/latest"
 parser = "json"

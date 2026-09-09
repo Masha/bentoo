@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@protonmail.com</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<use>
+		<flag name="keyring">
+			Store provider API keys in the OS keyring instead of in
+			opencodex's own configuration file. Pulls in the package's only
+			prebuilt binary, and needs a Secret Service provider
+			(gnome-keyring, KWallet or KeePassXC) on the session bus at
+			runtime.
+		</flag>
+	</use>
+	<upstream>
+		<remote-id type="github">lidge-jun/opencodex</remote-id>
+		<bugs-to>https://github.com/lidge-jun/opencodex/issues</bugs-to>
+	</upstream>
+	<longdescription lang="en">
+		opencodex is a universal provider proxy: it speaks the OpenAI Responses
+		and Anthropic Messages APIs on the front, and forwards to whatever
+		backend is configured behind it, so OpenAI's Codex CLI, Codex App and
+		SDK, and Anthropic's Claude Code can be pointed at Claude, Gemini,
+		Grok, DeepSeek, OpenRouter, a local Ollama, or any OpenAI-compatible
+		endpoint without the client knowing. It runs as a local daemon on
+		127.0.0.1:10100 and ships a browser UI for picking models and watching
+		traffic.
+
+		This package installs the TypeScript sources and runs them directly on
+		the Bun runtime from net-libs/bun-bin, with the JavaScript dependency
+		tree vendored from upstream's bun.lock rather than fetched at build
+		time. Because that is the layout opencodex classifies as a source
+		install, its built-in self-updater detects it and declines to write
+		into /usr: updates come through Portage.
+	</longdescription>
+</pkgmetadata>

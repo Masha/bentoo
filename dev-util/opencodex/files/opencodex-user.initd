@@ -1,0 +1,45 @@
+#!/sbin/openrc-run
+# Copyright 1999-2026 Gentoo Authors
+# Distributed under the terms of the GNU General Public License v2
+
+# USER-SCOPE service: this file belongs in /etc/user/init.d, not /etc/init.d,
+# and is started per login session by openrc-user.  The ebuild installs it with
+# `exeinto /etc/user/init.d` + `newexe` because newinitd has no user-scope
+# variant, following sys-apps/xdg-desktop-portal and sci-ml/lemonade-bin in
+# this overlay.
+#
+# There is deliberately NO system-scope counterpart.  opencodex holds per-user
+# provider credentials under ~/.opencodex and binds loopback only; a system
+# instance would either serve one user's keys to every account on the box or
+# have no keys at all.
+#
+# WHAT THIS MIRRORS.  `ocx service install` generates a user-scope systemd unit
+# at runtime (src/service.ts): Type=simple, Restart=on-failure, RestartSec=5,
+# OCX_SERVICE=1 in the environment, and an ExecStart that ends in
+# `... start --port <port>`.  The equivalents are set below.  What is NOT
+# mirrored is the unit's `/bin/sh -lc` wrapper, which exists to read
+# OPENCODEX_API_AUTH_TOKEN out of a file before exec; opencodex reads that file
+# itself when the variable is unset, so the shell hop buys nothing here.
+
+description="opencodex provider proxy (user session)"
+
+# Default listen port, matching upstream's built-in default.  Override in
+# ~/.config/rc/conf.d/opencodex or the environment.
+: "${OPENCODEX_PORT:=10100}"
+
+command="/usr/bin/opencodex"
+command_args="start --port ${OPENCODEX_PORT}"
+directory="${HOME}"
+supervisor="supervise-daemon"
+
+# Restart=on-failure / RestartSec=5
+respawn_delay=5
+
+# Marks the process as service-managed, exactly as the generated unit does;
+# opencodex uses it to tell a supervised proxy from an interactive `ocx start`.
+export OCX_SERVICE=1
+
+# No depend() on purpose: the unit's After=network-online.target has no
+# user-scope counterpart, since OpenRC user services live in their own tree and
+# cannot order themselves against system services.  The proxy binds loopback
+# and retries outbound calls, so it does not need the ordering.

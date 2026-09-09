@@ -154,6 +154,7 @@ dev-util/nvidia-cuda-toolkit:profiler - Install the NVIDIA CUDA profiler (nvprof
 dev-util/nvidia-cuda-toolkit:rdma - Enable infiniband support via sys-cluster/rdma-core
 dev-util/nvidia-cuda-toolkit:sanitizer - Install compute-sanitizer tool
 dev-util/nvidia-cuda-toolkit:vis-profiler - Install the NVIDIA CUDA visual profiler (nvvp)
+dev-util/opencodex:keyring - Store provider API keys in the OS keyring instead of in opencodex's own configuration file. Pulls in the package's only prebuilt binary, and needs a Secret Service provider (gnome-keyring, KWallet or KeePassXC) on the session bus at runtime.
 dev-util/vulkan-tools:cube - Build the cube/cubepp demos
 kde-plasma/spectacle:share - Enable support for a share menu using kde-frameworks/purpose
 mail-client/betterbird-bin:wayland - Enable native Wayland support (set MOZ_ENABLE_WAYLAND=1 at runtime)
