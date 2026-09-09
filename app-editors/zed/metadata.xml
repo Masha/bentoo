@@ -12,9 +12,10 @@
 		<flag name="claude-code-ide">Native Claude Code CLI editor integration (unofficial reverse-engineered IDE protocol, WebSocket MCP server) via a source patch</flag>
 		<flag name="collab">Build the collaboration server</flag>
 		<flag name="extensions-cli">Build the zed-extension CLI for managing extensions</flag>
+		<flag name="inspector">Build the GPUI UI inspector, which shows the element tree, layout and styles of Zed's own interface at run time</flag>
 		<flag name="mimalloc">Use mimalloc as the global memory allocator for improved performance</flag>
 		<flag name="neovim">Enable Neovim integration for full vim compatibility via RPC</flag>
-		<flag name="pulseaudio">Enable PulseAudio audio support</flag>
+		<flag name="remote-server">Build and install zed-remote-server, the daemon that backs Zed's SSH remote editing. Without it the client downloads its own copy from zed.dev onto the remote host at run time</flag>
 		<flag name="screen-capture">Enable screen capture support for collaboration sessions</flag>
 		<flag name="tracy">Enable Tracy profiler integration for performance analysis</flag>
 		<flag name="wayland">Enable Wayland display server support</flag>

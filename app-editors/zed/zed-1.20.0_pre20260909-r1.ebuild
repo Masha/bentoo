@@ -1573,7 +1573,7 @@ declare -A GIT_CRATES=(
 	[zed-xim]='https://github.com/zed-industries/xim-rs;16f35a2c881b815a2b6cdfd6687988e84f8447d8;xim-rs-%commit%'
 )
 
-EGIT_COMMIT="72b02bf1bb2f8eb2bd0e22440c3b703caf8f05b6"
+EGIT_COMMIT="5896274168e06663568f42b5bae142162936e0a6"
 LLVM_COMPAT=( 22 )
 RUST_MIN_VER="1.97.1"
 RUST_NEEDS_LLVM=1
@@ -1585,11 +1585,11 @@ WEBRTC_COMMIT="0001d84-4"
 # claude-agent-acp integrations; ::gentoo carries none.
 inherit cargo check-reqs desktop flag-o-matic llvm-r1 toolchain-funcs xdg
 
-# BENTOO-DIVERGENCE: metadata.xml - a <use> block describing thirteen flags,
+# BENTOO-DIVERGENCE: metadata.xml - a <use> block describing fourteen flags,
 # where ::gentoo's file has none. Every one of them is a flag this overlay adds
-# (see the IUSE tag): X, wayland, collab, neovim, mimalloc, tracy, the three
-# claude-agent ones and the rest. ::gentoo has nothing to describe because it
-# exposes none of them.
+# (see the IUSE tag): X, wayland, collab, neovim, mimalloc, tracy, inspector,
+# remote-server, the three claude-agent ones and the rest. ::gentoo has nothing
+# to describe because it exposes none of them.
 # BENTOO-DIVERGENCE: KEYWORDS - no ~arm64, where ::gentoo has it. Measured
 # 2026-09-07 by keywording it and running pkgcheck: dev-util/claude-agent-acp-plus
 # and dev-util/claude-agent-acp-tui are both DEFAULT-ON here and both ship a
@@ -1625,20 +1625,36 @@ LICENSE+="
 	Unicode-3.0 ZLIB BZIP2
 "
 SLOT="0"
-# Somente ~amd64: os agentes Claude ligados por padrao
-# (dev-util/claude-agent-acp-{plus,tui}) embutem binarios x86-64 e sao
-# KEYWORDS="-* ~amd64", entao o pacote nao e instalavel em arm64 com as USE
-# flags default. O suporte a arm64 no SRC_URI/src_configure foi mantido para
-# facilitar um re-keyword futuro.
+# The arm64 half of SRC_URI and of src_compile's LK_CUSTOM_WEBRTC is kept even
+# though KEYWORDS carries no ~arm64: it is what a future re-keyword needs, and
+# the only thing standing in the way is the two Claude agents named above.
 KEYWORDS="~amd64"
 # BENTOO-DIVERGENCE: IUSE - claude-agent-acp-plus, claude-agent-acp-tui and
 # claude-code-ide gate integrations with overlay-only packages; X is exposed
 # separately from wayland here.
-IUSE="+X +claude-agent-acp-plus +claude-agent-acp-tui +claude-code-ide collab extensions-cli +mimalloc neovim +pulseaudio screen-capture tracy +wayland"
+#
+# pulseaudio was dropped on 2026-09-09 rather than carried: it changed no part
+# of the build. Zed's audio path is cpal, which on Linux is ALSA -- the lockfile
+# carries alsa/alsa-sys and no libpulse crate at all -- so the flag only added
+# media-libs/libpulse to the depset. A PulseAudio sink is reached through
+# media-plugins/alsa-plugins[pulseaudio], which is a runtime choice, not a
+# property of this binary.
+#
+# inserted the same day: inspector (the GPUI UI inspector, upstream feature
+# zed/inspector) and remote-server (crates/remote_server, the SSH remote-editing
+# daemon Zed otherwise downloads from zed.dev at run time -- packaging it is
+# what lets a server host serve it from portage instead).
+#
+# test is not a Zed feature: src_test has existed here without it, which left
+# RESTRICT unable to say the suite is optional.
+IUSE="+X +claude-agent-acp-plus +claude-agent-acp-tui +claude-code-ide collab
+	extensions-cli inspector +mimalloc neovim remote-server screen-capture test
+	tracy +wayland"
 # BENTOO-DIVERGENCE: REQUIRED_USE - the || ( X wayland ) clause, which follows
 # from the X and wayland flags this overlay adds (see the IUSE tag). ::gentoo
 # exposes neither, so it has nothing to constrain.
 REQUIRED_USE="|| ( X wayland )"
+RESTRICT="!test? ( test )"
 CHECKREQS_DISK_BUILD="18G"
 CHECKREQS_MEMORY="8G"
 
@@ -1666,7 +1682,6 @@ DEPEND="
 	media-libs/vulkan-loader[X?]
 	sys-apps/xdg-desktop-portal
 	virtual/zlib:=
-	pulseaudio? ( media-libs/libpulse )
 	screen-capture? (
 		wayland? (
 			media-video/pipewire
@@ -1711,6 +1726,7 @@ QA_FLAGS_IGNORED="
 	usr/libexec/zed-editor
 	usr/bin/collab
 	usr/bin/zed-extension
+	usr/bin/zed-remote-server
 "
 
 pkg_setup() {
@@ -1818,10 +1834,10 @@ src_prepare() {
 	default
 
 	export APP_CLI="zedit"
-	# Ebuild força RELEASE_CHANNEL="nightly" abaixo, então o app_id runtime
-	# (Wayland app_id / X11 WM_CLASS) é "dev.zed.Zed-Nightly".
-	# .desktop filename, Icon name e StartupWMClass DEVEM casar com isso,
-	# senão compositors Wayland exibem o ícone genérico em vez do ícone do Zed.
+	# The ebuild forces RELEASE_CHANNEL="nightly" below, so the runtime app_id
+	# (Wayland app_id / X11 WM_CLASS) is "dev.zed.Zed-Nightly". The .desktop
+	# filename, the Icon name and StartupWMClass MUST all match it, or Wayland
+	# compositors draw the generic icon instead of Zed's.
 	export APP_ID="dev.zed.Zed-Nightly"
 	export APP_ICON="${APP_ID}"
 	export APP_NAME="Zed Nightly"
@@ -1829,8 +1845,8 @@ src_prepare() {
 	export DO_STARTUP_NOTIFY="true"
 	envsubst < "crates/zed/resources/zed.desktop.in" > ${APP_ID}.desktop || die
 
-	# Adiciona StartupWMClass na seção [Desktop Entry] (antes da linha Actions=)
-	# para máxima compatibilidade com X11 e fallback de compositors Wayland.
+	# StartupWMClass goes in the [Desktop Entry] section (before the Actions=
+	# line) for X11 compatibility and as the Wayland compositor fall-back.
 	sed -i "/^Actions=/i StartupWMClass=${APP_ID}" "${APP_ID}.desktop" || die
 
 	# Set release channel to nightly so the remote_server auto-download
@@ -1857,9 +1873,9 @@ src_prepare() {
 	LIVEKIT_GIT+=", rev = \"${LIVEKIT_COMMIT}\""
 	local LIVEKIT_PATH="livekit = \\{ path = \"${WORKDIR}/livekit-rust-sdks-${LIVEKIT_COMMIT}/livekit\""
 
-	local LIBWERBRTC_GIT="libwebrtc = { git = \"https://github.com/zed-industries/livekit-rust-sdks\""
-	LIBWERBRTC_GIT+=", rev = \"${LIVEKIT_COMMIT}\""
-	local LIBWERBRTC_PATH="libwebrtc = \\{ path = \"${WORKDIR}/livekit-rust-sdks-${LIVEKIT_COMMIT}/libwebrtc\""
+	local LIBWEBRTC_GIT="libwebrtc = { git = \"https://github.com/zed-industries/livekit-rust-sdks\""
+	LIBWEBRTC_GIT+=", rev = \"${LIVEKIT_COMMIT}\""
+	local LIBWEBRTC_PATH="libwebrtc = \\{ path = \"${WORKDIR}/livekit-rust-sdks-${LIVEKIT_COMMIT}/libwebrtc\""
 
 	local WIN_CAP_COMMIT="f0d6c1b6691db75461b732f6d5ff56eed002eeb9"
 	local WIN_CAP_GIT="windows-capture = { git = \"https://github.com/zed-industries/windows-capture.git\""
@@ -1893,7 +1909,7 @@ src_prepare() {
 		-e "s#${ASYNC_TASK_GIT}#${ASYNC_TASK_PATH}#" \
 		-e "s#${CALLOOP_GIT}#${CALLOOP_PATH}#" \
 		-e "s#${LIVEKIT_GIT}#${LIVEKIT_PATH}#" \
-		-e "s#${LIBWERBRTC_GIT}#${LIBWERBRTC_PATH}#" \
+		-e "s#${LIBWEBRTC_GIT}#${LIBWEBRTC_PATH}#" \
 		-e "s#${WEBRTC_SYS_GIT}#${WEBRTC_SYS_PATH}#" \
 		-e "s#${WIN_CAP_GIT}#${WIN_CAP_PATH}#" \
 		-e "s#${NOTIFY_TYPES_GIT}#${NOTIFY_TYPES_PATH}#" \
@@ -1948,6 +1964,7 @@ src_compile() {
 		export LK_CUSTOM_WEBRTC="${WORKDIR}/linux-x64-release"
 	fi
 	local features=()
+	use inspector && features+=( zed/inspector )
 	use mimalloc && features+=( zed/mimalloc )
 	use tracy && features+=( zed/tracy )
 
@@ -1957,9 +1974,19 @@ src_compile() {
 	)
 	use collab && packages+=( --package collab )
 	use extensions-cli && packages+=( --package extension_cli )
+	# remote_server is built from this same workspace rather than upstream's
+	# separate musl target, so it links the system libraries the rest of the
+	# package already depends on. That is what makes it usable on a host that
+	# has this package installed, and it is why it is not a drop-in replacement
+	# for the static binary zed.dev serves.
+	use remote-server && packages+=( --package remote_server )
 
-	cargo_src_compile "${packages[@]}" \
-		${features:+--features "${features[*]}"}
+	# "${features[*]}" alone would be an empty --features argument when no flag
+	# is on; the count is what decides whether the option appears at all.
+	local feature_args=()
+	(( ${#features[@]} )) && feature_args=( --features "${features[*]}" )
+
+	cargo_src_compile "${packages[@]}" "${feature_args[@]}"
 }
 
 src_install() {
@@ -1975,8 +2002,15 @@ src_install() {
 		newbin "$(cargo_target_dir)"/zed-extension zed-extension
 	fi
 
-	# Usa o icon set específico do canal nightly (existe no source),
-	# instalado com nome igual ao APP_ID para resolução por compositors Wayland.
+	# The client looks the daemon up by a name it builds at run time, under the
+	# remote user's ~/.zed_server -- a path no ebuild can write to. Installing
+	# it here is therefore half the job; pkg_postinst spells out the other half.
+	if use remote-server; then
+		newbin "$(cargo_target_dir)"/remote_server zed-remote-server
+	fi
+
+	# The nightly channel's own icon set, which the source ships, installed
+	# under the APP_ID name so Wayland compositors resolve it.
 	newicon -s 512 crates/zed/resources/app-icon-nightly.png "${APP_ID}.png"
 	newicon -s 1024 crates/zed/resources/app-icon-nightly@2x.png "${APP_ID}.png"
 	domenu "${S}/${APP_ID}.desktop"
@@ -2001,6 +2035,28 @@ pkg_postinst() {
 		elog "    \"agent_servers\": {"
 		elog "        \"Claude Agent TUI\": { \"command\": \"claude-agent-acp-tui\", \"args\": [] }"
 		elog "    }"
+	fi
+
+	if use remote-server; then
+		elog ""
+		elog "The remote editing daemon was installed as 'zed-remote-server'."
+		elog "Installing it is only half of what makes it used: a Zed client"
+		elog "looks the daemon up on the remote host by a name it builds at run"
+		elog "time, under that user's home:"
+		elog ""
+		elog "    ~/.zed_server/zed-remote-server-nightly-<VERSION>"
+		elog ""
+		elog "so the daemon has to be reachable under exactly that name. Connect"
+		elog "once without it and Zed downloads its own copy there -- the name it"
+		elog "wrote is the name to use:"
+		elog ""
+		elog "    mkdir -p ~/.zed_server"
+		elog "    ln -sf /usr/bin/zed-remote-server \\"
+		elog "        ~/.zed_server/zed-remote-server-nightly-<VERSION>"
+		elog ""
+		elog "This build comes from the same workspace as the editor, not from"
+		elog "upstream's separate static musl target, so it needs this package's"
+		elog "shared libraries present on the host that runs it."
 	fi
 
 	if use claude-code-ide; then

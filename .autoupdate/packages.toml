@@ -2177,7 +2177,7 @@ base_from = "file"
 base_url = "https://api.github.com/repos/zed-industries/zed/contents/crates/zed/Cargo.toml?ref=main"
 base_pattern = '(?m)^version = "([0-9][0-9.]*)"'
 headers = { "User-Agent" = "bentoo-autoupdate", "Accept" = "application/vnd.github.raw" }
-version = "1.20.0_pre20260909"
+version = "1.20.0_pre20260909-r1"
 comments = """
 zed — commit-tracked on main; _pre suffix preserved from current ebuild.
 2026-08-06: 2 commits landed same UTC day (d61e80b -> 6b2aa1c), so the date
@@ -2314,6 +2314,32 @@ series touches (acp_thread agent agent_servers agent_ui claude_code_ide
 feature_flags project settings settings_content workspace) finishes clean in
 1m06, so nothing drifted at the API level either. Not merged with a build: this
 host has no sudo, so no emerge ran.
+2026-09-09: MANUAL bump, 72b02bf1 -> 5896274 (both 2026-09-09 UTC, so -r1). The
+smallest bump this package has had: 2 commits, 10 files, and the Cargo.lock
+untouched -- pycargoebuild reproduced CRATES (1493), GIT_CRATES (73) and the
+LICENSE block byte-identically, and the regenerated Manifest changed exactly one
+line, the source tarball's. The eleven sed patterns still resolve one-for-one
+(11/11 came out `path =` against the real prepared tree), and the sixteen
+patches refresh to a byte-identical series -- not merely applying, but with no
+offset drift at all, which follows from the ten changed files intersecting
+nothing the series touches.
+Four ebuild changes rode along, none of them required by the bump:
+  - pulseaudio DROPPED from IUSE. It changed no part of the build. Zed's audio
+    path is cpal, which is ALSA on Linux; the lockfile carries alsa/alsa-sys and
+    no libpulse crate at all, so the flag only added media-libs/libpulse to the
+    depset. A PulseAudio sink is an alsa-plugins runtime choice.
+  - inspector ADDED (upstream feature zed/inspector, the GPUI UI inspector).
+  - remote-server ADDED: crates/remote_server, the SSH remote-editing daemon the
+    client otherwise fetches from zed.dev onto the remote host at run time.
+    Built from this workspace, not upstream's static musl target, so it needs
+    this package's shared libraries; pkg_postinst spells out the ~/.zed_server
+    naming the client requires.
+  - test ADDED with RESTRICT="!test? ( test )": src_test had existed with no
+    flag able to say the suite is optional.
+Verified: `cargo check --offline -p zed -p remote_server --features
+zed/inspector` finishes clean in 1m40 over 892 crates -- one pass covering the
+patch series' API drift and both new flags. Not merged with a build: this host
+has no sudo, so no emerge ran.
 """
 # END
 

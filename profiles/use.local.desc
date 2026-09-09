@@ -21,9 +21,10 @@ app-editors/zed:claude-agent-acp-tui - Install the claude-agent-acp-tui ACP brid
 app-editors/zed:claude-code-ide - Native Claude Code CLI editor integration (unofficial reverse-engineered IDE protocol, WebSocket MCP server) via a source patch
 app-editors/zed:collab - Build the collaboration server
 app-editors/zed:extensions-cli - Build the zed-extension CLI for managing extensions
+app-editors/zed:inspector - Build the GPUI UI inspector, which shows the element tree, layout and styles of Zed's own interface at run time
 app-editors/zed:mimalloc - Use mimalloc as the global memory allocator for improved performance
 app-editors/zed:neovim - Enable Neovim integration for full vim compatibility via RPC
-app-editors/zed:pulseaudio - Enable PulseAudio audio support
+app-editors/zed:remote-server - Build and install zed-remote-server, the daemon that backs Zed's SSH remote editing. Without it the client downloads its own copy from zed.dev onto the remote host at run time
 app-editors/zed:screen-capture - Enable screen capture support for collaboration sessions
 app-editors/zed:tracy - Enable Tracy profiler integration for performance analysis
 app-editors/zed:wayland - Enable Wayland display server support
