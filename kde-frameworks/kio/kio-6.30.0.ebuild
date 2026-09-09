@@ -71,8 +71,6 @@ PDEPEND="
 	kde-plasma/keditfiletype
 "
 
-PATCHES=( "${FILESDIR}/${P}-openurljob-fix-shellscripts.patch" )  # KDE-bug 522948
-
 src_configure() {
 	use elibc_musl && append-ldflags -Wl,-z,stack-size=0x100000 # upstream bug 470763
 

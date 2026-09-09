@@ -47,11 +47,6 @@ BDEPEND="
 	)
 "
 
-PATCHES=(
-	"${FILESDIR}/${P}-fix-kdeconnect-100pc-load.patch" # KDE-bug #517743, in 6.30
-	"${FILESDIR}/${P}-fix-paste-large-imgs.patch" # KDE-bug #519651, in 6.30
-)
-
 src_configure() {
 	local mycmakeargs=(
 		-DBUILD_GEO_SCHEME_HANDLER=ON
