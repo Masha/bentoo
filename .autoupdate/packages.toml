@@ -8134,12 +8134,10 @@ wrong line.
 # END
 
 ["app-admin/ansible"]
-enabled = false
-disabled_by = "parity-audit 2026-09-04: removed, ::gentoo copy is better"
 url = "https://pypi.org/pypi/ansible/json"
 parser = "json"
 path = "info.version"
-version = "14.3.1"
+version = "14.4.0"
 comments = """
 Ansible — PyPI info.version (community package); check resolves 14.1.0 = ebuild.
 NOTE: PyPI's info.version for the ansible community package can occasionally lag
