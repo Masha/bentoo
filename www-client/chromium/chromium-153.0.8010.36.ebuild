@@ -550,14 +550,33 @@ src_prepare() {
 	python_setup
 
 	# We'll fill this in as we go. Patches go in chromium-patches.
-	# BENTOO-DIVERGENCE: PATCHES - three series-152 fixes with no counterpart:
-	# unbundle-minizip-undo-unicode, dawn-lifetime-safety-flags and
-	# cbor-crubit-optional. ::gentoo is on 142 and carries an old-fontconfig
-	# patch this series no longer needs.
+	# BENTOO-DIVERGENCE: PATCHES - four fixes with no counterpart:
+	# unbundle-minizip-undo-unicode, cbor-crubit-optional and the two
+	# chromium-patches rebases below. ::gentoo is on 142 and carries an
+	# old-fontconfig patch this series no longer needs.
 	local PATCHES=()
+
+	# BENTOO-DIVERGENCE: chromium-patches has no 153 tag -- 152 (2026-08-22) is
+	# still the newest -- so PATCH_V lags PV by a series and two of its patches
+	# no longer apply to this tarball. Both are replaced here by a rebase in
+	# FILESDIR rather than skipped: eapply takes whole directories, so the only
+	# way to substitute one member is to delete it from the unpacked patchset
+	# first. Drop each rm together with its FILESDIR twin the moment
+	# chromium-patches tags 153 and PATCH_V follows -- keeping a rm for a file
+	# that no longer exists turns the next bump into a die.
+	rm "${WORKDIR}/chromium-patches-${PATCH_V}/common/cr152-revert-to-rollup-wasm.patch" ||
+		die "chromium-patches no longer ships cr152-revert-to-rollup-wasm.patch; drop this rm and its rebase"
 
 	PATCHES+=(
 		"${WORKDIR}/chromium-patches-${PATCH_V}/common/"
+		# bentoo: rebase of chromium-patches' cr152-revert-to-rollup-wasm.patch.
+		# Only one of its seven files moved: 153 rewrote codemirror.next's
+		# rebuild.sh (added `set -e`, `npm audit`, a package-lock pass and new
+		# tsc flags), so the @@ -1,6 +1,6 @@ hunk lost its context. The
+		# substitution it makes -- node_modules/rollup -> @rollup/wasm-node --
+		# is unchanged; rebuild.sh is a devtools maintainer script and not part
+		# of the build, but a rejected hunk still fails the whole eapply.
+		"${FILESDIR}/chromium-153-revert-to-rollup-wasm.patch"
 	)
 
 	# So many fontconfig magic numbers to cover
@@ -630,18 +649,23 @@ src_prepare() {
 			# the one that does not. Only reachable here: with USE=bundled-
 			# toolchain the flag is true and the patch is a no-op.
 			"${FILESDIR}/chromium-152-cbor-crubit-optional.patch"
-			# bentoo: dawn/src/utils turns off Clang's experimental lifetime-safety
-			# analysis with two -Xclang flags. Those exist only in the toolchain
-			# Chromium bundles -- a system clang without the analysis is also
-			# without the flags, and rejects them as `unknown argument`. That is
-			# fatal, unlike an unknown -W..., which the append-flags
-			# -Wno-unknown-warning-option in src_configure already silences.
-			# Dropping them is safe because there is no pass to turn off in the
-			# first place. Sole occurrence in the tree: pdfium, skia and v8 use
-			# plain -W forms that a system clang tolerates. Drop this once
-			# chromium-patches ships an llvm/lt-<n>/ patch covering it.
-			"${FILESDIR}/chromium-152-dawn-lifetime-safety-flags.patch"
+			# bentoo: rebase of chromium-patches' toolchain/
+			# cr152-fix-rust-2-oxidize-harder.patch, which teaches Crubit to take
+			# rs_bindings_from_cc and rustfmt from ${rust_sysroot} instead of the
+			# bundled //third_party/rust-toolchain the tarball does not ship. Its
+			# three .gni hunks still apply; 153 only reformatted
+			# run_rs_bindings_from_cc.py to 4-space indent, which rejected all
+			# four hunks against that file. Nothing about the fix changed -- the
+			# hardcoded RUST_TOOLCHAIN_DIR constants are still there. Reachable
+			# only on this branch: the patchset's toolchain/ directory is applied
+			# by the loop below, which is inside this same USE=-bundled-toolchain
+			# else.
+			"${FILESDIR}/chromium-153-fix-rust-2-oxidize-harder.patch"
 		)
+
+		# See the rm above common/ for why substitution means deleting first.
+		rm "${WORKDIR}/chromium-patches-${PATCH_V}/toolchain/cr152-fix-rust-2-oxidize-harder.patch" ||
+			die "chromium-patches no longer ships cr152-fix-rust-2-oxidize-harder.patch; drop this rm and its rebase"
 
 		# Automate conditional application of chromium-patches
 		# The directory structure is expected to be something like:
