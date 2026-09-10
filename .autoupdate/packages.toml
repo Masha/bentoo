@@ -915,6 +915,29 @@ Trilium — releases/latest tag "vX.Y.Z" (tags[0] is a separate web-clipper line
 """
 # END
 
+["app-emulation/bochs"]
+url = "https://api.github.com/repos/bochs-emu/Bochs/releases/latest"
+parser = "json"
+path = "tag_name"
+transform = [['^REL_', ""], ['_FINAL$', ""], ['_', "."]]
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "3.0-r1"
+comments = """
+bochs — releases/latest, NOT refs/tags: the API returns tags in reverse
+alphabetical order, so the top of that list is dead branch litter
+(x86-64-works, tmp-before1), never the release. tag_name is "REL_3_1_FINAL";
+the three transforms reduce it to "3.1", and the third rule is global, so a
+future REL_3_1_1_FINAL would also come out Gentoo-shaped. Only three releases
+exist upstream (2.8, 3.0, 3.1) and none is flagged prerelease.
+BUMP CAVEATS: the ebuild derives MY_P from ver_cut 1 and 2, so a three-component
+version would need MY_P edited by hand. The -r1 is a bentoo divergence (the GCC
+16 -latomic_asneeded libtool workaround); it travels with the bump, but the
+`grep -q ... || die` guarding it will fail the build if upstream stops emitting
+the flag — that is deliberate, not a regression.
+Live=REL_3_1_FINAL -> 3.1.
+"""
+# END
+
 ["app-emulation/cloud-utils"]
 url = "https://api.github.com/repos/canonical/cloud-utils/releases/latest"
 parser = "json"
