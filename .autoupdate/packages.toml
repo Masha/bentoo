@@ -1969,6 +1969,8 @@ xf86-video-qxl — tags carry "xf86-video-qxl-" prefix; regex extracts the versi
 # END
 
 ["x11-drivers/nvidia-drivers"]
+enabled = false
+disabled_by = "removed 2026-09-10: ::gentoo now ships 615.71.09 itself, which is the exact condition the overlay ebuild's own BENTOO-DIVERGENCE comment named as the moment to drop it (\"the right move is to drop this ebuild, not to align the file\"). The overlay copy had also fallen behind ::gentoo AT THE SAME PV -- ::gentoo since added python-single-r1, the CGROUPS kernel check, python_fix_shebang and dobin nvidia-networking-bug-report.py, none of which the overlay copy had. Kept as a record, not deleted, so the verified probe survives; re-enable only if bentoo ever carries this package again."
 url = "https://www.nvidia.com/en-us/drivers/unix/"
 parser = "regex"
 pattern = 'Latest New Feature Branch Version:</span> <a href="[^"]+">([0-9][0-9.]*)</a>'
