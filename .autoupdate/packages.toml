@@ -1278,7 +1278,7 @@ url = "https://api.github.com/repos/v-novaltd/LCEVCdec/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "4.2.1"
+version = "4.2.2"
 comments = """
 lcevc_dec — release tag bare semver.
 """
@@ -1836,7 +1836,7 @@ url = "https://api.github.com/repos/vim/vim/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "9.2.1061"
+version = "9.2.1064"
 comments = """
 vim — no releases (404); tags[0] "vX.Y.ZZZZ".
 """
@@ -1847,7 +1847,7 @@ url = "https://api.github.com/repos/vim/vim/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "9.2.1061"
+version = "9.2.1064"
 comments = """
 vim-core — same upstream repo as vim.
 """
@@ -4412,7 +4412,7 @@ named ${PN}-opencv5.patch, not ${P}-, deliberately: it has been byte-identical \
 since 6.7.1, and a version in the filename would make every bump rename it by \
 hand. Drop this once ::gentoo carries the opencv5 fix itself.\
 """
-version = "6.7.5"
+version = "6.7.90"
 comments = """
 spectacle -> KDE/plasma-workspace (anchor: overlay versions it as Plasma)
 """
@@ -7762,7 +7762,7 @@ is a workspace and pycargoebuild refuses it.
 url = "https://pypi.org/pypi/openai/json"
 parser = "json"
 path = "info.version"
-version = "3.11.0"
+version = "3.12.0"
 comments = """
 openai — official Python SDK; core dep of sci-ml/amd-gaia. info.version is
 clean X.Y.Z. Live=3.0.0 == current PV.
@@ -8549,7 +8549,7 @@ url = "https://api.github.com/repos/microsoft/onnxruntime/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.29.1"
+version = "1.30.0"
 comments = """
 onnxruntime — tag "vX.Y.Z". Verified 2026-07-19: releases/latest is v1.27.1
 and is not flagged prerelease, so latest tracks the stable line.
@@ -8562,7 +8562,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "1.29.1"
+version = "1.30.0"
 comments = """
 onnxruntime-bin — same upstream repo as the source package; must stay
 version-aligned with it.
@@ -8635,7 +8635,7 @@ transform = [['T.*', ""], ['-', ""]]
 commit_sha_path = "sha"
 base_from = "none"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0_pre20260909"
+version = "0_pre20260910"
 comments = """
 ik_llama-cpp — base_from = "none": upstream publishes no usable release
 series.  Verified 2026-07-19 and again 2026-08-04: the repo has exactly ONE
