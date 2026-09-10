@@ -132,40 +132,40 @@
 =media-plugins/gst-plugins-ximagesrc-1.29*
 =media-plugins/gst-plugins-zbar-1.29*
 
-# Lucas C.S. <lucascs@protonmail.com> (2026-09-02)
+# Lucas C.S. <lucascs@protonmail.com> (2026-09-10)
 # dev-lang/flutter unbundles the Dart SDK -- src_install removes
 # bin/cache/dart-sdk and symlinks it to /usr/lib/dart -- so it pins the exact
-# version it was built against: RDEPEND="~dev-lang/dart-3.13.2". That pin is
+# version it was built against: RDEPEND="~dev-lang/dart-3.13.3". That pin is
 # not caution, it is the ABI. bin/cache/flutter_tools.snapshot only loads on
 # the Dart VM it was compiled for; on any other one every flutter command dies
 # with "Wrong full snapshot version, expected '<new>' found '<old>'".
 #
-# Dart 3.13.3 was released 2026-09-01 and NO Flutter release ships it -- not on
-# any channel. The newest stable, 3.47.2 (2026-08-27), carries dart_sdk_version
-# 3.13.2, and beta has already moved past it to 3.14.0. Unmasked, an
-# "emerge -uDN @world" picks dart 3.13.3, which nothing in the tree can satisfy
-# a dependency on, and the update stops on a conflict instead of proceeding.
+# The floor tracks the newest Dart that NO Flutter release ships. It moved from
+# 3.13.3 to 3.14.0 on 2026-09-10: Flutter stable 3.47.3 (2026-09-09) carries
+# dart_sdk_version 3.13.3, which retired the previous floor exactly as the
+# entry it replaced predicted. 3.14.0 is where beta sits (3.48.0-0.4.pre), so
+# it is again a real Dart with no stable Flutter behind it. Unmasked, an
+# "emerge -uDN @world" picks it, nothing in the tree can satisfy a dependency
+# on it, and the update stops on a conflict instead of proceeding.
 #
-# dev-lang/dart-3.13.2 is kept in the tree alongside it for exactly that reason.
-# Do not drop it in an overlay-maintainer pass that removes superseded versions
-# -- it was dropped twice already: by .autoupdate's own "git mv" bump in
-# 1693e3c57, which produced the conflict this entry answers, and again in
-# d72f93009 by `autoupdate --clean`, which deletes every ebuild no registry
-# entry claims. THIS MASK PROTECTS NOTHING FROM THAT SWEEP: it speaks to
-# Portage, not to the tooling. The claim is what protects the file, and it now
-# exists -- .autoupdate/packages.toml carries two records for this atom,
-# dev-lang/dart@stable (3.13.2, the line Flutter runs, exact series so it can
-# never auto-bump) and dev-lang/dart@testing (upstream's stable channel, the
-# line this mask covers). Promote them together with the floor below; deleting
+# Every version below the floor needs an OWNER in .autoupdate/packages.toml or
+# the tooling deletes it. THIS MASK PROTECTS NOTHING FROM THAT SWEEP: it speaks
+# to Portage, not to the tooling. dev-lang/dart-3.13.2 was dropped twice while
+# it was the line Flutter ran -- by .autoupdate's own "git mv" bump in
+# 1693e3c57, and again in d72f93009 by `autoupdate --clean`, which deletes
+# every ebuild no registry entry claims. The claim is what protects the file:
+# packages.toml carries dev-lang/dart@stable (the line Flutter runs, exact
+# series so it can never auto-bump) and dev-lang/dart@testing (upstream's
+# stable channel, the line this mask covers). Both now point at 3.13.3, which
+# is expected -- they converge whenever Flutter catches up and diverge again on
+# upstream's next release. Promote them together with the floor; deleting
 # either record re-arms the sweep.
 #
 # The atom is a floor, not an equality, because .autoupdate bumps dart daily:
-# =dev-lang/dart-3.13.3 would let 3.13.4 through tomorrow and reopen the same
+# =dev-lang/dart-3.14.0 would let 3.14.1 through tomorrow and reopen the same
 # conflict silently. Raise the floor -- or delete this entry -- once a Flutter
-# release lands whose dart_sdk_version reaches the masked version. Given where
-# beta already is, the likely exit is a raise to >=dev-lang/dart-3.14.x, not a
-# deletion: 3.13.3 may never get a Flutter at all. Ask the source, never the
-# changelog:
+# release lands whose dart_sdk_version reaches the masked version. Ask the
+# source, never the changelog:
 #
 #   curl -s 'https://storage.googleapis.com/flutter_infra_release/releases/releases_linux.json' \
 #     | jq -r '.releases[] | select(.channel=="stable") | "\(.version)\t\(.dart_sdk_version)"' | head
@@ -177,7 +177,7 @@
 # The atom is deliberately unqualified. dev-lang/dart exists only in this
 # overlay, and Portage stamps every repo-level mask atom as "<atom>::bentoo",
 # which is exactly where the ebuild lives.
->=dev-lang/dart-3.13.3
+>=dev-lang/dart-3.14.0
 
 # Lucas C.S. <lucascs@protonmail.com> (2026-08-11)
 # Nettle 4.0 is a deliberately incompatible release. The *_digest functions
