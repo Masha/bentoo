@@ -2657,7 +2657,7 @@ base_from = "tag"
 base_url = "https://api.github.com/repos/KhronosGroup/SPIRV-Tools/git/refs/tags"
 base_tag_pattern = '^vulkan-sdk-([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)$'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.357.0_p20260909"
+version = "1.4.357.0_p20260910"
 comments = """
 spirv-tools — commit-tracked on main; scans titles for vulkan-sdk-X.Y.Z.W to detect base bump.
 """
@@ -8390,7 +8390,7 @@ parser = "regex"
 pattern = '"name": ?"v([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.13.7"
+version = "1.13.8"
 comments = """
 sherpa-onnx — TAG list, highest "vX.Y.Z". This is the axis the ebuild itself
 consumes: SRC_URI takes archive/refs/tags/v${PV}.tar.gz, never a release asset.
