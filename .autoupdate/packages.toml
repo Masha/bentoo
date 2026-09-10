@@ -179,7 +179,7 @@
 url = "https://registry.npmjs.org/@anthropic-ai/claude-code"
 parser = "json"
 path = "dist-tags.latest"
-version = "2.1.266"
+version = "2.1.267"
 comments = """
 claude-code — npm @anthropic-ai/claude-code; dist-tags.latest is the stable channel.
 
@@ -468,7 +468,7 @@ url = "https://nodejs.org/dist/latest-v26.x/SHASUMS256.txt"
 parser = "regex"
 pattern = 'node-v(26\.[0-9]+\.[0-9]+)\.tar\.xz'
 select = "max"
-version = "26.8.1"
+version = "26.8.2"
 comments = """
 Node.js SLOT 26 — the current line.
 Identical in shape to net-libs/nodejs:24 above, which carries the shared
@@ -485,12 +485,10 @@ be fixed there before any entry could ever track it.
 # END
 
 ["mail-client/thunderbird"]
-enabled = false
-disabled_by = "removed 2026-09-02: ::gentoo caught up to 155.0, the exact version this overlay carried, so the ebuild had nothing left to add"
 url = "https://product-details.mozilla.org/1.0/thunderbird_versions.json"
 parser = "json"
 path = "LATEST_THUNDERBIRD_VERSION"
-version = "155.0"
+version = "155.0.1"
 comments = """
 Thunderbird — Mozilla's authoritative product-details endpoint. Use the
 LATEST_THUNDERBIRD_VERSION key (rapid/release channel, matching SLOT=0/stable):
@@ -521,12 +519,10 @@ packages ever leave again, disable them instead.
 # END
 
 ["mail-client/thunderbird-l10n"]
-enabled = false
-disabled_by = "removed 2026-09-02: follows mail-client/thunderbird — ::gentoo ships the same 155.0"
 url = "https://product-details.mozilla.org/1.0/thunderbird_versions.json"
 parser = "json"
 path = "LATEST_THUNDERBIRD_VERSION"
-version = "155.0"
+version = "155.0.1"
 comments = """
 Thunderbird translation files — same upstream endpoint and key as
 mail-client/thunderbird above, because they are the same release: the .xpi are
@@ -1100,7 +1096,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "0.12.11"
+version = "0.12.12"
 comments = """
 uv (uv-bin) — tag bare "X.Y.Z".
 """
@@ -1122,7 +1118,7 @@ url = "https://api.github.com/repos/openai/codex/releases/latest"
 parser = "regex"
 pattern = '"tag_name":\s*"rust-v([0-9]+\.[0-9]+\.[0-9]+)"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.153.4"
+version = "0.154.0"
 comments = """
 codex — tag "rust-vX.Y.Z" ("rust-" not strippable); regex extracts X.Y.Z from tag_name.
 
@@ -1149,7 +1145,7 @@ parser = "regex"
 pattern = '"tag_name":\s*"rust-v([0-9]+\.[0-9]+\.[0-9]+)"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "0.153.4"
+version = "0.154.0"
 comments = """
 codex-bin — same upstream tag "rust-vX.Y.Z"; regex on tag_name.
 """
@@ -1817,7 +1813,7 @@ url = "https://api.github.com/repos/vim/vim/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "9.2.1054"
+version = "9.2.1061"
 comments = """
 vim — no releases (404); tags[0] "vX.Y.ZZZZ".
 """
@@ -1828,7 +1824,7 @@ url = "https://api.github.com/repos/vim/vim/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "9.2.1054"
+version = "9.2.1061"
 comments = """
 vim-core — same upstream repo as vim.
 """
@@ -2498,7 +2494,7 @@ path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
 series = '^[0-9.]+$'
-version = "1.18.1"
+version = "1.19.2"
 comments = """
 zed-bin (stable channel) — releases/latest is the stable release by definition
 (prerelease=false); upstream tags it "vX.Y.Z" and the preview "vX.Y.Z-pre".
@@ -2523,7 +2519,7 @@ select = "max"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
 series = '_pre$'
-version = "1.19.1_pre"
+version = "1.20.0_pre"
 comments = """
 zed-bin (preview channel) — releases/latest never returns a prerelease, so the
 preview needs the full list: the pattern takes only "vX.Y.Z-pre" tags and the
@@ -2604,7 +2600,7 @@ base_from = "tag"
 base_url = "https://api.github.com/repos/KhronosGroup/glslang/git/refs/tags"
 base_tag_pattern = '^vulkan-sdk-([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)$'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.357.0_p20260908"
+version = "1.4.357.0_p20260909"
 comments = """
 glslang — commit-tracked on main; scans titles for vulkan-sdk-X.Y.Z.W to detect base bump.
 """
@@ -2621,7 +2617,7 @@ base_from = "tag"
 base_url = "https://api.github.com/repos/KhronosGroup/SPIRV-Headers/git/refs/tags"
 base_tag_pattern = '^vulkan-sdk-([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)$'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.357.0_p20260826-r1"
+version = "1.4.357.0_p20260909"
 comments = """
 spirv-headers — commit-tracked on main; scans titles for vulkan-sdk-X.Y.Z.W to detect base bump.
 """
@@ -2732,7 +2728,7 @@ base_from = "file"
 base_url = "https://raw.githubusercontent.com/KhronosGroup/Vulkan-Loader/main/CMakeLists.txt"
 base_pattern = '(?m)^project\([A-Za-z_-]+ VERSION ([0-9][0-9.]*)'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.362_p20260908"
+version = "1.4.362_p20260909"
 comments = """
 vulkan-loader — commit-tracked on main; scans for "Update for Vulkan-Docs X.Y.Z" to detect base bump.
 """
@@ -7713,7 +7709,7 @@ is a workspace and pycargoebuild refuses it.
 url = "https://pypi.org/pypi/openai/json"
 parser = "json"
 path = "info.version"
-version = "3.10.0"
+version = "3.11.0"
 comments = """
 openai — official Python SDK; core dep of sci-ml/amd-gaia. info.version is
 clean X.Y.Z. Live=3.0.0 == current PV.
@@ -8086,7 +8082,7 @@ url = "https://api.github.com/repos/lucascouts/claude-agent-acp-plus/releases/la
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.14.0"
+version = "0.15.1"
 comments = """
 claude-agent-acp-plus — GitHub releases/latest tag "vX.Y.Z" (v stripped).
 SRC_URI releases/download/v${PV}/${P}-bundle.tar.gz. Live=v0.2.0.
@@ -8190,7 +8186,7 @@ pattern = '"name":\s*"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 series = '^2\.'
-version = "2.36.41"
+version = "2.36.42"
 comments = """
 aws-cli v2 — GitHub tag index, pinned to the 2.x series. Verified 2026-08-19
 against the live endpoint: 100 matches, all of them 2.x, max = 2.36.27 = ebuild.
@@ -8282,7 +8278,7 @@ hand.
 url = "https://storage.googleapis.com/flutter_infra_release/releases/releases_linux.json"
 parser = "regex"
 pattern = '"channel": "stable",\s+"version": "([0-9]+\.[0-9]+\.[0-9]+)"'
-version = "3.47.2-r1"
+version = "3.47.3"
 comments = """
 Flutter — official releases_linux.json (pretty-printed, newest-first). The
 current_release.stable is a hash, not a version, so anchor the regex on the
@@ -8797,7 +8793,7 @@ url = "https://gitlab.freedesktop.org/api/v4/projects/xorg%2Fxserver/repository/
 parser = "regex"
 pattern = '"name":"xwayland-([0-9.]+)"'
 select = "max"
-version = "26.0.99.901"
+version = "26.0.99.902"
 comments = """
 xwayland — the xorg/xserver tag list on gitlab.freedesktop.org, narrowed to the
 xwayland axis by the API's own search= filter.
