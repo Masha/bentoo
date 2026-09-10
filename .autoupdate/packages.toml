@@ -4421,9 +4421,11 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 # END
 
 ["kde-plasma/spectacle"]
-url = "https://api.github.com/repos/KDE/plasma-workspace/tags"
-parser = "json"
-path = "[0].name"
+url = "https://api.github.com/repos/KDE/plasma-workspace/tags?per_page=20"
+parser = "regex"
+pattern = '"name":"v([0-9]+\.[0-9]+\.[0-9]+(?:\.[0-9]+)?)"'
+select = "max"
+series = '^[0-9]+\.[0-9]+\.(?:[0-9]|[1-8][0-9])(?:\.[0-9]+)?$'
 headers = { "User-Agent" = "bentoo-autoupdate" }
 patched = """
 Applies files/spectacle-opencv5.patch, which ::gentoo does not ship at 6.7.4 — \
@@ -4433,9 +4435,21 @@ named ${PN}-opencv5.patch, not ${P}-, deliberately: it has been byte-identical \
 since 6.7.1, and a version in the filename would make every bump rename it by \
 hand. Drop this once ::gentoo carries the opencv5 fix itself.\
 """
-version = "6.7.90"
+version = "6.7.5"
 comments = """
-spectacle -> KDE/plasma-workspace (anchor: overlay versions it as Plasma)
+spectacle -> KDE/plasma-workspace (anchor: overlay versions it as Plasma).
+
+`series` excludes the BETAS. Plasma numbers the next series' beta as x.y.90 /
+x.y.91 -- 6.7.90 IS the 6.8 beta -- and `[0].name` over the tag list always
+returns the newest tag, beta included. On 2026-09-10 that bumped spectacle to
+6.7.90 and broke emerge: the ebuild derives its Plasma-family deps from
+${KDE_CATV} (== ${PV}), so it asked for >=kde-plasma/kpipewire-6.7.90 -- and
+bentoo does not carry kpipewire, it comes from ::gentoo, which was at 6.7.5. No
+ebuild satisfies the dep, so the package becomes uninstallable. Hence
+`parser = "regex"` + `select = "max"` instead of `[0].name`: the regex matches
+EVERY tag, `series` drops any third component >= 90, and `max` picks the highest
+remaining stable. Once Plasma 6.8.0 ships as stable it matches the series on its
+own and the record moves again.
 """
 # END
 
