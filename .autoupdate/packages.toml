@@ -217,7 +217,7 @@ would actually ship fetches on its own.\
 """
 aux_var = "EGIT_COMMIT"
 aux_pattern = 'id>urn:sha1:([0-9a-f]{40})'
-version = "20260831"
+version = "20260910"
 comments = """
 linux-firmware — kernel.org's cgit atom feed, because this package has no
 releases to track: it is fetched with git-r3 from a pinned commit and versioned
@@ -412,7 +412,7 @@ url = "https://dl.pstmn.io/api/version/latest?platform=linux64&channel=stable"
 parser = "json"
 path = "version"
 type = "bin"
-version = "12.27.2"
+version = "12.27.5"
 comments = """
 Postman — official version API; clean {"version":"..."}.
 """
@@ -580,7 +580,7 @@ transform strips the "go" prefix to match PV. Live=1.26.5.
 url = "https://persistent.oaistatic.com/codex-app-prod/linux/deb/dists/stable/main/binary-amd64/Packages"
 parser = "regex"
 pattern = 'Package: chatgpt\nVersion: ([0-9]+\.[0-9]+\.[0-9]+)'
-version = "26.903.61454"
+version = "26.903.71938"
 comments = """
 OpenAI Codex/ChatGPT desktop app — read the APT index of the very repo that
 SRC_URI pulls from. Both openai.com and chatgpt.com sit behind Cloudflare and
@@ -921,7 +921,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^REL_', ""], ['_FINAL$', ""], ['_', "."]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "3.0-r1"
+version = "3.1"
 comments = """
 bochs — releases/latest, NOT refs/tags: the API returns tags in reverse
 alphabetical order, so the top of that list is dead branch litter
@@ -1429,7 +1429,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "0.33.3"
+version = "0.34.0"
 comments = """
 ollama-bin — same upstream repo.
 """
@@ -2245,7 +2245,7 @@ commit_sha_path = "[0].id"
 base_from = "file"
 base_url = "https://gitlab.freedesktop.org/mesa/mesa/-/raw/main/VERSION"
 base_pattern = '^([0-9][0-9.]*)-devel'
-version = "26.3.0_pre20260909"
+version = "26.3.0_pre20260910"
 comments = """
 mesa — commit-tracked on main; _pre suffix preserved from current ebuild.
 
@@ -2263,7 +2263,7 @@ commit_sha_path = "[0].id"
 base_from = "file"
 base_url = "https://gitlab.freedesktop.org/mesa/mesa/-/raw/main/VERSION"
 base_pattern = '^([0-9][0-9.]*)-devel'
-version = "26.3.0_pre20260909"
+version = "26.3.0_pre20260910"
 comments = """
 mesa_clc — part of the mesa tree; same source/rule as media-libs/mesa.
 """
@@ -2280,7 +2280,7 @@ base_from = "file"
 base_url = "https://api.github.com/repos/zed-industries/zed/contents/crates/zed/Cargo.toml?ref=main"
 base_pattern = '(?m)^version = "([0-9][0-9.]*)"'
 headers = { "User-Agent" = "bentoo-autoupdate", "Accept" = "application/vnd.github.raw" }
-version = "1.21.0_pre20260909"
+version = "1.21.0_pre20260910"
 comments = """
 zed — commit-tracked on main; _pre suffix preserved from current ebuild.
 2026-08-06: 2 commits landed same UTC day (d61e80b -> 6b2aa1c), so the date
@@ -2734,7 +2734,7 @@ base_from = "file"
 base_url = "https://raw.githubusercontent.com/KhronosGroup/Vulkan-ValidationLayers/main/CMakeLists.txt"
 base_pattern = '(?m)^project\([A-Za-z_-]+ VERSION ([0-9][0-9.]*)'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.362_p20260909"
+version = "1.4.362_p20260910"
 comments = """
 vulkan-layers — commit-tracked on main (Vulkan-ValidationLayers); scans for "Update for Vulkan-Docs X.Y.Z".
 """
@@ -8519,7 +8519,7 @@ url = "https://api.github.com/repos/microsoft/onnxruntime/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.29.0"
+version = "1.29.1"
 comments = """
 onnxruntime — tag "vX.Y.Z". Verified 2026-07-19: releases/latest is v1.27.1
 and is not flagged prerelease, so latest tracks the stable line.
@@ -8532,7 +8532,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "1.29.0"
+version = "1.29.1"
 comments = """
 onnxruntime-bin — same upstream repo as the source package; must stay
 version-aligned with it.
