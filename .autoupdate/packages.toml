@@ -9376,3 +9376,36 @@ openvdb-13.0.0-nanovdb-python-bindings.patch (a backport of upstream master;
 it must be DROPPED, not forced, once a release carries the fix).
 """
 # END
+
+["www-client/opera"]
+url = "https://deb.opera.com/opera-stable/dists/stable/non-free/binary-amd64/Packages"
+parser = "regex"
+pattern = 'Package: opera-stable\nVersion: ([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)'
+version = "135.0.5973.123"
+comments = """
+Opera — read the APT index of Opera's own repository. The download CDN
+(downloadN.operacdn.com, which SRC_URI uses) publishes no listing, and
+opera.com/blogs returns marketing HTML with no machine-readable version.
+This index is plain text and carries all four channels in ONE file, so the
+anchor "Package: opera-stable" is load-bearing: opera-beta, opera-developer
+and opera-gx-stable sit in the same document, and opera-developer's version
+(137.x) is HIGHER than stable's. A loose regex reports the wrong channel.
+Same shape as dev-util/codex-desktop-bin above.
+
+bentoo carries this package only because of one line ::gentoo gets wrong:
+CHROMIUM_VERSION. Opera does not ship libffmpeg.so on Gentoo — the ebuild
+symlinks the one from media-video/ffmpeg-chromium:${CHROMIUM_VERSION} — and
+::gentoo's opera-135.0.5973.123 still pins 142 while the binary is Chromium
+151, which makes the browser die at startup on the missing symbol
+av_dynamic_hdr_smpte2094_app5_to_t35. Our -r1 pins 151.
+
+ON EVERY BUMP, RE-DERIVE THAT PIN; the applier carries the old value forward
+and it goes stale silently (the failure is a runtime symbol error, never a
+build error). After merging:
+
+  strings /opt/opera-stable/opera | grep -oE 'Chrome/[0-9.]+'
+
+and set CHROMIUM_VERSION to that major. Drop this package outright once
+::gentoo's own pin matches the Chromium the stable channel actually ships.
+"""
+# END
