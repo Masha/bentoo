@@ -70,6 +70,7 @@ this file.
 | `acct-user/ntpd-rs-observe` | `0` | As above. |
 | `acct-group/ntpd-rs-observe` | `0` | As above. |
 | `app-eselect/eselect-nodejs` | `2-r1` | Written for this overlay (story 005) to arbitrate the `net-libs/nodejs` slots. `HOMEPAGE` is Gentoo's "no homepage" placeholder because there is genuinely none: bentoo is the upstream. It moves when the slot contract does, which `check-slot-naming-contract.sh` asserts. |
+| `sec-keys/openpgp-keys-kamilaszewczyk` | `20260910` | OpenPGP key package for the current GNU Automake release manager, needed because 1.19 is the first tarball NOT signed by Karl Berry. `SRC_URI` is a keyserver lookup by fingerprint, which returns the key's *current* state and publishes no version at all: the `PV` is the date the packager snapshotted it. Bumps when the key gains a signing subkey or the old one expires, which only a failing `verify-sig` will tell you. |
 | `sys-libs/binutils-libs` | `2.47` | **Deliberately unrecorded, not overlooked.** Upstream is probeable — it is the same GNU release directory `sys-devel/binutils` tracks. It has no record of its own precisely so automation cannot move it independently: the two must be bumped together against bentoo's own patchset, and a record here would invite exactly the drift it is meant to prevent. See the `sys-devel/binutils` comment in `packages.toml`. |
 
 The account packages are the reason this section is a table rather than a

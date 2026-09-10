@@ -7269,6 +7269,34 @@ Gentoo form (-stable→bare, -beta→_beta, -rc→_rc, -dev→_alpha).
 """
 # END
 
+["dev-build/automake@1.19"]
+url = "https://ftp.gnu.org/gnu/automake/?C=M;O=D"
+parser = "regex"
+pattern = 'automake-([0-9][0-9.]*)\.tar\.xz'
+select = "max"
+series = '^1\.19(\.|$)'
+version = "1.19"
+comments = """
+automake (1.19 line) — GNU FTP release dir, Apache listing with "?C=M;O=D"
+(newest first); select = "max" is belt-and-braces in case the sort ever changes.
+
+WHY THE SERIES PIN, AND WHY IT MUST NOT BE WIDENED: the ebuild derives its SLOT
+from the version (MANGLED_SLOT=${PV:0:4}), so 1.19.1 stays in slot 1.19 and is
+safe to auto-bump, while 1.20 would be a DIFFERENT slot. The applier renames the
+ebuild in place — it never adds a second one — so an unpinned record would let a
+1.20 release silently DELETE slot 1.19 instead of adding slot 1.20. This is the
+same defect that erased dev-libs/icu-compat's slot on 2026-08-12. A new major
+line gets a NEW record (@1.20) and a new ebuild, both by hand.
+
+Prereleases (1.x.90+) live on alpha.gnu.org, not in this directory, so the
+pattern cannot pick one up by accident.
+
+bentoo carries this AHEAD of ::gentoo, which is still on 1.18.1. The ebuild is
+additive (autotools.eclass is not overridden), so nothing regresses if the two
+lines drift.
+"""
+# END
+
 ["dev-build/gn"]
 hold = true
 url = "https://deps.gentoo.zip/dev-build/gn/"
