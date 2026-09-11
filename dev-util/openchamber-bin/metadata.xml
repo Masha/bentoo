@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>diego.evangelista5642@gmail.com</email>
+		<name>lucascouts</name>
+	</maintainer>
+	<longdescription lang="en">
+		OpenChamber is a desktop cockpit for driving several opencode
+		sessions at once, each in its own workspace.
+
+		Repackaged from upstream's AppImage. The copies of system libraries
+		the AppImage carries for portability are removed, and Chromium's
+		sandbox is installed setuid and left enabled — upstream's own
+		launcher disables it, which an AppImage has to do because it cannot
+		ship a setuid helper.
+	</longdescription>
+	<use>
+		<flag name="wayland">Pull in GTK+ built with Wayland support</flag>
+	</use>
+	<upstream>
+		<remote-id type="github">OpenChamber/openchamber</remote-id>
+	</upstream>
+</pkgmetadata>

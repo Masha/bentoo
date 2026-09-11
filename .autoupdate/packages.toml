@@ -2303,7 +2303,7 @@ base_from = "file"
 base_url = "https://api.github.com/repos/zed-industries/zed/contents/crates/zed/Cargo.toml?ref=main"
 base_pattern = '(?m)^version = "([0-9][0-9.]*)"'
 headers = { "User-Agent" = "bentoo-autoupdate", "Accept" = "application/vnd.github.raw" }
-version = "1.21.0_pre20260910"
+version = "1.21.0_pre20260911"
 comments = """
 zed — commit-tracked on main; _pre suffix preserved from current ebuild.
 2026-08-06: 2 commits landed same UTC day (d61e80b -> 6b2aa1c), so the date
@@ -8401,7 +8401,7 @@ handshake timeout (2026-07-31); /releases responde rápido e só existe DEPOIS
 que o workflow publica o tarball (assets librewolf-<ver>.source.tar.gz*), então
 nunca aponta para uma tag sem distfile — a tag é criada antes do upload.
 Version "153.0.1-1" maps to ebuild PV "153.0.1_p1" (transform "-"->"_p").
-Live=153.0.1-1 (tarball generic confirmado 200).
+Live=153.0.4-1 (verificado 2026-09-10: HTTP 200 em 0,7s).
 """
 # END
 
@@ -8421,7 +8421,7 @@ timeout de 30s (2026-07-31) — trocado pelo repo do build system "bsys6", que
 só publica release DEPOIS que o binário sobe (o corpo cita o workflow).
 newest-first, então [0].tag_name é a release binária mais recente.
 A minor version é opcional (153.0-3 é válido). "153.0-3" -> PV "153.0_p3".
-Live=153.0.1-1 (asset x86_64 confirmado 200).
+Live=155.0.1-1 (verificado 2026-09-10: HTTP 200 em 0,9s).
 """
 # END
 
@@ -9682,5 +9682,40 @@ distfile the ebuild fetches actually exists at it.
 
 The binary is static-pie and self-contained: no Node, no JS wrapper, so it
 installs straight to /usr/bin. npm ships it mode 0644, hence doexe.
+"""
+# END
+
+["dev-util/openchamber-bin"]
+url = "https://api.github.com/repos/OpenChamber/openchamber/releases/latest"
+parser = "regex"
+pattern = '"tag_name":\s*"v([0-9]+\.[0-9]+\.[0-9]+)"'
+headers = { "User-Agent" = "bentoo-autoupdate" }
+type = "bin"
+version = "1.23.0"
+comments = """
+OpenChamber — a desktop cockpit for parallel opencode sessions. Tracks
+OpenChamber-<PV>-linux-{x86_64,arm64}.AppImage; the same release also carries
+.apk/.aab (Android), .dmg/.zip (macOS), .exe (Windows), a .vsix and a web
+tarball, so a bump must not drift onto those.
+
+AppImage is the ONLY Linux artefact, and unpacker.eclass cannot read the
+format, so src_unpack computes the squashfs offset from the ELF section header
+table and feeds it to unsquashfs -- no execution of the downloaded file, and
+no dependency on FUSE.
+
+Two things src_prepare repairs, both asserted so an upstream change fails the
+build rather than passing silently:
+
+  * the AppImage bundles copies of system libraries (libXss, libXtst,
+    libnotify, libappindicator, libgconf, libindicator) for portability. None
+    appear in the binary's NEEDED list; only libnotify is referenced at all,
+    via dlopen. They are removed and RDEPEND names the real packages -- which
+    matters because libappindicator and libindicator do not exist in ::gentoo
+    and would otherwise be silently shipped as vendored copies.
+
+  * upstream's desktop entry runs "AppRun --no-sandbox". An AppImage has to
+    disable the Chromium sandbox because it cannot ship a setuid helper; an
+    installed package can, so chrome-sandbox goes in 4755 and the sandbox
+    stays ON. Do not let a bump reintroduce --no-sandbox.
 """
 # END
