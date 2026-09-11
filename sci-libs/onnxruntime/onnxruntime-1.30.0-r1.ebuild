@@ -90,10 +90,19 @@ BDEPEND="
 	)
 "
 
+# use-system-libraries is version-specific by construction, not by accident:
+# most of its hunks take the upstream `PATCH_COMMAND ${Patch_EXECUTABLE} ...`
+# lines as context, and upstream edits those every release. 1.30.0 dropped the
+# `FIND_PACKAGE_ARGS NAMES cpuinfo` and `NAMES xnnpack` declarations and split
+# the cpuinfo block into three branches (ARM64 / Linux / fallback), so three
+# hunks were rejected -- and eapply aborts the whole src_prepare on a single
+# rejection, which left 1.30.0 unbuildable for everyone. Reported and rebased
+# by IlgazC in obentoo/bentoo#46. Dry-run every patch on a clean tree at each
+# bump; the rename has to travel with it.
 PATCHES=(
 	"${FILESDIR}/${PN}-1.22.2-relax-the-dependency-on-flatbuffers.patch"
 	"${FILESDIR}/${PN}-1.24.4-no-werror.patch"
-	"${FILESDIR}/${PN}-1.28.0-use-system-libraries.patch"
+	"${FILESDIR}/${PN}-1.30.0-use-system-libraries.patch"
 )
 
 CMAKE_USE_DIR="${S}/cmake"
