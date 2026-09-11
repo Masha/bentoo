@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>diego.evangelista5642@gmail.com</email>
+		<name>lucascouts</name>
+	</maintainer>
+	<longdescription lang="en">
+		Cline is an autonomous coding agent that plans and applies multi-file
+		edits, runs commands and drives a browser, using an API key of your
+		choice across more than thirty providers.
+
+		This package installs the standalone terminal build. The VS Code and
+		JetBrains extensions, which are how most people run Cline, are not
+		packaged here and are installed from their respective marketplaces.
+	</longdescription>
+	<upstream>
+		<remote-id type="github">cline/cline</remote-id>
+	</upstream>
+</pkgmetadata>

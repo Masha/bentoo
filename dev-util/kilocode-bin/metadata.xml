@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>diego.evangelista5642@gmail.com</email>
+		<name>lucascouts</name>
+	</maintainer>
+	<longdescription lang="en">
+		Kilo Code is an open-source AI coding agent CLI (the upstream project
+		also ships a VS Code extension, which this package does not install).
+		This ebuild packages the prebuilt glibc x86_64/arm64 release tarball,
+		which bundles a static bubblewrap 0.11.2 binary (GNU LGPL-2) as the
+		sandbox runtime alongside the main "kilo" executable, tree-sitter
+		grammar files, and sandbox worker scripts.
+	</longdescription>
+	<upstream>
+		<remote-id type="github">Kilo-Org/kilocode</remote-id>
+	</upstream>
+</pkgmetadata>

@@ -9409,3 +9409,93 @@ and set CHROMIUM_VERSION to that major. Drop this package outright once
 ::gentoo's own pin matches the Chromium the stable channel actually ships.
 """
 # END
+
+["dev-util/goose-bin"]
+url = "https://api.github.com/repos/aaif-goose/goose/releases/latest"
+parser = "regex"
+pattern = '"tag_name":\s*"v([0-9]+\.[0-9]+\.[0-9]+)"'
+headers = { "User-Agent" = "bentoo-autoupdate" }
+type = "bin"
+version = "1.50.0"
+comments = """
+goose — Block's AI agent, moved org: block/goose is now aaif-goose/goose. The
+old path still answers, but only through a GitHub 301 that can be withdrawn
+without notice, so both this probe and SRC_URI pin the canonical org.
+
+Upstream publishes several CLI flavours per release (-vulkan, -musl) plus a
+separate Desktop app (Goose.zip / .rpm / .deb). This package tracks the plain
+glibc CLI only: goose-{x86_64,aarch64}-unknown-linux-gnu.tar.bz2. The asset
+names carry no version, so the tag is the only thing that pins them.
+"""
+# END
+
+["dev-util/kilocode-bin"]
+url = "https://api.github.com/repos/Kilo-Org/kilocode/releases/latest"
+parser = "regex"
+pattern = '"tag_name":\s*"v([0-9]+\.[0-9]+\.[0-9]+)"'
+headers = { "User-Agent" = "bentoo-autoupdate" }
+type = "bin"
+version = "7.6.2"
+comments = """
+Kilo Code — releases land several times a day (v7.6.1 and v7.6.2 shipped within
+hours of each other), so expect this record to move often.
+
+Tracks the plain glibc CLI: kilo-linux-{x64,arm64}.tar.gz. The -musl and
+-baseline variants and the .vsix extension bundles are deliberately untracked.
+
+The tarball bundles bubblewrap 0.11.2 (LGPL-2) and a sandbox-runtime
+(Apache-2.0), which is why LICENSE is not upstream's bare MIT. Re-check those
+bundled licences on a major bump -- the applier only moves PV and will not
+notice if the bundle changes.
+"""
+# END
+
+["dev-util/copilot-cli-bin"]
+url = "https://api.github.com/repos/github/copilot-cli/releases/latest"
+parser = "regex"
+pattern = '"tag_name":\s*"v([0-9]+\.[0-9]+\.[0-9]+)"'
+headers = { "User-Agent" = "bentoo-autoupdate" }
+type = "bin"
+version = "1.0.83"
+comments = """
+GitHub Copilot CLI — TWO PARALLEL TRAINS out of one repository, and picking the
+wrong one is the whole trap here:
+
+  vX.Y.Z-N  -> pre-release (N is a respin counter, several per week)
+  vX.Y.Z    -> the stable release
+
+Ranking tags would therefore always report a pre-release as "newest": on
+2026-09-10 the tag list led with v1.0.84-4 while stable was still v1.0.83.
+/releases/latest skips pre-releases by definition, which is why this record
+probes that endpoint and NOT /tags. Do not "fix" this into a tag listing.
+
+The bare-version regex is deliberate too: it cannot match a "-N" tag, so it
+fails loudly rather than silently packaging a pre-release.
+
+github/copilot-cli publishes NO source code -- only LICENSE.md, README.md,
+changelog.md and install.sh -- so -bin is the only possible packaging. The
+licence is proprietary and lives in the overlay at licenses/github-copilot-cli.
+"""
+# END
+
+["dev-util/cline-bin"]
+url = "https://registry.npmjs.org/@cline/cli-linux-x64/latest"
+parser = "regex"
+pattern = '"version":"([0-9]+\.[0-9]+\.[0-9]+)"'
+type = "bin"
+version = "3.0.61"
+comments = """
+Cline — probed on npm, NOT on GitHub, and that is deliberate: the GitHub
+releases only carry the macOS/Windows desktop app (Cline_*.dmg / *-setup.exe),
+so a GitHub probe would track a version this package does not ship.
+
+Upstream publishes the Linux CLI as per-platform packages behind the
+optionalDependencies of the "cline" wrapper -- @cline/cli-linux-x64 and
+@cline/cli-linux-arm64 are the real payload, ~51 MB each. Same shape as
+pnpm 12, see the pnpm record.
+
+The probe deliberately targets the x64 payload rather than the "cline" wrapper:
+both report the same version today, but only this one is a distfile the ebuild
+actually fetches, so a bump can never claim a version whose asset is missing.
+"""
+# END

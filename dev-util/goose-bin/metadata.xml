@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>diego.evangelista5642@gmail.com</email>
+		<name>lucascouts</name>
+	</maintainer>
+	<longdescription lang="en">
+		goose is an open-source, extensible AI agent from Block (Square) that
+		runs locally and can execute, edit and test code on its own, using any
+		LLM. It supports the Model Context Protocol (MCP) to extend its
+		capabilities with external tools and services.
+
+		This package installs the prebuilt glibc CLI binary only. It does not
+		package the -vulkan or -musl CLI variants, nor the separate Goose
+		Desktop application.
+	</longdescription>
+	<upstream>
+		<remote-id type="github">block/goose</remote-id>
+		<bugs-to>https://github.com/block/goose/issues</bugs-to>
+	</upstream>
+</pkgmetadata>
