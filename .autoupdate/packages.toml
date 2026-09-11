@@ -506,6 +506,8 @@ be fixed there before any entry could ever track it.
 # END
 
 ["mail-client/thunderbird"]
+enabled = false
+disabled_by = "parity-audit 2026-09-11: removed, byte-identical to ::gentoo 155.0.1 (ebuild, files/, metadata.xml)"
 url = "https://product-details.mozilla.org/1.0/thunderbird_versions.json"
 parser = "json"
 path = "LATEST_THUNDERBIRD_VERSION"
@@ -540,6 +542,8 @@ packages ever leave again, disable them instead.
 # END
 
 ["mail-client/thunderbird-l10n"]
+enabled = false
+disabled_by = "parity-audit 2026-09-11: removed with mail-client/thunderbird, byte-identical to ::gentoo 155.0.1"
 url = "https://product-details.mozilla.org/1.0/thunderbird_versions.json"
 parser = "json"
 path = "LATEST_THUNDERBIRD_VERSION"
@@ -1917,6 +1921,8 @@ networkmanager-openvpn — default (commit-recency) order; version sort returns 
 # END
 
 ["media-libs/dav1d"]
+enabled = false
+disabled_by = "parity-audit 2026-09-11: removed, byte-identical to ::gentoo 1.5.4"
 url = "https://code.videolan.org/api/v4/projects/videolan%2Fdav1d/repository/tags?order_by=version&sort=desc"
 parser = "json"
 path = "[0].name"
@@ -2029,6 +2035,8 @@ all 57 types covered, nothing new since 610.57.04.
 # END
 
 ["net-misc/networkmanager"]
+enabled = false
+disabled_by = "parity-audit 2026-09-11: removed, ::gentoo 1.58.1-r1 absorbed the clat divergence and leads on bpftool floor, slang, systemd generator dir"
 url = "https://gitlab.freedesktop.org/api/v4/projects/NetworkManager%2FNetworkManager/repository/tags?order_by=version&sort=desc&per_page=40"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]+)"'
@@ -7891,6 +7899,8 @@ must regenerate CRATES= (pycargoebuild). GitHub releases/latest agrees (tag 0.19
 # END
 
 ["media-libs/kquickimageeditor"]
+enabled = false
+disabled_by = "parity-audit 2026-09-11: removed, sole difference from ::gentoo 0.7.0.1 was an empty IUSE assignment, which is the same as declaring none"
 url = "https://invent.kde.org/api/v4/projects/libraries%2Fkquickimageeditor/repository/tags"
 parser = "json"
 path = "[0].name"

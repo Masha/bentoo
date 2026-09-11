@@ -9,8 +9,8 @@ PYTHON_COMPAT=( python3_{12..14} )
 inherit check-reqs edo toolchain-funcs
 inherit python-r1
 
-GCC_MAX_VER="15"
-CLANG_MAX_VER="21"
+GCC_MAX_VER="16"
+CLANG_MAX_VER="22"
 
 DESCRIPTION="NVIDIA CUDA Toolkit (compiler and friends)"
 HOMEPAGE="https://developer.nvidia.com/cuda-zone"
@@ -30,6 +30,11 @@ SLOT="0/${PV}" # UNSLOTTED
 # SLOT="${PV}" # SLOTTED
 
 KEYWORDS="-* ~amd64 ~arm64"
+# BENTOO-DIVERGENCE: IUSE - examples, which ::gentoo does not expose. The
+# runfile ships Demo_Suite (the CUDA sample binaries) and nvprof; ::gentoo
+# drops Demo_Suite unconditionally, so there is no way to get the samples from
+# its ebuild at all. Gated and default-off here, it costs a user who does not
+# want it nothing but the freeglut/glu RDEPEND below, which is itself gated.
 IUSE="clang debugger examples nsight profiler rdma sanitizer"
 RESTRICT="bindist mirror strip test"
 
@@ -40,6 +45,9 @@ REQUIRED_USE="${PYTHON_REQUIRED_USE}"
 # the driver to a separate download. Up to 13.3.1 the name carried it, which is
 # what the removed DRIVER_PV pinned. Anything installing a driver alongside this
 # toolkit now goes through x11-drivers/nvidia-drivers, as it should.
+# BENTOO-DIVERGENCE: RDEPEND - media-libs/freeglut and media-libs/glu under
+# examples? (). The Demo_Suite binaries link both; without them USE=examples
+# installs samples that cannot run. Nothing is pulled in with USE=-examples.
 RDEPEND="
 	!clang? (
 		<sys-devel/gcc-$(( GCC_MAX_VER + 1 ))_pre[cxx]
@@ -173,6 +181,10 @@ src_compile() {
 
 src_install() {
 	local -x SKIP_COMPONENTS=(
+		# Kernel_Objects is the open-kernel-module source tree, which belongs to
+		# x11-drivers/nvidia-drivers; shipping it here would install a second,
+		# unbuilt copy. ::gentoo keeps it because its runfile still carried the
+		# driver -- 13.4.1 no longer does, see the SRC_URI note above.
 		"Kernel_Objects"
 		"Visual_Tools"
 		"Documentation"  # obsolete
@@ -181,6 +193,8 @@ src_install() {
 
 	! use debugger     && SKIP_COMPONENTS+=( "cuda-gdb" )
 	! use examples     && SKIP_COMPONENTS+=( "Demo_Suite" )
+	# nvprof rides with the profiler flag here; ::gentoo leaves it installed
+	# unconditionally, which contradicts USE=-profiler.
 	! use profiler     && SKIP_COMPONENTS+=( "cuda-cupti" "cuda-profiler-api" "nvprof" )
 	! use sanitizer    && SKIP_COMPONENTS+=( "compute-sanitizer" )
 
@@ -205,8 +219,8 @@ src_install() {
 			if [[ -e "${ED}${_DESTDIR}/$(basename "${1}")" ]]; then
 				return
 			fi
-			if [[ "$1" == "targets/x86_64-linux/lib/stubs/libcusolverMg*" ]] ||
-				[[ "$1" == "targets/x86_64-linux/lib/libcusparse.so.*" ]]; then
+			if [[ "$1" == "targets/${narch}-linux/lib/stubs/libcusolverMg*" ]] ||
+				[[ "$1" == "targets/${narch}-linux/lib/libcusparse.so.*" ]]; then
 				return
 			fi
 			return
@@ -287,7 +301,8 @@ src_install() {
 
 	# remove rdma libs (unless USE=rdma)
 	if ! use rdma; then
-		rm "${ED}/${CUDA_PATH}/targets/${narch}-linux/lib/libcufile_rdma"* || die "failed to remove rdma files"
+		# intentionally -f to support SKIP_COMPONENTS
+		rm -f "${ED}/${CUDA_PATH}/targets/${narch}-linux/lib/libcufile_rdma"* || die "failed to remove rdma files"
 	fi
 
 	# Add include and lib symlinks
@@ -323,8 +338,9 @@ src_install() {
 	# TODO drop and replace with runtime detection similar to what python does {{{
 	# ATTENTION: change requires revbump, see link below for supported GCC # versions
 	# https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html#system-requirements
-	local cuda_supported_gcc=( 8.5 9.5 10 11 12 13 14 "${GCC_MAX_VER}" )
+	local cuda_supported_gcc=( 8.5 9.5 10 11 12 13 14 15 "${GCC_MAX_VER}" )
 
+	mkdir -p "${ED}/${CUDA_PATH}/bin" || die
 	sed \
 		-e "s:CUDA_SUPPORTED_GCC:${cuda_supported_gcc[*]}:g" \
 		"${FILESDIR}"/cuda-config.in > "${ED}/${CUDA_PATH}/bin/cuda-config" || die
@@ -389,6 +405,7 @@ pkg_postinst() {
 	fi
 }
 
+# BENTOO-DIVERGENCE: DEFINED_PHASES - pkg_info, which ::gentoo does not define.
 # Restored from ::gentoo 2026-09-07: emerge --info <pkg> prints nothing useful
 # for CUDA without it, and every variable below is one a user reporting a
 # broken nvcc invocation would be asked for. It was lost when this ebuild was
