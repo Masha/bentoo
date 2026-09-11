@@ -192,3 +192,47 @@ endpoint rather than its entry point.
 
 It is worth saying plainly that this is a volume problem, not a quality one.
 Nothing here is unpackageable in principle; it is simply not one ebuild.
+
+---
+
+## `cline` and `kilocode` from source — the TypeScript monorepos
+
+**Assessed:** 2026-09-10 · **Upstream versions then:** `@cline/cli` `3.0.61`
+(repo tag `v4.1.17`) and `kilocode` `7.6.2` · **Verdict:** deferred. Both ship
+as `-bin` in this overlay; a from-source ebuild is possible but carries a
+maintenance cost out of proportion to what it buys.
+
+Version numbering first, because it misleads: the `cline/cline` repository tags
+the **VS Code extension** (`v4.1.x`), while the CLI carries its own numbering
+(`3.0.61`). They live in one repo and move independently. The mapping is
+recoverable — `apps/cli/package.json` at tag `v4.1.17` reads exactly `3.0.61` —
+but nothing in the tag name tells you that, and a bump has to re-derive it.
+Same family as the `github/copilot-cli` and `QwenLM/qwen-code` traps recorded
+in `packages.toml`.
+
+The actual blocker is the dependency graph. Both are bun workspaces:
+
+| | build tool | lockfile | distinct npm packages |
+|---|---|---|---|
+| `cline` | `bun` | `bun.lock`, 932 KB | **3298** |
+| `kilocode` | `bun@1.3.14` | `bun.lock`, 680 KB | **2721** |
+
+`net-libs/bun-bin` is already in this overlay, so the toolchain is not the
+problem — `bun install` reaching the network inside Portage's sandbox is. The
+two ways out are both bad at this scale: enumerating some three thousand npm
+tarballs in `SRC_URI` (the `dev-lang/rapydscript-ng` approach, which is fine
+at its eleven), or building a consolidated `node_modules` tarball and hosting
+it ourselves (the `sci-ml/lemonade` approach), which means regenerating and
+re-uploading a multi-hundred-megabyte artifact on **every** bump of a package
+that releases several times a week — kilocode shipped v7.6.1 and v7.6.2 hours
+apart.
+
+Set against that: `dev-util/cline-bin` and `dev-util/kilocode-bin` already
+install the official upstream binaries, verified to run. A from-source build
+would reproduce the same artifact at a far higher cost.
+
+**Condition that reopens this:** upstream publishing a `bun.lock`-derived
+vendor tarball as a release asset (which would remove the hosting burden
+entirely), or the overlay deciding it wants a from-source path badly enough to
+accept the R2 regeneration cycle — in which case the recipe is known and
+written above, not research that has to be redone.
