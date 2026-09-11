@@ -2303,7 +2303,7 @@ base_from = "file"
 base_url = "https://api.github.com/repos/zed-industries/zed/contents/crates/zed/Cargo.toml?ref=main"
 base_pattern = '(?m)^version = "([0-9][0-9.]*)"'
 headers = { "User-Agent" = "bentoo-autoupdate", "Accept" = "application/vnd.github.raw" }
-version = "1.21.0_pre20260911"
+version = "1.21.0_pre20260911-r1"
 comments = """
 zed — commit-tracked on main; _pre suffix preserved from current ebuild.
 2026-08-06: 2 commits landed same UTC day (d61e80b -> 6b2aa1c), so the date
@@ -2509,6 +2509,45 @@ targets present in the prepared tree; all sixteen patches apply through the real
 `ebuild ... prepare` (>>> Source prepared); `cargo check --offline -p zed -p
 remote_server --features zed/inspector` exits 0 in 2m03; md5-cache _md5_ matches
 the ebuild; pkgcheck reports only the pre-existing deprecated-llvm-r1 finding.
+Not merged with a build: this host has no sudo, so no emerge ran.
+2026-09-11 (manual, requested): 2518540 (01:07 UTC) -> d9e1c024 (05:25 UTC), the
+same UTC day, so the date component alone did not move and this is -r1 -- and it
+had to be -r1 rather than an in-place swap, because _pre20260911 was already
+pushed. 2 commits, 9 files, Cargo.lock and root Cargo.toml both BYTE-IDENTICAL
+between the two, so the eleven seds and the seven `local *_COMMIT` needed
+nothing; all eighteen were re-checked anyway rather than assumed.
+What the bump actually uncovered was in the two ebuilds ALREADY PUBLISHED, and
+neither would have built offline. The applier's 2026-08-25 defect -- CRATES and
+GIT_CRATES copied verbatim while upstream's lockfile moved -- recurred twice:
+  (a) _pre20260910 (86b2cf96) added objc2-core-graphics, objc2-io-surface and
+      objc2-screen-capture-kit to Cargo.lock; all three were missing from CRATES,
+      so they were absent from SRC_URI entirely.
+  (b) _pre20260911 (2518540) moved pet from microsoft/python-environment-tools
+      @bb8e0460 to zed-industries/python-environment-tools @5aad7164. All 27
+      pet-* entries in GIT_CRATES kept naming the microsoft repo and the dead
+      rev.
+Both were found by re-running pycargoebuild rather than by reasoning about the
+diff: an identical Cargo.lock proves the SOURCE did not move between the two
+commits, never that the EBUILD ever matched it. Run it on every bump, including
+the ones where the lockfile is provably unchanged -- that is exactly the shape of
+bump where the check looks redundant and is not.
+The patch series was 17 commits behind, not 2: files/ was generated against
+52b2927a (09-09) and the two applier bumps since never touched it. Refreshed
+through zed-patches; all 16 apply, and only 0002 and 0012 changed -- blob index
+hashes plus two offsets (Cargo.lock @@ -22769 -> -22807 from the objc2 crates,
+main.rs @@ -696 -> -698 from the `mod watcher_debug;` and `watcher_debug::init`
+lines d9e1c024 inserted above the hunk). No semantic rebase was needed.
+Verified before publishing: sync-overlay + check-sync agree on all three
+relations (series <-> ebuild, patches <-> overlay, patches <-> source);
+`ebuild ... prepare` applies all sixteen for real (>>> Source prepared); 11/11
+sed patterns match the new Cargo.toml exactly once, leaving 0 [patch.crates-io]
+entries on `git =` and all ten WORKDIR targets present (the eleventh `path =`,
+corgi-patches/scratch, is upstream's own and relative); `cargo check --offline
+-p zed -p remote_server --features zed/inspector` exits 0 in 1m33 with zero
+errors; md5-cache _md5_ matches the ebuild; pkgcheck reports only the
+pre-existing deprecated-llvm-r1 finding. Three orphan md5-cache entries were
+swept (1.20.0_pre20260909-r1, 1.21.0_pre20260910, 1.21.0_pre20260911); the two
+under zed-bin are a different package and were left alone.
 Not merged with a build: this host has no sudo, so no emerge ran.
 """
 # END

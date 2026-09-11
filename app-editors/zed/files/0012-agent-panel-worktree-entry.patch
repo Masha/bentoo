@@ -45,7 +45,7 @@ discoverability this is for.
 ---
 
 diff --git a/crates/agent_ui/src/agent_panel.rs b/crates/agent_ui/src/agent_panel.rs
-index 998c1fd..f553f1f 100644
+index e9ebe07..a88a3ba 100644
 --- a/crates/agent_ui/src/agent_panel.rs
 +++ b/crates/agent_ui/src/agent_panel.rs
 @@ -5790,9 +5790,14 @@ impl AgentPanel {
