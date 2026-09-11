@@ -550,9 +550,10 @@ src_prepare() {
 	python_setup
 
 	# We'll fill this in as we go. Patches go in chromium-patches.
-	# BENTOO-DIVERGENCE: PATCHES - five fixes with no counterpart:
+	# BENTOO-DIVERGENCE: PATCHES - six fixes with no counterpart:
 	# unbundle-minizip-undo-unicode, cbor-crubit-optional,
-	# revert-font-format-crubit and the two chromium-patches rebases below.
+	# revert-font-format-crubit, devtools-tsc-via-node and the two
+	# chromium-patches rebases below.
 	# ::gentoo is on 142 and carries an old-fontconfig patch this series no
 	# longer needs.
 	local PATCHES=()
@@ -578,6 +579,15 @@ src_prepare() {
 		# is unchanged; rebuild.sh is a devtools maintainer script and not part
 		# of the build, but a rejected hunk still fails the whole eapply.
 		"${FILESDIR}/chromium-153-revert-to-rollup-wasm.patch"
+		# bentoo: M153 made devtools-frontend's ts_library.py exec the prebuilt
+		# tsgo ELF from third_party/typescript/linux-amd64 unconditionally --
+		# the M152 node fallback is gone. That directory is not in keeplibs
+		# (nothing else needs it), the ELF purge would strip the binary
+		# anyway, and there is no arm64 build of it. Restore the node +
+		# node_modules/typescript path. The matching switch for
+		# //tools/typescript is the gn arg use_typescript_go=false in
+		# src_configure; the two go together.
+		"${FILESDIR}/chromium-153-devtools-tsc-via-node.patch"
 	)
 
 	# So many fontconfig magic numbers to cover
@@ -955,6 +965,15 @@ src_prepare() {
 		third_party/gperf # We symlink system gperf, but this will purge the symlink since we tidy up afterwards.
 		third_party/highway
 		third_party/hunspell
+		# M153: media/filters depends on //third_party/iamf_tools:iamf_tools_lib
+		# (software IAMF audio decoder) whenever media_use_iamf_tools is true,
+		# which is its default in media/media_options.gni. Without this entry
+		# remove_bundled_libraries.py strips all 40 of its sources and ninja
+		# dies at plan time: "third_party/iamf_tools/src/iamf/api/conversion/
+		# channel_reorderer.cc ... missing and no known rule to make it". No
+		# system package exists; it only depends on abseil-cpp and opus/src,
+		# both already kept.
+		third_party/iamf_tools
 		third_party/ink/src/ink/brush
 		third_party/ink/src/ink/color
 		third_party/ink/src/ink/geometry
@@ -1470,6 +1489,17 @@ chromium_configure() {
 		"v8_use_libm_trig_functions=true"
 		# use system go
 		"tint_use_system_go=true"
+		# M153 (crbug.com/423789047) defaults use_typescript_go=true, which
+		# compiles WebUI TypeScript with the native tsgo binary shipped as a
+		# prebuilt ELF under third_party/typescript/linux-amd64/. That directory
+		# is not in keeplibs, so remove_bundled_libraries.py deletes it and
+		# ninja dies with "third_party/typescript/typescript.py ... missing and
+		# no known rule to make it". Keeping it would only move the failure:
+		# bin-finder.py --elf strips the prebuilt tsc, and there is no arm64
+		# build of it at all. Use the JS compiler (third_party/node/node_modules/
+		# typescript, run through the system node) that ts_library.py still
+		# supports as the non-tsgo branch.
+		"use_typescript_go=false"
 	)
 
 	if use bindist ; then
