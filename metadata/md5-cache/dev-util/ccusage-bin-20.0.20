@@ -1,0 +1,10 @@
+DEFINED_PHASES=install
+DESCRIPTION=ccusage, a token usage and cost analyser for Claude Code and other agents
+EAPI=8
+HOMEPAGE=https://ccusage.com/ https://github.com/ccusage/ccusage
+KEYWORDS=-* ~amd64 ~arm64
+LICENSE=MIT
+RESTRICT=bindist mirror strip
+SLOT=0
+SRC_URI=amd64? ( https://registry.npmjs.org/@ccusage/ccusage-linux-x64/-/ccusage-linux-x64-20.0.20.tgz -> ccusage-bin-20.0.20-amd64.tgz ) arm64? ( https://registry.npmjs.org/@ccusage/ccusage-linux-arm64/-/ccusage-linux-arm64-20.0.20.tgz -> ccusage-bin-20.0.20-arm64.tgz )
+_md5_=89cc28c2ee543f89f4ed57a900be98f0

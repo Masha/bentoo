@@ -179,7 +179,7 @@
 url = "https://registry.npmjs.org/@anthropic-ai/claude-code"
 parser = "json"
 path = "dist-tags.latest"
-version = "2.1.267"
+version = "2.1.268"
 comments = """
 claude-code — npm @anthropic-ai/claude-code; dist-tags.latest is the stable channel.
 
@@ -311,7 +311,7 @@ path = "version"
 headers = { "User-Agent" = "Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0" }
 aux_var = "BUILD_ID"
 aux_pattern = 'Claude-([0-9a-f]{40})\.deb'
-version = "1.49585.0"
+version = "1.52386.0"
 comments = """
 Claude Desktop — official download API behind the claude.ai/download button
 ({"version","url"}). claude.ai sits behind Cloudflare: a plain curl/wget UA gets
@@ -1857,7 +1857,7 @@ url = "https://api.github.com/repos/vim/vim/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "9.2.1064"
+version = "9.2.1067"
 comments = """
 vim — no releases (404); tags[0] "vX.Y.ZZZZ".
 """
@@ -1868,7 +1868,7 @@ url = "https://api.github.com/repos/vim/vim/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "9.2.1064"
+version = "9.2.1067"
 comments = """
 vim-core — same upstream repo as vim.
 """
@@ -7299,7 +7299,7 @@ url = "https://godotengine.org/download/archive/"
 parser = "regex"
 pattern = '(\d+\.\d+(?:\.\d+)?-(?:stable|beta\d*|rc\d*|dev\d*))'
 transform = [['-stable', ""], ['-beta', "_beta"], ['-rc', "_rc"], ['-dev', "_alpha"]]
-version = "4.8_alpha4-r1"
+version = "4.8_alpha5"
 comments = """
 godot — download archive lists newest first; transform the upstream suffix to
 Gentoo form (-stable→bare, -beta→_beta, -rc→_rc, -dev→_alpha).
@@ -7797,7 +7797,7 @@ is a workspace and pycargoebuild refuses it.
 url = "https://pypi.org/pypi/openai/json"
 parser = "json"
 path = "info.version"
-version = "3.12.0"
+version = "3.13.0"
 comments = """
 openai — official Python SDK; core dep of sci-ml/amd-gaia. info.version is
 clean X.Y.Z. Live=3.0.0 == current PV.
@@ -8274,7 +8274,7 @@ pattern = '"name":\s*"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 series = '^2\.'
-version = "2.36.42"
+version = "2.36.43"
 comments = """
 aws-cli v2 — GitHub tag index, pinned to the 2.x series. Verified 2026-08-19
 against the live endpoint: 100 matches, all of them 2.x, max = 2.36.27 = ebuild.
@@ -8366,7 +8366,7 @@ hand.
 url = "https://storage.googleapis.com/flutter_infra_release/releases/releases_linux.json"
 parser = "regex"
 pattern = '"channel": "stable",\s+"version": "([0-9]+\.[0-9]+\.[0-9]+)"'
-version = "3.47.3"
+version = "3.47.3-r1"
 comments = """
 Flutter — official releases_linux.json (pretty-printed, newest-first). The
 current_release.stable is a hash, not a version, so anchor the regex on the
@@ -9381,7 +9381,7 @@ it must be DROPPED, not forced, once a release carries the fix).
 url = "https://deb.opera.com/opera-stable/dists/stable/non-free/binary-amd64/Packages"
 parser = "regex"
 pattern = 'Package: opera-stable\nVersion: ([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)'
-version = "135.0.5973.123"
+version = "135.0.5973.123-r1"
 comments = """
 Opera — read the APT index of Opera's own repository. The download CDN
 (downloadN.operacdn.com, which SRC_URI uses) publishes no listing, and
@@ -9660,5 +9660,27 @@ instead of the "-*" used by the prebuilt packages.
 node-pty and keytar are listed upstream as optional native bindings and are
 deliberately not packaged -- the bundle was verified to run without them, and
 each would need its own ebuild with a compiled component.
+"""
+# END
+
+["dev-util/ccusage-bin"]
+url = "https://registry.npmjs.org/@ccusage/ccusage-linux-x64/latest"
+parser = "regex"
+pattern = '"version":"([0-9]+\.[0-9]+\.[0-9]+)"'
+type = "bin"
+version = "20.0.20"
+comments = """
+ccusage — probed on the PER-PLATFORM npm package, not on the main "ccusage"
+one and not on GitHub, and the distinction is load-bearing.
+
+GitHub publishes no Linux asset at all. On npm the main "ccusage" package is a
+20 KB wrapper that cannot run by itself: without its optional native
+dependency it prints "ccusage native binary is not available for linux-x64"
+and exits 1. The payload is @ccusage/ccusage-linux-{x64,arm64}, and that is
+what this record follows -- so a version can never be claimed unless the
+distfile the ebuild fetches actually exists at it.
+
+The binary is static-pie and self-contained: no Node, no JS wrapper, so it
+installs straight to /usr/bin. npm ships it mode 0644, hence doexe.
 """
 # END
