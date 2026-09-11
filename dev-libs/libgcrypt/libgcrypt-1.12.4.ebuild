@@ -51,10 +51,6 @@ BDEPEND="
 PATCHES=(
 	"${FILESDIR}"/${PN}-1.12.0-multilib-syspath.patch
 	"${FILESDIR}"/${PN}-powerpc-darwin.patch
-	# Post-1.12.3 fixes
-	"${FILESDIR}"/0001-cipher-rsa-oaep-Validate-all-zero-PS.patch
-	"${FILESDIR}"/0002-cipher-rsa-pss-Validate-the-length-of-hashed-input.patch
-	"${FILESDIR}"/0003-cipher-rsa-pss-Fix-SALT-LENGTH-handling.patch
 )
 
 MULTILIB_CHOST_TOOLS=(
