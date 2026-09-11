@@ -2115,13 +2115,11 @@ but redirects to a random, possibly stale mirror on every hit.
 # END
 
 ["dev-libs/libgcrypt"]
-enabled = false
-disabled_by = "removed 2026-09-02: byte-identical to ::gentoo's 1.12.3, which has since shipped -r1 with three post-1.12.3 RSA-OAEP/PSS validation patches. The overlay copy carried nothing of its own and lost on revision anyway"
 url = "https://gnupg.org/ftp/gcrypt/libgcrypt/"
 parser = "regex"
 pattern = 'libgcrypt-([0-9]+\.[0-9]+\.[0-9]+)\.tar\.bz2'
 select = "max"
-version = "1.12.3"
+version = "1.12.4"
 comments = """
 libgcrypt — official gnupg.org FTP dir, the only place upstream publishes. The
 listing happens to be newest-first today (1.12.3 is the first match), but the
@@ -7233,11 +7231,10 @@ Ver a entrada @stable irma.
 # END
 
 ["app-admin/calamares"]
-enabled = false
-disabled_by = "auto"
 url = "https://codeberg.org/api/v1/repos/Calamares/calamares/tags"
 parser = "json"
 path = "[0].name"
+version = "3.4.3"
 comments = """
 calamares — Codeberg (Forgejo) tags API; GitHub only carries 3.3.x, Codeberg has
 the 3.4 line. [0].name is newest "vX.Y.Z" ("v" stripped).
@@ -8414,12 +8411,11 @@ first stable release object and capture its version. Live=3.44.5.
 # END
 
 ["sys-power/upower"]
-enabled = false
-disabled_by = "auto"
 url = "https://gitlab.freedesktop.org/api/v4/projects/upower%2Fupower/repository/tags?per_page=10"
 parser = "regex"
 pattern = '"name":"v([0-9]+\.[0-9]+\.[0-9]+)"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "1.91.4"
 comments = """
 upower — GitLab freedesktop tags API; first tag "vX.Y.Z" (v captured out).
 CAVEAT: gitlab.freedesktop.org has intermittent Anubis anti-bot; the tags API
