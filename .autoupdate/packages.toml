@@ -9499,3 +9499,32 @@ both report the same version today, but only this one is a distfile the ebuild
 actually fetches, so a bump can never claim a version whose asset is missing.
 """
 # END
+
+["dev-util/goose"]
+url = "https://api.github.com/repos/aaif-goose/goose/releases/latest"
+parser = "regex"
+pattern = '"tag_name":\s*"v([0-9]+\.[0-9]+\.[0-9]+)"'
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "1.50.0"
+comments = """
+goose, built from source. Same probe as dev-util/goose-bin -- both track the
+canonical aaif-goose org, NOT the old block/goose path (see that record).
+
+A version bump here is NOT just a PV change, and the applier cannot do it
+alone: CRATES and GIT_CRATES have to be regenerated, or the build dies with
+"no matching package" for whatever the lock moved. Regenerate with
+
+  cd <workdir>/goose-v<PV>/crates/goose-cli
+  WGETRC=<ua-override> pycargoebuild -i <ebuild> -M -f .
+
+from the crate member, never from the workspace root -- the root is a virtual
+workspace and pycargoebuild exits 0 there without touching a thing.
+
+Re-check src_prepare on every bump. Upstream's own [patch.crates-io] points
+agent-client-protocol, agent-client-protocol-http and cudaforge at git URLs,
+and cargo ADDS that table to the one cargo.eclass writes rather than letting
+the eclass override it -- so without the rewrite the build reaches for github
+and dies under --offline. The phase asserts each substitution, so an upstream
+reshuffle fails the build loudly instead of silently restoring network access.
+"""
+# END

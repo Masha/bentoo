@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>diego.evangelista5642@gmail.com</email>
+		<name>lucascouts</name>
+	</maintainer>
+	<longdescription lang="en">
+		goose is an extensible AI agent that runs on your own machine: it
+		executes commands, edits files and tests its own work, driving any
+		model you point it at and any MCP server you give it.
+
+		Built from the upstream source tarball. For the prebuilt upstream
+		binary, see dev-util/goose-bin instead; the two do not collide,
+		since this one installs to /usr/bin and goose-bin to /opt.
+	</longdescription>
+	<use>
+		<flag name="aws">Enable the AWS Bedrock and SageMaker providers</flag>
+		<flag name="keyring">Store credentials in the system keyring over D-Bus SecretService</flag>
+		<flag name="local-inference">Run models locally through candle and a bundled llama.cpp. The cuda and vulkan flags accelerate this and have no effect unless it is enabled</flag>
+		<flag name="telemetry">Enable usage telemetry and OpenTelemetry export</flag>
+	</use>
+	<upstream>
+		<remote-id type="github">aaif-goose/goose</remote-id>
+	</upstream>
+</pkgmetadata>
