@@ -1,0 +1,10 @@
+DEFINED_PHASES=install
+DESCRIPTION=Kimi CLI, Moonshot AI's terminal coding agent
+EAPI=8
+HOMEPAGE=https://github.com/MoonshotAI/kimi-cli
+KEYWORDS=-* ~amd64 ~arm64
+LICENSE=Apache-2.0
+RESTRICT=bindist mirror strip
+SLOT=0
+SRC_URI=amd64? ( https://github.com/MoonshotAI/kimi-cli/releases/download/1.50.0/kimi-1.50.0-x86_64-unknown-linux-gnu.tar.gz -> kimi-cli-bin-1.50.0-amd64.tar.gz ) arm64? ( https://github.com/MoonshotAI/kimi-cli/releases/download/1.50.0/kimi-1.50.0-aarch64-unknown-linux-gnu.tar.gz -> kimi-cli-bin-1.50.0-arm64.tar.gz )
+_md5_=d923460d3c1116d55614da8fe56ef92b

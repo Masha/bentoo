@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>diego.evangelista5642@gmail.com</email>
+		<name>lucascouts</name>
+	</maintainer>
+	<longdescription lang="en">
+		opencode is a terminal-native coding agent that is deliberately not
+		tied to one vendor: it speaks to more than seventy model providers,
+		integrates with language servers, and keeps its state on your machine.
+
+		This package installs the prebuilt upstream CLI. The separate opencode
+		desktop application is not packaged here.
+	</longdescription>
+	<upstream>
+		<remote-id type="github">anomalyco/opencode</remote-id>
+	</upstream>
+</pkgmetadata>

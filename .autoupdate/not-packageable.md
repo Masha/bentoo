@@ -146,3 +146,49 @@ split and contradicts it: `anythingllm` is not an overlay package, and
 `enabled = false` is for a record that *once* worked, not for one that never
 can. Filed here instead, which is the destination CLAUDE.md now prescribes for
 an upstream assessed and rejected.
+
+---
+
+## `openhands` — OpenHands CLI (terminal agent)
+
+**Assessed:** 2026-09-10 · **Upstream version then:** PyPI `openhands` `1.16.0`
+(MIT) · **Verdict:** deferred, not rejected — the blocker is dependency volume,
+not the artifact.
+
+Three separate things carry the OpenHands name, and conflating them is the
+first trap:
+
+| Artifact | What it actually is | Language |
+|---|---|---|
+| `OpenHands/OpenHands` (87k stars) | Agent Canvas / webapp | **TypeScript** |
+| `OpenHands/software-agent-sdk` | `openhands-sdk`, `openhands-agent-server` | Python |
+| PyPI `openhands` | the terminal CLI — **this is the packageable one** | Python |
+
+Note the org rename: `All-Hands-AI/OpenHands` now answers as
+`OpenHands/OpenHands`, the same kind of move `block/goose` made to
+`aaif-goose/goose`. The GitHub release assets are the Canvas desktop app
+(`.deb`/`.AppImage`), **not** the agent, so packaging those would ship a
+different product under the expected name.
+
+The CLI itself is small and well-formed: MIT, an sdist on PyPI, `requires-python
+== 3.12.*`. The blocker is underneath it. Resolving its dependency tree against
+`::gentoo`, cutting off at **three levels and ignoring all extras**, already
+leaves **65 packages missing**, and the walk was truncated there — the real
+number is higher. The tree is not padding either; it includes
+
+- `litellm`, `anthropic`, `openai`, `google-genai`, `groq`, `ollama` — a
+  provider fan-out, each with its own subtree,
+- `browser-use` + `browser-use-core` + `browser-use-sdk` + `cdp-use`,
+- `tokenizers` (Rust, its own `CRATES` block),
+- **15** `tree-sitter-*` grammar packages,
+- `pyobjc`, which is macOS-only and should never be reachable on a Linux profile.
+
+**Condition that reopens this:** any of — (a) `::gentoo` gains `litellm` and
+`textual`, which together cut the largest branches; (b) upstream publishes a
+self-contained binary for the CLI, the way `opencode` and `crush` do, making a
+`-bin` possible; or (c) the overlay decides to take the ~65-package Python AI
+stack as a project in its own right, in which case this CLI is its natural
+endpoint rather than its entry point.
+
+It is worth saying plainly that this is a volume problem, not a quality one.
+Nothing here is unpackageable in principle; it is simply not one ebuild.

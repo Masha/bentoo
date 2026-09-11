@@ -9528,3 +9528,63 @@ and dies under --offline. The phase asserts each substitution, so an upstream
 reshuffle fails the build loudly instead of silently restoring network access.
 """
 # END
+
+["dev-util/opencode-bin"]
+url = "https://api.github.com/repos/anomalyco/opencode/releases/latest"
+parser = "regex"
+pattern = '"tag_name":\s*"v([0-9]+\.[0-9]+\.[0-9]+)"'
+headers = { "User-Agent" = "bentoo-autoupdate" }
+type = "bin"
+version = "1.18.30"
+comments = """
+opencode — the most-starred open-source coding agent. Repo lives at
+anomalyco/opencode (it was sst/opencode before; both answer today).
+
+Each release carries THREE Linux CLI flavours per arch -- plain glibc, -musl
+and -baseline for CPUs without the newer instruction sets -- plus a wholly
+separate desktop app (opencode-desktop-*.deb/.rpm/.AppImage, ~150 MB). This
+record tracks the plain glibc CLI: opencode-linux-{x64,arm64}.tar.gz. Do not
+let a bump wander onto the desktop assets; they are a different product that
+happens to share the release.
+"""
+# END
+
+["dev-util/crush-bin"]
+url = "https://api.github.com/repos/charmbracelet/crush/releases/latest"
+parser = "regex"
+pattern = '"tag_name":\s*"v([0-9]+\.[0-9]+\.[0-9]+)"'
+headers = { "User-Agent" = "bentoo-autoupdate" }
+type = "bin"
+version = "0.93.1"
+comments = """
+Crush, by Charm. Tracks crush_<PV>_Linux_{x86_64,arm64}.tar.gz -- note the
+asset name embeds the version AND upstream's own arch spelling, and the
+tarball's top-level directory repeats both, which is why src_unpack sets S
+per-arch instead of a global assignment.
+
+LICENSE is FSL-1.1-MIT, which is NOT OSI-approved: source-available now,
+converting to MIT two years after each release. ::gentoo ships no FSL entry,
+so the overlay carries its own licenses/FSL-1.1-MIT. If a bump ever changes
+the licence file in the tarball, update that copy too -- nothing checks it
+automatically.
+"""
+# END
+
+["dev-util/kimi-cli-bin"]
+url = "https://api.github.com/repos/MoonshotAI/kimi-cli/releases/latest"
+parser = "regex"
+pattern = '"tag_name":\s*"([0-9]+\.[0-9]+\.[0-9]+)"'
+headers = { "User-Agent" = "bentoo-autoupdate" }
+type = "bin"
+version = "1.50.0"
+comments = """
+Kimi CLI, by Moonshot AI. The tag has NO leading "v" -- it is a bare "1.50.0"
+-- so this pattern deliberately omits it. Copying the v-prefixed regex from a
+neighbouring record here would simply never match, and the probe would report
+"up to date" forever while the package went stale.
+
+Tracks kimi-<PV>-{x86_64,aarch64}-unknown-linux-gnu.tar.gz. Upstream also
+publishes "-onedir" variants of the same builds, which unpack to a directory
+tree rather than a single binary; those are not used.
+"""
+# END
