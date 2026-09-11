@@ -9640,3 +9640,25 @@ on a bump -- the fix asserts its own result, so an upstream change fails the
 build instead of silently shipping an invalid entry.
 """
 # END
+
+["dev-util/gemini-cli"]
+url = "https://registry.npmjs.org/@google/gemini-cli/latest"
+parser = "regex"
+pattern = '"version":"([0-9]+\.[0-9]+\.[0-9]+)"'
+version = "0.59.0"
+comments = """
+Gemini CLI — probed on npm because GitHub publishes NO Linux artefact for it.
+The release tags exist, but every asset is source; npm is the only channel
+that ships the built bundle, so the npm version is the one this package can
+actually follow.
+
+Unlike cline and pnpm, the npm tarball here is NOT a wrapper around a
+platform binary: it is a self-contained JavaScript bundle, which is why the
+ebuild is architecture-independent and keeps ordinary ~amd64 ~arm64 keywords
+instead of the "-*" used by the prebuilt packages.
+
+node-pty and keytar are listed upstream as optional native bindings and are
+deliberately not packaged -- the bundle was verified to run without them, and
+each would need its own ebuild with a compiled component.
+"""
+# END
