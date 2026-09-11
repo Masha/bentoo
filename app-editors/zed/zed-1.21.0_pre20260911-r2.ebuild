@@ -16,9 +16,9 @@ CRATES="
 	addr2line@0.26.1
 	adler2@2.0.1
 	aes@0.8.4
-	agent-client-protocol-derive@2.0.0
-	agent-client-protocol-schema@1.5.0
-	agent-client-protocol@2.0.0
+	agent-client-protocol-derive@2.1.0
+	agent-client-protocol-schema@1.7.0
+	agent-client-protocol@2.1.0
 	ahash@0.7.8
 	ahash@0.8.12
 	aho-corasick@1.1.3
@@ -52,7 +52,7 @@ CRATES="
 	as-slice@0.2.1
 	ascii@1.1.0
 	ash@0.38.0+1.3.281
-	ashpd@0.13.2
+	ashpd@0.13.5
 	async-attributes@1.1.2
 	async-broadcast@0.7.2
 	async-channel@1.9.0
@@ -417,20 +417,20 @@ CRATES="
 	fsevent-sys@4.1.0
 	fuchsia-cprng@0.1.1
 	funty@2.0.0
-	futures-channel@0.3.32
+	futures-channel@0.3.34
 	futures-concurrency@7.7.1
-	futures-core@0.3.32
-	futures-executor@0.3.32
+	futures-core@0.3.34
+	futures-executor@0.3.34
 	futures-intrusive@0.5.0
-	futures-io@0.3.32
+	futures-io@0.3.34
 	futures-lite@1.13.0
 	futures-lite@2.6.1
-	futures-macro@0.3.32
-	futures-sink@0.3.32
-	futures-task@0.3.32
-	futures-util@0.3.32
+	futures-macro@0.3.34
+	futures-sink@0.3.34
+	futures-task@0.3.34
+	futures-util@0.3.34
 	futures@0.1.31
-	futures@0.3.32
+	futures@0.3.34
 	gaoya@0.2.0
 	generator@0.8.9
 	generic-array@0.14.7
@@ -1576,9 +1576,9 @@ declare -A GIT_CRATES=(
 	[zed-xim]='https://github.com/zed-industries/xim-rs;16f35a2c881b815a2b6cdfd6687988e84f8447d8;xim-rs-%commit%'
 )
 
-EGIT_COMMIT="d9e1c024f393832765a03f4de204d6c8cd9abcb2"
+EGIT_COMMIT="a9cdfc9936c4ccf0503ee4631204e045f913e2c1"
 LLVM_COMPAT=( 22 )
-RUST_MIN_VER="1.97.1"
+RUST_MIN_VER="1.98.1"
 RUST_NEEDS_LLVM=1
 WEBRTC_COMMIT="0001d84-4"
 

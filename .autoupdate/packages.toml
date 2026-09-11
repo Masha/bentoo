@@ -2544,7 +2544,7 @@ base_from = "file"
 base_url = "https://api.github.com/repos/zed-industries/zed/contents/crates/zed/Cargo.toml?ref=main"
 base_pattern = '(?m)^version = "([0-9][0-9.]*)"'
 headers = { "User-Agent" = "bentoo-autoupdate", "Accept" = "application/vnd.github.raw" }
-version = "1.21.0_pre20260911-r1"
+version = "1.21.0_pre20260911-r2"
 comments = """
 zed — commit-tracked on main; _pre suffix preserved from current ebuild.
 2026-08-06: 2 commits landed same UTC day (d61e80b -> 6b2aa1c), so the date
@@ -2789,6 +2789,51 @@ errors; md5-cache _md5_ matches the ebuild; pkgcheck reports only the
 pre-existing deprecated-llvm-r1 finding. Three orphan md5-cache entries were
 swept (1.20.0_pre20260909-r1, 1.21.0_pre20260910, 1.21.0_pre20260911); the two
 under zed-bin are a different package and were left alone.
+Not merged with a build: this host has no sudo, so no emerge ran.
+2026-09-11 (-r2, second bump of the day): a9cdfc9936c4 (21:33 UTC). Found a
+complete but UNPUBLISHED -r2 already sitting on the wt/zed-1.21.0_pre20260911-r2
+worktree branch, built against 3cef31688ae2 (11:10 UTC) -- an ancestor, nine
+commits back. It was retargeted in place rather than published and followed by an
+-r3: a revision for an intermediate commit nobody would install buys nothing, and
+SRC_URI names the tarball after ${PF}, so reusing -r2 reuses the DIST slot too.
+That unpublished -r2 carried a defect of a kind none of the entries above names.
+RUST_MIN_VER was still "1.97.1" while rust-toolchain.toml had ALREADY moved to
+1.98.1 at 3cef3168, the very commit it packaged. rust-toolchain.toml is a bump
+axis of its own: the applier never reads it, `ebuild ... prepare` never consults
+it, and on a host whose active toolchain is already newer the gap is invisible to
+every local test -- `cargo check` passes precisely because the machine has what
+the ebuild forgot to ask for. Diff that file between the old and the new commit on
+every bump; here it is the only reason the ebuild changed outside CRATES and
+EGIT_COMMIT.
+pycargoebuild re-run from crates/zed: CRATES 1494 entries differing in exactly one
+row (ashpd 0.13.2 -> 0.13.5), GIT_CRATES (71) and the LICENSE+= block byte
+identical. `unindent` left crates/migrator's dev-dependencies in this range and
+stays in CRATES anyway, other consumers holding it -- which is why the answer
+comes from pycargoebuild and not from reading the Cargo.toml diff. All seven
+`local *_COMMIT` were re-checked against the regenerated GIT_CRATES: all seven
+resolve, none moved.
+The series was refreshed through zed-patches onto a9cdfc99, and the run hit
+refresh.sh's clobber guard -- patches/<PF> already existed for 3cef3168, the PF
+being reused. Resolved by `git mv`-ing it to a temporary name and refreshing
+--from that --to the real PF, which keeps the 3cef3168 series as the source (the
+closest one there is, nine commits away) and leaves no partial directory behind.
+6 of 16 patches changed, offsets only (conversation_view.rs +7,
+crates/zed/src/main.rs +3); no semantic rebase.
+The Manifest trap of the 09-09 entry recurred, for the same reason: PF unchanged,
+so the stale DIST line sat under exactly the right filename -- and so did the
+stale distfile in DISTDIR. Both had to be replaced by hand before
+`pkgdev manifest`, which otherwise has no reason to look at either.
+Verified before publishing: verify.sh, sync-overlay and check-sync agree on all
+three relations (series <-> ebuild, patches <-> overlay, patches <-> source);
+`ebuild ... prepare` applies all sixteen for real (>>> Source prepared); 11/11 sed
+patterns match the new Cargo.toml exactly once, leaving 0 [patch.crates-io]
+entries on `git =` and all ten WORKDIR targets present; `cargo check --locked
+--offline -p zed -p remote_server --features zed/inspector` exits 0 with zero
+errors -- `--locked` on purpose, because the defect the 3cef3168 pass found
+(0002's added Cargo.lock entry pinning a futures version that commit's lock no
+longer had) is silent without it; md5-cache _md5_ matches the ebuild and egencache
+touched only this one entry; pkgcheck reports only the pre-existing
+deprecated-llvm-r1 finding.
 Not merged with a build: this host has no sudo, so no emerge ran.
 """
 # END
