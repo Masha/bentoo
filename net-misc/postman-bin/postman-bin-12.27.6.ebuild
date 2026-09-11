@@ -9,7 +9,7 @@ inherit desktop xdg
 
 DESCRIPTION="API platform for building and using APIs"
 HOMEPAGE="https://www.postman.com/"
-SRC_URI="https://dl.pstmn.io/download/version/${PV}/linux64 -> ${P}.tar.gz"
+SRC_URI="https://dl.pstmn.io/download/version/${PV}/linux_64 -> ${P}.tar.gz"
 
 LICENSE="all-rights-reserved"
 SLOT="0"
