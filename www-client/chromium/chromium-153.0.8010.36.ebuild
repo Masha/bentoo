@@ -550,10 +550,11 @@ src_prepare() {
 	python_setup
 
 	# We'll fill this in as we go. Patches go in chromium-patches.
-	# BENTOO-DIVERGENCE: PATCHES - four fixes with no counterpart:
-	# unbundle-minizip-undo-unicode, cbor-crubit-optional and the two
-	# chromium-patches rebases below. ::gentoo is on 142 and carries an
-	# old-fontconfig patch this series no longer needs.
+	# BENTOO-DIVERGENCE: PATCHES - five fixes with no counterpart:
+	# unbundle-minizip-undo-unicode, cbor-crubit-optional,
+	# revert-font-format-crubit and the two chromium-patches rebases below.
+	# ::gentoo is on 142 and carries an old-fontconfig patch this series no
+	# longer needs.
 	local PATCHES=()
 
 	# BENTOO-DIVERGENCE: chromium-patches has no 153 tag -- 152 (2026-08-22) is
@@ -649,6 +650,14 @@ src_prepare() {
 			# the one that does not. Only reachable here: with USE=bundled-
 			# toolchain the flag is true and the patch is a no-op.
 			"${FILESDIR}/chromium-152-cbor-crubit-optional.patch"
+			# bentoo: M153 (upstream 493e6c3911e3) moved blink's OpenType
+			# FontFormatCheck from a cxx bridge to a Crubit binding and made
+			# //third_party/blink/renderer/platform depend on //build/rust/crubit
+			# unconditionally -- the same gn death as cbor above, but with no C++
+			# fallback to gate on: font_format_check.cc calls the generated
+			# bindings directly. This reverts the commit, restoring the M152 cxx
+			# path. Same reachability as cbor: no-op with USE=bundled-toolchain.
+			"${FILESDIR}/chromium-153-revert-font-format-crubit.patch"
 			# bentoo: rebase of chromium-patches' toolchain/
 			# cr152-fix-rust-2-oxidize-harder.patch, which teaches Crubit to take
 			# rs_bindings_from_cc and rustfmt from ${rust_sysroot} instead of the
