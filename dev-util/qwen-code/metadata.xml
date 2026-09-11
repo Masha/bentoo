@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>diego.evangelista5642@gmail.com</email>
+		<name>lucascouts</name>
+	</maintainer>
+	<longdescription lang="en">
+		Qwen Code is Alibaba's terminal coding agent, forked from Google's
+		Gemini CLI and adapted to the Qwen models.
+
+		Upstream's release bundles its own Node.js runtime. This package
+		discards it and runs on net-libs/nodejs instead, which cuts roughly
+		two thirds of the installed size and avoids carrying a second Node
+		that nothing else on the system would update.
+	</longdescription>
+	<upstream>
+		<remote-id type="github">QwenLM/qwen-code</remote-id>
+	</upstream>
+</pkgmetadata>

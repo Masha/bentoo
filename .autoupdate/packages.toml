@@ -9588,3 +9588,55 @@ publishes "-onedir" variants of the same builds, which unpack to a directory
 tree rather than a single binary; those are not used.
 """
 # END
+
+["dev-util/qwen-code"]
+url = "https://api.github.com/repos/QwenLM/qwen-code/releases?per_page=30"
+parser = "regex"
+pattern = '"tag_name":\s*"v([0-9]+\.[0-9]+\.[0-9]+)"'
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "0.23.3"
+comments = """
+Qwen Code — this record probes /releases and NOT /releases/latest, which is
+backwards from every other GitHub record here and is deliberate.
+
+The repository publishes two products from one release stream. On 2026-09-10
+/releases/latest answered "sdk-typescript-v0.1.12" -- the TypeScript SDK, not
+the CLI, whose tags are "v0.23.x". A /releases/latest probe would therefore
+track the wrong product and report a version this package cannot install.
+
+The regex is anchored on the quote followed by "v", which is what makes the
+listing safe to read: it skips "sdk-typescript-v..." (starts with s) and also
+skips the "v0.23.3-nightly.<date>.<sha>" tags, since it requires the closing
+quote right after the patch number. First match wins, so the newest real CLI
+release is picked.
+
+The ebuild discards upstream's bundled Node.js (199 MB of a 303 MB tarball)
+and runs on net-libs/nodejs. If a bump changes bin/qwen so it no longer
+invokes the bundled runtime, src_prepare dies on purpose rather than removing
+a directory the launcher still needs.
+"""
+# END
+
+["dev-util/cc-switch-bin"]
+url = "https://api.github.com/repos/farion1231/cc-switch/releases/latest"
+parser = "regex"
+pattern = '"tag_name":\s*"v([0-9]+\.[0-9]+\.[0-9]+)"'
+headers = { "User-Agent" = "bentoo-autoupdate" }
+type = "bin"
+version = "3.20.2"
+comments = """
+CC Switch — a Tauri GUI for switching between Claude Code, Codex and Gemini
+CLI accounts. Tracks CC-Switch-v<PV>-Linux-{x86_64,arm64}.deb; note the asset
+name carries a capitalised product name and a "v" before the version, unlike
+most records here.
+
+The .deb is used rather than the AppImage upstream also ships: same program,
+12 MB against 88 MB, because the AppImage bundles a runtime this package gets
+from the system (WebKitGTK 4.1, GTK+ 3, libsoup 3).
+
+Upstream's desktop entry is broken in two ways that src_install repairs: the
+file name contains a space, and Categories= is present but EMPTY. Re-check it
+on a bump -- the fix asserts its own result, so an upstream change fails the
+build instead of silently shipping an invalid entry.
+"""
+# END
