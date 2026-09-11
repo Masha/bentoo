@@ -94,9 +94,13 @@ BDEPEND="
 	wayland? ( dev-util/wayland-scanner )
 "
 
-# BENTOO-DIVERGENCE: PATCHES - three 4.8 patches ::gentoo has no version to
-# carry them for (it stops at 4.7.2): system-pcre2 and two that disable
-# deprecated editor screens.
+# BENTOO-DIVERGENCE: PATCHES - one 4.8 patch ::gentoo has no version to carry
+# it for (it stops at 4.7.2): system-pcre2.
+#
+# The two deprecated-editor-screen patches were DROPPED at 4.8_alpha5 as their
+# own headers instructed: upstream commit 2e26ab8a3afb ("Fix deprecated build
+# after dock changes", 2026-08-28) landed in 4.8-dev5 and fixes both call sites
+# they guarded, so main-screen no longer applies and game-view is redundant.
 #
 # The fourth was godot-4.5-scons.patch, which shared ::gentoo's FILENAME but
 # not its CONTENT. RESOLVED 2026-09-06 by renaming it to
@@ -118,8 +122,6 @@ BDEPEND="
 PATCHES=(
 	"${FILESDIR}"/${PN}-4.8-scons-toolchain.patch
 	"${FILESDIR}"/${PN}-4.8-system-pcre2.patch
-	"${FILESDIR}"/${PN}-4.8-disable-deprecated-main-screen.patch
-	"${FILESDIR}"/${PN}-4.8-disable-deprecated-game-view.patch
 )
 
 src_prepare() {
