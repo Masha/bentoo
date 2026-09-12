@@ -345,6 +345,31 @@ nothing and closes the hole permanently.
 """
 # END
 
+["app-forensics/aflplusplus"]
+url = "https://api.github.com/repos/AFLplusplus/AFLplusplus/releases/latest"
+parser = "json"
+path = "tag_name"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "5.03c"
+comments = """
+AFL++ — GitHub release tag, "v" prefix stripped by the normalizer.
+
+Point releases carry a letter suffix (5.01c -> 5.02c -> 5.03c), the same shape
+as app-misc/tmux: a valid Gentoo version component that sorts the way upstream
+intends, so the tag needs no rewriting.
+
+releases/latest rather than ranking refs/tags: the 4.x and 5.x tags share one
+tag space and upstream has backported to the older series, so ranking tags
+would be a coin flip on which series is newest.
+
+A BUMP IS NOT MECHANICAL HERE. The ebuild carries three Gentoo patches in
+files/ that ::gentoo distributes as a tarball on dev.gentoo.org/~sam/ — that
+tarball stops at 4.35c and none exists for 5.x. They touch GNUmakefile,
+GNUmakefile.llvm and GNUmakefile.gcc_plugin, all of which upstream edits every
+release, so every bump needs them rebased and re-verified before it ships.
+"""
+# END
+
 ["app-office/obsidian"]
 url = "https://raw.githubusercontent.com/obsidianmd/obsidian-releases/HEAD/desktop-releases.json"
 parser = "json"

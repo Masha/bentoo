@@ -1,0 +1,25 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Sam James <sam@gentoo.org>
+Date: Fri, 11 Sep 2026 21:09:07 -0300
+Subject: [PATCH 3/3] Don't pass *FLAGS to test-instr
+
+It breaks the instrumentation.
+
+Signed-off-by: Sam James <sam@gentoo.org>
+---
+ GNUmakefile.llvm | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/GNUmakefile.llvm b/GNUmakefile.llvm
+index 3d33dcf..19b9738 100644
+--- a/GNUmakefile.llvm
++++ b/GNUmakefile.llvm
+@@ -618,7 +618,7 @@ ifdef AFL_NO_TEST_BUILD
+ 	@echo "[*] Not testing the CC wrapper and instrumentation output (AFL_NO_TEST_BUILD set)."
+ else
+ 	@echo "[*] Testing the CC wrapper and instrumentation output..."
+-	unset AFL_USE_ASAN AFL_USE_MSAN AFL_INST_RATIO AFL_LLVM_ALLOWLIST AFL_LLVM_DENYLIST; ASAN_OPTIONS=detect_leaks=0 AFL_QUIET=1 AFL_PATH=. AFL_LLVM_LAF_ALL=1 ./afl-cc $(CFLAGS) $(CPPFLAGS) ./test-instr.c -o test-instr $(LDFLAGS)
++	unset AFL_USE_ASAN AFL_USE_MSAN AFL_INST_RATIO AFL_LLVM_ALLOWLIST AFL_LLVM_DENYLIST; ASAN_OPTIONS=detect_leaks=0 AFL_QUIET=1 AFL_PATH=. AFL_LLVM_LAF_ALL=1 ./afl-cc ./test-instr.c -o test-instr
+ ifdef IS_IOS
+ 	@ldid -Sentitlements.plist test-instr && echo "[+] Signed test-instr" || echo "[-] Failed to sign test-instr"
+ endif
