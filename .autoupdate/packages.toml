@@ -284,7 +284,7 @@ url = "https://api2.cursor.sh/updates/api/download/stable/linux-x64/cursor"
 parser = "json"
 path = "version"
 commit_sha_path = "commitSha"
-version = "3.20.10"
+version = "3.20.14"
 comments = """
 Cursor — official download API; "version" is the full version. commitSha is the
 per-release BUILD_ID embedded in SRC_URI; the applier substitutes it into the
@@ -1300,7 +1300,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.30.1"
+version = "0.30.2"
 comments = """
 bentoolkit — releases/latest devolve tag_name "vX.Y.Z"; o transform tira o "v",
 senao o bump gera um PV invalido (bentoolkit-v0.17.0).
@@ -2096,7 +2096,7 @@ url = "https://api.github.com/repos/vim/vim/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "9.2.1074"
+version = "9.2.1080"
 comments = """
 vim — no releases (404); tags[0] "vX.Y.ZZZZ".
 """
@@ -2107,7 +2107,7 @@ url = "https://api.github.com/repos/vim/vim/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "9.2.1074"
+version = "9.2.1080"
 comments = """
 vim-core — same upstream repo as vim.
 """
@@ -4857,7 +4857,6 @@ url = "https://api.github.com/repos/KDE/plasma-workspace/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"v([0-9]+\.[0-9]+\.[0-9]+(?:\.[0-9]+)?)"'
 select = "max"
-series = '^[0-9]+\.[0-9]+\.(?:[0-9]|[1-8][0-9])(?:\.[0-9]+)?$'
 headers = { "User-Agent" = "bentoo-autoupdate" }
 patched = """
 Applies files/spectacle-opencv5.patch, which ::gentoo does not ship at 6.7.4 — \
@@ -4867,6 +4866,7 @@ named ${PN}-opencv5.patch, not ${P}-, deliberately: it has been byte-identical \
 since 6.7.1, and a version in the filename would make every bump rename it by \
 hand. Drop this once ::gentoo carries the opencv5 fix itself.\
 """
+series = '^[0-9]+\.[0-9]+\.(?:[0-9]|[1-8][0-9])(?:\.[0-9]+)?$'
 version = "6.7.5"
 comments = """
 spectacle -> KDE/plasma-workspace (anchor: overlay versions it as Plasma).
@@ -8106,7 +8106,7 @@ url = "https://api.github.com/repos/lucascouts/claude-agent-tui/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.13.0"
+version = "0.13.2"
 comments = """
 Renamed from dev-util/claude-agent-tui (commit e8a05fdc: del old ebuild + add
 claude-agent-acp-tui, same upstream repo lucascouts/claude-agent-tui, same PV).
@@ -8603,7 +8603,7 @@ url = "https://api.github.com/repos/lucascouts/claude-agent-acp-plus/releases/la
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.15.1"
+version = "0.15.2"
 comments = """
 claude-agent-acp-plus — GitHub releases/latest tag "vX.Y.Z" (v stripped).
 SRC_URI releases/download/v${PV}/${P}-bundle.tar.gz. Live=v0.2.0.
@@ -10123,7 +10123,7 @@ parser = "regex"
 pattern = '"tag_name":\s*"v([0-9]+\.[0-9]+\.[0-9]+)"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "1.23.0"
+version = "1.23.1"
 comments = """
 OpenChamber — a desktop cockpit for parallel opencode sessions. Tracks
 OpenChamber-<PV>-linux-{x86_64,arm64}.AppImage; the same release also carries
