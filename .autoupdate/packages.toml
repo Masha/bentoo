@@ -370,6 +370,32 @@ release, so every bump needs them rebased and re-verified before it ships.
 """
 # END
 
+["app-forensics/honggfuzz"]
+url = "https://api.github.com/repos/google/honggfuzz/tags?per_page=30"
+parser = "regex"
+pattern = '"name":\s*"([0-9]+(?:\.[0-9]+)+)"'
+select = "max"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "2.6"
+comments = """
+honggfuzz - PROBE THE TAGS, AND ONLY THE NUMERIC ONES. Both releases/latest and
+tags[0] answer "oss-fuzz": a rolling tag upstream re-points at the OSS-Fuzz
+integration branch, last moved 2024-07. Reading either field verbatim would
+write "oss-fuzz" into version and every later comparison would be nonsense.
+
+The pattern therefore matches only dotted-numeric tags, which excludes the
+rolling one outright, and select = "max" ranks what is left rather than trusting
+tag order. 2.6 is the newest real release and has been since 2022.
+
+Because upstream is effectively dormant, treat any movement here as suspicious
+rather than routine: check it is a real tagged release before bumping.
+
+A BUMP IS NOT MECHANICAL HERE. files/honggfuzz-bfd-bool.patch adapts
+linux/bfd.c to binutils >= 2.44 and touches code upstream would also touch if it
+ever resumed. Rebase and rebuild before shipping a bump.
+"""
+# END
+
 ["dev-util/shfmt"]
 url = "https://api.github.com/repos/mvdan/sh/releases/latest"
 parser = "json"

@@ -1,0 +1,74 @@
+Fix build against binutils >= 2.44.
+
+Two independent breakages, both from libopcodes/libbfd churn:
+
+1. honggfuzz decides which disassembler() prototype to use by probing
+   for FOR_EACH_DISASSEMBLER_OPTION, a macro added to dis-asm.h in
+   binutils 2.29. That macro is gone from current dis-asm.h, which
+   superseded it with the disasm_options_t machinery, so the probe now
+   silently selects the pre-2.29 branch and calls disassembler() with
+   one argument where the header declares four.
+
+   The probe is dead weight regardless: the ebuild already floors
+   RDEPEND at >=sys-libs/binutils-libs-2.29, so the legacy branch is
+   unreachable. Drop the probe and keep only the modern call.
+
+2. bfd.h no longer defines TRUE/FALSE; current binutils uses the C99
+   bool, which honggfuzz already has in scope via honggfuzz.h -> 
+   <stdbool.h>. Three uses remain in linux/bfd.c: two
+   bfd_find_nearest_line() comparisons and the `bool big` argument of
+   disassembler().
+
+Symptom note: because TRUE/FALSE are undeclared, GCC also reports
+"too few arguments to function 'disassembler'" on the same line. That
+is error recovery noise, not a third defect.
+
+Not submitted upstream: the last tagged release is 2.6 and the only
+activity since is the rolling "oss-fuzz" tag from 2024-07.
+
+--- a/linux/bfd.c
++++ b/linux/bfd.c
+@@ -56,13 +56,6 @@
+ } bfd_t;
+ 
+ /* INFO: binutils (libbfd, libopcode) has an unstable public interface. */
+-/*
+- * This is probably the only define which was added with binutils 2.29, so we use
+- * it, do decide which disassembler() prototype from dis-asm.h to use.
+- */
+-#if defined(FOR_EACH_DISASSEMBLER_OPTION)
+-#define _HF_BFD_GE_2_29
+-#endif /* defined(FOR_EACH_DISASSEMBLER_OPTION) */
+ 
+ static pthread_mutex_t arch_bfd_mutex = PTHREAD_MUTEX_INITIALIZER;
+ 
+@@ -173,13 +166,13 @@
+         long sec_offset = (long)funcs[i].pc - bfd_get_section_vma(bfdParams.bfdh, section);
+ 
+         if (bfd_find_nearest_line(
+-                bfdParams.bfdh, section, bfdParams.syms, sec_offset, &file, &func, &line) == TRUE) {
++                bfdParams.bfdh, section, bfdParams.syms, sec_offset, &file, &func, &line) == true) {
+             snprintf(funcs[i].func, sizeof(funcs->func), "%s", func ? func : "");
+             snprintf(funcs[i].file, sizeof(funcs->file), "%s", file ? file : "");
+             funcs[i].line = line;
+         }
+         if (bfd_find_nearest_line(
+-                bfdParams.bfdh, section, bfdParams.syms, sec_offset, &file, &func, &line) == TRUE) {
++                bfdParams.bfdh, section, bfdParams.syms, sec_offset, &file, &func, &line) == true) {
+             snprintf(funcs[i].func, sizeof(funcs->func), "%s", func ? func : "");
+             snprintf(funcs[i].file, sizeof(funcs->file), "%s", file ? file : "");
+             funcs[i].line = line;
+@@ -226,12 +219,8 @@
+         bfd_close(bfdh);
+         return;
+     }
+-#if defined(_HF_BFD_GE_2_29)
+     disassembler_ftype disassemble =
+-        disassembler(bfd_get_arch(bfdh), bfd_little_endian(bfdh) ? FALSE : TRUE, 0, NULL);
+-#else
+-    disassembler_ftype disassemble = disassembler(bfdh);
+-#endif    // defined(_HD_BFD_GE_2_29)
++        disassembler(bfd_get_arch(bfdh), bfd_little_endian(bfdh) ? false : true, 0, NULL);
+     if (disassemble == NULL) {
+         LOG_W("disassembler() failed");
+         bfd_close(bfdh);
