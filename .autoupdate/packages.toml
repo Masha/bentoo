@@ -2096,7 +2096,7 @@ url = "https://api.github.com/repos/vim/vim/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "9.2.1080"
+version = "9.2.1090"
 comments = """
 vim — no releases (404); tags[0] "vX.Y.ZZZZ".
 """
@@ -2107,7 +2107,7 @@ url = "https://api.github.com/repos/vim/vim/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "9.2.1080"
+version = "9.2.1090"
 comments = """
 vim-core — same upstream repo as vim.
 """
@@ -8258,7 +8258,7 @@ toml — MUST use PyPI, not GitHub: uiri/toml has no releases and its /tags [0] 
 url = "https://pypi.org/pypi/jiter/json"
 parser = "json"
 path = "info.version"
-version = "0.16.0"
+version = "0.17.0"
 comments = """
 jiter — pyo3/maturin extension pulled in by dev-python/openai. info.version is
 clean X.Y.Z. Live=0.16.0 == current PV.
