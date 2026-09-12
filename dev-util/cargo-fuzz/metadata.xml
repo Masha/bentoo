@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@protonmail.com</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<longdescription lang="en">
+		cargo-fuzz is the cargo subcommand for fuzzing a Rust crate with
+		libFuzzer. It generates and maintains the fuzz target boilerplate,
+		builds the target with the sanitizer and coverage instrumentation
+		libFuzzer needs, and manages the corpus. Note that running a fuzz
+		target requires a nightly toolchain, because the instrumentation is
+		driven by unstable compiler flags.
+	</longdescription>
+	<upstream>
+		<bugs-to>https://github.com/rust-fuzz/cargo-fuzz/issues</bugs-to>
+		<remote-id type="github">rust-fuzz/cargo-fuzz</remote-id>
+	</upstream>
+</pkgmetadata>

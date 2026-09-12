@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@protonmail.com</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<longdescription lang="en">
+		cargo-mutants performs mutation testing: it rewrites your source in
+		small, plausible ways -- a returned value replaced, a condition
+		negated -- and reruns the test suite for each mutant. A mutant that
+		survives is a change no test noticed, which is a far stronger signal
+		than line coverage: coverage says a line ran, a surviving mutant says
+		nothing checked what that line did.
+	</longdescription>
+	<upstream>
+		<bugs-to>https://github.com/sourcefrog/cargo-mutants/issues</bugs-to>
+		<remote-id type="github">sourcefrog/cargo-mutants</remote-id>
+	</upstream>
+</pkgmetadata>

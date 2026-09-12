@@ -1,0 +1,12 @@
+--- a/internal/scan/run.go
++++ b/internal/scan/run.go
+@@ -116,6 +116,9 @@
+ 		return
+ 	}
+ 
++	cfg.ScannerVersion = "v1.8.0"
++	return
++
+ 	// TODO(https://go.dev/issue/29228): we need to manually construct the
+ 	// version string when it is "(devel)" until #29228 is resolved.
+ 	var revision, at string

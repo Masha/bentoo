@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@protonmail.com</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<longdescription lang="en">
+		govulncheck is the Go team's vulnerability scanner. Unlike a scanner
+		that only compares a dependency list against a database, it performs
+		static reachability analysis: it reports a vulnerability only when the
+		affected function is actually reachable from your code, which
+		typically cuts the raw dependency-level findings by half. It reads the
+		Go vulnerability database at vuln.go.dev and can analyse either
+		sources or an already-built binary.
+	</longdescription>
+	<upstream>
+		<bugs-to>https://github.com/golang/vuln/issues</bugs-to>
+		<remote-id type="github">golang/vuln</remote-id>
+	</upstream>
+</pkgmetadata>

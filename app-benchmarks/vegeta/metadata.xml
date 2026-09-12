@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@protonmail.com</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<longdescription lang="en">
+		Vegeta drives HTTP load at a constant request rate, rather than with a
+		fixed pool of workers. The difference matters: a worker-pool tool slows
+		down when the target slows down, hiding exactly the degradation you are
+		measuring, while a constant-rate attacker keeps the pressure and
+		records the latency it causes. It reports latency percentiles and can
+		plot results, and works as both a CLI and a Go library.
+	</longdescription>
+	<upstream>
+		<bugs-to>https://github.com/tsenart/vegeta/issues</bugs-to>
+		<remote-id type="github">tsenart/vegeta</remote-id>
+	</upstream>
+</pkgmetadata>

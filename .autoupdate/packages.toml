@@ -370,6 +370,216 @@ release, so every bump needs them rebased and re-verified before it ships.
 """
 # END
 
+["dev-util/shfmt"]
+url = "https://api.github.com/repos/mvdan/sh/releases/latest"
+parser = "json"
+path = "tag_name"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "3.14.1"
+comments = """
+shfmt - the binary is one command of the mvdan/sh repository, so the tag lives
+under that name, not under "shfmt". releases/latest returns "vX.Y.Z".
+
+The ebuild patches cmd/shfmt/main.go to bake the version in, because shfmt
+reads it from debug.ReadBuildInfo() and a tarball build has none. The patch is
+version-specific by name; a bump must refresh it or the build dies on a patch
+that no longer applies -- which is the intended failure, louder than a binary
+that silently reports "(devel)".
+"""
+# END
+
+["dev-go/govulncheck"]
+url = "https://api.github.com/repos/golang/vuln/tags?per_page=30"
+parser = "regex"
+pattern = '"name":\s*"v([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "1.8.0"
+comments = """
+govulncheck - PROBE THE TAGS, NOT THE RELEASES. golang/vuln stopped publishing
+GitHub releases at v1.1.4 (January 2025) while continuing to tag every version;
+releases/latest therefore reports a version more than a year stale. That is the
+mirror image of the usual trap documented at the top of this file: here ranking
+tags is right and the release endpoint is the one that lies.
+
+Pinning v1.1.4 is not merely old, it is broken: its golang.org/x/tools v0.29.0
+predates the Go 1.27 AST and PANICS ("unexpected expr: *ast.KeyValueExpr") on
+any modern source tree. Measured on four projects, 2026-09-11.
+
+The ebuild patches internal/scan/run.go so the scanner reports its own version;
+a bump must refresh that patch.
+"""
+# END
+
+["net-analyzer/nuclei"]
+url = "https://api.github.com/repos/projectdiscovery/nuclei/releases/latest"
+parser = "json"
+path = "tag_name"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "3.11.1"
+comments = """
+nuclei - releases/latest returns "vX.Y.Z".
+
+Two things a bump must re-check, neither of which the probe can see:
+* LICENSE carries GPL-2 because nuclei statically links
+  github.com/projectdiscovery/ldapserver, which is GPL-2 despite nuclei itself
+  being MIT. If that dependency is dropped or relicensed, drop the GPL-2.
+* The vendor tarball on distfiles.obentoo.org must be regenerated
+  (`go mod vendor`) and uploaded for the new version, or SRC_URI 404s.
+"""
+# END
+
+["dev-vcs/trufflehog"]
+url = "https://api.github.com/repos/trufflesecurity/trufflehog/releases/latest"
+parser = "json"
+path = "tag_name"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "3.97.4"
+comments = """
+trufflehog - releases/latest returns "vX.Y.Z". Upstream ships several releases
+a week, so this record moves often.
+
+A bump must regenerate and upload the vendor tarball to distfiles.obentoo.org
+(`go mod vendor`), or SRC_URI 404s.
+"""
+# END
+
+["dev-util/reviewdog"]
+url = "https://api.github.com/repos/reviewdog/reviewdog/releases/latest"
+parser = "json"
+path = "tag_name"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "0.21.0"
+comments = """
+reviewdog - releases/latest returns "vX.Y.Z". Last release was September 2025;
+a long gap here is normal for this project, not a sign the probe broke.
+
+A bump must regenerate and upload the vendor tarball to distfiles.obentoo.org.
+"""
+# END
+
+["app-benchmarks/vegeta"]
+url = "https://api.github.com/repos/tsenart/vegeta/releases/latest"
+parser = "json"
+path = "tag_name"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "12.13.0"
+comments = """
+vegeta - releases/latest returns "vX.Y.Z". The major is part of the Go module
+path (/v12), so a major bump changes the import path and the ldflags target.
+
+A bump must regenerate and upload the vendor tarball to distfiles.obentoo.org.
+"""
+# END
+
+["dev-util/cargo-fuzz"]
+url = "https://api.github.com/repos/rust-fuzz/cargo-fuzz/releases/latest"
+parser = "json"
+path = "tag_name"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "0.13.2"
+comments = """
+cargo-fuzz - releases/latest returns a BARE version with no "v", unlike most of
+this file. The repository also carries older "vX.Y.Z" tags, so ranking tags
+would mix the two shapes; the release endpoint sidesteps that.
+"""
+# END
+
+["dev-util/cargo-mutants"]
+url = "https://api.github.com/repos/sourcefrog/cargo-mutants/releases/latest"
+parser = "json"
+path = "tag_name"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "27.1.0"
+comments = """
+cargo-mutants - releases/latest returns "vX.Y.Z". Upstream versions by year
+(27.x = 2027 line), so a jump in the major is routine, not a rewrite.
+"""
+# END
+
+["dev-util/cargo-llvm-cov"]
+url = "https://api.github.com/repos/taiki-e/cargo-llvm-cov/releases/latest"
+parser = "json"
+path = "tag_name"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "0.9.1"
+comments = """
+cargo-llvm-cov - releases/latest returns "vX.Y.Z".
+
+Upstream does NOT ship Cargo.lock in the release tarball, so the CRATES list in
+the ebuild was resolved by us with `cargo generate-lockfile`, not by upstream.
+Two consequences for a bump: the list must be regenerated with pycargoebuild
+rather than edited by hand, and GIT_CRATES carries taiki-e/test-helper pinned
+at a commit that changes without a version to announce it.
+"""
+# END
+
+["dev-util/cargo-geiger"]
+url = "https://api.github.com/repos/geiger-rs/cargo-geiger/releases/latest"
+parser = "json"
+path = "tag_name"
+transform = [['^cargo-geiger-', '']]
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "0.13.0"
+comments = """
+cargo-geiger - the tag is PREFIXED with the crate name, "cargo-geiger-X.Y.Z",
+because the repository is a workspace that also tags geiger-X.Y.Z and
+cargo-geiger-serde-X.Y.Z from the same space. Ranking tags here would happily
+return a geiger-0.4.x and read as a massive downgrade; the transform strips the
+prefix off the release endpoint instead.
+
+Upstream has been quiet since August 2025. A long gap is expected.
+"""
+# END
+
+["dev-util/ast-grep"]
+url = "https://api.github.com/repos/ast-grep/ast-grep/releases/latest"
+parser = "json"
+path = "tag_name"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "0.45.3"
+comments = """
+ast-grep - releases/latest returns a BARE version with no "v".
+
+The CLI is one member of a workspace (crates/cli); pycargoebuild must be run
+from there, not from the repository root, or it refuses with "the specified
+directory is a workspace root".
+"""
+# END
+
+["app-misc/watchexec"]
+url = "https://api.github.com/repos/watchexec/watchexec/releases/latest"
+parser = "json"
+path = "tag_name"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "2.7.2"
+comments = """
+watchexec - PROBE THE RELEASES, NOT THE TAGS. The repository is a workspace
+that tags every crate from one space, and the library crate is far ahead of the
+CLI: watchexec-v8.4.1 exists while the CLI is at v2.7.2. Ranking tags returns
+the library version, which is not a version of this package at all.
+releases/latest is titled "CLI vX.Y.Z" and tagged "vX.Y.Z".
+
+Derived from the guru overlay's ebuild (app-misc/watchexec-2.5.0), rebased onto
+2.7.2 with regenerated CRATES and ~arm64 added.
+"""
+# END
+
+["dev-util/tokei"]
+url = "https://api.github.com/repos/XAMPPRocky/tokei/releases/latest"
+parser = "json"
+path = "tag_name"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "15.0.0"
+comments = """
+tokei - releases/latest returns "vX.Y.Z".
+
+Derived from the guru overlay's ebuild (dev-util/tokei-14.0.0), rebased onto
+15.0.0 with regenerated CRATES and ~arm64 added. Note RUST_MIN_VER is 1.71.1,
+not the 1.71 upstream declares: cargo.eclass rejects anything below 1.71.1.
+"""
+# END
+
 ["app-office/obsidian"]
 url = "https://raw.githubusercontent.com/obsidianmd/obsidian-releases/HEAD/desktop-releases.json"
 parser = "json"

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@protonmail.com</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<longdescription lang="en">
+		TruffleHog scans for leaked credentials in git history, filesystems,
+		S3 buckets, container images and many other sources. What sets it
+		apart from a pure pattern matcher is verification: for hundreds of
+		credential types it calls the provider to check whether the secret is
+		still live, which separates a real incident from a rotated key. It
+		complements dev-vcs/gitleaks rather than replacing it, the latter
+		being the lighter pre-commit-shaped option.
+	</longdescription>
+	<upstream>
+		<bugs-to>https://github.com/trufflesecurity/trufflehog/issues</bugs-to>
+		<remote-id type="github">trufflesecurity/trufflehog</remote-id>
+	</upstream>
+</pkgmetadata>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@protonmail.com</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<longdescription lang="en">
+		ast-grep searches and rewrites code by matching the abstract syntax
+		tree rather than lines of text, so a pattern like `foo($A)` matches
+		the call however it is wrapped or indented, and ignores the same text
+		inside a comment or string. It supports many languages through
+		tree-sitter and can apply rewrites in bulk, which makes it a codemod
+		tool as much as a search tool.
+
+		Upstream also installs the binary under the short name `sg`. This
+		package does not, because `sg` is already a command from
+		sys-apps/shadow.
+	</longdescription>
+	<upstream>
+		<bugs-to>https://github.com/ast-grep/ast-grep/issues</bugs-to>
+		<remote-id type="github">ast-grep/ast-grep</remote-id>
+	</upstream>
+</pkgmetadata>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@protonmail.com</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<longdescription lang="en">
+		cargo-geiger walks the dependency tree and counts expressions inside
+		unsafe blocks, per crate. It is a triage aid, not a verdict: unsafe is
+		legitimate in low-level crates, and the count says where to look
+		rather than what is wrong. Upstream activity has been low since 2025 --
+		the newest release, 0.13.0, is from August 2025.
+	</longdescription>
+	<upstream>
+		<bugs-to>https://github.com/geiger-rs/cargo-geiger/issues</bugs-to>
+		<remote-id type="github">geiger-rs/cargo-geiger</remote-id>
+	</upstream>
+</pkgmetadata>

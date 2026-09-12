@@ -1,0 +1,20 @@
+--- a/cmd/shfmt/main.go
++++ b/cmd/shfmt/main.go
+@@ -156,13 +156,15 @@
+ 	flag.Parse()
+ 
+ 	if versionFlag.val {
+-		version := "(unknown)"
++		version := "v3.14.1"
+ 		if info, ok := debug.ReadBuildInfo(); ok {
+ 			mod := &info.Main
+ 			if mod.Replace != nil {
+ 				mod = mod.Replace
+ 			}
+-			version = mod.Version
++			if mod.Version != "" && mod.Version != "(devel)" {
++				version = mod.Version
++			}
+ 		}
+ 		fmt.Println(version)
+ 		return

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@protonmail.com</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<longdescription lang="en">
+		shfmt formats shell programs. It supports POSIX Shell, Bash and mksh,
+		and unlike a regex-based formatter it parses the script into a real
+		syntax tree, so it reformats rather than rewrites text. It is the
+		formatter component of mvdan/sh, which also provides a shell parser
+		and interpreter as Go libraries.
+	</longdescription>
+	<upstream>
+		<bugs-to>https://github.com/mvdan/sh/issues</bugs-to>
+		<remote-id type="github">mvdan/sh</remote-id>
+	</upstream>
+</pkgmetadata>

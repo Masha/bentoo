@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@protonmail.com</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<longdescription lang="en">
+		cargo-llvm-cov collects code coverage using LLVM's source-based
+		instrumentation (-C instrument-coverage) rather than a line-counting
+		approximation, so it reports region and branch coverage that matches
+		what the compiler actually emitted. It produces lcov, JSON, HTML and
+		Cobertura output for CI consumption.
+	</longdescription>
+	<upstream>
+		<bugs-to>https://github.com/taiki-e/cargo-llvm-cov/issues</bugs-to>
+		<remote-id type="github">taiki-e/cargo-llvm-cov</remote-id>
+	</upstream>
+</pkgmetadata>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@protonmail.com</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<longdescription lang="en">
+		tokei counts lines of code, separating code from comments and blank
+		lines, grouped by language. Unlike a word-count approximation it
+		parses enough of each language to get nested and inline comments
+		right, and it respects .gitignore by default. It is the faster
+		counterpart to dev-util/cloc.
+	</longdescription>
+	<upstream>
+		<bugs-to>https://github.com/XAMPPRocky/tokei/issues</bugs-to>
+		<remote-id type="github">XAMPPRocky/tokei</remote-id>
+	</upstream>
+</pkgmetadata>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@protonmail.com</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<longdescription lang="en">
+		watchexec runs a command whenever files in a directory change. It
+		handles the details that make naive file-watching loops painful:
+		debouncing bursts of events, respecting .gitignore, and killing or
+		signalling the previous process before starting the next one, so a
+		long-running server restarts cleanly instead of piling up.
+	</longdescription>
+	<upstream>
+		<bugs-to>https://github.com/watchexec/watchexec/issues</bugs-to>
+		<remote-id type="github">watchexec/watchexec</remote-id>
+	</upstream>
+</pkgmetadata>

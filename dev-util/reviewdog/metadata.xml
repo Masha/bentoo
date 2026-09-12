@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@protonmail.com</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<longdescription lang="en">
+		reviewdog takes the output of any linter, on stdin or through an
+		errorformat, and turns it into review comments. Its point is the
+		filtering: it reports only the findings that fall on lines the current
+		diff touches, so introducing the tool into an old codebase does not
+		bury the author under pre-existing warnings. It posts to GitHub,
+		GitLab, Gerrit and Bitbucket, and also runs purely locally.
+	</longdescription>
+	<upstream>
+		<bugs-to>https://github.com/reviewdog/reviewdog/issues</bugs-to>
+		<remote-id type="github">reviewdog/reviewdog</remote-id>
+	</upstream>
+</pkgmetadata>

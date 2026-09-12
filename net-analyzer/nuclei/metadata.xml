@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@protonmail.com</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<longdescription lang="en">
+		nuclei scans targets for known vulnerabilities and misconfigurations
+		using templates written in a declarative YAML DSL, rather than
+		hardcoded checks. Because the detection logic lives in the templates,
+		the community catalogue can cover a new CVE without a new release of
+		the scanner. Templates are not installed by this package; fetch them
+		with `nuclei -update-templates`.
+	</longdescription>
+	<upstream>
+		<bugs-to>https://github.com/projectdiscovery/nuclei/issues</bugs-to>
+		<remote-id type="github">projectdiscovery/nuclei</remote-id>
+	</upstream>
+</pkgmetadata>
