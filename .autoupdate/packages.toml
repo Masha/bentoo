@@ -179,7 +179,7 @@
 url = "https://registry.npmjs.org/@anthropic-ai/claude-code"
 parser = "json"
 path = "dist-tags.latest"
-version = "2.1.269"
+version = "2.1.270"
 comments = """
 claude-code — npm @anthropic-ai/claude-code; dist-tags.latest is the stable channel.
 
@@ -2096,7 +2096,7 @@ url = "https://api.github.com/repos/vim/vim/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "9.2.1090"
+version = "9.2.1091"
 comments = """
 vim — no releases (404); tags[0] "vX.Y.ZZZZ".
 """
@@ -2107,7 +2107,7 @@ url = "https://api.github.com/repos/vim/vim/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "9.2.1090"
+version = "9.2.1091"
 comments = """
 vim-core — same upstream repo as vim.
 """
@@ -4783,14 +4783,27 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 enabled = false
 disabled_by = "removed 2026-09-02: frozen copy of ::gentoo's 6.7.4 with nothing bentoo-specific; ::gentoo's -r1 carries newer PYTHON_COMPAT/QTMIN"
 url = "https://api.github.com/repos/KDE/breeze-gtk/tags"
-parser = "json"
-path = "[0].name"
+parser = "regex"
+pattern = '"name":"v([0-9]+\.[0-9]+\.[0-9]+(?:\.[0-9]+)?)"'
+select = "max"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+series = '^[0-9]+\.[0-9]+\.(?:[0-9]|[1-8][0-9])(?:\.[0-9]+)?(?:-r[0-9]+)?$'
 version = "6.7.4"
 comments = """
-breeze-gtk — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
-Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
-incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
+breeze-gtk -> KDE/breeze-gtk. KDE Plasma family: the whole series is released in lockstep.
+
+Probed with `parser = "regex"` + `select = "max"` + `series`, NOT `[0].name`.
+Plasma numbers the next series' beta as x.y.90 / x.y.91 -- v6.7.90 IS the 6.8
+beta -- and the tag list is semver-desc, so `[0].name` returns a beta for as
+long as one is open.
+
+This record is DISABLED, which does not stop the probe: the revivable-orphan
+scan reads upstream all the same. On 2026-09-12 it therefore compared 6.7.90
+against ::gentoo's 6.7.5 and offered this package for revival on every sweep --
+a revival straight onto a beta. kde-plasma/spectacle is the same fix and carries
+the full account, including what the beta actually broke when it merged: the
+Plasma-family deps derive from ${KDE_CATV} (== ${PV}), so a 6.7.90 ebuild asks
+for 6.7.90 siblings that ::gentoo does not have, and nothing satisfies them.
 """
 # END
 
@@ -4798,14 +4811,27 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 enabled = false
 disabled_by = "removed 2026-09-02: frozen copy; ::gentoo's -r1 renamed BUILD_SteamOSBackend to BUILD_HoloBackend, so the overlay passed a flag upstream no longer has"
 url = "https://api.github.com/repos/KDE/discover/tags"
-parser = "json"
-path = "[0].name"
+parser = "regex"
+pattern = '"name":"v([0-9]+\.[0-9]+\.[0-9]+(?:\.[0-9]+)?)"'
+select = "max"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+series = '^[0-9]+\.[0-9]+\.(?:[0-9]|[1-8][0-9])(?:\.[0-9]+)?(?:-r[0-9]+)?$'
 version = "6.7.4"
 comments = """
-discover — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
-Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
-incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
+discover -> KDE/discover. KDE Plasma family: the whole series is released in lockstep.
+
+Probed with `parser = "regex"` + `select = "max"` + `series`, NOT `[0].name`.
+Plasma numbers the next series' beta as x.y.90 / x.y.91 -- v6.7.90 IS the 6.8
+beta -- and the tag list is semver-desc, so `[0].name` returns a beta for as
+long as one is open.
+
+This record is DISABLED, which does not stop the probe: the revivable-orphan
+scan reads upstream all the same. On 2026-09-12 it therefore compared 6.7.90
+against ::gentoo's 6.7.5 and offered this package for revival on every sweep --
+a revival straight onto a beta. kde-plasma/spectacle is the same fix and carries
+the full account, including what the beta actually broke when it merged: the
+Plasma-family deps derive from ${KDE_CATV} (== ${PV}), so a 6.7.90 ebuild asks
+for 6.7.90 siblings that ::gentoo does not have, and nothing satisfies them.
 """
 # END
 
@@ -4813,14 +4839,27 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 enabled = false
 disabled_by = "removed 2026-09-02: frozen copy of ::gentoo's 6.7.4 with nothing bentoo-specific"
 url = "https://api.github.com/repos/KDE/drkonqi/tags"
-parser = "json"
-path = "[0].name"
+parser = "regex"
+pattern = '"name":"v([0-9]+\.[0-9]+\.[0-9]+(?:\.[0-9]+)?)"'
+select = "max"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+series = '^[0-9]+\.[0-9]+\.(?:[0-9]|[1-8][0-9])(?:\.[0-9]+)?(?:-r[0-9]+)?$'
 version = "6.7.4"
 comments = """
-drkonqi — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
-Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
-incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
+drkonqi -> KDE/drkonqi. KDE Plasma family: the whole series is released in lockstep.
+
+Probed with `parser = "regex"` + `select = "max"` + `series`, NOT `[0].name`.
+Plasma numbers the next series' beta as x.y.90 / x.y.91 -- v6.7.90 IS the 6.8
+beta -- and the tag list is semver-desc, so `[0].name` returns a beta for as
+long as one is open.
+
+This record is DISABLED, which does not stop the probe: the revivable-orphan
+scan reads upstream all the same. On 2026-09-12 it therefore compared 6.7.90
+against ::gentoo's 6.7.5 and offered this package for revival on every sweep --
+a revival straight onto a beta. kde-plasma/spectacle is the same fix and carries
+the full account, including what the beta actually broke when it merged: the
+Plasma-family deps derive from ${KDE_CATV} (== ${PV}), so a 6.7.90 ebuild asks
+for 6.7.90 siblings that ::gentoo does not have, and nothing satisfies them.
 """
 # END
 
@@ -4828,12 +4867,27 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 enabled = false
 disabled_by = "removed 2026-09-02: existed only to lift kdeplasma-addons' kdeds/kameleon out of the corrosion dependency. ::gentoo now makes that optional natively via USE=led, so the split has no remaining purpose"
 url = "https://api.github.com/repos/KDE/plasma-workspace/tags"
-parser = "json"
-path = "[0].name"
+parser = "regex"
+pattern = '"name":"v([0-9]+\.[0-9]+\.[0-9]+(?:\.[0-9]+)?)"'
+select = "max"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+series = '^[0-9]+\.[0-9]+\.(?:[0-9]|[1-8][0-9])(?:\.[0-9]+)?(?:-r[0-9]+)?$'
 version = "6.7.4"
 comments = """
-kameleon-qmk-helper -> KDE/plasma-workspace (anchor: overlay versions it as Plasma)
+kameleon-qmk-helper -> KDE/plasma-workspace (anchor: overlay versions it as Plasma).
+
+Probed with `parser = "regex"` + `select = "max"` + `series`, NOT `[0].name`.
+Plasma numbers the next series' beta as x.y.90 / x.y.91 -- v6.7.90 IS the 6.8
+beta -- and the tag list is semver-desc, so `[0].name` returns a beta for as
+long as one is open.
+
+This record is DISABLED, which does not stop the probe: the revivable-orphan
+scan reads upstream all the same. On 2026-09-12 it therefore compared 6.7.90
+against ::gentoo's 6.7.5 and offered this package for revival on every sweep --
+a revival straight onto a beta. kde-plasma/spectacle is the same fix and carries
+the full account, including what the beta actually broke when it merged: the
+Plasma-family deps derive from ${KDE_CATV} (== ${PV}), so a 6.7.90 ebuild asks
+for 6.7.90 siblings that ::gentoo does not have, and nothing satisfies them.
 """
 # END
 
@@ -4841,14 +4895,27 @@ kameleon-qmk-helper -> KDE/plasma-workspace (anchor: overlay versions it as Plas
 enabled = false
 disabled_by = "removed 2026-09-02: the overlay's USE=qmk + optional-corrosion patch + kameleon-qmk-helper split is superseded by ::gentoo's native USE=led, which gates the same Rust kded and ships newer KFMIN/QTMIN"
 url = "https://api.github.com/repos/KDE/kdeplasma-addons/tags"
-parser = "json"
-path = "[0].name"
+parser = "regex"
+pattern = '"name":"v([0-9]+\.[0-9]+\.[0-9]+(?:\.[0-9]+)?)"'
+select = "max"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+series = '^[0-9]+\.[0-9]+\.(?:[0-9]|[1-8][0-9])(?:\.[0-9]+)?(?:-r[0-9]+)?$'
 version = "6.7.4-r1"
 comments = """
-kdeplasma-addons — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
-Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
-incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
+kdeplasma-addons -> KDE/kdeplasma-addons. KDE Plasma family: the whole series is released in lockstep.
+
+Probed with `parser = "regex"` + `select = "max"` + `series`, NOT `[0].name`.
+Plasma numbers the next series' beta as x.y.90 / x.y.91 -- v6.7.90 IS the 6.8
+beta -- and the tag list is semver-desc, so `[0].name` returns a beta for as
+long as one is open.
+
+This record is DISABLED, which does not stop the probe: the revivable-orphan
+scan reads upstream all the same. On 2026-09-12 it therefore compared 6.7.90
+against ::gentoo's 6.7.5 and offered this package for revival on every sweep --
+a revival straight onto a beta. kde-plasma/spectacle is the same fix and carries
+the full account, including what the beta actually broke when it merged: the
+Plasma-family deps derive from ${KDE_CATV} (== ${PV}), so a 6.7.90 ebuild asks
+for 6.7.90 siblings that ::gentoo does not have, and nothing satisfies them.
 """
 # END
 
@@ -4856,14 +4923,27 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 enabled = false
 disabled_by = "removed 2026-09-02: frozen copy; ::gentoo's -r2 adds kwin-6.7.4-patchset-1 (fixes landing in 6.7.5) that the overlay had no counterpart for"
 url = "https://api.github.com/repos/KDE/kwin/tags"
-parser = "json"
-path = "[0].name"
+parser = "regex"
+pattern = '"name":"v([0-9]+\.[0-9]+\.[0-9]+(?:\.[0-9]+)?)"'
+select = "max"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+series = '^[0-9]+\.[0-9]+\.(?:[0-9]|[1-8][0-9])(?:\.[0-9]+)?(?:-r[0-9]+)?$'
 version = "6.7.4"
 comments = """
-kwin — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
-Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
-incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
+kwin -> KDE/kwin. KDE Plasma family: the whole series is released in lockstep.
+
+Probed with `parser = "regex"` + `select = "max"` + `series`, NOT `[0].name`.
+Plasma numbers the next series' beta as x.y.90 / x.y.91 -- v6.7.90 IS the 6.8
+beta -- and the tag list is semver-desc, so `[0].name` returns a beta for as
+long as one is open.
+
+This record is DISABLED, which does not stop the probe: the revivable-orphan
+scan reads upstream all the same. On 2026-09-12 it therefore compared 6.7.90
+against ::gentoo's 6.7.5 and offered this package for revival on every sweep --
+a revival straight onto a beta. kde-plasma/spectacle is the same fix and carries
+the full account, including what the beta actually broke when it merged: the
+Plasma-family deps derive from ${KDE_CATV} (== ${PV}), so a 6.7.90 ebuild asks
+for 6.7.90 siblings that ::gentoo does not have, and nothing satisfies them.
 """
 # END
 
@@ -4871,14 +4951,27 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 enabled = false
 disabled_by = "removed 2026-09-02: frozen copy; ::gentoo's -r1 adds the X USE dep on qtbase"
 url = "https://api.github.com/repos/KDE/plasma-desktop/tags"
-parser = "json"
-path = "[0].name"
+parser = "regex"
+pattern = '"name":"v([0-9]+\.[0-9]+\.[0-9]+(?:\.[0-9]+)?)"'
+select = "max"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+series = '^[0-9]+\.[0-9]+\.(?:[0-9]|[1-8][0-9])(?:\.[0-9]+)?(?:-r[0-9]+)?$'
 version = "6.7.4"
 comments = """
-plasma-desktop — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
-Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
-incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
+plasma-desktop -> KDE/plasma-desktop. KDE Plasma family: the whole series is released in lockstep.
+
+Probed with `parser = "regex"` + `select = "max"` + `series`, NOT `[0].name`.
+Plasma numbers the next series' beta as x.y.90 / x.y.91 -- v6.7.90 IS the 6.8
+beta -- and the tag list is semver-desc, so `[0].name` returns a beta for as
+long as one is open.
+
+This record is DISABLED, which does not stop the probe: the revivable-orphan
+scan reads upstream all the same. On 2026-09-12 it therefore compared 6.7.90
+against ::gentoo's 6.7.5 and offered this package for revival on every sweep --
+a revival straight onto a beta. kde-plasma/spectacle is the same fix and carries
+the full account, including what the beta actually broke when it merged: the
+Plasma-family deps derive from ${KDE_CATV} (== ${PV}), so a 6.7.90 ebuild asks
+for 6.7.90 siblings that ::gentoo does not have, and nothing satisfies them.
 """
 # END
 
@@ -4886,14 +4979,27 @@ incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
 enabled = false
 disabled_by = "removed 2026-09-02: frozen copy of ::gentoo's 6.7.4 with nothing bentoo-specific"
 url = "https://api.github.com/repos/KDE/plasma-firewall/tags"
-parser = "json"
-path = "[0].name"
+parser = "regex"
+pattern = '"name":"v([0-9]+\.[0-9]+\.[0-9]+(?:\.[0-9]+)?)"'
+select = "max"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+series = '^[0-9]+\.[0-9]+\.(?:[0-9]|[1-8][0-9])(?:\.[0-9]+)?(?:-r[0-9]+)?$'
 version = "6.7.4"
 comments = """
-plasma-firewall — KDE Plasma family (73) — all on the Plasma series (6.6.91), released together.
-Each maps to its KDE/<repo> GitHub mirror (tags semver-desc, [0].name newest,
-incl. betas). Sub-extracted/re-versioned pkgs anchor to plasma-workspace.
+plasma-firewall -> KDE/plasma-firewall. KDE Plasma family: the whole series is released in lockstep.
+
+Probed with `parser = "regex"` + `select = "max"` + `series`, NOT `[0].name`.
+Plasma numbers the next series' beta as x.y.90 / x.y.91 -- v6.7.90 IS the 6.8
+beta -- and the tag list is semver-desc, so `[0].name` returns a beta for as
+long as one is open.
+
+This record is DISABLED, which does not stop the probe: the revivable-orphan
+scan reads upstream all the same. On 2026-09-12 it therefore compared 6.7.90
+against ::gentoo's 6.7.5 and offered this package for revival on every sweep --
+a revival straight onto a beta. kde-plasma/spectacle is the same fix and carries
+the full account, including what the beta actually broke when it merged: the
+Plasma-family deps derive from ${KDE_CATV} (== ${PV}), so a 6.7.90 ebuild asks
+for 6.7.90 siblings that ::gentoo does not have, and nothing satisfies them.
 """
 # END
 
@@ -4911,8 +5017,8 @@ named ${PN}-opencv5.patch, not ${P}-, deliberately: it has been byte-identical \
 since 6.7.1, and a version in the filename would make every bump rename it by \
 hand. Drop this once ::gentoo carries the opencv5 fix itself.\
 """
-series = '^[0-9]+\.[0-9]+\.(?:[0-9]|[1-8][0-9])(?:\.[0-9]+)?$'
-version = "6.7.5"
+series = '^[0-9]+\.[0-9]+\.(?:[0-9]|[1-8][0-9])(?:\.[0-9]+)?(?:-r[0-9]+)?$'
+version = "6.7.5-r1"
 comments = """
 spectacle -> KDE/plasma-workspace (anchor: overlay versions it as Plasma).
 
@@ -4927,6 +5033,14 @@ ebuild satisfies the dep, so the package becomes uninstallable. Hence
 EVERY tag, `series` drops any third component >= 90, and `max` picks the highest
 remaining stable. Once Plasma 6.8.0 ships as stable it matches the series on its
 own and the record moves again.
+
+THE TRAILING `(?:-r[0-9]+)?` IS NOT DECORATION. `series` is matched against the
+version as it appears in the ebuild FILENAME -- revision included -- so an
+anchored regex without it puts a revbumped ebuild outside its own line. That is
+not hypothetical: the 6.7.5 -> 6.7.5-r1 revbump in 43e3f0617 made every sweep
+fail with ErrSeriesNotFound, and that error is deliberately not auto-disabling,
+so the package simply stopped being checked until this was fixed. Any series
+regex in this file that anchors on `$` needs the same allowance.
 """
 # END
 
