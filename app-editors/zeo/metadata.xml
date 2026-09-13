@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@proton.me</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<use>
+		<flag name="X">Enable X11 display server support</flag>
+		<flag name="claude-agent-acp-plus">Install the claude-agent-acp-plus ACP agent and apply source patches that force-enable the acp-beta feature flag plus agent panel UI improvements: multiline elicitation fields, collapsible markdown option previews, a manual-mode badge, clickable file mentions in replayed messages, and adoption of the agent's config-option response; also makes a thread menu choice (permission mode, model, thinking effort, agent config option) apply to that thread only, with Shift to make it the default for new threads</flag>
+		<flag name="claude-agent-acp-tui">Install the claude-agent-acp-tui ACP bridge to run the Claude Code TUI in the agent panel</flag>
+		<flag name="claude-code-ide">Native Claude Code CLI editor integration (unofficial reverse-engineered IDE protocol, WebSocket MCP server) via a source patch</flag>
+		<flag name="inspector">Build the GPUI UI inspector, which shows the element tree, layout and styles of the interface at run time</flag>
+		<flag name="mimalloc">Use mimalloc as the global memory allocator for improved performance</flag>
+		<flag name="neovim">Enable Neovim integration for full vim compatibility via RPC</flag>
+		<flag name="screen-capture">Enable screen capture support for collaboration sessions</flag>
+		<flag name="tracy">Enable Tracy profiler integration for performance analysis</flag>
+		<flag name="wayland">Enable Wayland display server support</flag>
+	</use>
+	<longdescription lang="en">
+		Zeo is the Zed editor with a distinct visual identity: its own name,
+		icon, release channel, application binary, URL scheme and state
+		directories. It is not a fork - it is built from the same upstream
+		commit app-editors/zed packages, with a rebrand applied as patches
+		0019-0023 on top of that package's series.
+
+		Because the identity is separate all the way down, Zeo installs
+		alongside app-editors/zed with no blocker: /usr/bin/zeo,
+		/usr/libexec/zeo-editor, dev.zeo.Zeo.desktop and ~/.config/zeo.
+
+		The collab, extensions-cli and remote-server flags app-editors/zed
+		offers are deliberately absent here, because each installs a binary
+		under a name that package already uses.
+	</longdescription>
+	<upstream>
+		<remote-id type="github">lucascouts/zeo</remote-id>
+		<bugs-to>https://github.com/lucascouts/zeo/issues</bugs-to>
+	</upstream>
+</pkgmetadata>
