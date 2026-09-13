@@ -8,9 +8,6 @@ inherit go-module
 DESCRIPTION="Posts the output of any linter as review comments, filtered to the diff"
 HOMEPAGE="https://github.com/reviewdog/reviewdog"
 SRC_URI="https://github.com/reviewdog/reviewdog/archive/refs/tags/v${PV}.tar.gz -> ${P}.tar.gz"
-# Vendored dependency tree, generated with `go mod vendor` and hosted by the
-# overlay, so the build carries a checksum and needs no network.
-SRC_URI+=" https://distfiles.obentoo.org/${P}-vendor.tar.xz"
 
 LICENSE="MIT"
 # Dependent (bundled, statically linked) Go module licenses
@@ -18,10 +15,18 @@ LICENSE+=" Apache-2.0 BSD BSD-2 ISC MPL-2.0"
 SLOT="0"
 KEYWORDS="~amd64 ~arm64"
 
-BDEPEND=">=dev-lang/go-1.25"
+BDEPEND=">=dev-lang/go-1.26"
 
-# The suite talks to the GitHub and GitLab APIs.
-RESTRICT="test"
+# Go modules are downloaded in src_unpack (no vendor tarball is published for
+# reviewdog 0.21.1), so the network sandbox must be disabled. The test suite
+# talks to the GitHub and GitLab APIs.
+RESTRICT="network-sandbox test"
+
+src_unpack() {
+	default
+	cd "${S}" || die
+	ego mod download
+}
 
 src_compile() {
 	local go_ldflags=(
