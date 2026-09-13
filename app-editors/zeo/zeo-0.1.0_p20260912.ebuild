@@ -1576,6 +1576,13 @@ declare -A GIT_CRATES=(
 	[zed-xim]='https://github.com/zed-industries/xim-rs;16f35a2c881b815a2b6cdfd6687988e84f8447d8;xim-rs-%commit%'
 )
 
+# Zeo versions itself. ${PV} is Zeo's own version and says nothing about the Zed
+# it is built from -- Gentoo's version grammar (PMS 3.2) has no way to carry two
+# upstream versions, since a suffix number is a plain integer and no dot may
+# follow it. The Zed base is therefore a variable, exactly as EGIT_COMMIT already
+# is, and it is what the distfile is named after so both packages share one.
+ZED_PV="1.21.0_pre20260912"
+
 EGIT_COMMIT="9d272b036335401f339d024ea94968fd51016c40"
 LLVM_COMPAT=( 22 )
 RUST_MIN_VER="1.98.1"
@@ -1599,10 +1606,10 @@ inherit cargo check-reqs desktop flag-o-matic llvm-r1 toolchain-funcs xdg
 # so an arm64 user would get an uninstallable package out of the box.
 # Arch-guarding the IUSE is not the answer - that poisons md5-cache. Reopen this
 # when those two gain an arm64 build; nothing else here is amd64-bound.
-DESCRIPTION="Zeo - the Zed editor, rebranded, built from the packaged Zed source"
+DESCRIPTION="Zeo - the Zed editor, rebranded, built from Zed ${ZED_PV}"
 HOMEPAGE="https://github.com/lucascouts/zeo https://zed.dev"
 SRC_URI="
-	https://github.com/zed-industries/zed/archive/${EGIT_COMMIT}.tar.gz -> ${PF}.tar.gz
+	https://github.com/zed-industries/zed/archive/${EGIT_COMMIT}.tar.gz -> zed-${ZED_PV}.tar.gz
 	amd64? (
 		https://github.com/zed-industries/livekit-rust-sdks/releases/download/webrtc-${WEBRTC_COMMIT}/webrtc-linux-x64-release.zip ->
 			webrtc-${WEBRTC_COMMIT}-linux-x64-release.zip
