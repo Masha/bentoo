@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@proton.me</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<use>
+		<flag name="systemd">Install the systemd <pkg>sys-apps/systemd</pkg> user
+		unit for the tray daemon. The OpenRC user-scope init script is installed
+		unconditionally, so the daemon is startable either way.</flag>
+	</use>
+	<longdescription lang="en">
+		zeo-systray is a desktop tray indicator for Claude Code agent sessions.
+		It shows, at a glance, whether an agent is running, waiting on a
+		permission decision, finished, or still carrying background work, so the
+		session does not have to be kept in front of you.
+
+		It is fed by Claude Code hooks rather than by any editor, so it covers
+		every session equally: the ones started in an editor's agent panel and
+		the ones started in a terminal. Despite the name it does not require the
+		zeo editor, or any editor. One binary provides both halves: "zeo-systray
+		notify" runs as the hook, reads the payload on stdin and sends a single
+		datagram to a socket in XDG_RUNTIME_DIR, always exiting 0 so that a tray
+		which is not running can never surface as a failure inside an agent turn;
+		"zeo-systray daemon" draws the icon. The daemon keeps its state in memory
+		only and writes nothing to disk.
+
+		The tray is drawn by speaking StatusNotifierItem over D-Bus directly, with
+		no GTK and no libappindicator, so it works on KDE Plasma, XFCE, MATE,
+		Cinnamon, Budgie and LXQt out of the box, under X11 or Wayland alike.
+		GNOME removed built-in tray support and needs a shell extension such as
+		AppIndicator Support, which is true of every tray application.
+
+		Hook payloads can carry tool inputs, full shell command lines, transcript
+		paths and assistant text. None of that crosses the socket: only the
+		session id, the working directory, a project label, the session title and
+		per-type counters for background tasks, plus the notification text itself
+		on the Notification event. That boundary is covered by upstream tests.
+	</longdescription>
+	<upstream>
+		<remote-id type="github">lucascouts/zeo-systray</remote-id>
+		<bugs-to>https://github.com/lucascouts/zeo-systray/issues</bugs-to>
+	</upstream>
+</pkgmetadata>

@@ -1,0 +1,26 @@
+#!/sbin/openrc-run
+# Copyright 1999-2026 Gentoo Authors
+# Distributed under the terms of the GNU General Public License, v2 or later
+
+# USER-scope service, the counterpart of the systemd user unit. Start it from
+# inside a desktop session:
+#
+#   rc-service --user zeo-systray start
+#
+# Not a system service: the tray talks to a StatusNotifierHost on the session
+# bus, and outside a logged-in session there is no such bus and nothing to draw.
+
+depend() {
+	need dbus
+}
+
+# openrc-run does not inherit the session's environment, so the address of the
+# session bus has to be stated. ${XDG_RUNTIME_DIR}/bus is where every current
+# dbus-daemon/dbus-broker session puts it.
+DBUS_SESSION_BUS_ADDRESS="unix:path=${XDG_RUNTIME_DIR}/bus"
+export DBUS_SESSION_BUS_ADDRESS
+
+supervisor=supervise-daemon
+command="/usr/bin/zeo-systray"
+command_args="daemon"
+respawn_delay=5
