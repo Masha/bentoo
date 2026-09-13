@@ -1780,6 +1780,15 @@ src_prepare() {
 		# time. It also decides src_install below: the list is Zeo-only, so the
 		# application MUST land at libexec/zeo-editor.
 		"${FILESDIR}/0023-cli-point-the-launcher-at-the-Zeo-application-binary.patch"
+		# 0025 renames the product in the strings a user actually reads. It is
+		# 21 literals out of 404 containing "Zed" in the tree: most of the rest
+		# name Zed Industries -- the vendor, the plans, the team, the hosted
+		# models -- or are font-family lookup keys, a User-Agent, or theme names
+		# referenced from user settings, and renaming any of those breaks
+		# something. The window title is not here because it never needed a
+		# patch: it resolves through display_name(), which 0021 already made
+		# return "Zeo". Numbered 0025 because app-editors/zed took 0024.
+		"${FILESDIR}/0025-zed-say-Zeo-in-the-strings-a-user-actually-reads.patch"
 	)
 
 	if use claude-agent-acp-plus; then
