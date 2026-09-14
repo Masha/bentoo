@@ -12,7 +12,7 @@ inherit chromium-2 desktop optfeature pax-utils unpacker xdg
 # curl -sA 'Mozilla/5.0' "https://claude.ai/api/desktop/linux/x64/deb/latest" | jq -r '.url'
 # The arm64 endpoint (.../linux/arm64/deb/latest) ships the same version and the
 # same BUILD_ID hash, so one variable covers both SRC_URI branches.
-BUILD_ID="41896ee2c7be716ee0cf8e330b1e0c6f99f4d613"
+BUILD_ID="612f3fafc24aa4c10d0d896a8f16a1f2bdd834fb"
 
 MY_PN="${PN%-bin}"
 
