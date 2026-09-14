@@ -1757,6 +1757,15 @@ src_prepare() {
 	# flag would only hide a setting behind a rebuild.
 	PATCHES+=( "${FILESDIR}/0018-drop-folder-opens-project.patch" )
 
+	# 0024 is unconditional for the same reason as 0018: it adds a parameter to
+	# an existing URL scheme (zed://agent?session=<id>) and changes no default.
+	# Nothing about it needs an adapter -- the session id it takes is the agent
+	# session id, which AgentPanel::open_thread already resolved, so gating it on
+	# claude-agent-acp-plus would withhold it from every other agent for no
+	# reason. Numbered 0024 because 0019-0023 belong to app-editors/zeo, which
+	# shares this files/ directory.
+	PATCHES+=( "${FILESDIR}/0024-agent-deep-link-session.patch" )
+
 	if use claude-agent-acp-plus; then
 		PATCHES+=(
 			"${FILESDIR}/0001-force-enable-claude-agent-acp-plus.patch"
