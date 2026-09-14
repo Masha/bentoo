@@ -1895,6 +1895,19 @@ src_prepare() {
 	# line) for X11 compatibility and as the Wayland compositor fall-back.
 	sed -i "/^Actions=/i StartupWMClass=${APP_ID}" "${APP_ID}.desktop" || die
 
+	# Upstream's template declares x-scheme-handler/zed, and envsubst does not
+	# touch it -- so an unedited Zeo entry advertises itself as a handler for
+	# ZED's URLs and declares none of its own. Measured on a real install: the
+	# system mimeinfo.cache listed dev.zeo.Zeo.desktop beside Zed's under
+	# x-scheme-handler/zed, and zeo:// resolved to nothing at all. Patch 0022
+	# registers zeo:// at run time, but the desktop file is what the desktop
+	# environment reads to route a link, and it is the half that decides which
+	# editor opens someone else's zed:// link.
+	sed -i "s|x-scheme-handler/zed|x-scheme-handler/zeo|" "${APP_ID}.desktop" || die
+	# Keywords is what an application launcher searches. Keep "zed" so people
+	# looking for the editor Zeo is built from still find it, and add "zeo".
+	sed -i "s|^Keywords=zed;|Keywords=zeo;zed;|" "${APP_ID}.desktop" || die
+
 	# The file drives the runtime ReleaseChannel enum through include_str!.
 	# src_compile exports the identically named ENVIRONMENT VARIABLE, which is a
 	# different input read by build.rs; both are needed and they are not
