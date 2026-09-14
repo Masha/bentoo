@@ -148,7 +148,7 @@ index e38b902..7120254 100644
      Copy,
      Clone,
 diff --git a/crates/workspace/src/pane.rs b/crates/workspace/src/pane.rs
-index 56338cb..275d7d6 100644
+index 25771a8..64eea99 100644
 --- a/crates/workspace/src/pane.rs
 +++ b/crates/workspace/src/pane.rs
 @@ -1,5 +1,5 @@
@@ -212,7 +212,7 @@ index 56338cb..275d7d6 100644
                      if let Ok((open_task, to_pane)) =
                          workspace.update_in(cx, |workspace, window, cx| {
                              if let Some(split_direction) = split_direction {
-@@ -5078,6 +5116,26 @@ impl Render for DraggedTab {
+@@ -5080,6 +5118,26 @@ impl Render for DraggedTab {
      }
  }
  
@@ -239,7 +239,7 @@ index 56338cb..275d7d6 100644
  #[cfg(test)]
  mod tests {
      use std::{cell::Cell, iter::zip, num::NonZero, rc::Rc};
-@@ -9662,4 +9720,42 @@ mod tests {
+@@ -9664,4 +9722,42 @@ mod tests {
              }
          }
      }

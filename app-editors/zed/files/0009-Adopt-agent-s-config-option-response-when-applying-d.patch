@@ -30,10 +30,10 @@ Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 ---
 
 diff --git a/crates/agent_servers/src/acp.rs b/crates/agent_servers/src/acp.rs
-index 30f37fa..3c651fe 100644
+index 81f099b..3d67274 100644
 --- a/crates/agent_servers/src/acp.rs
 +++ b/crates/agent_servers/src/acp.rs
-@@ -1276,6 +1276,7 @@ impl AcpConnection {
+@@ -1287,6 +1287,7 @@ impl AcpConnection {
  
                      let (modes, config_options) =
                          config_state(response.modes, response.config_options);
@@ -41,7 +41,7 @@ index 30f37fa..3c651fe 100644
  
                      if let Some(config_opts) = config_options.as_ref() {
                          this.apply_default_config_options(&session_id, config_opts, cx);
-@@ -1291,7 +1292,7 @@ impl AcpConnection {
+@@ -1302,7 +1303,7 @@ impl AcpConnection {
                              )));
                          };
                          session.session_modes = modes;
@@ -50,7 +50,7 @@ index 30f37fa..3c651fe 100644
                      }
  
                      Ok(thread)
-@@ -1313,10 +1314,12 @@ impl AcpConnection {
+@@ -1324,10 +1325,12 @@ impl AcpConnection {
      fn apply_default_config_options(
          &self,
          session_id: &acp::SessionId,
@@ -64,7 +64,7 @@ index 30f37fa..3c651fe 100644
          let defaults_to_apply: Vec<_> = {
              let config_opts_ref = config_options.borrow();
              config_opts_ref
-@@ -1388,6 +1391,7 @@ impl AcpConnection {
+@@ -1399,6 +1402,7 @@ impl AcpConnection {
                  let session_id = session_id.clone();
                  let config_id_clone = config_id.clone();
                  let config_opts = config_options.clone();
@@ -72,7 +72,7 @@ index 30f37fa..3c651fe 100644
                  let conn = self.connection.clone();
                  async move |_| {
                      let result = conn
-@@ -1400,23 +1404,37 @@ impl AcpConnection {
+@@ -1411,23 +1415,37 @@ impl AcpConnection {
                          .await
                          .log_err();
  
@@ -126,7 +126,7 @@ index 30f37fa..3c651fe 100644
                              }
                          }
                      }
-@@ -1676,6 +1694,7 @@ impl AgentConnection for AcpConnection {
+@@ -1687,6 +1705,7 @@ impl AgentConnection for AcpConnection {
                  }
              }
  
@@ -134,7 +134,7 @@ index 30f37fa..3c651fe 100644
              if let Some(config_opts) = config_options.as_ref() {
                  self.apply_default_config_options(&response.session_id, config_opts, cx);
              }
-@@ -1703,7 +1722,7 @@ impl AgentConnection for AcpConnection {
+@@ -1714,7 +1733,7 @@ impl AgentConnection for AcpConnection {
                      response.session_id,
                      &thread,
                      modes,
@@ -143,7 +143,7 @@ index 30f37fa..3c651fe 100644
                      cx,
                  )
              });
-@@ -3593,11 +3612,9 @@ mod tests {
+@@ -3620,11 +3639,9 @@ mod tests {
                  AgentConfigOptionValue::Boolean(true),
              )]),
          );
@@ -158,7 +158,7 @@ index 30f37fa..3c651fe 100644
  
          let mut async_cx = cx.to_async();
          connection.apply_default_config_options(
-@@ -3621,10 +3638,19 @@ mod tests {
+@@ -3648,10 +3665,19 @@ mod tests {
              acp::SessionConfigOptionValue::boolean(true)
          );
  
@@ -179,7 +179,7 @@ index 30f37fa..3c651fe 100644
      }
  
      async fn connect_config_defaults_test_agent(
-@@ -3649,7 +3675,14 @@ mod tests {
+@@ -3676,7 +3702,14 @@ mod tests {
                                  .expect("set config requests mutex poisoned")
                                  .push(req);
  
