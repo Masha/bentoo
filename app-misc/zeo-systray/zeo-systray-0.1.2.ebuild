@@ -216,6 +216,14 @@ src_install() {
 	exeinto /etc/user/init.d
 	newexe "${FILESDIR}"/${PN}.initd ${PN}
 
+	# The KDE opener: switches virtual desktop and raises the editor window
+	# before handing over the deep link, through a KWin script -- the one thing
+	# an application cannot do for itself on Wayland. Under /usr/share rather
+	# than /usr/bin because it is not a command a person runs; it is what
+	# ZEO_SYSTRAY_OPEN_CMD points at, and pkg_postinst says so.
+	exeinto /usr/share/${PN}
+	doexe contrib/${PN}-open-kde.sh
+
 	einstalldocs
 	# The hook wiring is documentation, not configuration: it has to be merged
 	# into a ~/.claude/settings.json this package must not touch. Left
@@ -238,6 +246,9 @@ pkg_postinst() {
 		elog "  systemctl --user enable --now ${PN}.service"
 	fi
 	elog "  rc-service --user ${PN} start   (OpenRC)"
+	elog
+	elog "On KDE, to have a click switch desktop and raise the editor window:"
+	elog "  ZEO_SYSTRAY_OPEN_CMD='/usr/share/${PN}/${PN}-open-kde.sh {session} {cwd}'"
 	elog
 	elog "GNOME removed built-in tray support: there it additionally needs the"
 	elog "AppIndicator Support or Status Tray shell extension. Every other"
