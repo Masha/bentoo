@@ -44,7 +44,7 @@ this work lives now, and where protocol breakage is reported first.
 ---
 
 diff --git a/Cargo.lock b/Cargo.lock
-index d4b1f45..9757ed1 100644
+index 4e5c2ea..744b646 100644
 --- a/Cargo.lock
 +++ b/Cargo.lock
 @@ -3085,6 +3085,31 @@ version = "0.7.6"
@@ -79,7 +79,7 @@ index d4b1f45..9757ed1 100644
  [[package]]
  name = "cli"
  version = "0.1.0"
-@@ -22807,6 +22832,7 @@ dependencies = [
+@@ -22812,6 +22837,7 @@ dependencies = [
   "channel",
   "chrono",
   "clap",
@@ -1971,7 +1971,7 @@ index d9562b6..3b33dc2 100644
  cli.workspace = true
  client.workspace = true
 diff --git a/crates/zed/src/main.rs b/crates/zed/src/main.rs
-index ec31980..d5e7135 100644
+index da28f89..1e0f690 100644
 --- a/crates/zed/src/main.rs
 +++ b/crates/zed/src/main.rs
 @@ -701,6 +701,7 @@ fn main() {

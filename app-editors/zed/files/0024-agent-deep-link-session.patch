@@ -46,9 +46,6 @@ from another host work at all.
 Upstreamable as-is: it adds a parameter to an existing scheme, changes no
 default, and the behaviour it exposes was already reachable in the panel.
 ---
- crates/zed/src/main.rs              |  21 +++--
- crates/zed/src/zed/open_listener.rs | 127 ++++++++++++++++++++++++++--
- 2 files changed, 138 insertions(+), 10 deletions(-)
 
 diff --git a/crates/zed/src/main.rs b/crates/zed/src/main.rs
 index ec31980..da28f89 100644
@@ -289,6 +286,3 @@ index 0675fdd..09ac1d5 100644
      #[gpui::test]
      fn test_parse_git_commit_url(cx: &mut TestAppContext) {
          let _app_state = init_test(cx);
--- 
-2.55.0
-
