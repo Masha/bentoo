@@ -38,7 +38,7 @@ CRATES="
 	backtrace@0.3.76
 	base64@0.22.1
 	bitflags@1.3.2
-	bitflags@2.13.1
+	bitflags@2.13.2
 	blake3@1.8.7
 	block-buffer@0.10.4
 	block2@0.6.2
@@ -50,17 +50,17 @@ CRATES="
 	bytes@1.12.1
 	c-gull@0.22.3
 	c-scape@0.22.3
-	cc@1.4.5
+	cc@1.4.6
 	cfg-if@1.0.4
 	cfg_aliases@0.2.2
 	chacha20@0.10.2
 	chrono@0.4.45
-	clap@4.6.6
-	clap_builder@4.6.6
-	clap_complete@4.6.9
+	clap@4.6.7
+	clap_builder@4.6.7
+	clap_complete@4.6.10
 	clap_complete_nushell@4.6.2
-	clap_derive@4.6.4
-	clap_lex@1.1.0
+	clap_derive@4.6.7
+	clap_lex@1.1.1
 	clap_mangen@0.2.33
 	clearscreen@4.0.6
 	colorchoice@1.0.5
@@ -71,7 +71,7 @@ CRATES="
 	core-foundation-sys@0.8.7
 	cpufeatures@0.2.17
 	cpufeatures@0.3.1
-	crc32fast@1.5.1
+	crc32fast@1.5.2
 	crossbeam-channel@0.5.17
 	crossbeam-deque@0.8.8
 	crossbeam-epoch@0.9.21
@@ -86,6 +86,7 @@ CRATES="
 	dirs-sys@0.5.0
 	dirs@6.0.0
 	dispatch2@0.3.1
+	displaydoc@0.2.7
 	dunce@1.0.5
 	dyn-clone@1.0.20
 	either@1.18.0
@@ -167,6 +168,13 @@ CRATES="
 	hyper@1.11.1
 	iana-time-zone-haiku@0.1.2
 	iana-time-zone@0.1.65
+	icu_collections@2.3.0
+	icu_locale_core@2.3.0
+	icu_locale_fallback@2.3.0
+	icu_locale_fallback_data@2.3.0
+	icu_provider@2.3.1
+	icu_segmenter@2.3.0
+	icu_segmenter_data@2.3.0
 	ignore@0.4.33
 	indexmap@2.14.2
 	inotify-sys@0.1.8
@@ -178,11 +186,11 @@ CRATES="
 	jaq-core@2.2.1
 	jaq-json@1.1.3
 	jaq-std@2.1.2
-	jiff-core@0.1.0
-	jiff-static@0.2.35
+	jiff-core@0.1.1
+	jiff-static@0.2.37
 	jiff-tzdb-platform@0.1.3
 	jiff-tzdb@0.1.8
-	jiff@0.2.35
+	jiff@0.2.37
 	js-sys@0.3.105
 	kqueue-sys@1.1.2
 	kqueue@1.2.1
@@ -190,10 +198,11 @@ CRATES="
 	libc@0.2.189
 	libm@0.2.16
 	libmimalloc-sys@0.1.49
-	libredox@0.1.23
+	libredox@0.1.24
 	linux-raw-sys@0.12.1
 	linux-raw-sys@0.9.4
 	listenfd@1.0.2
+	litemap@0.8.3
 	lock_api@0.4.14
 	log@0.4.34
 	mac-notification-sys@0.6.15
@@ -252,6 +261,7 @@ CRATES="
 	portable-atomic-util@0.2.8
 	portable-atomic@1.15.0
 	posix-regex@0.1.4
+	potential_utf@0.1.6
 	powerfmt@0.2.0
 	ppv-lite86@0.2.21
 	printf-compat@0.3.1
@@ -309,7 +319,7 @@ CRATES="
 	similar@3.2.0
 	siphasher@1.0.3
 	slab@0.4.12
-	smallvec@1.16.0
+	smallvec@1.16.1
 	snapbox-macros@1.1.0
 	snapbox@1.2.2
 	socket2@0.6.5
@@ -322,27 +332,28 @@ CRATES="
 	syn@2.0.119
 	syn@3.0.5
 	sync_wrapper@1.0.2
+	synstructure@0.13.2
 	tauri-winrt-notification@0.7.3
 	tempfile@3.27.0
 	termcolor@1.4.1
 	terminal_size@0.4.4
 	terminfo@0.9.0
-	textwrap@0.16.2
+	textwrap@0.16.4
 	thiserror-impl@2.0.20
 	thiserror@2.0.20
 	thread_local@1.1.10
 	time-core@0.1.9
 	time-macros@0.2.32
 	time@0.3.55
-	tinyvec@1.13.2
-	tinyvec_macros@0.1.1
+	tinystr@0.8.4
+	tinyvec@1.13.3
 	tokio-macros@2.7.2
 	tokio-stream@0.1.19
 	tokio-util@0.7.19
 	tokio@1.53.1
-	toml@1.1.5+spec-1.1.0
+	toml@1.1.6+spec-1.1.0
 	toml_datetime@1.1.1+spec-1.1.0
-	toml_edit@0.25.13+spec-1.1.0
+	toml_edit@0.25.15+spec-1.1.0
 	toml_parser@1.1.3+spec-1.1.0
 	toml_writer@1.1.2+spec-1.1.0
 	tonic-prost@0.14.6
@@ -366,14 +377,14 @@ CRATES="
 	uds_windows@1.2.1
 	unicode-bom@2.0.3
 	unicode-ident@1.0.24
-	unicode-linebreak@0.1.5
 	unicode-normalization@0.1.25
 	unicode-width@0.1.14
 	unicode-width@0.2.2
 	unwinding@0.2.10
 	urlencoding@2.1.3
+	utf8_iter@1.0.4
 	utf8parse@0.2.2
-	uuid@1.26.0
+	uuid@1.26.1
 	valuable@0.1.1
 	version_check@0.9.5
 	vswhom-sys@0.1.3
@@ -436,12 +447,20 @@ CRATES="
 	winnow@1.0.4
 	winreg@0.55.0
 	wit-bindgen@0.57.1
+	writeable@0.6.4
+	yoke-derive@0.8.2
+	yoke@0.8.3
 	zbus@5.19.0
 	zbus_macros@5.19.0
 	zbus_names@4.3.4
 	zcheapstr@1.1.0
-	zerocopy-derive@0.8.56
-	zerocopy@0.8.56
+	zerocopy-derive@0.8.57
+	zerocopy@0.8.57
+	zerofrom-derive@0.1.7
+	zerofrom@0.1.8
+	zerotrie@0.2.5
+	zerovec-derive@0.11.6
+	zerovec@0.11.8
 	zlib-rs@0.6.7
 	zmij@1.0.23
 	zvariant@5.15.0
@@ -449,7 +468,7 @@ CRATES="
 	zvariant_utils@4.2.0
 "
 
-RUST_MIN_VER="1.88.0"
+RUST_MIN_VER="1.89.0"
 
 inherit cargo shell-completion
 
