@@ -1362,7 +1362,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.30.2"
+version = "0.30.3"
 comments = """
 bentoolkit — releases/latest devolve tag_name "vX.Y.Z"; o transform tira o "v",
 senao o bump gera um PV invalido (bentoolkit-v0.17.0).
@@ -1739,7 +1739,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "2.1.12"
+version = "2.1.13"
 comments = """
 bisq2 (bisq2-bin) — tag "vX.Y.Z".
 """
@@ -9152,7 +9152,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.120"
+version = "1.121"
 comments = """
 koboldcpp — releases/latest; tag_name is "vX.Y[.Z]", so the transform strips the
 leading v to match PV.  Verified by real download on 2026-08-16: tag_name
