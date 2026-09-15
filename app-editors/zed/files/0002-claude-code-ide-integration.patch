@@ -1971,7 +1971,7 @@ index d9562b6..3b33dc2 100644
  cli.workspace = true
  client.workspace = true
 diff --git a/crates/zed/src/main.rs b/crates/zed/src/main.rs
-index da28f89..1e0f690 100644
+index b2aea75..96bb1ca 100644
 --- a/crates/zed/src/main.rs
 +++ b/crates/zed/src/main.rs
 @@ -701,6 +701,7 @@ fn main() {

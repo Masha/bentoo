@@ -1576,7 +1576,7 @@ declare -A GIT_CRATES=(
 	[zed-xim]='https://github.com/zed-industries/xim-rs;16f35a2c881b815a2b6cdfd6687988e84f8447d8;xim-rs-%commit%'
 )
 
-EGIT_COMMIT="d62802d456ac93a5abce5fecd5e98d2b8124485d"
+EGIT_COMMIT="7f00507e015636cfc8ab5dc053340ad7f74f6aca"
 LLVM_COMPAT=( 22 )
 RUST_MIN_VER="1.98.1"
 RUST_NEEDS_LLVM=1
@@ -1835,6 +1835,14 @@ src_prepare() {
 			# the generic tool row. Rides this flag by DEPENDENCY: only this
 			# adapter emits that key.
 			"${FILESDIR}/0017-native-compaction-entry.patch"
+			# 0026: the two end-of-turn navigation controls -- scroll to the user
+			# message, scroll to the top -- float over the conversation instead of
+			# riding inside the last list item, where they scrolled out of view
+			# together with the turn that owned them. The copy button stays inline
+			# on purpose: it copies one specific response, and a control floating
+			# over the whole thread cannot say which. Pure Zed, by CHOICE, the way
+			# 0010, 0012 and 0014 are.
+			"${FILESDIR}/0026-float-thread-navigation-controls.patch"
 		)
 	fi
 
