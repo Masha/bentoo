@@ -240,7 +240,7 @@ agree before applying.
 url = "https://registry.npmjs.org/pnpm"
 parser = "json"
 path = "dist-tags.latest"
-version = "12.4.1"
+version = "12.4.2"
 comments = """
 pnpm — npm package, stable channel. dist-tags.latest is the RIGHT endpoint and
 must stay: pnpm promotes through next-<major> first, and that channel carries
@@ -578,7 +578,7 @@ url = "https://api.github.com/repos/watchexec/watchexec/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "2.7.2"
+version = "2.7.3"
 comments = """
 watchexec - PROBE THE RELEASES, NOT THE TAGS. The repository is a workspace
 that tags every crate from one space, and the library crate is far ahead of the
@@ -694,7 +694,7 @@ url = "https://dl.pstmn.io/api/version/latest?platform=linux64&channel=stable"
 parser = "json"
 path = "version"
 type = "bin"
-version = "12.28.0"
+version = "12.28.1"
 comments = """
 Postman — official version API; clean {"version":"..."}.
 """
@@ -884,7 +884,7 @@ moving alias and unusable as a distfile.
 url = "https://windsurf-stable.codeiumdata.com/wVxQEIWkwPUEAGf3/apt/dists/stable/main/binary-amd64/Packages"
 parser = "regex"
 pattern = 'Package: devin-desktop\nVersion: ([0-9]+\.[0-9]+\.[0-9]+)'
-version = "3.10.23"
+version = "3.10.27"
 comments = """
 Windsurf — rebranded to "Devin Desktop". The docs.devin.ai changelog is a
 client-rendered SPA that stalls headless rendering; read the APT index of the
@@ -910,6 +910,42 @@ CAVEAT: esr-bbNN is an upstream build counter that increments every release
 The applier only bumps PV (and 40-hex commit SHAs), so it CANNOT sync the
 ebuild's MY_BUILD="esr-bbNN". Every bump needs MY_BUILD updated by hand, else
 the SRC_URI 404s at manifest time. Look up the current bb on the page above.
+"""
+# END
+
+["media-gfx/gimp"]
+url = "https://www.gimp.org/gimp_versions.json"
+parser = "json"
+path = "STABLE[0].version"
+version = "3.2.6"
+comments = """
+GIMP — upstream publishes its own release index at gimp_versions.json, split
+into STABLE / DEVELOPMENT arrays, newest first.  STABLE[0] therefore tracks the
+stable LINE as well as the release: when 3.4 lands it becomes STABLE[0] on its
+own, and SRC_URI already adapts because it interpolates
+`mirror://gimp/v$(ver_cut 1-2)/`.  No `series` pin is needed, and none should be
+added: it would freeze the record on 3.2 the day 3.4 ships.
+
+Do NOT probe the download directory instead.  Two separate traps:
+  - https://download.gimp.org/gimp/v3.2/ hardcodes the series, so it goes stale
+    in SILENCE the day upstream opens v3.4 — the old dir keeps answering 200.
+  - that host IGNORES the ?C=M;O=D query string (it is not Apache autoindex).
+    Measured 2026-09-15: with the sort requested, the first match was still
+    gimp-3.2.0.tar.xz.  The GNU-FTP idiom used by sys-apps/coreutils does NOT
+    transfer here.
+
+The JSON also carries the sha512 of each source tarball, which is worth using:
+on the 3.2.6 import it matched the Manifest byte for byte, confirming the
+distfile came from upstream and not from a mirror that had drifted.
+
+This record is temporary, like the package.  bentoo mirrors gimp only while it
+is AHEAD of ::gentoo (3.2.4 when 3.2.6 was imported, 2026-09-15).  Drop both
+once ::gentoo ships 3.2.6.
+
+A bump must re-diff the `*_minver` block of the upstream meson.build against
+the previous release and move any floor that changed into COMMON_DEPEND -- the
+applier only rewrites PV.  3.2.4 -> 3.2.6 moved exactly one: gdk_pixbuf_minver,
+2.30.8 -> 2.32.0.
 """
 # END
 
@@ -1405,7 +1441,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "0.12.14"
+version = "0.12.15"
 comments = """
 uv (uv-bin) — tag bare "X.Y.Z".
 """
@@ -2424,7 +2460,7 @@ at configure — is no longer needed.
 url = "https://www.blender.org/download/"
 parser = "regex"
 pattern = 'blender-([0-9]+\.[0-9]+\.[0-9]+)'
-version = "5.2.1-r1"
+version = "5.2.2"
 comments = """
 blender — download page; anchored to "blender-X.Y.Z".
 """
@@ -2435,7 +2471,7 @@ url = "https://www.blender.org/download/"
 parser = "regex"
 pattern = 'blender-([0-9]+\.[0-9]+\.[0-9]+)'
 type = "bin"
-version = "5.2.1"
+version = "5.2.2"
 comments = """
 blender-bin — deliberately the SAME endpoint and pattern as media-gfx/blender
 above, not a second probe for the same upstream. The two packages ship the same
@@ -9287,7 +9323,7 @@ transform = [['T.*', ""], ['-', ""]]
 commit_sha_path = "sha"
 base_from = "none"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0_pre20260914"
+version = "0_pre20260915"
 comments = """
 ik_llama-cpp — base_from = "none": upstream publishes no usable release
 series.  Verified 2026-07-19 and again 2026-08-04: the repo has exactly ONE
@@ -9307,6 +9343,44 @@ on 2026-07-26.  Two things had to be true for that, and neither was before:
   - the "0_pre" prefix must come from the snapshot suffix the checker carries
     over from the current PV, NOT from a transform.  A third transform rule
     ('^(\\d+)$' -> "0_pre$1") would compose with it and yield "0_pre0_pre<date>".
+"""
+# END
+
+["sys-apps/coreutils"]
+url = "https://ftp.gnu.org/gnu/coreutils/?C=M;O=D"
+parser = "regex"
+pattern = 'coreutils-([0-9.]+)\.tar\.xz'
+version = "9.12"
+comments = """
+GNU coreutils — the release dir is probed with ?C=M;O=D (newest first), so the
+FIRST match is the newest tarball.  Do NOT drop the query string: the default
+listing is sorted by NAME, where "coreutils-9.9.tar.xz" sorts after
+"coreutils-9.12.tar.xz" and a first-match regex would report 9.9 as newest.
+`select = "max"` is deliberately NOT set: max over bare "9.9" vs "9.12" is only
+correct under version comparison, and the ordering guarantee above makes it
+unnecessary.
+
+This record is temporary, like the package.  bentoo mirrors coreutils only
+while it is AHEAD of ::gentoo (9.11-r1 when 9.12 was imported, 2026-09-15).
+Drop both once ::gentoo ships 9.12.  A 9.6 mirror existed for the same reason
+and was removed in Jan 2026 when ::gentoo caught up.
+
+Two things a bump must re-check by hand, because the applier is blind to both:
+
+  - PATCHES.  ::gentoo's 9.11-r1 carried ${PN}-9.11-tee.patch; it applies in
+    REVERSE against 9.12, i.e. the fix shipped upstream, so it was dropped.
+    Probe every files/ patch with `patch -p1 -R --dry-run` on the new tarball
+    before assuming it still belongs.
+  - MY_PATCH, pinned at "${PN}-9.6-patches".  That is NOT a stale pin: no
+    newer patchset exists on dev.gentoo.org/~sam/distfiles/sys-apps/coreutils/
+    (9.10, 9.11 and 9.12 all 404), and ::gentoo pins 9.6 for the same reason.
+    All four patches in it still apply cleanly to 9.12.  Re-probe on each bump;
+    the tarball is default-on via `!vanilla?`, so a stale one is a build break,
+    not a warning.
+
+KEYWORDS are ALL ~arch here, unlike ::gentoo (amd64 arm64 ppc64 stable).  That
+is deliberate: coreutils is @system and this version has not been exercised in
+bentoo.  Raise them only with evidence, not on the next bump by habit.
 """
 # END
 
@@ -9998,7 +10072,7 @@ it must be DROPPED, not forced, once a release carries the fix).
 url = "https://deb.opera.com/opera-stable/dists/stable/non-free/binary-amd64/Packages"
 parser = "regex"
 pattern = 'Package: opera-stable\nVersion: ([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)'
-version = "135.0.5973.133"
+version = "135.0.5973.142"
 comments = """
 Opera — read the APT index of Opera's own repository. The download CDN
 (downloadN.operacdn.com, which SRC_URI uses) publishes no listing, and
@@ -10052,7 +10126,7 @@ parser = "regex"
 pattern = '"tag_name":\s*"v([0-9]+\.[0-9]+\.[0-9]+)"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "7.6.2"
+version = "7.7.1"
 comments = """
 Kilo Code — releases land several times a day (v7.6.1 and v7.6.2 shipped within
 hours of each other), so expect this record to move often.
@@ -10100,7 +10174,7 @@ url = "https://registry.npmjs.org/@cline/cli-linux-x64/latest"
 parser = "regex"
 pattern = '"version":"([0-9]+\.[0-9]+\.[0-9]+)"'
 type = "bin"
-version = "3.0.61"
+version = "3.0.62"
 comments = """
 Cline — probed on npm, NOT on GitHub, and that is deliberate: the GitHub
 releases only carry the macOS/Windows desktop app (Cline_*.dmg / *-setup.exe),
