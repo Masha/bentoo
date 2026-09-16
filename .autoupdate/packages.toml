@@ -460,7 +460,7 @@ url = "https://api.github.com/repos/trufflesecurity/trufflehog/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "3.97.4"
+version = "3.97.5"
 comments = """
 trufflehog - releases/latest returns "vX.Y.Z". Upstream ships several releases
 a week, so this record moves often.
@@ -750,7 +750,7 @@ url = "https://nodejs.org/dist/latest-v26.x/SHASUMS256.txt"
 parser = "regex"
 pattern = 'node-v(26\.[0-9]+\.[0-9]+)\.tar\.xz'
 select = "max"
-version = "26.8.2"
+version = "26.9.0"
 comments = """
 Node.js SLOT 26 — the current line.
 Identical in shape to net-libs/nodejs:24 above, which carries the shared
@@ -907,7 +907,7 @@ moving alias and unusable as a distfile.
 url = "https://windsurf-stable.codeiumdata.com/wVxQEIWkwPUEAGf3/apt/dists/stable/main/binary-amd64/Packages"
 parser = "regex"
 pattern = 'Package: devin-desktop\nVersion: ([0-9]+\.[0-9]+\.[0-9]+)'
-version = "3.10.27"
+version = "3.10.31"
 comments = """
 Windsurf — rebranded to "Devin Desktop". The docs.devin.ai changelog is a
 client-rendered SPA that stalls headless rendering; read the APT index of the
@@ -1725,7 +1725,7 @@ url = "https://api.github.com/repos/netdata/netdata/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "2.11.0"
+version = "2.11.1"
 comments = """
 netdata — tag "vX.Y.Z".
 """
@@ -1772,7 +1772,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "1.10.7"
+version = "1.10.8"
 comments = """
 bisq (bisq-bin) — tag "vX.Y.Z".
 """
@@ -2192,7 +2192,7 @@ url = "https://api.github.com/repos/brave/brave-browser/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.95.101"
+version = "1.95.102"
 comments = """
 brave-browser — releases/latest is the stable channel (tag "vX.Y.Z").
 """
@@ -2203,7 +2203,7 @@ url = "https://api.github.com/repos/vim/vim/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "9.2.1112"
+version = "9.2.1116"
 comments = """
 vim — no releases (404); tags[0] "vX.Y.ZZZZ".
 """
@@ -2214,7 +2214,7 @@ url = "https://api.github.com/repos/vim/vim/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "9.2.1112"
+version = "9.2.1116"
 comments = """
 vim-core — same upstream repo as vim.
 """
@@ -2651,7 +2651,7 @@ base_from = "file"
 base_url = "https://api.github.com/repos/zed-industries/zed/contents/crates/zed/Cargo.toml?ref=main"
 base_pattern = '(?m)^version = "([0-9][0-9.]*)"'
 headers = { "User-Agent" = "bentoo-autoupdate", "Accept" = "application/vnd.github.raw" }
-version = "1.21.0_pre20260916"
+version = "1.22.0_pre20260916"
 comments = """
 zed — commit-tracked on main; _pre suffix preserved from current ebuild.
 2026-08-06: 2 commits landed same UTC day (d61e80b -> 6b2aa1c), so the date
@@ -2972,7 +2972,7 @@ path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
 series = '^[0-9.]+$'
-version = "1.19.2"
+version = "1.20.1"
 comments = """
 zed-bin (stable channel) — releases/latest is the stable release by definition
 (prerelease=false); upstream tags it "vX.Y.Z" and the preview "vX.Y.Z-pre".
@@ -2997,7 +2997,7 @@ select = "max"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
 series = '_pre$'
-version = "1.20.1_pre"
+version = "1.21.0_pre"
 comments = """
 zed-bin (preview channel) — releases/latest never returns a prerelease, so the
 preview needs the full list: the pattern takes only "vX.Y.Z-pre" tags and the
@@ -3078,7 +3078,7 @@ base_from = "tag"
 base_url = "https://api.github.com/repos/KhronosGroup/glslang/git/refs/tags"
 base_tag_pattern = '^vulkan-sdk-([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)$'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.357.0_p20260915"
+version = "1.4.357.0_p20260916"
 comments = """
 glslang — commit-tracked on main; scans titles for vulkan-sdk-X.Y.Z.W to detect base bump.
 """
@@ -8984,7 +8984,7 @@ pattern = '"name":\s*"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 series = '^2\.'
-version = "2.36.46"
+version = "2.36.47"
 comments = """
 aws-cli v2 — GitHub tag index, pinned to the 2.x series. Verified 2026-08-19
 against the live endpoint: 100 matches, all of them 2.x, max = 2.36.27 = ebuild.
@@ -10000,7 +10000,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "2.2.2"
+version = "2.3.0"
 comments = """
 ai-memory — releases/latest on akitaonrails/ai-memory; tag_name is "vX.Y.Z" and
 the transform strips the v.  Verified by real request on 2026-09-07: tag_name
@@ -10049,7 +10049,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "2.2.2"
+version = "2.3.0"
 comments = """
 ai-memory-bin — same endpoint and same release as dev-util/ai-memory; this
 record exists separately only because the two are separate packages.  Bump them
