@@ -13,7 +13,7 @@ DLIB_VER="19.24.8"
 # also builds ext/recover/{sqlite3recover,dbdata}.c -- dev-db/sqlite ships
 # neither, so there is no system-library path here. Keep in sync with
 # SQLITE_VERSION_NUMBER / SQLITE_VERSION_YEAR in that file on every bump.
-SQLITE_VER_NUM="3530300"
+SQLITE_VER_NUM="3530400"
 SQLITE_VER_YEAR="2026"
 
 if [[ ${PV} == *9999 ]] ; then
@@ -109,7 +109,7 @@ BDEPEND="
 PATCHES=(
 	# Lets NETDATA_SQLITE_SOURCE_PATH replace the build-time download of the
 	# bundled SQLite, which the network sandbox blocks.
-	"${FILESDIR}/${P}-sqlite-local-source.patch"
+	"${FILESDIR}/${PN}-sqlite-local-source.patch"
 )
 
 FILECAPS=(
