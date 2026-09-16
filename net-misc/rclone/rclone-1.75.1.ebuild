@@ -24,7 +24,7 @@ RDEPEND="
 	sys-fs/fuse:3=
 "
 BDEPEND="
-	>=dev-lang/go-1.25.0
+	>=dev-lang/go-1.26.0
 "
 
 CHECKREQS_DISK_BUILD="2500M"
