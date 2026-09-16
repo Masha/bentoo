@@ -94,8 +94,15 @@ BDEPEND="
 	wayland? ( dev-util/wayland-scanner )
 "
 
-# BENTOO-DIVERGENCE: PATCHES - one 4.8 patch ::gentoo has no version to carry
-# it for (it stops at 4.7.2): system-pcre2.
+# BENTOO-DIVERGENCE: PATCHES - two 4.8 patches ::gentoo has no version to
+# carry them for (it stops at 4.7.2): system-pcre2 and xr-no-deprecated.
+#
+# xr-no-deprecated (added at 4.8_alpha6-r1): upstream FTBFS with
+# deprecated=no. XRInterface::get_projection_for_view() is declared only
+# under #ifndef DISABLE_DEPRECATED, yet modules/mobile_vr, scene/3d/xr and
+# servers/xr/xr_interface_extension.cpp still use it unguarded, so
+# USE=-deprecated cannot build. Still unfixed in upstream master on
+# 2026-09-16. Drop when upstream compiles with deprecated=no.
 #
 # The two deprecated-editor-screen patches were DROPPED at 4.8_alpha5 as their
 # own headers instructed: upstream commit 2e26ab8a3afb ("Fix deprecated build
@@ -122,6 +129,7 @@ BDEPEND="
 PATCHES=(
 	"${FILESDIR}"/${PN}-4.8-scons-toolchain.patch
 	"${FILESDIR}"/${PN}-4.8-system-pcre2.patch
+	"${FILESDIR}"/${PN}-4.8-xr-no-deprecated.patch
 )
 
 src_prepare() {
