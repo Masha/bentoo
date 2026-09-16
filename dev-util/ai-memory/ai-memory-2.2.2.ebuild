@@ -30,27 +30,29 @@ EAPI=8
 # /home/otaku/Projetos/git/bentoo so the wrangler profile resolves to "bentoo";
 # the default profile is a different account entirely.
 #
-# Verified for 2.1.0: the member-scoped run covers all 490 external crates the
-# workspace resolves -- generated list and the previous inline CRATES list were
-# compared entry by entry, with no difference in either direction.
+# Verified for 2.1.0 (and again for 2.2.2): the member-scoped run covers all
+# 490 external crates the workspace resolves -- generated list and the previous
+# inline CRATES list were compared entry by entry, with no difference in either
+# direction.
 CRATES="
 "
 
-# Version of the crates tarball to fetch, which is NOT always ${PV}. The 2.1.1
-# bump changes nothing in the dependency graph: the whole Cargo.lock diff
-# against 2.1.0 is the twelve workspace members' own `version =` fields, and
-# the external set is the same 490 crates, name and version for name and
-# version -- verified by comparing every `source = "registry+..."` entry in
-# 2.1.1's lock against the cargo_home/gentoo/<crate>-<ver>/ directories in the
-# published 2.1.0 tarball, with no difference in either direction. So the
-# 2.1.0 artifact is reused verbatim instead of regenerating and re-uploading a
-# byte-identical 36 MiB file under a new name; both versions then share one
-# distfile rather than duplicating it.
+# Version of the crates tarball to fetch, which is NOT always ${PV}: when a
+# bump leaves the external crate set untouched, the previous artifact is
+# reused instead of re-uploading a byte-identical 36 MiB file (2.1.1 reused
+# 2.1.0's this way).
+#
+# 2.2.2 could NOT reuse it: the lock moved rustls 0.23.40 -> 0.23.45 and
+# rustls-webpki 0.103.13 -> 0.103.15, and the stale tarball still fetched,
+# so the failure landed in src_compile as "failed to select a version for
+# the requirement `rustls` (locked to 0.23.45)". Comparing the lock's
+# `source = "registry+..."` entries against cargo_home/gentoo/ in the
+# candidate tarball is the check that catches it before that.
 #
 # BUMP THIS to ${PV} (and run the recipe above) the moment the lock's external
 # packages change -- a stale tarball still FETCHES, so the failure would land
 # in src_compile as a missing crate rather than here.
-CRATES_PV="2.1.0"
+CRATES_PV="2.2.2"
 
 # Upstream pins channel 1.95 in rust-toolchain.toml; the workspace is
 # edition 2024 and declares rust-version = "1.95".
