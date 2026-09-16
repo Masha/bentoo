@@ -3,7 +3,7 @@
 
 EAPI=8
 
-FIREFOX_PATCHSET="firefox-155-patches-05t.tar.xz"
+FIREFOX_PATCHSET="firefox-156-patches-01.tar.xz"
 
 LLVM_COMPAT=( 22 )
 
@@ -117,7 +117,7 @@ COMMON_DEPEND="${TB_ONLY_DEPEND}
 	>=app-accessibility/at-spi2-core-2.46.0:2
 	dev-libs/glib:2
 	dev-libs/libffi:=
-	>=dev-libs/nss-3.127
+	>=dev-libs/nss-3.128
 	>=dev-libs/nspr-4.39
 	media-libs/alsa-lib
 	media-libs/fontconfig
@@ -143,8 +143,8 @@ COMMON_DEPEND="${TB_ONLY_DEPEND}
 	selinux? ( sec-policy/selinux-mozilla )
 	sndio? ( >=media-sound/sndio-1.8.0-r1 )
 	system-av1? (
-		>=media-libs/dav1d-1.0.0:=
-		>=media-libs/libaom-1.0.0:=
+		>=media-libs/dav1d-1.5.4:=
+		>=media-libs/libaom-3.12.1:=
 	)
 	system-harfbuzz? (
 		>=media-gfx/graphite2-1.3.13
@@ -483,6 +483,12 @@ src_prepare() {
 
 	eapply "${WORKDIR}/firefox-patches"
 
+	# The firefox-156 patchset has no Thunderbird ('t') variant published yet.
+	# comm/ ships its own vendored bindgen copy, which needs the same libc++
+	# fix the shared tree gets from 0027. Drop this once
+	# firefox-156-patches-NNt.tar.xz lands on dev.gentoo.org.
+	eapply "${FILESDIR}/${PN}-bgo-981812-bindgen-libcxx-fix-tb.patch"
+
 	# Allow user to apply any additional patches without modifing ebuild
 	eapply_user
 
@@ -685,9 +691,8 @@ src_configure() {
 		mozconfig_add_options_ac '' --enable-sandbox
 	fi
 
-	# riscv-related options, bgo#947337, bgo#947338
+	# riscv-related options, bgo#947337, bgo#947338, bgo#977845
 	if use riscv ; then
-		mozconfig_add_options_ac 'Disable JIT for RISC-V 64' --disable-jit
 		mozconfig_add_options_ac 'Disable webrtc for RISC-V' --disable-webrtc
 	fi
 

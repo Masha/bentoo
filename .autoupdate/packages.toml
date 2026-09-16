@@ -783,13 +783,29 @@ artifact (dev.gentoo.org/~juippis/mozilla/patchsets/) with a counter unrelated
 to PV; the applier only bumps PV, so a series bump (154 -> 155) leaves the
 patchset stale and SRC_URI 404s at manifest time. Same failure mode as
 mail-client/betterbird-bin's MY_BUILD. Update it by hand on every bump.
-Second caveat, new at 155.0: Gentoo normally ships the Thunderbird-only extras
-as a "t" variant of that patchset (firefox-154-patches-01t carried t0001, the
-nsXREDirProvider Success/X.h fix). No firefox-155-patches-*t was ever
-published, so this ebuild consumes the plain firefox-155-patches-04 and carries
-that one patch in files/ as thunderbird-undef-Success-nsXREDirProvider.patch.
+Second caveat: Gentoo ships the Thunderbird-only extras as a "t" variant of
+that patchset, but does so inconsistently -- and the ebuild has to follow.
+154 had firefox-154-patches-01t (t0001 = the nsXREDirProvider Success/X.h fix);
+155 started with no "t" at all, so the ebuild consumed the plain
+firefox-155-patches-04 plus a local copy of that patch; then
+firefox-155-patches-05t appeared and the local copy was dropped again.
+At 156 there is once more NO "t" variant (firefox-156-patches-01t is a 404),
+so the ebuild consumes the plain firefox-156-patches-01 and carries the single
+Thunderbird-only patch in files/ as
+thunderbird-bgo-981812-bindgen-libcxx-fix-tb.patch -- the same libc++/bindgen
+fix that 0027 applies to the shared tree, re-pathed onto comm/, which ships its
+own vendored bindgen. The files/ name is deliberately version-agnostic
+(${PN}, not ${P}): the applier never renames files/, so a ${P} name would
+break the FILESDIR reference on the next bump.
 When a "t" patchset reappears, switch back to it and drop the local copy --
 applying both would fail, not merge.
+Third caveat, same root cause as the patchset: a series bump also moves the
+dependency floors the shared Gecko tree imposes. 155 -> 156 raised nss to
+3.128, dav1d to 1.5.4 and libaom to 3.12.1, and dropped --disable-jit for
+riscv (bgo#977845). Diff www-client/firefox-<old> against firefox-<new> in
+::gentoo on every series bump and carry those over; the applier sees none of
+it. Do NOT blindly copy the pipewire floor: ::gentoo deliberately keeps
+media-video/pipewire unversioned for Thunderbird while Firefox pins it.
 Bumps here MUST land together with mail-client/thunderbird-l10n below: this
 ebuild carries RDEPEND="~mail-client/thunderbird-l10n-${PV}", an exact-version
 dep, so a lone thunderbird bump leaves the package uninstallable.
