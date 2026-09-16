@@ -217,7 +217,7 @@ would actually ship fetches on its own.\
 """
 aux_var = "EGIT_COMMIT"
 aux_pattern = 'id>urn:sha1:([0-9a-f]{40})'
-version = "20260915"
+version = "20260916"
 comments = """
 linux-firmware — kernel.org's cgit atom feed, because this package has no
 releases to track: it is fetched with git-r3 from a pinned commit and versioned
@@ -694,7 +694,7 @@ url = "https://dl.pstmn.io/api/version/latest?platform=linux64&channel=stable"
 parser = "json"
 path = "version"
 type = "bin"
-version = "12.28.1"
+version = "12.28.2"
 comments = """
 Postman — official version API; clean {"version":"..."}.
 """
@@ -767,12 +767,10 @@ be fixed there before any entry could ever track it.
 # END
 
 ["mail-client/thunderbird"]
-enabled = false
-disabled_by = "parity-audit 2026-09-11: removed, byte-identical to ::gentoo 155.0.1 (ebuild, files/, metadata.xml)"
 url = "https://product-details.mozilla.org/1.0/thunderbird_versions.json"
 parser = "json"
 path = "LATEST_THUNDERBIRD_VERSION"
-version = "155.0.1"
+version = "156.0"
 comments = """
 Thunderbird — Mozilla's authoritative product-details endpoint. Use the
 LATEST_THUNDERBIRD_VERSION key (rapid/release channel, matching SLOT=0/stable):
@@ -799,16 +797,23 @@ These two entries were DELETED, not disabled, when the packages were dropped at
 153.0.3 (b3d70567d) -- against the convention that a removed package keeps its
 record with enabled = false. Restored here with the 155.0 re-add; if these
 packages ever leave again, disable them instead.
+They left again on 2026-09-11 (8b6bda20c) and that time the convention was
+followed: disabled_by = "parity-audit: byte-identical to ::gentoo 155.0.1".
+Revived on 2026-09-16 at 156.0, and unlike sci-ml/ollama and
+net-print/hplip-plugin -- swept back in by the same non-selective
+`--revive all` -- this revival is legitimate: ::gentoo tops out at 155.0.1, so
+156.0 is real divergence. The 155.0.1 ebuilds the revive also restored were
+not, being the very copies the parity audit had removed, and were deleted
+again. Re-check that before the next revival: if ::gentoo catches up to the
+version being restored, there is nothing here to maintain.
 """
 # END
 
 ["mail-client/thunderbird-l10n"]
-enabled = false
-disabled_by = "parity-audit 2026-09-11: removed with mail-client/thunderbird, byte-identical to ::gentoo 155.0.1"
 url = "https://product-details.mozilla.org/1.0/thunderbird_versions.json"
 parser = "json"
 path = "LATEST_THUNDERBIRD_VERSION"
-version = "155.0.1"
+version = "156.0"
 comments = """
 Thunderbird translation files — same upstream endpoint and key as
 mail-client/thunderbird above, because they are the same release: the .xpi are
@@ -826,6 +831,8 @@ package.
 # END
 
 ["mail-client/proton-mail-bin"]
+enabled = false
+disabled_by = "auto"
 url = "https://proton.me/download/mail/linux/version.json"
 parser = "json"
 path = "Releases[0].Version"
@@ -897,6 +904,8 @@ Vendor HTML / regex scraping
 # END
 
 ["mail-client/betterbird-bin"]
+enabled = false
+disabled_by = "auto"
 url = "https://www.betterbird.eu/downloads/"
 parser = "regex"
 pattern = 'Current version:\s*Betterbird\s*([0-9]+\.[0-9]+\.[0-9]+)\s+ESR\s*\([^)]*esr-bb[0-9]+'
@@ -1005,12 +1014,32 @@ release.gitkraken.com/linux/gitkraken-amd64.tar.gz 302 target).
 
 ["net-print/hplip-plugin"]
 enabled = false
-disabled_by = "auto"
+disabled_by = "removed 2026-09-16: byte-identical to ::gentoo 3.26.4, and the probe below tracks the wrong artifact -- see comments"
 url = "https://sourceforge.net/projects/hplip/rss?path=/hplip"
 parser = "regex"
 pattern = 'hplip-([0-9]+\.[0-9]+\.[0-9]+)'
 comments = """
 hplip-plugin — version tracks HPLIP; SourceForge RSS lists "hplip-X.Y.Z" newest-first.
+
+That endpoint is the wrong artifact, and it is why this record cannot be armed
+as written. The RSS lists releases of the HPLIP *source*; the ebuild downloads
+the proprietary blob, openprinting.org/download/printdriver/auxfiles/HP/plugins/
+hplip-<PV>-plugin.run, which HP publishes on its own cadence and which lags.
+Probed 2026-09-16: 3.26.4 -> 200, 3.26.5 and 3.26.6 -> 301 to openprinting's
+404.php. So the probe answers 3.26.6 while SRC_URI only has 3.26.4, and every
+bump dies at `pkgdev manifest` with "failed fetching required distfiles" -- not
+a transient 404, a permanent mismatch between what is probed and what is
+fetched. Any revival has to re-point url/pattern at a listing of the .run files
+themselves before enabling this again.
+
+The package itself was removed on 2026-09-16 for a second, independent reason:
+the 3.26.4 ebuild here was byte-identical to net-print/hplip-plugin-3.26.4 in
+::gentoo, so the overlay copy carried no divergence to maintain.
+
+Both of those facts were already true when `autoupdate --revive all` stripped
+this record's enabled = false and re-added the package on 2026-09-16. Same
+failure mode as sci-ml/ollama below: --revive is not selective, it clears the
+flag on EVERY disabled record, including the ones whose disable was the point.
 """
 # END
 
@@ -1806,7 +1835,7 @@ tarball plus arch-independent data from the .deb.
 url = "https://pypi.org/pypi/amd-gaia/json"
 parser = "json"
 path = "info.version"
-version = "0.23.0"
+version = "0.24.1"
 comments = """
 amd-gaia — AMD's local agent framework; the client half of the stack whose
 server is sci-ml/lemonade above. PyPI, not GitHub: the dist is named
@@ -2000,7 +2029,7 @@ url = "https://api.github.com/repos/chromium-linux-tarballs/chromium-tarballs/re
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "153.0.8010.36"
+version = "153.0.8010.47"
 comments = """
 chromium — probes the TARBALL repo, not chromiumdash or the Chrome release
 feed, because that repo is what actually gates a bump: SRC_URI points at
@@ -2245,7 +2274,7 @@ dav2d — default tag order (new project).
 url = "https://gitlab.isc.org/api/v4/projects/isc-projects%2Fbind9/repository/tags?search=v9.20&order_by=version&sort=desc"
 parser = "json"
 path = "[0].name"
-version = "9.20.27"
+version = "9.20.29"
 comments = """
 bind-tools — pinned to the 9.20 stable branch via search; "v" stripped.
 """
@@ -2571,7 +2600,7 @@ commit_sha_path = "[0].id"
 base_from = "file"
 base_url = "https://gitlab.freedesktop.org/mesa/mesa/-/raw/main/VERSION"
 base_pattern = '^([0-9][0-9.]*)-devel'
-version = "26.3.0_pre20260915"
+version = "26.3.0_pre20260916"
 comments = """
 mesa — commit-tracked on main; _pre suffix preserved from current ebuild.
 
@@ -2589,7 +2618,7 @@ commit_sha_path = "[0].id"
 base_from = "file"
 base_url = "https://gitlab.freedesktop.org/mesa/mesa/-/raw/main/VERSION"
 base_pattern = '^([0-9][0-9.]*)-devel'
-version = "26.3.0_pre20260915"
+version = "26.3.0_pre20260916"
 comments = """
 mesa_clc — part of the mesa tree; same source/rule as media-libs/mesa.
 """
@@ -2606,7 +2635,7 @@ base_from = "file"
 base_url = "https://api.github.com/repos/zed-industries/zed/contents/crates/zed/Cargo.toml?ref=main"
 base_pattern = '(?m)^version = "([0-9][0-9.]*)"'
 headers = { "User-Agent" = "bentoo-autoupdate", "Accept" = "application/vnd.github.raw" }
-version = "1.21.0_pre20260915"
+version = "1.21.0_pre20260916"
 comments = """
 zed — commit-tracked on main; _pre suffix preserved from current ebuild.
 2026-08-06: 2 commits landed same UTC day (d61e80b -> 6b2aa1c), so the date
@@ -2973,7 +3002,7 @@ base_from = "file"
 base_url = "https://raw.githubusercontent.com/sqlitebrowser/sqlitebrowser/master/CMakeLists.txt"
 base_pattern = '(?m)^\s+VERSION ([0-9][0-9.]*)'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "3.13.99_p20260913"
+version = "3.13.99_p20260916"
 comments = """
 sqlitebrowser — commit-tracked on master (uses COMMIT= without quotes); date YYYYMMDD becomes _pDATE suffix.
 """
@@ -7951,7 +7980,7 @@ url = "https://godotengine.org/download/archive/"
 parser = "regex"
 pattern = '(\d+\.\d+(?:\.\d+)?-(?:stable|beta\d*|rc\d*|dev\d*))'
 transform = [['-stable', ""], ['-beta', "_beta"], ['-rc', "_rc"], ['-dev', "_alpha"]]
-version = "4.8_alpha6"
+version = "4.8_alpha6-r1"
 comments = """
 godot — download archive lists newest first; transform the upstream suffix to
 Gentoo form (-stable→bare, -beta→_beta, -rc→_rc, -dev→_alpha).
@@ -8673,6 +8702,7 @@ which is why this entry carried no revision until 2026-07-26.
 
 ["sci-ml/ollama"]
 enabled = false
+disabled_by = "deliberate removal 2026-08-19 (7cbe62f54); ::gentoo covers this package -- see comments"
 url = "https://api.github.com/repos/ollama/ollama/releases/latest"
 parser = "json"
 path = "tag_name"
@@ -8732,6 +8762,16 @@ had exactly the defect this comment warns about -- LLAMA_CPP_tag=b10630 where
 its own release asks for b10760 -- plus a ggml floor of 0.20.0 against
 ::gentoo's 0.23.0, which is the only ggml that exists. Removed again, and this
 time enabled = false, which is the part that actually holds.
+
+And then a third time, on 2026-09-16, which is what proves enabled = false is
+NOT sufficient on its own. `bentoo overlay autoupdate --revive all` is not
+selective: it clears enabled = false from every disabled record before probing,
+so a flag set precisely to keep a package out is the flag that gets stripped.
+It re-added 0.34.0 -- byte-identical to sci-ml/ollama-0.34.0::gentoo, zero
+divergence -- and 0.34.1, carrying LLAMA_CPP_tag=b10760 while v0.34.1's own
+LLAMA_CPP_VERSION file says b10864. Third resurrection, third stale pin, for
+the reason written three paragraphs up: the applier bumps PV and nothing else.
+Never run --revive with `all` against this overlay; name the package instead.
 
 --- ollama source: same upstream repo as sci-ml/ollama-bin ---
 """
@@ -9323,7 +9363,7 @@ transform = [['T.*', ""], ['-', ""]]
 commit_sha_path = "sha"
 base_from = "none"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0_pre20260915"
+version = "0_pre20260916"
 comments = """
 ik_llama-cpp — base_from = "none": upstream publishes no usable release
 series.  Verified 2026-07-19 and again 2026-08-04: the repo has exactly ONE
@@ -10038,7 +10078,7 @@ parser = "regex"
 pattern = '"name":\s*"v([0-9.]+)"'
 select = "max"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "13.0.0"
+version = "13.1.0"
 comments = """
 openvdb — /tags with select = "max", and the "v[0-9]" anchor is the whole
 reason this is not releases/latest. The repository hosts a SECOND product on
@@ -10147,7 +10187,7 @@ parser = "regex"
 pattern = '"tag_name":\s*"v([0-9]+\.[0-9]+\.[0-9]+)"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "1.0.83"
+version = "1.0.85"
 comments = """
 GitHub Copilot CLI — TWO PARALLEL TRAINS out of one repository, and picking the
 wrong one is the whole trap here:
@@ -10246,7 +10286,7 @@ parser = "regex"
 pattern = '"tag_name":\s*"v([0-9]+\.[0-9]+\.[0-9]+)"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "0.94.2"
+version = "0.95.0"
 comments = """
 Crush, by Charm. Tracks crush_<PV>_Linux_{x86_64,arm64}.tar.gz -- note the
 asset name embeds the version AND upstream's own arch spelling, and the
@@ -10285,7 +10325,7 @@ url = "https://api.github.com/repos/QwenLM/qwen-code/releases?per_page=30"
 parser = "regex"
 pattern = '"tag_name":\s*"v([0-9]+\.[0-9]+\.[0-9]+)"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.23.4"
+version = "0.24.0"
 comments = """
 Qwen Code — this record probes /releases and NOT /releases/latest, which is
 backwards from every other GitHub record here and is deliberate.
