@@ -63,7 +63,7 @@ Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>
 ---
 
 diff --git a/assets/settings/default.json b/assets/settings/default.json
-index fd52963..d1003a1 100644
+index 52c048b..2426d93 100644
 --- a/assets/settings/default.json
 +++ b/assets/settings/default.json
 @@ -181,6 +181,17 @@
@@ -85,10 +85,10 @@ index fd52963..d1003a1 100644
    // The state is stored per pane.
    // When disabled, defaults are applied instead of the state restoration.
 diff --git a/crates/settings/src/vscode_import.rs b/crates/settings/src/vscode_import.rs
-index fbf9df9..ae5d1f6 100644
+index 60836aa..d97dac1 100644
 --- a/crates/settings/src/vscode_import.rs
 +++ b/crates/settings/src/vscode_import.rs
-@@ -1052,6 +1052,7 @@ impl VsCodeSettings {
+@@ -1057,6 +1057,7 @@ impl VsCodeSettings {
              centered_layout: None,
              cli_default_open_behavior: None,
              default_open_behavior: None,

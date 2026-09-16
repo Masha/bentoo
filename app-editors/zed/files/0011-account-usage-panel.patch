@@ -494,7 +494,7 @@ index 8b1fb2c..41c0aa8 100644
                  if let Some(thread_view) = self.thread_view(&session_id) {
                      let available_skills = thread
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
-index b35c668..ac850af 100644
+index e88476f..88a69a3 100644
 --- a/crates/agent_ui/src/conversation_view/thread_view.rs
 +++ b/crates/agent_ui/src/conversation_view/thread_view.rs
 @@ -9,8 +9,9 @@ use agent_client_protocol::schema::v1 as acp;
@@ -509,8 +509,8 @@ index b35c668..ac850af 100644
  };
  use agent::{
      SandboxStatusKey, SandboxStatusRefresh, SkillLoadingIssue, SkillLoadingIssueKind,
-@@ -4772,6 +4773,32 @@ impl ThreadView {
-             crate::humanize_token_count(usage.max_tokens.saturating_sub(max_output_tokens));
+@@ -4779,6 +4780,32 @@ impl ThreadView {
+         let input_max_label = crate::humanize_token_count(max_input_tokens);
          let output_max_label = crate::humanize_token_count(max_output_tokens);
  
 +        // Account quota, when the agent reports it. Only the Claude adapter does today: it
@@ -542,7 +542,7 @@ index b35c668..ac850af 100644
          let build_tooltip = {
              move |_window: &mut Window, cx: &mut App| {
                  let percentage = percentage.clone();
-@@ -4784,8 +4811,11 @@ impl ThreadView {
+@@ -4791,8 +4818,11 @@ impl ThreadView {
                  let project_entry_ids = project_entry_ids.clone();
                  let workspace = workspace.clone();
                  let cost_label = cost_label.clone();
@@ -554,7 +554,7 @@ index b35c668..ac850af 100644
                      used,
                      max,
                      input_tokens: input_tokens_label,
-@@ -5773,8 +5803,23 @@ impl ThreadView {
+@@ -5780,8 +5810,23 @@ impl ThreadView {
      }
  }
  
@@ -578,7 +578,7 @@ index b35c668..ac850af 100644
      used: String,
      max: String,
      input_tokens: String,
-@@ -5802,6 +5847,8 @@ impl Render for TokenUsageTooltip {
+@@ -5809,6 +5854,8 @@ impl Render for TokenUsageTooltip {
          let output_max = self.output_max.clone();
          let show_split = self.show_split;
          let cost_label = self.cost_label.clone();
@@ -587,7 +587,7 @@ index b35c668..ac850af 100644
          let global_agents_md_loaded = self.global_agents_md_loaded;
          let project_rules_count = self.project_rules_count;
          let project_entry_ids = self.project_entry_ids.clone();
-@@ -5864,6 +5911,68 @@ impl Render for TokenUsageTooltip {
+@@ -5871,6 +5918,68 @@ impl Render for TokenUsageTooltip {
                              .child(Label::new(cost_label)),
                      )
                  })

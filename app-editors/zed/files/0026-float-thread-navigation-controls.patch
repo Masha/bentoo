@@ -56,10 +56,10 @@ the claude-agent-acp-plus flag BY CHOICE rather than by dependency.
 ---
 
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
-index a0fce13..023fd20 100644
+index 01cefd9..0bcd946 100644
 --- a/crates/agent_ui/src/conversation_view/thread_view.rs
 +++ b/crates/agent_ui/src/conversation_view/thread_view.rs
-@@ -6733,13 +6733,6 @@ impl ThreadView {
+@@ -6740,13 +6740,6 @@ impl ThreadView {
              .unwrap_or(!is_generating);
  
          let primary = if is_turn_end && !assistant_message_is_blank {
@@ -73,7 +73,7 @@ index a0fce13..023fd20 100644
              v_flex()
                  .w_full()
                  .child(primary)
-@@ -6748,7 +6741,6 @@ impl ThreadView {
+@@ -6755,7 +6748,6 @@ impl ThreadView {
                      entry_ix,
                      Some(entry_ix),
                      entry_ix + 1 == total_entries,
@@ -81,7 +81,7 @@ index a0fce13..023fd20 100644
                      cx,
                  ))
                  .into_any_element()
-@@ -6776,7 +6768,6 @@ impl ThreadView {
+@@ -6783,7 +6775,6 @@ impl ThreadView {
                          entry_ix,
                          last_assistant_index,
                          true,
@@ -89,7 +89,7 @@ index a0fce13..023fd20 100644
                          cx,
                      ))
                  })
-@@ -6991,7 +6982,6 @@ impl ThreadView {
+@@ -6998,7 +6989,6 @@ impl ThreadView {
          entry_ix: usize,
          copy_response_index: Option<usize>,
          is_thread_bottom: bool,
@@ -97,7 +97,7 @@ index a0fce13..023fd20 100644
          cx: &Context<Self>,
      ) -> impl IntoElement {
          let is_generating = matches!(thread.read(cx).status(), ThreadStatus::Generating);
-@@ -7016,27 +7006,6 @@ impl ThreadView {
+@@ -7023,27 +7013,6 @@ impl ThreadView {
                  }))
          });
  
@@ -125,7 +125,7 @@ index a0fce13..023fd20 100644
          let show_stats = is_thread_bottom && AgentSettings::get_global(cx).show_turn_stats;
  
          let last_turn_clock = show_stats
-@@ -7124,6 +7093,19 @@ impl ThreadView {
+@@ -7131,6 +7100,19 @@ impl ThreadView {
              })
              .flatten();
  
@@ -145,7 +145,7 @@ index a0fce13..023fd20 100644
          let separator_dots = || {
              Label::new("•")
                  .size(LabelSize::Small)
-@@ -7156,11 +7138,75 @@ impl ThreadView {
+@@ -7163,11 +7145,75 @@ impl ThreadView {
              )
              .when_some(feedback_buttons, |this, buttons| this.child(buttons))
              .when_some(copy_response_button, |this, button| this.child(button))
@@ -223,7 +223,7 @@ index a0fce13..023fd20 100644
      fn is_thread_feedback_enabled(&self, cx: &App) -> bool {
          util::maybe!({
              let project = self.thread.read(cx).project().read(cx);
-@@ -12422,9 +12468,11 @@ impl Render for ThreadView {
+@@ -12429,9 +12475,11 @@ impl Render for ThreadView {
              })
              .map(|this| {
                  if has_messages {

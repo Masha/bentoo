@@ -168,7 +168,7 @@ CRATES="
 	cached_proc_macro@0.25.0
 	cached_proc_macro_types@0.1.1
 	calloop-wayland-source@0.4.1
-	camino@1.2.1
+	camino@1.2.6
 	cap-fs-ext@4.0.3
 	cap-primitives@4.0.3
 	cap-std@4.0.3
@@ -306,6 +306,7 @@ CRATES="
 	data-encoding@2.9.0
 	data-url@0.3.2
 	dbus@0.9.9
+	debug-ignore@1.0.5
 	debugid@0.8.0
 	deflate64@0.1.10
 	der@0.6.1
@@ -458,6 +459,8 @@ CRATES="
 	gpu-descriptor@0.3.2
 	granit-parser@1.0.0
 	group@0.12.1
+	guppy-workspace-hack@0.1.0
+	guppy@0.18.0
 	h2@0.3.27
 	h2@0.4.12
 	half@2.7.1
@@ -678,6 +681,7 @@ CRATES="
 	ndk-context@0.1.1
 	ndk-sys@0.6.0+11769913
 	ndk@0.9.0
+	nested@0.1.1
 	new_debug_unreachable@1.0.6
 	nix@0.28.0
 	nix@0.30.1
@@ -995,11 +999,11 @@ CRATES="
 	security-framework@3.5.1
 	selectors@0.37.0
 	self_cell@1.2.2
-	semver@1.0.27
-	serde@1.0.228
+	semver@1.0.28
+	serde@1.0.229
 	serde_bytes@0.11.19
-	serde_core@1.0.228
-	serde_derive@1.0.228
+	serde_core@1.0.229
+	serde_derive@1.0.229
 	serde_derive_internals@0.29.1
 	serde_fmt@1.0.3
 	serde_json@1.0.151
@@ -1044,7 +1048,7 @@ CRATES="
 	skrifa@0.40.0
 	slab@0.4.11
 	slotmap@1.0.7
-	smallvec@1.15.1
+	smallvec@1.16.1
 	smart-default@0.7.1
 	smol@2.0.2
 	smol_str@0.3.6
@@ -1126,6 +1130,7 @@ CRATES="
 	tao-core-video-sys@0.2.0
 	tap@1.0.1
 	target-lexicon@0.13.5
+	target-spec@3.7.0
 	tauri-winrt-notification@0.7.3
 	tempfile@3.27.0
 	tendril@0.5.1
@@ -1576,7 +1581,7 @@ declare -A GIT_CRATES=(
 	[zed-xim]='https://github.com/zed-industries/xim-rs;16f35a2c881b815a2b6cdfd6687988e84f8447d8;xim-rs-%commit%'
 )
 
-EGIT_COMMIT="7f00507e015636cfc8ab5dc053340ad7f74f6aca"
+EGIT_COMMIT="739fdbef762f7e514d62e1fa650c1b7cac5bbff4"
 LLVM_COMPAT=( 22 )
 RUST_MIN_VER="1.98.1"
 RUST_NEEDS_LLVM=1

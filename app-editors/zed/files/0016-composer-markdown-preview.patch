@@ -69,7 +69,7 @@ of this patch said the same sentence, and it was right.
 ---
 
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
-index 3536ed1..a0fce13 100644
+index ab00739..01cefd9 100644
 --- a/crates/agent_ui/src/conversation_view/thread_view.rs
 +++ b/crates/agent_ui/src/conversation_view/thread_view.rs
 @@ -4456,6 +4456,10 @@ impl ThreadView {

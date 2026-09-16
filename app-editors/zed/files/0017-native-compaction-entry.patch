@@ -74,7 +74,7 @@ both zero.
 ---
 
 diff --git a/crates/acp_thread/src/acp_thread.rs b/crates/acp_thread/src/acp_thread.rs
-index 32945d9..f11e5cb 100644
+index 32945d9..157947e 100644
 --- a/crates/acp_thread/src/acp_thread.rs
 +++ b/crates/acp_thread/src/acp_thread.rs
 @@ -852,6 +852,30 @@ pub struct ContextCompactionUpdate {
