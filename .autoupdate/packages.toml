@@ -8421,6 +8421,8 @@ Live=v0.7.0.
 # END
 
 ["net-misc/rclone"]
+enabled = false
+disabled_by = "parity-audit 2026-09-16: removed, identical to ::gentoo 1.75.1 apart from KEYWORDS we stabilised ourselves -- see comments"
 url = "https://api.github.com/repos/rclone/rclone/releases/latest"
 parser = "json"
 path = "tag_name"
@@ -8428,6 +8430,21 @@ headers = { "User-Agent" = "bentoo-autoupdate" }
 version = "1.75.1"
 comments = """
 rclone/rclone Releases; tag_name "vX.Y.Z" (leading v stripped). Live=v1.74.3, prerelease=false.
+
+Removed 2026-09-16. ::gentoo ships the same 1.75.1 and the ONLY axis that
+differed was KEYWORDS: we marked amd64 and x86 stable, they keep both ~arch.
+So aligning the one difference would have made the ebuild byte-identical --
+the parity sweep would report REDUNDANT instead of ALIGN, and the answer to
+both is the same: drop it.
+
+Stabilising ahead of ::gentoo is the part worth not repeating. A stable
+keyword is a claim that arch testing happened; an overlay asserting it alone
+makes a promise it has no process to keep. If a release needs to land here
+early, ship it ~arch and say why.
+
+Nothing broke on the way out: app-portage/bentoolkit is the only consumer, it
+is ~amd64 ~x86 itself, and its net-misc/rclone atom sits behind
+system-snapshot? ( ), so ::gentoo's ~arch copy satisfies it unchanged.
 """
 # END
 
