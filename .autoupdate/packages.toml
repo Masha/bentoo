@@ -203,6 +203,8 @@ version and is fetched separately because npm resolves it offline from DISTDIR.
 # END
 
 ["sys-kernel/linux-firmware"]
+enabled = false
+disabled_by = "removed 2026-09-16: ::gentoo reached the same PV 20260916, so the pinned-commit mirror stopped being ahead -- see comments"
 url = "https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/atom/?h=main"
 parser = "regex"
 pattern = '<updated>([0-9]{4}-[0-9]{2}-[0-9]{2})'
@@ -233,6 +235,26 @@ aux_pattern runs against the raw feed, where the first urn:sha1 is the newest
 commit — the same entry the first <updated> came from.  If kernel.org ever
 reorders the feed, these two would describe different commits; check that they
 agree before applying.
+
+Removed 2026-09-16, and the reason is convergence rather than redundancy. The
+whole point of this ebuild was to sit AHEAD of ::gentoo: they publish dated
+snapshots, we cut our own between them from a pinned EGIT_COMMIT. ::gentoo now
+ships linux-firmware-20260916, the same PV we had, so the gap the mirror
+existed to fill closed on that date.
+
+The two ebuilds are NOT interchangeable, which is why this is a decision and
+not housekeeping. Ours inherits git-r3 and fetches the exact commit from
+kernel.org, with no SRC_URI and no Manifest, because the gitlab archive tarball
+::gentoo falls back to is unreachable behind Cloudflare. Theirs is a release
+tarball. Choosing ::gentoo means accepting their cadence: no more same-day
+firmware, only their dated snapshots.
+
+Re-enable this record the moment a firmware fix you need lands upstream and
+::gentoo has not cut a snapshot for it yet. Everything needed is preserved
+above -- the atom feed, the date pattern, and the aux_var/aux_pattern pair that
+keeps EGIT_COMMIT moving with PV. Restore the ebuild from the commit that
+deleted it rather than writing a new one; the src_unpack there is already the
+unconditional git-r3 form, which ::gentoo's tarball/9999 branch is not.
 """
 # END
 
