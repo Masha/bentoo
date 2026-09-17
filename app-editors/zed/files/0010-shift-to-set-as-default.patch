@@ -92,7 +92,7 @@ index 5f0cf69..8ea6077 100644
              Task::ready(Ok(()))
          }
 diff --git a/crates/agent/src/agent.rs b/crates/agent/src/agent.rs
-index 96eea55..a49d540 100644
+index c5526e7..a52045e 100644
 --- a/crates/agent/src/agent.rs
 +++ b/crates/agent/src/agent.rs
 @@ -2560,7 +2560,12 @@ impl acp_thread::AgentModelSelector for NativeAgentModelSelector {
@@ -175,7 +175,7 @@ index 96eea55..a49d540 100644
      fn selected_model(&self, cx: &mut App) -> Task<Result<acp_thread::AgentModelInfo>> {
          let Some(thread) = self
              .connection
-@@ -6431,6 +6451,86 @@ mod internal_tests {
+@@ -6422,6 +6442,86 @@ mod internal_tests {
          );
      }
  
@@ -262,7 +262,7 @@ index 96eea55..a49d540 100644
      #[gpui::test]
      async fn test_model_selection_persists_to_settings(cx: &mut TestAppContext) {
          init_test(cx);
-@@ -6478,7 +6578,7 @@ mod internal_tests {
+@@ -6469,7 +6569,7 @@ mod internal_tests {
          // Select a model
          let selector = connection.model_selector(&session_id).unwrap();
          let model_id = AgentModelId::new("fake/fake");
@@ -271,7 +271,7 @@ index 96eea55..a49d540 100644
              .await
              .unwrap();
  
-@@ -6528,9 +6628,11 @@ mod internal_tests {
+@@ -6519,9 +6619,11 @@ mod internal_tests {
          agent.update(cx, |agent, cx| agent.models.refresh_list(cx));
  
          let selector = connection.model_selector(&session_id).unwrap();
@@ -286,7 +286,7 @@ index 96eea55..a49d540 100644
          cx.run_until_parked();
  
          // Verify enable_thinking was written to settings as true.
-@@ -6602,9 +6704,11 @@ mod internal_tests {
+@@ -6593,9 +6695,11 @@ mod internal_tests {
  
          // Select the thinking model via select_model.
          let selector = connection.model_selector(&session_id).unwrap();
@@ -301,7 +301,7 @@ index 96eea55..a49d540 100644
  
          // select_model should have enabled thinking based on the model's supports_thinking().
          agent.read_with(cx, |agent, _| {
-@@ -6619,7 +6723,7 @@ mod internal_tests {
+@@ -6610,7 +6714,7 @@ mod internal_tests {
  
          // Switch back to the non-thinking model.
          let selector = connection.model_selector(&session_id).unwrap();
@@ -310,7 +310,7 @@ index 96eea55..a49d540 100644
              .await
              .unwrap();
  
-@@ -6736,9 +6840,11 @@ mod internal_tests {
+@@ -6727,9 +6831,11 @@ mod internal_tests {
          let session_id = acp_thread.read_with(cx, |thread, _| thread.session_id().clone());
  
          let selector = connection.model_selector(&session_id).unwrap();
@@ -325,7 +325,7 @@ index 96eea55..a49d540 100644
  
          // Verify thinking is enabled after selecting the thinking model.
          let thread = agent.read_with(cx, |agent, _| {
-@@ -6837,9 +6943,11 @@ mod internal_tests {
+@@ -6828,9 +6934,11 @@ mod internal_tests {
          let session_id = acp_thread.read_with(cx, |thread, _| thread.session_id().clone());
  
          let selector = connection.model_selector(&session_id).unwrap();
@@ -340,7 +340,7 @@ index 96eea55..a49d540 100644
  
          let thread = agent.read_with(cx, |agent, _| {
              agent.sessions.get(&session_id).unwrap().thread.clone()
-@@ -6945,9 +7053,11 @@ mod internal_tests {
+@@ -6936,9 +7044,11 @@ mod internal_tests {
          let session_id = acp_thread.read_with(cx, |thread, _| thread.session_id().clone());
  
          let selector = connection.model_selector(&session_id).unwrap();
@@ -355,7 +355,7 @@ index 96eea55..a49d540 100644
  
          let send = acp_thread.update(cx, |thread, cx| thread.send(vec!["Hello".into()], cx));
          let send = cx.foreground_executor().spawn(send);
-@@ -7072,9 +7182,11 @@ mod internal_tests {
+@@ -7063,9 +7173,11 @@ mod internal_tests {
          cx.run_until_parked();
  
          let selector = connection.model_selector(&session_id).unwrap();
@@ -371,7 +371,7 @@ index 96eea55..a49d540 100644
          thread.read_with(cx, |thread, _| {
              assert_eq!(thread.model().unwrap().id().0.as_ref(), "other-model-id");
 diff --git a/crates/agent_ui/src/agent_ui.rs b/crates/agent_ui/src/agent_ui.rs
-index 64780d7..81cfcc9 100644
+index f25c16a..531628c 100644
 --- a/crates/agent_ui/src/agent_ui.rs
 +++ b/crates/agent_ui/src/agent_ui.rs
 @@ -24,6 +24,7 @@ mod mode_selector;

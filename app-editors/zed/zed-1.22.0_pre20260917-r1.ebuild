@@ -15,6 +15,7 @@ CRATES="
 	addr2line@0.25.1
 	addr2line@0.26.1
 	adler2@2.0.1
+	adler32@1.2.0
 	aes@0.8.4
 	agent-client-protocol-derive@2.1.0
 	agent-client-protocol-schema@1.7.0
@@ -301,6 +302,7 @@ CRATES="
 	darling_macro@0.20.11
 	darling_macro@0.21.3
 	darling_macro@0.23.0
+	dary_heap@0.3.9
 	dashmap@6.1.0
 	dasp_sample@0.11.0
 	data-encoding@2.9.0
@@ -533,6 +535,9 @@ CRATES="
 	imagesize@0.14.0
 	imara-diff@0.2.0
 	imgref@1.12.0
+	include-flate-codegen@0.3.4
+	include-flate-compress@0.3.4
+	include-flate@0.3.4
 	indenter@0.3.4
 	indexmap@1.9.3
 	indexmap@2.14.0
@@ -598,6 +603,8 @@ CRATES="
 	libbz2-rs-sys@0.2.2
 	libc@0.2.186
 	libdbus-sys@0.2.6
+	libflate@2.3.1
+	libflate_lz77@2.3.0
 	libfuzzer-sys@0.4.10
 	libloading@0.8.9
 	libm@0.2.16
@@ -685,6 +692,7 @@ CRATES="
 	new_debug_unreachable@1.0.6
 	nix@0.28.0
 	nix@0.30.1
+	no_std_io2@0.9.4
 	nom@7.1.3
 	nom@8.0.0
 	noop_proc_macro@0.3.0
@@ -726,7 +734,9 @@ CRATES="
 	objc2-core-graphics@0.3.2
 	objc2-core-image@0.2.2
 	objc2-core-location@0.3.2
+	objc2-core-media@0.3.2
 	objc2-core-services@0.3.2
+	objc2-core-video@0.3.2
 	objc2-encode@4.1.0
 	objc2-foundation@0.2.2
 	objc2-foundation@0.3.2
@@ -842,7 +852,9 @@ CRATES="
 	pretty_assertions@1.4.1
 	prettyplease@0.2.37
 	proc-macro-crate@3.4.0
+	proc-macro-error-attr3@3.1.1
 	proc-macro-error-attr@1.0.4
+	proc-macro-error3@3.1.1
 	proc-macro-error@1.0.4
 	proc-macro2-diagnostics@0.10.1
 	proc-macro2@1.0.107
@@ -935,6 +947,7 @@ CRATES="
 	ring@0.17.14
 	rkyv@0.7.45
 	rkyv_derive@0.7.45
+	rle-decode-fast@1.0.3
 	rmp@0.8.14
 	rmpv@1.3.0
 	roughr-merman@0.12.3
@@ -1097,17 +1110,10 @@ CRATES="
 	svg_fmt@0.4.5
 	svgtypes@0.16.1
 	swash@0.2.6
-	symphonia-bundle-flac@0.5.5
-	symphonia-bundle-mp3@0.5.5
-	symphonia-codec-aac@0.5.5
 	symphonia-codec-pcm@0.5.5
-	symphonia-codec-vorbis@0.5.5
 	symphonia-core@0.5.5
-	symphonia-format-isomp4@0.5.5
-	symphonia-format-ogg@0.5.5
 	symphonia-format-riff@0.5.5
 	symphonia-metadata@0.5.5
-	symphonia-utils-xiph@0.5.5
 	symphonia@0.5.5
 	syn@1.0.109
 	syn@2.0.117
@@ -1497,8 +1503,10 @@ CRATES="
 	zip@0.6.6
 	zmij@1.0.23
 	zstd-safe@5.0.2+zstd.1.5.2
+	zstd-safe@7.3.0
 	zstd-sys@2.0.16+zstd.1.5.7
 	zstd@0.11.2+zstd.1.5.2
+	zstd@0.13.3
 	zune-core@0.5.1
 	zune-inflate@0.2.54
 	zune-jpeg@0.5.15
@@ -1581,7 +1589,7 @@ declare -A GIT_CRATES=(
 	[zed-xim]='https://github.com/zed-industries/xim-rs;16f35a2c881b815a2b6cdfd6687988e84f8447d8;xim-rs-%commit%'
 )
 
-EGIT_COMMIT="4b47ceb9d328035bde5ef99009e674d9fee07fb7"
+EGIT_COMMIT="b6171bcc982c406c34e786c09ae26f59620e52ae"
 LLVM_COMPAT=( 22 )
 RUST_MIN_VER="1.98.1"
 RUST_NEEDS_LLVM=1

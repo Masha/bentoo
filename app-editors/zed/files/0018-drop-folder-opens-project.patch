@@ -63,7 +63,7 @@ Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>
 ---
 
 diff --git a/assets/settings/default.json b/assets/settings/default.json
-index 52c048b..2426d93 100644
+index a7bae4d..bc69221 100644
 --- a/assets/settings/default.json
 +++ b/assets/settings/default.json
 @@ -181,6 +181,17 @@
@@ -97,7 +97,7 @@ index 60836aa..d97dac1 100644
              close_panel_on_toggle: None,
              command_aliases: Default::default(),
 diff --git a/crates/settings_content/src/workspace.rs b/crates/settings_content/src/workspace.rs
-index e38b902..7120254 100644
+index ab0666e..bc143fb 100644
 --- a/crates/settings_content/src/workspace.rs
 +++ b/crates/settings_content/src/workspace.rs
 @@ -58,6 +58,13 @@ pub struct WorkspaceSettingsContent {
