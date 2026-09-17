@@ -38,6 +38,23 @@ BDEPEND="${PYTHON_DEPS}
 DEPEND=">=dev-util/spirv-tools-1.4.357.0_p20260813[${MULTILIB_USEDEP}]"
 RDEPEND="${DEPEND}"
 
+# BENTOO-DIVERGENCE: PATCHES - there is no PATCHES array here, while ::gentoo's
+# 1.4.357.0 applies ${PV}-Fix-format-specifier-for-64-bit-index-in-error-messa
+# .patch. That patch is a cherry-pick of upstream b44e6091 (2026-09-14), which
+# makes the "index out of range" messages print the int64_t index with %lld
+# instead of %d -- on 32-bit ARM and PowerPC the %d read variadic padding and
+# printed garbage.
+#
+# This snapshot is 31b9aacf, cut 2026-09-16, so it is DOWNSTREAM of that commit
+# and already carries the fix. Verified in the tarball rather than inferred
+# from dates: glslang/MachineIndependent/ParseHelper.cpp has the %lld form with
+# the (long long) cast at all three call sites.
+#
+# Adding the patch would not be harmless. eapply runs `patch -f`, so an already
+# applied hunk does not get skipped -- it fails, or worse, applies in reverse
+# and reintroduces the bug. Re-check this on every snapshot bump ONLY if the
+# snapshot ever moves backwards; a later commit can only keep the fix.
+
 multilib_src_configure() {
 	local mycmakeargs=(
 		-DENABLE_PCH=OFF

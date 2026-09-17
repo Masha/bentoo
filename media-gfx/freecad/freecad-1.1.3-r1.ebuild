@@ -160,10 +160,36 @@ BDEPEND="
 #   fix-sketcher-toolbars  NOT in 1.1.3 -- it applies clean, so the overlay was
 #                       silently missing a real fix. Added here under ::gentoo's
 #                       exact filename so the sweep can pair them.
+# BENTOO-DIVERGENCE: files/content - our copy of
+# freecad-1.1.1-fix-sketcher-toolbars.patch differs from ::gentoo's byte for
+# byte, and that is deliberate: it is the SAME fix, rebased onto a different
+# source tree.
+#
+# Both carry the same two upstream commits (4859a133 and 7db3f901) and the same
+# hunks. What differs is the offsets -- ours starts at @@ -841, theirs at
+# @@ -844 -- because the two ebuilds extract different tarballs. ::gentoo
+# fetches the release asset freecad_source_${PV}.tar.gz; this ebuild fetches
+# the git tag archive plus AddonManager, as SRC_URI above shows. Copying their
+# file over ours would make the hunks miss.
+#
+# Same filename on purpose, so the parity sweep pairs the two and reports the
+# content difference instead of an orphan on each side.
 PATCHES=(
 	"${FILESDIR}"/freecad-1.1.1-fix-sketcher-toolbars.patch
 )
 
+# BENTOO-DIVERGENCE: DEFINED_PHASES - no src_unpack here, where ::gentoo's
+# 1.1.3 defines one. Theirs exists only to add src/Mod/AddonManager to
+# EGIT_SUBMODULES on the 9999 branch; for a released PV its whole body is
+# `default`. This ebuild solves the same problem earlier and without a phase:
+# AddonManager is a second SRC_URI pinned at ADDONMGR_COMMIT, unpacked by the
+# default phase like any other distfile.
+#
+# The reason it is a second tarball rather than a submodule is cadence.
+# AddonManager lives in its own repo and releases on its own schedule, and the
+# 1.1.1 tag upstream references an older commit than the one worth shipping.
+# A pin can be bumped on evidence; a submodule reference cannot, short of
+# tracking 9999.
 DOCS=( CODE_OF_CONDUCT.md README.md )
 
 CHECKREQS_DISK_BUILD="2G"
