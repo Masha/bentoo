@@ -247,43 +247,37 @@
 # 2027-04-30. See the nodejs-slotted news item.
 net-libs/nodejs:0::gentoo
 
-# Lucas C.S. <lucascs@protonmail.com> (2026-08-27)
-# py-tree-sitter 0.26.0 returns a borrowed reference from a getter. Point.row
-# and Point.column hand out PyTuple_GetItem(self, n) directly, but a
-# PyGetSetDef getter must return a strong reference -- so destroying a
-# temporary Point frees an integer its caller is still holding. The result is a
-# use-after-free that corrupts the heap.
+# Lucas C.S. <lucascs@protonmail.com> (2026-09-16)
+# dev-python/tree-sitter-0.26.0 is the release that regressed Point: its
+# Point.row and Point.column getters hand out PyTuple_GetItem(self, n)
+# directly, a borrowed reference where PyGetSetDef requires a strong one, so
+# destroying a temporary Point frees an integer its caller still holds. The
+# visible victim is dev-util/pkgcheck, which sorts nodes by
+# attrgetter("start_point.row", "start_point.column"): measured here, 3/6, 2/6,
+# 3/6 and 4/8 scans died with SIGSEGV. The crash lands in a multiprocessing
+# worker, so pkgcheck still exits 0 -- a scan can drop whole checks and still
+# look green. QA that lies is worse than QA that fails.
 #
-# The visible victim is dev-util/pkgcheck, which sorts nodes by
-# attrgetter("start_point.row", "start_point.column"). Measured here: 3/6, 2/6,
-# 3/6 and 4/8 scans died with SIGSEGV. What makes this worth a mask rather than
-# a note is that the crash lands in a multiprocessing worker, so pkgcheck still
-# exits 0 -- a scan can drop whole checks and still look green. QA that lies is
-# worse than QA that fails.
+# This entry REPLACES the ">0.26.0-r1::gentoo" one removed the same day. That
+# one existed to protect this overlay's own patched ebuild from being outranked
+# by a ::gentoo bump. Upstream has since fixed it (PR #466) and ::gentoo now
+# packages a snapshot downstream of the merge, so our ebuild and our patch are
+# gone and the old mask went with them -- left in place it would have barred
+# the very snapshot that carries the fix.
 #
-# This overlay ships dev-python/tree-sitter-0.26.0-r1 with the fix, and it wins
-# over ::gentoo's 0.26.0 on revision alone. The mask exists for what comes
-# next: upstream has no corrected release (v0.26.0 is still the latest tag) and
-# no report was filed, so a plain 0.26.1 in ::gentoo would outrank the -r1 and
-# restore the bug silently.
+# What survives is narrower and points at one version. The fix reached
+# ::gentoo only as 0.26.0_p20260816, which is ~arch on every arch, while broken
+# 0.26.0 is STABLE on amd64, arm, arm64, ppc, ppc64 and x86. Without this mask
+# a stable system resolves to the broken one -- the snapshot is newer but
+# unkeyworded for it. Masking 0.26.0 alone leaves both usable answers: the
+# snapshot for ~arch, and 0.25.2-r1 for stable, which predates the regression
+# entirely (it built Point with PyStructSequence, whose accessors CPython
+# generates with correct refcounting).
 #
-# The floor is "> this overlay's revision", not an equality, for the same
-# reason the dart entry above uses one: =dev-python/tree-sitter-0.26.1 would
-# let 0.26.2 through and reopen the hole. It leaves ::gentoo's 0.26.0 and
-# 0.25.2-r1 alone -- both are usable fallbacks, 0.25.2 predating the
-# regression entirely (it built Point with PyStructSequence, whose accessors
-# CPython generates with correct refcounting).
+# Lift this when ::gentoo stabilises a version carrying the fix, and ask the
+# source rather than the version number:
 #
-# The ::gentoo qualifier is load-bearing, and here it points the opposite way
-# from the nodejs entry below. Portage rewrites every repo-level mask atom as
-# "<atom>::bentoo", so an unqualified atom would mask this overlay's own future
-# revisions -- exactly the ebuilds carrying the fix -- while leaving ::gentoo
-# untouched. Naming ::gentoo masks the master and lets a bentoo -r2 through.
+#   grep -c Py_NewRef tree_sitter/binding/point.c
 #
-# Ask the source before lifting this, never the version number: a ::gentoo bump
-# is only safe if the tarball it fetches actually carries the fix.
-#
-#   grep Py_XNewRef tree_sitter/binding/point.c
-#
-# Two hits means upstream fixed it and this entry, along with our patch, goes.
->dev-python/tree-sitter-0.26.0-r1::gentoo
+# Two hits in the getters mean that version is safe.
+=dev-python/tree-sitter-0.26.0::gentoo

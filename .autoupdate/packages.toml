@@ -1029,33 +1029,40 @@ release.gitkraken.com/linux/gitkraken-amd64.tar.gz 302 target).
 # END
 
 ["net-print/hplip-plugin"]
-enabled = false
-disabled_by = "removed 2026-09-16: byte-identical to ::gentoo 3.26.4, and the probe below tracks the wrong artifact -- see comments"
-url = "https://sourceforge.net/projects/hplip/rss?path=/hplip"
+url = "https://www.openprinting.org/download/printdriver/auxfiles/HP/plugins/"
 parser = "regex"
-pattern = 'hplip-([0-9]+\.[0-9]+\.[0-9]+)'
+pattern = 'hplip-([0-9]+\.[0-9]+\.[0-9]+)-plugin\.run'
+select = "max"
+version = "3.26.4"
 comments = """
-hplip-plugin — version tracks HPLIP; SourceForge RSS lists "hplip-X.Y.Z" newest-first.
+hplip-plugin — probes the openprinting directory that holds the .run blobs
+themselves, which is the ONLY endpoint whose answer the ebuild can actually
+fetch.
 
-That endpoint is the wrong artifact, and it is why this record cannot be armed
-as written. The RSS lists releases of the HPLIP *source*; the ebuild downloads
-the proprietary blob, openprinting.org/download/printdriver/auxfiles/HP/plugins/
-hplip-<PV>-plugin.run, which HP publishes on its own cadence and which lags.
-Probed 2026-09-16: 3.26.4 -> 200, 3.26.5 and 3.26.6 -> 301 to openprinting's
-404.php. So the probe answers 3.26.6 while SRC_URI only has 3.26.4, and every
-bump dies at `pkgdev manifest` with "failed fetching required distfiles" -- not
-a transient 404, a permanent mismatch between what is probed and what is
-fetched. Any revival has to re-point url/pattern at a listing of the .run files
-themselves before enabling this again.
+This record used to probe the HPLIP source releases on SourceForge RSS, and
+that was the wrong artifact. The RSS lists releases of the HPLIP *source*,
+while SRC_URI downloads HP's proprietary blob, which HP publishes on its own
+cadence and which lags the source. Probed 2026-09-16: the .run for 3.26.4 ->
+200, while 3.26.5 and 3.26.6 -> 301 to openprinting's 404.php. So the old probe
+answered 3.26.6 while SRC_URI only had 3.26.4, and every bump died at
+`pkgdev manifest` with "failed fetching required distfiles" -- not a transient
+404, a permanent mismatch between what was probed and what is fetched.
 
-The package itself was removed on 2026-09-16 for a second, independent reason:
-the 3.26.4 ebuild here was byte-identical to net-print/hplip-plugin-3.26.4 in
-::gentoo, so the overlay copy carried no divergence to maintain.
+Fixed 2026-09-16 by pointing url at the plugin directory, which serves a plain
+listing (HTTP 200) of every hplip-X.Y.Z-plugin.run HP ever published. Newest on
+that listing is 3.26.4, matching the ebuild in tree, so probe and SRC_URI now
+answer the same question and a bump can only propose a version that exists as a
+blob. select = "max" rather than trusting the listing order: it is a flat
+directory index carrying every release back to 3.23.5.
 
-Both of those facts were already true when `autoupdate --revive all` stripped
-this record's enabled = false and re-added the package on 2026-09-16. Same
-failure mode as sci-ml/ollama below: --revive is not selective, it clears the
-flag on EVERY disabled record, including the ones whose disable was the point.
+History worth keeping: the package was removed on 2026-09-16 because the 3.26.4
+ebuild here was byte-identical to net-print/hplip-plugin-3.26.4 in ::gentoo,
+and `autoupdate --revive all` put it straight back -- --revive is not selective,
+it clears enabled = false on EVERY disabled record, including the ones whose
+disable was the point. The re-add was kept on the maintainer's call, so the
+byte-identical copy stands, and that is the thing to re-examine: if ::gentoo
+keeps tracking this blob, the overlay copy still has no divergence to justify
+it.
 """
 # END
 
@@ -2465,6 +2472,8 @@ but redirects to a random, possibly stale mirror on every hit.
 # END
 
 ["dev-libs/libgcrypt"]
+enabled = false
+disabled_by = "parity-audit 2026-09-16: removed, ::gentoo shipped 1.12.4 and stabilised it -- see comments"
 url = "https://gnupg.org/ftp/gcrypt/libgcrypt/"
 parser = "regex"
 pattern = 'libgcrypt-([0-9]+\.[0-9]+\.[0-9]+)\.tar\.bz2'
@@ -2484,6 +2493,13 @@ genkey, assertion failures in OCB and small-order Ed25519, plus missing
 validation in Argon2/Balloon/KEM/RSA-PSS. Drop this ebuild once ::gentoo
 catches up — the ebuild is a verbatim copy of theirs except for KEYWORDS,
 which are downgraded to ~arch because a fresh release is not stable.
+
+Dropped 2026-09-16: ::gentoo caught up and went past us. It ships the same
+1.12.4 and has since stabilised amd64, arm, ppc, ppc64 and x86, while our copy
+still carried every arch as ~arch. KEYWORDS was the ONLY axis that differed, so
+keeping the ebuild did nothing but deny the stable keyword to users of this
+overlay. Re-enable this record only if a future release needs to land here
+ahead of ::gentoo again.
 """
 # END
 
@@ -8717,23 +8733,35 @@ which is why this entry carried no revision until 2026-07-26.
 # END
 
 ["sci-ml/ollama"]
-enabled = false
-disabled_by = "deliberate removal 2026-08-19 (7cbe62f54); ::gentoo covers this package -- see comments"
 url = "https://api.github.com/repos/ollama/ollama/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.33.3"
+version = "0.34.1"
 comments = """
 ollama source — same repo as ollama-bin; tag "vX.Y.Z" (leading v stripped).
-NO source ebuild is in the overlay since 2026-08-19: 7cbe62f54 dropped
-sci-ml/ollama-0.32.14 because ::gentoo had caught up, the same sweep that
-retired telegram-desktop, uutils-coreutils, mold and intel-microcode that day.
-That removal was deliberate, unlike the one on 2026-07-30 when --clean swept
-the whole directory (Manifest, metadata.xml and files/ included) by accident.
-Earlier history: hold = true for the llama.cpp rearch that makes every bump
+
+State as of 2026-09-16: the source ebuild is BACK, and the record is armed to
+match. The overlay carries 0.34.0 and 0.34.1. Only 0.34.1 earns its keep --
+::gentoo stops at 0.34.0, and our 0.34.0 is byte-identical to theirs, so that
+one is a pruning candidate on the next sweep and not a divergence to defend.
+
+How it got back matters, because it was not a decision: `autoupdate --revive
+all` stripped this record's enabled = false and re-added the package on
+2026-09-16. --revive is not selective -- it clears the flag on EVERY disabled
+record, including the ones whose disable was the point (net-print/hplip-plugin
+above came back in the same run). The re-add was kept on the maintainer's call,
+and the Manifest and md5-cache were generated the same day to make the tree
+consistent again.
+
+Prior history, still the reason to read before bumping: 7cbe62f54 dropped
+sci-ml/ollama-0.32.14 on 2026-08-19 because ::gentoo had caught up, the same
+sweep that retired telegram-desktop, uutils-coreutils, mold and intel-microcode.
+That removal was deliberate, unlike the one on 2026-07-30 when --clean swept the
+whole directory (Manifest, metadata.xml and files/ included) by accident.
+Earlier still: hold = true for the llama.cpp rearch that makes every bump
 manual, then enabled = false from 2026-07-26, then enabled again on 2026-08-10
-when sci-ml/ollama-0.32.6 was restored. Only sci-ml/ollama-bin remains here.
+when sci-ml/ollama-0.32.6 was restored.
 
 The llama.cpp tag is NOT free-form. It is read from LLAMA_CPP_VERSION, a
 one-line file at the repo root, by llama/server/CMakeLists.txt — so the value
@@ -9704,7 +9732,8 @@ cmd/drivers/kvm. Drop this package from the overlay once ::gentoo fixes it.
 # END
 
 ["dev-python/tree-sitter"]
-hold = true
+enabled = false
+disabled_by = "parity-audit 2026-09-16: removed, upstream carries the refcount fix and ::gentoo packages it -- see comments"
 url = "https://api.github.com/repos/tree-sitter/py-tree-sitter/tags"
 parser = "json"
 path = "[0].name"
@@ -9740,6 +9769,22 @@ When a new tag shows up, ask the source rather than the version number --
 Two hits mean the fix is upstream: drop our patch, drop the package.mask entry,
 drop this hold, and bump normally. No hits mean the bump needs the patch
 rebased onto the new tree first.
+
+Resolved 2026-09-16, and the arrival was not a tag. ::gentoo now ships
+0.26.0_p20260816, a SNAPSHOT pinned at commit 2e556e54, which is downstream of
+PR #466. Asking the source the way the paragraph above prescribes -- at that
+exact commit, not at a version number -- both getters return a strong
+reference:
+
+  point_get_row(...)    { return Py_NewRef(PyTuple_GET_ITEM(self, 0)); }
+  point_get_column(...) { return Py_NewRef(PyTuple_GET_ITEM(self, 1)); }
+
+Py_NewRef, not Py_XNewRef, and that is the same fix: PyTuple_GET_ITEM cannot
+return NULL, so the NULL-tolerant variant our patch used buys nothing here. Two
+hits. Our 0.26.0-r1, files/tree-sitter-0.26.0-point-refcount.patch and the
+package.mask entry are all gone; ::gentoo's snapshot is the package now. Note
+that the mask HAD to go with them -- left behind, it would have kept barring
+the very snapshot that carries the fix.
 """
 # END
 
