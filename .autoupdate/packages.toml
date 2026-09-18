@@ -8410,6 +8410,8 @@ from the same release. Live=0.3.0. (A bump must re-check the mozjs/xargs build g
 # END
 
 ["dev-db/redis"]
+enabled = false
+disabled_by = "removed 2026-09-18: the revival condition expired within a day. ::gentoo shipped redis-8.10.2 at 04:07 on 2026-09-18, so 'one release ahead' became 'tied', and the overlay copy is byte-identical to ::gentoo's on every file -- ebuild, all 14 files/ entries, metadata.xml and the DIST hashes. ::gentoo carries priority = -1000, so at a tied PV this overlay WINS and was intercepting ::gentoo with an exact copy of it. That is the 2026-09-07 failure mode itself, not merely a resemblance: a frozen copy goes stale in silence while repo priority hides ::gentoo's improvements, which is how the zstd USE flag failed to reach anyone. Being identical today does not protect against that; only removal does. Reopen only to carry a version ::gentoo does not have, and close it again the moment ::gentoo catches up."
 url = "https://api.github.com/repos/redis/redis/releases/latest"
 parser = "json"
 path = "tag_name"
@@ -8428,10 +8430,11 @@ serving the poorer of the two. That reason is gone. The ebuild carried here now 
 BYTE-IDENTICAL to ::gentoo's 8.10.1 (verified by diff on 2026-09-17; PV comes from
 the filename), zstd included, and it sits one release ahead at 8.10.2.
 
-So this is an ahead-of-::gentoo mirror, the same pattern as sys-apps/uutils and
-app-arch/fakeroot: the overlay carries it only while ::gentoo lags. DROP IT AGAIN
-the moment ::gentoo ships >=8.10.2 -- at that point the copy stops adding anything
-and repo priority makes it dead weight.
+So this was an ahead-of-::gentoo mirror, the same pattern as sys-apps/uutils and
+app-arch/fakeroot: the overlay carries it only while ::gentoo lags. That block set
+the exit condition as "DROP IT AGAIN the moment ::gentoo ships >=8.10.2", and it
+was met the next morning -- see disabled_by above. Kept here because the record of
+WHY it came back is what stops the same case being re-argued from scratch.
 """
 # END
 
