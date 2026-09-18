@@ -82,6 +82,27 @@ extract_stage_sha() {
 	printf '%s\n' "${sha}"
 }
 
+# Does this tdesktop ebuild depend on media-libs/tlottie at all?
+#
+# Deliberately NOT a plain `grep media-libs/tlottie`: the ebuild carries the
+# string in a BENTOO-DIVERGENCE comment as well, and a comment is not a
+# dependency. Anchoring on the start of the line keeps prose out.
+#
+# The leading [<>=~]* is what lets the atom carry a floor
+# (>=media-libs/tlottie-0.1.0_pre20260911), which it must: the archive is
+# linked statically, so a user whose installed tlottie predates the pin has to
+# be forced to rebuild, and only a version range can say that. `!` is excluded
+# on purpose -- a blocker mentions the package precisely in order NOT to depend
+# on it.
+#
+# The trailing alternation accepts the three ways an atom can end: whitespace
+# or end of line (bare), `:` (slot dep), or `-<digit>` (the version). Requiring
+# a digit after the hyphen is what keeps a hypothetical media-libs/tlottie-foo
+# from being mistaken for this package.
+declares_tlottie_dep() {
+	grep -qE '^[[:space:]]*[<>=~]*media-libs/tlottie([[:space:]:]|-[0-9]|$)' "$1"
+}
+
 extract_egit_commit() {
 	local file=$1 sha
 	sha=$(sed -nE 's/^EGIT_COMMIT="([0-9a-fA-F]+)".*/\1/p' "${file}" | head -n1)
@@ -169,6 +190,30 @@ PY
 		fail "a prepare.py without a tlottie stage must not yield a sha"
 	fi
 
+	# declares_tlottie_dep: every atom form that IS a dependency, and the
+	# three lookalikes that are not.
+	printf 'CDEPEND="\n\tmedia-libs/tlottie\n"\n' >"${tmp}/dep-bare.ebuild"
+	declares_tlottie_dep "${tmp}/dep-bare.ebuild" ||
+		fail "a bare atom was not recognised as a dependency"
+	printf 'CDEPEND="\n\t>=media-libs/tlottie-0.1.0_pre20260911\n"\n' >"${tmp}/dep-floor.ebuild"
+	declares_tlottie_dep "${tmp}/dep-floor.ebuild" ||
+		fail "an atom carrying a version floor was not recognised as a dependency"
+	printf 'CDEPEND="\n\tmedia-libs/tlottie:0=\n"\n' >"${tmp}/dep-slot.ebuild"
+	declares_tlottie_dep "${tmp}/dep-slot.ebuild" ||
+		fail "a slotted atom was not recognised as a dependency"
+	printf '# series 7.2 adds cmark-gfm, glibmm and media-libs/tlottie\n' >"${tmp}/dep-comment.ebuild"
+	if declares_tlottie_dep "${tmp}/dep-comment.ebuild"; then
+		fail "a mention inside a comment is not a dependency"
+	fi
+	printf 'CDEPEND="\n\t!media-libs/tlottie\n"\n' >"${tmp}/dep-block.ebuild"
+	if declares_tlottie_dep "${tmp}/dep-block.ebuild"; then
+		fail "a blocker is the opposite of a dependency"
+	fi
+	printf 'CDEPEND="\n\tmedia-libs/tlottie-tools\n"\n' >"${tmp}/dep-other.ebuild"
+	if declares_tlottie_dep "${tmp}/dep-other.ebuild"; then
+		fail "a different package sharing the prefix must not match"
+	fi
+
 	printf 'EGIT_COMMIT="758c7cb74444f1c3c9923065c40fdb3aad8b7d60"\n' >"${tmp}/a.ebuild"
 	[[ $(extract_egit_commit "${tmp}/a.ebuild") == 758c7cb74444f1c3c9923065c40fdb3aad8b7d60 ]] ||
 		fail "EGIT_COMMIT not extracted"
@@ -200,7 +245,7 @@ PY
 		fail "a non-snapshot version must not yield a stamp"
 	fi
 
-	echo "self-test: OK (17 assertions)"
+	echo "self-test: OK (23 assertions)"
 	exit 0
 fi
 
@@ -239,7 +284,7 @@ for tdesktop in "${tdesktop_ebuilds[@]}"; do
 	fi
 
 	declares_dep=0
-	grep -qE '^[[:space:]]*media-libs/tlottie([[:space:]:]|$)' "${tdesktop}" && declares_dep=1
+	declares_tlottie_dep "${tdesktop}" && declares_dep=1
 
 	url="${raw_base}/v${pv}/Telegram/build/prepare/prepare.py"
 	prepare=$(curl -sL --fail --max-time 30 -H 'User-Agent: bentoo-autoupdate' "${url}") || prepare=''
