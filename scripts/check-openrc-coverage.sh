@@ -155,6 +155,7 @@ NON_PACKAGE_TOPLEVEL=( metadata profiles scripts licenses eclass )
 # handles correctly AND make its genuine gap permanently unreportable.
 declare -A ALLOWLIST=(
 	[sys-apps/flatpak]=$'its units are a Type=oneshot updater plus a timer, not a daemon: there\nis nothing to supervise, and an init script wrapping a one-shot would\nshow up as crashed in rc-status. The two files are byte-identical to\n::gentoo\'s. The honest OpenRC analogue is a cron.daily drop-in, which\nwould add a virtual/cron dependency to a package that has none.'
+	[sys-power/upower]=$'its unit is D-Bus activated, not supervised: upower.service is\nType=dbus with BusName=org.freedesktop.UPower, and the package installs\n/usr/share/dbus-1/system-services/org.freedesktop.UPower.service. The\nactivating process is dbus-daemon, which OpenRC systems run too, so the\ndaemon already starts on demand there -- with no init script and no\nsystemd. Adding one would not close a gap, it would open a second start\npath racing the bus activation for the same well-known name.\nThe ebuild is byte-identical to ::gentoo\'s upower-1.91.3 (bentoo mirrors\nit one release ahead), and ::gentoo ships no init script either, so there\nis no downstream decision here to correct.'
 )
 
 ### command line #####################################################
@@ -1084,10 +1085,20 @@ self_test_assertions() {
 	# the new evidence says AND check SYS_UNITDIR_TOKENS still covers the
 	# spelling. A rename that nobody adds to that list turns this package
 	# silently into system=n/a, which reads exactly like a package with no unit.
+	#
+	# SUBJECT MOVED ON 2026-09-18. The original subject was
+	# net-misc/networkmanager, dropped from the overlay in commit 8b6bda20c;
+	# the assertion then failed with rows=0 and had been failing since, which
+	# is the worst reading available - a vanished subject says nothing about
+	# the rule, so a red here meant "something", not "R3.10 regressed".
+	# net-misc/modemmanager replaces it: same upstream family, same meson
+	# unit-dir idiom, a single ebuild, and it produces exactly the token pair
+	# below. Note the expected value pins TOKENS and not a version, so a
+	# snapshot bump of modemmanager does not touch this pin.
 	assert_eq A02 \
-		'net-misc/networkmanager: unit seen through the meson unit-dir argument, initd through newinitd (R3.10)' \
+		'net-misc/modemmanager: unit seen through the meson unit-dir argument, initd through newinitd (R3.10)' \
 		'rows=1 system=PASS user=n/a sys-unit=systemd_get_systemunitdir sys-initd=newinitd user-unit=- user-initd=-' \
-		"$(pkg_state net-misc/networkmanager)"
+		"$(pkg_state net-misc/modemmanager)"
 
 	# R3.9, the user-scope pair, and the only one in the tree. The unit comes
 	# from a meson argument and the OpenRC side is not an init-script helper at
@@ -1156,9 +1167,26 @@ self_test_assertions() {
 	# confirm the newly-expected basename really IS the higher of the two by
 	# Gentoo's ordering; a pin updated by copying the observed value is a pin
 	# that would have accepted the wrong answer.
+	#
+	# REPINNED 2026-09-18, 1.15.0_pre -> 1.21.0_pre, the tree now holding
+	# zed-bin-1.20.2 (stable) beside zed-bin-1.21.0_pre. The check the comment
+	# above demands was actually run rather than assumed, because eyeballing
+	# "_pre" is exactly how this pin would get repinned onto the wrong answer:
+	#
+	#   >>> from portage.versions import vercmp
+	#   >>> vercmp('1.21.0_pre', '1.20.2')
+	#   1
+	#
+	# i.e. the _pre really is the higher of the two here, and for the ordinary
+	# reason (1.21 > 1.20) rather than through the _pre suffix. That makes this
+	# a WEAKER instance of R3.11 than the one it replaces: when the two differ
+	# only in the suffix (1.15.0_pre vs 1.15.0) a raw `sort -V` gets it
+	# backwards and only version_sort_key saves it, whereas here even a naive
+	# sort lands on the right file. Restore the strong form on the next bump
+	# where the stable catches up to the _pre's base version.
 	assert_eq A06 \
 		'app-editors/zed-bin: two ebuilds, one row, and the _pre outranks the release (R3.11)' \
-		'rows=1 ebuild=zed-bin-1.15.0_pre.ebuild' \
+		'rows=1 ebuild=zed-bin-1.21.0_pre.ebuild' \
 		"$(pkg_selection app-editors/zed-bin)"
 
 	# --- the five pins this story MOVED (all six predicted below) -----
@@ -1247,6 +1275,39 @@ self_test_assertions() {
 	# hidden the gaps rather than closed them, and that is the one way this
 	# assertion can be met dishonestly.
 	#
+	# THE PIN MOVED TO 2 ON 2026-09-18, and this is the audit trail the warning
+	# above demands, because growing the allowlist is the suspect move by
+	# default. sys-power/upower-1.91.4 arrived (commit 43e3f0617) and turned
+	# this red. It was allowlisted, NOT given an init script, on evidence taken
+	# from the installed image rather than from ebuild text:
+	#
+	#   $ qfile /usr/lib/systemd/system/upower.service
+	#   sys-power/upower: /usr/lib/systemd/system/upower.service
+	#   $ qfile /usr/share/dbus-1/system-services/org.freedesktop.UPower.service
+	#   sys-power/upower: /usr/share/dbus-1/system-services/org.freedesktop.UPower.service
+	#   $ grep -E '^(Type|BusName)=' /usr/lib/systemd/system/upower.service
+	#   Type=dbus
+	#   BusName=org.freedesktop.UPower
+	#
+	# The one package installs both the unit and the D-Bus activation file, and
+	# the unit is Type=dbus - so even under systemd the daemon is started by bus
+	# activation, not by supervision. dbus-daemon does the identical thing on
+	# OpenRC from the identical file. The daemon is therefore ALREADY startable
+	# without systemd, which is the whole of what this guard exists to demand;
+	# an init script would add a second start path racing the bus for the same
+	# well-known name. No gap was hidden, because there was none to hide.
+	#
+	# Why the allowlist and not the classifier: the classifier reads ebuilds,
+	# and nothing in upower's ebuild names the activation file - upstream's
+	# meson install does. Teaching the classifier this class would mean reading
+	# the built image, which it deliberately does not do.
+	#
+	# The standard for the NEXT entry is unchanged: prove from the image that
+	# the unit is not a supervised daemon. "The classifier finds it hard" and
+	# "the init script is inconvenient" remain non-reasons, and a pin moving to
+	# 3 without this kind of block underneath it should be treated as the
+	# dishonest case the warning above describes.
+	#
 	# WHEN IT GOES STALE OTHERWISE: a new package landing with a unit and no
 	# init script makes this red. That is the guard WORKING, not a bad pin -
 	# fix the package, then repin. Never widen it.
@@ -1259,7 +1320,7 @@ self_test_assertions() {
 	# a deliberate follow-up, not something to fake by keeping a red pin.
 	assert_eq A12 \
 		'a clean run reports zero findings and still prints the allowlist (was R3.5)' \
-		'exit=0 rows=0 findings=0 allowlisted=1' \
+		'exit=0 rows=0 findings=0 allowlisted=2' \
 		"$(full_run "${SELF_TEST_SCRATCH}")"
 
 	# --- exit 2: nothing was compared ---------------------------------

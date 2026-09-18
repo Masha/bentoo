@@ -789,6 +789,8 @@ be fixed there before any entry could ever track it.
 # END
 
 ["mail-client/thunderbird"]
+enabled = false
+disabled_by = "removed 2026-09-18: the fork existed for exactly one reason, stated in the ebuild itself -- the firefox-156 patchset had no Thunderbird 't' variant on dev.gentoo.org, so bentoo used firefox-156-patches-01.tar.xz plus a local bindgen/libc++ patch (bgo#981812). firefox-156-patches-01t.tar.xz has since landed (HTTP 200 on 2026-09-18) and ::gentoo-156.0 now uses it with no extra eapply, so the whole 4-hunk divergence is obsolete. thunderbird-l10n was already byte-identical to ::gentoo. Reopen only if ::gentoo again ships a Thunderbird release whose 't' patchset is missing."
 url = "https://product-details.mozilla.org/1.0/thunderbird_versions.json"
 parser = "json"
 path = "LATEST_THUNDERBIRD_VERSION"
@@ -848,6 +850,8 @@ version being restored, there is nothing here to maintain.
 # END
 
 ["mail-client/thunderbird-l10n"]
+enabled = false
+disabled_by = "removed 2026-09-18: the fork existed for exactly one reason, stated in the ebuild itself -- the firefox-156 patchset had no Thunderbird 't' variant on dev.gentoo.org, so bentoo used firefox-156-patches-01.tar.xz plus a local bindgen/libc++ patch (bgo#981812). firefox-156-patches-01t.tar.xz has since landed (HTTP 200 on 2026-09-18) and ::gentoo-156.0 now uses it with no extra eapply, so the whole 4-hunk divergence is obsolete. thunderbird-l10n was already byte-identical to ::gentoo. Reopen only if ::gentoo again ships a Thunderbird release whose 't' patchset is missing."
 url = "https://product-details.mozilla.org/1.0/thunderbird_versions.json"
 parser = "json"
 path = "LATEST_THUNDERBIRD_VERSION"

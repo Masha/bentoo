@@ -54,9 +54,11 @@ fi
 # BENTOO-DIVERGENCE: IUSE - "pnpm", absent from ::gentoo. PDEPEND-only; it
 # pulls sys-apps/pnpm, which ships as its own package here.
 #
-# BENTOO-DIVERGENCE: IUSE_DEFAULTS - "+system-icu" where ::gentoo leaves it off.
-# Default-on unbundles ICU for everyone: a bundled ICU is a second copy of the
-# timezone and locale data that no dev-libs/icu update reaches.
+# "+system-icu" carried an IUSE_DEFAULTS divergence tag until 2026-09-18, when
+# it stopped being true on THIS slot: ::gentoo's own nodejs-24.21.0 now ships
+# the flag default-on too. The divergence is still real on slot 26, where
+# ::gentoo leaves system-icu off, and the tag lives in nodejs-26.9.0.ebuild --
+# do not copy it back here on a bump of the 24 line without re-diffing first.
 IUSE="cpu_flags_x86_sse2 debug doc +icu +inspector lto +npm pax-kernel pnpm +snapshot +ssl +system-icu +system-ssl test"
 REQUIRED_USE="inspector? ( icu ssl )
 	npm? ( ssl )

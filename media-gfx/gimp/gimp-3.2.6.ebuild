@@ -31,10 +31,14 @@ else
 		[[ $(( $(ver_cut 2) % 2 )) -eq 0 ]] &&
 		[[ $(( $(ver_cut 3) % 2 )) -eq 0 ]]
 	then
-		# BENTOO-DIVERGENCE: KEYWORDS - every arch is ~arch, where ::gentoo
-		# stables amd64, arm64, ppc64 and x86 on 3.2.4. bentoo mirrors gimp
-		# AHEAD of ::gentoo, so 3.2.6 has no stabilisation history anywhere.
-		# Raise an arch on evidence, not by habit on the next bump.
+		# This carried a KEYWORDS divergence tag until 2026-09-18, when
+		# ::gentoo caught up to 3.2.6 and -- as predicted -- keyworded it
+		# ~arch everywhere, so the two trees stopped differing on this axis
+		# and the tag lost its subject. The reasoning it recorded still
+		# stands and is why the list below is all ~arch: a version with no
+		# stabilisation history in EITHER tree gets an arch raised on
+		# evidence, never by habit on the next bump. Expect the divergence
+		# to come back the day ::gentoo stables 3.2.6; re-add the tag then.
 		KEYWORDS="~amd64 ~arm ~arm64 ~loong ~ppc ~ppc64 ~riscv ~x86"
 	fi
 fi
