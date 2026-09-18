@@ -85,7 +85,7 @@ index a7bae4d..bc69221 100644
    // The state is stored per pane.
    // When disabled, defaults are applied instead of the state restoration.
 diff --git a/crates/settings/src/vscode_import.rs b/crates/settings/src/vscode_import.rs
-index 60836aa..d97dac1 100644
+index f74c65a..bbed9e4 100644
 --- a/crates/settings/src/vscode_import.rs
 +++ b/crates/settings/src/vscode_import.rs
 @@ -1057,6 +1057,7 @@ impl VsCodeSettings {

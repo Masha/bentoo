@@ -505,7 +505,6 @@ CRATES="
 	httpdate@1.0.3
 	human_bytes@0.4.3
 	humantime@2.3.0
-	hyper-rustls@0.24.2
 	hyper-rustls@0.27.9
 	hyper-timeout@0.5.2
 	hyper-tls@0.5.0
@@ -975,9 +974,7 @@ CRATES="
 	rustls-pki-types@1.12.0
 	rustls-platform-verifier-android@0.1.1
 	rustls-platform-verifier@0.7.0
-	rustls-webpki@0.101.7
 	rustls-webpki@0.103.13
-	rustls@0.21.12
 	rustls@0.23.40
 	rustversion@1.0.22
 	rusty-fork@0.3.1
@@ -997,7 +994,6 @@ CRATES="
 	screencapturekit@0.2.8
 	scroll@0.12.0
 	scroll_derive@0.12.1
-	sct@0.7.1
 	sdd@4.6.2
 	sea-bae@0.2.2
 	sea-orm-macros@1.1.10
@@ -1162,7 +1158,6 @@ CRATES="
 	tokio-io@0.1.13
 	tokio-macros@2.7.0
 	tokio-native-tls@0.3.1
-	tokio-rustls@0.24.1
 	tokio-rustls@0.26.4
 	tokio-socks@0.5.2
 	tokio-stream@0.1.17
@@ -1589,7 +1584,7 @@ declare -A GIT_CRATES=(
 	[zed-xim]='https://github.com/zed-industries/xim-rs;16f35a2c881b815a2b6cdfd6687988e84f8447d8;xim-rs-%commit%'
 )
 
-EGIT_COMMIT="650a8d1bedaca3f841f1c11f89fa786f574c2aab"
+EGIT_COMMIT="72b060af2e901406f9cf4a050c4f30bb479103fe"
 LLVM_COMPAT=( 22 )
 RUST_MIN_VER="1.98.1"
 RUST_NEEDS_LLVM=1
