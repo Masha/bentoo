@@ -10070,7 +10070,7 @@ url = "https://www.blackmagicdesign.com/api/support/latest-stable-version/davinc
 parser = "regex"
 pattern = '"major":([0-9]+,"minor":[0-9]+,"releaseNum":[0-9]+)'
 transform = [[',"minor":', "."], [',"releaseNum":', "."]]
-meta = { fetch_method = "post", fetch_url = "https://www.blackmagicdesign.com/api/register/us/download/{id}", fetch_body = "json", fetch_response = "url", fetch_content_type = "application/zip", fetch_min_bytes = "3000000000", fetch_filename = "DaVinci_Resolve_{version}_Linux.zip", fetch_form = "country=br&product=DaVinci+Resolve&platform=Linux&policy=true&origin=www.blackmagicdesign.com", fetch_form_env = "firstname=BMD_FIRSTNAME&lastname=BMD_LASTNAME&email=BMD_EMAIL&phone=BMD_PHONE&street=BMD_STREET&city=BMD_CITY&state=BMD_STATE&zip=BMD_ZIP", fetch_timeout = "1800", fetch_id_url = "https://www.blackmagicdesign.com/api/support/us/downloads.json", fetch_id_pattern = '"Linux":\[\{"releaseId":"[0-9a-f]+","downloadId":"([0-9a-f]+)","downloadTitle":"DaVinci Resolve {version}"' }
+meta = { fetch_method = "post", fetch_url = "https://www.blackmagicdesign.com/api/register/us/download/{id}", fetch_body = "json", fetch_response = "url", fetch_content_type = "application/zip", fetch_min_bytes = "3000000000", fetch_filename = "DaVinci_Resolve_{version}_Linux.zip", fetch_form = "product=DaVinci+Resolve&platform=Linux&policy=true&origin=www.blackmagicdesign.com", fetch_form_env = "country=BMD_COUNTRY&firstname=BMD_FIRSTNAME&lastname=BMD_LASTNAME&email=BMD_EMAIL&phone=BMD_PHONE&street=BMD_STREET&city=BMD_CITY&state=BMD_STATE&zip=BMD_ZIP", fetch_timeout = "1800", fetch_id_url = "https://www.blackmagicdesign.com/api/support/us/downloads.json", fetch_id_pattern = '"Linux":\[\{"releaseId":"[0-9a-f]+","downloadId":"([0-9a-f]+)","downloadTitle":"DaVinci Resolve {version}"' }
 version = "21.1.0-r1"
 comments = """
 davinci-resolve — Blackmagic's own version endpoint, the only machine-readable
@@ -10087,16 +10087,28 @@ separators into dots to yield 21.1.0.  Verified against the live endpoint on
 2026-09-09.  The trailing "build" field is upstream's respin counter and is
 deliberately outside the capture: it moves without a release.
 
-HOLD is not caution here, it is arithmetic.  The ebuild carries
-RESTRICT="fetch": the 4.1 GiB archive sits behind a registration form, so the
-applier can neither download it nor regenerate the Manifest.  An unheld record
-would happily git-mv the ebuild to the new PV and leave the OLD version's DIST
-line in place — a package that cannot merge at all, produced silently.  Every
-bump of this package needs a human to fetch the archive first.
+HOLD survives the [meta] block below, but NOT for the reason it was first
+written.  The original one is gone: the applier can now download the archive
+and regenerate the Manifest, which is exactly what fetch_* buys.  What remains
+is the file NAME.  The ebuild builds it from ${PV%.0}, correct only while the
+third component is zero — upstream calls this release "21.1", not "21.1.0".  A
+hypothetical 21.1.1 keeps all three components, so an unheld record would bump
+the PV and then fetch, digest and publish under a name that release does not
+use.  The archive would be real and the Manifest self-consistent; the package
+still could not merge.  A human has to re-check the file name shape at every
+bump, and hold is what stops one from happening without that.
 
 The download is no longer a manual curl: the [meta] block above performs it.
 
   bentoo distfile fetch media-video/davinci-resolve --version 21.1
+
+That command reads /var/db/repos/bentoo, NOT the checkout it runs from —
+measured 2026-09-19, from a worktree carrying this very record: the answer was
+"this package configures no authenticated distfile fetch", because the synced
+copy still held the record without it.  So a change here reaches the command
+only after commit + push + `emaint sync -r bentoo`, the same rule the ebuilds
+follow.  Editing the record and testing in place will report a record that is
+right as broken.
 
 --version IS REQUIRED and it is the TWO-component version, not this record's
 `version`.  The ebuild names the archive after ${PV%.0}
@@ -10128,6 +10140,7 @@ then /etc/bentoo/secrets, so every operator sends their own details.  Set them
 once:
 
   # ~/.config/bentoo/secrets   (chmod 600)
+  BMD_COUNTRY=…           # ISO 3166-1 alpha-2, lowercase ("br", "us")
   BMD_FIRSTNAME=…
   BMD_LASTNAME=…
   BMD_EMAIL=…
@@ -10138,9 +10151,16 @@ once:
   BMD_ZIP=…               # CEP, no punctuation
 
 A missing one is reported before any request goes out, naming both the variable
-and the field it belongs to.  What stays in fetch_form is only what is not
-personal: country, product, platform, policy and the origin the vendor's own
-page injects.
+and the field it belongs to.  What stays in fetch_form is only what identifies
+the DOWNLOAD and not the person: product, platform, policy and the origin the
+vendor's own page injects.
+
+country is in the env list rather than the form for the same reason as the
+rest, and it is easy to get wrong: it looks like a property of the package
+(this record was first written with a literal "country=br") but it is a
+property of whoever submits the form.  The ebuild's pkg_nofetch points USERS at
+this command, so a literal here would register every one of them from the
+maintainer's country.
 
 fetch_timeout is 1800 because the default is 300: 3.81 GiB cannot arrive inside
 five minutes below ~13 MB/s, and a link slower than that would fail every time
