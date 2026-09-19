@@ -1533,7 +1533,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "0.12.16"
+version = "0.12.17"
 comments = """
 uv (uv-bin) — tag bare "X.Y.Z".
 """
@@ -1555,7 +1555,7 @@ url = "https://api.github.com/repos/openai/codex/releases/latest"
 parser = "regex"
 pattern = '"tag_name":\s*"rust-v([0-9]+\.[0-9]+\.[0-9]+)"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.155.0"
+version = "0.155.1"
 comments = """
 codex — tag "rust-vX.Y.Z" ("rust-" not strippable); regex extracts X.Y.Z from tag_name.
 
@@ -1582,7 +1582,7 @@ parser = "regex"
 pattern = '"tag_name":\s*"rust-v([0-9]+\.[0-9]+\.[0-9]+)"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "0.155.0"
+version = "0.155.1"
 comments = """
 codex-bin — same upstream tag "rust-vX.Y.Z"; regex on tag_name.
 """
@@ -3183,7 +3183,7 @@ base_from = "tag"
 base_url = "https://api.github.com/repos/KhronosGroup/SPIRV-Headers/git/refs/tags"
 base_tag_pattern = '^vulkan-sdk-([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)$'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.357.0_p20260917"
+version = "1.4.357.0_p20260918"
 comments = """
 spirv-headers — commit-tracked on main; scans titles for vulkan-sdk-X.Y.Z.W to detect base bump.
 """
@@ -8357,7 +8357,7 @@ url = "https://antigravity.google/download"
 parser = "regex"
 pattern = '/antigravity-hub/([0-9]+\.[0-9]+\.[0-9]+-[0-9]+)/'
 transform = [['-', "."]]
-version = "2.14.0.5449404535144448"
+version = "2.15.0.6576870427328512"
 comments = """
 Antigravity 2.0 — the standalone desktop hub (agent orchestration), a separate
 product from the IDE above. /download now ships the links in the raw HTML, so the
@@ -8614,7 +8614,7 @@ is a workspace and pycargoebuild refuses it.
 url = "https://pypi.org/pypi/openai/json"
 parser = "json"
 path = "info.version"
-version = "3.16.0"
+version = "3.16.2"
 comments = """
 openai — official Python SDK; core dep of sci-ml/amd-gaia. info.version is
 clean X.Y.Z. Live=3.0.0 == current PV.
@@ -9116,7 +9116,7 @@ pattern = '"name":\s*"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 series = '^2\.'
-version = "2.36.48"
+version = "2.36.49"
 comments = """
 aws-cli v2 — GitHub tag index, pinned to the 2.x series. Verified 2026-08-19
 against the live endpoint: 100 matches, all of them 2.x, max = 2.36.27 = ebuild.
@@ -9208,7 +9208,7 @@ hand.
 url = "https://storage.googleapis.com/flutter_infra_release/releases/releases_linux.json"
 parser = "regex"
 pattern = '"channel": "stable",\s+"version": "([0-9]+\.[0-9]+\.[0-9]+)"'
-version = "3.47.4"
+version = "3.47.5"
 comments = """
 Flutter — official releases_linux.json (pretty-printed, newest-first). The
 current_release.stable is a hash, not a version, so anchor the regex on the
