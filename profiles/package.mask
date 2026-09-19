@@ -132,10 +132,10 @@
 =media-plugins/gst-plugins-ximagesrc-1.29*
 =media-plugins/gst-plugins-zbar-1.29*
 
-# Lucas C.S. <lucascs@protonmail.com> (2026-09-10)
+# Lucas C.S. <lucascs@protonmail.com> (2026-09-19)
 # dev-lang/flutter unbundles the Dart SDK -- src_install removes
 # bin/cache/dart-sdk and symlinks it to /usr/lib/dart -- so it pins the exact
-# version it was built against: RDEPEND="~dev-lang/dart-3.13.3". That pin is
+# version it was built against: RDEPEND="~dev-lang/dart-3.13.4". That pin is
 # not caution, it is the ABI. bin/cache/flutter_tools.snapshot only loads on
 # the Dart VM it was compiled for; on any other one every flutter command dies
 # with "Wrong full snapshot version, expected '<new>' found '<old>'".
@@ -143,10 +143,16 @@
 # The floor tracks the newest Dart that NO Flutter release ships. It moved from
 # 3.13.3 to 3.14.0 on 2026-09-10: Flutter stable 3.47.3 (2026-09-09) carries
 # dart_sdk_version 3.13.3, which retired the previous floor exactly as the
-# entry it replaced predicted. 3.14.0 is where beta sits (3.48.0-0.4.pre), so
+# entry it replaced predicted. 3.14.0 is where beta sits (3.48.0-0.5.pre), so
 # it is again a real Dart with no stable Flutter behind it. Unmasked, an
 # "emerge -uDN @world" picks it, nothing in the tree can satisfy a dependency
 # on it, and the update stops on a conflict instead of proceeding.
+#
+# The floor did NOT move on 2026-09-19, and that is the normal case: upstream
+# Dart released 3.13.4 (2026-09-15) and Flutter stable 3.47.5 shipped it, so
+# the pair was promoted 3.13.3 -> 3.13.4 while the floor stayed where it is.
+# A Dart release only raises this floor when it OVERTAKES the floor; patch
+# releases underneath it are promotions, not mask work.
 #
 # Every version below the floor needs an OWNER in .autoupdate/packages.toml or
 # the tooling deletes it. THIS MASK PROTECTS NOTHING FROM THAT SWEEP: it speaks
@@ -156,7 +162,7 @@
 # every ebuild no registry entry claims. The claim is what protects the file:
 # packages.toml carries dev-lang/dart@stable (the line Flutter runs, exact
 # series so it can never auto-bump) and dev-lang/dart@testing (upstream's
-# stable channel, the line this mask covers). Both now point at 3.13.3, which
+# stable channel, the line this mask covers). Both now point at 3.13.4, which
 # is expected -- they converge whenever Flutter catches up and diverge again on
 # upstream's next release. Promote them together with the floor; deleting
 # either record re-arms the sweep.
