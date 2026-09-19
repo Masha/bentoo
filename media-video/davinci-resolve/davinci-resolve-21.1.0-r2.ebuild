@@ -361,7 +361,7 @@ src_install() {
 
 	# Directories resolve writes to at RUNTIME, as an ordinary user.  The install
 	# image is root-owned 0755, so each one has to be made writable here or it is
-	# simply not writable at all.  Three independent sources, no overlap:
+	# simply not writable at all.  Four independent sources, no overlap:
 	#
 	#  * "Immersive" is the one that made 21.1 unusable.  bin/resolve mkdir()s
 	#    ${install_dir}/Immersive/Canon/STMap during startup and ABORTS with
@@ -378,6 +378,14 @@ src_install() {
 	#    Dir", shared by every user of the machine.  The path is hardcoded in
 	#    bin/resolve, which creates ".migrated" inside it, so it cannot be moved
 	#    under /opt.
+	#  * Extras and Fairlight are absent from the payload AND from post_install.sh,
+	#    so nothing above predicts them -- they were read off a running 21.1.0.0017
+	#    on 2026-09-19.  Extras is the Download Manager's package store: failing to
+	#    create it is not degraded, it aborts the whole subsystem
+	#    ("DDM: failed to create storage dir ... (Permission denied)" ->
+	#    "DDM init failed"), so Blackmagic Cloud and downloadable extras are gone
+	#    for the session.  Fairlight logs "mkdir failed ... (errno 13)" three times
+	#    and then comes up anyway, which is exactly why it went unnoticed.
 	#
 	# 0777 rather than a group: upstream chowns to the single user running the
 	# installer, which a package cannot do -- there is no such user at merge time,
@@ -388,6 +396,8 @@ src_install() {
 		"Apple Immersive" \
 		.license \
 		easyDCP \
+		Extras \
+		Fairlight \
 		Immersive
 	do
 		keepdir "${install_dir}/${writable_dir}"
@@ -474,6 +484,30 @@ pkg_postinst() {
 
 	elog "DaVinci Resolve requires a working OpenCL runtime and GPU driver."
 	elog "Install the vendor GPU stack matching your hardware if Resolve cannot detect OpenCL."
+
+	# Measured on 2026-09-19, NVIDIA-only host with four ICDs installed: GPUDetect
+	# calls clGetPlatformIDs, the ICD loader dlopen()s EVERY file in
+	# /etc/OpenCL/vendors, and the static constructor of libhsa-runtime64.so.1
+	# (pulled in by libamdocl64.so) binds std::filesystem::path::_M_split_cmpts()
+	# to the copy exported by the bundled libs/libProResRAW.so -- an old statically
+	# linked libstdc++ that is already in the global scope.  SIGSEGV, milliseconds
+	# in, with no error message of any kind.
+	#
+	# There is no ebuild-side fix: the rpaths are correct and the colliding symbol
+	# comes out of a proprietary blob we cannot relink.  Narrowing the ICD set is
+	# the user's call because it is hardware-dependent -- a machine with both an
+	# AMD and an NVIDIA GPU genuinely needs both ICDs -- so this is documented
+	# rather than wrapped.
+	elog
+	elog "If Resolve dies with no message right after startup, an unrelated OpenCL"
+	elog "ICD is likely crashing inside it. The loader opens every file in"
+	elog "/etc/OpenCL/vendors, and a runtime for a GPU you do not have is enough."
+	elog "Confirm it by restricting the set to the ICD of your own GPU:"
+	elog
+	elog "    mkdir -p ~/.config/resolve-icd"
+	elog "    cp /etc/OpenCL/vendors/<your-vendor>.icd ~/.config/resolve-icd/"
+	elog "    OCL_ICD_VENDORS=~/.config/resolve-icd davinci-resolve"
+	elog
 }
 
 pkg_postrm() {
