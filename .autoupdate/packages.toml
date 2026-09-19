@@ -10070,7 +10070,7 @@ url = "https://www.blackmagicdesign.com/api/support/latest-stable-version/davinc
 parser = "regex"
 pattern = '"major":([0-9]+,"minor":[0-9]+,"releaseNum":[0-9]+)'
 transform = [[',"minor":', "."], [',"releaseNum":', "."]]
-meta = { fetch_method = "post", fetch_url = "https://www.blackmagicdesign.com/api/register/us/download/{id}", fetch_body = "json", fetch_response = "url", fetch_content_type = "application/zip", fetch_min_bytes = "3000000000", fetch_filename = "DaVinci_Resolve_{version}_Linux.zip", fetch_form = "firstname=Bento&lastname=Overlay&email=bentoo-overlay%40example.com&phone=%2B5511987654321&street=Rua+Exemplo+100&city=Campinas&state=S%C3%A3o+Paulo&zip=13010000&country=br&product=DaVinci+Resolve&platform=Linux&policy=true&origin=www.blackmagicdesign.com", fetch_id_url = "https://www.blackmagicdesign.com/api/support/us/downloads.json", fetch_id_pattern = '"Linux":\[\{"releaseId":"[0-9a-f]+","downloadId":"([0-9a-f]+)","downloadTitle":"DaVinci Resolve {version}"' }
+meta = { fetch_method = "post", fetch_url = "https://www.blackmagicdesign.com/api/register/us/download/{id}", fetch_body = "json", fetch_response = "url", fetch_content_type = "application/zip", fetch_min_bytes = "3000000000", fetch_filename = "DaVinci_Resolve_{version}_Linux.zip", fetch_form = "country=br&product=DaVinci+Resolve&platform=Linux&policy=true&origin=www.blackmagicdesign.com", fetch_form_env = "firstname=BMD_FIRSTNAME&lastname=BMD_LASTNAME&email=BMD_EMAIL&phone=BMD_PHONE&street=BMD_STREET&city=BMD_CITY&state=BMD_STATE&zip=BMD_ZIP", fetch_timeout = "1800", fetch_id_url = "https://www.blackmagicdesign.com/api/support/us/downloads.json", fetch_id_pattern = '"Linux":\[\{"releaseId":"[0-9a-f]+","downloadId":"([0-9a-f]+)","downloadTitle":"DaVinci Resolve {version}"' }
 version = "21.1.0-r1"
 comments = """
 davinci-resolve — Blackmagic's own version endpoint, the only machine-readable
@@ -10120,13 +10120,31 @@ what turns it into a second request; without it the URL itself would be written
 as the "zip" and digested into a green Manifest.  fetch_content_type and
 fetch_min_bytes are the belt to that brace.
 
-THE IDENTITY IN fetch_form IS FICTITIOUS AND DELIBERATELY SO.  The vendor gates
-the download behind a registration form, and this file is public — a real name,
-e-mail, telephone and address could not live here.  The values are only
-format-correct (Brazilian state name as the vendor's own list spells it, CEP
-with no punctuation, E.164 telephone).  Replace them locally if you would
-rather register under your own details; a secrets-backed identity, so that each
-operator sends their own without touching this record, is not built yet.
+THE IDENTITY IS NOT IN THIS FILE.  The vendor gates the download behind a
+registration form — name, e-mail, telephone, address — and this file is public.
+fetch_form_env therefore records only the VARIABLE NAMES; each value is
+resolved at fetch time from the environment, then ~/.config/bentoo/secrets,
+then /etc/bentoo/secrets, so every operator sends their own details.  Set them
+once:
+
+  # ~/.config/bentoo/secrets   (chmod 600)
+  BMD_FIRSTNAME=…
+  BMD_LASTNAME=…
+  BMD_EMAIL=…
+  BMD_PHONE=+55…          # E.164
+  BMD_STREET=…
+  BMD_CITY=…
+  BMD_STATE=…             # spelled as the vendor's own list spells it ("São Paulo")
+  BMD_ZIP=…               # CEP, no punctuation
+
+A missing one is reported before any request goes out, naming both the variable
+and the field it belongs to.  What stays in fetch_form is only what is not
+personal: country, product, platform, policy and the origin the vendor's own
+page injects.
+
+fetch_timeout is 1800 because the default is 300: 3.81 GiB cannot arrive inside
+five minutes below ~13 MB/s, and a link slower than that would fail every time
+on a download that was working.
 """
 # END
 
