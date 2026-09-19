@@ -33,8 +33,14 @@ if [[ ${PV} == 9999* ]] ; then
 	inherit git-r3
 	EGIT_REPO_URI="https://github.com/vim/vim.git"
 else
+	# gitweb.gentoo.org is the canonical home of the patchset, but its snapshot
+	# endpoint flaps with 502s. The identical distfile is on the Gentoo mirrors,
+	# so a direct mirror URL is kept as a fallback. Its "41/" component is the
+	# filename-hash bucket of distfiles layout.conf -- recompute it with
+	# `printf '%s' <filename> | b2sum | cut -c1-2` if VIM_PATCHES_VERSION moves.
 	SRC_URI="https://github.com/vim/vim/archive/v${PV}.tar.gz -> ${P}.tar.gz
-		https://gitweb.gentoo.org/proj/vim-patches.git/snapshot/vim-patches-vim-${VIM_PATCHES_VERSION}-patches.tar.bz2"
+		https://gitweb.gentoo.org/proj/vim-patches.git/snapshot/vim-patches-vim-${VIM_PATCHES_VERSION}-patches.tar.bz2
+		https://distfiles.gentoo.org/distfiles/41/vim-patches-vim-${VIM_PATCHES_VERSION}-patches.tar.bz2"
 	KEYWORDS="~alpha amd64 arm arm64 ~hppa ~loong ~m68k ~mips ppc ppc64 ~riscv ~s390 ~sparc x86 ~arm64-macos ~x64-macos ~x64-solaris"
 fi
 
