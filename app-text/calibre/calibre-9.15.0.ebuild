@@ -57,12 +57,20 @@ RESTRICT="!test? ( test )"
 # series requires Python 3.14, so the older targets cannot build it at all.
 REQUIRED_USE="${PYTHON_REQUIRED_USE}"
 
+# BENTOO-DIVERGENCE: DEPEND - app-text/podofo:1 instead of :0, because calibre
+# 9.15.0 ported its bindings to the PoDoFo 1.x API (PdfErrorCode::FlateError,
+# AppendDocumentPages(), PdfMemDocument::CreateDestination(), one-argument
+# CreateChild()), none of which 0.10.x can provide; upstream pins podofo 1.1.2
+# in bypy/sources.json. app-text/podofo:1 is overlay-only and installs into a
+# private prefix, so :0 stays available for app-office/scribus and
+# kde-misc/krename.
+#
 # Qt slotted dependencies are used because the libheadless.so plugin links to
 # QT_*_PRIVATE_ABI. It only uses core/gui/dbus.
 COMMON_DEPEND="${PYTHON_DEPS}
 	app-i18n/uchardet
 	>=app-text/hunspell-1.7:=
-	>=app-text/podofo-0.10.0:=
+	>=app-text/podofo-1.1.0:1=[jpeg,png]
 	app-text/poppler[utils]
 	dev-libs/hyphen:=
 	>=dev-libs/icu-57.1:=
@@ -148,11 +156,14 @@ DEPEND="${COMMON_DEPEND}
 # BENTOO-DIVERGENCE: BDEPEND - dev-build/cmake, made explicit here. setup.py
 # build_headless() shells out to cmake to build libheadless.so; ::gentoo
 # leaves it implicit, which works only when cmake happens to be present.
+# app-misc/pax-utils is for the scanelf guard in src_compile that proves the
+# podofo extension linked the right slot.
 BDEPEND="$(python_gen_cond_dep '
 		>=dev-python/pyqt-builder-1.10.3[${PYTHON_USEDEP}]
 		>=dev-python/sip-5[${PYTHON_USEDEP}]
 	')
 	virtual/pkgconfig
+	app-misc/pax-utils
 	dev-build/cmake
 	system-mathjax? ( >=dev-lang/rapydscript-ng-0.8.5 )
 	verify-sig? ( sec-keys/openpgp-keys-kovidgoyal )
@@ -207,10 +218,44 @@ src_compile() {
 
 	# bug 821871
 	local MY_LIBDIR="${ESYSROOT}/usr/$(get_libdir)"
-	export FT_LIB_DIR="${MY_LIBDIR}" HUNSPELL_LIB_DIR="${MY_LIBDIR}" PODOFO_LIB_DIR="${MY_LIBDIR}"
+	export FT_LIB_DIR="${MY_LIBDIR}" HUNSPELL_LIB_DIR="${MY_LIBDIR}"
+
+	# app-text/podofo:1 is installed into a private prefix so that it can
+	# coexist with slot 0 (see the dependency comment above). Nothing there is
+	# in a default search path, so point setup.py at it explicitly and record
+	# an RPATH: setup/build.py appends ${LDFLAGS} to the link line verbatim.
+	#
+	# PODOFO_INC_DIR must be the directory *containing* podofo.h, because
+	# build.py also adds its parent, which is what makes <podofo/podofo.h>
+	# resolve.
+	#
+	# PODOFO_LIB_NAME is the one that must be an absolute path, and it is not
+	# belt and braces. build.py emits "-L/usr/lib64 -lpython3.14 ... -L<the
+	# private prefix> -lpodofo", and ld scans every -L in command-line order
+	# for each -l: plain "-lpodofo" therefore finds slot 0's
+	# /usr/lib64/libpodofo.so FIRST. That does not fail the build -- a -shared
+	# link leaves undefined symbols alone -- it just yields an extension
+	# compiled against the 1.x headers and linked to libpodofo.so.2, which
+	# dies at import time. build.py passes any library name containing a "/"
+	# through verbatim (setup/build.py, libraries_to_ldflags), so an absolute
+	# path removes the search entirely. The check after the build proves it.
+	local podofo_libdir="${ESYSROOT}/usr/$(get_libdir)/podofo-1"
+	export PODOFO_INC_DIR="${ESYSROOT}/usr/include/podofo-1/podofo"
+	export PODOFO_LIB_DIR="${podofo_libdir}"
+	export PODOFO_LIB_NAME="${podofo_libdir}/libpodofo.so"
+	export LDFLAGS="${LDFLAGS} -Wl,-rpath,${EPREFIX}/usr/$(get_libdir)/podofo-1"
 	export QMAKE="$(qt6_get_bindir)/qmake"
 
 	edo ${EPYTHON} setup.py build
+
+	# Guard for the -L ordering described above: assert the extension needs
+	# the SONAME of the slot it was compiled against, whatever that number is
+	# (4 for podofo-1.1.x, 2 for the 0.10.x line in ::gentoo).
+	local want got
+	want=$(scanelf -qF '%S#F' "${podofo_libdir}/libpodofo.so") || die
+	got=$(scanelf -qF '%n#F' src/calibre/plugins/podofo.so) || die
+	[[ ,${got}, == *,${want},* ]] ||
+		die "podofo.so needs '${got}', expected '${want}': the wrong PoDoFo slot was linked in"
 	edo ${EPYTHON} setup.py gui
 
 	# A few different resources are bundled in the distfile by default, because

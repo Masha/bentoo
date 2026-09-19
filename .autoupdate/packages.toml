@@ -2648,6 +2648,11 @@ tag list: upstream tags every point release and ranking refs/tags would report a
 newer tag than the one that actually has a published tarball on
 download.calibre-ebook.com. A bump must also re-check the two patches in files/:
 both are rebases of ::gentoo's and neither applies across series unchanged.
+
+Since 9.15.0 this ebuild builds against app-text/podofo:1 (overlay-only, private
+prefix) instead of the :0 from ::gentoo — the bindings were ported to the PoDoFo
+1.x API. A bump that walks back to a release predating that port would also have
+to walk the dependency back.
 """
 # END
 
@@ -2659,6 +2664,33 @@ headers = { "User-Agent" = "bentoo-autoupdate" }
 version = "0.1.13-r1"
 comments = """
 libetonyek — GitHub mirror tags (newest-first); "libetonyek-X.Y.Z".
+"""
+# END
+
+["app-text/podofo"]
+url = "https://api.github.com/repos/podofo/podofo/releases/latest"
+parser = "json"
+path = "tag_name"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+series = '^1\.'
+version = "1.1.2"
+comments = """
+podofo — GitHub release tag, already bare ("1.1.2", no "v"). releases/latest
+rather than ranking refs/tags: the 0.10.x and 1.x tags share one tag space and
+upstream still publishes 0.10.x point releases, so ranking would flip between
+the two lines.
+
+series pins this record to the 1.x line, which is the whole reason the package
+exists here. The overlay ships ONLY app-text/podofo:1, in a private prefix
+(/usr/include/podofo-1, /usr/$(get_libdir)/podofo-1), so it can coexist with
+app-text/podofo:0 from ::gentoo — app-office/scribus and kde-misc/krename are
+still on the 0.10.x API. The single consumer is app-text/calibre, which moved to
+the 1.x API in 9.15.0.
+
+A 2.0 release will therefore fail the probe loudly ("outside this entry's
+series") instead of bumping. That is the intended outcome: the API break would
+have to be carried through calibre first, and only then may this series/version
+and the calibre dependency floor move together.
 """
 # END
 
