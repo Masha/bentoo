@@ -11,6 +11,22 @@ inherit desktop udev xdg
 # a hypothetical 21.1.1 would keep all three, which is also what upstream names
 # such a release.  A bump that changes this shape must re-check the file name
 # before trusting the Manifest.
+
+# Blackmagic RESPINS a release under the SAME file name: "21.1" was build 0014
+# on 7 Sep 2026 and build 0017 on 10 Sep 2026, and only the second one is still
+# served.  The zip is RESTRICT=fetch, so the mismatch surfaces as a digest
+# failure on the user's machine and nowhere else -- there is no fetch here that
+# could have caught it.  The build the Manifest describes is readable from the
+# payload itself:
+#
+#   unzip -o DaVinci_Resolve_21.1_Linux.zip
+#   chmod u+x DaVinci_Resolve_21.1_Linux.run
+#   unsquashfs -o "$(./DaVinci_Resolve_21.1_Linux.run --appimage-offset)" \
+#       -d out DaVinci_Resolve_21.1_Linux.run bin/resolve
+#   strings -a out/bin/resolve | grep -oE '21\.1\.0\.[0-9]{4}'
+#
+# A digest failure reported by a user is therefore a respin until proven
+# otherwise, NOT a corrupt download.
 ZIP_NAME="DaVinci_Resolve_${PV%.0}_Linux"
 RUN_NAME="${ZIP_NAME}.run"
 
@@ -323,7 +339,6 @@ src_install() {
 	for runtime_dir in \
 		"Apple Immersive/Calibration" \
 		.crashreport \
-		.license \
 		.LUT \
 		configs \
 		DolbyVision \
@@ -332,6 +347,47 @@ src_install() {
 	do
 		keepdir "${install_dir}/${runtime_dir}"
 	done
+
+	# Directories resolve writes to at RUNTIME, as an ordinary user.  The install
+	# image is root-owned 0755, so each one has to be made writable here or it is
+	# simply not writable at all.  Three independent sources, no overlap:
+	#
+	#  * "Immersive" is the one that made 21.1 unusable.  bin/resolve mkdir()s
+	#    ${install_dir}/Immersive/Canon/STMap during startup and ABORTS with
+	#    "Failed to create application support directories" when that returns
+	#    EACCES.  Measured, not guessed: an LD_PRELOAD mkdir(2) tracer over the
+	#    installed image names that mkdir and no other as the failing one, and the
+	#    abort disappears once the directory exists writable.  Note the name -- it
+	#    is NOT the "Apple Immersive" below, which is a different directory.
+	#  * easyDCP, LUT and .license are what the vendor scripts/post_install.sh
+	#    creates 0775 and chowns to the installing user (create_config_files), and
+	#    "Apple Immersive" is its set_folder_permissions "chmod a+w".  src_prepare
+	#    deletes that script, which is why those permissions are reproduced here.
+	#  * /var/BlackmagicDesign/DaVinci Resolve is the installer's "Common Data
+	#    Dir", shared by every user of the machine.  The path is hardcoded in
+	#    bin/resolve, which creates ".migrated" inside it, so it cannot be moved
+	#    under /opt.
+	#
+	# 0777 rather than a group: upstream chowns to the single user running the
+	# installer, which a package cannot do -- there is no such user at merge time,
+	# and the machine may well have several.  Upstream itself uses 0777 for the
+	# /var directory.
+	local writable_dir
+	for writable_dir in \
+		"Apple Immersive" \
+		.license \
+		easyDCP \
+		Immersive
+	do
+		keepdir "${install_dir}/${writable_dir}"
+		fperms 0777 "${install_dir}/${writable_dir}"
+	done
+
+	# LUT ships in the payload, so it needs the mode and not the directory.
+	fperms 0777 "${install_dir}/LUT"
+
+	keepdir "/var/BlackmagicDesign/DaVinci Resolve"
+	fperms 0777 "/var/BlackmagicDesign/DaVinci Resolve"
 
 	cp "${app_dir}/share/"{default-config.dat,log-conf.xml} "${app_dir}/configs/" || die
 	cp "${app_dir}/share/default_cm_config.bin" "${app_dir}/DolbyVision/" || die
