@@ -13,4 +13,4 @@ RESTRICT=fetch mirror bindist strip
 SLOT=0
 SRC_URI=DaVinci_Resolve_21.1_Linux.zip
 _eclasses_=desktop	e447b5f77146d69797e9f03ff177f3f1	toolchain-funcs	58a918e3a42d0156f010dcfd43725be5	udev	1a23882bb73bc31c64a6f00a5e515f34	xdg-utils	42869b3c8d86a70ef3cf75165a395e09	xdg	3ef49a87c52c8b77c476351195dfe575
-_md5_=0bba4b152fc547b6b84d0cf58ca3227d
+_md5_=a55cbc794134a2fe051e259d2d9bfb39

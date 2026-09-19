@@ -118,14 +118,25 @@ RDEPEND="
 	x11-libs/xcb-util-wm
 "
 
+# The manual route comes FIRST and stays complete on its own: bentoolkit is not a
+# dependency of this package, and whoever does not have it installed may not be
+# left without a way to get the archive.
 pkg_nofetch() {
 	einfo
-	einfo "  DaVinci Resolve cannot be downloaded automatically."
-	einfo "  Please download ${ZIP_NAME}.zip manually from:"
+	einfo "  ${ZIP_NAME}.zip is behind a registration form, so Portage cannot"
+	einfo "  fetch it. Download it from:"
 	einfo
-	einfo "    https://www.blackmagicdesign.com/support/family/davinci-resolve-and-fusion"
+	einfo "    ${HOMEPAGE}"
 	einfo
-	einfo "  Then place it in your DISTDIR directory and re-run emerge."
+	einfo "  place it in your DISTDIR directory, and re-run emerge."
+	einfo
+	einfo "  With app-portage/bentoolkit installed, one command does the same --"
+	einfo "  it submits the form and writes the archive under the exact name this"
+	einfo "  package's Manifest expects:"
+	einfo
+	einfo "    bentoo distfile fetch ${CATEGORY}/${PN} --version ${PV%.0}"
+	einfo
+	einfo "  The version there is the TWO-component one, matching the file name."
 	einfo
 }
 

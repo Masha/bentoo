@@ -27,11 +27,19 @@ DEPEND="${RDEPEND}"
 
 S="${WORKDIR}/FileZilla3"
 
+# The manual route comes FIRST and stays complete on its own: bentoolkit is not a
+# dependency of this package, and whoever does not have it installed may not be
+# left without a way to get the archive.
 pkg_nofetch() {
 	einfo "Please download"
-	#einfo "  - FileZilla_Pro_${PV}_x86_64-linux-gnu.tar.bz2"
 	einfo "  - ${A}"
 	einfo "from ${HOMEPAGE} and place it in your DISTDIR directory."
+	einfo
+	einfo "With app-portage/bentoolkit installed and your licence serial exported"
+	einfo "as \$FILEZILLA_PRO_KEY (or kept in ~/.config/bentoo/secrets), one"
+	einfo "command does the same:"
+	einfo
+	einfo "  bentoo distfile fetch ${CATEGORY}/${PN} --version ${PV}"
 }
 
 src_prepare() {

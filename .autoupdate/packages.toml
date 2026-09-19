@@ -10070,6 +10070,7 @@ url = "https://www.blackmagicdesign.com/api/support/latest-stable-version/davinc
 parser = "regex"
 pattern = '"major":([0-9]+,"minor":[0-9]+,"releaseNum":[0-9]+)'
 transform = [[',"minor":', "."], [',"releaseNum":', "."]]
+meta = { fetch_method = "post", fetch_url = "https://www.blackmagicdesign.com/api/register/us/download/{id}", fetch_body = "json", fetch_response = "url", fetch_content_type = "application/zip", fetch_min_bytes = "3000000000", fetch_filename = "DaVinci_Resolve_{version}_Linux.zip", fetch_form = "firstname=Bento&lastname=Overlay&email=bentoo-overlay%40example.com&phone=%2B5511987654321&street=Rua+Exemplo+100&city=Campinas&state=S%C3%A3o+Paulo&zip=13010000&country=br&product=DaVinci+Resolve&platform=Linux&policy=true&origin=www.blackmagicdesign.com", fetch_id_url = "https://www.blackmagicdesign.com/api/support/us/downloads.json", fetch_id_pattern = '"Linux":\[\{"releaseId":"[0-9a-f]+","downloadId":"([0-9a-f]+)","downloadTitle":"DaVinci Resolve {version}"' }
 version = "21.1.0-r1"
 comments = """
 davinci-resolve — Blackmagic's own version endpoint, the only machine-readable
@@ -10093,18 +10094,39 @@ would happily git-mv the ebuild to the new PV and leave the OLD version's DIST
 line in place — a package that cannot merge at all, produced silently.  Every
 bump of this package needs a human to fetch the archive first.
 
-The download IS scriptable, which is what makes the manual step bounded rather
-than open-ended.  POST to the register endpoint returns a time-limited signed
-CloudFront URL:
+The download is no longer a manual curl: the [meta] block above performs it.
 
-  curl -X POST -H 'Content-Type: application/json' \
-    "https://www.blackmagicdesign.com/api/register/us/download/$(downloadId)" \
-    --data-raw '{"firstname":"…","lastname":"…","email":"…","country":"us",…}'
+  bentoo distfile fetch media-video/davinci-resolve --version 21.1
 
-The downloadId comes from the same JSON this record parses, so the two
-endpoints chain.  Note the archive is named after a TWO-component version
-(DaVinci_Resolve_21.1_Linux.zip) while this record emits three — see the
-ZIP_NAME comment in the ebuild before trusting a bumped file name.
+--version IS REQUIRED and it is the TWO-component version, not this record's
+`version`.  The ebuild names the archive after ${PV%.0}
+(DaVinci_Resolve_21.1_Linux.zip) while the record tracks the three-component
+21.1.0, and BOTH fetch_filename and fetch_id_pattern resolve against whatever
+{version} is given.  Passing 21.1.0 would look up a downloadTitle that does not
+exist and, if it somehow matched, would write a file name the Manifest does not
+carry.  Verified end to end on 2026-09-19 against DaVinci Resolve 21.1.
+
+How the two endpoints chain, and why the id is not hardcoded: Blackmagic mints
+a fresh downloadId per release AND per platform, so fetch_id_url +
+fetch_id_pattern read it out of the public catalogue at fetch time and
+substitute it into {id}.  The pattern is anchored on "Linux" and on the release
+title together, because all four platforms share one downloadTitle.  Note this
+is a DIFFERENT id from the one in the download page's own URL, which is the
+releaseId and posts to the wrong endpoint.
+
+The reply to that POST is 492 bytes of text/plain holding a signed CloudFront
+URL that expires in three hours — not the archive.  fetch_response = "url" is
+what turns it into a second request; without it the URL itself would be written
+as the "zip" and digested into a green Manifest.  fetch_content_type and
+fetch_min_bytes are the belt to that brace.
+
+THE IDENTITY IN fetch_form IS FICTITIOUS AND DELIBERATELY SO.  The vendor gates
+the download behind a registration form, and this file is public — a real name,
+e-mail, telephone and address could not live here.  The values are only
+format-correct (Brazilian state name as the vendor's own list spells it, CEP
+with no punctuation, E.164 telephone).  Replace them locally if you would
+rather register under your own details; a secrets-backed identity, so that each
+operator sends their own without touching this record, is not built yet.
 """
 # END
 
