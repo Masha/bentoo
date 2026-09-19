@@ -168,14 +168,18 @@ BDEPEND="
 	)
 "
 
-# BENTOO-DIVERGENCE: PATCHES - retriaged against the 13.0.0 tarball rather than
+# BENTOO-DIVERGENCE: PATCHES - retriaged against the 13.1.0 tarball rather than
 # carried over. openvdb-11.0.0-cmake_fixes.patch needed a rebase and is renamed
 # to -13.0.0- (13.0.0 added a third gtest consumer, nanovdb_test_mgpu, that the
-# old hunk did not cover). openvdb-12.0.0-remove-c-style-casts.patch is DROPPED:
-# upstream shipped the same memcpy form in PNanoVDB.h, so carrying it would
-# break the next bump for nothing. openvdb-13.0.0-nanovdb-python-bindings.patch
-# is new here and has no ::gentoo counterpart, because ::gentoo never reached a
-# release where USE=python fails to build.
+# old hunk did not cover). Three patches are DROPPED because 13.x carries the
+# same fix upstream, so keeping them only breaks src_prepare:
+#   - openvdb-12.0.0-remove-c-style-casts.patch: upstream shipped the same
+#     memcpy form in PNanoVDB.h.
+#   - openvdb-12.0.0-fix-linking-of-vdb_tool-with-OpenEXR.patch: 13.1.0's
+#     vdb_tool/CMakeLists.txt now picks OpenEXR::OpenEXR itself, guarded by
+#     if(TARGET OpenEXR::OpenEXR), and also links Imath::Imath.
+#   - openvdb-13.0.0-nanovdb-python-bindings.patch: the bentoo-only backport of
+#     blindDataCount / the 2-arg nanoToOpenVDB landed in 13.1.0 itself.
 PATCHES=(
 	"${FILESDIR}/${PN}-8.1.0-glfw-libdir.patch"
 
@@ -185,11 +189,7 @@ PATCHES=(
 
 	"${FILESDIR}/${PN}-13.0.0-cmake_fixes.patch"
 
-	"${FILESDIR}/${PN}-12.0.0-fix-linking-of-vdb_tool-with-OpenEXR.patch"
 	"${FILESDIR}/${PN}-12.0.0-loosen-float-equality-tolerances.patch"
-
-	# USE=python does not build without this; see the patch header.
-	"${FILESDIR}/${PN}-13.0.0-nanovdb-python-bindings.patch"
 )
 
 cuda_get_host_compiler() {
