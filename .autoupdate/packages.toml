@@ -262,7 +262,7 @@ unconditional git-r3 form, which ::gentoo's tarball/9999 branch is not.
 url = "https://registry.npmjs.org/pnpm"
 parser = "json"
 path = "dist-tags.latest"
-version = "12.4.2"
+version = "12.5.1"
 comments = """
 pnpm — npm package, stable channel. dist-tags.latest is the RIGHT endpoint and
 must stay: pnpm promotes through next-<major> first, and that channel carries
@@ -306,7 +306,7 @@ url = "https://api2.cursor.sh/updates/api/download/stable/linux-x64/cursor"
 parser = "json"
 path = "version"
 commit_sha_path = "commitSha"
-version = "3.21.13"
+version = "3.21.16"
 comments = """
 Cursor — official download API; "version" is the full version. commitSha is the
 per-release BUILD_ID embedded in SRC_URI; the applier substitutes it into the
@@ -1467,7 +1467,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.30.3"
+version = "0.31.0"
 comments = """
 bentoolkit — releases/latest devolve tag_name "vX.Y.Z"; o transform tira o "v",
 senao o bump gera um PV invalido (bentoolkit-v0.17.0).
@@ -2717,7 +2717,7 @@ commit_sha_path = "[0].id"
 base_from = "file"
 base_url = "https://gitlab.freedesktop.org/mesa/mesa/-/raw/main/VERSION"
 base_pattern = '^([0-9][0-9.]*)-devel'
-version = "26.3.0_pre20260918"
+version = "26.3.0_pre20260919"
 comments = """
 mesa — commit-tracked on main; _pre suffix preserved from current ebuild.
 
@@ -2735,7 +2735,7 @@ commit_sha_path = "[0].id"
 base_from = "file"
 base_url = "https://gitlab.freedesktop.org/mesa/mesa/-/raw/main/VERSION"
 base_pattern = '^([0-9][0-9.]*)-devel'
-version = "26.3.0_pre20260918"
+version = "26.3.0_pre20260919"
 comments = """
 mesa_clc — part of the mesa tree; same source/rule as media-libs/mesa.
 """
@@ -3290,7 +3290,7 @@ base_from = "file"
 base_url = "https://raw.githubusercontent.com/KhronosGroup/Vulkan-ValidationLayers/main/CMakeLists.txt"
 base_pattern = '(?m)^project\([A-Za-z_-]+ VERSION ([0-9][0-9.]*)'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.363_p20260919"
+version = "1.4.363_p20260920"
 comments = """
 vulkan-layers — commit-tracked on main (Vulkan-ValidationLayers); scans for "Update for Vulkan-Docs X.Y.Z".
 """
@@ -9221,7 +9221,7 @@ hand.
 url = "https://storage.googleapis.com/flutter_infra_release/releases/releases_linux.json"
 parser = "regex"
 pattern = '"channel": "stable",\s+"version": "([0-9]+\.[0-9]+\.[0-9]+)"'
-version = "3.47.5"
+version = "3.47.5-r1"
 comments = """
 Flutter — official releases_linux.json (pretty-printed, newest-first). The
 current_release.stable is a hash, not a version, so anchor the regex on the
@@ -10071,7 +10071,7 @@ parser = "regex"
 pattern = '"major":([0-9]+,"minor":[0-9]+,"releaseNum":[0-9]+)'
 transform = [[',"minor":', "."], [',"releaseNum":', "."]]
 meta = { fetch_method = "post", fetch_url = "https://www.blackmagicdesign.com/api/register/us/download/{id}", fetch_body = "json", fetch_response = "url", fetch_content_type = "application/zip", fetch_min_bytes = "3000000000", fetch_filename = "DaVinci_Resolve_{version}_Linux.zip", fetch_form = "product=DaVinci+Resolve&platform=Linux&policy=true&origin=www.blackmagicdesign.com", fetch_form_env = "country=BMD_COUNTRY&firstname=BMD_FIRSTNAME&lastname=BMD_LASTNAME&email=BMD_EMAIL&phone=BMD_PHONE&street=BMD_STREET&city=BMD_CITY&state=BMD_STATE&zip=BMD_ZIP", fetch_timeout = "1800", fetch_id_url = "https://www.blackmagicdesign.com/api/support/us/downloads.json", fetch_id_pattern = '"Linux":\[\{"releaseId":"[0-9a-f]+","downloadId":"([0-9a-f]+)","downloadTitle":"DaVinci Resolve {version}"' }
-version = "21.1.0-r1"
+version = "21.1.0-r2"
 comments = """
 davinci-resolve — Blackmagic's own version endpoint, the only machine-readable
 source they publish.  It answers with the release split across three integer
