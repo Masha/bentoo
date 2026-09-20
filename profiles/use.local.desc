@@ -405,6 +405,8 @@ sys-kernel/linux-firmware:initramfs - Create and install initramfs for early mic
 sys-kernel/linux-firmware:redistributable - Install also non-free (but redistributable) firmware files
 sys-kernel/linux-firmware:savedconfig - Allows individual selection of firmware files
 sys-kernel/linux-firmware:unknown-license - Install firmware files whose license is unknown
+sys-libs/libunwind:debug-frame - Adds support for DWARF .debug_frame section: Use the information from this section if available
+sys-libs/libunwind:libatomic - Use libatomic instead of builtin atomic operations
 sys-process/nohang:desktop - Pull in x11-libs/libnotify and app-admin/sudo, needed by the nohang-desktop profile to send GUI warnings to the logged-in user
 www-client/brave-browser:qt6 - Enable Qt6 integration for better KDE/Qt desktop environment support. Provides native look and feel on KDE Plasma and other Qt-based desktops.
 www-client/brave-browser:selinux - Enable SELinux policy support for enhanced security in SELinux-enabled systems. Required for proper operation on systems with SELinux in enforcing mode.

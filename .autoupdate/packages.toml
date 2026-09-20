@@ -10698,3 +10698,38 @@ build rather than passing silently:
     stays ON. Do not let a bump reintroduce --no-sandbox.
 """
 # END
+
+["sys-libs/libunwind@pinned"]
+url = "https://api.github.com/repos/libunwind/libunwind/releases/latest"
+parser = "json"
+path = "tag_name"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+transform = [["v", ""]]
+series = '^1\.8\.3(-r[0-9]+)?$'
+version = "1.8.3"
+comments = """
+libunwind — a TRANSIENT fork of ::gentoo, not a package bentoo owns. The ebuild
+is ::gentoo's libunwind-1.8.3 verbatim plus one extra patch, and the correct
+end state is deleting this directory, never bumping it.
+
+What it fixes: configure.ac substitutes UNW_CRT_LDFLAGS as "-WCClinker
+-nostdlib". The libtool option is -XCClinker; with the wrong letter libtool
+does not recognise it, passes it straight to gcc, and the link of libunwind.so
+dies with "unrecognized command-line option '-WCClinker'". The branch is taken
+whenever AC_SEARCH_LIBS has to add -lgcc_s for _Unwind_Resume, which under the
+-nostdlib the test itself sets is always -- so ::gentoo's 1.8.3 cannot build on
+amd64 at all with the --enable-cxx-exceptions the ebuild forces on every arch
+for bug #418253. Upstream fixed it in 8e6a348b9 (post-1.8.3, unreleased).
+
+::gentoo's own libunwind-1.8.3-typo.patch corrects a DIFFERENT typo in the same
+AC_SEARCH_LIBS call (a stray -lc) and leaves -WCClinker untouched.
+
+series pins the 1.8.3 line (revisions allowed, nothing else), and that is the
+mechanism, not decoration. The probe can only say "up to date" or fail loudly
+with "outside this entry's series"; it can never propose a bump. A bump is exactly the wrong move here: 1.8.4 will
+carry the fix, so the patch would stop applying. When this check goes red, the
+job is to delete sys-libs/libunwind from the overlay and let ::gentoo serve it
+again -- the same applies the moment ::gentoo revbumps 1.8.3 with the fix, which
+this probe cannot see.
+"""
+# END
