@@ -10763,8 +10763,8 @@ build rather than passing silently:
 url = "https://api.github.com/repos/libunwind/libunwind/releases/latest"
 parser = "json"
 path = "tag_name"
-headers = { "User-Agent" = "bentoo-autoupdate" }
 transform = [["v", ""]]
+headers = { "User-Agent" = "bentoo-autoupdate" }
 series = '^1\.8\.3(-r[0-9]+)?$'
 version = "1.8.3-r1"
 comments = """
