@@ -1584,7 +1584,7 @@ declare -A GIT_CRATES=(
 	[zed-xim]='https://github.com/zed-industries/xim-rs;16f35a2c881b815a2b6cdfd6687988e84f8447d8;xim-rs-%commit%'
 )
 
-EGIT_COMMIT="916fc2b8cb3a815cbef4a3b40e13081be72036b6"
+EGIT_COMMIT="bcf6582ce3500df93a8a39366640173e6786cea6"
 LLVM_COMPAT=( 22 )
 RUST_MIN_VER="1.98.1"
 RUST_NEEDS_LLVM=1
@@ -1992,7 +1992,11 @@ src_compile() {
 		export LK_CUSTOM_WEBRTC="${WORKDIR}/linux-x64-release"
 	fi
 	local features=()
-	use inspector && features+=( zed/inspector )
+	# gpui/inspector, not zed/inspector: upstream reverted "Implement
+	# `inspector` flag" (#62920) on 2026-09-15, so the zed crate has carried no
+	# such feature since. The switch is back where it was before that PR, in
+	# gpui, and gpui is a direct dependency of zed, so dep/feature resolves.
+	use inspector && features+=( gpui/inspector )
 	use mimalloc && features+=( zed/mimalloc )
 	use tracy && features+=( zed/tracy )
 

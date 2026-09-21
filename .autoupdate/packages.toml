@@ -2752,7 +2752,7 @@ base_from = "file"
 base_url = "https://api.github.com/repos/zed-industries/zed/contents/crates/zed/Cargo.toml?ref=main"
 base_pattern = '(?m)^version = "([0-9][0-9.]*)"'
 headers = { "User-Agent" = "bentoo-autoupdate", "Accept" = "application/vnd.github.raw" }
-version = "1.22.0_pre20260919"
+version = "1.22.0_pre20260921"
 comments = """
 zed — commit-tracked on main; _pre suffix preserved from current ebuild.
 2026-08-06: 2 commits landed same UTC day (d61e80b -> 6b2aa1c), so the date
@@ -3041,6 +3041,53 @@ errors -- `--locked` on purpose, because the defect the 3cef3168 pass found
 (0002's added Cargo.lock entry pinning a futures version that commit's lock no
 longer had) is silent without it; md5-cache _md5_ matches the ebuild and egencache
 touched only this one entry; pkgcheck reports only the pre-existing
+deprecated-llvm-r1 finding.
+Not merged with a build: this host has no sudo, so no emerge ran.
+2026-09-21: MANUAL bump, 916fc2b8 -> bcf6582c (2026-09-19 -> 2026-09-21 UTC,
+so the date component alone carries it; no -r1). Cargo.lock, the root Cargo.toml
+and rust-toolchain.toml are all BYTE-IDENTICAL between the two commits, and
+pycargoebuild re-run from crates/zed reproduced the whole ebuild byte for byte
+(same md5) -- the two WARNINGs it printed are what distinguishes that from the
+silent no-op run in the virtual workspace root. All seven `local *_COMMIT` still
+resolve against GIT_CRATES, and `grep -c` of the new EGIT_COMMIT gave 1, not 8:
+this was a manual bump, so the applier's 40-hex rewrite never ran.
+What the bump uncovered is a PRE-EXISTING defect in the four ebuilds already
+published since _pre20260916. `use inspector && features+=( zed/inspector )`
+names a cargo feature that no longer exists: upstream REVERTED "Implement
+`inspector` flag (#62920)" on 2026-09-15 (01c555b4), so crates/zed/Cargo.toml has
+carried no `inspector` key since. cargo answers `none of the selected packages
+contains this feature` and src_compile dies -- but only for someone who sets
+USE=inspector, which is default-off, which is why four bumps went by without it
+surfacing. Repointed at `gpui/inspector`, where the switch lived before #62920
+and still does (crates/gpui/Cargo.toml: inspector = ["gpui_macros/inspector"]);
+gpui is a direct dependency of the zed crate, so the dep/feature form resolves
+from `-p zed`. The other two mappings were re-checked at the same time and are
+both fine: zed/tracy is a real [features] key, and zed/mimalloc is the implicit
+feature cargo derives from the optional mimalloc dependency.
+The lesson generalises past this package: a USE flag that maps to
+`--features <crate>/<name>` is a bump axis of its own, exactly like
+rust-toolchain.toml. Nothing reads it -- not pycargoebuild, not the patch series,
+not `ebuild ... prepare` -- and a default-off flag is invisible to any cargo
+check that does not name it. Diff the [features] table of crates/zed/Cargo.toml
+on a bump, or pass every flag's feature to the check.
+One note for the next bump: `cargo check --locked` now FAILS in the prepared
+tree, and that is correct rather than a regression. The eleven src_prepare seds
+rewrite [patch.crates-io] from `git =` to `path =`, so cargo has to drop the
+matching `source = "git+..."` lines from Cargo.lock -- which --locked forbids by
+definition. cargo.eclass's cargo_src_compile passes --offline and never
+--locked, so the real build does the same rewrite. Verify with --offline alone.
+Verified before publishing: the series was 3 versions behind (files/ generated
+against _pre20260918-r1 by the applier) and refreshed through zed-patches; all
+18 patches apply, and only 0018 changed, by offset. verify.sh, sync-overlay and
+check-sync agree on all three relations (series <-> ebuild, patches <-> overlay,
+patches <-> source); `ebuild ... prepare` applies all eighteen for real
+(>>> Source prepared); 11/11 sed patterns match the new Cargo.toml exactly once,
+leaving 0 [patch.crates-io] entries on `git =` and all ten WORKDIR targets
+present; the four USE-flag seds produce valid TOML in all sixteen
+wayland/X/screen-capture/neovim combinations; `cargo check --offline -p zed
+-p remote_server --features gpui/inspector` exits 0 in 1m49 with zero errors;
+md5-cache _md5_ matches the ebuild and egencache also swept the orphan
+_pre20260918-r1 entry; pkgcheck reports only the pre-existing
 deprecated-llvm-r1 finding.
 Not merged with a build: this host has no sudo, so no emerge ran.
 """
