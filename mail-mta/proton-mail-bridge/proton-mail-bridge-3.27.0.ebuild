@@ -10,8 +10,7 @@ MY_P="${MY_PN}-${PV}"
 
 DESCRIPTION="Serves Proton Mail to IMAP/SMTP clients"
 HOMEPAGE="https://proton.me/mail/bridge https://github.com/ProtonMail/proton-bridge/"
-SRC_URI="https://github.com/ProtonMail/${MY_PN}/archive/refs/tags/v${PV}.tar.gz -> ${P}.tar.gz
-	https://distfiles.obentoo.org/${P}-vendor.tar.xz"
+SRC_URI="https://github.com/ProtonMail/${MY_PN}/archive/refs/tags/v${PV}.tar.gz -> ${P}.tar.gz"
 S="${WORKDIR}"/${MY_P}
 
 LICENSE="GPL-3+ Apache-2.0 BSD BSD-2 ISC LGPL-3+ MIT MPL-2.0 Unlicense"
@@ -24,14 +23,15 @@ KEYWORDS="~amd64"
 # gated, so a non-systemd system can still run the daemon.
 IUSE="gui systemd"
 
-# Tests still require Internet access; the build no longer does.
+# Both the build and the tests require Internet access.
 PROPERTIES="test_network"
-# The vendored dependencies come from SRC_URI, not from the network. Until
-# 2026-09-05 src_prepare ran `go mod download` against the live module proxy,
-# which is why RESTRICT carried network-sandbox: the build was not
-# reproducible and its inputs were not in the Manifest. The vendor tarball
-# above replaces that, the same way ::gentoo does it.
-RESTRICT="test strip"
+# Between 2026-09-05 and this bump the module tree came from a
+# ${P}-vendor.tar.xz on the overlay mirror, which made the build reproducible
+# and put its inputs in the Manifest. No such tarball has been published for
+# 3.27.0, so src_prepare is back to `go mod download` against the live module
+# proxy and RESTRICT carries network-sandbox again. Restore the vendor tarball
+# in SRC_URI once it is available for this version.
+RESTRICT="network-sandbox test strip"
 
 BDEPEND="
 	>=dev-lang/go-1.21
@@ -70,19 +70,17 @@ DOCS=( "${S}"/{README,Changelog}.md )
 src_unpack() {
 	default
 
-	# The vendor tarball unpacks to ${WORKDIR}/vendor; the build wants it inside
-	# the source tree. Same shape ::gentoo uses.
-	if [[ -d "${WORKDIR}"/vendor ]]; then
-		mv "${WORKDIR}"/vendor "${S}"/vendor || die
-	fi
-
 	go-env_set_compile_environment
 }
 
 src_prepare() {
 	xdg_environment_reset
 	default
-	
+
+	# No vendor tarball for this version, so populate the module cache from the
+	# proxy instead. Guarded by RESTRICT=network-sandbox above.
+	ego mod download
+
 	if use gui; then
 		# prepare desktop file
 		local desktopFilePath="${S}"/dist/${MY_PN}.desktop
@@ -104,10 +102,7 @@ src_configure() {
 	export CGO_CPPFLAGS="${CPPFLAGS}"
 	export CGO_CXXFLAGS="${CXXFLAGS}"
 	export CGO_LDFLAGS="${LDFLAGS} -lfido2 -lcbor -lssl -lcrypto"
-	
-	# Use vendored modules for build reproducibility
-	export GOFLAGS="${GOFLAGS} -mod=vendor"
-	
+
 	if use gui; then
 		local mycmakeargs=(
 			-DBRIDGE_APP_FULL_NAME="Proton Mail Bridge"
@@ -125,12 +120,9 @@ src_configure() {
 }
 
 src_compile() {
-	# Ensure Go modules are available during compilation
-	export GOFLAGS="${GOFLAGS} -mod=vendor"
-	
 	# Build with proper Go flags for Gentoo
 	emake -Onone \
-		GOFLAGS="-buildmode=pie -mod=vendor ${GOFLAGS}" \
+		GOFLAGS="-buildmode=pie ${GOFLAGS}" \
 		build-nogui
 
 	if use gui; then
@@ -141,8 +133,6 @@ src_compile() {
 }
 
 src_test() {
-	# Use vendored modules for testing
-	export GOFLAGS="${GOFLAGS} -mod=vendor"
 	emake -Onone test
 }
 
