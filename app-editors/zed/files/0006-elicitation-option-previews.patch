@@ -52,7 +52,7 @@ index 242e384..8b1fb2c 100644
                  .log_err();
              },
 diff --git a/crates/agent_ui/src/conversation_view/elicitation.rs b/crates/agent_ui/src/conversation_view/elicitation.rs
-index 599bc1d..9b259ea 100644
+index 599bc1d..6b8c2d8 100644
 --- a/crates/agent_ui/src/conversation_view/elicitation.rs
 +++ b/crates/agent_ui/src/conversation_view/elicitation.rs
 @@ -4,12 +4,18 @@ use collections::{HashMap, HashSet};
@@ -145,7 +145,20 @@ index 599bc1d..9b259ea 100644
  }
  
  impl ElicitationFormSubmission {
-@@ -1196,6 +1242,224 @@ mod tests {
+@@ -439,6 +485,12 @@ mod tests {
+                             .push(format!("{name}: {value} = {selected}"));
+                     })
+                 },
++                on_toggle_preview: {
++                    let events = self.events.clone();
++                    Rc::new(move |_, name, value, _, _| {
++                        events.borrow_mut().push(format!("preview: {name}/{value}"));
++                    })
++                },
+             };
+ 
+             div()
+@@ -1196,6 +1248,224 @@ mod tests {
              Editor::single_line(window, cx)
          });
      }
@@ -370,7 +383,7 @@ index 599bc1d..9b259ea 100644
  }
  
  #[derive(RegisterComponent)]
-@@ -1411,6 +1675,54 @@ fn preview_form_schema() -> acp::ElicitationSchema {
+@@ -1411,6 +1681,54 @@ fn preview_form_schema() -> acp::ElicitationSchema {
          )
  }
  
@@ -425,7 +438,7 @@ index 599bc1d..9b259ea 100644
  fn single_select_options(schema: &acp::StringPropertySchema) -> Vec<ElicitationOption> {
      if let Some(options) = &schema.one_of {
          return options
-@@ -1419,6 +1731,7 @@ fn single_select_options(schema: &acp::StringPropertySchema) -> Vec<ElicitationO
+@@ -1419,6 +1737,7 @@ fn single_select_options(schema: &acp::StringPropertySchema) -> Vec<ElicitationO
                  value: option.value.clone(),
                  label: SharedString::from(option.title.clone()),
                  description: option.description.clone().map(SharedString::from),
@@ -433,7 +446,7 @@ index 599bc1d..9b259ea 100644
              })
              .collect();
      }
-@@ -1432,6 +1745,7 @@ fn single_select_options(schema: &acp::StringPropertySchema) -> Vec<ElicitationO
+@@ -1432,6 +1751,7 @@ fn single_select_options(schema: &acp::StringPropertySchema) -> Vec<ElicitationO
              value: value.clone(),
              label: SharedString::from(value.clone()),
              description: None,
@@ -441,7 +454,7 @@ index 599bc1d..9b259ea 100644
          })
          .collect()
  }
-@@ -1460,6 +1774,7 @@ fn multi_select_options(schema: &acp::MultiSelectPropertySchema) -> Vec<Elicitat
+@@ -1460,6 +1780,7 @@ fn multi_select_options(schema: &acp::MultiSelectPropertySchema) -> Vec<Elicitat
                  value: value.clone(),
                  label: SharedString::from(value.clone()),
                  description: None,
@@ -449,7 +462,7 @@ index 599bc1d..9b259ea 100644
              })
              .collect(),
          acp::MultiSelectItems::Titled(items) => items
-@@ -1469,6 +1784,7 @@ fn multi_select_options(schema: &acp::MultiSelectPropertySchema) -> Vec<Elicitat
+@@ -1469,6 +1790,7 @@ fn multi_select_options(schema: &acp::MultiSelectPropertySchema) -> Vec<Elicitat
                  value: option.value.clone(),
                  label: SharedString::from(option.title.clone()),
                  description: option.description.clone().map(SharedString::from),
@@ -457,7 +470,7 @@ index 599bc1d..9b259ea 100644
              })
              .collect(),
          _ => Vec::new(),
-@@ -1689,6 +2005,7 @@ type OpenUrlHandler = Rc<dyn Fn(ElicitationEntryId, String, &mut Window, &mut Ap
+@@ -1689,6 +2011,7 @@ type OpenUrlHandler = Rc<dyn Fn(ElicitationEntryId, String, &mut Window, &mut Ap
  type BooleanHandler = Rc<dyn Fn(ElicitationEntryId, String, bool, &mut App)>;
  type SelectHandler = Rc<dyn Fn(ElicitationEntryId, String, String, &mut App)>;
  type MultiSelectHandler = Rc<dyn Fn(ElicitationEntryId, String, String, bool, &mut App)>;
@@ -465,7 +478,7 @@ index 599bc1d..9b259ea 100644
  
  #[derive(Clone)]
  pub(crate) struct ElicitationCardHandlers {
-@@ -1700,6 +2017,7 @@ pub(crate) struct ElicitationCardHandlers {
+@@ -1700,6 +2023,7 @@ pub(crate) struct ElicitationCardHandlers {
      on_boolean_change: BooleanHandler,
      on_single_select_change: SelectHandler,
      on_multi_select_change: MultiSelectHandler,
@@ -473,7 +486,7 @@ index 599bc1d..9b259ea 100644
  }
  
  impl ElicitationCardHandlers {
-@@ -1712,6 +2030,7 @@ impl ElicitationCardHandlers {
+@@ -1712,6 +2036,7 @@ impl ElicitationCardHandlers {
          on_boolean_change: impl Fn(ElicitationEntryId, String, bool, &mut App) + 'static,
          on_single_select_change: impl Fn(ElicitationEntryId, String, String, &mut App) + 'static,
          on_multi_select_change: impl Fn(ElicitationEntryId, String, String, bool, &mut App) + 'static,
@@ -481,7 +494,7 @@ index 599bc1d..9b259ea 100644
      ) -> Self {
          Self {
              on_submit: Rc::new(on_submit),
-@@ -1722,6 +2041,7 @@ impl ElicitationCardHandlers {
+@@ -1722,6 +2047,7 @@ impl ElicitationCardHandlers {
              on_boolean_change: Rc::new(on_boolean_change),
              on_single_select_change: Rc::new(on_single_select_change),
              on_multi_select_change: Rc::new(on_multi_select_change),
@@ -489,7 +502,7 @@ index 599bc1d..9b259ea 100644
          }
      }
  
-@@ -1735,6 +2055,7 @@ impl ElicitationCardHandlers {
+@@ -1735,6 +2061,7 @@ impl ElicitationCardHandlers {
              |_, _, _, _| {},
              |_, _, _, _| {},
              |_, _, _, _, _| {},
@@ -497,7 +510,7 @@ index 599bc1d..9b259ea 100644
          )
      }
  }
-@@ -2100,11 +2421,14 @@ impl<'a> ElicitationCard<'a> {
+@@ -2100,11 +2427,14 @@ impl<'a> ElicitationCard<'a> {
                              let elicitation_id = self.elicitation.id.clone();
                              let field_name = field_name.to_string();
                              let value = option.value.clone();
@@ -513,7 +526,7 @@ index 599bc1d..9b259ea 100644
                                  .id(SharedString::from(format!(
                                      "elicitation-multi-option-{}-{field_name}-{}",
                                      self.entry_ix, option.value
-@@ -2132,7 +2456,18 @@ impl<'a> ElicitationCard<'a> {
+@@ -2132,7 +2462,18 @@ impl<'a> ElicitationCard<'a> {
                                      );
                                  })
                                  .child(div().child(Checkbox::new(checkbox_id, checkbox_state)))
@@ -533,7 +546,7 @@ index 599bc1d..9b259ea 100644
                          }))
                          .into_any_element()
                  }
-@@ -2172,11 +2507,14 @@ impl<'a> ElicitationCard<'a> {
+@@ -2172,11 +2513,14 @@ impl<'a> ElicitationCard<'a> {
                  let row_background = Self::option_row_background(is_selected, cx);
                  let hover_background = Self::option_row_hover_background(is_selected, cx);
                  let control_background = Self::option_control_background(cx);
@@ -549,7 +562,7 @@ index 599bc1d..9b259ea 100644
                      .id(option_id)
                      .tab_index(0)
                      .w_full()
-@@ -2212,11 +2550,71 @@ impl<'a> ElicitationCard<'a> {
+@@ -2212,11 +2556,71 @@ impl<'a> ElicitationCard<'a> {
                                  control_background,
                              )),
                      )

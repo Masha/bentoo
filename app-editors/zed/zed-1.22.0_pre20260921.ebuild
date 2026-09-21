@@ -1851,6 +1851,19 @@ src_prepare() {
 			# over the whole thread cannot say which. Pure Zed, by CHOICE, the way
 			# 0010, 0012 and 0014 are.
 			"${FILESDIR}/0026-float-thread-navigation-controls.patch"
+			# 0027: a question the agent asks is pinned above the composer
+			# instead of scrolling away with the conversation, and a
+			# multi-question one is stepped through a page at a time. Zed
+			# already renders CONNECTION-scoped elicitations in that slot with
+			# this same card; only the SESSION-scoped half -- how
+			# AskUserQuestion arrives -- never reached it. Behind the new
+			# agent.elicitation_placement setting, offered as two entries in
+			# the panel's options menu; unlike 0018 it defaults to the NEW
+			# behaviour, upstream's inline rendering being one click away.
+			# Pagination is gated on the adapter's un-namespaced
+			# _askUserQuestionCustomAnswer marker, so an ordinary MCP form is
+			# never split. Rides this flag by CHOICE, like 0010/0012/0014/0026.
+			"${FILESDIR}/0027-pinned-elicitation-card.patch"
 		)
 	fi
 
