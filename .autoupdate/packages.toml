@@ -10853,3 +10853,21 @@ again -- the same applies the moment ::gentoo revbumps 1.8.3 with the fix, which
 this probe cannot see.
 """
 # END
+
+["net-misc/wget2"]
+url = "https://ftp.gnu.org/gnu/wget/"
+parser = "regex"
+pattern = 'wget2-([0-9]+(?:\.[0-9]+)+)\.tar\.gz"'
+select = "max"
+version = "2.3.0"
+comments = """
+wget2 -- probe the GNU FTP directory listing, which IS the SRC_URI source, not
+the GitLab tag space. Upstream tags v2.3.0 and uploads the tarball separately;
+a tag-based probe would propose a version whose mirror://gnu distfile does not
+exist yet. The listing carries every historical release in name order, so
+select = "max" is mandatory -- the first regex match is wget2-1.99.2.
+
+The trailing quote in the pattern anchors on the href, keeping the .sig files
+out of the match.
+"""
+# END
