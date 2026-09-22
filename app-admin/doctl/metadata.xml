@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@protonmail.com</email>
+		<name>Lucas Couto</name>
+	</maintainer>
+	<upstream>
+		<remote-id type="github">digitalocean/doctl</remote-id>
+		<bugs-to>https://github.com/digitalocean/doctl/issues</bugs-to>
+		<doc>https://docs.digitalocean.com/reference/doctl/</doc>
+		<changelog>https://raw.githubusercontent.com/digitalocean/doctl/main/CHANGELOG.md</changelog>
+	</upstream>
+	<longdescription lang="en">
+The official DigitalOcean command-line client (historically named "doit" and
+published in the DigitalOcean community as "DoCli"), which leverages the
+DigitalOcean API to provide access to DigitalOcean services: Droplets,
+Kubernetes (DOKS), App Platform, Spaces, databases, load balancers, VPCs,
+container registry and the serverless/functions runtime.
+
+Built from the upstream -source release tarball, which ships a complete
+vendor/ tree, so the build needs no network access. Bash, zsh and fish
+completions are generated from the built binary and installed.
+	</longdescription>
+</pkgmetadata>

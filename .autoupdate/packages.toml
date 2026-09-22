@@ -8905,34 +8905,35 @@ excluded by the 3\\.7\\. series anchor. group1 has no prefix (normalizer no-op).
 ["net-libs/webkit-gtk:4.1"]
 url = "https://www.webkitgtk.org/releases/"
 parser = "regex"
-pattern = 'webkitgtk-(2\.52\.[0-9]+)\.tar\.xz'
+pattern = 'webkitgtk-(2\.54\.[0-9]+)\.tar\.xz'
 select = "max"
 revision = 410
-version = "2.52.6-r410"
+version = "2.54.0-r410"
 comments = """
 revision is the SLOT's BASE revision, not whatever the current ebuild carries.
 -r411 is a revbump WITHIN a PV; a PV change resets it to the base, exactly as
 ::gentoo bumps webkit-gtk-2.52.3-r411 to webkit-gtk-2.52.5-r410.
 
---- webkit-gtk: pinned to stable 2.52.x, one entry per SLOT ---
+--- webkit-gtk: pinned to stable 2.54.x, one entry per SLOT ---
 Both slots live in ONE directory and share the PV series, so a single entry
 cannot express them: the highest version in the directory is whichever slot is
 ahead, so that slot would be bumped forever and the other never. The ":slot"
 suffix gives each its own entry, its own pending record and its own cache
 record; the current version is resolved by reading each ebuild's SLOT=.
 
-webkitgtk.org HTML listing (ascending) -> select=max over the 2.52.x series;
-ignores dev 2.53.x and the 2.48 LTS / 2.50 lines.
+webkitgtk.org HTML listing (ascending) -> select=max over the 2.54.x series;
+ignores dev 2.55.x and the 2.48 LTS / 2.50 / 2.52 lines. Moved off 2.52.x on
+2026-09-21, when ::gentoo adopted 2.54.0 and the overlay followed.
 """
 # END
 
 ["net-libs/webkit-gtk:6"]
 url = "https://www.webkitgtk.org/releases/"
 parser = "regex"
-pattern = 'webkitgtk-(2\.52\.[0-9]+)\.tar\.xz'
+pattern = 'webkitgtk-(2\.54\.[0-9]+)\.tar\.xz'
 select = "max"
 revision = 600
-version = "2.52.6-r600"
+version = "2.54.0-r600"
 comments = """
 600 is the base for this SLOT (::gentoo ships -r600 for every PV and -r601 as
 the revbump), and the overlay now follows it: the ebuild is
@@ -9271,6 +9272,33 @@ and the bump is mechanical. bentoo carries this package only while ahead of
 ::gentoo catches up, delete the ebuild and flip this record to
 enabled = false — the 2.21.1 cycle did exactly that removal (2e845fbf) but
 predates this record, hence its late creation.
+"""
+# END
+
+["app-admin/doctl"]
+url = "https://api.github.com/repos/digitalocean/doctl/releases/latest"
+parser = "json"
+path = "tag_name"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "1.169.0"
+comments = """
+doctl (DigitalOcean CLI, historically "doit"/DoCli) — GitHub releases/latest
+tag "vX.Y.Z"; the leading v is normalized away by the autoupdate. Verified
+2026-09-21 against the live endpoint: tag_name = v1.169.0, prerelease = false,
+draft = false, published 2026-09-18 = ebuild.
+
+releases/latest is load-bearing here and must NOT be relaxed into a tag index
+or a releases?per_page=N regex. Upstream runs a beta-release workflow that
+publishes a dense stream of vX.Y.Z-beta.N prereleases onto the SAME repository
+— on the day this record was written the two newest releases were
+v1.169.0-beta.2 and v1.169.0-beta.1, both NEWER than the stable v1.169.0. Any
+probe that ranks raw tags, or takes releases[0], therefore reports a beta.
+releases/latest is the only endpoint that filters prerelease = true, and it
+returned the stable release correctly with both betas already published.
+
+The fetched artifact is the upstream -source tarball, not the git archive:
+doctl-${PV}-source.tar.gz ships a complete vendor/ tree (3868 entries) and
+extracts at the root, so PV alone drives the fetch and the bump is mechanical.
 """
 # END
 
