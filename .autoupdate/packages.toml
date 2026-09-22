@@ -2790,7 +2790,7 @@ base_from = "file"
 base_url = "https://api.github.com/repos/zed-industries/zed/contents/crates/zed/Cargo.toml?ref=main"
 base_pattern = '(?m)^version = "([0-9][0-9.]*)"'
 headers = { "User-Agent" = "bentoo-autoupdate", "Accept" = "application/vnd.github.raw" }
-version = "1.22.0_pre20260922"
+version = "1.22.0_pre20260922-r1"
 comments = """
 zed — commit-tracked on main; _pre suffix preserved from current ebuild.
 2026-08-06: 2 commits landed same UTC day (d61e80b -> 6b2aa1c), so the date
@@ -3159,6 +3159,55 @@ in 1m34 with zero errors -- `--offline` alone, not `--locked`, for the reason th
 09-21 entry gives; md5-cache _md5_ matches the ebuild and the orphan _pre20260921
 entry was swept; pkgcheck reports only the pre-existing deprecated-llvm-r1
 finding.
+Not merged with a build: this host has no sudo, so no emerge ran.
+2026-09-22 (-r1, second bump of the day): MANUAL bump, f25434f3 (00:11 UTC) ->
+96e95eda (22:57 UTC), the same UTC day, so the date component alone does not
+move and this is -r1; _pre20260922 was already pushed, so it could not be an
+in-place swap. SRC_URI names the tarball after ${PF}, so the DIST entry renames
+with it and the stale one was deleted by hand.
+Cargo.lock, the root Cargo.toml, crates/zed/Cargo.toml and rust-toolchain.toml
+are ALL BYTE-IDENTICAL between the two commits -- which settles, measured rather
+than assumed, the four axes the entries above opened: the dependency graph, the
+[patch.crates-io] block the eleven seds anchor on, the [features] table a USE
+flag maps onto, and the pinned toolchain (RUST_MIN_VER stays 1.98.1).
+pycargoebuild re-run from crates/zed reproduced the ebuild BYTE-IDENTICALLY
+(same md5 before and after) -- both WARNINGs printed, which is what tells a real
+run apart from the silent no-op in the virtual workspace root. Run anyway on the
+provably-unchanged lockfile for the reason the 2026-09-11 entry gives: an
+identical Cargo.lock proves the SOURCE did not move, never that the EBUILD ever
+matched it. All seven `local *_COMMIT` were re-checked against the regenerated
+GIT_CRATES and against the new Cargo.lock: all seven resolve, none moved.
+`grep -c` of the new EGIT_COMMIT gives 1, not 8 -- manual bump, so the applier's
+40-hex rewrite never ran.
+What the bump cost was in the patch series, not in the ebuild. 0027 hunk #1
+CONFLICTED: it widens agent_panel.rs's `use settings::{...}` import to carry
+ElicitationPlacement, and upstream moved both context lines around it in the
+same window -- `use settings::TerminalDockPosition;` above was dropped, and
+`use terminal::{Event as TerminalEvent, terminal_settings::TerminalSettings};`
+below was split into a plain import plus a cfg(test)-gated one. The change
+itself is one line and untouched; only its surroundings moved.
+Fixed as code, not by hand-editing @@ counts: the edit was made in the prepared
+tree, committed with the original patch's author/date/subject, regenerated with
+`git format-patch`, and fed back as a temporary source series
+(patches/_tmp-fixed) for a full refresh -- so the other eighteen were refreshed
+against the same tree in the same pass rather than left on stale offsets. The
+regenerated 0027 has the same shape as the old one (40 hunks, +545/-24, 10
+files), so only positions moved. 9 of 19 patches changed in the overlay, all by
+offset.
+Upstream also renamed its own corgi scratch patch path, corgi-patches/scratch ->
+tooling/corgi/patches/scratch. It is the eleventh [patch.crates-io] `path =`,
+upstream's own and relative, so nothing in the ebuild names it and no sed reads
+it.
+Verified before publishing: verify.sh, sync-overlay and check-sync agree on all
+three relations (series <-> ebuild, patches <-> overlay, patches <-> source);
+`ebuild ... prepare` applies all nineteen for real (>>> Source prepared); 11/11
+sed patterns leave zero [patch.crates-io] entries on `git =`, with all ten
+WORKDIR targets present in the prepared tree; `cargo check --offline -p zed
+-p remote_server --features gpui/inspector` exits 0 in 2m40 with zero errors
+(--offline alone, not --locked, for the reason the 09-21 entry gives);
+osv-scanner reports the four node lockfiles clean; md5-cache _md5_ matches the
+ebuild and the orphan _pre20260922 entry was swept; pkgcheck reports only the
+pre-existing deprecated-llvm-r1 finding.
 Not merged with a build: this host has no sudo, so no emerge ran.
 """
 # END

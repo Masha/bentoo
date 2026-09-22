@@ -60,7 +60,7 @@ is checked in a running Zed, not here.
 ---
 
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
-index 250dc0c..5a54660 100644
+index 46797ea..7b2f22d 100644
 --- a/crates/agent_ui/src/conversation_view/thread_view.rs
 +++ b/crates/agent_ui/src/conversation_view/thread_view.rs
 @@ -4790,7 +4790,7 @@ impl ThreadView {
@@ -126,7 +126,7 @@ index 250dc0c..5a54660 100644
          }
  
          let start_index = (0..entry_index)
-@@ -12960,6 +12994,148 @@ mod tests {
+@@ -12998,6 +13032,148 @@ mod tests {
              acp_thread::CommandCategory::Mcp,
          ))
      }

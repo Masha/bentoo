@@ -1,4 +1,4 @@
-From 6948cbe52b0d9ce388a0ad440546329eb99ad992 Mon Sep 17 00:00:00 2001
+From 19387f5f24644f456e1f0247181f743ebe7a3b05 Mon Sep 17 00:00:00 2001
 From: lucascouts <lucascs@protonmail.com>
 Date: Mon, 21 Sep 2026 15:12:19 -0300
 Subject: [PATCH] feat(agent_ui): pin a pending question above the composer,
@@ -170,19 +170,19 @@ index 193cc5a..06cd333 100644
              tool_permissions: compile_tool_permissions(agent.tool_permissions),
              sandbox_permissions: compile_sandbox_permissions(agent.sandbox_permissions),
 diff --git a/crates/agent_ui/src/agent_panel.rs b/crates/agent_ui/src/agent_panel.rs
-index de965ae..0266fc8 100644
+index a19115b..cf21182 100644
 --- a/crates/agent_ui/src/agent_panel.rs
 +++ b/crates/agent_ui/src/agent_panel.rs
-@@ -84,7 +84,7 @@ use language_model::LanguageModelRegistry;
+@@ -83,7 +83,7 @@ use language::LanguageRegistry;
+ use language_model::LanguageModelRegistry;
  use notifications::status_toast::StatusToast;
  use project::{Project, ProjectPath, Worktree};
- use settings::TerminalDockPosition;
 -use settings::{NotifyWhenAgentWaiting, Settings, update_settings_file};
 +use settings::{ElicitationPlacement, NotifyWhenAgentWaiting, Settings, update_settings_file};
  
  use search::{BufferSearchBar, buffer_search::Deploy as DeployBufferSearch};
- use terminal::{Event as TerminalEvent, terminal_settings::TerminalSettings};
-@@ -5674,6 +5674,7 @@ impl AgentPanel {
+ use terminal::Event as TerminalEvent;
+@@ -5600,6 +5600,7 @@ impl AgentPanel {
              .is_some();
  
          let workspace = self.workspace.clone();
@@ -190,7 +190,7 @@ index de965ae..0266fc8 100644
  
          PopoverMenu::new("agent-options-menu")
              .trigger_with_tooltip(
-@@ -5827,6 +5828,32 @@ impl AgentPanel {
+@@ -5753,6 +5754,32 @@ impl AgentPanel {
                              .action("Worktrees", Box::new(zed_actions::git::Worktree))
                              .action("Toggle Threads Sidebar", Box::new(ToggleWorkspaceSidebar));
  
@@ -856,7 +856,7 @@ index 6b8c2d8..c6afdbd 100644
                              on_submit(submit_id.clone(), window, cx);
                          }
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
-index f36e3a1..78b1d75 100644
+index 009a652..e5ae90c 100644
 --- a/crates/agent_ui/src/conversation_view/thread_view.rs
 +++ b/crates/agent_ui/src/conversation_view/thread_view.rs
 @@ -42,7 +42,7 @@ use language_model::{
@@ -967,7 +967,7 @@ index f36e3a1..78b1d75 100644
      fn render_request_elicitations(&self, cx: &Context<Self>) -> Vec<AnyElement> {
          let server_view = self.server_view.clone();
          let handlers_view = server_view.clone();
-@@ -12813,6 +12885,7 @@ impl Render for ThreadView {
+@@ -12851,6 +12923,7 @@ impl Render for ThreadView {
                  |this, version| this.child(self.render_new_version_callout(&version, cx)),
              )
              .children(self.render_token_limit_callout(cx))
