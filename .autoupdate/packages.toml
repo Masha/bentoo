@@ -991,6 +991,8 @@ the SRC_URI 404s at manifest time. Look up the current bb on the page above.
 # END
 
 ["media-gfx/gimp"]
+enabled = false
+disabled_by = "parity-audit 2026-09-22: removed, ::gentoo shipped 3.2.6 -- the exact condition the comments below already named as the moment to drop both. The only functional divergence left was -Dwebkit-unmaintained=false, which is a NO-OP: gimp-3.2.6/meson_options.txt declares that option `value: false` itself, and ::gentoo passes nothing, so both trees build it the same way. The gdk-pixbuf floor the comments call out had also converged -- ::gentoo 3.2.6 carries >=2.32.0 too. Reopen only to carry a version ::gentoo does not have."
 url = "https://www.gimp.org/gimp_versions.json"
 parser = "json"
 path = "STABLE[0].version"
@@ -1480,7 +1482,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.31.0"
+version = "0.31.1"
 comments = """
 bentoolkit — releases/latest devolve tag_name "vX.Y.Z"; o transform tira o "v",
 senao o bump gera um PV invalido (bentoolkit-v0.17.0).
@@ -2283,6 +2285,8 @@ vim — no releases (404); tags[0] "vX.Y.ZZZZ".
 # END
 
 ["app-editors/vim-core"]
+enabled = false
+disabled_by = "parity-audit 2026-09-22: removed, the overlay copy was BEHIND ::gentoo at the same PV, not diverging from it -- it dropped the distro patchset, pinned BDEPEND=dev-build/autoconf with no floor where ::gentoo requires >=2.71, and lost --disable-hardcopy-pango. Its three files/ entries were the same names ::gentoo ships. app-editors/vim stays, realigned onto ::gentoo with USE_RUBY as its one declared divergence. Reopen only to carry a version ::gentoo does not have."
 url = "https://api.github.com/repos/vim/vim/tags"
 parser = "json"
 path = "[0].name"
@@ -2576,6 +2580,8 @@ ahead of ::gentoo again.
 # END
 
 ["dev-libs/libinput"]
+enabled = false
+disabled_by = "parity-audit 2026-09-22: removed, identical to ::gentoo 1.32.0 apart from KEYWORDS we stabilised ourselves -- a two-line diff, no code. ::gentoo keeps 1.31.3 stable on the same arches, so nothing is left without a stable option. Reopen only to carry a version ::gentoo does not have."
 url = "https://gitlab.freedesktop.org/api/v4/projects/libinput%2Flibinput/repository/tags?order_by=version&sort=desc&per_page=10"
 parser = "regex"
 pattern = '"name":"([0-9]+\.[0-9]+\.[0-9]{1,2})"'
@@ -3375,7 +3381,7 @@ base_from = "tag"
 base_url = "https://api.github.com/repos/KhronosGroup/Vulkan-Utility-Libraries/git/refs/tags"
 base_tag_pattern = '^v([0-9]+\.[0-9]+\.[0-9]+)$'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.363"
+version = "1.4.363_p20260922"
 comments = """
 vulkan-utility-libraries — commit-tracked on main, same shape as vulkan-headers.
 
@@ -8216,6 +8222,8 @@ Gentoo form (-stable→bare, -beta→_beta, -rc→_rc, -dev→_alpha).
 # END
 
 ["dev-build/automake@1.19"]
+enabled = false
+disabled_by = "auto"
 url = "https://ftp.gnu.org/gnu/automake/?C=M;O=D"
 parser = "regex"
 pattern = 'automake-([0-9][0-9.]*)\.tar\.xz'
@@ -8599,7 +8607,7 @@ url = "https://api.github.com/repos/lucascouts/claude-agent-tui/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.13.2"
+version = "0.13.3"
 comments = """
 Renamed from dev-util/claude-agent-tui (commit e8a05fdc: del old ebuild + add
 claude-agent-acp-tui, same upstream repo lucascouts/claude-agent-tui, same PV).
@@ -9155,7 +9163,7 @@ url = "https://api.github.com/repos/lucascouts/claude-agent-acp-plus/releases/la
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.18.0"
+version = "0.19.0"
 comments = """
 claude-agent-acp-plus — GitHub releases/latest tag "vX.Y.Z" (v stripped).
 SRC_URI releases/download/v${PV}/${P}-bundle.tar.gz. Live=v0.2.0.
@@ -9317,7 +9325,7 @@ url = "https://api.github.com/repos/digitalocean/doctl/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.170.0"
+version = "1.171.0"
 comments = """
 doctl (DigitalOcean CLI, historically "doit"/DoCli) — GitHub releases/latest
 tag "vX.Y.Z"; the leading v is normalized away by the autoupdate. Verified
@@ -10752,7 +10760,7 @@ url = "https://api.github.com/repos/QwenLM/qwen-code/releases?per_page=30"
 parser = "regex"
 pattern = '"tag_name":\s*"v([0-9]+\.[0-9]+\.[0-9]+)"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.24.3"
+version = "0.24.4"
 comments = """
 Qwen Code — this record probes /releases and NOT /releases/latest, which is
 backwards from every other GitHub record here and is deliberate.
