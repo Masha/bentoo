@@ -3,14 +3,14 @@
 
 EAPI=8
 
-# CRATES is deliberately empty: the 490 crates come from a single tarball in
+# CRATES is deliberately empty: the 492 crates come from a single tarball in
 # SRC_URI instead. Listing them inline works -- it is what this package did
 # first, and it built -- but Portage answers it with
 #
 #   QA Notice: This package uses a very large number of CRATES. Please provide
 #   a crate tarball instead and fetch it via SRC_URI.
 #
-# and it puts 490 DIST lines (151 KiB) in the Manifest. Same precedent as
+# and it puts ~490 DIST lines (151 KiB) in the Manifest. Same precedent as
 # dev-util/codex in this overlay.
 #
 # REGENERATING IT ON A BUMP -- the tarball is NOT produced by upstream and no
@@ -20,8 +20,8 @@ EAPI=8
 #
 #   cd crates/ai-memory-cli
 #   name="${PN}-${CRATES_PV}-crates.tar.xz"
-#   pycargoebuild -c --crate-tarball-path "${DISTDIR}/${name}" \
-#       -d "${DISTDIR}" -o /dev/null .
+#   pycargoebuild -w --crate-tarball-path "${DISTDIR}/${name}" \
+#       -d "${DISTDIR}" -o /tmp/throwaway.ebuild -f -M .
 #   npx --yes wrangler@latest r2 object put "obentoo-distfiles/${name}" \
 #       --file="${DISTDIR}/${name}" --content-type=application/x-xz --remote
 #
@@ -30,8 +30,16 @@ EAPI=8
 # /home/otaku/Projetos/git/bentoo so the wrangler profile resolves to "bentoo";
 # the default profile is a different account entirely.
 #
-# Verified for 2.1.0 (and again for 2.2.2): the member-scoped run covers all
-# 490 external crates the workspace resolves -- generated list and the previous
+# `-o /dev/null` (what this recipe used to say) is NOT usable: pycargoebuild
+# writes the ebuild through a tempfile in the DESTINATION directory, so it dies
+# with PermissionError on /dev and leaves behind a plausible-looking tarball
+# built from whatever was already cached. A real run takes ~3 min and logs
+# "Processed N out of <total>" followed by "Crate tarball written to"; an
+# aborted one finishes in seconds without them. `-M` keeps it from calling
+# `pkgdev manifest` on the whole overlay by itself.
+#
+# Verified for 2.1.0, 2.2.2 and 2.4.0: the member-scoped run covers all
+# 492 external crates the workspace resolves -- generated list and the previous
 # inline CRATES list were compared entry by entry, with no difference in either
 # direction.
 CRATES="
@@ -49,10 +57,15 @@ CRATES="
 # `source = "registry+..."` entries against cargo_home/gentoo/ in the
 # candidate tarball is the check that catches it before that.
 #
+# 2.4.0 repeated it, one release later: the lock gained rmcp 2.2.0,
+# rmcp-macros 2.2.0, sse-stream 0.2.6, utf16_iter 1.0.5 and write16 1.0.0
+# (490 -> 492 crates), and the build died with "failed to select a version for
+# the requirement `rmcp = "^2.2"` (locked to 2.2.0)". Same shape, same fix.
+#
 # BUMP THIS to ${PV} (and run the recipe above) the moment the lock's external
 # packages change -- a stale tarball still FETCHES, so the failure would land
 # in src_compile as a missing crate rather than here.
-CRATES_PV="2.2.2"
+CRATES_PV="2.4.0"
 
 # Upstream pins channel 1.95 in rust-toolchain.toml; the workspace is
 # edition 2024 and declares rust-version = "1.95".
