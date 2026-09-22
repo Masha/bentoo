@@ -9619,6 +9619,28 @@ letter. Pulled in as a hard dependency of sci-libs/onnxruntime.
 """
 # END
 
+["dev-cpp/simdutf"]
+url = "https://api.github.com/repos/simdutf/simdutf/releases/latest"
+parser = "json"
+path = "tag_name"
+transform = [['^v', ""]]
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "9.0.0-r1"
+comments = """
+simdutf — bentoo carries this package only to build it as C++20
+(-DSIMDUTF_CXX_STANDARD=20). Upstream gates the atomic base64 API behind
+__cpp_lib_atomic_ref, so a C++17 libsimdutf.so does not export
+simdutf::atomic_binary_to_base64 and net-libs/nodejs >= 26.10.0 fails to link
+mksnapshot against it. ::gentoo builds with the upstream default of C++17.
+
+Two consequences for a bump. The revision suffix is load-bearing: the ebuild
+must stay strictly newer than whatever ::gentoo ships, or Portage picks the
+C++17 build and nodejs breaks again. And src_configure must keep the
+SIMDUTF_CXX_STANDARD argument — re-check that upstream still honours that
+option, since it is the only knob that reaches the library's own compilation.
+"""
+# END
+
 ["sci-libs/dlpack"]
 url = "https://api.github.com/repos/dmlc/dlpack/releases/latest"
 parser = "json"
@@ -10741,7 +10763,7 @@ parser = "regex"
 pattern = '"tag_name":\s*"v([0-9]+\.[0-9]+\.[0-9]+)"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "3.20.3"
+version = "3.20.4"
 comments = """
 CC Switch — a Tauri GUI for switching between Claude Code, Codex and Gemini
 CLI accounts. Tracks CC-Switch-v<PV>-Linux-{x86_64,arm64}.deb; note the asset

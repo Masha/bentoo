@@ -92,10 +92,20 @@ RESTRICT="!test? ( test )"
 # is closer but still low. Re-derive every floor from deps/ on each bump rather
 # than carrying these forward -- carrying forward is what this whole tag set
 # exists to stop.
+#
+# simdutf is the exception to "match what node bundles": the floor is
+# >=9.0.0-r1 and the -r1 is bentoo's, not ::gentoo's. V8's
+# builtins-typed-array.cc is compiled with -std=gnu++20 and calls
+# simdutf::atomic_binary_to_base64 / simdutf::atomic_base64_to_binary_safe,
+# which libsimdutf.so only exports when it was itself built as C++20.
+# ::gentoo's simdutf builds as C++17, so --shared-simdutf against it fails to
+# link mksnapshot. dev-cpp/simdutf-9.0.0-r1::bentoo carries -DSIMDUTF_CXX_STANDARD=20;
+# the reasoning lives there. A future ::gentoo simdutf newer than 9.0.0-r1 would
+# satisfy this floor and reintroduce the failure -- keep the bentoo copy ahead.
 COMMON_DEPEND=">=app-arch/brotli-1.2.0:=
 	dev-db/sqlite:3
 	>=dev-cpp/ada-3.4.4:=
-	>=dev-cpp/simdutf-7.7.0:=
+	>=dev-cpp/simdutf-9.0.0-r1:=
 	>=dev-libs/libuv-1.52.1:=
 	>=dev-libs/simdjson-4.6.1:=
 	>=net-dns/c-ares-1.34.6:=
