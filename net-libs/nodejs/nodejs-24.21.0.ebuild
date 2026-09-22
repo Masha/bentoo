@@ -106,29 +106,33 @@ RESTRICT="!test? ( test )"
 # BENTOO-DIVERGENCE: DEPEND - no dev-cpp/simdutf, for the reason spelled out
 # immediately below. The prose predates the tag; only the tag is machine
 # readable, and without it the parity guard reads this as an unexplained lag.
-# dev-cpp/simdutf is DELIBERATELY ABSENT, matching this overlay's 26 ebuild
-# and diverging from ::gentoo, which carries >=dev-cpp/simdutf-7.3.4:= plus
-# --shared-simdutf on BOTH its 24.16.0-r1 and its 26.3.0. That is the whole
-# point: it is a bentoo decision about the package, not a difference between
-# majors, so re-adding it here alone would split the two slots on a choice
-# that is not allowed to differ between them.
+# dev-cpp/simdutf is DELIBERATELY ABSENT, and since 2026-09-22 that is a
+# 24-ONLY decision: the 26 ebuild now DOES carry --shared-simdutf. The two
+# slots are allowed to differ here because upstream changed the mechanism
+# between the majors, not because the packaging preference changed.
 #
-# It also stands on its own merits. --shared-simdutf does not REPLACE the
-# bundled copy, it adds a second one. Node 24.18.1 ships no top-level
-# deps/simdutf; the only copy is deps/v8/third_party/simdutf, v6.4.0.
-# node_shared_simdutf gates exactly two places -- node.gypi:237 (node's own
-# target) and node.gyp:1525 (the host js2c tool) -- while
-# tools/v8_gypfiles/v8.gyp:1079 makes v8_base_without_compiler depend on that
-# vendored simdutf UNCONDITIONALLY. So with the flag on, node's src/*.cc
-# compiles against the system headers (dev-cpp/simdutf is 9.0.0 here) while
-# V8 compiles against 6.4.0, and both land in one binary. Neither side uses a
-# versioned namespace -- both spell it plain `simdutf::`, 435 such symbols in
-# libsimdutf.so.34 -- so that is an ODR violation, not a tidy substitution.
+# The reason --shared-simdutf stays off here. It does not REPLACE the bundled
+# copy, it adds a second one. Node 24.21.0 ships no top-level deps/simdutf;
+# the only copy is deps/v8/third_party/simdutf. node_shared_simdutf gates
+# exactly two places -- node.gypi (node's own target) and node.gyp (the host
+# js2c tool) -- while tools/v8_gypfiles/v8.gyp makes v8_base_without_compiler
+# depend on that vendored simdutf UNCONDITIONALLY: grep the 24.21.0 tarball
+# and v8.gyp mentions node_shared_simdutf ZERO times. So with the flag on,
+# node's src/*.cc compiles against the system headers while V8 compiles
+# against the vendored tree, and both land in one binary. Neither side uses a
+# versioned namespace -- both spell it plain `simdutf::` -- so that is an ODR
+# violation, not a tidy substitution.
 #
-# Weighed against Gentoo's prefer-system-libraries policy, which genuinely
-# points the other way. If that wins, the change belongs on BOTH slots and
-# needs a real build on each: --shared-simdutf has never been exercised in
-# this overlay, whereas the fallback has (slot 26, commit ecb7586e).
+# What changed in 26, and why the slots now differ. 26.10.0's v8.gyp gates
+# that same dependency on node_shared_simdutf, so the vendored copy drops out
+# entirely: a 26.10.0 built here has ZERO `simdutf::` symbols defined inside
+# the binary and 35 undefined ones resolved by libsimdutf.so. One copy, no
+# ODR problem. That build is the evidence -- run `nm -C` on the result before
+# trusting this paragraph again after a bump, because the gate is upstream's
+# and could move.
+#
+# Do NOT copy --shared-simdutf here from the 26 ebuild without first checking
+# that v8.gyp in THIS tarball gained the same gate.
 COMMON_DEPEND=">=app-arch/brotli-1.1.0:=
 	dev-db/sqlite:3
 	>=dev-cpp/ada-3.3.0:=

@@ -1,0 +1,35 @@
+Make deps/merve honour --shared-simdutf.
+
+merve.gyp hardcodes the include path of V8's bundled simdutf, with no
+condition on node_shared_simdutf. Under --shared-simdutf that makes merve.cpp
+compile against the bundled header while linking against the system library.
+Any version skew between the two is then a link error: in the bundled 7.7.0
+simdutf::find is an exported function, whereas from 9.0.0 on it is an inline
+wrapper and only simdutf::detail::find remains in the library, so
+node_mksnapshot fails with "undefined reference to simdutf::find".
+
+The condition added here is the one node already uses for simdutf in
+node.gypi, so the bundled header is picked up only when simdutf is bundled.
+
+Not accepted upstream -- bentoo does not submit to Gentoo or to node.
+
+--- a/deps/merve/merve.gyp
++++ b/deps/merve/merve.gyp
+@@ -8,7 +8,6 @@
+       'type': 'static_library',
+       'include_dirs': [
+         '.',
+-        '../v8/third_party/simdutf',
+       ],
+       'direct_dependent_settings': {
+         'include_dirs': ['.'],
+@@ -16,6 +15,9 @@
+       'defines': [ 'MERVE_USE_SIMDUTF=1' ],
+       'sources': [ '<@(merve_sources)' ],
+       'conditions': [
++        [ 'node_shared_simdutf=="false" and node_use_bundled_v8!="false"', {
++          'include_dirs': [ '../v8/third_party/simdutf' ],
++        }],
+         ['OS=="win"', {
+           'msvs_settings': {
+             'VCCLCompilerTool': {

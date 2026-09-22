@@ -263,10 +263,24 @@ src_prepare() {
 	# PATCHES array; this ebuild has none, so they go here). gcc17 is a
 	# bentoo-local rebase -- see the header of the 26.7.0 copy for why the
 	# ::gentoo 26.6.0 one cannot be used verbatim.
+	#
+	# merve-shared-simdutf is bentoo-local and has no ::gentoo counterpart.
+	# deps/merve/merve.gyp hardcodes the include path of V8's bundled simdutf
+	# with no condition on node_shared_simdutf, so under --shared-simdutf the
+	# lexer compiles against the bundled 7.7.0 header while linking against the
+	# system library. From simdutf 9.0.0 on, simdutf::find is an inline wrapper
+	# and only simdutf::detail::find survives in the .so, so node_mksnapshot
+	# dies with "undefined reference to simdutf::find". ::gentoo does not hit
+	# this because its simdutf floor happens to match what node bundles.
+	#
+	# The patch filename carries no version on purpose: the autoupdate applier
+	# copies the ebuild but never renames anything under files/, so a versioned
+	# name would dangle on the next bump.
 	PATCHES+=(
 		"${FILESDIR}"/${PN}-26.7.0-gcc17.patch
 		"${FILESDIR}"/${PN}-26.6.0-format-cstdlib.patch
 		"${FILESDIR}"/${PN}-26.6.0-v8-climits.patch
+		"${FILESDIR}"/${PN}-merve-shared-simdutf.patch
 	)
 
 	# We need to disable mprotect on two files when it builds Bug 694100.
