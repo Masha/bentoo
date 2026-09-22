@@ -37,10 +37,18 @@ CHECKREQS_DISK_BUILD="4G"
 
 QA_PREBUILT="*"
 
-# The other half of the blocker pair declared by sci-ml/ollama. Both provide
-# /usr/bin/ollama, /etc/init.d/ollama, /etc/conf.d/ollama and the systemd unit
-# -- same program, two ways of getting it. Hard and symmetric, following
-# sci-libs/onnxruntime{,-bin} and sci-ml/lemonade{,-bin} in this overlay.
+# The ONLY half of the blocker against sci-ml/ollama, and it has to stay that
+# way. Both provide /usr/bin/ollama, /etc/init.d/ollama, /etc/conf.d/ollama and
+# the systemd unit -- same program, two ways of getting it.
+#
+# This used to read "the other half of the pair", following
+# sci-libs/onnxruntime{,-bin} and sci-ml/lemonade{,-bin}, but the symmetry was
+# never real: neither this overlay's sci-ml/ollama nor ::gentoo's ever declared
+# the reverse atom. Since 2026-09-22 the source ebuild is gone from here for
+# good (fourth removal -- see .autoupdate/packages.toml), so the package this
+# blocks is sci-ml/ollama::gentoo, which cannot be made to block back. A "!!"
+# in one direction is enough to keep both off the same system; do not read the
+# missing counterpart as an omission to fix.
 #
 # acct-user/ollama is unversioned on purpose. It used to read
 # >=acct-user/ollama-3, pointing at an override this overlay carried until

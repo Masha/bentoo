@@ -8962,6 +8962,8 @@ which is why this entry carried no revision until 2026-07-26.
 # END
 
 ["sci-ml/ollama"]
+enabled = false
+disabled_by = "removed 2026-09-22 (fourth time): ::gentoo ships the same 0.34.2 with the correct llama.cpp pin, ours had the stale one again -- see comments"
 url = "https://api.github.com/repos/ollama/ollama/releases/latest"
 parser = "json"
 path = "tag_name"
@@ -9045,6 +9047,22 @@ divergence -- and 0.34.1, carrying LLAMA_CPP_tag=b10760 while v0.34.1's own
 LLAMA_CPP_VERSION file says b10864. Third resurrection, third stale pin, for
 the reason written three paragraphs up: the applier bumps PV and nothing else.
 Never run --revive with `all` against this overlay; name the package instead.
+
+Fourth removal, 2026-09-22, and this one is not "::gentoo caught up" -- it is
+"our copy is worse". Both trees carry 0.34.2. Ours pinned LLAMA_CPP_tag=b10760;
+raw.githubusercontent.com/ollama/ollama/v0.34.2/LLAMA_CPP_VERSION answers
+b10969, which is exactly what sci-ml/ollama-0.34.2::gentoo pins. That is the
+same defect this comment has warned about since 0.32.3, now on its fourth
+consecutive occurrence, and it recurs for the reason stated above: the applier
+bumps PV and touches nothing else, so every resurrection re-inherits the
+predecessor's pin. ::gentoo also renamed the cmake patch to ${P}-cmake.patch
+while ours still named ${PN}-0.31.1-cmake.patch, and their DEPEND on sci-ml/ggml
+is the floor shape recommended four paragraphs up.
+
+The two dev-build/automake-1.19 and sec-keys/openpgp-keys-kamilaszewczyk
+ebuilds went in the same commit, for the opposite reason -- there ::gentoo did
+catch up -- and neither of those has a record here, so nothing had to be
+disabled for them.
 
 --- ollama source: same upstream repo as sci-ml/ollama-bin ---
 """
