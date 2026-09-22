@@ -81,10 +81,10 @@ Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>
 ---
 
 diff --git a/assets/settings/default.json b/assets/settings/default.json
-index bc69221..a1f77a7 100644
+index cbb1bb6..c69a34d 100644
 --- a/assets/settings/default.json
 +++ b/assets/settings/default.json
-@@ -1391,6 +1391,14 @@
+@@ -1401,6 +1401,14 @@
      //
      // Default: false
      "show_turn_stats": false,
@@ -100,10 +100,10 @@ index bc69221..a1f77a7 100644
      // that offers to resolve conflicts using the agent.
      //
 diff --git a/crates/acp_thread/src/acp_thread.rs b/crates/acp_thread/src/acp_thread.rs
-index 157947e..9579927 100644
+index 84a16fc..ef25f78 100644
 --- a/crates/acp_thread/src/acp_thread.rs
 +++ b/crates/acp_thread/src/acp_thread.rs
-@@ -4265,6 +4265,17 @@ impl AcpThread {
+@@ -4222,6 +4222,17 @@ impl AcpThread {
          Some((index, elicitation))
      }
  
@@ -122,7 +122,7 @@ index 157947e..9579927 100644
          &self.plan
      }
 diff --git a/crates/agent/src/tool_permissions.rs b/crates/agent/src/tool_permissions.rs
-index cd8a02b..71a4644 100644
+index bbb680d..9623ae4 100644
 --- a/crates/agent/src/tool_permissions.rs
 +++ b/crates/agent/src/tool_permissions.rs
 @@ -607,6 +607,7 @@ mod tests {
@@ -131,10 +131,10 @@ index cd8a02b..71a4644 100644
              show_turn_stats: false,
 +            elicitation_placement: settings::ElicitationPlacement::default(),
              show_merge_conflict_indicator: true,
-             sidebar_side: Default::default(),
-             threads_sidebar_default_width: px(300.),
+             threads_sidebar: agent_settings::ThreadsSidebarSettings {
+                 auto_open: true,
 diff --git a/crates/agent_settings/src/agent_settings.rs b/crates/agent_settings/src/agent_settings.rs
-index fd64625..2a03b01 100644
+index 193cc5a..06cd333 100644
 --- a/crates/agent_settings/src/agent_settings.rs
 +++ b/crates/agent_settings/src/agent_settings.rs
 @@ -16,10 +16,11 @@ use project::DisableAiSettings;
@@ -153,7 +153,7 @@ index fd64625..2a03b01 100644
  };
  use util::ResultExt as _;
  
-@@ -248,6 +249,7 @@ pub struct AgentSettings {
+@@ -246,6 +247,7 @@ pub struct AgentSettings {
      pub use_modifier_to_send: bool,
      pub message_editor_min_lines: usize,
      pub show_turn_stats: bool,
@@ -161,7 +161,7 @@ index fd64625..2a03b01 100644
      pub show_merge_conflict_indicator: bool,
      pub tool_permissions: ToolPermissions,
      pub sandbox_permissions: SandboxPermissions,
-@@ -833,6 +835,7 @@ impl Settings for AgentSettings {
+@@ -841,6 +843,7 @@ impl Settings for AgentSettings {
              use_modifier_to_send: agent.use_modifier_to_send.unwrap(),
              message_editor_min_lines: agent.message_editor_min_lines.unwrap(),
              show_turn_stats: agent.show_turn_stats.unwrap(),
@@ -224,7 +224,7 @@ index de965ae..0266fc8 100644
                              menu = menu.separator()
                          }
 diff --git a/crates/agent_ui/src/agent_ui.rs b/crates/agent_ui/src/agent_ui.rs
-index 531628c..ea3db65 100644
+index 3207b0f..9be352b 100644
 --- a/crates/agent_ui/src/agent_ui.rs
 +++ b/crates/agent_ui/src/agent_ui.rs
 @@ -1010,6 +1010,7 @@ mod tests {
@@ -233,10 +233,10 @@ index 531628c..ea3db65 100644
              show_turn_stats: false,
 +            elicitation_placement: settings::ElicitationPlacement::default(),
              show_merge_conflict_indicator: true,
-             sidebar_side: Default::default(),
-             threads_sidebar_default_width: px(300.),
+             threads_sidebar: agent_settings::ThreadsSidebarSettings {
+                 auto_open: true,
 diff --git a/crates/agent_ui/src/conversation_view.rs b/crates/agent_ui/src/conversation_view.rs
-index 41c0aa8..c1dc003 100644
+index 941b863..6011f67 100644
 --- a/crates/agent_ui/src/conversation_view.rs
 +++ b/crates/agent_ui/src/conversation_view.rs
 @@ -2530,22 +2530,37 @@ impl ConversationView {
@@ -856,7 +856,7 @@ index 6b8c2d8..c6afdbd 100644
                              on_submit(submit_id.clone(), window, cx);
                          }
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
-index 0bcd946..18fce1e 100644
+index f36e3a1..78b1d75 100644
 --- a/crates/agent_ui/src/conversation_view/thread_view.rs
 +++ b/crates/agent_ui/src/conversation_view/thread_view.rs
 @@ -42,7 +42,7 @@ use language_model::{
@@ -868,7 +868,7 @@ index 0bcd946..18fce1e 100644
  use ui::{
      ButtonLike, CalloutBorderPosition, Checkbox, SpinnerLabel, SpinnerVariant, SplitButton,
      SplitButtonStyle, Tab, ToggleState,
-@@ -6644,6 +6644,7 @@ impl ThreadView {
+@@ -6632,6 +6632,7 @@ impl ThreadView {
                  let thread = self.thread.read(cx);
                  if let Some((_, elicitation)) = thread.elicitation(elicitation_id)
                      && should_render_elicitation(elicitation)
@@ -876,7 +876,7 @@ index 0bcd946..18fce1e 100644
                  {
                      let elicitation = self.render_elicitation(entry_ix, elicitation, window, cx);
  
-@@ -6905,10 +6906,22 @@ impl ThreadView {
+@@ -6893,10 +6894,22 @@ impl ThreadView {
                      .log_err();
                  }
              },
@@ -901,7 +901,7 @@ index 0bcd946..18fce1e 100644
                          cx.notify();
                      }
                  })
-@@ -7250,6 +7263,65 @@ impl ThreadView {
+@@ -7238,6 +7251,65 @@ impl ThreadView {
          self.message_editor.read(cx).set_local_commands(commands);
      }
  
@@ -967,7 +967,7 @@ index 0bcd946..18fce1e 100644
      fn render_request_elicitations(&self, cx: &Context<Self>) -> Vec<AnyElement> {
          let server_view = self.server_view.clone();
          let handlers_view = server_view.clone();
-@@ -12815,6 +12887,7 @@ impl Render for ThreadView {
+@@ -12813,6 +12885,7 @@ impl Render for ThreadView {
                  |this, version| this.child(self.render_new_version_callout(&version, cx)),
              )
              .children(self.render_token_limit_callout(cx))
@@ -976,10 +976,10 @@ index 0bcd946..18fce1e 100644
              .child(self.render_message_editor(window, cx))
      }
 diff --git a/crates/settings_content/src/agent.rs b/crates/settings_content/src/agent.rs
-index dea0240..f46800f 100644
+index d8c755e..cf7c86b 100644
 --- a/crates/settings_content/src/agent.rs
 +++ b/crates/settings_content/src/agent.rs
-@@ -74,6 +74,33 @@ pub enum ThinkingBlockDisplay {
+@@ -97,6 +97,33 @@ pub enum ThinkingBlockDisplay {
      AlwaysCollapsed,
  }
  
@@ -1013,7 +1013,7 @@ index dea0240..f46800f 100644
  /// Threshold at which agent auto-compaction runs. See
  /// [`AutoCompactSettingsContent::threshold`] for the accepted formats.
  ///
-@@ -364,6 +391,11 @@ pub struct AgentSettingsContent {
+@@ -381,6 +408,11 @@ pub struct AgentSettingsContent {
      ///
      /// Default: false
      pub show_turn_stats: Option<bool>,

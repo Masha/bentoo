@@ -92,7 +92,7 @@ index 5f0cf69..8ea6077 100644
              Task::ready(Ok(()))
          }
 diff --git a/crates/agent/src/agent.rs b/crates/agent/src/agent.rs
-index c5526e7..a52045e 100644
+index 9ea7e6b..0851dad 100644
 --- a/crates/agent/src/agent.rs
 +++ b/crates/agent/src/agent.rs
 @@ -2560,7 +2560,12 @@ impl acp_thread::AgentModelSelector for NativeAgentModelSelector {
@@ -175,7 +175,7 @@ index c5526e7..a52045e 100644
      fn selected_model(&self, cx: &mut App) -> Task<Result<acp_thread::AgentModelInfo>> {
          let Some(thread) = self
              .connection
-@@ -6422,6 +6442,86 @@ mod internal_tests {
+@@ -6421,6 +6441,86 @@ mod internal_tests {
          );
      }
  
@@ -262,7 +262,7 @@ index c5526e7..a52045e 100644
      #[gpui::test]
      async fn test_model_selection_persists_to_settings(cx: &mut TestAppContext) {
          init_test(cx);
-@@ -6469,7 +6569,7 @@ mod internal_tests {
+@@ -6468,7 +6568,7 @@ mod internal_tests {
          // Select a model
          let selector = connection.model_selector(&session_id).unwrap();
          let model_id = AgentModelId::new("fake/fake");
@@ -271,7 +271,7 @@ index c5526e7..a52045e 100644
              .await
              .unwrap();
  
-@@ -6519,9 +6619,11 @@ mod internal_tests {
+@@ -6518,9 +6618,11 @@ mod internal_tests {
          agent.update(cx, |agent, cx| agent.models.refresh_list(cx));
  
          let selector = connection.model_selector(&session_id).unwrap();
@@ -286,7 +286,7 @@ index c5526e7..a52045e 100644
          cx.run_until_parked();
  
          // Verify enable_thinking was written to settings as true.
-@@ -6593,9 +6695,11 @@ mod internal_tests {
+@@ -6592,9 +6694,11 @@ mod internal_tests {
  
          // Select the thinking model via select_model.
          let selector = connection.model_selector(&session_id).unwrap();
@@ -301,7 +301,7 @@ index c5526e7..a52045e 100644
  
          // select_model should have enabled thinking based on the model's supports_thinking().
          agent.read_with(cx, |agent, _| {
-@@ -6610,7 +6714,7 @@ mod internal_tests {
+@@ -6609,7 +6713,7 @@ mod internal_tests {
  
          // Switch back to the non-thinking model.
          let selector = connection.model_selector(&session_id).unwrap();
@@ -310,7 +310,7 @@ index c5526e7..a52045e 100644
              .await
              .unwrap();
  
-@@ -6727,9 +6831,11 @@ mod internal_tests {
+@@ -6726,9 +6830,11 @@ mod internal_tests {
          let session_id = acp_thread.read_with(cx, |thread, _| thread.session_id().clone());
  
          let selector = connection.model_selector(&session_id).unwrap();
@@ -325,7 +325,7 @@ index c5526e7..a52045e 100644
  
          // Verify thinking is enabled after selecting the thinking model.
          let thread = agent.read_with(cx, |agent, _| {
-@@ -6828,9 +6934,11 @@ mod internal_tests {
+@@ -6827,9 +6933,11 @@ mod internal_tests {
          let session_id = acp_thread.read_with(cx, |thread, _| thread.session_id().clone());
  
          let selector = connection.model_selector(&session_id).unwrap();
@@ -340,7 +340,7 @@ index c5526e7..a52045e 100644
  
          let thread = agent.read_with(cx, |agent, _| {
              agent.sessions.get(&session_id).unwrap().thread.clone()
-@@ -6936,9 +7044,11 @@ mod internal_tests {
+@@ -6935,9 +7043,11 @@ mod internal_tests {
          let session_id = acp_thread.read_with(cx, |thread, _| thread.session_id().clone());
  
          let selector = connection.model_selector(&session_id).unwrap();
@@ -355,7 +355,7 @@ index c5526e7..a52045e 100644
  
          let send = acp_thread.update(cx, |thread, cx| thread.send(vec!["Hello".into()], cx));
          let send = cx.foreground_executor().spawn(send);
-@@ -7063,9 +7173,11 @@ mod internal_tests {
+@@ -7062,9 +7172,11 @@ mod internal_tests {
          cx.run_until_parked();
  
          let selector = connection.model_selector(&session_id).unwrap();
@@ -371,7 +371,7 @@ index c5526e7..a52045e 100644
          thread.read_with(cx, |thread, _| {
              assert_eq!(thread.model().unwrap().id().0.as_ref(), "other-model-id");
 diff --git a/crates/agent_ui/src/agent_ui.rs b/crates/agent_ui/src/agent_ui.rs
-index f25c16a..531628c 100644
+index c9e823b..3207b0f 100644
 --- a/crates/agent_ui/src/agent_ui.rs
 +++ b/crates/agent_ui/src/agent_ui.rs
 @@ -24,6 +24,7 @@ mod mode_selector;
@@ -623,7 +623,7 @@ index 196dc74..a93fea9 100644
          assert_eq!(
              config_options.set_values.borrow().as_slice(),
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
-index 5003919..e88476f 100644
+index 2eaba20..44638e4 100644
 --- a/crates/agent_ui/src/conversation_view/thread_view.rs
 +++ b/crates/agent_ui/src/conversation_view/thread_view.rs
 @@ -24,6 +24,7 @@ use sandbox::{SandboxFsPolicy, SandboxNetPolicy, SandboxPolicy};
@@ -740,7 +740,7 @@ index 5003919..e88476f 100644
                  }))
              })
              .with_handle(self.thinking_effort_menu_handle.clone())
-@@ -12082,7 +12127,9 @@ impl ThreadView {
+@@ -12080,7 +12125,9 @@ impl ThreadView {
          else {
              return;
          };

@@ -2765,7 +2765,7 @@ base_from = "file"
 base_url = "https://api.github.com/repos/zed-industries/zed/contents/crates/zed/Cargo.toml?ref=main"
 base_pattern = '(?m)^version = "([0-9][0-9.]*)"'
 headers = { "User-Agent" = "bentoo-autoupdate", "Accept" = "application/vnd.github.raw" }
-version = "1.22.0_pre20260921"
+version = "1.22.0_pre20260922"
 comments = """
 zed — commit-tracked on main; _pre suffix preserved from current ebuild.
 2026-08-06: 2 commits landed same UTC day (d61e80b -> 6b2aa1c), so the date
@@ -3102,6 +3102,38 @@ wayland/X/screen-capture/neovim combinations; `cargo check --offline -p zed
 md5-cache _md5_ matches the ebuild and egencache also swept the orphan
 _pre20260918-r1 entry; pkgcheck reports only the pre-existing
 deprecated-llvm-r1 finding.
+Not merged with a build: this host has no sudo, so no emerge ran.
+2026-09-22: MANUAL bump, bcf6582c -> f25434f3 (2026-09-22T00:11 UTC, so the date
+component carries it on its own; no -r1). The base version in crates/zed/Cargo.toml
+is still 1.22.0.
+The bump is as narrow as this package gets, and the value is in having measured
+that rather than assumed it. rust-toolchain.toml and crates/zed/Cargo.toml are
+BYTE-IDENTICAL between the two commits -- which settles the two axes the previous
+two entries opened, the pinned toolchain and the [features] table a USE flag maps
+onto. The root Cargo.toml moved by exactly one line (agent-client-protocol
+"=2.1.0" -> "=2.2.0"), well away from [patch.crates-io], and pycargoebuild re-run
+from crates/zed changed exactly three CRATES rows -- agent-client-protocol and
+-derive 2.1.0 -> 2.2.0, -schema 1.7.0 -> 1.9.1 -- with GIT_CRATES (71) and the
+LICENSE+= block byte identical. It printed both WARNINGs, which is what tells a
+real run apart from the silent no-op in the virtual workspace root. All seven
+`local *_COMMIT` were re-checked against the regenerated GIT_CRATES: all seven
+resolve, none moved. `grep -c` of the new EGIT_COMMIT gives 1, not 8 -- manual
+bump, so the applier's 40-hex rewrite never ran.
+Verified before publishing: the series was current (files/ generated against
+_pre20260921) and was carried forward through zed-patches; all 19 patches apply,
+12 changed by offset only, no semantic rebase. verify.sh, sync-overlay and
+check-sync agree on all three relations (series <-> ebuild, patches <-> overlay,
+patches <-> source); `ebuild ... prepare` applies all nineteen for real
+(>>> Source prepared); 11/11 sed patterns match the new root Cargo.toml exactly
+once, leaving 0 [patch.crates-io] entries on `git =` and all ten WORKDIR targets
+present (the eleventh `path =` is upstream's own corgi scratch, relative); the
+four USE-flag seds produce valid TOML in all sixteen
+wayland/X/screen-capture/neovim combinations, checked by parsing the result;
+`cargo check --offline -p zed -p remote_server --features gpui/inspector` exits 0
+in 1m34 with zero errors -- `--offline` alone, not `--locked`, for the reason the
+09-21 entry gives; md5-cache _md5_ matches the ebuild and the orphan _pre20260921
+entry was swept; pkgcheck reports only the pre-existing deprecated-llvm-r1
+finding.
 Not merged with a build: this host has no sudo, so no emerge ran.
 """
 # END

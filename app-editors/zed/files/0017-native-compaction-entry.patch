@@ -74,10 +74,10 @@ both zero.
 ---
 
 diff --git a/crates/acp_thread/src/acp_thread.rs b/crates/acp_thread/src/acp_thread.rs
-index 32945d9..157947e 100644
+index e5417d0..84a16fc 100644
 --- a/crates/acp_thread/src/acp_thread.rs
 +++ b/crates/acp_thread/src/acp_thread.rs
-@@ -852,6 +852,30 @@ pub struct ContextCompactionUpdate {
+@@ -846,6 +846,30 @@ pub struct ContextCompactionUpdate {
      pub status: Option<ContextCompactionStatus>,
  }
  
@@ -108,7 +108,7 @@ index 32945d9..157947e 100644
  impl AgentThreadEntry {
      pub fn is_indented(&self) -> bool {
          match self {
-@@ -3112,10 +3136,24 @@ impl AcpThread {
+@@ -3081,10 +3105,24 @@ impl AcpThread {
                  );
              }
              acp::SessionUpdate::ToolCall(tool_call) => {
@@ -135,7 +135,7 @@ index 32945d9..157947e 100644
              }
              acp::SessionUpdate::CompactionUpdate(compaction_update) => {
                  self.upsert_context_compaction_update(compaction_update, cx);
-@@ -3651,6 +3689,73 @@ impl AcpThread {
+@@ -3618,6 +3656,73 @@ impl AcpThread {
          cx.emit(AcpThreadEvent::EntryUpdated(ix));
      }
  
@@ -209,7 +209,7 @@ index 32945d9..157947e 100644
      pub fn can_set_title(&mut self, cx: &mut Context<Self>) -> bool {
          self.connection.set_title(&self.session_id, cx).is_some()
      }
-@@ -11703,6 +11808,475 @@ mod tests {
+@@ -12172,6 +12277,475 @@ mod tests {
              assert_eq!(usage.max_tokens, 10000);
          });
      }

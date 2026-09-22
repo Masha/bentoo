@@ -30,7 +30,7 @@ Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 ---
 
 diff --git a/crates/agent_servers/src/acp.rs b/crates/agent_servers/src/acp.rs
-index 9da6f3e..24a59a0 100644
+index c4d8a0f..80b3ae8 100644
 --- a/crates/agent_servers/src/acp.rs
 +++ b/crates/agent_servers/src/acp.rs
 @@ -1295,6 +1295,7 @@ impl AcpConnection {
