@@ -9,22 +9,22 @@ CHROMIUM_LANGS="af am ar bg bn ca cs da de el en-GB es es-419 et fa fi fil fr gu
 
 inherit chromium-2 desktop optfeature pax-utils unpacker xdg
 
-# curl -sA 'Mozilla/5.0' "https://claude.ai/api/desktop/linux/x64/deb/latest" | jq -r '.url'
-# The arm64 endpoint (.../linux/arm64/deb/latest) ships the same version and the
-# same BUILD_ID hash, so one variable covers both SRC_URI branches.
-BUILD_ID="c38127e27202ddc1c8c187102f7798a93b1b8ede"
-
 MY_PN="${PN%-bin}"
 
 DESCRIPTION="Desktop application for Claude.ai"
 HOMEPAGE="https://claude.ai/ https://code.claude.com/docs/en/desktop-linux"
+# The releases/ path used until 2026-09-22 embedded a per-build 40-hex hash in
+# the filename, which had to be hand-carried in a BUILD_ID variable. Anthropic's
+# own APT repository serves the identical artifacts under a plain versioned name
+# (sha256 of the amd64 .deb verified equal on 2026-09-22), so the hash is gone.
+MY_URI="https://downloads.claude.ai/claude-desktop/apt/stable/pool/main/c/${MY_PN}"
 SRC_URI="
 	amd64? (
-		https://downloads.claude.ai/releases/linux/x64/${PV}/Claude-${BUILD_ID}.deb
+		${MY_URI}/${MY_PN}_${PV}_amd64.deb
 			-> ${P}-x86_64.deb
 	)
 	arm64? (
-		https://downloads.claude.ai/releases/linux/arm64/${PV}/Claude-${BUILD_ID}.deb
+		${MY_URI}/${MY_PN}_${PV}_arm64.deb
 			-> ${P}-aarch64.deb
 	)
 "

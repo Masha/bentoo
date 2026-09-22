@@ -7,12 +7,14 @@
 # ebuild (Gentoo version rules: prefixes v/release-/ver-/version- stripped;
 # regex returns capture group 1 of the FIRST match on the raw body).
 #
-# 456 records — 318 regex, 138 json. 99 disabled (enabled = false),
-# 11 held (hold = true): app-office/libreoffice@legacy,
-# app-office/libreoffice-l10n@legacy, dev-build/gn,
-# dev-lang/{rust,rust-bin,rust-common,ghc}, dev-python/tree-sitter,
-# net-ftp/filezilla-pro, sci-ml/stable-diffusion-cpp, sys-cluster/minikube.
-# Recounted with tomllib on 2026-08-29 by the one-liner below. The historical
+# 519 records — 357 regex, 162 json. 127 disabled (enabled = false),
+# 14 held (hold = true): app-office/libreoffice{,-l10n}@legacy, dev-build/gn,
+# dev-lang/{dart@testing,ghc,rust,rust-bin,rust-common}, dev-util/opencodex,
+# media-libs/tlottie, media-video/davinci-resolve, net-ftp/filezilla-pro,
+# sci-ml/stable-diffusion-cpp, sys-cluster/minikube.
+# Recounted with tomllib on 2026-09-22 by the one-liner below. The 2026-08-29
+# figures it replaces read 456/318/138/99/11 and were 24 days old; note that
+# dev-python/tree-sitter left the held set and six records joined it. The historical
 # 96 -> 98 step was not new records: it was dev-libs/icu-compat and
 # media-libs/libjxl-compat getting their enabled = false back, see below.
 #
@@ -327,22 +329,33 @@ Kiro — kiro.dev SPA metadata endpoint (found via DevTools); "currentRelease" i
 # END
 
 ["app-misc/claude-desktop-bin"]
-url = "https://claude.ai/api/desktop/linux/x64/deb/latest"
-parser = "json"
-path = "version"
-headers = { "User-Agent" = "Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0" }
-aux_var = "BUILD_ID"
-aux_pattern = 'Claude-([0-9a-f]{40})\.deb'
+url = "https://downloads.claude.ai/claude-desktop/apt/stable/dists/stable/main/binary-amd64/Packages"
+parser = "regex"
+pattern = 'Version: ([0-9][0-9.]*)'
+select = "max"
 version = "2.2553.1"
 comments = """
-Claude Desktop — official download API behind the claude.ai/download button
-({"version","url"}). claude.ai sits behind Cloudflare: a plain curl/wget UA gets
-a 403 challenge, but the autoupdate UA passes. The .deb has a per-release 40-hex
-hash in its filename that is NOT a standalone JSON field, so it is pulled out of
-the "url" body with aux_pattern into the ebuild's BUILD_ID (same hash serves the
-arm64 endpoint). Do NOT probe the apt repo (downloads.claude.ai/claude-desktop/
-apt/stable): its Packages index lags many releases behind. downloads.claude.ai
-itself has no Cloudflare challenge, so SRC_URI fetches fine under portage's wget.
+Claude Desktop — the Debian "Packages" index of Anthropic's own APT repository,
+the one code.claude.com/docs/en/desktop-linux tells users to add. It is a flat
+text file: one "Version:" field per package, 44 of them on 2026-09-22 and no
+other line containing that word, so select = "max" is exact. The index is NOT
+sorted, hence max rather than the default first-match.
+
+This record pointed at https://claude.ai/api/desktop/linux/x64/deb/latest until
+2026-09-22, when it started returning Cloudflare's interstitial ("Just a
+moment...", HTTP 403) for EVERY User-Agent tried, browser ones included: the
+challenge is now a JS one, so no header fixes it. The old record also carried
+aux_var = "BUILD_ID" / aux_pattern, because the releases/ filename embedded a
+per-build 40-hex hash; the APT pool serves the identical artifacts under a plain
+versioned name (sha256 of the 2.2553.1 amd64 .deb verified byte-equal against
+the cached distfile), so the ebuild dropped BUILD_ID and this record needs no
+auxiliary substitution at all.
+
+The predecessor record warned that "its Packages index lags many releases
+behind". That is no longer true — the index's newest entry was 2.2553.1 on
+2026-09-22, exactly the ebuild's PV. Re-check the lag if a bump ever looks
+suspiciously old, but do not go back to the claude.ai API: it is unprobeable.
+The arm64 index (binary-arm64/Packages) tracks the same versions.
 """
 # END
 
@@ -2400,29 +2413,35 @@ xf86-video-qxl — tags carry "xf86-video-qxl-" prefix; regex extracts the versi
 ["x11-drivers/nvidia-drivers"]
 enabled = false
 disabled_by = "removed 2026-09-10: ::gentoo now ships 615.71.09 itself, which is the exact condition the overlay ebuild's own BENTOO-DIVERGENCE comment named as the moment to drop it (\"the right move is to drop this ebuild, not to align the file\"). The overlay copy had also fallen behind ::gentoo AT THE SAME PV -- ::gentoo since added python-single-r1, the CGROUPS kernel check, python_fix_shebang and dobin nvidia-networking-bug-report.py, none of which the overlay copy had. Kept as a record, not deleted, so the verified probe survives; re-enable only if bentoo ever carries this package again."
-url = "https://www.nvidia.com/en-us/drivers/unix/"
+url = "https://download.nvidia.com/XFree86/Linux-x86_64/"
 parser = "regex"
-pattern = 'Latest New Feature Branch Version:</span> <a href="[^"]+">([0-9][0-9.]*)</a>'
-headers = { "User-Agent" = "bentoo-autoupdate" }
+pattern = '>([0-9]+\.[0-9]+\.[0-9]+)/</a>'
+select = "max"
 version = "615.71.09"
 comments = """
-nvidia-drivers - the Unix Driver Archive page, NOT a directory index.  Verified
-2026-09-09: the raw HTML carries the versions with no JS, and the first match is
-the "Linux x86_64/AMD64/EM64T" block, which is the one this ebuild follows.
-aarch64 is the second block and has tracked the same version so far (615.71.09
-in both on the day this record was written).
+nvidia-drivers - the auto-generated directory index of the Unix driver archive.
+205 version directories on 2026-09-22.  The pattern matches the link TEXT
+(>615.71.09/</a>) rather than the href, because the index quotes attributes with
+single quotes (href='615.71.09/') and a TOML literal string cannot contain one.
+The index is ordered lexicographically, not by version, hence select = "max".  Max is also the right
+semantics here: the New Feature Branch this package follows always carries the
+highest number, the Production Branch a lower one.
 
-The two obvious probes are both wrong, and both fail SILENTLY, which is the
-reason this record points at a marketing page instead:
+This record probed https://www.nvidia.com/en-us/drivers/unix/ until 2026-09-22,
+when the regex stopped matching: that page was redesigned into a JS-rendered
+one and its HTML no longer contains any driver version at all (366 KB of body,
+zero version strings).  Nothing about the pattern can be salvaged.
 
-  - https://download.nvidia.com/XFree86/Linux-x86_64/ is an auto-generated
-    directory index whose own header reads "Generated on Mon Aug  3 2026".  It
-    lists neither 595.99.02 nor 615.71.09, although both directories exist and
-    answer 200 when requested directly.  A regex over it would report 610.57.04
-    as the newest version forever and never once go red.
-  - .../Linux-x86_64/latest.txt tracks the PRODUCTION branch (595.99.02 on
-    2026-09-09), not the New Feature Branch this package follows.  It would read
-    as a permanent downgrade.
+The directory index was rejected in the 2026-09-09 assessment because its own
+"Generated on" header was five weeks stale and it listed neither 595.99.02 nor
+615.71.09.  Re-measured 2026-09-22: the header reads Wed Sep 9 2026 and both
+versions ARE listed, 615.71.09 being the max.  The staleness was a transient
+regeneration lag, not a property of the endpoint.  Watch for it returning - a
+stale index fails SILENTLY, reporting an older version forever.
+
+  - .../Linux-x86_64/latest.txt remains wrong: it tracks the PRODUCTION branch
+    (595.99.02 on 2026-09-22), not the New Feature Branch this package follows.
+    It would read as a permanent downgrade.
 
 This overlay carries the New Feature Branch because ::gentoo stops at the
 previous one (610.57.04).  The day ::gentoo ships 615 or newer, drop the ebuild
