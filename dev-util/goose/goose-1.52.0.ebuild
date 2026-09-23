@@ -1331,13 +1331,9 @@ CRATES="
 "
 
 declare -A GIT_CRATES=(
-	[agent-client-protocol-derive]='https://github.com/agentclientprotocol/rust-sdk;c97a5203d3392f7f231514d84eea014f9f43e6fb;rust-sdk-%commit%/src/agent-client-protocol-derive'
-	[agent-client-protocol-http]='https://github.com/agentclientprotocol/rust-sdk;c97a5203d3392f7f231514d84eea014f9f43e6fb;rust-sdk-%commit%/src/agent-client-protocol-http'
-	[agent-client-protocol]='https://github.com/agentclientprotocol/rust-sdk;c97a5203d3392f7f231514d84eea014f9f43e6fb;rust-sdk-%commit%/src/agent-client-protocol'
 	[cudaforge]='https://github.com/jbg/cudaforge;e7c1967340e40673db98dc9e17da0f04834a456f;cudaforge-%commit%'
 )
 
-ACP_COMMIT="c97a5203d3392f7f231514d84eea014f9f43e6fb"
 CUDAFORGE_COMMIT="e7c1967340e40673db98dc9e17da0f04834a456f"
 
 inherit cargo
@@ -1395,27 +1391,24 @@ QA_FLAGS_IGNORED="usr/bin/goose"
 src_prepare() {
 	default
 
-	# Upstream's own [patch.crates-io] redirects these crates at GIT URLs.
+	# Upstream's own [patch.crates-io] redirects this crate at a GIT URL.
 	# cargo.eclass writes its own [patch] into the cargo config pointing at
 	# the tarballs it already unpacked, but the two patch tables ADD UP
 	# instead of overriding, so cargo still tries to reach github and dies
 	# on --offline with "can't checkout ... you are in the offline mode".
 	# Rewriting upstream's entries to local paths is what actually removes
 	# the network access.
-	local acp="${WORKDIR}/rust-sdk-${ACP_COMMIT}/src"
 	local forge="${WORKDIR}/cudaforge-${CUDAFORGE_COMMIT}"
 
 	# sed exits 0 when it matches nothing, so every substitution is asserted
 	# below -- otherwise an upstream reshuffle would silently restore the
 	# network fetch and only fail much later.
 	sed -i -E \
-		-e "s|^(agent-client-protocol) = \{ git = .*\}$|\1 = { path = \"${acp}/agent-client-protocol\" }|" \
-		-e "s|^(agent-client-protocol-http) = \{ git = .*\}$|\1 = { path = \"${acp}/agent-client-protocol-http\" }|" \
 		-e "s|^(cudaforge) = \{ git = .*\}$|\1 = { path = \"${forge}\" }|" \
 		Cargo.toml || die "failed to rewrite upstream [patch.crates-io]"
 
 	local crate
-	for crate in agent-client-protocol agent-client-protocol-http cudaforge; do
+	for crate in cudaforge; do
 		grep -qF "${crate} = { path = " Cargo.toml ||
 			die "[patch.crates-io] entry for ${crate} was not rewritten"
 	done

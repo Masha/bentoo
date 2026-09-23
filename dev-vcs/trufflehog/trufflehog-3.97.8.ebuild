@@ -10,7 +10,9 @@ HOMEPAGE="https://github.com/trufflesecurity/trufflehog"
 SRC_URI="https://github.com/trufflesecurity/trufflehog/archive/refs/tags/v${PV}.tar.gz -> ${P}.tar.gz"
 # Vendored dependency tree, generated with `go mod vendor` and hosted by the
 # overlay, so the build carries a checksum and needs no network.
-SRC_URI+=" https://distfiles.obentoo.org/${P}-vendor.tar.xz"
+# go.mod/go.sum are unchanged since 3.97.5, so its vendor tarball is reused.
+VENDOR_P="${PN}-3.97.5"
+SRC_URI+=" https://distfiles.obentoo.org/${VENDOR_P}-vendor.tar.xz"
 
 LICENSE="AGPL-3"
 # Dependent (bundled, statically linked) Go module licenses
@@ -22,6 +24,11 @@ BDEPEND=">=dev-lang/go-1.25"
 
 # The suite reaches live credential-verification endpoints.
 RESTRICT="test"
+
+src_prepare() {
+	mv "${WORKDIR}/${VENDOR_P}/vendor" "${S}/" || die
+	default
+}
 
 src_compile() {
 	local version_pkg="github.com/trufflesecurity/trufflehog/v3/pkg/version"
