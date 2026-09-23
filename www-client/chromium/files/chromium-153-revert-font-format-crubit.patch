@@ -30,6 +30,12 @@ drops the new fonts/BUILD.gn.  `cxx_bindings` is still a supported
 it), and the Rust logic itself is unchanged -- the commit only flipped
 `fn` -> `pub fn` and `Box<T>` -> `T`.
 
+The three `//third_party/rust/...` deps restored here are the ones the deleted
+fonts/BUILD.gn listed, so they move with every roll of those crates: M154
+carries read_fonts v0_43 and skrifa v0_46 where M153 carried v0_41 and v0_44.
+On a series bump, re-read fonts/BUILD.gn and resync both copies -- the added
+target and the context of the deletion hunk -- or the hunk stops applying.
+
 Applied only with USE=-bundled-toolchain; with the bundled toolchain the
 upstream Crubit path works as-is.  Drop this patch once upstream gates the
 Crubit dependency on `enable_cpp_api_from_rust` or ships Crubit's support
@@ -48,8 +54,8 @@ diff -ruN a/third_party/blink/renderer/platform/BUILD.gn b/third_party/blink/ren
 +  cxx_bindings = [ crate_root ]
 +  deps = [
 +    "//third_party/rust/font_types/v0_12:lib",
-+    "//third_party/rust/read_fonts/v0_41:lib",
-+    "//third_party/rust/skrifa/v0_44:lib",
++    "//third_party/rust/read_fonts/v0_43:lib",
++    "//third_party/rust/skrifa/v0_46:lib",
 +  ]
 +}
 +
@@ -93,8 +99,8 @@ diff -ruN a/third_party/blink/renderer/platform/fonts/BUILD.gn b/third_party/bli
 -  }
 -  deps = [
 -    "//third_party/rust/font_types/v0_12:lib",
--    "//third_party/rust/read_fonts/v0_41:lib",
--    "//third_party/rust/skrifa/v0_44:lib",
+-    "//third_party/rust/read_fonts/v0_43:lib",
+-    "//third_party/rust/skrifa/v0_46:lib",
 -  ]
 -}
 diff -ruN a/third_party/blink/renderer/platform/fonts/opentype/font_format_check.cc b/third_party/blink/renderer/platform/fonts/opentype/font_format_check.cc
