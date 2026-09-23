@@ -3,7 +3,7 @@
 
 EAPI=8
 
-inherit go-module
+inherit go-env go-module
 
 DESCRIPTION="Finds and verifies leaked credentials across git history and many sources"
 HOMEPAGE="https://github.com/trufflesecurity/trufflehog"
@@ -25,9 +25,15 @@ BDEPEND=">=dev-lang/go-1.25"
 # The suite reaches live credential-verification endpoints.
 RESTRICT="test"
 
-src_prepare() {
-	mv "${WORKDIR}/${VENDOR_P}/vendor" "${S}/" || die
+# go-module_src_unpack runs `go mod verify` (network) unless ${S}/vendor
+# exists right after unpack; when VENDOR_P != P the tarball lands elsewhere,
+# so move it in before that check instead of in src_prepare.
+src_unpack() {
 	default
+	if [[ ${VENDOR_P} != ${P} ]]; then
+		mv "${WORKDIR}/${VENDOR_P}/vendor" "${S}/" || die
+	fi
+	go-env_set_compile_environment
 }
 
 src_compile() {
