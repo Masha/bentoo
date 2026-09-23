@@ -5377,6 +5377,41 @@ for 6.7.90 siblings that ::gentoo does not have, and nothing satisfies them.
 """
 # END
 
+["kde-plasma/powerdevil"]
+hold = true
+url = "https://invent.kde.org/api/v4/projects/plasma%2Fpowerdevil/repository/tags?search=^v6&per_page=100"
+parser = "regex"
+pattern = '"name":"v([0-9]+\.[0-9]+\.[0-9]+(?:\.[0-9]+)?)"'
+select = "max"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+series = '^[0-9]+\.[0-9]+\.(?:[0-9]|[1-8][0-9])(?:\.[0-9]+)?(?:-r[0-9]+)?$'
+version = "6.7.5"
+comments = """
+powerdevil -> plasma/powerdevil. Temporary mirror of ::gentoo's 6.7.5-r2 plus
+one patch, NOT a package bentoo intends to carry.
+
+::gentoo's -r2 added powerdevil-6.7.5-patchset-1, whose cherry-pick of upstream
+57f190459 (KDE-bug #523281) is half a change: it prefixes the brightness
+applet's controls with "dialog." but omits the companion commit declaring them
+as properties on PopupDialog. The prefix resolves to undefined, so every drag
+of the brightness slider dies on a TypeError and the display never dims. The
+overlay ebuild drops the prefix; files/ carries the reasoning.
+
+hold = true because the patch is pinned to 6.7.5: on any later tag it applies
+to code that no longer needs it, and the fix is already complete upstream from
+6.7.6 on. So this record does not bump -- it reports, and the report IS the
+exit condition. The moment it calls 6.7.6, delete this package and this record
+goes enabled = false; there is nothing bentoo-specific left to keep.
+
+Probed on invent.kde.org rather than api.github.com/repos/KDE: the GitHub
+token-less cap is 60 req/h and kde-plasma already overspends it (see
+kde-frameworks/attica). select = "max" + series, never [0].name, because
+Plasma numbers the next series' beta x.y.90 -- v6.7.90 IS the 6.8 beta and
+sorts first; kde-plasma/plasma-firewall carries the full account of what a
+revival onto such a beta breaks.
+"""
+# END
+
 ["kde-plasma/spectacle"]
 url = "https://api.github.com/repos/KDE/plasma-workspace/tags?per_page=20"
 parser = "regex"
