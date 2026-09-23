@@ -166,6 +166,18 @@ src_prepare() {
 		/^rev = /d
 	}' "$(gen_git_crate_dir tokio-tungstenite)/Cargo.toml" || die
 
+	# rustc 1.98 counts the layout query of an async fn body against
+	# recursion_limit, and codex-chatgpt's connectors::list_connectors() adds
+	# 130 to the depth on its own -- past the default of 128, which aborts the
+	# crate with "queries overflow the depth limit!". Upstream never sees it
+	# (their toolchain accounts the query differently), so the crate root
+	# carries no attribute of its own; the guard exists because inserting a
+	# second #![recursion_limit] once upstream adds one is a hard error.
+	if grep -q 'recursion_limit' chatgpt/src/lib.rs; then
+		die "codex-chatgpt now sets recursion_limit itself; drop the insert below"
+	fi
+	sed -i '1i #![recursion_limit = "512"]' chatgpt/src/lib.rs || die
+
 	# Remove the [patch.crates-io] section and add path-based patches
 	sed -i '/^\[patch\.crates-io\]/,/^$/d' "${S}/Cargo.toml" || die
 	sed -i '/^\[patch\."ssh:\/\/git@github\.com/,/^$/d' "${S}/Cargo.toml" || die
