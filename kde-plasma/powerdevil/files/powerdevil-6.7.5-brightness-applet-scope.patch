@@ -1,0 +1,45 @@
+Fix the brightness applet sliders being unable to change brightness.
+
+powerdevil-6.7.5-patchset-1 cherry-picks upstream 57f190459
+("applets/brightness: fix Slider binding issues", KDE-bug #523281), which
+rewrites the two onMoved handlers to qualify the control objects as
+`dialog.screenBrightnessControl` and `dialog.keyboardBrightnessControl`.
+
+Upstream can do that because master also declares those as required
+properties on PopupDialog and passes them from main.qml. That companion
+change is not part of the patchset, so in 6.7.5 `dialog` (id of the
+PlasmaExtras.Representation) has no such property: the expression evaluates
+to undefined and every drag of the slider dies with
+
+    PopupDialog.qml:82: TypeError: Cannot read property 'setBrightness' of undefined
+
+leaving the display brightness unchanged while the slider snaps back.
+
+Drop the `dialog.` qualifier so the handlers resolve the ids through the
+inherited context, exactly as the surrounding code already does for
+`model: screenBrightnessControl.displays` on line 49. The rest of the
+patchset, which is what actually fixes the slider bindings, is kept.
+
+Drop this patch once the tree moves to >=kde-plasma/powerdevil-6.7.6,
+which carries the complete upstream change.
+
+--- a/applets/brightness/PopupDialog.qml
++++ b/applets/brightness/PopupDialog.qml
+@@ -79,7 +79,7 @@
+ 
+                     stepSize: maxBrightness/100
+ 
+-                    onMoved: value => dialog.screenBrightnessControl.setBrightness(displayName, value)
++                    onMoved: value => screenBrightnessControl.setBrightness(displayName, value)
+                     onActiveFocusChanged: if (activeFocus) scrollView.positionViewAtItem(this)
+                 }
+ 
+@@ -132,7 +132,7 @@
+                 KeyNavigation.backtab: KeyNavigation.up
+                 KeyNavigation.tab: KeyNavigation.down
+ 
+-                onMoved: value => dialog.keyboardBrightnessControl.brightness = value
++                onMoved: value => keyboardBrightnessControl.brightness = value
+                 onActiveFocusChanged: if (activeFocus) scrollView.positionViewAtItem(this)
+             }
+ 
