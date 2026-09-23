@@ -100,10 +100,10 @@ index cbb1bb6..c69a34d 100644
      // that offers to resolve conflicts using the agent.
      //
 diff --git a/crates/acp_thread/src/acp_thread.rs b/crates/acp_thread/src/acp_thread.rs
-index 84a16fc..ef25f78 100644
+index f81de13..6ecc06a 100644
 --- a/crates/acp_thread/src/acp_thread.rs
 +++ b/crates/acp_thread/src/acp_thread.rs
-@@ -4222,6 +4222,17 @@ impl AcpThread {
+@@ -4255,6 +4255,17 @@ impl AcpThread {
          Some((index, elicitation))
      }
  
@@ -236,10 +236,10 @@ index 3207b0f..9be352b 100644
              threads_sidebar: agent_settings::ThreadsSidebarSettings {
                  auto_open: true,
 diff --git a/crates/agent_ui/src/conversation_view.rs b/crates/agent_ui/src/conversation_view.rs
-index 941b863..6011f67 100644
+index 6de4227..35c7bc1 100644
 --- a/crates/agent_ui/src/conversation_view.rs
 +++ b/crates/agent_ui/src/conversation_view.rs
-@@ -2530,22 +2530,37 @@ impl ConversationView {
+@@ -2560,22 +2560,37 @@ impl ConversationView {
                      .log_err();
                  }
              },
@@ -856,7 +856,7 @@ index 6b8c2d8..c6afdbd 100644
                              on_submit(submit_id.clone(), window, cx);
                          }
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
-index 009a652..e5ae90c 100644
+index a481ffa..289743a 100644
 --- a/crates/agent_ui/src/conversation_view/thread_view.rs
 +++ b/crates/agent_ui/src/conversation_view/thread_view.rs
 @@ -42,7 +42,7 @@ use language_model::{
@@ -967,7 +967,7 @@ index 009a652..e5ae90c 100644
      fn render_request_elicitations(&self, cx: &Context<Self>) -> Vec<AnyElement> {
          let server_view = self.server_view.clone();
          let handlers_view = server_view.clone();
-@@ -12851,6 +12923,7 @@ impl Render for ThreadView {
+@@ -12884,6 +12956,7 @@ impl Render for ThreadView {
                  |this, version| this.child(self.render_new_version_callout(&version, cx)),
              )
              .children(self.render_token_limit_callout(cx))

@@ -44,7 +44,7 @@ this work lives now, and where protocol breakage is reported first.
 ---
 
 diff --git a/Cargo.lock b/Cargo.lock
-index e601b4d..4170a21 100644
+index 8867d3e..8ac7a0d 100644
 --- a/Cargo.lock
 +++ b/Cargo.lock
 @@ -3085,6 +3085,31 @@ version = "0.7.6"
@@ -79,7 +79,7 @@ index e601b4d..4170a21 100644
  [[package]]
  name = "cli"
  version = "0.1.0"
-@@ -22879,6 +22904,7 @@ dependencies = [
+@@ -22878,6 +22903,7 @@ dependencies = [
   "channel",
   "chrono",
   "clap",

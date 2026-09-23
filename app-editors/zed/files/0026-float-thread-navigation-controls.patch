@@ -56,7 +56,7 @@ the claude-agent-acp-plus flag BY CHOICE rather than by dependency.
 ---
 
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
-index a9e5518..009a652 100644
+index d9e82f5..a481ffa 100644
 --- a/crates/agent_ui/src/conversation_view/thread_view.rs
 +++ b/crates/agent_ui/src/conversation_view/thread_view.rs
 @@ -6728,13 +6728,6 @@ impl ThreadView {
@@ -223,7 +223,7 @@ index a9e5518..009a652 100644
      fn is_thread_feedback_enabled(&self, cx: &App) -> bool {
          util::maybe!({
              let project = self.thread.read(cx).project().read(cx);
-@@ -12465,9 +12511,11 @@ impl Render for ThreadView {
+@@ -12495,9 +12541,11 @@ impl Render for ThreadView {
              })
              .map(|this| {
                  if has_messages {
