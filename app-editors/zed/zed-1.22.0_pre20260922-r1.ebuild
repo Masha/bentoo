@@ -1835,13 +1835,15 @@ src_prepare() {
 			# UI rather than an affordance over existing machinery. Pure Zed, by
 			# CHOICE.
 			"${FILESDIR}/0016-composer-markdown-preview.patch"
-			# 0017: native rendering for a compaction the adapter reports. The ACP
-			# compaction_update variant is unreachable here -- agent-client-protocol
-			# 2.0.0 carries zero occurrences of "compaction" -- so this reads the
-			# adapter's versioned _meta.contextCompaction and dispatches into the
-			# existing push_context_compaction; an unknown version falls through to
-			# the generic tool row. Rides this flag by DEPENDENCY: only this
-			# adapter emits that key.
+			# 0017: native rendering for a compaction the adapter reports. NOT
+			# because the ACP notification is unreachable -- that was this comment's
+			# claim until 2026-09-22 and it was false; acp_thread.rs matches
+			# acp::SessionUpdate::CompactionUpdate and the linked crate is 2.2.0 /
+			# schema 1.9.1. It is because _meta.contextCompaction is the channel the
+			# adapter actually sends, so this reads that versioned key and dispatches
+			# into the existing push_context_compaction; an unknown version falls
+			# through to the generic tool row. Rides this flag by DEPENDENCY: only
+			# this adapter emits that key.
 			"${FILESDIR}/0017-native-compaction-entry.patch"
 			# 0026: the two end-of-turn navigation controls -- scroll to the user
 			# message, scroll to the top -- float over the conversation instead of
