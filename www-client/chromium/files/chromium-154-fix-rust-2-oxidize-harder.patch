@@ -18,9 +18,13 @@ relative directory resolution.
 
 Bug: 491242305
 Signed-off-by: Matt Jolly <kangie@gentoo.org>
+
+[bentoo: rebased onto 154. Upstream 154 moved filter_clang_args out of
+ run_bindgen and hoisted the Crubit support path into a CRUBIT_SUPPORT_PATH
+ constant, which invalidated the context of two hunks in the 153 rebase.]
 --- a/build/config/rust.gni
 +++ b/build/config/rust.gni
-@@ -431,7 +431,7 @@ rustc_wrapper_inputs = [
+@@ -431,7 +431,7 @@
  ]
  
  if (host_os == "win") {
@@ -32,9 +36,9 @@ Signed-off-by: Matt Jolly <kangie@gentoo.org>
  }
 --- a/build/rust/gni_impl/run_rs_bindings_from_cc.py
 +++ b/build/rust/gni_impl/run_rs_bindings_from_cc.py
-@@ -15,15 +15,6 @@
+@@ -15,14 +15,6 @@
  sys.path.append(THIS_DIR)
- from run_bindgen import filter_clang_args
+ from filter_clang_args import filter_clang_args
  
 -RUST_TOOLCHAIN_DIR = os.path.join(
 -    CHROMIUM_SRC_DIR, "third_party", "rust-toolchain"
@@ -44,11 +48,10 @@ Signed-off-by: Matt Jolly <kangie@gentoo.org>
 -RS_BINDINGS_FROM_CC_EXE_PATH = os.path.join(
 -    RUST_TOOLCHAIN_DIR, "bin", "rs_bindings_from_cc"
 -)
--
- 
- def format_cmdline(args):
- 
-@@ -38,6 +29,8 @@
+ CRUBIT_SUPPORT_PATH = os.path.join(
+     "third_party", "crubit", "src", "rs_bindings_from_cc", "support"
+ )
+@@ -41,6 +33,8 @@
  
  def main():
      parser = argparse.ArgumentParser()
@@ -57,7 +60,7 @@ Signed-off-by: Matt Jolly <kangie@gentoo.org>
      (
          parser.add_argument(
              "--targets_and_args_from_gn",
-@@ -111,8 +104,9 @@
+@@ -114,8 +108,9 @@
      )
  
      # All Crubit invocations in Chromium share the following cmdline args.
@@ -66,11 +69,11 @@ Signed-off-by: Matt Jolly <kangie@gentoo.org>
 +    generator_args.append(f"--rustfmt_exe_path={args.rustfmt_path}")
 +    rustfmt_config_path = os.path.join(CHROMIUM_SRC_DIR, ".rustfmt.toml")
 +    generator_args.append(f"--rustfmt_config_path={rustfmt_config_path}")
-     generator_args.append(
-         "--crubit_support_path=third_party/crubit/src/rs_bindings_from_cc/support"
-     )
-@@ -143,7 +137,7 @@
-     clang_args += ["-Wno-unused-command-line-argument"]
+     generator_args.append(f"--crubit_support_path={CRUBIT_SUPPORT_PATH}")
+ 
+     # Long cmdlines may not work - work around that by using Abseil's
+@@ -135,7 +130,7 @@
+     clang_args.extend(filter_clang_args(args.clang_args))
  
      # Print a copy&pastable final cmdline when asked for debugging help.
 -    cmdline = [RS_BINDINGS_FROM_CC_EXE_PATH, f"--flagfile={params_file_path}"]
@@ -80,7 +83,7 @@ Signed-off-by: Matt Jolly <kangie@gentoo.org>
          pretty_cmdline = format_cmdline(cmdline)
 --- a/build/rust/gni_impl/rust_target.gni
 +++ b/build/rust/gni_impl/rust_target.gni
-@@ -725,9 +725,9 @@ template("rust_target") {
+@@ -725,9 +725,9 @@
            # `import`ed for `LoadRustEnvAndFlags`, etc.
            inputs = rustc_wrapper_inputs
            if (host_os == "win") {
@@ -92,7 +95,7 @@ Signed-off-by: Matt Jolly <kangie@gentoo.org>
            }
            if (rust_clippy_conf_file != "") {
              inputs += [ rust_clippy_conf_file ]
-@@ -735,7 +735,7 @@ template("rust_target") {
+@@ -735,7 +735,7 @@
  
            args = [
              "--clippy-driver",
@@ -103,7 +106,7 @@ Signed-off-by: Matt Jolly <kangie@gentoo.org>
              rebase_path(_rustc_env_and_flags, root_build_dir),
 --- a/build/rust/rs_bindings_from_cc.gni
 +++ b/build/rust/rs_bindings_from_cc.gni
-@@ -248,7 +248,15 @@ template("rs_bindings_from_cc") {
+@@ -248,7 +248,15 @@
      }
  
      script = "//build/rust/gni_impl/run_rs_bindings_from_cc.py"
@@ -120,7 +123,7 @@ Signed-off-by: Matt Jolly <kangie@gentoo.org>
      sources = invoker.public_headers
      outputs = [
        _rs_out_path,
-@@ -268,6 +276,10 @@ template("rs_bindings_from_cc") {
+@@ -268,6 +276,10 @@
        string_join(",", _rebased_public_headers),
        "--targets_and_args_from_gn",
        rebase_path(_metadata_path),

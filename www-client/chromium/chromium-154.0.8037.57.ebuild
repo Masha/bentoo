@@ -671,15 +671,16 @@ src_prepare() {
 			# bentoo: rebase of chromium-patches' toolchain/
 			# cr152-fix-rust-2-oxidize-harder.patch, which teaches Crubit to take
 			# rs_bindings_from_cc and rustfmt from ${rust_sysroot} instead of the
-			# bundled //third_party/rust-toolchain the tarball does not ship. Its
-			# three .gni hunks still apply; 153 only reformatted
-			# run_rs_bindings_from_cc.py to 4-space indent, which rejected all
-			# four hunks against that file. Nothing about the fix changed -- the
-			# hardcoded RUST_TOOLCHAIN_DIR constants are still there. Reachable
-			# only on this branch: the patchset's toolchain/ directory is applied
-			# by the loop below, which is inside this same USE=-bundled-toolchain
-			# else.
-			"${FILESDIR}/chromium-153-fix-rust-2-oxidize-harder.patch"
+			# bundled //third_party/rust-toolchain the tarball does not ship.
+			# Nothing about the fix changed -- the hardcoded RUST_TOOLCHAIN_DIR
+			# constants are still there -- only the context around it: 153
+			# reformatted run_rs_bindings_from_cc.py to 4-space indent, and 154
+			# moved filter_clang_args out of run_bindgen and hoisted the Crubit
+			# support path into a CRUBIT_SUPPORT_PATH constant, which sat exactly
+			# where two of the four hunks anchored. Reachable only on this
+			# branch: the patchset's toolchain/ directory is applied by the loop
+			# below, which is inside this same USE=-bundled-toolchain else.
+			"${FILESDIR}/chromium-154-fix-rust-2-oxidize-harder.patch"
 		)
 
 		# See the rm above common/ for why substitution means deleting first.
