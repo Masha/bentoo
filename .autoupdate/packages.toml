@@ -333,7 +333,7 @@ url = "https://downloads.claude.ai/claude-desktop/apt/stable/dists/stable/main/b
 parser = "regex"
 pattern = 'Version: ([0-9][0-9.]*)'
 select = "max"
-version = "2.2553.13"
+version = "2.7032.0"
 comments = """
 Claude Desktop — the Debian "Packages" index of Anthropic's own APT repository,
 the one code.claude.com/docs/en/desktop-linux tells users to add. It is a flat
@@ -941,7 +941,7 @@ transform strips the "go" prefix to match PV. Live=1.26.5.
 url = "https://persistent.oaistatic.com/codex-app-prod/linux/deb/dists/stable/main/binary-amd64/Packages"
 parser = "regex"
 pattern = 'Package: chatgpt\nVersion: ([0-9]+\.[0-9]+\.[0-9]+)'
-version = "26.917.61114"
+version = "26.917.62051"
 comments = """
 OpenAI Codex/ChatGPT desktop app — read the APT index of the very repo that
 SRC_URI pulls from. Both openai.com and chatgpt.com sit behind Cloudflare and
@@ -1083,13 +1083,11 @@ release.gitkraken.com/linux/gitkraken-amd64.tar.gz 302 target).
 # END
 
 ["net-print/hplip-plugin"]
-enabled = false
-disabled_by = "parity-audit 2026-09-16: removed, byte-identical to ::gentoo 3.26.4 and ::gentoo is not lagging the blob -- see comments"
 url = "https://www.openprinting.org/download/printdriver/auxfiles/HP/plugins/"
 parser = "regex"
 pattern = 'hplip-([0-9]+\.[0-9]+\.[0-9]+)-plugin\.run'
 select = "max"
-version = "3.26.4"
+version = "3.26.6"
 comments = """
 hplip-plugin — probes the openprinting directory that holds the .run blobs
 themselves, which is the ONLY endpoint whose answer the ebuild can actually
@@ -3456,7 +3454,7 @@ base_from = "tag"
 base_url = "https://api.github.com/repos/KhronosGroup/Vulkan-Utility-Libraries/git/refs/tags"
 base_tag_pattern = '^v([0-9]+\.[0-9]+\.[0-9]+)$'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.363_p20260922"
+version = "1.4.363_p20260923"
 comments = """
 vulkan-utility-libraries — commit-tracked on main, same shape as vulkan-headers.
 
@@ -3482,7 +3480,7 @@ base_from = "file"
 base_url = "https://raw.githubusercontent.com/KhronosGroup/Vulkan-ValidationLayers/main/CMakeLists.txt"
 base_pattern = '(?m)^project\([A-Za-z_-]+ VERSION ([0-9][0-9.]*)'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.363_p20260922"
+version = "1.4.363_p20260923"
 comments = """
 vulkan-layers — commit-tracked on main (Vulkan-ValidationLayers); scans for "Update for Vulkan-Docs X.Y.Z".
 """
@@ -9080,13 +9078,11 @@ which is why this entry carried no revision until 2026-07-26.
 # END
 
 ["sci-ml/ollama"]
-enabled = false
-disabled_by = "removed 2026-09-22 (fourth time): ::gentoo ships the same 0.34.2 with the correct llama.cpp pin, ours had the stale one again -- see comments"
 url = "https://api.github.com/repos/ollama/ollama/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.34.2"
+version = "0.34.3"
 comments = """
 ollama source — same repo as ollama-bin; tag "vX.Y.Z" (leading v stripped).
 
@@ -9435,7 +9431,7 @@ url = "https://api.github.com/repos/digitalocean/doctl/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.171.2"
+version = "1.173.0"
 comments = """
 doctl (DigitalOcean CLI, historically "doit"/DoCli) — GitHub releases/latest
 tag "vX.Y.Z"; the leading v is normalized away by the autoupdate. Verified
@@ -10711,7 +10707,7 @@ parser = "regex"
 pattern = '"tag_name":\s*"v([0-9]+\.[0-9]+\.[0-9]+)"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "7.7.7"
+version = "7.7.9"
 comments = """
 Kilo Code — releases land several times a day (v7.6.1 and v7.6.2 shipped within
 hours of each other), so expect this record to move often.
