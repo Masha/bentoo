@@ -12,7 +12,8 @@ S="${WORKDIR}"
 
 LICENSE="hplip-plugin"
 SLOT="0"
-KEYWORDS="amd64 arm arm64 x86"
+# ~arch only: it pairs with ~net-print/hplip-3.26.6, which is ~arch here.
+KEYWORDS="~amd64 ~arm ~arm64 ~x86"
 IUSE="orblite"
 # License does not allow us to redistribute the "source" package
 RESTRICT="mirror"

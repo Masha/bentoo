@@ -1,0 +1,162 @@
+Rebase of 014_hplip-3.25.2-missing-includes-and-definitions.patch from
+hplip-3.26.4-patches-1.tar.xz. Carried whole because eapply is all-or-nothing:
+one of its twelve hunks stopped applying to 3.26.6, so the patch has to be
+dropped from the fetched patchset and reinstated from here. See
+hplip-makefile-am-patchset-rebase.patch for the wider story.
+
+Two of the original hunks are deliberately NOT reproduced, because 3.26.6
+adopted them upstream:
+
+  protocol/hp_ipp.c   now opens with #define _GNU_SOURCE of its own.
+  scan/sane/sclpml.c  now includes <sys/time.h> (and <ctype.h>) directly.
+
+The sclpml.c _GNU_SOURCE define IS still reproduced and is still load-bearing:
+sclpml.c calls strcasestr() at line 1914, which glibc only declares under
+_GNU_SOURCE.
+
+The rest is unchanged in intent -- missing includes (<stdlib.h>, <unistd.h>),
+the Python 3 shims in pcardext.c, and the five prototypes in protocol/hp_ipp.h
+that prnt/cupsext/cupsext.c calls. Those prototypes are what actually breaks the
+build when this patch is missing: cupsext.c fails with "implicit declaration of
+function 'addCupsPrinter'" and four more of the same, which under -Werror=
+implicit-function-declaration is fatal.
+
+--- a/common/utils.c
++++ b/common/utils.c
+@@ -1,3 +1,7 @@
++#ifndef _GNU_SOURCE
++#define _GNU_SOURCE
++#endif
++
+ #include "utils.h"
+ #include "string.h"
+ #include <dlfcn.h>
+--- a/io/hpmud/jd.c
++++ b/io/hpmud/jd.c
+@@ -31,6 +31,7 @@
+ #endif
+ 
+ #include <signal.h>
++#include <stdlib.h>
+ #include "hpmud.h"
+ #include "hpmudi.h"
+ 
+--- a/pcard/pcardext/pcardext.c
++++ b/pcard/pcardext/pcardext.c
+@@ -39,6 +39,12 @@
+ #define PY_SSIZE_T_MIN INT_MIN
+ #endif
+ 
++#if PY_MAJOR_VERSION >= 3
++#define PyString_AsStringAndSize PyBytes_AsStringAndSize
++#define PyString_FromStringAndSize PyBytes_FromStringAndSize
++#define PyInt_AS_LONG PyLong_AS_LONG
++#endif
++
+ int verbose=0;
+ 
+ PyObject * readsectorFunc = NULL;
+@@ -81,8 +87,11 @@
+     
+     if( writesectorFunc )
+     {
++#if PY_MAJOR_VERSION >= 3
+         result = PyObject_CallFunction( writesectorFunc, "iis#", sector, nsector, buf, size );
+-        
++#else
++        result = PyObject_CallFunction( writesectorFunc, "iiy#", sector, nsector, buf, size );
++#endif
+         return PyInt_AS_LONG( result );
+     }
+ 
+@@ -236,6 +245,29 @@
+ 
+ static char pcardext_documentation[] = "Python extension for HP photocard services";
+ 
++#if PY_MAJOR_VERSION >= 3
++static struct PyModuleDef moduledef = {
++        .m_base = PyModuleDef_HEAD_INIT,
++        .m_name = "pcardext",
++        .m_doc = pcardext_documentation,
++        .m_size = -1,
++        .m_methods = pcardext_methods,
++        .m_slots = NULL,
++        .m_traverse = NULL,
++        .m_clear = NULL,
++        .m_free = NULL,
++};
++
++PyMODINIT_FUNC
++PyInit_pcardext( void )
++{
++       PyObject *module = PyModule_Create2(&moduledef, PYTHON_API_VERSION);
++
++       return module;
++}
++
++#else
++
+ void initpcardext( void )
+ {
+     PyObject * mod = Py_InitModule4( "pcardext", pcardext_methods, 
+@@ -246,4 +278,4 @@
+       return;
+ }
+ 
+-
++#endif
+--- a/protocol/hp_ipp.h
++++ b/protocol/hp_ipp.h
+@@ -149,6 +149,7 @@
+ 
+ 
+ http_t*    acquireCupsInstance();
++void _releaseCupsInstance();
+ const char *getCupsErrorString(int status);
+ void freePrinterList(printer_t *list);
+  
+@@ -163,6 +164,11 @@
+ ipp_t * networkDoRequest(ipp_t *request, char* device_uri,const char *resource);
+ ipp_t * getDeviceStatusAttributes(char* device_uri,char* printer_name, int *count);
+ int     getCupsPrinters(printer_t **printer_list);
++int addCupsPrinter(char *name, char *device_uri, char *location, char *ppd_file,
++                  char *model, char *info);
++int delCupsPrinter(char *pr_name);
++int setDefaultCupsPrinter(char *pr_name);
++int controlCupsPrinter(char *pr_name, int op);
+ 
+ HPIPP_RESULT parseResponseHeader(char* header, int *content_length, int *chunked, int* header_size);
+ HPIPP_RESULT prepend_http_header(raw_ipp *raw_request,const char *resource);
+--- a/scan/sane/bb_ledm.c
++++ b/scan/sane/bb_ledm.c
+@@ -27,6 +27,7 @@
+ # include "xml.h"
+ # include <stdlib.h>
+ 
++# include <unistd.h>
+ # include <stdint.h>
+ 
+ # define _STRINGIZE(x) #x
+--- a/scan/sane/http.c
++++ b/scan/sane/http.c
+@@ -33,6 +33,7 @@
+ 
+ #include <stdio.h>
+ #include <stdlib.h>
++#include <unistd.h>
+ #include <string.h>
+ #include <syslog.h>
+ #include <ctype.h>
+--- a/scan/sane/sclpml.c
++++ b/scan/sane/sclpml.c
+@@ -25,6 +25,10 @@
+ 
+ \************************************************************************************/
+ 
++#ifndef _GNU_SOURCE
++#define _GNU_SOURCE
++#endif
++
+ #include <stdio.h>
+ #include <string.h>
+ #include <unistd.h>

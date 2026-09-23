@@ -1,0 +1,83 @@
+Rebase of two hunks that ::gentoo carries in hplip-3.26.4-patches-1.tar.xz but
+that no longer apply to the 3.26.6 sources. The patchset itself was never
+rebased upstream -- dev.gentoo.org/~billie publishes no 3.26.5 or 3.26.6 tarball
+(both 404 as of 2026-09-23) -- so hplip-3.26.6.ebuild keeps fetching the 3.26.4
+patchset, drops the three files that broke, and reapplies their content from
+here.
+
+This file carries the Makefile.am half, originally split across:
+
+  005_hplip-3.21.4-remove-imageprocessor.patch
+      Drops the prebuilt, closed-source libImageProcessor-x86_{32,64}.so: from
+      the dist list, from hpcups' link line, and from install-data-hook. Broke
+      on the link line only, because 3.26.6 inserted hpcups_CPPFLAGS and
+      hpcups_LDFLAGS just above it and appended $(AM_CXXFLAGS) to
+      hpcups_CXXFLAGS, moving the hunk's context out from under it.
+
+  010_hplip-3.20.6-distribution.patch
+      Removes the hardcoded /usr/lib/systemd/system rules dir, and drops
+      uninstall.py / upgrade.py from dist_cmd_SCRIPTS -- a distribution's
+      package manager owns removal and upgrades, not the upstream installer.
+      Broke because 3.26.6 removed pkservice.py from that same line.
+
+Neither hunk changed in intent; only the surrounding context moved.
+
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -148,10 +148,6 @@
+ 	ip/xbi2gray.c ip/xcolrspc.c ip/xfakemono.c ip/xgray2bi.c ip/xinvert.c ip/xjpg_enc.c ip/xmatrix.c ip/xpnm.c ip/xscale.c ip/xthumb.c ip/xyxtract.c \
+ 	ip/hpip.h ip/ipdefs.h ip/xform.h ip/xjpg_dct.h ip/xjpg_huf.h ip/xjpg_mrk.h
+ 
+-#hpmud rules data dir
+-rulessystemdir=/usr/lib/systemd/system
+-dist_rulessystem_DATA =data/rules/hplip-printer@.service
+-
+ # hpmud.rules
+ if !HPLIP_CLASS_DRIVER
+ rulesdir = /etc/udev/rules.d
+@@ -184,7 +180,7 @@
+ dist_hplip_SCRIPTS = hpssd.py __init__.py hpdio.py
+ endif #HPLIP_CLASS_DRIVER
+ 
+-dist_noinst_DATA += prnt/drv/hpijs.drv.in.template prnt/drv/hpcups.drv.in.template prnt/hpcups/libImageProcessor-x86_64.so prnt/hpcups/libImageProcessor-x86_32.so
++dist_noinst_DATA += prnt/drv/hpijs.drv.in.template prnt/drv/hpcups.drv.in.template
+ 
+ dist_noinst_DATA += prnt/ipp-usb/HPLIP.conf
+ dist_noinst_SCRIPTS += dat2drv.py install.py  hplip-install init-suse-firewall init-iptables-firewall class_rpm_build.sh hplipclassdriver.spec createPPD.sh Makefile_dat2drv hpijs-drv
+@@ -197,8 +193,8 @@
+ if !HPLIP_CLASS_DRIVER
+ dist_cmd_SCRIPTS = align.py info.py print.py toolbox.py clean.py colorcal.py unload.py testpage.py makeuri.py check.py fab.py levels.py \
+ 	sendfax.py setup.py makecopies.py probe.py timedate.py firmware.py scan.py systray.py plugin.py linefeedcal.py pqdiag.py \
+-	faxsetup.py devicesettings.py printsettings.py query.py wificonfig.py diagnose_plugin.py uninstall.py \
+-	upgrade.py config_usb_printer.py diagnose_queues.py logcapture.py doctor.py uiscan.py
++	faxsetup.py devicesettings.py printsettings.py query.py wificonfig.py diagnose_plugin.py \
++	config_usb_printer.py diagnose_queues.py logcapture.py doctor.py uiscan.py
+ 
+ homedir = $(hplipdir)
+ dist_home_DATA =  check-plugin.py 
+@@ -602,7 +598,7 @@
+ hpcups_CPPFLAGS = -I$(srcdir)/prnt/hpcups -I$(srcdir)/prnt -I$(srcdir)/common -D_GNU_SOURCE
+ hpcups_CXXFLAGS = $(APDK_ENDIAN_FLAG) $(DBUS_CFLAGS) $(AM_CXXFLAGS)
+ hpcups_LDFLAGS = $(AM_LDFLAGS)
+-hpcups_LDADD = -L./prnt/hpcups/ -ljpeg -ldl -lImageProcessor -lcups -lcupsimage -lz $(DBUS_LIBS)
++hpcups_LDADD = -L./prnt/hpcups/ -ljpeg -ldl -lcups -lcupsimage -lz $(DBUS_LIBS)
+ #else
+ #hpcupsdir = $(cupsfilterdir)
+ #hpcups_PROGRAMS = hpcups
+@@ -704,16 +700,6 @@
+ 
+ install-data-hook:
+ if HPLIP_BUILD
+-	if [ \( "$(UNAME)" = "x86_64" -a  -d "$(libdir)/" \) ]; then \
+-		cp prnt/hpcups/libImageProcessor-x86_64.so $(libdir)/ ; \
+-		chmod 775 $(libdir)/libImageProcessor-x86_64.so ; \
+-		ln -sf $(libdir)/libImageProcessor-x86_64.so $(libdir)/libImageProcessor.so ; \
+-	fi; \
+-	if [ \( \( "$(UNAME)" = "i686" -o "$(UNAME)" = "i386" \) -a -d "$(libdir)/" \) ]; then \
+-		cp prnt/hpcups/libImageProcessor-x86_32.so $(libdir)/ ; \
+-		chmod 775 $(libdir)/libImageProcessor-x86_32.so ; \
+-		ln -sf $(libdir)/libImageProcessor-x86_32.so $(libdir)/libImageProcessor.so ; \
+-	fi
+ 	if [ -d "/usr/share/ipp-usb/quirks/" ]; then \
+ 		echo "ipp-usb directory exists"; \
+ 		cp prnt/ipp-usb/HPLIP.conf /usr/share/ipp-usb/quirks/ ; \

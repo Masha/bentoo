@@ -1082,6 +1082,43 @@ release.gitkraken.com/linux/gitkraken-amd64.tar.gz 302 target).
 """
 # END
 
+["net-print/hplip"]
+hold = true
+url = "https://sourceforge.net/projects/hplip/best_release.json"
+parser = "regex"
+pattern = 'hplip-([0-9]+\.[0-9]+\.[0-9]+)\.tar\.gz'
+version = "3.26.6"
+comments = """
+hplip — packaged here on 2026-09-23 for one reason: net-print/hplip-plugin had
+already been bumped to 3.26.6, and the plugin hard-depends on
+~net-print/hplip-${PV}. ::gentoo ships only 3.26.4, so the bumped plugin was
+uninstallable ("there are no ebuilds to satisfy ~net-print/hplip-3.26.6"). The
+overlay either supplies the matching hplip or it cannot ship the plugin at all.
+
+The probe is SourceForge's best_release.json, which names the newest source
+tarball directly. Deliberately NOT the openprinting plugin listing the
+hplip-plugin record uses: those are two different artifacts on two different
+cadences, and conflating them is the exact mistake that record documents.
+
+hold = true, and the reason is the patchset, not the source. The ebuild fetches
+${PN}-3.26.4-patches-1.tar.xz because dev.gentoo.org/~billie publishes nothing
+newer -- 3.26.5 and 3.26.6 both 404 as of 2026-09-23. Three of that patchset's
+patches no longer apply to 3.26.6 and were rebased into ${FILESDIR}. That work
+is not version-agnostic: every bump has to re-run it, because a patch can start
+applying again (upstream reverts), stop applying (context moves), or become
+obsolete (upstream adopts it). All three already happened in this single bump --
+3.26.6 adopted the _GNU_SOURCE define in protocol/hp_ipp.c and the <sys/time.h>
+include in scan/sane/sclpml.c, so those hunks had to be DROPPED rather than
+rebased. An unheld bump would carry the stale rebases forward and fail in
+src_prepare, or worse, apply them and fail in compile.
+
+Release the hold the day dev.gentoo.org/~billie publishes a patchset matching
+the version being bumped to. At that point PATCHSET_PV in the ebuild should
+track ${PV} again and the three local patches should be DELETED, not rebased --
+see the header of each one in files/ for what it replaced.
+"""
+# END
+
 ["net-print/hplip-plugin"]
 url = "https://www.openprinting.org/download/printdriver/auxfiles/HP/plugins/"
 parser = "regex"
@@ -1129,6 +1166,18 @@ at the .run listing itself, so a probe answers a version that SRC_URI can
 actually fetch. If HP ever publishes a plugin before ::gentoo packages it,
 re-enable, drop in the ebuild, and the bump works on the first try -- which was
 never true while this record probed SourceForge.
+
+That is exactly what happened on 2026-09-23, and it exposed the half this record
+did not cover. HP published the 3.26.6 blob, the probe answered 3.26.6, the bump
+fetched cleanly -- and the result was uninstallable, because the ebuild depends
+on ~net-print/hplip-${PV} and ::gentoo ships only 3.26.4. A plugin bump is
+therefore NEVER self-contained: it is a bump of a PAIR. net-print/hplip is now
+packaged here (held, see its record) to close that, and the byte-identical
+3.26.4 copy was dropped again -- ::gentoo still covers that version, so keeping
+it here bought nothing and left the Manifest missing its DIST entry.
+
+Before bumping this package, check that net-print/hplip carries the same PV. If
+it does not, bump that one first; a plugin ahead of its hplip is dead weight.
 """
 # END
 
