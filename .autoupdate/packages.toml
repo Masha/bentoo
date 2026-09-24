@@ -53,10 +53,14 @@
 # where the applier clobbers the seven src_prepare git-dep revisions with
 # EGIT_COMMIT. Both are the same root cause: the pass rewrites past target.
 #
-# No record uses parser = "script" any more: the three that did (antigravity-bin,
-# antigravity-hub-bin, gitkraken) were migrated to regex on 2026-08-06 because
-# their headless-Chrome route had started failing. The .autoupdate/scripts/
-# directory was deleted with them. Note that the LLM registry fixer which
+# parser = "script" (headless Chrome, bentoolkit USE=browser) is used sparingly.
+# The three records that first used it (antigravity-bin, antigravity-hub-bin,
+# gitkraken) were migrated to regex on 2026-08-06 because their headless-Chrome
+# route had started failing, and .autoupdate/scripts/ was deleted with them. It
+# came back on 2026-09-24 for the three LibreOffice-line records
+# (libreoffice@stable, libreoffice-l10n@stable, myspell-hu), which need two
+# listings -- stable/ for WHICH release, src/X.Y.Z/ for its build number -- that
+# no single regex probe can join; see .autoupdate/scripts/libreoffice-stable.js. Note that the LLM registry fixer which
 # performs such a migration cannot remove a file — it may only add or edit one —
 # so a future parser change away from "script" will again leave the .js behind
 # for someone to delete by hand.
@@ -8474,11 +8478,9 @@ LAST OBSERVED 2026-08-03: 0.2374 against our 0.2501 — vercmp = -1, still behin
 # END
 
 ["app-office/libreoffice@stable"]
-hold = true
-url = "https://downloadarchive.documentfoundation.org/libreoffice/old/"
-parser = "regex"
-pattern = 'href="([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)/"'
-select = "max"
+url = "https://download.documentfoundation.org/libreoffice/stable/#26.8"
+parser = "script"
+script = "@libreoffice-stable.js"
 series = '^26\.8\.'
 version = "26.8.0.3"
 comments = """
@@ -8491,20 +8493,21 @@ the final tarball is still named libreoffice-26.8.0.3.tar.xz — so this line lo
 its _pre marker on 2026-08-26. The 26.2 line is no longer tracked: it reaches EOL
 on 2026-11-30 and the overlay keeps 26.2.6.1 frozen until that ebuild is dropped.
 
-PROMOTION IS INVISIBLE TO THIS PROBE. old/ lists build directories, and upstream
-creates none when it promotes an RC to final; the only signal is
-download.documentfoundation.org/libreoffice/stable/ starting to list the release.
-Whoever repoints series must read stable/ by hand — see @testing for the full
-procedure.
+Promotion of an RC to final creates no new build directory; the only signal is
+download.documentfoundation.org/libreoffice/stable/ starting to list the
+release, which is exactly what this probe reads. Moving to a NEW release line
+(repointing series and the #fragment) is still manual — see @testing.
 
-HELD ON 2026-09-23 FOR 26.8.1.1 = 26.8.1 RC1. old/ listed 26.8.1.1 while
-download.documentfoundation.org/libreoffice/stable/ and src/ both stopped at
-26.8.0, so the probe proposed a release candidate as a bare final version.
-The applier had already moved myspell-hu to it; that bump was reverted. Lift
-the hold when stable/ lists 26.8.1, and bump to the build src/26.8.1/ carries
-(26.8.0 went final as .3, so it need not be .1). Every point release opens with
-an RC in old/, so this hold is the steady state between releases, not an
-accident: read stable/ before clearing it.
+RELEASED BUILDS ONLY, SINCE 2026-09-24. The probe used to read
+downloadarchive old/, which lists every build directory including RCs; on
+2026-09-23 it proposed 26.8.1.1 (= 26.8.1 RC1) as a final version and the
+record had to be held between every point release. It now runs
+.autoupdate/scripts/libreoffice-stable.js, which takes the newest X.Y.Z that
+stable/ lists (a release appears there only once promoted) and the build
+number from the tarball in src/X.Y.Z/ (26.8.0 went final as .3). The #26.8
+fragment names the release line for the script; repoint it together with
+series. The script throws when either listing has nothing for the line, so a
+broken probe fails loudly instead of proposing a guess. No hold is needed.
 """
 # END
 
@@ -8571,17 +8574,15 @@ version the overlay no longer ships is worse than no record at all.
 # END
 
 ["app-office/libreoffice-l10n@stable"]
-hold = true
-url = "https://downloadarchive.documentfoundation.org/libreoffice/old/"
-parser = "regex"
-pattern = 'href="([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)/"'
-select = "max"
+url = "https://download.documentfoundation.org/libreoffice/stable/#26.8"
+parser = "script"
+script = "@libreoffice-stable.js"
 series = '^26\.8\.'
 version = "26.8.0.3"
 comments = """
-libreoffice-l10n (stable line) — follows the core release, so it reads the same
-archive index rather than the headless src/ probe: that probe returns whatever is
-newest overall, which is the pre-release line, and a stable entry must not see it.
+libreoffice-l10n (stable line) — follows the core release, so it runs the same
+probe script as app-office/libreoffice@stable: only a release stable/ lists
+counts, never whatever is newest overall (that is the pre-release line).
 Promote together with app-office/libreoffice@stable.
 
 The ebuild picks its mirror from the version itself: with no _pre marker it builds
@@ -8590,14 +8591,16 @@ bytes — the 26.8.0 langpacks under stable/ match the Manifest recorded from
 testing/ (verified for hu on 2026-08-26: 2840184 bytes and the same SHA512) — so
 dropping the marker leaves the Manifest untouched.
 
-HELD ON 2026-09-23 FOR 26.8.1.1 = 26.8.1 RC1. old/ listed 26.8.1.1 while
-download.documentfoundation.org/libreoffice/stable/ and src/ both stopped at
-26.8.0, so the probe proposed a release candidate as a bare final version.
-The applier had already moved myspell-hu to it; that bump was reverted. Lift
-the hold when stable/ lists 26.8.1, and bump to the build src/26.8.1/ carries
-(26.8.0 went final as .3, so it need not be .1). Every point release opens with
-an RC in old/, so this hold is the steady state between releases, not an
-accident: read stable/ before clearing it.
+RELEASED BUILDS ONLY, SINCE 2026-09-24. The probe used to read
+downloadarchive old/, which lists every build directory including RCs; on
+2026-09-23 it proposed 26.8.1.1 (= 26.8.1 RC1) as a final version and the
+record had to be held between every point release. It now runs
+.autoupdate/scripts/libreoffice-stable.js, which takes the newest X.Y.Z that
+stable/ lists (a release appears there only once promoted) and the build
+number from the tarball in src/X.Y.Z/ (26.8.0 went final as .3). The #26.8
+fragment names the release line for the script; repoint it together with
+series. The script throws when either listing has nothing for the line, so a
+broken probe fails loudly instead of proposing a guess. No hold is needed.
 """
 # END
 
@@ -8648,17 +8651,15 @@ when the 26.2 ebuilds are dropped after EOL on 2026-11-30.
 # END
 
 ["app-dicts/myspell-hu"]
-hold = true
-url = "https://downloadarchive.documentfoundation.org/libreoffice/old/"
-parser = "regex"
-pattern = 'href="([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)/"'
-select = "max"
+url = "https://download.documentfoundation.org/libreoffice/stable/#26.8"
+parser = "script"
+script = "@libreoffice-stable.js"
 series = '^26\.8\.'
 version = "26.8.0.3"
 comments = """
 myspell-hu — PV=LO_VER; the hu langpack ships in the LibreOffice archive tree the
-ebuild's SRC_URI pulls from, so it reads the same index and follows the same
-release line. Only one line is packaged here (no @stable/@testing split), but
+ebuild's SRC_URI pulls from, so it runs the same probe script as
+app-office/libreoffice@stable and follows the same release line. Only one line is packaged here (no @stable/@testing split), but
 series still pins it: without it select=max would silently follow whichever line
 is numerically ahead, and the resulting bump would target a langpack the ebuild's
 paths ("libreoffice26.8/...") do not match.
@@ -8668,14 +8669,16 @@ The _pre marker came off on 2026-08-26 together with app-office/libreoffice:
 moves with the core one — repoint series, re-add suffix, and fix the
 "libreoffice26.8" paths inside the ebuild.
 
-HELD ON 2026-09-23 FOR 26.8.1.1 = 26.8.1 RC1. old/ listed 26.8.1.1 while
-download.documentfoundation.org/libreoffice/stable/ and src/ both stopped at
-26.8.0, so the probe proposed a release candidate as a bare final version.
-The applier had already moved myspell-hu to it; that bump was reverted. Lift
-the hold when stable/ lists 26.8.1, and bump to the build src/26.8.1/ carries
-(26.8.0 went final as .3, so it need not be .1). Every point release opens with
-an RC in old/, so this hold is the steady state between releases, not an
-accident: read stable/ before clearing it.
+RELEASED BUILDS ONLY, SINCE 2026-09-24. The probe used to read
+downloadarchive old/, which lists every build directory including RCs; on
+2026-09-23 it proposed 26.8.1.1 (= 26.8.1 RC1) as a final version and the
+record had to be held between every point release. It now runs
+.autoupdate/scripts/libreoffice-stable.js, which takes the newest X.Y.Z that
+stable/ lists (a release appears there only once promoted) and the build
+number from the tarball in src/X.Y.Z/ (26.8.0 went final as .3). The #26.8
+fragment names the release line for the script; repoint it together with
+series. The script throws when either listing has nothing for the line, so a
+broken probe fails loudly instead of proposing a guess. No hold is needed.
 """
 # END
 
