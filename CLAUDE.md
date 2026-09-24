@@ -85,15 +85,17 @@ surfaces on a user's machine.
 | `check-slot-naming-contract.sh` | `net-libs/nodejs` and `app-eselect/eselect-nodejs` agree on where a slot lives |
 | `check-foldingathome-image.sh <ebuild>` | properties of the installed *image*, not of the ebuild text (loader fix + `RDEPEND` reconciliation) |
 | `check-edk2-dbx-freshness.sh` | `sys-firmware/edk2`'s `SBO_VER` still names the newest Secure Boot revocation list; exits `2`, not `1`, when the network is the problem |
+| `go-vendor.sh [--check] <cat/pkg>` | a Go package's `*-vendor.tar.xz` on distfiles.obentoo.org still matches its `go.mod`; without `--check` it regenerates the tarball into DISTDIR and prints the R2 upload (never uploads). Needs the network; run it after autoupdate bumps one of these |
 | `test-eselect-nodejs.sh` | slot ordering (`node9` vs `node10`) and directory replacement in the eselect module |
 
 `check-openrc-coverage.sh`, `gentoo-parity.sh` and
 `check-edk2-dbx-freshness.sh` also take `--self-test`, which
 runs their assertions without touching the tree.
 
-`check-edk2-dbx-freshness.sh` is the only one that needs the network, which is
-why it is deliberately absent from `.git/hooks/pre-commit`: a guard that turns
-red offline is a guard people learn to skip. Run it in upstream sweeps.
+`check-edk2-dbx-freshness.sh` and `go-vendor.sh` are the ones that need the
+network, which is why they are deliberately absent from `.git/hooks/pre-commit`:
+a guard that turns red offline is a guard people learn to skip. Run the first
+in upstream sweeps, the second after a bump of a vendor-tarball Go package.
 
 `gentoo-parity.sh` is absent from the hook for a different reason, and it is
 not cost — a full sweep is ~7s. It is scope. The sweep compares against

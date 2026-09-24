@@ -10,8 +10,9 @@ HOMEPAGE="https://github.com/trufflesecurity/trufflehog"
 SRC_URI="https://github.com/trufflesecurity/trufflehog/archive/refs/tags/v${PV}.tar.gz -> ${P}.tar.gz"
 # Vendored dependency tree, generated with `go mod vendor` and hosted by the
 # overlay, so the build carries a checksum and needs no network.
-# go.mod/go.sum are unchanged since 3.97.5, so its vendor tarball is reused.
-VENDOR_P="${PN}-3.97.5"
+# Regenerated for 3.97.9: go.mod bumped go-osc52 and mimetype. When a later
+# release leaves go.mod/go.sum untouched, pin VENDOR_P to this version instead.
+VENDOR_P="${P}"
 SRC_URI+=" https://distfiles.obentoo.org/${VENDOR_P}-vendor.tar.xz"
 
 LICENSE="AGPL-3"
