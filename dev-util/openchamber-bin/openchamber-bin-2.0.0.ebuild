@@ -93,10 +93,17 @@ src_prepare() {
 	# that lack them. None of them are in the binary's NEEDED list, and only
 	# libnotify is referenced at all (dlopen'd for notifications), so they
 	# are dropped in favour of the real packages in RDEPEND.
+	#
+	# Since 2.0.0 the icon at the root is a symlink into usr/, so it is
+	# materialised first; otherwise doicon fails and /opt gets a dangling link.
+	cp --remove-destination "usr/share/icons/hicolor/scalable/${MY_PN}.svg" \
+		"${MY_PN}".svg || die
 	rm -r usr || die
 
-	# AppRun is the AppImage bootstrap and is meaningless once installed.
+	# AppRun is the AppImage bootstrap and is meaningless once installed, as is
+	# .DirIcon (the AppImage thumbnail, a link into the usr/ removed above).
 	rm AppRun || die
+	rm -f .DirIcon || die
 
 	# Upstream's desktop entry launches "AppRun --no-sandbox". Both halves
 	# are wrong here: AppRun is gone, and --no-sandbox is only there because
@@ -126,5 +133,6 @@ src_install() {
 	dosym -r "${dest}/${MY_PN}" /usr/bin/"${MY_PN}"
 
 	domenu "${MY_PN}".desktop
-	doicon "${MY_PN}".png
+	# 2.0.0 replaced the PNG icon with an SVG at the squashfs root.
+	doicon -s scalable "${MY_PN}".svg
 }

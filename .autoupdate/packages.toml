@@ -181,7 +181,7 @@
 url = "https://registry.npmjs.org/@anthropic-ai/claude-code"
 parser = "json"
 path = "dist-tags.latest"
-version = "2.1.280"
+version = "2.1.281"
 comments = """
 claude-code — npm @anthropic-ai/claude-code; dist-tags.latest is the stable channel.
 
@@ -1928,16 +1928,24 @@ ollama-bin — same upstream repo.
 url = "https://api.github.com/repos/ggml-org/llama.cpp/releases/latest"
 parser = "json"
 path = "tag_name"
-transform = [['^b(\d+)$', "0_pre$1"]]
+transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.4.1"
+aux_var = "MY_BUILD"
+aux_pattern = '\*\*Nightly build:\*\* \[(b[0-9]+)\]'
+version = "0.5.0"
 comments = """
-llama-cpp — upstream tags builds "bNNNN" (no semver); the ebuild carries them as
-the 0_pre<build> snapshot scheme and bridges back with MY_PV="b${PV#0_pre}", so
-the transform must map b9964 -> 0_pre9964 (a bare "9964" would read as a
-four-digit release and never match the ebuild). _pre suffixes compare
-numerically, so b10000 > b9999 holds.
-Cadence: upstream cuts ~6 releases/day, so nearly every check run yields a bump.
+llama-cpp — upstream cut semver releases (vX.Y.Z) from 0.2.0 on; the numbered
+nightly tags (bNNNNN) are still published every few hours but are marked
+prerelease, so releases/latest skips them and returns the semver tag.
+
+MY_BUILD IS LOAD-BEARING and is why aux_var exists here. The prebuilt webui
+dist and the build number (-DLLAMA_BUILD_NUMBER) exist only on the nightly the
+release was cut from, and the ebuild fetches llama-${MY_BUILD}-ui.tar.gz from
+that tag. The release body names it ("**Nightly build:** [b11146](...)" for
+v0.5.0; the nightly-tag.txt asset carries the same value). An applier that
+moved PV alone left MY_BUILD at b10566 (v0.2.0) from 0.2.0 through 0.5.0 --
+three releases shipping a stale webui, which no fetch error ever flagged
+because the old nightly still resolves. Found and fixed on 2026-09-23.
 """
 # END
 
@@ -2726,11 +2734,21 @@ ufw — Launchpad "0.36" series releases API, newest-first.
 ["net-vpn/openvpn"]
 enabled = false
 disabled_by = "auto"
-url = "https://openvpn.net/community-downloads/"
+url = "https://api.github.com/repos/OpenVPN/openvpn/releases?per_page=30"
 parser = "regex"
-pattern = 'OpenVPN-([0-9]+\.[0-9]+\.[0-9]+)'
+pattern = '"tag_name":"v([0-9]+\.[0-9]+\.[0-9]+)","target_commitish":"[^"]*","name":"[^"]*","draft":false,"immutable":[a-z]+,"prerelease":false'
+select = "max"
+headers = { "User-Agent" = "bentoo-autoupdate" }
 comments = """
-openvpn — community-downloads page; anchored to "OpenVPN-X.Y.Z".
+openvpn — GitHub release list. Until 2026-09-23 this read
+openvpn.net/community-downloads/, which now 301s to /community/ and timed out
+the revive scan (30s, no headers). The GitHub list carries the same versions
+(v2.7.7 on both that day).
+
+select = "max" is load-bearing: the 2.6 and 2.7 series release in parallel, so
+the newest-first list interleaves them (v2.6.23 above v2.7.7) and the first
+match would be the old series. releases/latest is no better -- it follows the
+maintainers' last flag, not the highest version.
 """
 # END
 
@@ -3214,8 +3232,8 @@ in-place swap. SRC_URI names the tarball after ${PF}, so the DIST entry renames
 with it and the stale one was deleted by hand.
 Cargo.lock, the root Cargo.toml, crates/zed/Cargo.toml and rust-toolchain.toml
 are ALL BYTE-IDENTICAL between the two commits -- which settles, measured rather
-than assumed, the four axes the entries above opened: the dependency graph, the
-[patch.crates-io] block the eleven seds anchor on, the [features] table a USE
+than assumed, the four axes the entries above opened: the dependency graph,
+the [patch.crates-io] block the eleven seds anchor on, the [features] table a USE
 flag maps onto, and the pinned toolchain (RUST_MIN_VER stays 1.98.1).
 pycargoebuild re-run from crates/zed reproduced the ebuild BYTE-IDENTICALLY
 (same md5 before and after) -- both WARNINGs printed, which is what tells a real
@@ -3418,7 +3436,7 @@ base_from = "tag"
 base_url = "https://api.github.com/repos/KhronosGroup/glslang/git/refs/tags"
 base_tag_pattern = '^vulkan-sdk-([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)$'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.357.0_p20260922"
+version = "1.4.357.0_p20260923"
 comments = """
 glslang — commit-tracked on main; scans titles for vulkan-sdk-X.Y.Z.W to detect base bump.
 """
@@ -8449,6 +8467,7 @@ LAST OBSERVED 2026-08-03: 0.2374 against our 0.2501 — vercmp = -1, still behin
 # END
 
 ["app-office/libreoffice@stable"]
+hold = true
 url = "https://downloadarchive.documentfoundation.org/libreoffice/old/"
 parser = "regex"
 pattern = 'href="([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)/"'
@@ -8470,6 +8489,15 @@ creates none when it promotes an RC to final; the only signal is
 download.documentfoundation.org/libreoffice/stable/ starting to list the release.
 Whoever repoints series must read stable/ by hand — see @testing for the full
 procedure.
+
+HELD ON 2026-09-23 FOR 26.8.1.1 = 26.8.1 RC1. old/ listed 26.8.1.1 while
+download.documentfoundation.org/libreoffice/stable/ and src/ both stopped at
+26.8.0, so the probe proposed a release candidate as a bare final version.
+The applier had already moved myspell-hu to it; that bump was reverted. Lift
+the hold when stable/ lists 26.8.1, and bump to the build src/26.8.1/ carries
+(26.8.0 went final as .3, so it need not be .1). Every point release opens with
+an RC in old/, so this hold is the steady state between releases, not an
+accident: read stable/ before clearing it.
 """
 # END
 
@@ -8536,6 +8564,7 @@ version the overlay no longer ships is worse than no record at all.
 # END
 
 ["app-office/libreoffice-l10n@stable"]
+hold = true
 url = "https://downloadarchive.documentfoundation.org/libreoffice/old/"
 parser = "regex"
 pattern = 'href="([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)/"'
@@ -8553,6 +8582,15 @@ SRC_URI from stable/<base>/rpm instead of testing/<base>/rpm. Both serve the sam
 bytes — the 26.8.0 langpacks under stable/ match the Manifest recorded from
 testing/ (verified for hu on 2026-08-26: 2840184 bytes and the same SHA512) — so
 dropping the marker leaves the Manifest untouched.
+
+HELD ON 2026-09-23 FOR 26.8.1.1 = 26.8.1 RC1. old/ listed 26.8.1.1 while
+download.documentfoundation.org/libreoffice/stable/ and src/ both stopped at
+26.8.0, so the probe proposed a release candidate as a bare final version.
+The applier had already moved myspell-hu to it; that bump was reverted. Lift
+the hold when stable/ lists 26.8.1, and bump to the build src/26.8.1/ carries
+(26.8.0 went final as .3, so it need not be .1). Every point release opens with
+an RC in old/, so this hold is the steady state between releases, not an
+accident: read stable/ before clearing it.
 """
 # END
 
@@ -8603,6 +8641,7 @@ when the 26.2 ebuilds are dropped after EOL on 2026-11-30.
 # END
 
 ["app-dicts/myspell-hu"]
+hold = true
 url = "https://downloadarchive.documentfoundation.org/libreoffice/old/"
 parser = "regex"
 pattern = 'href="([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)/"'
@@ -8621,6 +8660,15 @@ The _pre marker came off on 2026-08-26 together with app-office/libreoffice:
 26.8.0 was released in week 35 of 2026. When the overlay moves to 27.2 this record
 moves with the core one — repoint series, re-add suffix, and fix the
 "libreoffice26.8" paths inside the ebuild.
+
+HELD ON 2026-09-23 FOR 26.8.1.1 = 26.8.1 RC1. old/ listed 26.8.1.1 while
+download.documentfoundation.org/libreoffice/stable/ and src/ both stopped at
+26.8.0, so the probe proposed a release candidate as a bare final version.
+The applier had already moved myspell-hu to it; that bump was reverted. Lift
+the hold when stable/ lists 26.8.1, and bump to the build src/26.8.1/ carries
+(26.8.0 went final as .3, so it need not be .1). Every point release opens with
+an RC in old/, so this hold is the steady state between releases, not an
+accident: read stable/ before clearing it.
 """
 # END
 
@@ -8646,7 +8694,7 @@ url = "https://antigravity.google/download"
 parser = "regex"
 pattern = '/antigravity-hub/([0-9]+\.[0-9]+\.[0-9]+-[0-9]+)/'
 transform = [['-', "."]]
-version = "2.16.0.4917332007583744"
+version = "2.17.0.5217732355031040"
 comments = """
 Antigravity 2.0 — the standalone desktop hub (agent orchestration), a separate
 product from the IDE above. /download now ships the links in the raw HTML, so the
@@ -8903,7 +8951,7 @@ is a workspace and pycargoebuild refuses it.
 url = "https://pypi.org/pypi/openai/json"
 parser = "json"
 path = "info.version"
-version = "3.19.0"
+version = "3.19.1"
 comments = """
 openai — official Python SDK; core dep of sci-ml/amd-gaia. info.version is
 clean X.Y.Z. Live=3.0.0 == current PV.
@@ -9422,7 +9470,7 @@ pattern = '"name":\s*"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 series = '^2\.'
-version = "2.37.0"
+version = "2.37.1"
 comments = """
 aws-cli v2 — GitHub tag index, pinned to the 2.x series. Verified 2026-08-19
 against the live endpoint: 100 matches, all of them 2.x, max = 2.36.27 = ebuild.
@@ -9806,7 +9854,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "9.2.0"
+version = "9.2.1"
 comments = """
 simdutf — bentoo carries this package only to build it as C++20
 (-DSIMDUTF_CXX_STANDARD=20). Upstream gates the atomic base64 API behind
@@ -10751,9 +10799,9 @@ names carry no version, so the tag is the only thing that pins them.
 # END
 
 ["dev-util/kilocode-bin"]
-url = "https://api.github.com/repos/Kilo-Org/kilocode/releases/latest"
+url = "https://api.github.com/repos/Kilo-Org/kilocode/releases?per_page=30"
 parser = "regex"
-pattern = '"tag_name":\s*"v([0-9]+\.[0-9]+\.[0-9]+)"'
+pattern = '"tag_name":"v([0-9]+\.[0-9]+\.[0-9]+)","target_commitish":"[^"]*","name":"[^"]*","draft":false,"immutable":[a-z]+,"prerelease":false'
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
 version = "7.7.9"
@@ -10768,6 +10816,14 @@ The tarball bundles bubblewrap 0.11.2 (LGPL-2) and a sandbox-runtime
 (Apache-2.0), which is why LICENSE is not upstream's bare MIT. Re-check those
 bundled licences on a major bump -- the applier only moves PV and will not
 notice if the bundle changes.
+
+The repository also ships a JetBrains plugin train (jetbrains/vX.Y.Z, with no
+Linux tarballs) on its own numbering. On 2026-09-23 jetbrains/v7.1.7 became
+releases/latest and the old releases/latest regex stopped matching, so the
+record reads the release list instead. The pattern is anchored on a bare
+"v" tag AND "prerelease":false: the CLI train marks some plain tags as
+prereleases (v7.7.0, v7.5.11, v7.5.8), so a suffix-free tag alone is not
+enough to exclude them. The first match wins because the list is newest-first.
 """
 # END
 
@@ -11012,7 +11068,7 @@ parser = "regex"
 pattern = '"tag_name":\s*"v([0-9]+\.[0-9]+\.[0-9]+)"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "1.24.2"
+version = "2.0.0"
 comments = """
 OpenChamber — a desktop cockpit for parallel opencode sessions. Tracks
 OpenChamber-<PV>-linux-{x86_64,arm64}.AppImage; the same release also carries

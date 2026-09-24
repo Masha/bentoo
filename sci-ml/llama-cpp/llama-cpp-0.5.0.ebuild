@@ -20,8 +20,10 @@ else
 	# Upstream switched to semver release tags (vX.Y.Z); the numbered nightly
 	# tags (bNNNNN) still exist and remain the only place the prebuilt webui
 	# dist and the build number are published.  Each semver release names its
-	# nightly in the nightly-tag.txt asset -- v0.2.0 points at b10566.
-	MY_BUILD="b10566"
+	# nightly in the nightly-tag.txt asset and in the release body ("Nightly
+	# build: bNNNNN"), which autoupdate reads into MY_BUILD through aux_var --
+	# v0.5.0 points at b11146.
+	MY_BUILD="b11146"
 	SRC_URI="
 		https://github.com/ggml-org/llama.cpp/archive/refs/tags/${MY_PV}.tar.gz -> ${P}.tar.gz
 		webui? (
