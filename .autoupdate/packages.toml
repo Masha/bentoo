@@ -2340,13 +2340,32 @@ brave-browser — releases/latest is the stable channel (tag "vX.Y.Z").
 # END
 
 ["app-editors/vim"]
-url = "https://api.github.com/repos/vim/vim/tags"
-parser = "json"
-path = "[0].name"
+url = "https://api.github.com/repos/gentoo/gentoo/contents/app-editors/vim-core"
+parser = "regex"
+pattern = '"name":\s*"vim-core-([0-9]+\.[0-9]+\.[0-9]+)\.ebuild"'
+select = "max"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "9.2.1129"
+version = "9.2.1125"
 comments = """
-vim — no releases (404); tags[0] "vX.Y.ZZZZ".
+vim — follows ::gentoo's app-editors/vim-core, NOT upstream vim tags.
+
+The ebuild requires ~app-editors/vim-core-${PV}, and since the 2026-09-22
+parity audit vim-core lives only in ::gentoo (see its disabled record). A vim
+PV that ::gentoo has no vim-core for is uninstallable: on 2026-09-24 the old
+probe (vim/vim tags[0]) bumped vim to 9.2.1129 while ::gentoo stopped at
+9.2.1125, and emerge failed with 'no ebuilds to satisfy
+"~app-editors/vim-core-9.2.1129"'. So the probe reads the vim-core ebuild names
+in the gentoo/gentoo GitHub mirror and takes the highest bare X.Y.Z (the regex
+skips 9999 and -rN revisions, which do not change PV).
+
+The GitHub mirror can run hours ahead of a host's `emaint sync -r gentoo`; a
+bump applied in that window resolves once ::gentoo is synced. The overlay's only
+divergence from ::gentoo is USE_RUBY, so at the same PV the ebuild text is
+otherwise ::gentoo's.
+
+To track upstream ahead of ::gentoo instead, vim-core has to come back to the
+overlay and bump in lockstep with vim -- that is the condition its disabled
+record names for reopening.
 """
 # END
 
