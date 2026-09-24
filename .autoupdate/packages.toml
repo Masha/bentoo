@@ -326,7 +326,7 @@ Vendor JSON API  (per-vendor endpoint)
 url = "https://prod.download.desktop.kiro.dev/stable/metadata-linux-x64-stable.json"
 parser = "json"
 path = "currentRelease"
-version = "1.1.14"
+version = "1.1.70"
 comments = """
 Kiro — kiro.dev SPA metadata endpoint (found via DevTools); "currentRelease" is authoritative.
 """
@@ -2333,7 +2333,7 @@ url = "https://api.github.com/repos/brave/brave-browser/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.95.104"
+version = "1.96.59"
 comments = """
 brave-browser — releases/latest is the stable channel (tag "vX.Y.Z").
 """
@@ -2344,7 +2344,7 @@ url = "https://api.github.com/repos/vim/vim/tags"
 parser = "json"
 path = "[0].name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "9.2.1125"
+version = "9.2.1129"
 comments = """
 vim — no releases (404); tags[0] "vX.Y.ZZZZ".
 """
@@ -3447,7 +3447,7 @@ base_from = "tag"
 base_url = "https://api.github.com/repos/KhronosGroup/glslang/git/refs/tags"
 base_tag_pattern = '^vulkan-sdk-([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)$'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.357.0_p20260923"
+version = "1.4.357.0_p20260924"
 comments = """
 glslang — commit-tracked on main; scans titles for vulkan-sdk-X.Y.Z.W to detect base bump.
 """
@@ -3464,7 +3464,7 @@ base_from = "tag"
 base_url = "https://api.github.com/repos/KhronosGroup/SPIRV-Headers/git/refs/tags"
 base_tag_pattern = '^vulkan-sdk-([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)$'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.357.0_p20260923"
+version = "1.4.357.0_p20260924"
 comments = """
 spirv-headers — commit-tracked on main; scans titles for vulkan-sdk-X.Y.Z.W to detect base bump.
 """
@@ -9480,7 +9480,7 @@ pattern = '"name":\s*"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 series = '^2\.'
-version = "2.37.1"
+version = "2.37.2"
 comments = """
 aws-cli v2 — GitHub tag index, pinned to the 2.x series. Verified 2026-08-19
 against the live endpoint: 100 matches, all of them 2.x, max = 2.36.27 = ebuild.
@@ -10981,7 +10981,7 @@ url = "https://api.github.com/repos/QwenLM/qwen-code/releases?per_page=30"
 parser = "regex"
 pattern = '"tag_name":\s*"v([0-9]+\.[0-9]+\.[0-9]+)"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.24.4"
+version = "0.24.5"
 comments = """
 Qwen Code — this record probes /releases and NOT /releases/latest, which is
 backwards from every other GitHub record here and is deliberate.
@@ -11078,7 +11078,7 @@ parser = "regex"
 pattern = '"tag_name":\s*"v([0-9]+\.[0-9]+\.[0-9]+)"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "2.0.0"
+version = "2.0.1"
 comments = """
 OpenChamber — a desktop cockpit for parallel opencode sessions. Tracks
 OpenChamber-<PV>-linux-{x86_64,arm64}.AppImage; the same release also carries
