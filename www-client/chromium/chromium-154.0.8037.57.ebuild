@@ -436,7 +436,15 @@ pkg_setup() {
 		export RUSTC_BOOTSTRAP=1
 
 		# Sanity checks for development convenience
-		if ver_test $(gn --version || die) -lt ${GN_MIN_VER}; then
+		# ::gentoo's gn prints its PV ("0.2374"); ours prints what upstream's
+		# build/gen.py emits ("2540 (150a9d6ba0aa)"). Keep the first field and
+		# normalise it to 0.N, or ver_test gets two arguments -- and a bare
+		# "2540" would compare greater than any 0.N minimum anyway.
+		local gn_ver
+		gn_ver=$(gn --version) || die "Failed to query gn version"
+		gn_ver=${gn_ver%% *}
+		[[ ${gn_ver} == 0.* ]] || gn_ver=0.${gn_ver}
+		if ver_test "${gn_ver}" -lt ${GN_MIN_VER}; then
 			die "dev-build/gn >= ${GN_MIN_VER} is required to build this Chromium"
 		fi
 
