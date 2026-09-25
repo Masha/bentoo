@@ -8508,7 +8508,7 @@ url = "https://deps.gentoo.zip/dev-build/gn/"
 parser = "regex"
 pattern = 'gn-([0-9][0-9.]*)\.tar\.xz'
 select = "max"
-version = "0.2501"
+version = "0.2540"
 comments = """
 gn — deps.gentoo.zip lists tarballs in ascending order; select=max picks the
 highest (was SKIP: assumed git-only, but the mirror does host versioned tarballs).
@@ -8538,7 +8538,9 @@ WHAT IT MEANS: while that number is BELOW our PV, ::gentoo is still behind and
 the self-hosting stays. Once it reaches or passes our PV, the self-hosting can be
 retired — drop GN_COMMIT and the recipe, point SRC_URI back at deps.gentoo.zip,
 and this record goes back to being an ordinary bump signal with hold removed.
-LAST OBSERVED 2026-08-03: 0.2374 against our 0.2501 — vercmp = -1, still behind.
+LAST OBSERVED 2026-09-25: 0.2527 against our 0.2540 — vercmp = -1, still behind.
+(0.2540 is the gn pinned by chromium-154 DEPS; 0.2501 lacked 664f3e63,
+"Support public_inputs in group targets", which devtools-frontend needs.)
 """
 # END
 

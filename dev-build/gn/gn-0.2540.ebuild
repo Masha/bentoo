@@ -20,8 +20,8 @@ else
 	# of it yields different bytes under the same filename on a different day.
 	# ${PV} is itself derived from this commit --
 	# `git describe ${GN_COMMIT} --abbrev=12 --match initial-commit` gives
-	# initial-commit-2501-g3fd3b0624d8c, hence 0.2501.
-	GN_COMMIT="3fd3b0624d8cba16927853600130b2c33d4e7928"
+	# initial-commit-2540-g150a9d6ba0aa, hence 0.2540.
+	GN_COMMIT="150a9d6ba0aa7f407aa4feeabc5f03ce9aa7e04b"
 
 	# Upstream publishes commits, never releases, so somebody has to package a
 	# snapshot.  ::gentoo does that on deps.gentoo.zip, which means its mirror
