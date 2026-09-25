@@ -1,0 +1,64 @@
+From: Lucas C.S. <lucascs@protonmail.com>
+Subject: [PATCH] devtools-frontend: run the JS tsc, not the prebuilt tsgo ELF
+
+chromium-153-devtools-tsc-via-node.patch restored the node path in
+ts_library.py, but M154's devtools-frontend no longer goes through it for
+most targets: the new scripts/build/typescript/typescript_vars.gni defines
+`tsc_binary` as the prebuilt tsgo under
+//third_party/typescript/linux-amd64/src/lib/tsc, and ts_library_split.gni
+and ts_type_check.gni exec it directly through run_with_restat.py /
+run_with_stamp.py and list it as a ninja input.  That directory is not in
+keeplibs, so the tree ships it empty and ninja dies before running anything:
+
+  ninja: error: '../../third_party/typescript/linux-amd64/src/lib/tsc',
+  needed by 'gen/third_party/devtools-frontend/src/front_end/...d.ts', missing
+  and no known rule to make it
+
+Point the Linux branch at the JS compiler devtools vendors in its own
+node_modules (TypeScript 6.0.2 in M154).  bin/tsc is executable with a
+`#!/usr/bin/env node` shebang, so both runners can exec it as-is, and it
+accepts every flag the split build passes (--ignoreConfig, --noCheck,
+--noResolve, ...).  This also removes the last amd64-only binary from the
+devtools build.
+
+One flag has to go: ts_library_split.gni's .d.ts step passes
+--isolatedDeclarations, which TypeScript 6 enforces more strictly than tsgo
+(TypeScript 7) -- it rejects optional parameter properties such as
+core/host/DispatchHttpRequestClient.ts's `readonly response?: ...` with
+TS9025.  The flag only validates that declarations are derivable per file;
+emission does not depend on it (on that target all 14 .d.ts are emitted,
+the parameter typed as declared plus an explicit `| undefined`), and
+upstream already enforces the property with tsgo on every change.
+
+Goes together with chromium-153-devtools-tsc-via-node.patch and the gn arg
+use_typescript_go=false.  Drop all three once the tree ships a tsgo that
+survives unbundling, or devtools regains a node fallback.
+--- a/third_party/devtools-frontend/src/scripts/build/typescript/typescript_vars.gni
++++ b/third_party/devtools-frontend/src/scripts/build/typescript/typescript_vars.gni
+@@ -6,7 +6,9 @@
+ import("../ninja/vars.gni")
+ 
+ if (host_os == "linux") {
+-  tsc_binary = "//third_party/typescript/linux-amd64/src/lib/tsc"
++  # bentoo: the JS compiler from devtools' own node_modules, not the prebuilt
++  # tsgo ELF, which is stripped from the tree and has no arm64 build.
++  tsc_binary = devtools_location_prepend + "node_modules/typescript/bin/tsc"
+ } else if (host_os == "win") {
+   tsc_binary = "//third_party/typescript/windows-amd64/src/lib/tsc.exe"
+ } else if (host_os == "mac") {
+--- a/third_party/devtools-frontend/src/scripts/build/typescript/ts_library_split.gni
++++ b/third_party/devtools-frontend/src/scripts/build/typescript/ts_library_split.gni
+@@ -266,7 +266,12 @@
+           "--ignoreConfig",
+           "--declaration",
+           "--emitDeclarationOnly",
+-          "--isolatedDeclarations",
++
++          # bentoo: --isolatedDeclarations only *validates* that each file's
++          # declarations can be emitted in isolation; it does not change the
++          # emitted .d.ts. The JS tsc (TypeScript 6) rejects optional parameter
++          # properties under it (TS9025) where tsgo (TypeScript 7) accepts
++          # them, e.g. core/host/DispatchHttpRequestClient.ts.
+           "--noCheck",
+           "--noResolve",
+           "--outDir",

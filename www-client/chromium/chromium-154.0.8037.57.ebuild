@@ -558,9 +558,11 @@ src_prepare() {
 	python_setup
 
 	# We'll fill this in as we go. Patches go in chromium-patches.
-	# BENTOO-DIVERGENCE: PATCHES - six fixes with no counterpart:
+	# BENTOO-DIVERGENCE: PATCHES - nine fixes with no counterpart:
 	# unbundle-minizip-undo-unicode, cbor-crubit-optional,
-	# revert-font-format-crubit, devtools-tsc-via-node and the two
+	# revert-font-format-crubit, revert-signed-web-bundles-crubit,
+	# athm-cxx-bridge, devtools-tsc-via-node, devtools-tsc-binary-via-node
+	# and the two
 	# chromium-patches rebases below.
 	# ::gentoo is on 142 and carries an old-fontconfig patch this series no
 	# longer needs.
@@ -596,6 +598,12 @@ src_prepare() {
 		# //tools/typescript is the gn arg use_typescript_go=false in
 		# src_configure; the two go together.
 		"${FILESDIR}/chromium-153-devtools-tsc-via-node.patch"
+		# bentoo: M154 split most devtools TypeScript targets out of
+		# ts_library.py -- ts_library_split.gni now execs `tsc_binary` from the
+		# new typescript_vars.gni directly, and that still names the tsgo ELF
+		# under third_party/typescript/linux-amd64, which the tree ships empty.
+		# Point it at devtools' own JS tsc. Same trio as above.
+		"${FILESDIR}/chromium-154-devtools-tsc-binary-via-node.patch"
 	)
 
 	# So many fontconfig magic numbers to cover
@@ -676,6 +684,20 @@ src_prepare() {
 			# bindings directly. This reverts the commit, restoring the M152 cxx
 			# path. Same reachability as cbor: no-op with USE=bundled-toolchain.
 			"${FILESDIR}/chromium-153-revert-font-format-crubit.patch"
+			# bentoo: M154 added two more unconditional Crubit consumers, and
+			# gn gen dies on their missing *_bindings targets. web_package
+			# (upstream e85da0b2f2dc + b2c9d9c61c9f) moved Signed Web Bundle
+			# parsing and signature checks to a Rust crate; reverting both
+			# restores the M153 C++. private_verification_tokens (4ff7d01fb98f)
+			# cannot be reverted -- later M154 commits and chrome/browser build
+			# on it -- so it keeps upstream's Rust crate and reaches it through
+			# a small cxx bridge instead. Same reachability as the two above.
+			# Every one of these four is a stopgap: building Crubit for the
+			# system toolchain needs a rustc-dev from the same rustc build and
+			# a Rust stdlib compiled by Chromium (assert(!rust_prebuilt_stdlib)
+			# in build/rust/gni_impl/cpp_api_from_rust.gni).
+			"${FILESDIR}/chromium-154-revert-signed-web-bundles-crubit.patch"
+			"${FILESDIR}/chromium-154-athm-cxx-bridge.patch"
 			# bentoo: rebase of chromium-patches' toolchain/
 			# cr152-fix-rust-2-oxidize-harder.patch, which teaches Crubit to take
 			# rs_bindings_from_cc and rustfmt from ${rust_sysroot} instead of the
@@ -1050,6 +1072,12 @@ src_prepare() {
 		third_party/one_euro_filter
 		third_party/openscreen
 		third_party/openscreen/src/third_party/
+		# M154: device/vr/buildflags enables OpenXR (WebXR through a desktop
+		# runtime such as Monado or SteamVR) on Linux, not only Windows, and
+		# builds the Khronos loader from here. Without this entry ninja dies at
+		# plan time on third_party/openxr/src/src/common/filesystem_utils.cpp.
+		# No system loader is packaged; its only other dep, jsoncpp, is kept.
+		third_party/openxr
 		third_party/openscreen/src/third_party/tinycbor/src/src
 		third_party/opus
 		third_party/ots
