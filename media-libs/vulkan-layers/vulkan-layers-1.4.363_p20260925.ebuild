@@ -12,7 +12,7 @@ if [[ ${PV} == *9999* ]]; then
 	EGIT_SUBMODULES=()
 	inherit git-r3
 else
-	EGIT_COMMIT="f9021547096781cea0995d9d4455c390b50984e1"
+	EGIT_COMMIT="fd8605f99aa030a4693cf42362fedfe4ff73be78"
 	SRC_URI="https://github.com/KhronosGroup/${MY_PN}/archive/${EGIT_COMMIT}.tar.gz -> ${P}.tar.gz"
 	KEYWORDS="~amd64 ~arm ~arm64 ~loong ~ppc ~ppc64 ~riscv ~x86"
 	S="${WORKDIR}"/${MY_PN}-${EGIT_COMMIT}
@@ -33,10 +33,10 @@ RESTRICT="!test? ( test ) test"
 RDEPEND=">=dev-util/spirv-tools-1.4.357.0_p20260917[${MULTILIB_USEDEP}]"
 DEPEND="${RDEPEND}
 	${PYTHON_DEPS}
-	>=dev-util/glslang-1.4.357.0_p20260813:=[${MULTILIB_USEDEP}]
+	>=dev-util/glslang-1.4.357.0_p20260911:=[${MULTILIB_USEDEP}]
 	>=dev-util/spirv-headers-1.4.357.0_p20260826-r1
-	>=dev-util/vulkan-headers-1.4.360_p20260814
-	>=dev-util/vulkan-utility-libraries-1.4.360:=[${MULTILIB_USEDEP}]
+	>=dev-util/vulkan-headers-1.4.363_p20260918
+	>=dev-util/vulkan-utility-libraries-1.4.363_p20260923:=[${MULTILIB_USEDEP}]
 	wayland? ( dev-libs/wayland:=[${MULTILIB_USEDEP}] )
 	X? (
 		x11-libs/libX11:=[${MULTILIB_USEDEP}]

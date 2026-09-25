@@ -464,7 +464,7 @@ CRATES="
 	guppy-workspace-hack@0.1.0
 	guppy@0.18.0
 	h2@0.3.27
-	h2@0.4.12
+	h2@0.4.19
 	half@2.7.1
 	handlebars@4.5.0
 	handlebars@5.1.2
@@ -510,7 +510,7 @@ CRATES="
 	hyper-tls@0.5.0
 	hyper-util@0.1.17
 	hyper@0.14.32
-	hyper@1.7.0
+	hyper@1.11.1
 	iana-time-zone-haiku@0.1.2
 	iana-time-zone@0.1.64
 	icu_collator@2.3.0
@@ -1009,6 +1009,7 @@ CRATES="
 	selectors@0.37.0
 	self_cell@1.2.2
 	semver@1.0.28
+	send_wrapper@0.6.0
 	serde@1.0.229
 	serde_bytes@0.11.19
 	serde_core@1.0.229
@@ -1472,6 +1473,7 @@ CRATES="
 	y4m@0.8.0
 	yaml-rust2@0.8.1
 	yansi@1.0.1
+	yawc@0.4.2
 	yazi@0.2.1
 	yeslogic-fontconfig-sys@6.0.0
 	yoke-derive@0.8.2
@@ -1577,14 +1579,13 @@ declare -A GIT_CRATES=(
 	[wprcontrol]='https://github.com/zed-industries/wprcontrol;cd811f7d744f65291e13131b1d907fda63ed91a1;wprcontrol-%commit%'
 	[xim-ctext]='https://github.com/zed-industries/xim-rs;16f35a2c881b815a2b6cdfd6687988e84f8447d8;xim-rs-%commit%/xim-ctext'
 	[xim-parser]='https://github.com/zed-industries/xim-rs;16f35a2c881b815a2b6cdfd6687988e84f8447d8;xim-rs-%commit%/xim-parser'
-	[yawc]='https://github.com/zed-industries/yawc;71a452f551cac178367eaac5d7418a09afa1f3a2;yawc-%commit%'
 	[zed-font-kit]='https://github.com/zed-industries/font-kit;94b0f28166665e8fd2f53ff6d268a14955c82269;font-kit-%commit%'
 	[zed-reqwest]='https://github.com/zed-industries/reqwest;33bc764aa15ff7b200bf7c93bd96e24878d53e14;reqwest-%commit%'
 	[zed-scap]='https://github.com/zed-industries/scap;4afea48c3b002197176fb19cd0f9b180dd36eaac;scap-%commit%'
 	[zed-xim]='https://github.com/zed-industries/xim-rs;16f35a2c881b815a2b6cdfd6687988e84f8447d8;xim-rs-%commit%'
 )
 
-EGIT_COMMIT="2c4bc2d7b2c5b7832ad964f39840d823d961cb0e"
+EGIT_COMMIT="a84858acb95381c8c40b730879ad0f9a0c70b294"
 LLVM_COMPAT=( 22 )
 RUST_MIN_VER="1.98.1"
 RUST_NEEDS_LLVM=1
