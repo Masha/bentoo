@@ -2446,6 +2446,30 @@ and the applier will not update LICENSE on its own.
 """
 # END
 
+["net-vpn/obscura"]
+track = "commit"
+url = "https://api.github.com/repos/Sovereign-Engineering/obscuravpn-client/commits?sha=main&per_page=50"
+parser = "json"
+path = "[0].commit.committer.date"
+transform = [['T.*', ""], ['-', ""]]
+commit_sha_path = "[0].sha"
+base_from = "file"
+base_url = "https://raw.githubusercontent.com/Sovereign-Engineering/obscuravpn-client/main/tag.json"
+base_pattern = '"version": "([0-9][0-9.]*)"'
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "1.180_p20260924"
+comments = """
+Obscura VPN from source — commit-tracked on main because upstream tags only
+the Android releases (v/1.x); Linux versions are "Tag v1.x." commits that bump
+tag.json, which is the base. Snapshot and not the 1.180 commit on purpose:
+1.180 (80afacb4) is PolyForm Noncommercial, main is GPL-3 since 3e55fb3fd6.
+Every bump is a manual follow-up the applier cannot do: regenerate CRATES and
+GIT_CRATES from rustlib/Cargo.lock, and if obscura-ui/package-lock.json
+changed, rebuild obscura-ui-node_modules-<PV>.tar.xz, upload it to R2 and move
+UI_NODE_MODULES_PV.
+"""
+# END
+
 ["media-libs/dav1d"]
 enabled = false
 disabled_by = "parity-audit 2026-09-11: removed, byte-identical to ::gentoo 1.5.4"

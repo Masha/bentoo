@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@proton.me</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<longdescription lang="en">
+		Obscura is a VPN that tunnels WireGuard over QUIC through a two-party
+		relay design. This package builds the Linux client from source: the
+		obscura command-line tool, the obscura system service it drives
+		(OpenRC init script always, systemd unit with USE=systemd), and
+		optionally the GTK4/libadwaita desktop app that renders the web UI in
+		WebKitGTK.
+	</longdescription>
+	<use>
+		<flag name="gui">Build the obscura-gui desktop application (GTK4, <pkg>gui-libs/libadwaita</pkg>, <pkg>net-libs/webkit-gtk</pkg>) and install its desktop entry, AppStream metadata and icons</flag>
+	</use>
+	<upstream>
+		<remote-id type="github">Sovereign-Engineering/obscuravpn-client</remote-id>
+		<bugs-to>https://github.com/Sovereign-Engineering/obscuravpn-client/issues</bugs-to>
+	</upstream>
+</pkgmetadata>

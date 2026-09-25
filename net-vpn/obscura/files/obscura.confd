@@ -1,0 +1,19 @@
+# Configuration for /etc/init.d/obscura
+# Shared verbatim with net-vpn/obscura; keep the two copies byte-identical.
+
+# How the tunnel's DNS servers get installed on the system:
+#   auto             use systemd-resolved if running, else NetworkManager
+#   resolved         systemd-resolved only
+#   network-manager  NetworkManager only (reached over D-Bus)
+#   disabled         leave the system resolver alone
+#
+# "auto" REFUSES TO START when neither systemd-resolved nor NetworkManager is
+# running ("no supported DNS manager detected").  On an OpenRC box that
+# manages networking with netifrc, dhcpcd or iwd alone, set "disabled":
+# the tunnel still comes up, but DNS keeps using whatever /etc/resolv.conf
+# names, so queries may leave the tunnel's DNS path.
+OBSCURA_DNS="auto"
+
+# Extra arguments for "obscura service", e.g. "-vv" for info-level logs.
+# Logs are written to /var/log/obscura.
+OBSCURA_OPTS=""
