@@ -61,18 +61,18 @@ editor; that is what the live session is for.
 ---
 
 diff --git a/crates/agent_ui/src/threads_archive_view.rs b/crates/agent_ui/src/threads_archive_view.rs
-index 09a3ea8..78a835d 100644
+index ca56756..06ead7d 100644
 --- a/crates/agent_ui/src/threads_archive_view.rs
 +++ b/crates/agent_ui/src/threads_archive_view.rs
-@@ -29,6 +29,7 @@ use picker::{
-     highlighted_match_with_paths::{HighlightedMatch, HighlightedMatchWithPaths},
+@@ -30,6 +30,7 @@ use picker::{
  };
+ use platform_title_bar::apply_title_bar_insets;
  use project::{AgentId, AgentServerStore};
 +use remote::RemoteConnectionOptions;
  use settings::Settings as _;
  use theme::ActiveTheme;
  use ui::{
-@@ -127,6 +128,61 @@ pub fn fuzzy_match_positions(query: &str, candidate: &str) -> Option<Vec<usize>>
+@@ -128,6 +129,61 @@ pub fn fuzzy_match_positions(query: &str, candidate: &str) -> Option<Vec<usize>>
      None
  }
  
@@ -134,7 +134,7 @@ index 09a3ea8..78a835d 100644
  pub enum ThreadsArchiveViewEvent {
      Close,
      Activate { thread: ThreadMetadata },
-@@ -170,7 +226,7 @@ impl ThreadsArchiveView {
+@@ -171,7 +227,7 @@ impl ThreadsArchiveView {
  
          let filter_editor = cx.new(|cx| {
              let mut editor = Editor::single_line(window, cx);
@@ -143,7 +143,7 @@ index 09a3ea8..78a835d 100644
              editor
          });
  
-@@ -267,29 +323,35 @@ impl ThreadsArchiveView {
+@@ -268,29 +324,35 @@ impl ThreadsArchiveView {
              .is_focused(window)
      }
  
@@ -199,7 +199,7 @@ index 09a3ea8..78a835d 100644
  
          let query = self.filter_editor.read(cx).text(cx).to_lowercase();
          let today = Local::now().naive_local().date();
-@@ -948,8 +1010,10 @@ impl ThreadsArchiveView {
+@@ -954,8 +1016,10 @@ impl ThreadsArchiveView {
              .count();
  
          let has_archived_threads = {
@@ -211,7 +211,7 @@ index 09a3ea8..78a835d 100644
          };
  
          let count_label = if entry_count == 1 {
-@@ -1688,4 +1752,188 @@ mod tests {
+@@ -1694,4 +1758,188 @@ mod tests {
              );
          }
      }

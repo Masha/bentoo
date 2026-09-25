@@ -8,7 +8,7 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
 ---
 
 diff --git a/crates/agent_ui/src/conversation_view.rs b/crates/agent_ui/src/conversation_view.rs
-index 4811335..b14e2f1 100644
+index 973bf59..7324516 100644
 --- a/crates/agent_ui/src/conversation_view.rs
 +++ b/crates/agent_ui/src/conversation_view.rs
 @@ -2538,13 +2538,33 @@ impl ConversationView {
@@ -636,10 +636,10 @@ index 599bc1d..6b8c2d8 100644
          v_flex()
              .min_w_0()
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
-index bfefb98..cbf1ed3 100644
+index f31a122..ee1c0a3 100644
 --- a/crates/agent_ui/src/conversation_view/thread_view.rs
 +++ b/crates/agent_ui/src/conversation_view/thread_view.rs
-@@ -6704,10 +6704,22 @@ impl ThreadView {
+@@ -6635,10 +6635,22 @@ impl ThreadView {
                      .log_err();
                  }
              },

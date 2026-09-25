@@ -60,10 +60,10 @@ is checked in a running Zed, not here.
 ---
 
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
-index 0dcfbec..6744314 100644
+index fbe5849..10ac54e 100644
 --- a/crates/agent_ui/src/conversation_view/thread_view.rs
 +++ b/crates/agent_ui/src/conversation_view/thread_view.rs
-@@ -4790,7 +4790,7 @@ impl ThreadView {
+@@ -4724,7 +4724,7 @@ impl ThreadView {
                      .map(|window| {
                          let ratio = window.utilization.unwrap_or(0.0);
                          AccountUsageRow {
@@ -72,7 +72,7 @@ index 0dcfbec..6744314 100644
                              percentage: window
                                  .utilization
                                  .map(|u| format!("{}%", (u * 100.0).round() as u32))
-@@ -6428,7 +6428,35 @@ impl ThreadView {
+@@ -6362,7 +6362,35 @@ impl ThreadView {
                                      .border_1()
                                      .border_color(cx.theme().colors().border)
                                      .bg(cx.theme().colors().editor_background)
@@ -109,7 +109,7 @@ index 0dcfbec..6744314 100644
  
                                  let is_loading_contents = self.is_loading_contents;
                                  if is_editable {
-@@ -7877,8 +7905,14 @@ impl ThreadView {
+@@ -7807,8 +7835,14 @@ impl ThreadView {
          cx: &App,
      ) -> Option<String> {
          let entry = entries.get(entry_index)?;
@@ -126,7 +126,7 @@ index 0dcfbec..6744314 100644
          }
  
          let start_index = (0..entry_index)
-@@ -13031,6 +13065,148 @@ mod tests {
+@@ -12956,6 +12990,148 @@ mod tests {
              acp_thread::CommandCategory::Mcp,
          ))
      }

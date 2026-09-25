@@ -44,7 +44,7 @@ this work lives now, and where protocol breakage is reported first.
 ---
 
 diff --git a/Cargo.lock b/Cargo.lock
-index 8867d3e..8ac7a0d 100644
+index 26efd5f..743bb6d 100644
 --- a/Cargo.lock
 +++ b/Cargo.lock
 @@ -3085,6 +3085,31 @@ version = "0.7.6"
@@ -79,7 +79,7 @@ index 8867d3e..8ac7a0d 100644
  [[package]]
  name = "cli"
  version = "0.1.0"
-@@ -22878,6 +22903,7 @@ dependencies = [
+@@ -22889,6 +22914,7 @@ dependencies = [
   "channel",
   "chrono",
   "clap",
@@ -88,7 +88,7 @@ index 8867d3e..8ac7a0d 100644
   "client",
   "clock",
 diff --git a/Cargo.toml b/Cargo.toml
-index b1929a0..173e8c0 100644
+index 0420397..fa5ac1b 100644
 --- a/Cargo.toml
 +++ b/Cargo.toml
 @@ -26,6 +26,7 @@ members = [
@@ -99,7 +99,7 @@ index b1929a0..173e8c0 100644
      "crates/cli",
      "crates/client",
      "crates/clock",
-@@ -299,6 +300,7 @@ buffer_diff = { path = "crates/buffer_diff" }
+@@ -300,6 +301,7 @@ buffer_diff = { path = "crates/buffer_diff" }
  call = { path = "crates/call" }
  call_hierarchy = { path = "crates/call_hierarchy" }
  channel = { path = "crates/channel" }
@@ -1853,7 +1853,7 @@ index 0000000..2978e1b
 +    json!({ "content": [{ "type": "text", "text": payload.to_string() }] })
 +}
 diff --git a/crates/project/src/project.rs b/crates/project/src/project.rs
-index 2bdff41..7536eb1 100644
+index ae264f3..0f03bf3 100644
 --- a/crates/project/src/project.rs
 +++ b/crates/project/src/project.rs
 @@ -255,6 +255,10 @@ pub struct Project {
@@ -1867,7 +1867,7 @@ index 2bdff41..7536eb1 100644
  }
  
  struct DownloadingFile {
-@@ -1215,6 +1219,17 @@ impl Project {
+@@ -1216,6 +1220,17 @@ impl Project {
          context_server_store::init(cx);
      }
  
@@ -1885,7 +1885,7 @@ index 2bdff41..7536eb1 100644
      pub fn local(
          client: Arc<Client>,
          node: NodeRuntime,
-@@ -1417,6 +1432,7 @@ impl Project {
+@@ -1418,6 +1433,7 @@ impl Project {
                  agent_location: None,
                  downloading_files: Default::default(),
                  last_worktree_paths: WorktreePaths::default(),
@@ -1893,7 +1893,7 @@ index 2bdff41..7536eb1 100644
              }
          })
      }
-@@ -1660,6 +1676,7 @@ impl Project {
+@@ -1661,6 +1677,7 @@ impl Project {
                  agent_location: None,
                  downloading_files: Default::default(),
                  last_worktree_paths: WorktreePaths::default(),
@@ -1901,7 +1901,7 @@ index 2bdff41..7536eb1 100644
              };
  
              // remote server -> local machine handlers
-@@ -1951,6 +1968,7 @@ impl Project {
+@@ -1952,6 +1969,7 @@ impl Project {
                  agent_location: None,
                  downloading_files: Default::default(),
                  last_worktree_paths: WorktreePaths::default(),
@@ -1959,7 +1959,7 @@ index 2d8a37c..3a1505c 100644
              project.update(cx, move |_, cx| {
                  match remote_client {
 diff --git a/crates/zed/Cargo.toml b/crates/zed/Cargo.toml
-index 3a45078..864a033 100644
+index a17c2ed..c2d92b7 100644
 --- a/crates/zed/Cargo.toml
 +++ b/crates/zed/Cargo.toml
 @@ -84,6 +84,7 @@ call.workspace = true
