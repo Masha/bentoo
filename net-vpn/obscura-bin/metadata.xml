@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@protonmail.com</email>
+		<name>Lucas Couto</name>
+	</maintainer>
+	<longdescription lang="en">
+		Obscura is a two-party VPN: the operator of the entry relay never sees
+		traffic content, and the independent exit hop never sees who sent it.
+		The tunnel is WireGuard carried over QUIC, with an nftables kill switch.
+		This package installs upstream's prebuilt Debian binaries: the obscura
+		CLI and its root service (the daemon behind "obscura service"), and,
+		with USE=gui, the GTK4/WebKit desktop app.  An OpenRC init script is
+		always installed; the systemd unit is optional.
+	</longdescription>
+	<use>
+		<flag name="gui">Install the obscura-gui desktop application
+			(GTK4, libadwaita and <pkg>net-libs/webkit-gtk</pkg>:6)</flag>
+	</use>
+	<upstream>
+		<remote-id type="github">Sovereign-Engineering/obscuravpn-client</remote-id>
+		<bugs-to>https://github.com/Sovereign-Engineering/obscuravpn-client/issues</bugs-to>
+	</upstream>
+</pkgmetadata>

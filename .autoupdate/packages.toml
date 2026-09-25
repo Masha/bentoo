@@ -1619,7 +1619,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "0.12.18"
+version = "0.12.19"
 comments = """
 uv (uv-bin) — tag bare "X.Y.Z".
 """
@@ -2424,6 +2424,28 @@ networkmanager-openvpn — default (commit-recency) order; version sort returns 
 """
 # END
 
+["net-vpn/obscura-bin"]
+url = "https://linux-pkgs.obscura.com/deb/dists/stable/main/binary-amd64/Packages"
+parser = "regex"
+pattern = 'Package: obscura-cli\n(?:[^\n]*\n)*?Version: ([0-9][0-9.]*)'
+version = "1.180"
+comments = """
+Obscura VPN — the Debian "Packages" index of the APT repository SRC_URI pulls
+from (the one obscura-repository.deb configures). Plain text; four stanzas on
+2026-09-24: obscura (metapackage), obscura-cli, obscura-gui and
+obscura-repository, all at the same Version. The anchor is on obscura-cli
+because that deb is fetched unconditionally; a "Source: obscura" line sits
+between Package and Version, hence the lazy skip over whole lines rather than a
+literal "\\nVersion:" as in dev-util/codex-desktop-bin.
+GitHub is NOT a usable probe: v/1.180 has no tag or release there (latest is
+v/1.177), the debs are published straight to this repo.
+The Release file lists "Architectures: amd64" only; there is no arm64 index.
+On every bump re-read usr/share/doc/obscura-cli/copyright: 1.180 is PolyForm
+Noncommercial, upstream relicensed to GPL-3 + linking exception on 2026-09-22,
+and the applier will not update LICENSE on its own.
+"""
+# END
+
 ["media-libs/dav1d"]
 enabled = false
 disabled_by = "parity-audit 2026-09-11: removed, byte-identical to ::gentoo 1.5.4"
@@ -2850,7 +2872,7 @@ commit_sha_path = "[0].id"
 base_from = "file"
 base_url = "https://gitlab.freedesktop.org/mesa/mesa/-/raw/main/VERSION"
 base_pattern = '^([0-9][0-9.]*)-devel'
-version = "26.3.0_pre20260924"
+version = "26.3.0_pre20260925"
 comments = """
 mesa — commit-tracked on main; _pre suffix preserved from current ebuild.
 
@@ -2868,7 +2890,7 @@ commit_sha_path = "[0].id"
 base_from = "file"
 base_url = "https://gitlab.freedesktop.org/mesa/mesa/-/raw/main/VERSION"
 base_pattern = '^([0-9][0-9.]*)-devel'
-version = "26.3.0_pre20260924"
+version = "26.3.0_pre20260925"
 comments = """
 mesa_clc — part of the mesa tree; same source/rule as media-libs/mesa.
 """
@@ -3517,7 +3539,7 @@ base_from = "tag"
 base_url = "https://api.github.com/repos/KhronosGroup/Vulkan-Headers/git/refs/tags"
 base_tag_pattern = '^v([0-9]+\.[0-9]+\.[0-9]+)$'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.363_p20260918"
+version = "1.4.364_p20260925"
 comments = """
 vulkan-headers — commit-tracked on main; scans titles "Update for Vulkan-Docs X.Y.Z" to detect base bump.
 """
@@ -3551,7 +3573,7 @@ base_from = "tag"
 base_url = "https://api.github.com/repos/KhronosGroup/Vulkan-Utility-Libraries/git/refs/tags"
 base_tag_pattern = '^v([0-9]+\.[0-9]+\.[0-9]+)$'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.363_p20260923"
+version = "1.4.363_p20260925"
 comments = """
 vulkan-utility-libraries — commit-tracked on main, same shape as vulkan-headers.
 
@@ -3594,7 +3616,7 @@ base_from = "file"
 base_url = "https://raw.githubusercontent.com/KhronosGroup/Vulkan-Loader/main/CMakeLists.txt"
 base_pattern = '(?m)^project\([A-Za-z_-]+ VERSION ([0-9][0-9.]*)'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.363_p20260922"
+version = "1.4.364_p20260925"
 comments = """
 vulkan-loader — commit-tracked on main; scans for "Update for Vulkan-Docs X.Y.Z" to detect base bump.
 """
@@ -10593,7 +10615,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "2.1.0"
+version = "2.2.0"
 comments = """
 ai-jail — releases/latest on akitaonrails/ai-jail; tag_name is "vX.Y.Z" and the
 transform strips the v.  Verified by real download on 2026-09-07: tag_name
@@ -10627,7 +10649,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "2.1.0"
+version = "2.2.0"
 comments = """
 ai-jail-bin — same endpoint and same release as sys-apps/ai-jail; this record
 exists separately only because the two are separate packages.  Bump them

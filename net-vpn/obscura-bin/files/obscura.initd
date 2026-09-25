@@ -1,0 +1,57 @@
+#!/sbin/openrc-run
+# Copyright 1999-2026 Gentoo Authors
+# Distributed under the terms of the GNU General Public License v2
+
+# OpenRC counterpart of upstream's obscura.service.  Shared verbatim with
+# net-vpn/obscura (from source): both install the same /usr/bin/obscura, so
+# keep the two copies byte-identical.
+#
+# How each unit directive maps here:
+#   ExecStart=/usr/bin/obscura service  -> command + command_args
+#   Group=obscura                        -> command_user="root:obscura"
+#   UMask=0007                           -> umask=007; the daemon creates
+#                                           /run/obscura.sock with it, so the
+#                                           socket ends up 0660 root:obscura
+#                                           and only group members can drive it
+#   StateDirectory/LogsDirectory/
+#   RuntimeDirectory (mode 0750)         -> checkpath in start_pre; systemd
+#                                           hands the paths over through
+#                                           STATE_DIRECTORY / LOGS_DIRECTORY /
+#                                           RUNTIME_DIRECTORY, OpenRC passes
+#                                           them as --config-dir / --log-dir /
+#                                           --runtime-dir (the first two are
+#                                           mandatory)
+#   Restart=always, RestartSec=1         -> supervise-daemon respawn
+#   StartLimitIntervalSec=0              -> respawn_max=0 (no limit)
+#
+# Not mapped: Type=notify and FileDescriptorStoreMax.  Without NOTIFY_SOCKET
+# and LISTEN_FDS the daemon skips sd_notify and starts with an empty fd store,
+# so a respawn re-creates its nftables socket instead of adopting the old one.
+
+description="Obscura VPN service"
+
+: "${OBSCURA_DNS:=auto}"
+
+command="/usr/bin/obscura"
+command_args="service
+	--config-dir /var/lib/obscura
+	--log-dir /var/log/obscura
+	--runtime-dir /run/obscura
+	--dns ${OBSCURA_DNS}
+	${OBSCURA_OPTS}"
+command_user="root:obscura"
+umask=007
+supervisor="supervise-daemon"
+respawn_delay=1
+respawn_max=0
+
+depend() {
+	need net
+	use dbus dns NetworkManager
+}
+
+start_pre() {
+	checkpath -d -o root:obscura -m 0750 /var/lib/obscura
+	checkpath -d -o root:obscura -m 0750 /var/log/obscura
+	checkpath -d -o root:obscura -m 0750 /run/obscura
+}
