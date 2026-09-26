@@ -1362,6 +1362,8 @@ GitHub API  (releases/latest -> tag_name, or /tags -> [0].name; UA required)
 # END
 
 ["net-p2p/qbittorrent"]
+enabled = false
+disabled_by = "removed 2026-09-26: at the same 5.2.3 the only divergence was SRC_URI (GitHub releases instead of SourceForge), and SourceForge answers 200. Our files/qbittorrent.{initd,confd} were the 2023 copies, older than ::gentoo's, so the fork only held its fixes back. Reopen only to carry a version ::gentoo does not have."
 url = "https://api.github.com/repos/qbittorrent/qBittorrent/releases/latest"
 parser = "json"
 path = "tag_name"
@@ -2174,6 +2176,8 @@ source. Measured 2026-09-01: without it, "Checked 1 source, 0 bin".
 # END
 
 ["sys-firmware/intel-microcode"]
+enabled = false
+disabled_by = "removed 2026-09-26: ::gentoo ships the same Intel date with a newer collection snapshot (20260925_p20260925 vs our _p20260813), so ours was behind. The only other divergence was stable amd64/x86 KEYWORDS; accepted trade-off: stable-profile users fall back to ::gentoo's stable 20260812_p20260813 until ::gentoo stabilises 20260925. Reopen only to carry a version ::gentoo does not have."
 url = "https://api.github.com/repos/intel/Intel-Linux-Processor-Microcode-Data-Files/releases/latest"
 parser = "regex"
 pattern = '"tag_name":\s*"microcode-([0-9]{8})"'
@@ -10120,6 +10124,8 @@ on 2026-07-26.  Two things had to be true for that, and neither was before:
 # END
 
 ["sys-apps/coreutils"]
+enabled = false
+disabled_by = "removed 2026-09-26: ::gentoo now ships 9.12, the exact condition this record named for dropping the mirror. Its copy is better than ours: the 9.12 patchset (ours pinned 9.6), the glibc-2.44 regcomp guard and the 64-bit time_t guards, with the same all-~arch KEYWORDS. Reopen only to carry a version ::gentoo does not have."
 url = "https://ftp.gnu.org/gnu/coreutils/?C=M;O=D"
 parser = "regex"
 pattern = 'coreutils-([0-9.]+)\.tar\.xz'

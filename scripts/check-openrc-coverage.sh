@@ -358,9 +358,9 @@ classify_ebuild() {
 
 		# --- pass 2: a unit directory handed to a build system -------
 		# The unit is written by meson/cmake from this argument and no install
-		# call ever names it, so pass 1 cannot see it. Four packages in this
+		# call ever names it, so pass 1 cannot see it. Three packages in this
 		# tree are only visible here: net-misc/networkmanager,
-		# net-misc/modemmanager, net-p2p/qbittorrent and, at user scope,
+		# net-misc/modemmanager and, at user scope,
 		# sys-apps/xdg-desktop-portal.
 		if [[ -z ${CLS_SYS_UNIT} ]]; then
 			for token in "${SYS_UNITDIR_TOKENS[@]}"; do
