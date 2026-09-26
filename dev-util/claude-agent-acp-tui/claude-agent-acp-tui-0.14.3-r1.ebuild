@@ -17,7 +17,7 @@ KEYWORDS="-* ~amd64"
 RESTRICT="mirror strip bindist"
 
 RDEPEND="
-	net-libs/nodejs
+	>=net-libs/nodejs-24
 	dev-util/claude-code
 "
 
