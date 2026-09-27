@@ -1867,6 +1867,14 @@ src_prepare() {
 			# _askUserQuestionCustomAnswer marker, so an ordinary MCP form is
 			# never split. Rides this flag by CHOICE, like 0010/0012/0014/0026.
 			"${FILESDIR}/0027-pinned-elicitation-card.patch"
+			# 0028: a folder dropped on the threads sidebar opens as a project of
+			# its own, through the same MultiWorkspace::open_project the sidebar's
+			# "Add Project" popover uses, so its saved session is restored. One
+			# project per folder; files are ignored, and a folder that is already a
+			# project in any window is skipped rather than re-activated. The sidebar
+			# accepted no drop before, so there is no old behaviour to keep behind
+			# a setting. Rides this flag by CHOICE, like 0010/0012/0014/0026.
+			"${FILESDIR}/0028-sidebar-drop-folder-adds-project.patch"
 		)
 	fi
 
