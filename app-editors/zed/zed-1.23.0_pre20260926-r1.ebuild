@@ -1875,6 +1875,14 @@ src_prepare() {
 			# accepted no drop before, so there is no old behaviour to keep behind
 			# a setting. Rides this flag by CHOICE, like 0010/0012/0014/0026.
 			"${FILESDIR}/0028-sidebar-drop-folder-adds-project.patch"
+			# 0029: a thread whose turn ended while a background shell or async
+			# subagent keeps running gets its own sidebar status -- the running
+			# spinner, tinted and slower -- instead of the agent's plain icon. The
+			# count arrives as _meta["_claude/backgroundTasks"] on a
+			# session_info_update, sent by claude-agent-acp-plus >= 0.21.0; older
+			# adapters send nothing and the patch is inert. Rides this flag BY
+			# DEPENDENCY, like 0011/0013: no other agent sends that key.
+			"${FILESDIR}/0029-background-task-status.patch"
 		)
 	fi
 
