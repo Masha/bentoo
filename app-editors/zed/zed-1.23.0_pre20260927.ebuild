@@ -1585,7 +1585,7 @@ declare -A GIT_CRATES=(
 	[zed-xim]='https://github.com/zed-industries/xim-rs;16f35a2c881b815a2b6cdfd6687988e84f8447d8;xim-rs-%commit%'
 )
 
-EGIT_COMMIT="bda9c0bd43a8d235d82adb01ea5bc875b861ecfc"
+EGIT_COMMIT="e683fd7b465ecfb42b1da88ff685d204c2781076"
 LLVM_COMPAT=( 22 )
 RUST_MIN_VER="1.98.1"
 RUST_NEEDS_LLVM=1
