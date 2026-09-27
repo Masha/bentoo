@@ -1883,6 +1883,12 @@ src_prepare() {
 			# adapters send nothing and the patch is inert. Rides this flag BY
 			# DEPENDENCY, like 0011/0013: no other agent sends that key.
 			"${FILESDIR}/0029-background-task-status.patch"
+			# 0030: a thread whose agent asked a question and is waiting for the
+			# answer gets its own sidebar status -- a Chat icon, "Waiting for Your
+			# Answer" -- instead of the running spinner. Permissions keep their
+			# warning triangle and outrank it. Generic ACP, so it rides this flag
+			# by CHOICE, like 0027.
+			"${FILESDIR}/0030-question-status.patch"
 		)
 	fi
 
