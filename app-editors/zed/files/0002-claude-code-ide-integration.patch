@@ -44,10 +44,10 @@ this work lives now, and where protocol breakage is reported first.
 ---
 
 diff --git a/Cargo.lock b/Cargo.lock
-index 4eb6561..c5610a5 100644
+index 633872e..f7275b6 100644
 --- a/Cargo.lock
 +++ b/Cargo.lock
-@@ -3085,6 +3085,31 @@ version = "0.7.6"
+@@ -3110,6 +3110,31 @@ version = "0.7.6"
  source = "registry+https://github.com/rust-lang/crates.io-index"
  checksum = "a1d728cc89cf3aee9ff92b05e62b19ee65a02b5702cff7d5a377e32c6ae29d8d"
  
@@ -79,7 +79,7 @@ index 4eb6561..c5610a5 100644
  [[package]]
  name = "cli"
  version = "0.1.0"
-@@ -22898,6 +22923,7 @@ dependencies = [
+@@ -22896,6 +22921,7 @@ dependencies = [
   "channel",
   "chrono",
   "clap",
@@ -88,10 +88,10 @@ index 4eb6561..c5610a5 100644
   "client",
   "clock",
 diff --git a/Cargo.toml b/Cargo.toml
-index d159136..68cfc3d 100644
+index 41db7bf..2afffd7 100644
 --- a/Cargo.toml
 +++ b/Cargo.toml
-@@ -26,6 +26,7 @@ members = [
+@@ -27,6 +27,7 @@ members = [
      "crates/call",
      "crates/call_hierarchy",
      "crates/channel",
@@ -99,7 +99,7 @@ index d159136..68cfc3d 100644
      "crates/cli",
      "crates/client",
      "crates/clock",
-@@ -300,6 +301,7 @@ buffer_diff = { path = "crates/buffer_diff" }
+@@ -302,6 +303,7 @@ buffer_diff = { path = "crates/buffer_diff" }
  call = { path = "crates/call" }
  call_hierarchy = { path = "crates/call_hierarchy" }
  channel = { path = "crates/channel" }

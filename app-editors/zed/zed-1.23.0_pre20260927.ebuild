@@ -1889,6 +1889,13 @@ src_prepare() {
 			# warning triangle and outrank it. Generic ACP, so it rides this flag
 			# by CHOICE, like 0027.
 			"${FILESDIR}/0030-question-status.patch"
+			# 0031: the turn stats gain the session's side -- the turn's duration
+			# always shown, a running total of agent time since the thread was
+			# opened, and a tool-call count whose tooltip breaks it down by tool,
+			# by MCP server and by the programs the terminal calls ran. Same row,
+			# same show_turn_stats setting. Generic ACP, so it rides this flag by
+			# CHOICE, like 0026.
+			"${FILESDIR}/0031-session-stats.patch"
 		)
 	fi
 

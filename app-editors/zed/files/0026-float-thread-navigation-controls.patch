@@ -63,6 +63,12 @@ copy button of the last turn sat right behind the overlay, covered by it.
   `thread`, `entry_ix` and `copy_response_index` parameters with their last
   use, and the `rposition` search that fed the last one.
 
+- What stays in that row -- the turn's token count and duration -- moves to
+  its left end. Right-aligned, as it was beside the buttons, it sat exactly
+  under the overlay once the thread was scrolled to its end, the one place
+  it is read. The dot after the last stat goes too: it separated the stats
+  from buttons that are no longer in the row.
+
 This rides on `ThreadView` being re-rendered on every scroll: the list's
 scroll-wheel handler ends in `cx.notify(current_view)`, and the view that
 paints the list is this one, so the enabled state and the copy target are
@@ -82,7 +88,7 @@ the claude-agent-acp-plus flag BY CHOICE rather than by dependency.
 ---
 
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
-index a7c65a0..c56e3fa 100644
+index 2e8a082..434da62 100644
 --- a/crates/agent_ui/src/conversation_view/thread_view.rs
 +++ b/crates/agent_ui/src/conversation_view/thread_view.rs
 @@ -6659,24 +6659,10 @@ impl ThreadView {
@@ -214,7 +220,38 @@ index a7c65a0..c56e3fa 100644
          let separator_dots = || {
              Label::new("•")
                  .size(LabelSize::Small)
-@@ -7081,12 +7023,182 @@ impl ThreadView {
+@@ -7057,11 +6999,16 @@ impl ThreadView {
+                 .alpha(0.5)
+         };
+ 
++        let show_separator = last_turn_tokens_label.is_some() && last_turn_clock.is_some();
++
++        // The stats sit on the left: the floating controls occupy the bottom
++        // right corner of the conversation, which is exactly where a
++        // right-aligned row ends up once the thread is scrolled to its end.
+         h_flex()
+             .w_full()
+             .py_1p5()
+             .px_4()
+-            .justify_end()
++            .justify_between()
+             .opacity(0.4)
+             .hover(|s| s.opacity(1.))
+             .when(
+@@ -7071,22 +7018,189 @@ impl ThreadView {
+                         h_flex()
+                             .px_1()
+                             .gap_1()
+-                            .when_some(last_turn_tokens_label, |this, label| {
+-                                this.child(label).child(separator_dots())
+-                            })
+-                            .when_some(last_turn_clock, |this, label| {
+-                                this.child(label).child(separator_dots())
+-                            }),
++                            .when_some(last_turn_tokens_label, |this, label| this.child(label))
++                            .when(show_separator, |this| this.child(separator_dots()))
++                            .when_some(last_turn_clock, |this, label| this.child(label)),
+                     )
                  },
              )
              .when_some(feedback_buttons, |this, buttons| this.child(buttons))
@@ -400,7 +437,7 @@ index a7c65a0..c56e3fa 100644
      fn is_thread_feedback_enabled(&self, cx: &App) -> bool {
          util::maybe!({
              let project = self.thread.read(cx).project().read(cx);
-@@ -12420,9 +12532,11 @@ impl Render for ThreadView {
+@@ -12420,9 +12534,11 @@ impl Render for ThreadView {
              })
              .map(|this| {
                  if has_messages {
@@ -413,7 +450,7 @@ index a7c65a0..c56e3fa 100644
                          .vertical_scrollbar_for(&list_state, window, cx)
                          .into_any()
                  } else {
-@@ -13038,6 +13152,67 @@ mod tests {
+@@ -13038,6 +13154,67 @@ mod tests {
          }
      }
  
