@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>diego.evangelista5642@gmail.com</email>
+		<name>lucascouts</name>
+	</maintainer>
+	<longdescription lang="en">
+		Composer is the dependency manager for PHP. It resolves the libraries
+		a project declares in composer.json, installs them into vendor/,
+		records exact versions in composer.lock and generates an autoloader.
+		Packages come from Packagist by default, or from VCS, path and
+		private repositories.
+
+		Installed from the upstream release phar, which bundles all of its
+		own dependencies. The in-place "composer self-update" command does
+		not apply to this install; updates come through Portage.
+	</longdescription>
+	<upstream>
+		<bugs-to>https://github.com/composer/composer/issues</bugs-to>
+		<changelog>https://github.com/composer/composer/blob/main/CHANGELOG.md</changelog>
+		<doc>https://getcomposer.org/doc/</doc>
+		<remote-id type="github">composer/composer</remote-id>
+	</upstream>
+</pkgmetadata>

@@ -11662,3 +11662,25 @@ upstream tests race on a process-global cache; re-verify on bumps whether
 that is still needed.
 """
 # END
+
+["dev-php/composer"]
+url = "https://api.github.com/repos/composer/composer/releases/latest"
+parser = "json"
+path = "tag_name"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "2.10.3"
+comments = """
+composer - the upstream release phar, installed as fetched. GitHub release
+tag is a bare version with no "v" prefix.
+
+releases/latest rather than ranking refs/tags: upstream tags release
+candidates in the same tag space (2.10.0-RC1, 2.10.0-RC2 on 2026-09-28), and
+ranking tags would promote one.
+
+SRC_URI is getcomposer.org/download/${PV}/composer.phar, which serves the
+same bytes as the GitHub asset; getcomposer.org also publishes
+composer.phar.sha256sum next to it -- compare it against the Manifest on a
+bump. Re-read composer.json "require" for new ext-* entries: each one is a
+dev-lang/php USE flag in RDEPEND.
+"""
+# END
