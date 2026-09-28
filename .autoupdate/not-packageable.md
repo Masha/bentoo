@@ -237,30 +237,3 @@ entirely), or the overlay deciding it wants a from-source path badly enough to
 accept the R2 regeneration cycle — in which case the recipe is known and
 written above, not research that has to be redone.
 
----
-
-## `basedpyright` — basedpyright (Python type checker / language server)
-
-**Assessed:** 2026-09-27 · **Upstream version then:** `1.40.1` · **Verdict:**
-not packageable while it bundles core-js 4.0.0-alpha.1.
-
-Both the npm tarball (`dist/pyright.js`, `dist/pyright-langserver.js`) and the
-PyPI wheel carry `@core-js/pure@4.0.0-alpha.1` inside the webpack bundle — 110
-source files of it in the source maps. That alpha replaced core-js's MIT
-licence with a custom "core-js experimental version license": non-commercial
-use only, redistribution prohibited outside a non-commercial website, no use
-for AI training, and the licence itself expires 7 days after core-js 4 stable
-is released. `4.0.0-alpha.0` was still MIT; `alpha.1` was published 2026-03-22.
-
-Upstream pulled it in with PR #1760 (merged 2026-03-25). Going back does not
-help: v1.39.8's `package-lock.json` already resolves alpha.1, and
-`pyright-internal` pins `^4.0.0-alpha.1` in both v1.39.8 and v1.40.1. A
-non-commercial clause contradicts the overlay's "cover third-party use cases"
-rule, so shipping it under a custom licence plus `RESTRICT` was rejected.
-`dev-util/pyright`, which basedpyright forks, has no such dependency and is in
-the overlay.
-
-**Condition that reopens this:** upstream dropping or replacing core-js
-alpha.1, or core-js 4 shipping stable under a free licence — check
-`dist/*.map` for `@core-js/pure@` and read that version's LICENSE.
-

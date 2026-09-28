@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>diego.evangelista5642@gmail.com</email>
+		<name>lucascouts</name>
+	</maintainer>
+	<longdescription lang="en">
+		basedpyright is a fork of Pyright, the static type checker for
+		Python, with extra checks and the language-server features that
+		Pylance keeps closed (inlay hints, semantic highlighting, docstrings
+		for compiled builtins, and more). It installs a command-line checker
+		(basedpyright) and a language server (basedpyright-langserver).
+
+		Compiled from source with core-js removed: upstream's bundle ships
+		@core-js/pure 4.0.0-alpha.1 under a non-commercial, experimental-only
+		licence, and the four polyfills it provided are native in the
+		Node.js this package requires.
+	</longdescription>
+	<upstream>
+		<bugs-to>https://github.com/DetachHead/basedpyright/issues</bugs-to>
+		<changelog>https://github.com/DetachHead/basedpyright/releases</changelog>
+		<doc>https://docs.basedpyright.com/</doc>
+		<remote-id type="github">DetachHead/basedpyright</remote-id>
+		<remote-id type="pypi">basedpyright</remote-id>
+	</upstream>
+</pkgmetadata>

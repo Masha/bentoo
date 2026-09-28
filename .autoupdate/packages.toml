@@ -11723,3 +11723,32 @@ package byte-for-byte. A bump must re-read LICENSE.txt: if the text changed,
 licenses/intelephense must be refreshed with it.
 """
 # END
+
+["dev-util/basedpyright"]
+url = "https://registry.npmjs.org/basedpyright/latest"
+parser = "regex"
+pattern = '"version":"([0-9]+\.[0-9]+\.[0-9]+)"'
+version = "1.40.1"
+comments = """
+basedpyright -- probed on npm, where every release lands; the ebuild takes
+the source from the matching GitHub tag and only the typeshed-fallback stub
+tree from the npm tarball.
+
+A BUMP IS NOT AUTOMATABLE, for three reasons:
+- basedpyright-node_modules-${PV}.tar.xz on distfiles.obentoo.org must be
+  regenerated from the new pnpm-lock.yaml with the recipe in the ebuild header
+  and uploaded (wrangler --remote) BEFORE autoupdate fetches it, or Cloudflare
+  caches the 404. Redo the LICENSE survey in the same step.
+- files/basedpyright-drop-core-js.patch must still apply AND still be
+  complete: grep the new sources for "@core-js" (languageServer*,
+  languageService/*, both tsconfig.json). A new core-js import the patch does
+  not cover fails tsc loudly, since the tarball carries no core-js.
+- src_compile rewrites the "pyright-internal/" alias in exactly two entry
+  modules and compiles pyright-to-gitlab-ci's converter by file name; both
+  die if upstream moves them.
+The reason the ebuild exists at all: upstream bundles @core-js/pure
+4.0.0-alpha.1 (non-commercial, experimental-only licence). If upstream drops
+core-js or it ships stable under MIT, the npm bundle becomes installable as
+is and this source build can be simplified.
+"""
+# END
