@@ -9202,6 +9202,30 @@ newest-first; the first "version" (sid) carries the fixed "2:" epoch, so the reg
 """
 # END
 
+["dev-lang/typescript"]
+url = "https://registry.npmjs.org/typescript/latest"
+parser = "regex"
+pattern = '"version":"([0-9]+\.[0-9]+\.[0-9]+)"'
+version = "7.0.2"
+comments = """
+TypeScript -- probed on npm, Microsoft's only channel for the built compiler.
+The /latest document is the "latest" dist-tag, so the rc, beta and nightly
+"next" channels never reach the match.
+
+bentoo carries ONLY the 7.x series; 6.x keeps coming from ::gentoo. 7 is the
+native (Go) port: the npm tarball is a thin JS launcher plus one
+@typescript/typescript-linux-<arch> package holding the binary, and it ships
+neither tsserver.js nor lib/typescript.js. Anything needing tsserver or the JS
+compiler API must depend on <dev-lang/typescript-7 (dev-util/typescript-language-server
+does). Copying a 6.x ebuild here would shadow ::gentoo byte-for-byte and
+freeze it -- see gentoo-parity.sh REDUNDANT.
+
+On a bump, the platform tarballs in SRC_URI follow ${PV}; check that upstream
+still publishes every arch the ebuild keywords, and that engines.node has not
+risen past the nodejs floor in RDEPEND.
+"""
+# END
+
 ["dev-lang/rust"]
 enabled = false
 disabled_by = "parity-audit 2026-09-04: removed, ::gentoo copy is better"
@@ -11341,7 +11365,8 @@ npm tarball is the one that ships the built lib/cli.mjs bundle.
 The tarball is a self-contained rollup bundle (no runtime dependencies), so the
 ebuild is architecture-independent with ordinary ~amd64 ~arm64 keywords.
 
-tsserver is NOT bundled: the ebuild RDEPENDs on dev-lang/typescript and links
+tsserver is NOT bundled: the ebuild RDEPENDs on <dev-lang/typescript-7 (7.x is
+the native port and has no tsserver.js) and links
 /usr/lib/node_modules/typescript into /usr/share/${PN}/node_modules so the
 server's require.resolve('typescript') fallback finds it. On a bump, check that
 engines.node has not risen past the >=net-libs/nodejs floor in RDEPEND.

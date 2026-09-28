@@ -22,9 +22,10 @@ KEYWORDS="~amd64 ~arm64"
 # being edited and a tsserver.path from the client, and otherwise falls back to
 # require.resolve('typescript'). dev-lang/typescript backs that fallback, so
 # the server also works on plain JavaScript projects with no typescript of
-# their own.
+# their own. TypeScript 7 is the native (Go) port and ships neither tsserver.js
+# nor lib/typescript.js, so the fallback needs the last JavaScript series.
 RDEPEND="
-	dev-lang/typescript
+	<dev-lang/typescript-7
 	>=net-libs/nodejs-22.22.2:*
 "
 

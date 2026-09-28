@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>diego.evangelista5642@gmail.com</email>
+		<name>lucascouts</name>
+	</maintainer>
+	<longdescription lang="en">
+		TypeScript is a language for application-scale JavaScript. TypeScript
+		adds optional types to JavaScript that support tools for large-scale
+		JavaScript applications for any browser, for any host, on any OS.
+		TypeScript compiles to readable, standards-based JavaScript.
+
+		From 7.0 on the compiler is the native port written in Go and ships as
+		a prebuilt executable; tsc is a small Node.js launcher for it. The 7.x
+		series has no tsserver and no JavaScript compiler API, so tools that
+		need either must depend on the 6.x series.
+	</longdescription>
+	<upstream>
+		<bugs-to>https://github.com/microsoft/TypeScript/issues/</bugs-to>
+		<remote-id type="github">microsoft/TypeScript</remote-id>
+		<remote-id type="github">microsoft/typescript-go</remote-id>
+	</upstream>
+</pkgmetadata>

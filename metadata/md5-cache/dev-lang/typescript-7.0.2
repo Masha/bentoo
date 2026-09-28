@@ -1,0 +1,11 @@
+DEFINED_PHASES=compile install unpack
+DESCRIPTION=Superset of JavaScript with optional static typing (native Go compiler)
+EAPI=8
+HOMEPAGE=https://www.typescriptlang.org/ https://github.com/microsoft/TypeScript/ https://github.com/microsoft/typescript-go/
+KEYWORDS=-* ~amd64 ~arm ~arm64 ~loong ~riscv
+LICENSE=Apache-2.0 BSD BSD-2 CC-BY-4.0 MIT Unicode-DFS-2016 W3C
+RDEPEND=>=net-libs/nodejs-16.20.0:*
+RESTRICT=strip
+SLOT=0
+SRC_URI=https://registry.npmjs.org/typescript/-/typescript-7.0.2.tgz amd64? ( https://registry.npmjs.org/@typescript/typescript-linux-x64/-/typescript-linux-x64-7.0.2.tgz -> typescript-7.0.2-linux-x64.tgz ) arm? ( https://registry.npmjs.org/@typescript/typescript-linux-arm/-/typescript-linux-arm-7.0.2.tgz -> typescript-7.0.2-linux-arm.tgz ) arm64? ( https://registry.npmjs.org/@typescript/typescript-linux-arm64/-/typescript-linux-arm64-7.0.2.tgz -> typescript-7.0.2-linux-arm64.tgz ) loong? ( https://registry.npmjs.org/@typescript/typescript-linux-loong64/-/typescript-linux-loong64-7.0.2.tgz -> typescript-7.0.2-linux-loong64.tgz ) riscv? ( https://registry.npmjs.org/@typescript/typescript-linux-riscv64/-/typescript-linux-riscv64-7.0.2.tgz -> typescript-7.0.2-linux-riscv64.tgz )
+_md5_=18857ca3c2346dfb7cc3fac754937346
