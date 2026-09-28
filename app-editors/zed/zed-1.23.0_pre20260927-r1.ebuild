@@ -26,6 +26,7 @@ CRATES="
 	aliasable@0.1.3
 	aligned-vec@0.6.4
 	aligned@0.4.3
+	alloca@0.4.0
 	allocator-api2@0.2.21
 	alsa-sys@0.3.1
 	alsa@0.10.0
@@ -165,6 +166,7 @@ CRATES="
 	bzip2-sys@0.1.13+1.0.8
 	bzip2@0.4.4
 	bzip2@0.6.1
+	c-enum@0.2.3
 	cached@0.56.0
 	cached_proc_macro@0.25.0
 	cached_proc_macro_types@0.1.1
@@ -270,8 +272,8 @@ CRATES="
 	crc-fast@1.9.0
 	crc32fast@1.5.0
 	crc@3.3.0
-	criterion-plot@0.5.0
-	criterion@0.5.1
+	criterion-plot@0.8.2
+	criterion@0.8.2
 	crossbeam-channel@0.5.15
 	crossbeam-deque@0.8.6
 	crossbeam-epoch@0.9.18
@@ -562,7 +564,7 @@ CRATES="
 	is_executable@1.0.5
 	is_terminal_polyfill@1.70.1
 	itertools@0.10.5
-	itertools@0.11.0
+	itertools@0.13.0
 	itertools@0.14.0
 	itertools@0.15.0
 	itoa@1.0.18
@@ -801,6 +803,9 @@ CRATES="
 	pem-rfc7468@0.7.0
 	pem@3.0.6
 	percent-encoding@2.3.2
+	perf-event-data@0.1.8
+	perf-event-open-sys2@5.0.6
+	perf-event2@0.7.4
 	pest@2.8.3
 	pest_derive@2.8.3
 	pest_generator@2.8.3
@@ -1306,7 +1311,6 @@ CRATES="
 	wasmtime-wasi-io@48.0.1
 	wasmtime-wasi@48.0.1
 	wasmtime@48.0.1
-	wast@35.0.2
 	wax@0.7.0
 	wayland-backend@0.3.15
 	wayland-client@0.31.11
@@ -1334,9 +1338,6 @@ CRATES="
 	wgpu@29.0.4
 	which@8.0.5
 	whoami@1.6.1
-	wiggle-generate@48.0.1
-	wiggle-macro@48.0.1
-	wiggle@48.0.1
 	winapi-i686-pc-windows-gnu@0.4.0
 	winapi-util@0.1.11
 	winapi-x86_64-pc-windows-gnu@0.4.0
@@ -1452,7 +1453,6 @@ CRATES="
 	wit-parser@0.227.1
 	wit-parser@0.244.0
 	wit-parser@0.254.0
-	witx@0.9.1
 	write16@1.0.0
 	writeable@0.6.4
 	wyz@0.5.1
@@ -1585,7 +1585,7 @@ declare -A GIT_CRATES=(
 	[zed-xim]='https://github.com/zed-industries/xim-rs;16f35a2c881b815a2b6cdfd6687988e84f8447d8;xim-rs-%commit%'
 )
 
-EGIT_COMMIT="e683fd7b465ecfb42b1da88ff685d204c2781076"
+EGIT_COMMIT="1a28cff4b409169bac058bca40dfbfeb7621d19b"
 LLVM_COMPAT=( 22 )
 RUST_MIN_VER="1.98.1"
 RUST_NEEDS_LLVM=1
