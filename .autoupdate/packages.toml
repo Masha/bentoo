@@ -11647,12 +11647,11 @@ url = "https://api.github.com/repos/neocmakelsp/neocmakelsp/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.11.1"
+version = "0.11.2"
 comments = """
-neocmakelsp - Rust, cargo.eclass with an inline CRATES list (222 crates at
-0.11.1, below the eclass's 300-crate QA threshold; no git deps).
-releases/latest returns "vX.Y.Z". 0.11.2 was skipped on 2026-09-27 only
-because it was published that day (7-day minimum age); it is a normal bump.
+neocmakelsp - Rust, cargo.eclass with an inline CRATES list (below the
+eclass's 300-crate QA threshold; no git deps).
+releases/latest returns "vX.Y.Z".
 
 CRATES must be regenerated from the new Cargo.lock on every bump (pycargoebuild
 with a custom wget user_agent, crates.io 403s the default one); a stale list
