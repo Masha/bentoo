@@ -52,7 +52,14 @@ src_install() {
 	# runtime part is installed: lib/ (tsserver.js, typescript.js, the lib.*.d.ts
 	# declarations) and package.json. bin/ is left out: the server loads
 	# tsserver.js directly, and a tsc on PATH belongs to dev-lang/typescript.
-	insinto /usr/share/${PN}/node_modules/typescript
+	#
+	# It goes in lib/node_modules, the first directory that walk tries, and
+	# not in ${PN}/node_modules: up to -r1 that path was a symlink to
+	# /usr/lib/node_modules/typescript. Portage merges a directory through a
+	# symlink already on disk instead of replacing it, so on an upgrade the
+	# files landed in dev-lang/typescript's tree and the merge died on file
+	# collisions.
+	insinto /usr/share/${PN}/lib/node_modules/typescript
 	doins -r "${WORKDIR}"/typescript/{lib,package.json,LICENSE.txt,ThirdPartyNoticeText.txt}
 
 	# package.json points bin at lib/cli.mjs, which is meant to be reached
