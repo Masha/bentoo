@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>diego.evangelista5642@gmail.com</email>
+		<name>lucascouts</name>
+	</maintainer>
+	<longdescription lang="en">
+		Intelephense is a PHP language server providing completion,
+		diagnostics, formatting, hover, go to definition and references for
+		any LSP-capable editor. The core features are free; rename, code
+		actions, inlay hints, folding, type hierarchy and a few others need a
+		paid licence key.
+
+		Proprietary software under its own EULA: it must be accepted through
+		ACCEPT_LICENSE="intelephense", and it is never mirrored or shipped as
+		a binary package.
+	</longdescription>
+	<upstream>
+		<bugs-to>https://github.com/bmewburn/vscode-intelephense/issues</bugs-to>
+		<changelog>https://github.com/bmewburn/intelephense-docs/blob/master/changelog.md</changelog>
+		<remote-id type="github">bmewburn/vscode-intelephense</remote-id>
+	</upstream>
+</pkgmetadata>

@@ -11705,3 +11705,21 @@ bump. Re-read composer.json "require" for new ext-* entries: each one is a
 dev-lang/php USE flag in RDEPEND.
 """
 # END
+
+["dev-util/intelephense"]
+url = "https://registry.npmjs.org/intelephense/latest"
+parser = "regex"
+pattern = '"version":"([0-9]+\.[0-9]+\.[0-9]+)"'
+version = "1.18.5"
+comments = """
+Intelephense -- probed on npm, the only channel upstream ships the server
+through (the GitHub repos hold the VS Code extension and docs, not the server).
+The npm tarball is a self-contained webpack bundle whose only require() calls
+are Node built-ins, so the ebuild is architecture-independent (~amd64 ~arm64).
+
+Proprietary licence (licenses/intelephense): redistribution and modification
+are forbidden, hence RESTRICT="bindist mirror" and an install that copies the
+package byte-for-byte. A bump must re-read LICENSE.txt: if the text changed,
+licenses/intelephense must be refreshed with it.
+"""
+# END

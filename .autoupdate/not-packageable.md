@@ -264,25 +264,3 @@ the overlay.
 alpha.1, or core-js 4 shipping stable under a free licence — check
 `dist/*.map` for `@core-js/pure@` and read that version's LICENSE.
 
----
-
-## `dev-util/intelephense` — Intelephense (PHP language server)
-
-**Assessed:** 2026-09-27 · **Upstream version then:** `1.18.5` (npm) ·
-**Verdict:** discarded by maintainer decision on licence grounds.
-
-The npm package is a technically clean target — a self-contained webpack
-bundle, only Node built-ins at runtime, arch-independent — and an ebuild was
-written and verified (LSP `initialize` answered from the image). It was
-dropped before commit because of its licence: a proprietary EULA
-(`LICENSE.txt`, "Intelephense Licence") that forbids modifying (5a) and
-distributing (5c) the software and gates the premium features behind a paid
-key. That required a custom licence file, `RESTRICT="bindist mirror"` and an
-`ACCEPT_LICENSE` opt-in, for a server whose free tier is a subset of a
-commercial product. `dev-util/phpactor` (MIT) covers PHP in the overlay.
-
-**Condition that reopens this:** upstream relicensing the server under a
-free licence, or the overlay deciding to carry proprietary LSPs under
-`ACCEPT_LICENSE` — the ebuild shape is recorded above (npm tgz,
-`S=${WORKDIR}/package`, `/usr/share/${PN}/{lib,package.json}` unmodified, sh
-launcher, `RDEPEND="net-libs/nodejs:*"`).
