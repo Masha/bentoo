@@ -1921,6 +1921,27 @@ rustdesk-bin — same upstream repo.
 """
 # END
 
+["net-misc/anydesk"]
+url = "https://deb.anydesk.com/dists/all/main/binary-amd64/Packages"
+parser = "regex"
+pattern = 'Filename: pool/main/a/anydesk/anydesk_([0-9]+\.[0-9]+\.[0-9]+)_amd64\.deb'
+version = "8.1.0"
+comments = """
+AnyDesk -- the Debian "Packages" index of AnyDesk's own APT repository. The
+download.anydesk.com listing and changelog.txt answer 429 to curl and the
+anydesk.com download page 403s; this index is plain text and names the same
+version the linux/ and rpi/ tarballs in SRC_URI carry.
+
+This record is temporary, like the package: bentoo mirrors ::gentoo's
+anydesk-8.1.0 as 8.1.0-r1 only to swap its bare sys-apps/systemd-utils RDEPEND
+(which blocks sys-apps/systemd) for virtual/libudev, and to gate the unit on
+USE=systemd (added 2026-09-28). Once ::gentoo's anydesk no longer forces
+systemd-utils, remove the package and set enabled = false here. Before any
+bump, re-diff against ::gentoo's newest anydesk ebuild and re-run readelf -d
+on the new binary: RDEPEND tracks its NEEDED list by hand.
+"""
+# END
+
 ["net-p2p/bisq-bin"]
 url = "https://api.github.com/repos/bisq-network/bisq/releases/latest"
 parser = "json"
