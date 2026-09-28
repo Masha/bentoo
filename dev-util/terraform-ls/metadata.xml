@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@protonmail.com</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<longdescription lang="en">
+		terraform-ls is the official Language Server Protocol implementation
+		for the Terraform configuration language (HCL). It provides completion,
+		hover, go-to-definition, references, diagnostics and formatting for
+		Terraform modules. The language server itself is MPL-2.0; it calls the
+		terraform CLI, when installed, to read provider schemas of initialized
+		modules.
+	</longdescription>
+	<upstream>
+		<bugs-to>https://github.com/hashicorp/terraform-ls/issues</bugs-to>
+		<remote-id type="github">hashicorp/terraform-ls</remote-id>
+	</upstream>
+</pkgmetadata>

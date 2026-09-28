@@ -1,0 +1,57 @@
+Honour CC/AR/CFLAGS/CXXFLAGS/LDFLAGS in the luamake gcc backend and stop
+it from stripping the binary at link time (Portage strips and splits debug
+info itself).
+
+--- a/3rd/luamake/scripts/compiler/gcc.lua
++++ b/3rd/luamake/scripts/compiler/gcc.lua
+@@ -25,8 +25,10 @@
+         ldflags[#ldflags+1] = "-lstdc++"
+         ldflags[#ldflags+1] = "-Wl,-Bdynamic"
+     end
+-    if attribute.mode ~= "debug" then
+-        ldflags[#ldflags+1] = "-s"
++    -- bentoo: never strip here, Portage does it (and splits debug info);
++    -- honour LDFLAGS from the environment instead.
++    for flag in (os.getenv "LDFLAGS" or ""):gmatch "%S+" do
++        ldflags[#ldflags+1] = flag
+     end
+     if attribute.lto ~= "off" then
+         ldflags[#ldflags+1] = "-flto"
+--- a/3rd/luamake/scripts/compiler/gcc_opt.lua
++++ b/3rd/luamake/scripts/compiler/gcc_opt.lua
+@@ -1,6 +1,13 @@
+ local globals = require "globals"
+ local log = require "log"
+ 
++-- bentoo: append the distribution's compiler flags from the environment.
++-- They go last on the command line so that they win over upstream's
++-- defaults (-O2 and friends).
++local function env_flags(name)
++    return os.getenv(name) or ""
++end
++
+ local function format_path(path)
+     if path:match " " then
+         return '"'..path..'"'
+@@ -112,8 +119,8 @@
+ end
+ 
+ function gcc.rule_c(w, name, flags, cflags)
+-    w:rule("c_"..name, ([[$cc -MMD -MT $out -MF $out.d %s %s -o $out -c $in]])
+-        :format(cflags, flags),
++    w:rule("c_"..name, ([[$cc -MMD -MT $out -MF $out.d %s %s %s -o $out -c $in]])
++        :format(cflags, flags, env_flags "CFLAGS"),
+         {
+             description = "Compile C   $out",
+             deps = "gcc",
+@@ -122,8 +129,8 @@
+ end
+ 
+ function gcc.rule_cxx(w, name, flags, cxxflags)
+-    w:rule("cxx_"..name, ([[$cc -MMD -MT $out -MF $out.d %s %s -o $out -c $in]])
+-        :format(cxxflags, flags),
++    w:rule("cxx_"..name, ([[$cc -MMD -MT $out -MF $out.d %s %s %s -o $out -c $in]])
++        :format(cxxflags, flags, env_flags "CXXFLAGS"),
+         {
+             description = "Compile C++ $out",
+             deps = "gcc",

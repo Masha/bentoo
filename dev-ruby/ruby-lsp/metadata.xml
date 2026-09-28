@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@protonmail.com</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<longdescription lang="en">
+		Ruby LSP is Shopify's language server for Ruby. It indexes the project
+		with the Prism parser and provides completion, go to definition, hover,
+		diagnostics, formatting, semantic highlighting and code actions to any
+		editor that speaks the Language Server Protocol.
+	</longdescription>
+	<upstream>
+		<remote-id type="github">Shopify/ruby-lsp</remote-id>
+		<remote-id type="rubygems">ruby-lsp</remote-id>
+		<bugs-to>https://github.com/Shopify/ruby-lsp/issues</bugs-to>
+		<doc>https://shopify.github.io/ruby-lsp/</doc>
+	</upstream>
+</pkgmetadata>

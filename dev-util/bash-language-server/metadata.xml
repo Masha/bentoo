@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>diego.evangelista5642@gmail.com</email>
+		<name>lucascouts</name>
+	</maintainer>
+	<longdescription lang="en">
+		Language Server Protocol implementation for Bash, built on
+		tree-sitter-bash. It provides symbol navigation, completion, hover
+		documentation and workspace analysis to any LSP-capable editor.
+
+		Diagnostics come from ShellCheck and formatting from shfmt when
+		either is installed; completion of command options uses
+		bash-completion and hover documentation uses man pages. All four are
+		optional and reported by pkg_postinst.
+	</longdescription>
+	<upstream>
+		<remote-id type="github">bash-lsp/bash-language-server</remote-id>
+		<bugs-to>https://github.com/bash-lsp/bash-language-server/issues</bugs-to>
+	</upstream>
+</pkgmetadata>

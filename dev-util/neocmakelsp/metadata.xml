@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@proton.me</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<upstream>
+		<remote-id type="github">neocmakelsp/neocmakelsp</remote-id>
+		<bugs-to>https://github.com/neocmakelsp/neocmakelsp/issues</bugs-to>
+		<changelog>https://github.com/neocmakelsp/neocmakelsp/blob/master/CHANGELOG.md</changelog>
+	</upstream>
+	<longdescription lang="en">
+		neocmakelsp is a Language Server Protocol server for CMake, written in
+		Rust on top of tree-sitter. It provides completion (including the
+		commands, variables and packages CMake knows about), hover
+		documentation, go-to-definition, document symbols, diagnostics from
+		cmake-lint and a built-in formatter. It talks LSP over stdio or TCP,
+		and the same binary can format or search CMake files from the
+		command line.
+	</longdescription>
+</pkgmetadata>

@@ -236,3 +236,53 @@ vendor tarball as a release asset (which would remove the hosting burden
 entirely), or the overlay deciding it wants a from-source path badly enough to
 accept the R2 regeneration cycle — in which case the recipe is known and
 written above, not research that has to be redone.
+
+---
+
+## `basedpyright` — basedpyright (Python type checker / language server)
+
+**Assessed:** 2026-09-27 · **Upstream version then:** `1.40.1` · **Verdict:**
+not packageable while it bundles core-js 4.0.0-alpha.1.
+
+Both the npm tarball (`dist/pyright.js`, `dist/pyright-langserver.js`) and the
+PyPI wheel carry `@core-js/pure@4.0.0-alpha.1` inside the webpack bundle — 110
+source files of it in the source maps. That alpha replaced core-js's MIT
+licence with a custom "core-js experimental version license": non-commercial
+use only, redistribution prohibited outside a non-commercial website, no use
+for AI training, and the licence itself expires 7 days after core-js 4 stable
+is released. `4.0.0-alpha.0` was still MIT; `alpha.1` was published 2026-03-22.
+
+Upstream pulled it in with PR #1760 (merged 2026-03-25). Going back does not
+help: v1.39.8's `package-lock.json` already resolves alpha.1, and
+`pyright-internal` pins `^4.0.0-alpha.1` in both v1.39.8 and v1.40.1. A
+non-commercial clause contradicts the overlay's "cover third-party use cases"
+rule, so shipping it under a custom licence plus `RESTRICT` was rejected.
+`dev-util/pyright`, which basedpyright forks, has no such dependency and is in
+the overlay.
+
+**Condition that reopens this:** upstream dropping or replacing core-js
+alpha.1, or core-js 4 shipping stable under a free licence — check
+`dist/*.map` for `@core-js/pure@` and read that version's LICENSE.
+
+---
+
+## `dev-util/intelephense` — Intelephense (PHP language server)
+
+**Assessed:** 2026-09-27 · **Upstream version then:** `1.18.5` (npm) ·
+**Verdict:** discarded by maintainer decision on licence grounds.
+
+The npm package is a technically clean target — a self-contained webpack
+bundle, only Node built-ins at runtime, arch-independent — and an ebuild was
+written and verified (LSP `initialize` answered from the image). It was
+dropped before commit because of its licence: a proprietary EULA
+(`LICENSE.txt`, "Intelephense Licence") that forbids modifying (5a) and
+distributing (5c) the software and gates the premium features behind a paid
+key. That required a custom licence file, `RESTRICT="bindist mirror"` and an
+`ACCEPT_LICENSE` opt-in, for a server whose free tier is a subset of a
+commercial product. `dev-util/phpactor` (MIT) covers PHP in the overlay.
+
+**Condition that reopens this:** upstream relicensing the server under a
+free licence, or the overlay deciding to carry proprietary LSPs under
+`ACCEPT_LICENSE` — the ebuild shape is recorded above (npm tgz,
+`S=${WORKDIR}/package`, `/usr/share/${PN}/{lib,package.json}` unmodified, sh
+launcher, `RDEPEND="net-libs/nodejs:*"`).

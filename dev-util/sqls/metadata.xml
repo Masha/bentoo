@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@protonmail.com</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<longdescription lang="en">
+		sqls is a Language Server Protocol implementation for SQL. It offers
+		completion of keywords, tables and columns, hover, signature help,
+		formatting and query execution against a live database, and speaks to
+		MySQL, PostgreSQL, SQLite3, SQL Server, Oracle, H2, Vertica and
+		ClickHouse. Connections are configured per project or per user.
+	</longdescription>
+	<upstream>
+		<bugs-to>https://github.com/sqls-server/sqls/issues</bugs-to>
+		<remote-id type="github">sqls-server/sqls</remote-id>
+	</upstream>
+</pkgmetadata>

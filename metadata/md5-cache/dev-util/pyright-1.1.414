@@ -1,0 +1,10 @@
+DEFINED_PHASES=install
+DESCRIPTION=Static type checker and language server for Python
+EAPI=8
+HOMEPAGE=https://microsoft.github.io/pyright/ https://github.com/microsoft/pyright
+KEYWORDS=~amd64 ~arm64
+LICENSE=MIT 0BSD Apache-2.0 BSD BSD-2 ISC
+RDEPEND=net-libs/nodejs:*
+SLOT=0
+SRC_URI=https://registry.npmjs.org/pyright/-/pyright-1.1.414.tgz
+_md5_=357a4ba8e6deed2b83181d4db09a7ea4

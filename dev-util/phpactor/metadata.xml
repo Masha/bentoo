@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>diego.evangelista5642@gmail.com</email>
+		<name>lucascouts</name>
+	</maintainer>
+	<longdescription lang="en">
+		Phpactor is a PHP language server and command-line tool providing
+		completion, navigation, refactoring (class move/rename, extract
+		method/constant, import class, generate accessors) and static
+		introspection. It works with any LSP-capable editor.
+
+		Installed from the upstream release phar, which bundles all of its
+		Composer dependencies. The phar refuses to start when the PHP
+		extension "psr" is loaded (it conflicts with
+		symfony/service-contracts).
+	</longdescription>
+	<upstream>
+		<bugs-to>https://github.com/phpactor/phpactor/issues</bugs-to>
+		<changelog>https://github.com/phpactor/phpactor/blob/master/CHANGELOG.md</changelog>
+		<doc>https://phpactor.readthedocs.io/</doc>
+		<remote-id type="github">phpactor/phpactor</remote-id>
+	</upstream>
+</pkgmetadata>

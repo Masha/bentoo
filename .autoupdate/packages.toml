@@ -11327,3 +11327,314 @@ The trailing quote in the pattern anchors on the href, keeping the .sig files
 out of the match.
 """
 # END
+
+["dev-util/typescript-language-server"]
+url = "https://registry.npmjs.org/typescript-language-server/latest"
+parser = "regex"
+pattern = '"version":"([0-9]+\.[0-9]+\.[0-9]+)"'
+version = "6.0.1"
+comments = """
+TypeScript Language Server -- probed on npm because upstream publishes no
+release artefact anywhere else; the GitHub tags carry source only, and the
+npm tarball is the one that ships the built lib/cli.mjs bundle.
+
+The tarball is a self-contained rollup bundle (no runtime dependencies), so the
+ebuild is architecture-independent with ordinary ~amd64 ~arm64 keywords.
+
+tsserver is NOT bundled: the ebuild RDEPENDs on dev-lang/typescript and links
+/usr/lib/node_modules/typescript into /usr/share/${PN}/node_modules so the
+server's require.resolve('typescript') fallback finds it. On a bump, check that
+engines.node has not risen past the >=net-libs/nodejs floor in RDEPEND.
+"""
+# END
+
+["dev-util/pyright"]
+url = "https://registry.npmjs.org/pyright/latest"
+parser = "regex"
+pattern = '"version":"([0-9]+\.[0-9]+\.[0-9]+)"'
+version = "1.1.414"
+comments = """
+Pyright -- probed on npm because that is Microsoft's only channel for the built
+checker. The GitHub release assets are source/VSIX, and the PyPI "pyright" is
+a third-party wrapper that downloads this same npm tarball at runtime.
+
+The tarball is a self-contained webpack bundle; its only declared dependency,
+fsevents, is an optional macOS binding. The ebuild is therefore
+architecture-independent and keeps ordinary ~amd64 ~arm64 keywords.
+
+On a bump, re-list the bundled modules from dist/*.map (the .pnpm/<name>@<ver>
+paths) and re-check LICENSE: a new bundled module can bring a new license.
+"""
+# END
+
+
+["dev-util/phpactor"]
+url = "https://api.github.com/repos/phpactor/phpactor/releases/latest"
+parser = "json"
+path = "tag_name"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "2026.06.23.0"
+comments = """
+phpactor -- releases/latest returns the bare tag ("YYYY.MM.DD.N", no "v"); the
+only asset is phpactor.phar, a Humbug Box build with every Composer dependency
+inside, fetched as ${P}.phar.
+
+releases/latest is deliberate, and a tag index with select = "max" would be
+WRONG here: on 2026-09-27 the newest release (published 2026-08-15, 5 commits
+ahead of 2026.07.22.0) carried the lower-sorting tag 2026.06.23.0. Ranking tags
+would have picked the older content. The flip side: if upstream again publishes
+a release whose tag sorts below the packaged PV, the applier will not bump it,
+and the PV has to be aligned by hand.
+
+A bump must re-check the phar's .box/.requirements.php (PHP minimum and
+required extensions) against the ebuild's dev-lang/php USE list: Box aborts at
+startup when one is missing.
+"""
+# END
+
+["dev-util/bash-language-server"]
+url = "https://registry.npmjs.org/bash-language-server/latest"
+parser = "regex"
+pattern = '"version":"([0-9]+\.[0-9]+\.[0-9]+)"'
+version = "5.8.1"
+comments = """
+bash-language-server -- probed on npm, the channel that ships the compiled
+server (GitHub releases carry source only).
+
+A BUMP IS NOT AUTOMATABLE. The ebuild needs a second distfile we generate,
+bash-language-server-node_modules-${PV}.tar.xz on distfiles.obentoo.org; after
+autoupdate bumps PV it 404s until someone regenerates it with the recipe in
+the ebuild header (npm install --omit=dev --ignore-scripts --before=<date at
+least 7 days old>, deterministic tar | xz -T1 -9e) and uploads it with
+wrangler --remote. Upload BEFORE running autoupdate, or Cloudflare caches the
+404. Redo the LICENSE survey from node_modules/.package-lock.json in the same
+step, and re-check that the tree still has no install scripts or .node addons
+(KEYWORDS ~arm64 depends on it).
+"""
+# END
+
+["dev-util/dockerfile-language-server"]
+url = "https://registry.npmjs.org/dockerfile-language-server-nodejs/latest"
+parser = "regex"
+pattern = '"version":"([0-9]+\.[0-9]+\.[0-9]+)"'
+version = "0.15.0"
+comments = """
+dockerfile-language-server (npm: dockerfile-language-server-nodejs, command
+docker-langserver) -- probed on npm, the channel that ships the compiled
+server.
+
+A BUMP IS NOT AUTOMATABLE. The ebuild needs a second distfile we generate,
+dockerfile-language-server-node_modules-${PV}.tar.xz on distfiles.obentoo.org;
+after autoupdate bumps PV it 404s until someone regenerates it with the recipe
+in the ebuild header (npm install --omit=dev --ignore-scripts --before=<date
+at least 7 days old>, deterministic tar | xz -T1 -9e) and uploads it with
+wrangler --remote. Upload BEFORE running autoupdate, or Cloudflare caches the
+404. Redo the LICENSE survey from node_modules/.package-lock.json in the same
+step, and re-check that the tree still has no install scripts or .node addons.
+"""
+# END
+
+["dev-util/yaml-language-server"]
+url = "https://registry.npmjs.org/yaml-language-server/latest"
+parser = "regex"
+pattern = '"version":"([0-9]+\.[0-9]+\.[0-9]+)"'
+version = "1.24.0"
+comments = """
+yaml-language-server (Red Hat) -- probed on npm, the channel that ships the
+compiled server.
+
+A BUMP IS NOT AUTOMATABLE. The ebuild needs a second distfile we generate,
+yaml-language-server-node_modules-${PV}.tar.xz on distfiles.obentoo.org; after
+autoupdate bumps PV it 404s until someone regenerates it with the recipe in
+the ebuild header (npm install --omit=dev --ignore-scripts --before=<date at
+least 7 days old>, deterministic tar | xz -T1 -9e) and uploads it with
+wrangler --remote. Upload BEFORE running autoupdate, or Cloudflare caches the
+404. Redo the LICENSE survey in the same step: besides
+node_modules/.package-lock.json, the vendored prettier is itself a bundle whose
+THIRD-PARTY-NOTICES.md contributes Apache-2.0, BSD-2 and BlueOak-1.0.0.
+"""
+# END
+
+["dev-util/sqls"]
+url = "https://api.github.com/repos/sqls-server/sqls/releases/latest"
+parser = "json"
+path = "tag_name"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "0.2.48"
+comments = """
+sqls - releases/latest returns "vX.Y.Z".
+
+The build uses a vendor tarball we generate ourselves
+(distfiles.obentoo.org/${P}-vendor.tar.xz). A bump MUST run
+scripts/go-vendor.sh dev-util/sqls, upload the new tarball to R2 BEFORE the
+applier fetches it (a cached 404 poisons the edge), and re-survey the vendored
+module licenses (LICENSE+=), which the applier cannot see. The version is a
+constant in main.go, so no ldflags need refreshing.
+"""
+# END
+
+["dev-util/terraform-ls"]
+url = "https://api.github.com/repos/hashicorp/terraform-ls/releases/latest"
+parser = "json"
+path = "tag_name"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "0.39.0"
+comments = """
+terraform-ls - MPL-2.0 (unlike terraform itself, never relicensed to BUSL);
+re-check LICENSE on every bump. releases/latest returns "vX.Y.Z".
+
+The build uses a vendor tarball we generate ourselves
+(distfiles.obentoo.org/${P}-vendor.tar.xz). A bump MUST run
+scripts/go-vendor.sh dev-util/terraform-ls, upload the new tarball to R2
+BEFORE the applier fetches it, and re-survey the vendored module licenses.
+The version is embedded from version/VERSION; built-in provider schemas are
+deliberately absent (their generator needs the network).
+"""
+# END
+
+["dev-util/tofu-ls"]
+url = "https://api.github.com/repos/opentofu/tofu-ls/releases/latest"
+parser = "json"
+path = "tag_name"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "0.5.3"
+comments = """
+tofu-ls - releases/latest returns "vX.Y.Z".
+
+The build uses a vendor tarball we generate ourselves
+(distfiles.obentoo.org/${P}-vendor.tar.xz). A bump MUST run
+scripts/go-vendor.sh dev-util/tofu-ls, upload the new tarball to R2 BEFORE the
+applier fetches it, and re-survey the vendored module licenses. BDEPEND tracks
+the go directive of go.mod (1.26.0 at 0.5.3); raise it when upstream does.
+The version is embedded from version/VERSION; built-in provider schemas are
+deliberately absent (their generator needs the network).
+"""
+# END
+
+["dev-util/perlnavigator"]
+url = "https://registry.npmjs.org/perlnavigator-server/latest"
+parser = "regex"
+pattern = '"version":"([0-9]+\.[0-9]+\.[0-9]+)"'
+version = "0.8.20"
+comments = """
+perlnavigator (npm: perlnavigator-server) -- probed on npm, the channel that
+ships the compiled server. GitHub releases carry only pkg-built x86_64
+binaries, which would drop ~arm64.
+
+A BUMP IS NOT AUTOMATABLE. The ebuild needs a second distfile we generate,
+perlnavigator-node_modules-${PV}.tar.xz on distfiles.obentoo.org; after
+autoupdate bumps PV it 404s until someone regenerates it with the recipe in
+the ebuild header (npm install --omit=dev --ignore-scripts --before=<date at
+least 7 days old>, deterministic tar | xz -T1 -9e) and uploads it with
+wrangler --remote. Upload BEFORE running autoupdate, or Cloudflare caches the
+404. Redo the LICENSE survey from node_modules/.package-lock.json in the same
+step (plus the Perl modules vendored under src/perl/lib_bs22), re-check that
+the tree still has no install scripts or .node addons (KEYWORDS ~arm64 depends
+on it), and that out/assets.js still resolves src/perl next to out/.
+"""
+# END
+
+["dev-ruby/ruby-lsp"]
+url = "https://rubygems.org/api/v1/gems/ruby-lsp.json"
+parser = "json"
+path = "version"
+version = "0.26.11"
+comments = """
+ruby-lsp: the rubygems gems endpoint's "version" is the latest non-prerelease
+(0.27.0.betaN are skipped). On bump, re-check the gemspec runtime ranges
+(language_server-protocol ~> 3.17.0, prism >= 1.2 < 2, rbs >= 3 < 5) against
+the ruby_add_rdepend block, and confirm VERSION and static_docs still exist
+(RUBY_FAKEGEM_EXTRAINSTALL).
+"""
+# END
+
+["dev-ruby/language_server-protocol"]
+url = "https://rubygems.org/api/v1/gems/language_server-protocol.json"
+parser = "json"
+path = "version"
+version = "3.17.0.6"
+comments = """
+language_server-protocol: overlay-only dependency of dev-ruby/ruby-lsp (absent
+from ::gentoo). The rubygems "version" skips prereleases (3.18.0.0.pre.1).
+A 3.18 final would NOT satisfy ruby-lsp's "~> 3.17.0": keep a 3.17 ebuild
+until ruby-lsp widens its range.
+"""
+# END
+
+["dev-python/fortls"]
+url = "https://pypi.org/pypi/fortls/json"
+parser = "json"
+path = "info.version"
+version = "3.2.2"
+comments = """
+fortls -- inherit pypi; PyPI info.version is clean X.Y.Z, no prefix.
+src_prepare disables upstream's self-updater (pip install --user on startup)
+with a grep-guarded sed on fortls/langserver.py; a bump that changes that line
+dies in prepare by design -- re-target the sed.
+"""
+# END
+
+["dev-util/lua-language-server"]
+url = "https://api.github.com/repos/LuaLS/lua-language-server/releases/latest"
+parser = "json"
+path = "tag_name"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "3.19.1"
+comments = """
+lua-language-server - built from the "<ver>-submodules.zip" release asset, the
+only upstream artifact that carries the 3rd/ submodules (luamake, bee.lua,
+lpeglabel, EmmyLuaCodeStyle). Tags are bare "X.Y.Z", no "v" prefix.
+
+The ebuild patches luamake's gcc backend (files/*-luamake-toolchain.patch) and
+guards four seds with grep -qF (bootstrap cc/ar, crt=static, -Werror). A bump
+that moves any of those lines dies in src_prepare on purpose. Re-check the
+bundled-license list in LICENSE when 3rd/ gains a new compiled component.
+"""
+# END
+
+["dev-util/jdtls"]
+url = "https://download.eclipse.org/jdtls/milestones/"
+parser = "regex"
+pattern = "/jdtls/milestones/([0-9]+\\.[0-9]+\\.[0-9]+)'"
+select = "max"
+version = "1.61.0"
+comments = """
+jdtls - packaged from the official prebuilt milestone on download.eclipse.org,
+not built from source (Maven/Tycho needs the network). The probe reads the
+milestones directory listing rather than the GitHub tags: a tag can precede
+the milestone upload by a day, while a listed directory already holds the
+tarball. The listing is in no useful order, so select = "max" is mandatory.
+
+MY_BUILD is NOT covered by this probe: the distfile is
+jdt-language-server-${PV}-${MY_BUILD}.tar.gz and the timestamp only lives in
+https://download.eclipse.org/jdtls/milestones/${PV}/latest.txt, a URL that
+depends on the new version (milestones/latest.txt and jdtls/latest.txt are
+404), so aux_var cannot reach it. A bump applied by the tool keeps the old
+MY_BUILD and fails loudly at manifest time with a 404 -- refresh MY_BUILD by
+hand from latest.txt. files/jdtls-launcher-config.patch patches bin/jdtls.py;
+if upstream reworks the launcher, the patch fails to apply, which is the
+intended signal.
+"""
+# END
+
+["dev-util/neocmakelsp"]
+url = "https://api.github.com/repos/neocmakelsp/neocmakelsp/releases/latest"
+parser = "json"
+path = "tag_name"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "0.11.1"
+comments = """
+neocmakelsp - Rust, cargo.eclass with an inline CRATES list (222 crates at
+0.11.1, below the eclass's 300-crate QA threshold; no git deps).
+releases/latest returns "vX.Y.Z". 0.11.2 was skipped on 2026-09-27 only
+because it was published that day (7-day minimum age); it is a normal bump.
+
+CRATES must be regenerated from the new Cargo.lock on every bump (pycargoebuild
+with a custom wget user_agent, crates.io 403s the default one); a stale list
+still fetches and fails in src_compile. Diff the lock's registry entries
+against CRATES before building. Re-check RUST_MIN_VER against Cargo.toml's
+rust-version. src_test runs serially (RUST_TEST_THREADS=1) because two
+upstream tests race on a process-global cache; re-verify on bumps whether
+that is still needed.
+"""
+# END

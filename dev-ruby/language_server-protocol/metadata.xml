@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@protonmail.com</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<longdescription lang="en">
+		Ruby classes and constants for every Language Server Protocol message,
+		plus a JSON-RPC stdio transport. Used by Ruby language servers such as
+		ruby-lsp.
+	</longdescription>
+	<upstream>
+		<remote-id type="github">mtsmfm/language_server-protocol-ruby</remote-id>
+		<remote-id type="rubygems">language_server-protocol</remote-id>
+		<bugs-to>https://github.com/mtsmfm/language_server-protocol-ruby/issues</bugs-to>
+	</upstream>
+</pkgmetadata>

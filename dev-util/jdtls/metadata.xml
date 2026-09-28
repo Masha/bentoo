@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@proton.me</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<upstream>
+		<remote-id type="github">eclipse-jdtls/eclipse.jdt.ls</remote-id>
+		<bugs-to>https://github.com/eclipse-jdtls/eclipse.jdt.ls/issues</bugs-to>
+		<changelog>https://github.com/eclipse-jdtls/eclipse.jdt.ls/blob/main/CHANGELOG.md</changelog>
+	</upstream>
+	<longdescription lang="en">
+		The Eclipse JDT Language Server is a Java implementation of the
+		Language Server Protocol built on the Eclipse Java Development Tools.
+		It gives any LSP-capable editor completion, diagnostics, navigation,
+		refactoring, formatting and code actions for Java, and imports Maven
+		and Gradle projects on its own.
+
+		This package installs the official prebuilt milestone under
+		/usr/share/jdtls and a jdtls launcher in /usr/bin. The launcher keeps
+		its writable OSGi configuration and per-project workspaces under
+		~/.cache/jdtls, so the installed tree stays read-only.
+	</longdescription>
+</pkgmetadata>

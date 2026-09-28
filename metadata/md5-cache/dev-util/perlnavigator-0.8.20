@@ -1,0 +1,12 @@
+DEFINED_PHASES=install postinst
+DESCRIPTION=Perl language server
+EAPI=8
+HOMEPAGE=https://github.com/bscan/PerlNavigator
+INHERIT=optfeature
+KEYWORDS=~amd64 ~arm64
+LICENSE=MIT ISC || ( Artistic GPL-1+ )
+RDEPEND=dev-lang/perl >=net-libs/nodejs-16:*
+SLOT=0
+SRC_URI=https://registry.npmjs.org/perlnavigator-server/-/perlnavigator-server-0.8.20.tgz https://distfiles.obentoo.org/perlnavigator-node_modules-0.8.20.tar.xz
+_eclasses_=optfeature	58cc13bdc4e9a204077e1e7c9a1d7988
+_md5_=7738cb5236a59126d1cdacdd178d50e8

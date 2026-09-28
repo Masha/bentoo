@@ -1,0 +1,10 @@
+DEFINED_PHASES=install
+DESCRIPTION=Language server for Dockerfiles (docker-langserver)
+EAPI=8
+HOMEPAGE=https://github.com/rcjsuen/dockerfile-language-server-nodejs
+KEYWORDS=~amd64 ~arm64
+LICENSE=MIT
+RDEPEND=net-libs/nodejs:*
+SLOT=0
+SRC_URI=https://registry.npmjs.org/dockerfile-language-server-nodejs/-/dockerfile-language-server-nodejs-0.15.0.tgz https://distfiles.obentoo.org/dockerfile-language-server-node_modules-0.15.0.tar.xz
+_md5_=a1cab0aad6c5c9bc985046d2cb6e5603

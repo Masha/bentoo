@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@protonmail.com</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<longdescription lang="en">
+		tofu-ls is the OpenTofu Language Server, a Language Server Protocol
+		implementation for OpenTofu configurations, forked from terraform-ls.
+		It provides completion, hover, go-to-definition, references,
+		diagnostics and formatting, and calls the tofu CLI, when installed, to
+		read provider schemas of initialized modules.
+	</longdescription>
+	<upstream>
+		<bugs-to>https://github.com/opentofu/tofu-ls/issues</bugs-to>
+		<remote-id type="github">opentofu/tofu-ls</remote-id>
+	</upstream>
+</pkgmetadata>

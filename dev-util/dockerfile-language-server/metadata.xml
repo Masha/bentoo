@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>diego.evangelista5642@gmail.com</email>
+		<name>lucascouts</name>
+	</maintainer>
+	<longdescription lang="en">
+		Language Server Protocol implementation for Dockerfiles, installed as
+		the docker-langserver command. It provides diagnostics, completion,
+		hover, formatting, rename and other editor features for Dockerfile
+		instructions and directives.
+	</longdescription>
+	<upstream>
+		<remote-id type="github">rcjsuen/dockerfile-language-server-nodejs</remote-id>
+		<bugs-to>https://github.com/rcjsuen/dockerfile-language-server-nodejs/issues</bugs-to>
+	</upstream>
+</pkgmetadata>

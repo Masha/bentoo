@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>diego.evangelista5642@gmail.com</email>
+		<name>lucascouts</name>
+	</maintainer>
+	<longdescription lang="en">
+		Red Hat's Language Server Protocol implementation for YAML. It
+		validates documents against JSON Schema (including schemas fetched
+		from the JSON Schema Store, which needs network access at run time),
+		and provides completion, hover, formatting through a bundled Prettier,
+		and document outlines.
+	</longdescription>
+	<upstream>
+		<remote-id type="github">redhat-developer/yaml-language-server</remote-id>
+		<bugs-to>https://github.com/redhat-developer/yaml-language-server/issues</bugs-to>
+	</upstream>
+</pkgmetadata>

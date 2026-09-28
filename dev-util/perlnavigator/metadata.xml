@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>diego.evangelista5642@gmail.com</email>
+		<name>lucascouts</name>
+	</maintainer>
+	<longdescription lang="en">
+		Language Server Protocol implementation for Perl. It provides
+		syntax checking, symbol navigation, go-to-definition, hover
+		documentation, completion and outline views to any LSP-capable
+		editor, by combining a TextMate-grammar parser with introspection
+		done by the system perl interpreter (perl -c).
+
+		Perl::Critic diagnostics and Perl::Tidy formatting are optional and
+		reported by pkg_postinst.
+	</longdescription>
+	<upstream>
+		<remote-id type="github">bscan/PerlNavigator</remote-id>
+		<bugs-to>https://github.com/bscan/PerlNavigator/issues</bugs-to>
+	</upstream>
+</pkgmetadata>

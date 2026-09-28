@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@protonmail.com</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<longdescription lang="en">
+		fortls is a Language Server Protocol implementation for Fortran. It
+		provides completion, hover, signature help, go to definition, find
+		references, rename and diagnostics for Fortran 77 through Fortran 2018
+		sources, including preprocessor handling.
+	</longdescription>
+	<upstream>
+		<remote-id type="github">fortran-lang/fortls</remote-id>
+		<remote-id type="pypi">fortls</remote-id>
+		<bugs-to>https://github.com/fortran-lang/fortls/issues</bugs-to>
+		<doc>https://fortls.fortran-lang.org/</doc>
+	</upstream>
+</pkgmetadata>

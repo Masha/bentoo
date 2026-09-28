@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>diego.evangelista5642@gmail.com</email>
+		<name>lucascouts</name>
+	</maintainer>
+	<longdescription lang="en">
+		Pyright is Microsoft's static type checker for Python. It ships a
+		command-line checker (pyright) and a Language Server Protocol server
+		(pyright-langserver) for editors, with the typeshed stubs bundled.
+
+		This package installs the npm distribution, a self-contained
+		JavaScript bundle run by Node.js. It is not the PyPI "pyright"
+		wrapper, which downloads the same bundle at runtime.
+	</longdescription>
+	<upstream>
+		<remote-id type="github">microsoft/pyright</remote-id>
+		<bugs-to>https://github.com/microsoft/pyright/issues</bugs-to>
+	</upstream>
+</pkgmetadata>

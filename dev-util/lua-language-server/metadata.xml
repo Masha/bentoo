@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@protonmail.com</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<longdescription lang="en">
+		lua-language-server (LuaLS) implements the Language Server Protocol
+		for Lua 5.1 to 5.5 and LuaJIT: completion, go-to-definition, hover,
+		diagnostics, type checking through LuaCATS annotations, formatting
+		and bundled API definitions for common runtimes (LuaJIT, LOVE, OpenResty
+		and others). It is written in Lua and runs on the bee.lua runtime,
+		built here from source with the luamake build tool.
+	</longdescription>
+	<upstream>
+		<bugs-to>https://github.com/LuaLS/lua-language-server/issues</bugs-to>
+		<changelog>https://github.com/LuaLS/lua-language-server/blob/master/changelog.md</changelog>
+		<doc>https://luals.github.io/wiki/</doc>
+		<remote-id type="github">LuaLS/lua-language-server</remote-id>
+	</upstream>
+</pkgmetadata>
