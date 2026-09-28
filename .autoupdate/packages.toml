@@ -11386,11 +11386,14 @@ npm tarball is the one that ships the built lib/cli.mjs bundle.
 The tarball is a self-contained rollup bundle (no runtime dependencies), so the
 ebuild is architecture-independent with ordinary ~amd64 ~arm64 keywords.
 
-tsserver is NOT bundled: the ebuild RDEPENDs on <dev-lang/typescript-7 (7.x is
-the native port and has no tsserver.js) and links
-/usr/lib/node_modules/typescript into /usr/share/${PN}/node_modules so the
-server's require.resolve('typescript') fallback finds it. On a bump, check that
-engines.node has not risen past the >=net-libs/nodejs floor in RDEPEND.
+tsserver is NOT bundled upstream. The ebuild installs a private typescript
+(TS_PV, the last JavaScript series) under /usr/share/${PN}/node_modules, where
+the server's require.resolve('typescript') fallback finds it. It deliberately
+does NOT depend on dev-lang/typescript: 7.x is the native Go port, has no
+tsserver.js, and shares slot 0, so a <7 pin blocked TypeScript 7 for every
+user of this server. TS_PV is not probed by this record; raise it by hand if
+the 6.x series ever gets another release. On a bump, check that engines.node
+has not risen past the >=net-libs/nodejs floor in RDEPEND.
 """
 # END
 

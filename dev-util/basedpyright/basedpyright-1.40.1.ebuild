@@ -37,6 +37,12 @@ EAPI=8
 #    Redo the LICENSE survey below from node_modules/.package-lock.json.
 NODE_MODULES="${PN}-node_modules-${PVR}.tar.xz"
 
+# The compiler is a private copy of typescript ${TS_PV} rather than a BDEPEND
+# on dev-lang/typescript: TypeScript 7 (the native Go port) shares slot 0, so
+# pinning the system package to 6.x would block it for everyone who builds
+# this. Upstream pins typescript ~6.0.3.
+TS_PV="6.0.3"
+
 inherit edo
 
 DESCRIPTION="Pyright fork with various type checking improvements and Pylance features"
@@ -44,6 +50,7 @@ HOMEPAGE="https://docs.basedpyright.com/ https://github.com/DetachHead/basedpyri
 SRC_URI="
 	https://github.com/DetachHead/${PN}/archive/refs/tags/v${PV}.tar.gz -> ${P}.gh.tar.gz
 	https://registry.npmjs.org/${PN}/-/${P}.tgz
+	https://registry.npmjs.org/typescript/-/typescript-${TS_PV}.tgz
 	https://distfiles.obentoo.org/${NODE_MODULES}
 "
 
@@ -61,24 +68,35 @@ RESTRICT="test"
 
 # >=22: Set.prototype.union replaces the core-js Set (see the patch).
 RDEPEND=">=net-libs/nodejs-22:*"
-# Upstream pins typescript ~6.0.3.
-BDEPEND="=dev-lang/typescript-6.0*"
+BDEPEND="net-libs/nodejs"
 
 PATCHES=(
 	"${FILESDIR}"/${PN}-drop-core-js.patch
 )
 
 src_unpack() {
-	default
-	# The npm tarball unpacks to "package"; only its stub tree is used.
-	mv "${WORKDIR}"/package/dist/typeshed-fallback "${WORKDIR}"/typeshed-fallback || die
-	rm -r "${WORKDIR}"/package || die
+	unpack ${P}.gh.tar.gz ${NODE_MODULES}
+
+	# Both npm tarballs unpack to "package"; give each its own directory.
+	local a
+	for a in ${PN}-npm:${P}.tgz typescript:typescript-${TS_PV}.tgz; do
+		mkdir "${WORKDIR}"/${a%%:*} || die
+		tar -xzf "${DISTDIR}"/${a#*:} -C "${WORKDIR}"/${a%%:*} \
+			--strip-components=1 || die
+	done
+	# Only the stub tree of the npm package is used.
+	mv "${WORKDIR}"/${PN}-npm/dist/typeshed-fallback "${WORKDIR}"/typeshed-fallback || die
+	rm -r "${WORKDIR}"/${PN}-npm || die
+}
+
+bp_tsc() {
+	edo node "${WORKDIR}"/typescript/bin/tsc "$@"
 }
 
 src_compile() {
 	ln -s "${WORKDIR}"/node_modules node_modules || die
 
-	edo tsc -p packages/pyright/tsconfig.json
+	bp_tsc -p packages/pyright/tsconfig.json
 
 	# tsc keeps the "pyright-internal/*" path alias verbatim, which Node
 	# cannot resolve; the bundler did. Only the two entry modules use it.
@@ -95,7 +113,7 @@ src_compile() {
 	# --ignoreConfig: TS 6 refuses explicit files while ${S}/tsconfig.json
 	# sits in the working directory.
 	local gl="${WORKDIR}"/node_modules/pyright-to-gitlab-ci/src
-	edo tsc --ignoreConfig --module commonjs --target es2021 --esModuleInterop --skipLibCheck \
+	bp_tsc --ignoreConfig --module commonjs --target es2021 --esModuleInterop --skipLibCheck \
 		--typeRoots "${WORKDIR}"/node_modules/@types --types node \
 		--rootDir "${gl}" --outDir "${gl}" \
 		"${gl}"/converter/{index,converter}.ts "${gl}"/types/{index,gitlab,pyright}.ts
