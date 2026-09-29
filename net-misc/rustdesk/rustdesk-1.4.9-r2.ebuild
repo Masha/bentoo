@@ -55,34 +55,28 @@ declare -A GIT_CRATES=(
 	[x11]='https://github.com/bjornsnoen/x11-rs;c2e9bfaa7b196938f8700245564d8ac5d447786a;x11-rs-%commit%/x11'
 )
 
-# LLVM 22 IS DELIBERATELY ABSENT. Tested 2026-08-08 -- it does not work, and the
-# blocker is upstream, not packaging. Adding 22 here and building with
-# USE="llvm_slot_22" gets 64 errors in `scrap`:
+# LLVM 22+ NEEDS THE scrap BINDGEN PATCH (files/${P}-scrap-bindgen-0.72.patch).
+# libs/scrap asks for bindgen 0.65 (May 2023), which cannot parse the
+# libvpx/libaom headers through libclang >= 22: it gives up on the types and
+# emits `_address` as their only field, so `scrap` dies with 64 errors like
 #
 #   error[E0609]: no field `g_w` on type `vpx_codec_enc_cfg`
 #       = note: available fields are: `_address`
-#   error[E0609]: no field `g_w` on type `common::aom::aom_codec_enc_cfg`
-#       = note: available field is: `_address`
-#   error: could not compile `scrap` (lib) due to 64 previous errors
 #
-# `_address` is the ONLY field bindgen emits for a type it gave up parsing, so
-# those bindings came back opaque: libs/scrap asks for bindgen 0.65 (0.65.1,
-# May 2023), and that bindgen cannot parse the libvpx/libaom headers through
-# libclang 22. Nothing in rustdesk's own code is at fault, and no ebuild change
-# fixes it -- scrap has to move to a current bindgen upstream first.
+# The patch moves scrap to bindgen 0.72.1 and adds the matching Cargo.lock
+# entry. It has to touch Cargo.lock too: with the lock out of date cargo
+# re-resolves, and the GIT_CRATES sources then fail offline ("can't checkout
+# from 'https://github.com/rustdesk-org/confy'"). bindgen 0.72.1 and every one
+# of its dependencies already ship in ${P}-crates.tar.xz, so no distfile is
+# added. The other bindgen 0.65.1 user in the lock is left alone.
+# Fix suggested in https://github.com/obentoo/bentoo/issues/48 (from the AUR
+# rustdesk package). Drop the patch once upstream scrap moves off 0.65.
 #
-# Caveat on that measurement: RUST_NEEDS_LLVM=1 means the slot choice also
-# picks the Rust, so the two builds differed in both (llvm 21 -> rust-bin
-# 1.94.0, PASS; llvm 22 -> rust 1.97.1, FAIL). The variable is not isolable
-# without rebuilding Rust. It does not change the conclusion: `_address` is
-# text bindgen WRITES at build-script time using libclang, and rustc only
-# reports the missing fields afterwards -- the failing layer is bindgen/
-# libclang, and only LLVM moved there.
-#
-# Consequence for a host that pins LLVM_SLOT=22 in make.conf: this package
-# needs `net-misc/rustdesk llvm_slot_21` in package.use, and that is not a
-# temporary workaround. Re-test on the next bump; the fix arrives with scrap.
-LLVM_COMPAT=( 18 19 20 21 )
+# 23 is absent for a different reason: RUST_NEEDS_LLVM=1 needs a Rust built
+# against the same slot, and no dev-lang/rust{,-bin} is yet (1.98.1 carries
+# LLVM_COMPAT=( 22 )), so rust_pkg_setup dies with "no LLVM slot found". Add it
+# when rust does.
+LLVM_COMPAT=( 18 19 20 21 22 )
 RUST_MIN_VER="1.81.0"
 RUST_NEEDS_LLVM=1
 inherit cargo desktop llvm-r1 systemd xdg
@@ -143,7 +137,8 @@ _KCP_COMMIT="7f9805887b0909c52c825925f123e7a84da37167"
 # original .crate -- the same value Cargo.lock pins in its `checksum` field, and
 # Cargo.lock comes from ${P}.tar.gz, whose Manifest entry was never broken.
 # Result: 1003/1003 match, 0 missing, 0 mismatches, plus one extra
-# (bindgen-0.72.1) that Cargo.lock never references and cargo cannot select.
+# (bindgen-0.72.1) that the upstream Cargo.lock never references -- the scrap
+# bindgen patch (see LLVM_COMPAT below) is what puts it to use.
 # Not proven: that the extracted files correspond to the original .crate, since
 # the bundle ships trees rather than .crate archives.
 #
@@ -214,6 +209,10 @@ QA_PRESTRIPPED="
 	/usr/share/${PN}/${PN}
 	/usr/share/${PN}/libsciter-gtk.so
 "
+
+PATCHES=(
+	"${FILESDIR}"/${P}-scrap-bindgen-0.72.patch
+)
 
 pkg_setup() {
 	llvm-r1_pkg_setup

@@ -1,0 +1,49 @@
+--- a/Cargo.lock
++++ b/Cargo.lock
+@@ -772,6 +772,26 @@
+ ]
+ 
+ [[package]]
++name = "bindgen"
++version = "0.72.1"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "993776b509cfb49c750f11b8f07a46fa23e0a1386ffc01fb1e7d343efc387895"
++dependencies = [
++ "bitflags 2.9.1",
++ "cexpr",
++ "clang-sys",
++ "itertools 0.12.1",
++ "log",
++ "prettyplease",
++ "proc-macro2 1.0.93",
++ "quote 1.0.36",
++ "regex",
++ "rustc-hash 2.1.1",
++ "shlex",
++ "syn 2.0.98",
++]
++
++[[package]]
+ name = "bit_field"
+ version = "0.10.2"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+@@ -7578,7 +7598,7 @@
+ version = "0.5.0"
+ dependencies = [
+  "android_logger",
+- "bindgen 0.65.1",
++ "bindgen 0.72.1",
+  "block",
+  "cfg-if 1.0.0",
+  "dbus",
+--- a/libs/scrap/Cargo.toml
++++ b/libs/scrap/Cargo.toml
+@@ -48,7 +48,7 @@
+ 
+ [build-dependencies]
+ target_build_utils = "0.3"
+-bindgen = "0.65"
++bindgen = "0.72.1"
+ pkg-config = { version = "0.3.27", optional = true }
+ 
+ [target.'cfg(target_os = "linux")'.dependencies]
