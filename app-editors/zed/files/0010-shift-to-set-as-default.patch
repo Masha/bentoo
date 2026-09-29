@@ -45,7 +45,7 @@ Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>
 ---
 
 diff --git a/crates/acp_thread/src/connection.rs b/crates/acp_thread/src/connection.rs
-index 11d3edf..f84031b 100644
+index d0f7588..96d4f1b 100644
 --- a/crates/acp_thread/src/connection.rs
 +++ b/crates/acp_thread/src/connection.rs
 @@ -468,11 +468,27 @@ pub trait AgentModelSelector: 'static {
@@ -77,7 +77,7 @@ index 11d3edf..f84031b 100644
  
      /// Retrieves the currently selected model for a specific session (thread).
      ///
-@@ -1146,7 +1162,12 @@ mod test_support {
+@@ -1158,7 +1174,12 @@ mod test_support {
              Task::ready(Ok(AgentModelList::Flat(vec![model])))
          }
  
@@ -623,7 +623,7 @@ index 196dc74..a93fea9 100644
          assert_eq!(
              config_options.set_values.borrow().as_slice(),
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
-index 17fefeb..d1e88ab 100644
+index 74e1891..8bfb0ec 100644
 --- a/crates/agent_ui/src/conversation_view/thread_view.rs
 +++ b/crates/agent_ui/src/conversation_view/thread_view.rs
 @@ -23,6 +23,7 @@ use sandbox::{SandboxFsPolicy, SandboxNetPolicy, SandboxPolicy};
@@ -634,7 +634,7 @@ index 17fefeb..d1e88ab 100644
  use crate::ui::{
      SandboxGroup, SandboxRow, SandboxSection, SandboxStatusTooltip, TerminalSandboxWarning,
      TerminalToolHeader,
-@@ -5158,12 +5159,17 @@ impl ThreadView {
+@@ -5165,12 +5166,17 @@ impl ThreadView {
              .tooltip(move |_, cx| {
                  Tooltip::for_action_in(tooltip_label, &ToggleThinkingMode, &focus_handle, cx)
              })
@@ -653,7 +653,7 @@ index 17fefeb..d1e88ab 100644
                          let favorite_key = thread
                              .model()
                              .map(|model| (model.provider_id.0.to_string(), model.id.0.to_string()));
-@@ -5303,21 +5309,56 @@ impl ThreadView {
+@@ -5310,21 +5316,56 @@ impl ThreadView {
                  tooltip,
              )
              .menu(move |window, cx| {
@@ -716,7 +716,7 @@ index 17fefeb..d1e88ab 100644
                                  weak_self
                                      .update(cx, |this, cx| {
                                          if let Some(thread) = this.as_native_thread(cx) {
-@@ -5327,6 +5368,10 @@ impl ThreadView {
+@@ -5334,6 +5375,10 @@ impl ThreadView {
                                                      cx,
                                                  );
  
@@ -727,7 +727,7 @@ index 17fefeb..d1e88ab 100644
                                                  let favorite_key = thread.model().map(|model| {
                                                      (
                                                          model.provider_id().0.to_string(),
-@@ -5361,10 +5406,10 @@ impl ThreadView {
+@@ -5368,10 +5413,10 @@ impl ThreadView {
                                      })
                                      .ok();
                              }
@@ -740,7 +740,7 @@ index 17fefeb..d1e88ab 100644
                  }))
              })
              .with_handle(self.thinking_effort_menu_handle.clone())
-@@ -12189,7 +12234,9 @@ impl ThreadView {
+@@ -12196,7 +12241,9 @@ impl ThreadView {
          else {
              return;
          };

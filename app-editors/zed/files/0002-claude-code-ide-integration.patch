@@ -44,7 +44,7 @@ this work lives now, and where protocol breakage is reported first.
 ---
 
 diff --git a/Cargo.lock b/Cargo.lock
-index 3ec3134..f77084c 100644
+index f5fe9d0..61d02ac 100644
 --- a/Cargo.lock
 +++ b/Cargo.lock
 @@ -3105,6 +3105,31 @@ version = "0.7.6"
@@ -79,7 +79,7 @@ index 3ec3134..f77084c 100644
  [[package]]
  name = "cli"
  version = "0.1.0"
-@@ -22799,6 +22824,7 @@ dependencies = [
+@@ -22802,6 +22827,7 @@ dependencies = [
   "channel",
   "chrono",
   "clap",
@@ -88,7 +88,7 @@ index 3ec3134..f77084c 100644
   "client",
   "clock",
 diff --git a/Cargo.toml b/Cargo.toml
-index abec5e2..11e7e03 100644
+index 1a61f86..9bce877 100644
 --- a/Cargo.toml
 +++ b/Cargo.toml
 @@ -27,6 +27,7 @@ members = [
@@ -1991,10 +1991,10 @@ index ae264f3..0f03bf3 100644
              project.set_role(role, cx);
              for worktree in worktrees {
 diff --git a/crates/project/src/terminals.rs b/crates/project/src/terminals.rs
-index 2d8a37c..3a1505c 100644
+index c940607..3ece6e1 100644
 --- a/crates/project/src/terminals.rs
 +++ b/crates/project/src/terminals.rs
-@@ -134,6 +134,14 @@ impl Project {
+@@ -135,6 +135,14 @@ impl Project {
          cx.spawn(async move |project, cx| {
              let mut env = env_task.await.unwrap_or_default();
              env.extend(settings.env);
@@ -2009,8 +2009,8 @@ index 2d8a37c..3a1505c 100644
  
              let activation_script = maybe!(async {
                  for toolchain in toolchains {
-@@ -376,6 +384,14 @@ impl Project {
-             let shell_kind = ShellKind::new(&shell, path_style.is_windows());
+@@ -404,6 +412,14 @@ impl Project {
+             let shell_kind = ShellKind::new(&shell_program, path_style.is_windows());
              let mut env = env_task.await.unwrap_or_default();
              env.extend(settings.env);
 +            if let Some(port) = project
@@ -2024,7 +2024,7 @@ index 2d8a37c..3a1505c 100644
  
              let activation_script = maybe!(async {
                  for toolchain in toolchains {
-@@ -541,6 +557,14 @@ impl Project {
+@@ -577,6 +593,14 @@ impl Project {
          cx.spawn(async move |project, cx| {
              let mut env = env_task.await.unwrap_or_default();
              env.extend(settings.env);

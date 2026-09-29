@@ -460,7 +460,7 @@ index b81549d..cdf4815 100644
              | AcpThreadEvent::SubagentSpawned(_)
              | AcpThreadEvent::EntriesRemoved(_)
 diff --git a/crates/agent_ui/src/conversation_view.rs b/crates/agent_ui/src/conversation_view.rs
-index d765fbc..bf18671 100644
+index 5641d3d..c7f55ad 100644
 --- a/crates/agent_ui/src/conversation_view.rs
 +++ b/crates/agent_ui/src/conversation_view.rs
 @@ -337,6 +337,7 @@ impl Conversation {
@@ -494,7 +494,7 @@ index d765fbc..bf18671 100644
                  if let Some(thread_view) = self.thread_view(&session_id) {
                      let available_skills = thread
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
-index d1e88ab..51894bd 100644
+index 8bfb0ec..ec035d4 100644
 --- a/crates/agent_ui/src/conversation_view/thread_view.rs
 +++ b/crates/agent_ui/src/conversation_view/thread_view.rs
 @@ -8,8 +8,9 @@ use agent_client_protocol::schema::{v1 as acp_v1, v2 as acp_v2};
@@ -509,7 +509,7 @@ index d1e88ab..51894bd 100644
  };
  use agent::{
      SandboxStatusKey, SandboxStatusRefresh, SkillLoadingIssue, SkillLoadingIssueKind,
-@@ -4733,6 +4734,32 @@ impl ThreadView {
+@@ -4740,6 +4741,32 @@ impl ThreadView {
          let input_max_label = crate::humanize_token_count(max_input_tokens);
          let output_max_label = crate::humanize_token_count(max_output_tokens);
  
@@ -542,7 +542,7 @@ index d1e88ab..51894bd 100644
          let build_tooltip = {
              move |_window: &mut Window, cx: &mut App| {
                  let percentage = percentage.clone();
-@@ -4745,8 +4772,11 @@ impl ThreadView {
+@@ -4752,8 +4779,11 @@ impl ThreadView {
                  let project_entry_ids = project_entry_ids.clone();
                  let workspace = workspace.clone();
                  let cost_label = cost_label.clone();
@@ -554,7 +554,7 @@ index d1e88ab..51894bd 100644
                      used,
                      max,
                      input_tokens: input_tokens_label,
-@@ -5734,8 +5764,23 @@ impl ThreadView {
+@@ -5741,8 +5771,23 @@ impl ThreadView {
      }
  }
  
@@ -578,7 +578,7 @@ index d1e88ab..51894bd 100644
      used: String,
      max: String,
      input_tokens: String,
-@@ -5763,6 +5808,8 @@ impl Render for TokenUsageTooltip {
+@@ -5770,6 +5815,8 @@ impl Render for TokenUsageTooltip {
          let output_max = self.output_max.clone();
          let show_split = self.show_split;
          let cost_label = self.cost_label.clone();
@@ -587,7 +587,7 @@ index d1e88ab..51894bd 100644
          let global_agents_md_loaded = self.global_agents_md_loaded;
          let project_rules_count = self.project_rules_count;
          let project_entry_ids = self.project_entry_ids.clone();
-@@ -5825,6 +5872,68 @@ impl Render for TokenUsageTooltip {
+@@ -5832,6 +5879,68 @@ impl Render for TokenUsageTooltip {
                              .child(Label::new(cost_label)),
                      )
                  })

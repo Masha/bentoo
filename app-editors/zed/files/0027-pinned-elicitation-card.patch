@@ -261,7 +261,7 @@ index 653279d..5781f3f 100644
              max_idle_retained_threads: 5,
              threads_sidebar: agent_settings::ThreadsSidebarSettings {
 diff --git a/crates/agent_ui/src/conversation_view.rs b/crates/agent_ui/src/conversation_view.rs
-index bf18671..2653669 100644
+index c7f55ad..cbdfc53 100644
 --- a/crates/agent_ui/src/conversation_view.rs
 +++ b/crates/agent_ui/src/conversation_view.rs
 @@ -2564,22 +2564,37 @@ impl ConversationView {
@@ -992,7 +992,7 @@ index 6b8c2d8..be41aa9 100644
                              on_submit(submit_id.clone(), window, cx);
                          }
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
-index 800ed0b..cf92370 100644
+index 517415f..5f01f42 100644
 --- a/crates/agent_ui/src/conversation_view/thread_view.rs
 +++ b/crates/agent_ui/src/conversation_view/thread_view.rs
 @@ -41,7 +41,7 @@ use language_model::{
@@ -1030,7 +1030,7 @@ index 800ed0b..cf92370 100644
              _cancel_task: None,
              _save_task: None,
              _draft_resolve_task: None,
-@@ -6610,6 +6613,7 @@ impl ThreadView {
+@@ -6617,6 +6620,7 @@ impl ThreadView {
                  let thread = self.thread.read(cx);
                  if let Some((_, elicitation)) = thread.elicitation(elicitation_id)
                      && should_render_elicitation(elicitation)
@@ -1038,7 +1038,7 @@ index 800ed0b..cf92370 100644
                  {
                      let elicitation = self.render_elicitation(entry_ix, elicitation, window, cx);
  
-@@ -6850,10 +6854,22 @@ impl ThreadView {
+@@ -6857,10 +6861,22 @@ impl ThreadView {
                      .log_err();
                  }
              },
@@ -1063,7 +1063,7 @@ index 800ed0b..cf92370 100644
                          cx.notify();
                      }
                  })
-@@ -7332,6 +7348,75 @@ impl ThreadView {
+@@ -7339,6 +7355,75 @@ impl ThreadView {
          self.message_editor.read(cx).set_local_commands(commands);
      }
  
@@ -1139,7 +1139,7 @@ index 800ed0b..cf92370 100644
      fn render_request_elicitations(&self, cx: &Context<Self>) -> Vec<AnyElement> {
          let server_view = self.server_view.clone();
          let handlers_view = server_view.clone();
-@@ -13044,6 +13129,7 @@ impl Render for ThreadView {
+@@ -13051,6 +13136,7 @@ impl Render for ThreadView {
                  |this, version| this.child(self.render_new_version_callout(&version, cx)),
              )
              .children(self.render_token_limit_callout(cx))

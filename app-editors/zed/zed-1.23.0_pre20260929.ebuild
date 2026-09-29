@@ -188,7 +188,6 @@ CRATES="
 	cexpr@0.6.0
 	cfg-expr@0.20.9
 	cfg-if@1.0.4
-	cfg_aliases@0.1.1
 	cfg_aliases@0.2.1
 	cgl@0.3.2
 	chacha20@0.10.1
@@ -279,7 +278,6 @@ CRATES="
 	crossbeam-epoch@0.9.18
 	crossbeam-queue@0.3.12
 	crossbeam-utils@0.8.21
-	crossbeam@0.8.4
 	crunchy@0.2.4
 	crypto-bigint@0.4.9
 	crypto-bigint@0.5.5
@@ -581,7 +579,6 @@ CRATES="
 	jobserver@0.1.34
 	js-sys@0.3.97
 	json5@1.3.1
-	json_dotpath@1.1.0
 	jsonschema-regex@0.51.0
 	jsonschema-value@0.51.0
 	jsonschema@0.51.0
@@ -691,7 +688,6 @@ CRATES="
 	ndk@0.9.0
 	nested@0.1.1
 	new_debug_unreachable@1.0.6
-	nix@0.28.0
 	nix@0.30.1
 	no_std_io2@0.9.4
 	nom@7.1.3
@@ -845,7 +841,6 @@ CRATES="
 	pori@0.0.0
 	portable-atomic-util@0.2.4
 	portable-atomic@1.11.1
-	portable-pty@0.9.0
 	postage@0.5.0
 	postcard@1.1.3
 	potential_utf@0.1.3
@@ -1032,14 +1027,12 @@ CRATES="
 	serde_with_macros@3.22.0
 	serde_yaml@0.9.34+deprecated
 	serde_yaml_ng@0.10.0
-	serial2@0.2.33
 	servo_arc@0.4.3
 	sha-1@0.10.1
 	sha1@0.10.6
 	sha1_smol@1.0.1
 	sha2@0.10.9
 	sharded-slab@0.1.7
-	shared_library@0.1.9
 	shell-words@1.1.0
 	shellexpand@3.1.1
 	shingles@0.1.1
@@ -1134,7 +1127,6 @@ CRATES="
 	system-deps@7.0.7
 	taffy@0.13.0
 	tagptr@0.2.0
-	take-until@0.2.0
 	tao-core-video-sys@0.2.0
 	tap@1.0.1
 	target-lexicon@0.13.5
@@ -1424,7 +1416,6 @@ CRATES="
 	windows_x86_64_msvc@0.53.1
 	winnow@0.7.13
 	winnow@1.0.2
-	winreg@0.10.1
 	winreg@0.50.0
 	winreg@0.55.0
 	winresource@0.1.23
@@ -1456,7 +1447,6 @@ CRATES="
 	write16@1.0.0
 	writeable@0.6.4
 	wyz@0.5.1
-	x11-clipboard@0.9.3
 	x11@2.21.0
 	x11rb-protocol@0.13.2
 	x11rb@0.13.2
@@ -1585,7 +1575,7 @@ declare -A GIT_CRATES=(
 	[zed-xim]='https://github.com/zed-industries/xim-rs;16f35a2c881b815a2b6cdfd6687988e84f8447d8;xim-rs-%commit%'
 )
 
-EGIT_COMMIT="dd510f99e04e7a5b464f9a4e8771fa978ada138b"
+EGIT_COMMIT="1dc8844439af94d3fe6046ecea1206a922c50db8"
 LLVM_COMPAT=( 22 )
 RUST_MIN_VER="1.98.1"
 RUST_NEEDS_LLVM=1

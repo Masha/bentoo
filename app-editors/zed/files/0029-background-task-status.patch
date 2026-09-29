@@ -236,7 +236,7 @@ index cdf4815..d2bbe24 100644
              | AcpThreadEvent::SubagentSpawned(_)
              | AcpThreadEvent::EntriesRemoved(_)
 diff --git a/crates/agent_ui/src/conversation_view.rs b/crates/agent_ui/src/conversation_view.rs
-index 2653669..6e4a343 100644
+index cbdfc53..e25e906 100644
 --- a/crates/agent_ui/src/conversation_view.rs
 +++ b/crates/agent_ui/src/conversation_view.rs
 @@ -338,6 +338,7 @@ impl Conversation {
