@@ -185,7 +185,7 @@
 url = "https://registry.npmjs.org/@anthropic-ai/claude-code"
 parser = "json"
 path = "dist-tags.latest"
-version = "2.1.284"
+version = "2.1.285"
 comments = """
 claude-code — npm @anthropic-ai/claude-code; dist-tags.latest is the stable channel.
 
@@ -268,7 +268,7 @@ unconditional git-r3 form, which ::gentoo's tarball/9999 branch is not.
 url = "https://registry.npmjs.org/pnpm"
 parser = "json"
 path = "dist-tags.latest"
-version = "12.6.0"
+version = "12.8.1"
 comments = """
 pnpm — npm package, stable channel. dist-tags.latest is the RIGHT endpoint and
 must stay: pnpm promotes through next-<major> first, and that channel carries
@@ -952,7 +952,7 @@ transform strips the "go" prefix to match PV. Live=1.26.5.
 url = "https://persistent.oaistatic.com/codex-app-prod/linux/deb/dists/stable/main/binary-amd64/Packages"
 parser = "regex"
 pattern = 'Package: chatgpt\nVersion: ([0-9]+\.[0-9]+\.[0-9]+)'
-version = "26.924.51851"
+version = "26.928.20755"
 comments = """
 OpenAI Codex/ChatGPT desktop app — read the APT index of the very repo that
 SRC_URI pulls from. Both openai.com and chatgpt.com sit behind Cloudflare and
@@ -1641,7 +1641,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "0.12.20"
+version = "0.12.21"
 comments = """
 uv (uv-bin) — tag bare "X.Y.Z".
 """
@@ -1663,7 +1663,7 @@ url = "https://api.github.com/repos/openai/codex/releases/latest"
 parser = "regex"
 pattern = '"tag_name":\s*"rust-v([0-9]+\.[0-9]+\.[0-9]+)"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.159.0"
+version = "0.159.1"
 comments = """
 codex — tag "rust-vX.Y.Z" ("rust-" not strippable); regex extracts X.Y.Z from tag_name.
 
@@ -1690,7 +1690,7 @@ parser = "regex"
 pattern = '"tag_name":\s*"rust-v([0-9]+\.[0-9]+\.[0-9]+)"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "0.159.0"
+version = "0.159.1"
 comments = """
 codex-bin — same upstream tag "rust-vX.Y.Z"; regex on tag_name.
 """
@@ -1903,7 +1903,7 @@ url = "https://api.github.com/repos/rustdesk/rustdesk/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.9-r1"
+version = "1.4.9-r2"
 comments = """
 rustdesk — release tag bare semver.
 """
@@ -2229,7 +2229,7 @@ url = "https://api.github.com/repos/chromium-linux-tarballs/chromium-tarballs/re
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "154.0.8037.57"
+version = "154.0.8037.92"
 comments = """
 chromium — probes the TARBALL repo, not chromiumdash or the Chrome release
 feed, because that repo is what actually gates a bump: SRC_URI points at
@@ -2974,7 +2974,7 @@ base_from = "file"
 base_url = "https://api.github.com/repos/zed-industries/zed/contents/crates/zed/Cargo.toml?ref=main"
 base_pattern = '(?m)^version = "([0-9][0-9.]*)"'
 headers = { "User-Agent" = "bentoo-autoupdate", "Accept" = "application/vnd.github.raw" }
-version = "1.23.0_pre20260928"
+version = "1.23.0_pre20260929"
 comments = """
 zed — commit-tracked on main; _pre suffix preserved from current ebuild.
 2026-08-06: 2 commits landed same UTC day (d61e80b -> 6b2aa1c), so the date
@@ -3495,7 +3495,7 @@ base_from = "file"
 base_url = "https://raw.githubusercontent.com/sqlitebrowser/sqlitebrowser/master/CMakeLists.txt"
 base_pattern = '(?m)^\s+VERSION ([0-9][0-9.]*)'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "3.13.99_p20260927"
+version = "3.13.99_p20260929"
 comments = """
 sqlitebrowser — commit-tracked on master (uses COMMIT= without quotes); date YYYYMMDD becomes _pDATE suffix.
 """
@@ -3640,7 +3640,7 @@ base_from = "tag"
 base_url = "https://api.github.com/repos/KhronosGroup/Vulkan-Utility-Libraries/git/refs/tags"
 base_tag_pattern = '^v([0-9]+\.[0-9]+\.[0-9]+)$'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.364_p20260927"
+version = "1.4.364_p20260929"
 comments = """
 vulkan-utility-libraries — commit-tracked on main, same shape as vulkan-headers.
 
@@ -3683,7 +3683,7 @@ base_from = "file"
 base_url = "https://raw.githubusercontent.com/KhronosGroup/Vulkan-Loader/main/CMakeLists.txt"
 base_pattern = '(?m)^project\([A-Za-z_-]+ VERSION ([0-9][0-9.]*)'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.364_p20260925"
+version = "1.4.364_p20260929"
 comments = """
 vulkan-loader — commit-tracked on main; scans for "Update for Vulkan-Docs X.Y.Z" to detect base bump.
 """
@@ -8571,7 +8571,7 @@ url = "https://godotengine.org/download/archive/"
 parser = "regex"
 pattern = '(\d+\.\d+(?:\.\d+)?-(?:stable|beta\d*|rc\d*|dev\d*))'
 transform = [['-stable', ""], ['-beta', "_beta"], ['-rc', "_rc"], ['-dev', "_alpha"]]
-version = "4.8_alpha6-r1"
+version = "4.8_alpha7"
 comments = """
 godot — download archive lists newest first; transform the upstream suffix to
 Gentoo form (-stable→bare, -beta→_beta, -rc→_rc, -dev→_alpha).
@@ -8954,7 +8954,7 @@ url = "https://api.github.com/repos/servo/servo/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.5.0"
+version = "0.6.0"
 comments = """
 servo — GitHub release tag "vX.Y.Z" ("v" stripped). SRC_URI pulls the src-vendored tarball
 from the same release. Live=0.3.0. (A bump must re-check the mozjs/xargs build gotchas.)
@@ -9134,7 +9134,7 @@ is a workspace and pycargoebuild refuses it.
 url = "https://pypi.org/pypi/openai/json"
 parser = "json"
 path = "info.version"
-version = "3.20.0"
+version = "3.22.0"
 comments = """
 openai — official Python SDK; core dep of sci-ml/amd-gaia. info.version is
 clean X.Y.Z. Live=3.0.0 == current PV.
@@ -9587,7 +9587,7 @@ url = "https://api.github.com/repos/lucascouts/claude-agent-acp-plus/releases/la
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.21.0"
+version = "0.22.1"
 comments = """
 claude-agent-acp-plus — GitHub releases/latest tag "vX.Y.Z" (v stripped).
 SRC_URI releases/download/v${PV}/${P}-bundle.tar.gz. Live=v0.2.0.
@@ -9691,7 +9691,7 @@ pattern = '"name":\s*"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 series = '^2\.'
-version = "2.37.5"
+version = "2.37.6"
 comments = """
 aws-cli v2 — GitHub tag index, pinned to the 2.x series. Verified 2026-08-19
 against the live endpoint: 100 matches, all of them 2.x, max = 2.36.27 = ebuild.
@@ -10845,7 +10845,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "2.4.1"
+version = "2.4.2"
 comments = """
 ai-memory — releases/latest on akitaonrails/ai-memory; tag_name is "vX.Y.Z" and
 the transform strips the v.  Verified by real request on 2026-09-07: tag_name
@@ -10894,7 +10894,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "2.4.1"
+version = "2.4.2"
 comments = """
 ai-memory-bin — same endpoint and same release as dev-util/ai-memory; this
 record exists separately only because the two are separate packages.  Bump them
@@ -11245,7 +11245,7 @@ build instead of silently shipping an invalid entry.
 url = "https://registry.npmjs.org/@google/gemini-cli/latest"
 parser = "regex"
 pattern = '"version":"([0-9]+\.[0-9]+\.[0-9]+)"'
-version = "0.61.0"
+version = "0.62.0"
 comments = """
 Gemini CLI — probed on npm because GitHub publishes NO Linux artefact for it.
 The release tags exist, but every asset is source; npm is the only channel
