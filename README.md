@@ -8,7 +8,7 @@ Telegram: https://t.me/bentoolinux
 
 ### eselect repository
 ```
-eselect repository add bentoo git https://github.com/obentoo.git
+eselect repository add bentoo git https://github.com/obentoo/bentoo.git
 ```
 
 ### local Overlay
@@ -20,7 +20,7 @@ create a `/etc/portage/repos.conf/bentoo.conf` file containing precisely:
 [bentoo]
 location = /var/db/repos/bentoo
 sync-type = git
-sync-uri = https://github.com/obentoo.git
+sync-uri = https://github.com/obentoo/bentoo.git
 priority= 99
 ```
 
