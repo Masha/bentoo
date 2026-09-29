@@ -57,10 +57,10 @@ claude-agent-acp-plus flag BY DEPENDENCY, like 0011 and 0013.
 ---
 
 diff --git a/crates/acp_thread/src/acp_thread.rs b/crates/acp_thread/src/acp_thread.rs
-index 8c9011c..d6cf51c 100644
+index 388a60f..1f04b5d 100644
 --- a/crates/acp_thread/src/acp_thread.rs
 +++ b/crates/acp_thread/src/acp_thread.rs
-@@ -2661,6 +2661,15 @@ impl AccountUsage {
+@@ -3487,6 +3487,15 @@ impl AccountUsage {
  /// forwards the SDK's `rate_limit_event` here instead of dropping it.
  const CLAUDE_RATE_LIMIT_META_KEY: &str = "_claude/rateLimit";
  
@@ -76,23 +76,23 @@ index 8c9011c..d6cf51c 100644
  pub const TOKEN_USAGE_WARNING_THRESHOLD: f32 = 0.8;
  
  impl TokenUsage {
-@@ -2745,6 +2754,7 @@ pub struct AcpThread {
+@@ -3572,6 +3581,7 @@ pub struct AcpThread {
      connection: Rc<dyn AgentConnection>,
      token_usage: Option<TokenUsage>,
      account_usage: AccountUsage,
 +    background_task_count: usize,
      cost: Option<SessionCost>,
-     prompt_capabilities: acp::PromptCapabilities,
-     available_commands: Vec<acp::AvailableCommand>,
-@@ -2869,6 +2879,7 @@ pub enum AcpThreadEvent {
+     prompt_capabilities: acp_v1::PromptCapabilities,
+     available_commands: Vec<acp_v1::AvailableCommand>,
+@@ -3696,6 +3706,7 @@ pub enum AcpThreadEvent {
      NoticesUpdated,
      TokenUsageUpdated,
      AccountUsageUpdated,
 +    BackgroundTasksUpdated,
      EntryUpdated(usize),
      EntriesRemoved(Range<usize>),
-     ToolAuthorizationRequested(acp::ToolCallId),
-@@ -3012,6 +3023,7 @@ impl AcpThread {
+     ToolAuthorizationRequested(acp_v1::ToolCallId),
+@@ -3839,6 +3850,7 @@ impl AcpThread {
                  | AcpThreadEvent::NoticesUpdated
                  | AcpThreadEvent::TokenUsageUpdated
                  | AcpThreadEvent::AccountUsageUpdated
@@ -100,7 +100,7 @@ index 8c9011c..d6cf51c 100644
                  | AcpThreadEvent::EntryUpdated(_)
                  | AcpThreadEvent::Retry(_)
                  | AcpThreadEvent::SubagentSpawned(_)
-@@ -3062,6 +3074,7 @@ impl AcpThread {
+@@ -3890,6 +3902,7 @@ impl AcpThread {
              session_id,
              token_usage: None,
              account_usage: AccountUsage::default(),
@@ -108,7 +108,7 @@ index 8c9011c..d6cf51c 100644
              cost: None,
              prompt_capabilities,
              available_commands: Vec::new(),
-@@ -3254,6 +3267,12 @@ impl AcpThread {
+@@ -4079,6 +4092,12 @@ impl AcpThread {
          (!self.account_usage.is_empty()).then_some(&self.account_usage)
      }
  
@@ -121,7 +121,7 @@ index 8c9011c..d6cf51c 100644
      pub fn cost(&self) -> Option<&SessionCost> {
          self.cost.as_ref()
      }
-@@ -3416,6 +3435,22 @@ impl AcpThread {
+@@ -4254,6 +4273,22 @@ impl AcpThread {
                          cx.emit(AcpThreadEvent::TitleUpdated);
                      }
                  }
@@ -142,9 +142,9 @@ index 8c9011c..d6cf51c 100644
 +                    cx.emit(AcpThreadEvent::BackgroundTasksUpdated);
 +                }
              }
-             acp::SessionUpdate::AvailableCommandsUpdate(acp::AvailableCommandsUpdate {
+             acp_v1::SessionUpdate::AvailableCommandsUpdate(acp_v1::AvailableCommandsUpdate {
                  available_commands,
-@@ -12822,6 +12857,78 @@ mod tests {
+@@ -16713,6 +16748,78 @@ mod tests {
          );
      }
  
@@ -180,10 +180,10 @@ index 8c9011c..d6cf51c 100644
 +            .detach();
 +        });
 +
-+        let send = |update: acp::SessionInfoUpdate, cx: &mut TestAppContext| {
++        let send = |update: acp_v1::SessionInfoUpdate, cx: &mut TestAppContext| {
 +            thread
 +                .update(cx, |thread, cx| {
-+                    thread.handle_session_update(acp::SessionUpdate::SessionInfoUpdate(update), cx)
++                    thread.handle_session_update(acp_v1::SessionUpdate::SessionInfoUpdate(update), cx)
 +                })
 +                .expect("session info update should succeed");
 +        };
@@ -193,7 +193,7 @@ index 8c9011c..d6cf51c 100644
 +                CLAUDE_BACKGROUND_TASKS_META_KEY.to_string(),
 +                serde_json::json!({ "count": count, "tasks": [] }),
 +            );
-+            acp::SessionInfoUpdate::new().meta(meta)
++            acp_v1::SessionInfoUpdate::new().meta(meta)
 +        };
 +
 +        send(with_count(2), cx);
@@ -203,7 +203,7 @@ index 8c9011c..d6cf51c 100644
 +        assert_eq!(*events.borrow(), 1);
 +
 +        // A title-only update carries no count, and must not read as "none left".
-+        send(acp::SessionInfoUpdate::new().title("Renamed"), cx);
++        send(acp_v1::SessionInfoUpdate::new().title("Renamed"), cx);
 +        thread.read_with(cx, |thread, _| {
 +            assert_eq!(thread.background_task_count(), 2)
 +        });
@@ -236,10 +236,10 @@ index cdf4815..d2bbe24 100644
              | AcpThreadEvent::SubagentSpawned(_)
              | AcpThreadEvent::EntriesRemoved(_)
 diff --git a/crates/agent_ui/src/conversation_view.rs b/crates/agent_ui/src/conversation_view.rs
-index a146bdd..9264fea 100644
+index 2653669..6e4a343 100644
 --- a/crates/agent_ui/src/conversation_view.rs
 +++ b/crates/agent_ui/src/conversation_view.rs
-@@ -341,6 +341,7 @@ impl Conversation {
+@@ -338,6 +338,7 @@ impl Conversation {
                      | AcpThreadEvent::TitleUpdated
                      | AcpThreadEvent::TokenUsageUpdated
                      | AcpThreadEvent::AccountUsageUpdated
@@ -247,7 +247,7 @@ index a146bdd..9264fea 100644
                      | AcpThreadEvent::EntryUpdated(_)
                      | AcpThreadEvent::EntriesRemoved(_)
                      | AcpThreadEvent::Retry(_)
-@@ -619,6 +620,7 @@ fn affects_thread_metadata(event: &AcpThreadEvent) -> bool {
+@@ -617,6 +618,7 @@ fn affects_thread_metadata(event: &AcpThreadEvent) -> bool {
          | AcpThreadEvent::Retry(_)
          | AcpThreadEvent::TokenUsageUpdated
          | AcpThreadEvent::AccountUsageUpdated
@@ -255,7 +255,7 @@ index a146bdd..9264fea 100644
          | AcpThreadEvent::PromptCapabilitiesUpdated
          | AcpThreadEvent::AvailableCommandsUpdated(_)
          | AcpThreadEvent::ModeUpdated(_)
-@@ -1866,6 +1868,10 @@ impl ConversationView {
+@@ -1870,6 +1872,10 @@ impl ConversationView {
                      });
                  }
              }
@@ -267,7 +267,7 @@ index a146bdd..9264fea 100644
                  // A redraw is all this needs: the account section is built from the thread
                  // when the tooltip opens, so there is no per-turn state to recompute.
 diff --git a/crates/sidebar/src/sidebar.rs b/crates/sidebar/src/sidebar.rs
-index bd6a94d..4403bbb 100644
+index 2287857..c7f9671 100644
 --- a/crates/sidebar/src/sidebar.rs
 +++ b/crates/sidebar/src/sidebar.rs
 @@ -1849,7 +1849,14 @@ impl Sidebar {
@@ -298,7 +298,7 @@ index bd6a94d..4403bbb 100644
                          {
                              notified_threads.insert(thread_id);
                          }
-@@ -5799,7 +5809,9 @@ impl Sidebar {
+@@ -5822,7 +5832,9 @@ impl Sidebar {
                      AgentThreadStatus::Running | AgentThreadStatus::WaitingForConfirmation => {
                          return;
                      }
@@ -309,7 +309,7 @@ index bd6a94d..4403bbb 100644
                  }
                  if thread.draft.is_some() {
                      let workspace = thread.workspace.clone();
-@@ -8153,6 +8165,9 @@ fn all_thread_infos_for_workspace(
+@@ -8182,6 +8194,9 @@ fn all_thread_infos_for_workspace(
              } else {
                  match thread.status() {
                      ThreadStatus::Generating => AgentThreadStatus::Running,
@@ -320,10 +320,10 @@ index bd6a94d..4403bbb 100644
                  }
              };
 diff --git a/crates/sidebar/src/sidebar_tests.rs b/crates/sidebar/src/sidebar_tests.rs
-index 2789e70..24c46a2 100644
+index a235b37..802c1e0 100644
 --- a/crates/sidebar/src/sidebar_tests.rs
 +++ b/crates/sidebar/src/sidebar_tests.rs
-@@ -669,6 +669,7 @@ fn visible_entries_as_strings(
+@@ -680,6 +680,7 @@ fn visible_entries_as_strings(
                              let live = if thread.is_live { " *" } else { "" };
                              let status_str = match thread.status {
                                  AgentThreadStatus::Running => " (running)",
@@ -331,7 +331,7 @@ index 2789e70..24c46a2 100644
                                  AgentThreadStatus::Error => " (error)",
                                  AgentThreadStatus::WaitingForConfirmation => " (waiting)",
                                  _ => "",
-@@ -4465,6 +4466,72 @@ async fn test_background_thread_completion_triggers_notification(cx: &mut TestAp
+@@ -4555,6 +4556,72 @@ async fn test_background_thread_completion_triggers_notification(cx: &mut TestAp
      );
  }
  
@@ -405,7 +405,7 @@ index 2789e70..24c46a2 100644
      sidebar.update_in(cx, |sidebar, window, cx| {
          window.focus(&sidebar.filter_editor.focus_handle(cx), cx);
 diff --git a/crates/ui/src/components/ai/thread_item.rs b/crates/ui/src/components/ai/thread_item.rs
-index 6234407..ef6a455 100644
+index 7cf5748..ba13b04 100644
 --- a/crates/ui/src/components/ai/thread_item.rs
 +++ b/crates/ui/src/components/ai/thread_item.rs
 @@ -12,6 +12,9 @@ pub enum AgentThreadStatus {
@@ -418,7 +418,7 @@ index 6234407..ef6a455 100644
      WaitingForConfirmation,
      Error,
  }
-@@ -346,6 +349,17 @@ impl RenderOnce for ThreadItem {
+@@ -341,6 +344,17 @@ impl RenderOnce for ThreadItem {
                          .with_rotate_animation(2),
                  )
                  .into_any_element()
@@ -436,7 +436,7 @@ index 6234407..ef6a455 100644
          } else if let Some(status_icon) = status_icon {
              icon_container().child(status_icon).into_any_element()
          } else {
-@@ -406,7 +420,9 @@ impl RenderOnce for ThreadItem {
+@@ -402,7 +416,9 @@ impl RenderOnce for ThreadItem {
  
          let show_tooltip = matches!(
              self.status,
@@ -463,7 +463,7 @@ index 6234407..ef6a455 100644
                      _ => gpui::Empty.into_any_element(),
                  }))
              })
-@@ -701,6 +726,17 @@ impl Component for ThreadItem {
+@@ -699,6 +724,17 @@ impl Component for ThreadItem {
                      )
                      .into_any_element(),
              ),

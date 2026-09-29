@@ -55,7 +55,7 @@ Co-Authored-By: Claude Opus 5.5 (1M context) <noreply@anthropic.com>
 ---
 
 diff --git a/crates/sidebar/src/sidebar.rs b/crates/sidebar/src/sidebar.rs
-index 8e934d8..bd6a94d 100644
+index 890248d..2287857 100644
 --- a/crates/sidebar/src/sidebar.rs
 +++ b/crates/sidebar/src/sidebar.rs
 @@ -29,9 +29,9 @@ use feature_flags::{
@@ -143,17 +143,17 @@ index 8e934d8..bd6a94d 100644
      /// Opens a new workspace for a group that has no open workspaces.
      fn open_workspace_for_group(
          &mut self,
-@@ -7916,6 +7974,9 @@ impl Render for Sidebar {
-         let bg = color
-             .title_bar_background
-             .blend(color.panel_background.opacity(0.25));
+@@ -7945,6 +8003,9 @@ impl Render for Sidebar {
+ 
+         let color = cx.theme().colors();
+         let bg = color.surface_background;
 +        // drop_target_background is translucent: blended over the sidebar's
 +        // own background, not in place of it, or the window shows through.
 +        let drop_bg = bg.blend(color.drop_target_background);
  
          let no_open_projects = !self.contents.has_open_projects;
          let no_search_results = self.contents.entries.is_empty();
-@@ -7952,6 +8013,8 @@ impl Render for Sidebar {
+@@ -7981,6 +8042,8 @@ impl Render for Sidebar {
                  this.recent_projects_popover_handle.toggle(window, cx);
              }))
              .font(ui_font)
@@ -163,12 +163,12 @@ index 8e934d8..bd6a94d 100644
                  let on_left = self.side(cx) == SidebarSide::Left;
                  match window.window_decorations() {
 diff --git a/crates/sidebar/src/sidebar_tests.rs b/crates/sidebar/src/sidebar_tests.rs
-index 941e1a3..2789e70 100644
+index d6ae15c..a235b37 100644
 --- a/crates/sidebar/src/sidebar_tests.rs
 +++ b/crates/sidebar/src/sidebar_tests.rs
-@@ -15732,3 +15732,93 @@ async fn test_find_or_create_workspace_returns_the_created_remote_workspace(
-         "the local workspace should have re-activated during the open"
-     );
+@@ -15878,3 +15878,93 @@ fn sidebar_painted_background_at(position: Point<Pixels>, cx: &mut VisualTestCon
+         u32::from(Rgba::from(color))
+     })
  }
 +
 +#[gpui::test]

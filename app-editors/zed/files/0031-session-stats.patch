@@ -47,7 +47,7 @@ claude-agent-acp-plus flag BY CHOICE, like 0010, 0012, 0014 and 0026.
 ---
 
 diff --git a/crates/agent_ui/src/conversation_view.rs b/crates/agent_ui/src/conversation_view.rs
-index a84a3eb..2bb57de 100644
+index 40ee912..b50e5bb 100644
 --- a/crates/agent_ui/src/conversation_view.rs
 +++ b/crates/agent_ui/src/conversation_view.rs
 @@ -104,13 +104,13 @@ use crate::{
@@ -67,14 +67,14 @@ index a84a3eb..2bb57de 100644
  pub use message_queue::*;
 diff --git a/crates/agent_ui/src/conversation_view/session_stats.rs b/crates/agent_ui/src/conversation_view/session_stats.rs
 new file mode 100644
-index 0000000..6bc96ef
+index 0000000..9bd3ea6
 --- /dev/null
 +++ b/crates/agent_ui/src/conversation_view/session_stats.rs
 @@ -0,0 +1,255 @@
 +use std::collections::BTreeMap;
 +
 +use acp_thread::AgentThreadEntry;
-+use agent_client_protocol::schema::v1 as acp;
++use agent_client_protocol::schema::v2 as acp_v2;
 +use gpui::{AnyElement, SharedString};
 +use ui::prelude::*;
 +
@@ -110,13 +110,13 @@ index 0000000..6bc96ef
 +            let name = call
 +                .tool_name
 +                .clone()
-+                .unwrap_or_else(|| format!("{:?}", call.kind).into());
++                .unwrap_or_else(|| format!("{:?}", call.kind()).into());
 +            match mcp_server_name(&name) {
 +                Some(server) => *usage.mcp_servers.entry(server.into()).or_default() += 1,
 +                None => *usage.tools.entry(name).or_default() += 1,
 +            }
 +
-+            if call.kind == acp::ToolKind::Execute
++            if *call.kind() == acp_v2::ToolKind::Execute
 +                && let Some(command) = call
 +                    .raw_input
 +                    .as_ref()
@@ -327,7 +327,7 @@ index 0000000..6bc96ef
 +    }
 +}
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
-index 6c2c608..e8ca9f1 100644
+index cf92370..0577e88 100644
 --- a/crates/agent_ui/src/conversation_view/thread_view.rs
 +++ b/crates/agent_ui/src/conversation_view/thread_view.rs
 @@ -673,6 +673,9 @@ pub struct TurnFields {
@@ -340,7 +340,7 @@ index 6c2c608..e8ca9f1 100644
  }
  
  /// How a tool call is rendered relative to its surroundings.
-@@ -1419,6 +1422,9 @@ impl ThreadView {
+@@ -1433,6 +1436,9 @@ impl ThreadView {
              .turn_started_at
              .take()
              .map(|started| started.elapsed());
@@ -350,7 +350,7 @@ index 6c2c608..e8ca9f1 100644
          self.turn_fields.last_turn_tokens = self.turn_fields.turn_tokens.take();
          self.turn_fields._turn_timer_task = None;
      }
-@@ -6913,19 +6919,52 @@ impl ThreadView {
+@@ -6957,19 +6963,52 @@ impl ThreadView {
  
          let last_turn_clock = show_stats
              .then(|| {
@@ -413,7 +413,7 @@ index 6c2c608..e8ca9f1 100644
              .then(|| {
                  self.turn_fields
                      .last_turn_tokens
-@@ -7004,6 +7043,8 @@ impl ThreadView {
+@@ -7048,6 +7087,8 @@ impl ThreadView {
          if feedback_buttons.is_none()
              && last_turn_clock.is_none()
              && last_turn_tokens_label.is_none()
@@ -422,7 +422,7 @@ index 6c2c608..e8ca9f1 100644
          {
              return Empty.into_any_element();
          }
-@@ -7015,8 +7056,6 @@ impl ThreadView {
+@@ -7059,8 +7100,6 @@ impl ThreadView {
                  .alpha(0.5)
          };
  
@@ -431,7 +431,7 @@ index 6c2c608..e8ca9f1 100644
          // The stats sit on the left: the floating controls occupy the bottom
          // right corner of the conversation, which is exactly where a
          // right-aligned row ends up once the thread is scrolled to its end.
-@@ -7028,15 +7067,30 @@ impl ThreadView {
+@@ -7072,15 +7111,30 @@ impl ThreadView {
              .opacity(0.4)
              .hover(|s| s.opacity(1.))
              .when(
@@ -469,7 +469,7 @@ index 6c2c608..e8ca9f1 100644
                      )
                  },
              )
-@@ -7655,14 +7709,22 @@ impl ThreadView {
+@@ -7750,14 +7804,22 @@ impl ThreadView {
  
      fn render_generating(&self, confirmation: bool, cx: &App) -> impl IntoElement {
          let show_stats = AgentSettings::get_global(cx).show_turn_stats;
@@ -497,7 +497,7 @@ index 6c2c608..e8ca9f1 100644
  
          let is_blocked_on_terminal_command =
              !confirmation && self.is_blocked_on_terminal_command(cx);
-@@ -7722,6 +7784,13 @@ impl ThreadView {
+@@ -7817,6 +7879,13 @@ impl ThreadView {
                          .color(Color::Muted),
                  )
              })

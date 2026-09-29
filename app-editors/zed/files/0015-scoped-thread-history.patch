@@ -61,7 +61,7 @@ editor; that is what the live session is for.
 ---
 
 diff --git a/crates/agent_ui/src/threads_archive_view.rs b/crates/agent_ui/src/threads_archive_view.rs
-index ca56756..06ead7d 100644
+index fd1f69d..adeaf6a 100644
 --- a/crates/agent_ui/src/threads_archive_view.rs
 +++ b/crates/agent_ui/src/threads_archive_view.rs
 @@ -30,6 +30,7 @@ use picker::{
@@ -199,7 +199,7 @@ index ca56756..06ead7d 100644
  
          let query = self.filter_editor.read(cx).text(cx).to_lowercase();
          let today = Local::now().naive_local().date();
-@@ -954,8 +1016,10 @@ impl ThreadsArchiveView {
+@@ -959,8 +1021,10 @@ impl ThreadsArchiveView {
              .count();
  
          let has_archived_threads = {
@@ -211,7 +211,7 @@ index ca56756..06ead7d 100644
          };
  
          let count_label = if entry_count == 1 {
-@@ -1694,4 +1758,188 @@ mod tests {
+@@ -1699,4 +1763,188 @@ mod tests {
              );
          }
      }

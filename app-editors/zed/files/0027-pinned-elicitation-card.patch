@@ -104,10 +104,10 @@ Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>
 ---
 
 diff --git a/assets/settings/default.json b/assets/settings/default.json
-index cbb1bb6..c69a34d 100644
+index 721ef88..470c00d 100644
 --- a/assets/settings/default.json
 +++ b/assets/settings/default.json
-@@ -1401,6 +1401,14 @@
+@@ -1407,6 +1407,14 @@
      //
      // Default: false
      "show_turn_stats": false,
@@ -123,10 +123,10 @@ index cbb1bb6..c69a34d 100644
      // that offers to resolve conflicts using the agent.
      //
 diff --git a/crates/acp_thread/src/acp_thread.rs b/crates/acp_thread/src/acp_thread.rs
-index 420f88b..8c9011c 100644
+index bfc0383..388a60f 100644
 --- a/crates/acp_thread/src/acp_thread.rs
 +++ b/crates/acp_thread/src/acp_thread.rs
-@@ -4511,6 +4511,17 @@ impl AcpThread {
+@@ -5667,6 +5667,17 @@ impl AcpThread {
          Some((index, elicitation))
      }
  
@@ -141,11 +141,11 @@ index 420f88b..8c9011c 100644
 +        self.elicitations.elicitations()
 +    }
 +
-     pub fn plan(&self) -> &Plan {
-         &self.plan
+     pub fn plan(&self) -> Option<&Plan> {
+         self.plans.get(self.visible_plan.as_ref()?)
      }
 diff --git a/crates/agent/src/tool_permissions.rs b/crates/agent/src/tool_permissions.rs
-index bbb680d..9623ae4 100644
+index fa38a0b..3df102d 100644
 --- a/crates/agent/src/tool_permissions.rs
 +++ b/crates/agent/src/tool_permissions.rs
 @@ -607,6 +607,7 @@ mod tests {
@@ -154,10 +154,10 @@ index bbb680d..9623ae4 100644
              show_turn_stats: false,
 +            elicitation_placement: settings::ElicitationPlacement::default(),
              show_merge_conflict_indicator: true,
+             max_idle_retained_threads: 5,
              threads_sidebar: agent_settings::ThreadsSidebarSettings {
-                 auto_open: true,
 diff --git a/crates/agent_settings/src/agent_settings.rs b/crates/agent_settings/src/agent_settings.rs
-index 56f97f6..60b614f 100644
+index 331480c..ab76f65 100644
 --- a/crates/agent_settings/src/agent_settings.rs
 +++ b/crates/agent_settings/src/agent_settings.rs
 @@ -16,10 +16,11 @@ use project::DisableAiSettings;
@@ -176,7 +176,7 @@ index 56f97f6..60b614f 100644
  };
  use util::ResultExt as _;
  
-@@ -246,6 +247,7 @@ pub struct AgentSettings {
+@@ -247,6 +248,7 @@ pub struct AgentSettings {
      pub use_modifier_to_send: bool,
      pub message_editor_min_lines: usize,
      pub show_turn_stats: bool,
@@ -184,7 +184,7 @@ index 56f97f6..60b614f 100644
      pub show_merge_conflict_indicator: bool,
      pub tool_permissions: ToolPermissions,
      pub sandbox_permissions: SandboxPermissions,
-@@ -841,6 +843,7 @@ impl Settings for AgentSettings {
+@@ -843,6 +845,7 @@ impl Settings for AgentSettings {
              use_modifier_to_send: agent.use_modifier_to_send.unwrap(),
              message_editor_min_lines: agent.message_editor_min_lines.unwrap(),
              show_turn_stats: agent.show_turn_stats.unwrap(),
@@ -193,19 +193,21 @@ index 56f97f6..60b614f 100644
              tool_permissions: compile_tool_permissions(agent.tool_permissions),
              sandbox_permissions: compile_sandbox_permissions(agent.sandbox_permissions),
 diff --git a/crates/agent_ui/src/agent_panel.rs b/crates/agent_ui/src/agent_panel.rs
-index dd9f7c2..5a20bd2 100644
+index 0d45676..b998a62 100644
 --- a/crates/agent_ui/src/agent_panel.rs
 +++ b/crates/agent_ui/src/agent_panel.rs
-@@ -83,7 +83,7 @@ use language::LanguageRegistry;
+@@ -83,7 +83,9 @@ use language::LanguageRegistry;
  use language_model::LanguageModelRegistry;
  use notifications::status_toast::StatusToast;
  use project::{Project, ProjectPath, Worktree};
--use settings::{NotifyWhenAgentWaiting, Settings, update_settings_file};
-+use settings::{ElicitationPlacement, NotifyWhenAgentWaiting, Settings, update_settings_file};
+-use settings::{NotifyWhenAgentWaiting, Settings, SettingsStore, update_settings_file};
++use settings::{
++    ElicitationPlacement, NotifyWhenAgentWaiting, Settings, SettingsStore, update_settings_file,
++};
  
  use search::{BufferSearchBar, buffer_search::Deploy as DeployBufferSearch};
  use terminal::Event as TerminalEvent;
-@@ -5600,6 +5600,7 @@ impl AgentPanel {
+@@ -5638,6 +5640,7 @@ impl AgentPanel {
              .is_some();
  
          let workspace = self.workspace.clone();
@@ -213,7 +215,7 @@ index dd9f7c2..5a20bd2 100644
  
          PopoverMenu::new("agent-options-menu")
              .trigger_with_tooltip(
-@@ -5753,6 +5754,32 @@ impl AgentPanel {
+@@ -5791,6 +5794,32 @@ impl AgentPanel {
                              .action("Worktrees", Box::new(zed_actions::git::Worktree))
                              .action("Toggle Threads Sidebar", Box::new(ToggleWorkspaceSidebar));
  
@@ -247,22 +249,22 @@ index dd9f7c2..5a20bd2 100644
                              menu = menu.separator()
                          }
 diff --git a/crates/agent_ui/src/agent_ui.rs b/crates/agent_ui/src/agent_ui.rs
-index dc4921a..fcce64d 100644
+index 653279d..5781f3f 100644
 --- a/crates/agent_ui/src/agent_ui.rs
 +++ b/crates/agent_ui/src/agent_ui.rs
-@@ -1010,6 +1010,7 @@ mod tests {
+@@ -1009,6 +1009,7 @@ mod tests {
              tool_permissions: Default::default(),
              sandbox_permissions: Default::default(),
              show_turn_stats: false,
 +            elicitation_placement: settings::ElicitationPlacement::default(),
              show_merge_conflict_indicator: true,
+             max_idle_retained_threads: 5,
              threads_sidebar: agent_settings::ThreadsSidebarSettings {
-                 auto_open: true,
 diff --git a/crates/agent_ui/src/conversation_view.rs b/crates/agent_ui/src/conversation_view.rs
-index 0208c36..a146bdd 100644
+index bf18671..2653669 100644
 --- a/crates/agent_ui/src/conversation_view.rs
 +++ b/crates/agent_ui/src/conversation_view.rs
-@@ -2560,22 +2560,37 @@ impl ConversationView {
+@@ -2564,22 +2564,37 @@ impl ConversationView {
                      .log_err();
                  }
              },
@@ -990,7 +992,7 @@ index 6b8c2d8..be41aa9 100644
                              on_submit(submit_id.clone(), window, cx);
                          }
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
-index 434da62..6c2c608 100644
+index 800ed0b..cf92370 100644
 --- a/crates/agent_ui/src/conversation_view/thread_view.rs
 +++ b/crates/agent_ui/src/conversation_view/thread_view.rs
 @@ -41,7 +41,7 @@ use language_model::{
@@ -1014,13 +1016,13 @@ index 434da62..6c2c608 100644
  
 @@ -614,6 +615,7 @@ pub struct ThreadView {
      pub resumed_without_history: bool,
-     pub(crate) permission_selections: HashMap<acp::ToolCallId, PermissionSelection>,
+     pub(crate) permission_selections: HashMap<acp_v1::ToolCallId, PermissionSelection>,
      elicitation_form_states: HashMap<ElicitationEntryId, ElicitationFormState>,
 +    question_queue: QuestionQueue,
      pub _cancel_task: Option<Task<()>>,
      _save_task: Option<Task<()>>,
      _draft_resolve_task: Option<Task<()>>,
-@@ -1028,6 +1030,7 @@ impl ThreadView {
+@@ -1030,6 +1032,7 @@ impl ThreadView {
              new_server_version_available: None,
              permission_selections: HashMap::default(),
              elicitation_form_states: HashMap::default(),
@@ -1028,7 +1030,7 @@ index 434da62..6c2c608 100644
              _cancel_task: None,
              _save_task: None,
              _draft_resolve_task: None,
-@@ -6566,6 +6569,7 @@ impl ThreadView {
+@@ -6610,6 +6613,7 @@ impl ThreadView {
                  let thread = self.thread.read(cx);
                  if let Some((_, elicitation)) = thread.elicitation(elicitation_id)
                      && should_render_elicitation(elicitation)
@@ -1036,7 +1038,7 @@ index 434da62..6c2c608 100644
                  {
                      let elicitation = self.render_elicitation(entry_ix, elicitation, window, cx);
  
-@@ -6806,10 +6810,22 @@ impl ThreadView {
+@@ -6850,10 +6854,22 @@ impl ThreadView {
                      .log_err();
                  }
              },
@@ -1061,7 +1063,7 @@ index 434da62..6c2c608 100644
                          cx.notify();
                      }
                  })
-@@ -7237,6 +7253,75 @@ impl ThreadView {
+@@ -7332,6 +7348,75 @@ impl ThreadView {
          self.message_editor.read(cx).set_local_commands(commands);
      }
  
@@ -1075,7 +1077,7 @@ index 434da62..6c2c608 100644
 +    /// request the other has drawn too.
 +    fn renders_elicitation_as_card(elicitation: &Elicitation, cx: &App) -> bool {
 +        AgentSettings::get_global(cx).elicitation_placement == ElicitationPlacement::Card
-+            && matches!(elicitation.request.mode, acp::ElicitationMode::Form(_))
++            && matches!(elicitation.request.mode, acp_v1::ElicitationMode::Form(_))
 +            && matches!(elicitation.status, ElicitationStatus::Pending { .. })
 +    }
 +
@@ -1137,7 +1139,7 @@ index 434da62..6c2c608 100644
      fn render_request_elicitations(&self, cx: &Context<Self>) -> Vec<AnyElement> {
          let server_view = self.server_view.clone();
          let handlers_view = server_view.clone();
-@@ -12877,6 +12962,7 @@ impl Render for ThreadView {
+@@ -13044,6 +13129,7 @@ impl Render for ThreadView {
                  |this, version| this.child(self.render_new_version_callout(&version, cx)),
              )
              .children(self.render_token_limit_callout(cx))
@@ -1146,7 +1148,7 @@ index 434da62..6c2c608 100644
              .child(self.render_message_editor(window, cx))
      }
 diff --git a/crates/settings_content/src/agent.rs b/crates/settings_content/src/agent.rs
-index d8c755e..cf7c86b 100644
+index 6bafc02..0dc9e64 100644
 --- a/crates/settings_content/src/agent.rs
 +++ b/crates/settings_content/src/agent.rs
 @@ -97,6 +97,33 @@ pub enum ThinkingBlockDisplay {
@@ -1183,7 +1185,7 @@ index d8c755e..cf7c86b 100644
  /// Threshold at which agent auto-compaction runs. See
  /// [`AutoCompactSettingsContent::threshold`] for the accepted formats.
  ///
-@@ -381,6 +408,11 @@ pub struct AgentSettingsContent {
+@@ -387,6 +414,11 @@ pub struct AgentSettingsContent {
      ///
      /// Default: false
      pub show_turn_stats: Option<bool>,

@@ -86,10 +86,10 @@ both zero.
 ---
 
 diff --git a/crates/acp_thread/src/acp_thread.rs b/crates/acp_thread/src/acp_thread.rs
-index e94349a..420f88b 100644
+index 3d3948a..bfc0383 100644
 --- a/crates/acp_thread/src/acp_thread.rs
 +++ b/crates/acp_thread/src/acp_thread.rs
-@@ -841,6 +841,30 @@ pub struct ContextCompactionUpdate {
+@@ -933,6 +933,30 @@ pub struct ContextCompactionUpdate {
      pub status: Option<ContextCompactionStatus>,
  }
  
@@ -120,10 +120,10 @@ index e94349a..420f88b 100644
  impl AgentThreadEntry {
      pub fn is_indented(&self) -> bool {
          match self {
-@@ -3346,10 +3370,24 @@ impl AcpThread {
+@@ -4182,10 +4206,24 @@ impl AcpThread {
                  );
              }
-             acp::SessionUpdate::ToolCall(tool_call) => {
+             acp_v1::SessionUpdate::ToolCall(tool_call) => {
 -                self.upsert_tool_call(tool_call, cx)?;
 +                if !self.take_context_compaction_frame(
 +                    &tool_call.tool_call_id,
@@ -134,7 +134,7 @@ index e94349a..420f88b 100644
 +                    self.upsert_tool_call(tool_call, cx)?;
 +                }
              }
-             acp::SessionUpdate::ToolCallUpdate(tool_call_update) => {
+             acp_v1::SessionUpdate::ToolCallUpdate(tool_call_update) => {
 -                self.update_tool_call(tool_call_update, cx)?;
 +                if !self.take_context_compaction_frame(
 +                    &tool_call_update.tool_call_id,
@@ -145,9 +145,9 @@ index e94349a..420f88b 100644
 +                    self.update_tool_call(tool_call_update, cx)?;
 +                }
              }
-             acp::SessionUpdate::CompactionUpdate(compaction_update) => {
-                 self.upsert_context_compaction_update(compaction_update, cx);
-@@ -3897,6 +3935,73 @@ impl AcpThread {
+             acp_v1::SessionUpdate::CompactionUpdate(compaction_update) => {
+                 self.upsert_context_compaction_update(compaction_update, cx)
+@@ -5010,6 +5048,73 @@ impl AcpThread {
          cx.emit(AcpThreadEvent::EntryUpdated(ix));
      }
  
@@ -164,9 +164,9 @@ index e94349a..420f88b 100644
 +    /// beside the compaction.
 +    fn take_context_compaction_frame(
 +        &mut self,
-+        tool_call_id: &acp::ToolCallId,
-+        status: Option<acp::ToolCallStatus>,
-+        meta: Option<&acp::Meta>,
++        tool_call_id: &acp_v1::ToolCallId,
++        status: Option<acp_v1::ToolCallStatus>,
++        meta: Option<&acp_v1::Meta>,
 +        cx: &mut Context<Self>,
 +    ) -> bool {
 +        let Some(payload) = meta.and_then(|meta| meta.get(CONTEXT_COMPACTION_META_KEY)) else {
@@ -184,10 +184,10 @@ index e94349a..420f88b 100644
 +        let id =
 +            ContextCompactionId(format!("{CONTEXT_COMPACTION_ID_PREFIX}{tool_call_id}").into());
 +        let status = match status {
-+            Some(acp::ToolCallStatus::Completed) => ContextCompactionStatus::Completed,
++            Some(acp_v1::ToolCallStatus::Completed) => ContextCompactionStatus::Completed,
 +            // The native entry has no failure state, so a failed compaction takes the
 +            // terminal that claims the least: it stopped, and it did not finish.
-+            Some(acp::ToolCallStatus::Failed) => ContextCompactionStatus::Canceled,
++            Some(acp_v1::ToolCallStatus::Failed) => ContextCompactionStatus::Canceled,
 +            Some(_) => ContextCompactionStatus::InProgress,
 +            // A frame with no status is the enrichment the adapter sends after the
 +            // terminal one: facts, not a phase, so the phase already recorded stands.
@@ -221,7 +221,7 @@ index e94349a..420f88b 100644
      pub fn can_set_title(&mut self, cx: &mut Context<Self>) -> bool {
          self.connection.set_title(&self.session_id, cx).is_some()
      }
-@@ -13044,6 +13149,475 @@ mod tests {
+@@ -16936,6 +17041,475 @@ mod tests {
              assert_eq!(usage.max_tokens, 10000);
          });
      }
@@ -242,9 +242,9 @@ index e94349a..420f88b 100644
 +        thread.update(cx, |thread, cx| {
 +            thread
 +                .handle_session_update(
-+                    acp::SessionUpdate::ToolCall(compaction_tool_call(
++                    acp_v1::SessionUpdate::ToolCall(compaction_tool_call(
 +                        "compaction-1",
-+                        acp::ToolCallStatus::InProgress,
++                        acp_v1::ToolCallStatus::InProgress,
 +                        serde_json::json!({ "version": 1, "trigger": "manual" }),
 +                    )),
 +                    cx,
@@ -291,9 +291,9 @@ index e94349a..420f88b 100644
 +        thread.update(cx, |thread, cx| {
 +            thread
 +                .handle_session_update(
-+                    acp::SessionUpdate::ToolCall(compaction_tool_call(
++                    acp_v1::SessionUpdate::ToolCall(compaction_tool_call(
 +                        "compaction-1",
-+                        acp::ToolCallStatus::InProgress,
++                        acp_v1::ToolCallStatus::InProgress,
 +                        serde_json::json!({ "version": 1 }),
 +                    )),
 +                    cx,
@@ -301,9 +301,9 @@ index e94349a..420f88b 100644
 +                .unwrap();
 +            thread
 +                .handle_session_update(
-+                    acp::SessionUpdate::ToolCallUpdate(compaction_tool_call_update(
++                    acp_v1::SessionUpdate::ToolCallUpdate(compaction_tool_call_update(
 +                        "compaction-1",
-+                        Some(acp::ToolCallStatus::Completed),
++                        Some(acp_v1::ToolCallStatus::Completed),
 +                        serde_json::json!({
 +                            "version": 1,
 +                            "preTokens": 120_000,
@@ -351,9 +351,9 @@ index e94349a..420f88b 100644
 +            for id in ["compaction-1", "compaction-2"] {
 +                thread
 +                    .handle_session_update(
-+                        acp::SessionUpdate::ToolCall(compaction_tool_call(
++                        acp_v1::SessionUpdate::ToolCall(compaction_tool_call(
 +                            id,
-+                            acp::ToolCallStatus::Completed,
++                            acp_v1::ToolCallStatus::Completed,
 +                            serde_json::json!({ "version": 1, "trigger": "automatic" }),
 +                        )),
 +                        cx,
@@ -405,9 +405,9 @@ index e94349a..420f88b 100644
 +            );
 +            thread
 +                .handle_session_update(
-+                    acp::SessionUpdate::ToolCall(compaction_tool_call(
++                    acp_v1::SessionUpdate::ToolCall(compaction_tool_call(
 +                        "compaction-1",
-+                        acp::ToolCallStatus::Completed,
++                        acp_v1::ToolCallStatus::Completed,
 +                        serde_json::json!({ "version": 1 }),
 +                    )),
 +                    cx,
@@ -447,9 +447,9 @@ index e94349a..420f88b 100644
 +        thread.update(cx, |thread, cx| {
 +            thread
 +                .handle_session_update(
-+                    acp::SessionUpdate::ToolCall(compaction_tool_call(
++                    acp_v1::SessionUpdate::ToolCall(compaction_tool_call(
 +                        "compaction-1",
-+                        acp::ToolCallStatus::InProgress,
++                        acp_v1::ToolCallStatus::InProgress,
 +                        serde_json::json!({ "version": 1 }),
 +                    )),
 +                    cx,
@@ -457,9 +457,9 @@ index e94349a..420f88b 100644
 +                .unwrap();
 +            thread
 +                .handle_session_update(
-+                    acp::SessionUpdate::ToolCallUpdate(compaction_tool_call_update(
++                    acp_v1::SessionUpdate::ToolCallUpdate(compaction_tool_call_update(
 +                        "compaction-1",
-+                        Some(acp::ToolCallStatus::Failed),
++                        Some(acp_v1::ToolCallStatus::Failed),
 +                        serde_json::json!({ "version": 1, "error": "compaction failed" }),
 +                    )),
 +                    cx,
@@ -500,9 +500,9 @@ index e94349a..420f88b 100644
 +        thread.update(cx, |thread, cx| {
 +            thread
 +                .handle_session_update(
-+                    acp::SessionUpdate::ToolCall(compaction_tool_call(
++                    acp_v1::SessionUpdate::ToolCall(compaction_tool_call(
 +                        "compaction-future",
-+                        acp::ToolCallStatus::Completed,
++                        acp_v1::ToolCallStatus::Completed,
 +                        serde_json::json!({ "version": 2, "trigger": "manual" }),
 +                    )),
 +                    cx,
@@ -550,9 +550,9 @@ index e94349a..420f88b 100644
 +            ] {
 +                thread
 +                    .handle_session_update(
-+                        acp::SessionUpdate::ToolCall(compaction_tool_call(
++                        acp_v1::SessionUpdate::ToolCall(compaction_tool_call(
 +                            id,
-+                            acp::ToolCallStatus::Completed,
++                            acp_v1::ToolCallStatus::Completed,
 +                            payload,
 +                        )),
 +                        cx,
@@ -594,26 +594,26 @@ index e94349a..420f88b 100644
 +        thread.update(cx, |thread, cx| {
 +            thread
 +                .handle_session_update(
-+                    acp::SessionUpdate::ToolCall(
-+                        acp::ToolCall::new(
-+                            acp::ToolCallId::new("look-alike"),
++                    acp_v1::SessionUpdate::ToolCall(
++                        acp_v1::ToolCall::new(
++                            acp_v1::ToolCallId::new("look-alike"),
 +                            "Compact conversation",
 +                        )
-+                        .kind(acp::ToolKind::Think)
-+                        .status(acp::ToolCallStatus::Completed),
++                        .kind(acp_v1::ToolKind::Think)
++                        .status(acp_v1::ToolCallStatus::Completed),
 +                    ),
 +                    cx,
 +                )
 +                .unwrap();
 +            thread
 +                .handle_session_update(
-+                    acp::SessionUpdate::ToolCall(
-+                        acp::ToolCall::new(
-+                            acp::ToolCallId::new("other-meta"),
++                    acp_v1::SessionUpdate::ToolCall(
++                        acp_v1::ToolCall::new(
++                            acp_v1::ToolCallId::new("other-meta"),
 +                            "Compact conversation",
 +                        )
-+                        .kind(acp::ToolKind::Think)
-+                        .status(acp::ToolCallStatus::Completed)
++                        .kind(acp_v1::ToolKind::Think)
++                        .status(acp_v1::ToolCallStatus::Completed)
 +                        .meta(meta_with(
 +                            "somethingElse",
 +                            serde_json::json!({"version": 1}),
@@ -636,7 +636,7 @@ index e94349a..420f88b 100644
 +
 +    // --- helpers for the compaction `_meta` seam ------------------------------------
 +
-+    /// `_meta` carrying one key, in the `serde_json::Map` shape `acp::Meta` aliases.
++    /// `_meta` carrying one key, in the `serde_json::Map` shape `acp_v1::Meta` aliases.
 +    fn meta_with(
 +        key: &str,
 +        payload: serde_json::Value,
@@ -650,11 +650,11 @@ index e94349a..420f88b 100644
 +    /// `think`, titled "Compact conversation", carrying `_meta.contextCompaction`.
 +    fn compaction_tool_call(
 +        id: &str,
-+        status: acp::ToolCallStatus,
++        status: acp_v1::ToolCallStatus,
 +        payload: serde_json::Value,
-+    ) -> acp::ToolCall {
-+        acp::ToolCall::new(acp::ToolCallId::new(id), "Compact conversation")
-+            .kind(acp::ToolKind::Think)
++    ) -> acp_v1::ToolCall {
++        acp_v1::ToolCall::new(acp_v1::ToolCallId::new(id), "Compact conversation")
++            .kind(acp_v1::ToolKind::Think)
 +            .status(status)
 +            .meta(meta_with("contextCompaction", payload))
 +    }
@@ -663,12 +663,12 @@ index e94349a..420f88b 100644
 +    /// enrichment frame `compact_boundary` produces: facts, no second terminal.
 +    fn compaction_tool_call_update(
 +        id: &str,
-+        status: Option<acp::ToolCallStatus>,
++        status: Option<acp_v1::ToolCallStatus>,
 +        payload: serde_json::Value,
-+    ) -> acp::ToolCallUpdate {
-+        acp::ToolCallUpdate::new(
-+            acp::ToolCallId::new(id),
-+            acp::ToolCallUpdateFields::new().status(status),
++    ) -> acp_v1::ToolCallUpdate {
++        acp_v1::ToolCallUpdate::new(
++            acp_v1::ToolCallId::new(id),
++            acp_v1::ToolCallUpdateFields::new().status(status),
 +        )
 +        .meta(meta_with("contextCompaction", payload))
 +    }
