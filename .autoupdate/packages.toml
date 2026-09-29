@@ -753,7 +753,7 @@ url = "https://dl.pstmn.io/api/version/latest?platform=linux64&channel=stable"
 parser = "json"
 path = "version"
 type = "bin"
-version = "12.30.0"
+version = "12.30.3"
 comments = """
 Postman — official version API; clean {"version":"..."}.
 """
@@ -1477,7 +1477,7 @@ url = "https://api.github.com/repos/WinterSnowfall/d7vk/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "2.2"
+version = "2.3"
 comments = """
 d7vk — releases/latest "vX.Y" is the published line (tags[0] is unreleased).
 """
@@ -1629,7 +1629,7 @@ url = "https://api.github.com/repos/conda/conda/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "26.7.2"
+version = "26.7.3"
 comments = """
 conda — tag bare "X.Y.Z".
 """
@@ -1663,7 +1663,7 @@ url = "https://api.github.com/repos/openai/codex/releases/latest"
 parser = "regex"
 pattern = '"tag_name":\s*"rust-v([0-9]+\.[0-9]+\.[0-9]+)"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.158.0"
+version = "0.159.0"
 comments = """
 codex — tag "rust-vX.Y.Z" ("rust-" not strippable); regex extracts X.Y.Z from tag_name.
 
@@ -1690,7 +1690,7 @@ parser = "regex"
 pattern = '"tag_name":\s*"rust-v([0-9]+\.[0-9]+\.[0-9]+)"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "0.158.0"
+version = "0.159.0"
 comments = """
 codex-bin — same upstream tag "rust-vX.Y.Z"; regex on tag_name.
 """
@@ -2500,7 +2500,7 @@ base_from = "file"
 base_url = "https://raw.githubusercontent.com/Sovereign-Engineering/obscuravpn-client/main/tag.json"
 base_pattern = '"version": "([0-9][0-9.]*)"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.180_p20260928"
+version = "1.180_p20260929"
 comments = """
 Obscura VPN from source — commit-tracked on main because upstream tags only
 the Android releases (v/1.x); Linux versions are "Tag v1.x." commits that bump
@@ -2772,7 +2772,7 @@ a real X.Y.Z release, never an rc.
 url = "https://www.qemu.org/download/"
 parser = "regex"
 pattern = 'qemu-([0-9]+\.[0-9]+\.[0-9]+)'
-version = "11.1.1"
+version = "11.1.2"
 comments = """
 qemu — /download/ puts the current "qemu-X.Y.Z.tar.xz" link first.
 The 2026-06-27 HOLD is lifted: download.qemu.org publishes the official
@@ -3511,7 +3511,7 @@ commit_sha_path = "[0].id"
 base_from = "file"
 base_url = "https://gitlab.freedesktop.org/mobile-broadband/libqmi/-/raw/main/meson.build"
 base_pattern = "(?m)^  version: '([0-9][0-9.]*)'"
-version = "1.39.1_pre20260816-r1"
+version = "1.39.1_pre20260929"
 comments = """
 libqmi — commit-tracked on main; _pre suffix preserved from current ebuild.
 """
@@ -10973,7 +10973,7 @@ it must be DROPPED, not forced, once a release carries the fix).
 url = "https://deb.opera.com/opera-stable/dists/stable/non-free/binary-amd64/Packages"
 parser = "regex"
 pattern = 'Package: opera-stable\nVersion: ([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)'
-version = "136.0.6008.52"
+version = "136.0.6008.73"
 comments = """
 Opera — read the APT index of Opera's own repository. The download CDN
 (downloadN.operacdn.com, which SRC_URI uses) publishes no listing, and
@@ -11155,7 +11155,7 @@ parser = "regex"
 pattern = '"tag_name":\s*"v([0-9]+\.[0-9]+\.[0-9]+)"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "0.96.1"
+version = "0.97.1"
 comments = """
 Crush, by Charm. Tracks crush_<PV>_Linux_{x86_64,arm64}.tar.gz -- note the
 asset name embeds the version AND upstream's own arch spelling, and the
@@ -11194,7 +11194,7 @@ url = "https://api.github.com/repos/QwenLM/qwen-code/releases?per_page=30"
 parser = "regex"
 pattern = '"tag_name":\s*"v([0-9]+\.[0-9]+\.[0-9]+)"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.24.6"
+version = "0.24.7"
 comments = """
 Qwen Code — this record probes /releases and NOT /releases/latest, which is
 backwards from every other GitHub record here and is deliberate.

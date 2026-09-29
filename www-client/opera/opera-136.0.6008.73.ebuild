@@ -53,7 +53,8 @@ fi
 # CHROMIUM_VERSION pin has to match the Chromium the .deb was built from, not
 # merely be new enough to carry the symbols.
 CHROMIUM_VERSION="151"
-SRC_URI="${SRC_URI_BASE[*]/%//${PV}/linux/${MY_PN}_${PV}_amd64.deb}"
+SRC_URI="${SRC_URI_BASE[*]/%//${PV}/linux/${MY_PN}_${PV}_amd64.deb}
+	https://deb.opera.com/${MY_PN}/pool/non-free/o/${MY_PN}/${MY_PN}_${PV}_amd64.deb"
 S=${WORKDIR}
 
 LICENSE="OPERA-2018"
