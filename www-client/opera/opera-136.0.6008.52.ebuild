@@ -32,13 +32,26 @@ fi
 # or use Chromicler to handle bumps.
 # Does not _need_ to be updated for every new version of Opera, only when it breaks.
 #
-# It broke. ::gentoo still pins 142 here; this Opera build is Chromium 151
+# BENTOO-DIVERGENCE: RDEPEND - media-video/ffmpeg-chromium:151 where ::gentoo
+# pins :152 for this same PV. Both halves of the reason are below; drop this
+# ebuild only when ::gentoo pins 151, or when Opera itself moves to Chromium 152.
+#
+# Why not older: this Opera build is Chromium 151
 # (`strings opera | grep -oE "Chrome/[0-9.]+"` -> Chrome/151.0.7922.176), and it
 # resolves av_dynamic_hdr_smpte2094_app5_to_t35 out of libffmpeg.so. That symbol
 # is a Chromium-fork addition -- absent from ffmpeg-chromium-142 (FFmpeg 7.1.git)
 # and from upstream FFmpeg 8.x -- so the browser dies at startup with
 # "symbol lookup error: opera: undefined symbol". 151 is where it appears.
-# ::gentoo's own opera-developer ebuilds already pin 151; only stable lagged.
+#
+# Why not newer: 152 bumps the FFmpeg ABI majors (avcodec/avformat 62 -> 63,
+# avutil 60 -> 61). Every symbol Opera imports still exists there, so it LOADS,
+# but the layouts it was compiled against do not: FF_API_CODEC_PROPS goes away
+# at avcodec 63, removing AVCodecContext.properties, and every field after it
+# (skip_frame, lowres, codec_whitelist, max_pixels, coded_side_data, ...) moves.
+# A binary built for major 62 then reads and writes those at the wrong offsets
+# -- memory corruption during playback, not a clean failure at startup. The
+# CHROMIUM_VERSION pin has to match the Chromium the .deb was built from, not
+# merely be new enough to carry the symbols.
 CHROMIUM_VERSION="151"
 SRC_URI="${SRC_URI_BASE[*]/%//${PV}/linux/${MY_PN}_${PV}_amd64.deb}"
 S=${WORKDIR}
