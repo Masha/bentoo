@@ -241,6 +241,10 @@ pkg_postinst() {
 	elog "to the matching arrays in ~/.claude/settings.json -- appending, not"
 	elog "replacing, or you drop whatever else runs on those events."
 	elog
+	elog "For notifications as the plan usage limits fill (5-hour, weekly, and"
+	elog "per-model), also set the statusLine shown in that same file. Zed"
+	elog "agent-panel sessions are read from claude-agent-acp-plus without it."
+	elog
 	elog "Then start the daemon as your desktop user:"
 	if use systemd; then
 		elog "  systemctl --user enable --now ${PN}.service"
