@@ -184,9 +184,9 @@ ALL_DEPEND="
 # softmmu targets (qemu-system-*).
 #
 # BENTOO-DIVERGENCE: DEPEND - nettle upper bound. ::gentoo carries no bound, this
-# overlay adds `<dev-libs/nettle-4.0`.  The ${PN}-11.1.0-nettle-4 patch below
-# restores the BUILD against nettle 4 (which deleted <nettle/sha.h>), and that
-# is all it restores.  crypto/hash-nettle.c and crypto/hmac-nettle.c cast every
+# overlay adds `<dev-libs/nettle-4.0`.  Since 11.1.2 QEMU BUILDS against
+# nettle 4 (upstream now includes <nettle/sha1.h> and <nettle/sha2.h> instead of
+# the deleted <nettle/sha.h>), and that is all it fixed.  crypto/hash-nettle.c and crypto/hmac-nettle.c cast every
 # *_digest to a three-argument function pointer; nettle 4 dropped the length
 # argument, so the cast silences the compiler and the call then hands the
 # length to nettle in the register it reads as the output pointer.  Measured:
@@ -388,16 +388,14 @@ RDEPEND="
 # filename: ::gentoo renames it to the oldest version it still applies to
 # (qemu-10.2.2-...), this overlay kept the name minted when the series 11 ebuild
 # was first written (qemu-11.0.0-...).
-# All seven patches below were re-verified against the 11.1.0 tarball with
+# All six patches below were re-verified against the 11.1.2 tarball with
 # `patch -p1 --dry-run`; none needed a rebase.
 #
-# The nettle-4 patch is upstream (queued by Daniel P. Berrangé) and is a BUILD
-# fix only -- it restores the include after nettle 4.0 deleted <nettle/sha.h>.
-# QEMU is still runtime-broken against nettle 4, which is why the DEPEND bound
-# above exists; read the comment there before touching either.
+# The nettle-4 build fix (qemu-11.1.0-nettle-4.patch) was dropped at 11.1.2:
+# it is upstream, and the tarball carries it verbatim. It never fixed the
+# runtime breakage against nettle 4 -- the DEPEND bound above still does that.
 # BENTOO-DIVERGENCE: PATCHES - the optionrom fix is the same one ::gentoo
-# carries, rebased from 10.2.2 onto 11.0.0; the nettle-4 patch below has no
-# counterpart there because ::gentoo has no nettle bound to defend.
+# carries, rebased from 10.2.2 onto 11.0.0.
 PATCHES=(
 	"${FILESDIR}"/${PN}-10.1.2-fix_passt.patch
 	"${FILESDIR}"/${PN}-9.0.0-disable-keymap.patch
@@ -405,7 +403,6 @@ PATCHES=(
 	"${FILESDIR}"/${PN}-8.1.0-skip-tests.patch
 	"${FILESDIR}"/${PN}-8.1.0-find-sphinx.patch
 	"${FILESDIR}"/${PN}-11.0.0-optionrom-pass-Wl-no-error-rwx-segments.patch
-	"${FILESDIR}"/${PN}-11.1.0-nettle-4.patch
 )
 
 QA_PREBUILT="
