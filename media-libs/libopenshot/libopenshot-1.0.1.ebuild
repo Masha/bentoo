@@ -61,16 +61,15 @@ BDEPEND="
 "
 
 PATCHES=(
-	# EffectBase::TrackedObjectMask() calls TrackedObjectBBox methods without the
-	# #ifdef USE_OPENCV guard that Clip.cpp and Timeline.cpp use.  TrackedObjectBBox.cpp
-	# only enters the build via OPENSHOT_CV_SOURCES, so with USE=-opencv the library
-	# ends up with undefined symbols and every downstream link fails.
-	"${FILESDIR}/${P}-guard-tracked-object-mask.patch"
 	# Port to OpenCV 5 (this overlay ships media-libs/opencv-5.0.0, and opencv is
 	# SLOT="0/${PV}", so 4 and 5 cannot coexist).  Also raises CMAKE_CXX_STANDARD to
 	# 20, required by abseil/protobuf 7.x -- passing -DCMAKE_CXX_STANDARD=20 on the
 	# command line does not work, the set() in CMakeLists.txt overrides it.
-	"${FILESDIR}/${P}-opencv5-cxx20.patch"
+	# Named ${PN}, not ${P}: the autoupdate applier renames the ebuild on a bump but
+	# never files/, and this patch applied unchanged from 1.0.0 to 1.0.1.  (The
+	# 1.0.0 guard-tracked-object-mask patch was dropped: 1.0.1 guards
+	# TrackedObjectMask() with #ifdef USE_OPENCV upstream.)
+	"${FILESDIR}/${PN}-opencv5-cxx20.patch"
 )
 
 pkg_pretend() {
