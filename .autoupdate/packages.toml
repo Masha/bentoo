@@ -1252,7 +1252,7 @@ url = "https://filezillapro.com/filezilla-pro-version-history/"
 parser = "regex"
 pattern = 'Latest:\s*([0-9]+\.[0-9]+\.[0-9]+)'
 headers = { "User-Agent" = "Mozilla/5.0" }
-meta = { fetch_method = "post", fetch_url = "https://download.filezillapro.com/", fetch_serial_env = "FILEZILLA_PRO_KEY", fetch_serial_field = "key", fetch_filename = "filezilla-pro-{version}_x86_64-linux-gnu.tar.xz", fetch_form = "mail=&number=&platform=linux&platform_cli=win&platform_cli_nonpro=win&platform_fzpes=win&download_program=Start download of FileZilla Pro" }
+meta = { fetch_method = "post", fetch_url = "https://download.filezillapro.com/", fetch_serial_env = "BENTOO_FETCH_FILEZILLA_PRO_KEY", fetch_serial_field = "key", fetch_filename = "filezilla-pro-{version}_x86_64-linux-gnu.tar.xz", fetch_form = "mail=&number=&platform=linux&platform_cli=win&platform_cli_nonpro=win&platform_fzpes=win&download_program=Start download of FileZilla Pro" }
 type = "bin"
 version = "3.71.1"
 comments = """
@@ -1261,7 +1261,7 @@ release (the h3 changelog list also includes -betaN, so anchor on "Latest:").
 Binary, serial-gated: the .tar.xz is not on a public mirror — at --apply time
 the [meta] block drives an authenticated POST whose `key` field carries the
 serial; ALL form fields must be sent or the server silently re-shows the form.
-The serial comes from $FILEZILLA_PRO_KEY (or ~/.config/bentoo/secrets) and is
+The serial comes from $BENTOO_FETCH_FILEZILLA_PRO_KEY (or ~/.config/bentoo/secrets) and is
 never committed here. The downloaded file is dropped into pkgdev's distdir so
 the Manifest digests it directly.
 
@@ -10707,7 +10707,7 @@ url = "https://www.blackmagicdesign.com/api/support/latest-stable-version/davinc
 parser = "regex"
 pattern = '"major":([0-9]+,"minor":[0-9]+,"releaseNum":[0-9]+)'
 transform = [[',"minor":', "."], [',"releaseNum":', "."]]
-meta = { fetch_method = "post", fetch_url = "https://www.blackmagicdesign.com/api/register/us/download/{id}", fetch_body = "json", fetch_response = "url", fetch_content_type = "application/zip", fetch_min_bytes = "3000000000", fetch_filename = "DaVinci_Resolve_{version}_Linux.zip", fetch_form = "product=DaVinci+Resolve&platform=Linux&policy=true&origin=www.blackmagicdesign.com", fetch_form_env = "country=BMD_COUNTRY&firstname=BMD_FIRSTNAME&lastname=BMD_LASTNAME&email=BMD_EMAIL&phone=BMD_PHONE&street=BMD_STREET&city=BMD_CITY&state=BMD_STATE&zip=BMD_ZIP", fetch_timeout = "1800", fetch_id_url = "https://www.blackmagicdesign.com/api/support/us/downloads.json", fetch_id_pattern = '"Linux":\[\{"releaseId":"[0-9a-f]+","downloadId":"([0-9a-f]+)","downloadTitle":"DaVinci Resolve {version}"' }
+meta = { fetch_method = "post", fetch_url = "https://www.blackmagicdesign.com/api/register/us/download/{id}", fetch_body = "json", fetch_response = "url", fetch_content_type = "application/zip", fetch_min_bytes = "3000000000", fetch_filename = "DaVinci_Resolve_{version}_Linux.zip", fetch_form = "product=DaVinci+Resolve&platform=Linux&policy=true&origin=www.blackmagicdesign.com", fetch_form_env = "country=BENTOO_FETCH_BMD_COUNTRY&firstname=BENTOO_FETCH_BMD_FIRSTNAME&lastname=BENTOO_FETCH_BMD_LASTNAME&email=BENTOO_FETCH_BMD_EMAIL&phone=BENTOO_FETCH_BMD_PHONE&street=BENTOO_FETCH_BMD_STREET&city=BENTOO_FETCH_BMD_CITY&state=BENTOO_FETCH_BMD_STATE&zip=BENTOO_FETCH_BMD_ZIP", fetch_timeout = "1800", fetch_id_url = "https://www.blackmagicdesign.com/api/support/us/downloads.json", fetch_id_pattern = '"Linux":\[\{"releaseId":"[0-9a-f]+","downloadId":"([0-9a-f]+)","downloadTitle":"DaVinci Resolve {version}"' }
 version = "21.1.0-r2"
 comments = """
 davinci-resolve — Blackmagic's own version endpoint, the only machine-readable
@@ -10777,15 +10777,15 @@ then /etc/bentoo/secrets, so every operator sends their own details.  Set them
 once:
 
   # ~/.config/bentoo/secrets   (chmod 600)
-  BMD_COUNTRY=…           # ISO 3166-1 alpha-2, lowercase ("br", "us")
-  BMD_FIRSTNAME=…
-  BMD_LASTNAME=…
-  BMD_EMAIL=…
-  BMD_PHONE=+55…          # E.164
-  BMD_STREET=…
-  BMD_CITY=…
-  BMD_STATE=…             # spelled as the vendor's own list spells it ("São Paulo")
-  BMD_ZIP=…               # CEP, no punctuation
+  BENTOO_FETCH_BMD_COUNTRY=…           # ISO 3166-1 alpha-2, lowercase ("br", "us")
+  BENTOO_FETCH_BMD_FIRSTNAME=…
+  BENTOO_FETCH_BMD_LASTNAME=…
+  BENTOO_FETCH_BMD_EMAIL=…
+  BENTOO_FETCH_BMD_PHONE=+55…          # E.164
+  BENTOO_FETCH_BMD_STREET=…
+  BENTOO_FETCH_BMD_CITY=…
+  BENTOO_FETCH_BMD_STATE=…             # spelled as the vendor's own list spells it ("São Paulo")
+  BENTOO_FETCH_BMD_ZIP=…               # CEP, no punctuation
 
 A missing one is reported before any request goes out, naming both the variable
 and the field it belongs to.  What stays in fetch_form is only what identifies

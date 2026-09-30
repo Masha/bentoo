@@ -36,8 +36,8 @@ pkg_nofetch() {
 	einfo "from ${HOMEPAGE} and place it in your DISTDIR directory."
 	einfo
 	einfo "With app-portage/bentoolkit installed and your licence serial exported"
-	einfo "as \$FILEZILLA_PRO_KEY (or kept in ~/.config/bentoo/secrets), one"
-	einfo "command does the same:"
+	einfo "as \$BENTOO_FETCH_FILEZILLA_PRO_KEY (or kept in ~/.config/bentoo/secrets),"
+	einfo "one command does the same:"
 	einfo
 	einfo "  bentoo distfile fetch ${CATEGORY}/${PN} --version ${PV}"
 }
