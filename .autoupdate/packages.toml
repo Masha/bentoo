@@ -1875,6 +1875,30 @@ touching either half of this pair.
 """
 # END
 
+["media-video/vlc"]
+track = "commit"
+url = "https://code.videolan.org/api/v4/projects/videolan%2Fvlc/repository/commits?ref_name=master&per_page=50"
+parser = "json"
+path = "[0].committed_date"
+transform = [['T.*', ""], ['-', ""]]
+commit_sha_path = "[0].id"
+base_from = "file"
+base_url = "https://code.videolan.org/videolan/vlc/-/raw/master/configure.ac"
+base_pattern = 'AC_INIT\(\[vlc\], \[([0-9][0-9.]*)-dev\]\)'
+version = "4.0.0_pre20260929"
+comments = """
+vlc — 4.0 development snapshot, commit-tracked on master; _pre suffix
+preserved from the current ebuild. Only the 4.0 line lives here: 3.0.x is
+current in ::gentoo and is not mirrored. Re-added 2026-09-30 because the
+::gentoo snapshot (4.0.0_pre20260625) had fallen ~1450 commits behind.
+
+The base comes from AC_INIT in configure.ac ("4.0.0-dev"); meson.build carries
+the same string. When upstream tags 4.0.0 the track must move to tags.
+
+Snapshot / git-commit packages  (track upstream stable; Gentoo _pre/_p ordering)
+"""
+# END
+
 ["net-analyzer/netdata"]
 url = "https://api.github.com/repos/netdata/netdata/releases/latest"
 parser = "json"
