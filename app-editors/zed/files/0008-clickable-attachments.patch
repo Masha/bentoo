@@ -8,10 +8,10 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
 ---
 
 diff --git a/crates/agent_ui/src/message_editor.rs b/crates/agent_ui/src/message_editor.rs
-index 602160e..471cd87 100644
+index abf2168..ab8bda0 100644
 --- a/crates/agent_ui/src/message_editor.rs
 +++ b/crates/agent_ui/src/message_editor.rs
-@@ -1801,7 +1801,25 @@ impl MessageEditor {
+@@ -1802,7 +1802,25 @@ impl MessageEditor {
          for chunk in message {
              match chunk {
                  acp_v1::ContentBlock::Text(text_content) => {
@@ -37,7 +37,7 @@ index 602160e..471cd87 100644
                  }
                  acp_v1::ContentBlock::Resource(acp_v1::EmbeddedResource {
                      resource: acp_v1::EmbeddedResourceResource::TextResourceContents(resource),
-@@ -5754,6 +5772,68 @@ mod tests {
+@@ -5755,6 +5773,68 @@ mod tests {
          assert_eq!(mention_uris.len(), 1);
      }
  
