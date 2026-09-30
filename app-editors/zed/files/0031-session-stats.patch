@@ -47,7 +47,7 @@ claude-agent-acp-plus flag BY CHOICE, like 0010, 0012, 0014 and 0026.
 ---
 
 diff --git a/crates/agent_ui/src/conversation_view.rs b/crates/agent_ui/src/conversation_view.rs
-index 61402ac..2052ffd 100644
+index 48634f1..1c7841a 100644
 --- a/crates/agent_ui/src/conversation_view.rs
 +++ b/crates/agent_ui/src/conversation_view.rs
 @@ -104,13 +104,13 @@ use crate::{
@@ -327,20 +327,20 @@ index 0000000..9bd3ea6
 +    }
 +}
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
-index 5f01f42..31522dd 100644
+index 9b20d03..dd21717 100644
 --- a/crates/agent_ui/src/conversation_view/thread_view.rs
 +++ b/crates/agent_ui/src/conversation_view/thread_view.rs
-@@ -673,6 +673,9 @@ pub struct TurnFields {
-     pub turn_generation: usize,
+@@ -675,6 +675,9 @@ pub struct TurnFields {
      pub turn_started_at: Option<Instant>,
      pub turn_tokens: Option<u64>,
+     pub reported_activity_generation: Option<u64>,
 +    /// The finished turns' durations, summed. Held by the view, so it counts
 +    /// the agent time since this thread was opened here, not since it began.
 +    pub session_duration: Duration,
  }
  
  /// How a tool call is rendered relative to its surroundings.
-@@ -1435,6 +1438,9 @@ impl ThreadView {
+@@ -1443,6 +1446,9 @@ impl ThreadView {
              .turn_started_at
              .take()
              .map(|started| started.elapsed());
@@ -350,7 +350,7 @@ index 5f01f42..31522dd 100644
          self.turn_fields.last_turn_tokens = self.turn_fields.turn_tokens.take();
          self.turn_fields._turn_timer_task = None;
      }
-@@ -6964,19 +6970,52 @@ impl ThreadView {
+@@ -7229,19 +7235,52 @@ impl ThreadView {
  
          let last_turn_clock = show_stats
              .then(|| {
@@ -413,7 +413,7 @@ index 5f01f42..31522dd 100644
              .then(|| {
                  self.turn_fields
                      .last_turn_tokens
-@@ -7055,6 +7094,8 @@ impl ThreadView {
+@@ -7320,6 +7359,8 @@ impl ThreadView {
          if feedback_buttons.is_none()
              && last_turn_clock.is_none()
              && last_turn_tokens_label.is_none()
@@ -422,7 +422,7 @@ index 5f01f42..31522dd 100644
          {
              return Empty.into_any_element();
          }
-@@ -7066,8 +7107,6 @@ impl ThreadView {
+@@ -7331,8 +7372,6 @@ impl ThreadView {
                  .alpha(0.5)
          };
  
@@ -431,7 +431,7 @@ index 5f01f42..31522dd 100644
          // The stats sit on the left: the floating controls occupy the bottom
          // right corner of the conversation, which is exactly where a
          // right-aligned row ends up once the thread is scrolled to its end.
-@@ -7079,15 +7118,30 @@ impl ThreadView {
+@@ -7344,15 +7383,30 @@ impl ThreadView {
              .opacity(0.4)
              .hover(|s| s.opacity(1.))
              .when(
@@ -469,7 +469,7 @@ index 5f01f42..31522dd 100644
                      )
                  },
              )
-@@ -7757,14 +7811,22 @@ impl ThreadView {
+@@ -8022,14 +8076,22 @@ impl ThreadView {
  
      fn render_generating(&self, confirmation: bool, cx: &App) -> impl IntoElement {
          let show_stats = AgentSettings::get_global(cx).show_turn_stats;
@@ -497,7 +497,7 @@ index 5f01f42..31522dd 100644
  
          let is_blocked_on_terminal_command =
              !confirmation && self.is_blocked_on_terminal_command(cx);
-@@ -7824,6 +7886,13 @@ impl ThreadView {
+@@ -8089,6 +8151,13 @@ impl ThreadView {
                          .color(Color::Muted),
                  )
              })

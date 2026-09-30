@@ -123,10 +123,10 @@ index 721ef88..470c00d 100644
      // that offers to resolve conflicts using the agent.
      //
 diff --git a/crates/acp_thread/src/acp_thread.rs b/crates/acp_thread/src/acp_thread.rs
-index bfc0383..388a60f 100644
+index 52dc71e..1c76b1f 100644
 --- a/crates/acp_thread/src/acp_thread.rs
 +++ b/crates/acp_thread/src/acp_thread.rs
-@@ -5667,6 +5667,17 @@ impl AcpThread {
+@@ -5934,6 +5934,17 @@ impl AcpThread {
          Some((index, elicitation))
      }
  
@@ -193,7 +193,7 @@ index 331480c..ab76f65 100644
              tool_permissions: compile_tool_permissions(agent.tool_permissions),
              sandbox_permissions: compile_sandbox_permissions(agent.sandbox_permissions),
 diff --git a/crates/agent_ui/src/agent_panel.rs b/crates/agent_ui/src/agent_panel.rs
-index 0142266..a2618bd 100644
+index 82ada28..ac61428 100644
 --- a/crates/agent_ui/src/agent_panel.rs
 +++ b/crates/agent_ui/src/agent_panel.rs
 @@ -83,7 +83,9 @@ use language::LanguageRegistry;
@@ -207,7 +207,7 @@ index 0142266..a2618bd 100644
  
  use search::{BufferSearchBar, buffer_search::Deploy as DeployBufferSearch};
  use terminal::Event as TerminalEvent;
-@@ -5671,6 +5673,7 @@ impl AgentPanel {
+@@ -5677,6 +5679,7 @@ impl AgentPanel {
              .is_some();
  
          let workspace = self.workspace.clone();
@@ -215,7 +215,7 @@ index 0142266..a2618bd 100644
  
          PopoverMenu::new("agent-options-menu")
              .trigger_with_tooltip(
-@@ -5824,6 +5827,32 @@ impl AgentPanel {
+@@ -5830,6 +5833,32 @@ impl AgentPanel {
                              .action("Worktrees", Box::new(zed_actions::git::Worktree))
                              .action("Toggle Threads Sidebar", Box::new(ToggleWorkspaceSidebar));
  
@@ -261,10 +261,10 @@ index 653279d..5781f3f 100644
              max_idle_retained_threads: 5,
              threads_sidebar: agent_settings::ThreadsSidebarSettings {
 diff --git a/crates/agent_ui/src/conversation_view.rs b/crates/agent_ui/src/conversation_view.rs
-index c7f55ad..cbdfc53 100644
+index 69d7907..dd636d9 100644
 --- a/crates/agent_ui/src/conversation_view.rs
 +++ b/crates/agent_ui/src/conversation_view.rs
-@@ -2564,22 +2564,37 @@ impl ConversationView {
+@@ -2636,22 +2636,37 @@ impl ConversationView {
                      .log_err();
                  }
              },
@@ -992,10 +992,10 @@ index 6b8c2d8..be41aa9 100644
                              on_submit(submit_id.clone(), window, cx);
                          }
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
-index 517415f..5f01f42 100644
+index 4e885cc..9b20d03 100644
 --- a/crates/agent_ui/src/conversation_view/thread_view.rs
 +++ b/crates/agent_ui/src/conversation_view/thread_view.rs
-@@ -41,7 +41,7 @@ use language_model::{
+@@ -42,7 +42,7 @@ use language_model::{
      LanguageModelProvider, LanguageModelProviderId, LanguageModelRegistry, Speed,
  };
  use notifications::status_toast::StatusToast;
@@ -1004,7 +1004,7 @@ index 517415f..5f01f42 100644
  use ui::{
      ButtonLike, CalloutBorderPosition, Checkbox, SpinnerLabel, SpinnerVariant, SplitButton,
      SplitButtonStyle, Tab, ToggleState,
-@@ -50,7 +50,8 @@ use util::markdown::{source_position_from_fragment, split_local_url_fragment};
+@@ -51,7 +51,8 @@ use util::markdown::{source_position_from_fragment, split_local_url_fragment};
  use workspace::{OpenOptions, SERIALIZATION_THROTTLE_TIME};
  
  use super::elicitation::{
@@ -1014,7 +1014,7 @@ index 517415f..5f01f42 100644
  };
  use super::*;
  
-@@ -614,6 +615,7 @@ pub struct ThreadView {
+@@ -615,6 +616,7 @@ pub struct ThreadView {
      pub resumed_without_history: bool,
      pub(crate) permission_selections: HashMap<acp_v1::ToolCallId, PermissionSelection>,
      elicitation_form_states: HashMap<ElicitationEntryId, ElicitationFormState>,
@@ -1022,7 +1022,7 @@ index 517415f..5f01f42 100644
      pub _cancel_task: Option<Task<()>>,
      _save_task: Option<Task<()>>,
      _draft_resolve_task: Option<Task<()>>,
-@@ -1030,6 +1032,7 @@ impl ThreadView {
+@@ -1033,6 +1035,7 @@ impl ThreadView {
              new_server_version_available: None,
              permission_selections: HashMap::default(),
              elicitation_form_states: HashMap::default(),
@@ -1030,7 +1030,7 @@ index 517415f..5f01f42 100644
              _cancel_task: None,
              _save_task: None,
              _draft_resolve_task: None,
-@@ -6617,6 +6620,7 @@ impl ThreadView {
+@@ -6882,6 +6885,7 @@ impl ThreadView {
                  let thread = self.thread.read(cx);
                  if let Some((_, elicitation)) = thread.elicitation(elicitation_id)
                      && should_render_elicitation(elicitation)
@@ -1038,7 +1038,7 @@ index 517415f..5f01f42 100644
                  {
                      let elicitation = self.render_elicitation(entry_ix, elicitation, window, cx);
  
-@@ -6857,10 +6861,22 @@ impl ThreadView {
+@@ -7122,10 +7126,22 @@ impl ThreadView {
                      .log_err();
                  }
              },
@@ -1063,7 +1063,7 @@ index 517415f..5f01f42 100644
                          cx.notify();
                      }
                  })
-@@ -7339,6 +7355,75 @@ impl ThreadView {
+@@ -7604,6 +7620,75 @@ impl ThreadView {
          self.message_editor.read(cx).set_local_commands(commands);
      }
  
@@ -1139,7 +1139,7 @@ index 517415f..5f01f42 100644
      fn render_request_elicitations(&self, cx: &Context<Self>) -> Vec<AnyElement> {
          let server_view = self.server_view.clone();
          let handlers_view = server_view.clone();
-@@ -13051,6 +13136,7 @@ impl Render for ThreadView {
+@@ -13343,6 +13428,7 @@ impl Render for ThreadView {
                  |this, version| this.child(self.render_new_version_callout(&version, cx)),
              )
              .children(self.render_token_limit_callout(cx))
