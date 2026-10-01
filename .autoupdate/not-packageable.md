@@ -237,3 +237,41 @@ entirely), or the overlay deciding it wants a from-source path badly enough to
 accept the R2 regeneration cycle — in which case the recipe is known and
 written above, not research that has to be redone.
 
+---
+
+## `bark.cpp` — C/C++ port of Suno Bark TTS
+
+**Assessed:** 2026-10-01 · **Upstream version then:** tag `v1.0.0` (2024-10-11,
+MIT), `main` at `5d5be84` (2024-11-16) · **Verdict:** rejected — upstream
+abandoned, with an unfixed code-execution bug in its own model loader.
+
+The technical side is fine: the CPU build of `v1.0.0` compiles here with
+CMake 4 and GCC 16, needs no network, and its vendored ggml links statically,
+so it would not collide with `sci-ml/llama-cpp`'s `libggml*.so`. The rejection
+rests on two facts that a patch in `files/` would not make go away:
+
+- **Abandoned.** No commit for ~23 months. The maintainer is active elsewhere —
+  the same fix was merged in `encodec.cpp` on 2026-09-16 — but not on this
+  repository.
+- **Unfixed memory-safety bug.** The weight loader reads `n_dims` from the file
+  unchecked and loops over `int32_t ne[2]` (`bark.cpp` ~L1017; `ne[4]` in the
+  quantizer), so a crafted weights file overflows the stack. The fix,
+  [PR #220](https://github.com/PABannier/bark.cpp/pull/220), has sat unanswered
+  since 2026-08-17. `ttype`, `length`, `nelements` and the vocabulary size are
+  equally unchecked. Carrying a security patch set on a dead upstream means the
+  overlay becomes its only maintainer.
+
+Secondary, but each would have needed its own workaround:
+
+| Issue | Detail |
+|---|---|
+| Stale ggml fork | submodule pins `PABannier/ggml` `aa00e16` (Jan 2024), 4322 commits behind; predates the GGUF parser fixes (CVE-2024-23605, CVE-2024-21836) |
+| No GPU parity | only `GGML_CUBLAS`, `GGML_OPENBLAS`, `GGML_CLBLAST`; no HIP, Vulkan or SYCL, so the overlay's backend rule cannot be met |
+| CUDA | `CUDA_ARCHITECTURES "52;61;70"` hardcoded; CUDA 13 dropped all three |
+| Bundled cpp-httplib 0.14.1 | `server` example; predates CVE-2025-46728 |
+| Conversion scripts | `torch.load` without `weights_only`; `download_weights.py` pins no revision |
+
+**Condition that reopens this:** upstream merges PR #220 *and* resumes
+commits, or an actively maintained fork takes over (with a ggml that tracks
+`ggml-org/ggml`). TTS on ggml in the meantime: `sci-ml/koboldcpp` already ships
+TTS (bundled TTS.cpp).
