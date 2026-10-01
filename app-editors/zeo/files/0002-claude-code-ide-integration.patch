@@ -41,6 +41,15 @@ CLI when it next moves.
 
 Upstream PR #58300 was closed unmerged on 2026-06-30. Discussion #58338 is where
 this work lives now, and where protocol breakage is reported first.
+
+A server is published -- lock file written AND port handed to the project's
+terminals -- only while its workspace has folders (2026-10-01). Every window
+opens with a workspace of its own and the projects of its sidebar arrive as
+further workspaces, so the first one never gets a folder: on that day 7 windows
+held 7 folderless lock files, matching no working directory, alongside two 401
+handshakes. Lock and port move together because the CLI reads the token from
+the lock file of the port it was given: a port without a lock file would make a
+CLI started in that terminal fail the handshake rather than run without an IDE.
 ---
 
 diff --git a/Cargo.lock b/Cargo.lock
@@ -222,10 +231,10 @@ index 0000000..eb59c5d
 +
 diff --git a/crates/claude_code_ide/src/claude_code_ide.rs b/crates/claude_code_ide/src/claude_code_ide.rs
 new file mode 100644
-index 0000000..01d8350
+index 0000000..140faa4
 --- /dev/null
 +++ b/crates/claude_code_ide/src/claude_code_ide.rs
-@@ -0,0 +1,222 @@
+@@ -0,0 +1,245 @@
 +//! IDE-side implementation of the Claude Code editor integration protocol.
 +//!
 +//! This lets the Claude Code CLI connect to Zed the same way it connects to the
@@ -337,10 +346,12 @@ index 0000000..01d8350
 +            }
 +        });
 +
-+        // A workspace's folders are not loaded yet when it is first observed, so
-+        // the lock file `run` writes can start out with an empty folder list.
-+        // The CLI matches its working directory against that list to pick an
-+        // IDE, so rewrite the file whenever the set of folders changes.
++        // A workspace's folders are not loaded yet when it is first observed, and
++        // some workspaces never get any -- every window opens with one, and the
++        // projects of its sidebar arrive as workspaces of their own. The CLI
++        // matches its working directory against the folder list to pick an IDE,
++        // so the lock file is published only while there are folders, and
++        // re-published whenever the set changes.
 +        let worktrees_subscription =
 +            cx.subscribe(&project, |this, _project, event: &project::Event, cx| {
 +                if matches!(
@@ -362,11 +373,10 @@ index 0000000..01d8350
 +        }
 +    }
 +
-+    /// Rewrites this server's lock file with the workspace's current folders.
++    /// Re-publishes this server's lock file for the workspace's current folders.
 +    ///
-+    /// A no-op until the listener is bound, since `run` writes the file itself
-+    /// once it has a port; the write is atomic, so the CLI never reads a
-+    /// half-updated file.
++    /// A no-op until the listener is bound, since `run` publishes once it has a
++    /// port; the write is atomic, so the CLI never reads a half-updated file.
 +    fn rewrite_lockfile(&self, cx: &mut App) {
 +        let (Some(port), Some(auth_token)) = (self.port.get(), self.auth_token.borrow().clone())
 +        else {
@@ -376,7 +386,8 @@ index 0000000..01d8350
 +            return;
 +        };
 +        let folders = workspace_folders_of(workspace.read(cx), cx);
-+        lockfile::create(port, &auth_token, &folders).log_err();
++        let project = workspace.read(cx).project().clone();
++        publish(port, &auth_token, &folders, &project, cx);
 +    }
 +
 +    async fn run(
@@ -389,23 +400,16 @@ index 0000000..01d8350
 +        let (listener, port) = bind().await?;
 +        let auth_token = generate_auth_token();
 +
-+        let workspace_folders = workspace
-+            .update(cx, |workspace, cx| workspace_folders_of(workspace, cx))
-+            .context("reading workspace folders")?;
-+
-+        lockfile::create(port, &auth_token, &workspace_folders)?;
 +        port_cell.set(Some(port));
 +        *auth_token_cell.borrow_mut() = Some(auth_token.clone());
 +
-+        // Publish the port to the project so newly opened terminals advertise it
-+        // to the Claude CLI via `CLAUDE_CODE_SSE_PORT`.
 +        workspace
 +            .update(cx, |workspace, cx| {
-+                workspace
-+                    .project()
-+                    .update(cx, |project, _| project.set_claude_code_ide_port(Some(port)));
++                let folders = workspace_folders_of(workspace, cx);
++                let project = workspace.project().clone();
++                publish(port, &auth_token, &folders, &project, cx);
 +            })
-+            .context("publishing IDE port to project")?;
++            .context("publishing the IDE lock file")?;
 +
 +        log::info!("Claude Code IDE server listening on 127.0.0.1:{port}");
 +
@@ -436,6 +440,34 @@ index 0000000..01d8350
 +    fn drop(&mut self) {
 +        self.remove_lockfile();
 +    }
++}
++
++/// Publishes or withdraws a server, keeping the lock file and the port the
++/// project hands to its terminals (`CLAUDE_CODE_SSE_PORT`) in step.
++///
++/// With folders, the lock file is written and the port published. Without any,
++/// both are withdrawn: a lock file listing no folders matches no working
++/// directory, so it can only mislead the CLI, and a port without a lock file
++/// gives a CLI started in that workspace's terminal no token to authenticate
++/// with -- it would fail the handshake instead of running without an IDE.
++fn publish(
++    port: u16,
++    auth_token: &str,
++    folders: &[PathBuf],
++    project: &Entity<Project>,
++    cx: &mut App,
++) {
++    let advertised = if folders.is_empty() {
++        lockfile::remove(port).log_err();
++        None
++    } else {
++        lockfile::create(port, auth_token, folders)
++            .log_err()
++            .map(|_| port)
++    };
++    project.update(cx, |project, _| {
++        project.set_claude_code_ide_port(advertised)
++    });
 +}
 +
 +/// The absolute paths of a workspace's visible folders, as the lock file and the

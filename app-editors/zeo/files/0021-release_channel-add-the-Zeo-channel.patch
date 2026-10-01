@@ -38,7 +38,8 @@ Across the workspace, each site and the reasoning for its arm:
   client/zed_urls.rs and the crate's own docs_url - Zeo uses Zed Industries'
   servers and documentation; there is no Zeo backend. Both group with Stable.
 
-  auto_update - release_notes_url points at github.com/lucascouts/zeo/releases.
+  auto_update - release_notes_url points at github.com/zeo-workspace/zeo/releases
+  (lucascouts/zeo until 2026-10-01, when the repository moved organizations).
 
   auto_update_ui - an announcement gate whose arms are currently identical;
   recorded here so the next person does not have to re-derive that it is a no-op.
@@ -63,14 +64,14 @@ Decisions D2 and D3 in zeo/docs/REBRAND.md.
 ---
 
 diff --git a/crates/auto_update/src/auto_update.rs b/crates/auto_update/src/auto_update.rs
-index 38324d5..0b6a761 100644
+index 38324d5..4e4a8e7 100644
 --- a/crates/auto_update/src/auto_update.rs
 +++ b/crates/auto_update/src/auto_update.rs
 @@ -359,6 +359,7 @@ pub fn release_notes_url(cx: &mut App) -> Option<String> {
              "https://github.com/zed-industries/zed/commits/nightly/".to_string()
          }
          ReleaseChannel::Dev => "https://github.com/zed-industries/zed/commits/main/".to_string(),
-+        ReleaseChannel::Zeo => "https://github.com/lucascouts/zeo/releases".to_string(),
++        ReleaseChannel::Zeo => "https://github.com/zeo-workspace/zeo/releases".to_string(),
      };
      Some(url)
  }
