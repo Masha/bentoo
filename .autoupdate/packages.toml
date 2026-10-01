@@ -11779,3 +11779,566 @@ core-js or it ships stable under MIT, the npm bundle becomes installable as
 is and this source build can be simplified.
 """
 # END
+
+["dev-qt/qt3d"]
+url = "https://download.qt.io/official_releases/qt/6.12/"
+parser = "regex"
+pattern = 'href="(6\.12\.[0-9]+)/"'
+select = "max"
+version = "6.12.0"
+comments = """
+qt3d -- Qt 6.12 LTS family (32 modules), all released together from one
+download.qt.io directory. TEMPORARY MIRROR of ::gentoo's 6.12.9999 ebuild,
+shipped ahead of ::gentoo: once ::gentoo carries dev-qt/qt3d-6.12.x, remove the
+ebuild and set enabled = false here. The URL pins the 6.12 series on purpose:
+6.13 is a new decision, not a bump. Bumped in lockstep with every module,
+since each ebuild pins ~dev-qt/qtbase-${PV}. qtwebengine is NOT part of this
+family any more (see its own record).
+"""
+# END
+
+["dev-qt/qt5compat"]
+url = "https://download.qt.io/official_releases/qt/6.12/"
+parser = "regex"
+pattern = 'href="(6\.12\.[0-9]+)/"'
+select = "max"
+version = "6.12.0"
+comments = """
+qt5compat -- Qt 6.12 LTS family (32 modules), all released together from one
+download.qt.io directory. TEMPORARY MIRROR of ::gentoo's 6.12.9999 ebuild,
+shipped ahead of ::gentoo: once ::gentoo carries dev-qt/qt5compat-6.12.x, remove the
+ebuild and set enabled = false here. The URL pins the 6.12 series on purpose:
+6.13 is a new decision, not a bump. Bumped in lockstep with every module,
+since each ebuild pins ~dev-qt/qtbase-${PV}. qtwebengine is NOT part of this
+family any more (see its own record).
+"""
+# END
+
+["dev-qt/qtbase"]
+url = "https://download.qt.io/official_releases/qt/6.12/"
+parser = "regex"
+pattern = 'href="(6\.12\.[0-9]+)/"'
+select = "max"
+version = "6.12.0"
+comments = """
+qtbase -- Qt 6.12 LTS family (32 modules), all released together from one
+download.qt.io directory. TEMPORARY MIRROR of ::gentoo's 6.12.9999 ebuild,
+shipped ahead of ::gentoo: once ::gentoo carries dev-qt/qtbase-6.12.x, remove the
+ebuild and set enabled = false here. The URL pins the 6.12 series on purpose:
+6.13 is a new decision, not a bump. Bumped in lockstep with every module,
+since each ebuild pins ~dev-qt/qtbase-${PV}. qtwebengine is NOT part of this
+family any more (see its own record).
+"""
+# END
+
+["dev-qt/qtcharts"]
+url = "https://download.qt.io/official_releases/qt/6.12/"
+parser = "regex"
+pattern = 'href="(6\.12\.[0-9]+)/"'
+select = "max"
+version = "6.12.0"
+comments = """
+qtcharts -- Qt 6.12 LTS family (32 modules), all released together from one
+download.qt.io directory. TEMPORARY MIRROR of ::gentoo's 6.12.9999 ebuild,
+shipped ahead of ::gentoo: once ::gentoo carries dev-qt/qtcharts-6.12.x, remove the
+ebuild and set enabled = false here. The URL pins the 6.12 series on purpose:
+6.13 is a new decision, not a bump. Bumped in lockstep with every module,
+since each ebuild pins ~dev-qt/qtbase-${PV}. qtwebengine is NOT part of this
+family any more (see its own record).
+"""
+# END
+
+["dev-qt/qtconnectivity"]
+url = "https://download.qt.io/official_releases/qt/6.12/"
+parser = "regex"
+pattern = 'href="(6\.12\.[0-9]+)/"'
+select = "max"
+version = "6.12.0"
+comments = """
+qtconnectivity -- Qt 6.12 LTS family (32 modules), all released together from one
+download.qt.io directory. TEMPORARY MIRROR of ::gentoo's 6.12.9999 ebuild,
+shipped ahead of ::gentoo: once ::gentoo carries dev-qt/qtconnectivity-6.12.x, remove the
+ebuild and set enabled = false here. The URL pins the 6.12 series on purpose:
+6.13 is a new decision, not a bump. Bumped in lockstep with every module,
+since each ebuild pins ~dev-qt/qtbase-${PV}. qtwebengine is NOT part of this
+family any more (see its own record).
+"""
+# END
+
+["dev-qt/qtdeclarative"]
+url = "https://download.qt.io/official_releases/qt/6.12/"
+parser = "regex"
+pattern = 'href="(6\.12\.[0-9]+)/"'
+select = "max"
+version = "6.12.0"
+comments = """
+qtdeclarative -- Qt 6.12 LTS family (32 modules), all released together from one
+download.qt.io directory. TEMPORARY MIRROR of ::gentoo's 6.12.9999 ebuild,
+shipped ahead of ::gentoo: once ::gentoo carries dev-qt/qtdeclarative-6.12.x, remove the
+ebuild and set enabled = false here. The URL pins the 6.12 series on purpose:
+6.13 is a new decision, not a bump. Bumped in lockstep with every module,
+since each ebuild pins ~dev-qt/qtbase-${PV}. qtwebengine is NOT part of this
+family any more (see its own record).
+"""
+# END
+
+["dev-qt/qtgraphs"]
+url = "https://download.qt.io/official_releases/qt/6.12/"
+parser = "regex"
+pattern = 'href="(6\.12\.[0-9]+)/"'
+select = "max"
+version = "6.12.0"
+comments = """
+qtgraphs -- Qt 6.12 LTS family (32 modules), all released together from one
+download.qt.io directory. TEMPORARY MIRROR of ::gentoo's 6.12.9999 ebuild,
+shipped ahead of ::gentoo: once ::gentoo carries dev-qt/qtgraphs-6.12.x, remove the
+ebuild and set enabled = false here. The URL pins the 6.12 series on purpose:
+6.13 is a new decision, not a bump. Bumped in lockstep with every module,
+since each ebuild pins ~dev-qt/qtbase-${PV}. qtwebengine is NOT part of this
+family any more (see its own record).
+"""
+# END
+
+["dev-qt/qthttpserver"]
+url = "https://download.qt.io/official_releases/qt/6.12/"
+parser = "regex"
+pattern = 'href="(6\.12\.[0-9]+)/"'
+select = "max"
+version = "6.12.0"
+comments = """
+qthttpserver -- Qt 6.12 LTS family (32 modules), all released together from one
+download.qt.io directory. TEMPORARY MIRROR of ::gentoo's 6.12.9999 ebuild,
+shipped ahead of ::gentoo: once ::gentoo carries dev-qt/qthttpserver-6.12.x, remove the
+ebuild and set enabled = false here. The URL pins the 6.12 series on purpose:
+6.13 is a new decision, not a bump. Bumped in lockstep with every module,
+since each ebuild pins ~dev-qt/qtbase-${PV}. qtwebengine is NOT part of this
+family any more (see its own record).
+"""
+# END
+
+["dev-qt/qtimageformats"]
+url = "https://download.qt.io/official_releases/qt/6.12/"
+parser = "regex"
+pattern = 'href="(6\.12\.[0-9]+)/"'
+select = "max"
+version = "6.12.0"
+comments = """
+qtimageformats -- Qt 6.12 LTS family (32 modules), all released together from one
+download.qt.io directory. TEMPORARY MIRROR of ::gentoo's 6.12.9999 ebuild,
+shipped ahead of ::gentoo: once ::gentoo carries dev-qt/qtimageformats-6.12.x, remove the
+ebuild and set enabled = false here. The URL pins the 6.12 series on purpose:
+6.13 is a new decision, not a bump. Bumped in lockstep with every module,
+since each ebuild pins ~dev-qt/qtbase-${PV}. qtwebengine is NOT part of this
+family any more (see its own record).
+"""
+# END
+
+["dev-qt/qtlanguageserver"]
+url = "https://download.qt.io/official_releases/qt/6.12/"
+parser = "regex"
+pattern = 'href="(6\.12\.[0-9]+)/"'
+select = "max"
+version = "6.12.0"
+comments = """
+qtlanguageserver -- Qt 6.12 LTS family (32 modules), all released together from one
+download.qt.io directory. TEMPORARY MIRROR of ::gentoo's 6.12.9999 ebuild,
+shipped ahead of ::gentoo: once ::gentoo carries dev-qt/qtlanguageserver-6.12.x, remove the
+ebuild and set enabled = false here. The URL pins the 6.12 series on purpose:
+6.13 is a new decision, not a bump. Bumped in lockstep with every module,
+since each ebuild pins ~dev-qt/qtbase-${PV}. qtwebengine is NOT part of this
+family any more (see its own record).
+"""
+# END
+
+["dev-qt/qtlocation"]
+url = "https://download.qt.io/official_releases/qt/6.12/"
+parser = "regex"
+pattern = 'href="(6\.12\.[0-9]+)/"'
+select = "max"
+version = "6.12.0"
+comments = """
+qtlocation -- Qt 6.12 LTS family (32 modules), all released together from one
+download.qt.io directory. TEMPORARY MIRROR of ::gentoo's 6.12.9999 ebuild,
+shipped ahead of ::gentoo: once ::gentoo carries dev-qt/qtlocation-6.12.x, remove the
+ebuild and set enabled = false here. The URL pins the 6.12 series on purpose:
+6.13 is a new decision, not a bump. Bumped in lockstep with every module,
+since each ebuild pins ~dev-qt/qtbase-${PV}. qtwebengine is NOT part of this
+family any more (see its own record).
+"""
+# END
+
+["dev-qt/qtmultimedia"]
+url = "https://download.qt.io/official_releases/qt/6.12/"
+parser = "regex"
+pattern = 'href="(6\.12\.[0-9]+)/"'
+select = "max"
+version = "6.12.0"
+comments = """
+qtmultimedia -- Qt 6.12 LTS family (32 modules), all released together from one
+download.qt.io directory. TEMPORARY MIRROR of ::gentoo's 6.12.9999 ebuild,
+shipped ahead of ::gentoo: once ::gentoo carries dev-qt/qtmultimedia-6.12.x, remove the
+ebuild and set enabled = false here. The URL pins the 6.12 series on purpose:
+6.13 is a new decision, not a bump. Bumped in lockstep with every module,
+since each ebuild pins ~dev-qt/qtbase-${PV}. qtwebengine is NOT part of this
+family any more (see its own record).
+"""
+# END
+
+["dev-qt/qtnetworkauth"]
+url = "https://download.qt.io/official_releases/qt/6.12/"
+parser = "regex"
+pattern = 'href="(6\.12\.[0-9]+)/"'
+select = "max"
+version = "6.12.0"
+comments = """
+qtnetworkauth -- Qt 6.12 LTS family (32 modules), all released together from one
+download.qt.io directory. TEMPORARY MIRROR of ::gentoo's 6.12.9999 ebuild,
+shipped ahead of ::gentoo: once ::gentoo carries dev-qt/qtnetworkauth-6.12.x, remove the
+ebuild and set enabled = false here. The URL pins the 6.12 series on purpose:
+6.13 is a new decision, not a bump. Bumped in lockstep with every module,
+since each ebuild pins ~dev-qt/qtbase-${PV}. qtwebengine is NOT part of this
+family any more (see its own record).
+"""
+# END
+
+["dev-qt/qtpositioning"]
+url = "https://download.qt.io/official_releases/qt/6.12/"
+parser = "regex"
+pattern = 'href="(6\.12\.[0-9]+)/"'
+select = "max"
+version = "6.12.0"
+comments = """
+qtpositioning -- Qt 6.12 LTS family (32 modules), all released together from one
+download.qt.io directory. TEMPORARY MIRROR of ::gentoo's 6.12.9999 ebuild,
+shipped ahead of ::gentoo: once ::gentoo carries dev-qt/qtpositioning-6.12.x, remove the
+ebuild and set enabled = false here. The URL pins the 6.12 series on purpose:
+6.13 is a new decision, not a bump. Bumped in lockstep with every module,
+since each ebuild pins ~dev-qt/qtbase-${PV}. qtwebengine is NOT part of this
+family any more (see its own record).
+"""
+# END
+
+["dev-qt/qtquick3d"]
+url = "https://download.qt.io/official_releases/qt/6.12/"
+parser = "regex"
+pattern = 'href="(6\.12\.[0-9]+)/"'
+select = "max"
+version = "6.12.0"
+comments = """
+qtquick3d -- Qt 6.12 LTS family (32 modules), all released together from one
+download.qt.io directory. TEMPORARY MIRROR of ::gentoo's 6.12.9999 ebuild,
+shipped ahead of ::gentoo: once ::gentoo carries dev-qt/qtquick3d-6.12.x, remove the
+ebuild and set enabled = false here. The URL pins the 6.12 series on purpose:
+6.13 is a new decision, not a bump. Bumped in lockstep with every module,
+since each ebuild pins ~dev-qt/qtbase-${PV}. qtwebengine is NOT part of this
+family any more (see its own record).
+"""
+# END
+
+["dev-qt/qtquicktimeline"]
+url = "https://download.qt.io/official_releases/qt/6.12/"
+parser = "regex"
+pattern = 'href="(6\.12\.[0-9]+)/"'
+select = "max"
+version = "6.12.0"
+comments = """
+qtquicktimeline -- Qt 6.12 LTS family (32 modules), all released together from one
+download.qt.io directory. TEMPORARY MIRROR of ::gentoo's 6.12.9999 ebuild,
+shipped ahead of ::gentoo: once ::gentoo carries dev-qt/qtquicktimeline-6.12.x, remove the
+ebuild and set enabled = false here. The URL pins the 6.12 series on purpose:
+6.13 is a new decision, not a bump. Bumped in lockstep with every module,
+since each ebuild pins ~dev-qt/qtbase-${PV}. qtwebengine is NOT part of this
+family any more (see its own record).
+"""
+# END
+
+["dev-qt/qtremoteobjects"]
+url = "https://download.qt.io/official_releases/qt/6.12/"
+parser = "regex"
+pattern = 'href="(6\.12\.[0-9]+)/"'
+select = "max"
+version = "6.12.0"
+comments = """
+qtremoteobjects -- Qt 6.12 LTS family (32 modules), all released together from one
+download.qt.io directory. TEMPORARY MIRROR of ::gentoo's 6.12.9999 ebuild,
+shipped ahead of ::gentoo: once ::gentoo carries dev-qt/qtremoteobjects-6.12.x, remove the
+ebuild and set enabled = false here. The URL pins the 6.12 series on purpose:
+6.13 is a new decision, not a bump. Bumped in lockstep with every module,
+since each ebuild pins ~dev-qt/qtbase-${PV}. qtwebengine is NOT part of this
+family any more (see its own record).
+"""
+# END
+
+["dev-qt/qtscxml"]
+url = "https://download.qt.io/official_releases/qt/6.12/"
+parser = "regex"
+pattern = 'href="(6\.12\.[0-9]+)/"'
+select = "max"
+version = "6.12.0"
+comments = """
+qtscxml -- Qt 6.12 LTS family (32 modules), all released together from one
+download.qt.io directory. TEMPORARY MIRROR of ::gentoo's 6.12.9999 ebuild,
+shipped ahead of ::gentoo: once ::gentoo carries dev-qt/qtscxml-6.12.x, remove the
+ebuild and set enabled = false here. The URL pins the 6.12 series on purpose:
+6.13 is a new decision, not a bump. Bumped in lockstep with every module,
+since each ebuild pins ~dev-qt/qtbase-${PV}. qtwebengine is NOT part of this
+family any more (see its own record).
+"""
+# END
+
+["dev-qt/qtsensors"]
+url = "https://download.qt.io/official_releases/qt/6.12/"
+parser = "regex"
+pattern = 'href="(6\.12\.[0-9]+)/"'
+select = "max"
+version = "6.12.0"
+comments = """
+qtsensors -- Qt 6.12 LTS family (32 modules), all released together from one
+download.qt.io directory. TEMPORARY MIRROR of ::gentoo's 6.12.9999 ebuild,
+shipped ahead of ::gentoo: once ::gentoo carries dev-qt/qtsensors-6.12.x, remove the
+ebuild and set enabled = false here. The URL pins the 6.12 series on purpose:
+6.13 is a new decision, not a bump. Bumped in lockstep with every module,
+since each ebuild pins ~dev-qt/qtbase-${PV}. qtwebengine is NOT part of this
+family any more (see its own record).
+"""
+# END
+
+["dev-qt/qtserialbus"]
+url = "https://download.qt.io/official_releases/qt/6.12/"
+parser = "regex"
+pattern = 'href="(6\.12\.[0-9]+)/"'
+select = "max"
+version = "6.12.0"
+comments = """
+qtserialbus -- Qt 6.12 LTS family (32 modules), all released together from one
+download.qt.io directory. TEMPORARY MIRROR of ::gentoo's 6.12.9999 ebuild,
+shipped ahead of ::gentoo: once ::gentoo carries dev-qt/qtserialbus-6.12.x, remove the
+ebuild and set enabled = false here. The URL pins the 6.12 series on purpose:
+6.13 is a new decision, not a bump. Bumped in lockstep with every module,
+since each ebuild pins ~dev-qt/qtbase-${PV}. qtwebengine is NOT part of this
+family any more (see its own record).
+"""
+# END
+
+["dev-qt/qtserialport"]
+url = "https://download.qt.io/official_releases/qt/6.12/"
+parser = "regex"
+pattern = 'href="(6\.12\.[0-9]+)/"'
+select = "max"
+version = "6.12.0"
+comments = """
+qtserialport -- Qt 6.12 LTS family (32 modules), all released together from one
+download.qt.io directory. TEMPORARY MIRROR of ::gentoo's 6.12.9999 ebuild,
+shipped ahead of ::gentoo: once ::gentoo carries dev-qt/qtserialport-6.12.x, remove the
+ebuild and set enabled = false here. The URL pins the 6.12 series on purpose:
+6.13 is a new decision, not a bump. Bumped in lockstep with every module,
+since each ebuild pins ~dev-qt/qtbase-${PV}. qtwebengine is NOT part of this
+family any more (see its own record).
+"""
+# END
+
+["dev-qt/qtshadertools"]
+url = "https://download.qt.io/official_releases/qt/6.12/"
+parser = "regex"
+pattern = 'href="(6\.12\.[0-9]+)/"'
+select = "max"
+version = "6.12.0"
+comments = """
+qtshadertools -- Qt 6.12 LTS family (32 modules), all released together from one
+download.qt.io directory. TEMPORARY MIRROR of ::gentoo's 6.12.9999 ebuild,
+shipped ahead of ::gentoo: once ::gentoo carries dev-qt/qtshadertools-6.12.x, remove the
+ebuild and set enabled = false here. The URL pins the 6.12 series on purpose:
+6.13 is a new decision, not a bump. Bumped in lockstep with every module,
+since each ebuild pins ~dev-qt/qtbase-${PV}. qtwebengine is NOT part of this
+family any more (see its own record).
+"""
+# END
+
+["dev-qt/qtspeech"]
+url = "https://download.qt.io/official_releases/qt/6.12/"
+parser = "regex"
+pattern = 'href="(6\.12\.[0-9]+)/"'
+select = "max"
+version = "6.12.0"
+comments = """
+qtspeech -- Qt 6.12 LTS family (32 modules), all released together from one
+download.qt.io directory. TEMPORARY MIRROR of ::gentoo's 6.12.9999 ebuild,
+shipped ahead of ::gentoo: once ::gentoo carries dev-qt/qtspeech-6.12.x, remove the
+ebuild and set enabled = false here. The URL pins the 6.12 series on purpose:
+6.13 is a new decision, not a bump. Bumped in lockstep with every module,
+since each ebuild pins ~dev-qt/qtbase-${PV}. qtwebengine is NOT part of this
+family any more (see its own record).
+"""
+# END
+
+["dev-qt/qtsvg"]
+url = "https://download.qt.io/official_releases/qt/6.12/"
+parser = "regex"
+pattern = 'href="(6\.12\.[0-9]+)/"'
+select = "max"
+version = "6.12.0"
+comments = """
+qtsvg -- Qt 6.12 LTS family (32 modules), all released together from one
+download.qt.io directory. TEMPORARY MIRROR of ::gentoo's 6.12.9999 ebuild,
+shipped ahead of ::gentoo: once ::gentoo carries dev-qt/qtsvg-6.12.x, remove the
+ebuild and set enabled = false here. The URL pins the 6.12 series on purpose:
+6.13 is a new decision, not a bump. Bumped in lockstep with every module,
+since each ebuild pins ~dev-qt/qtbase-${PV}. qtwebengine is NOT part of this
+family any more (see its own record).
+"""
+# END
+
+["dev-qt/qttasktree"]
+url = "https://download.qt.io/official_releases/qt/6.12/"
+parser = "regex"
+pattern = 'href="(6\.12\.[0-9]+)/"'
+select = "max"
+version = "6.12.0"
+comments = """
+qttasktree -- Qt 6.12 LTS family (32 modules), all released together from one
+download.qt.io directory. TEMPORARY MIRROR of ::gentoo's 6.12.9999 ebuild,
+shipped ahead of ::gentoo: once ::gentoo carries dev-qt/qttasktree-6.12.x, remove the
+ebuild and set enabled = false here. The URL pins the 6.12 series on purpose:
+6.13 is a new decision, not a bump. Bumped in lockstep with every module,
+since each ebuild pins ~dev-qt/qtbase-${PV}. qtwebengine is NOT part of this
+family any more (see its own record).
+"""
+# END
+
+["dev-qt/qttools"]
+url = "https://download.qt.io/official_releases/qt/6.12/"
+parser = "regex"
+pattern = 'href="(6\.12\.[0-9]+)/"'
+select = "max"
+version = "6.12.0"
+comments = """
+qttools -- Qt 6.12 LTS family (32 modules), all released together from one
+download.qt.io directory. TEMPORARY MIRROR of ::gentoo's 6.12.9999 ebuild,
+shipped ahead of ::gentoo: once ::gentoo carries dev-qt/qttools-6.12.x, remove the
+ebuild and set enabled = false here. The URL pins the 6.12 series on purpose:
+6.13 is a new decision, not a bump. Bumped in lockstep with every module,
+since each ebuild pins ~dev-qt/qtbase-${PV}. qtwebengine is NOT part of this
+family any more (see its own record).
+"""
+# END
+
+["dev-qt/qttranslations"]
+url = "https://download.qt.io/official_releases/qt/6.12/"
+parser = "regex"
+pattern = 'href="(6\.12\.[0-9]+)/"'
+select = "max"
+version = "6.12.0"
+comments = """
+qttranslations -- Qt 6.12 LTS family (32 modules), all released together from one
+download.qt.io directory. TEMPORARY MIRROR of ::gentoo's 6.12.9999 ebuild,
+shipped ahead of ::gentoo: once ::gentoo carries dev-qt/qttranslations-6.12.x, remove the
+ebuild and set enabled = false here. The URL pins the 6.12 series on purpose:
+6.13 is a new decision, not a bump. Bumped in lockstep with every module,
+since each ebuild pins ~dev-qt/qtbase-${PV}. qtwebengine is NOT part of this
+family any more (see its own record).
+"""
+# END
+
+["dev-qt/qtvirtualkeyboard"]
+url = "https://download.qt.io/official_releases/qt/6.12/"
+parser = "regex"
+pattern = 'href="(6\.12\.[0-9]+)/"'
+select = "max"
+version = "6.12.0"
+comments = """
+qtvirtualkeyboard -- Qt 6.12 LTS family (32 modules), all released together from one
+download.qt.io directory. TEMPORARY MIRROR of ::gentoo's 6.12.9999 ebuild,
+shipped ahead of ::gentoo: once ::gentoo carries dev-qt/qtvirtualkeyboard-6.12.x, remove the
+ebuild and set enabled = false here. The URL pins the 6.12 series on purpose:
+6.13 is a new decision, not a bump. Bumped in lockstep with every module,
+since each ebuild pins ~dev-qt/qtbase-${PV}. qtwebengine is NOT part of this
+family any more (see its own record).
+"""
+# END
+
+["dev-qt/qtwayland"]
+url = "https://download.qt.io/official_releases/qt/6.12/"
+parser = "regex"
+pattern = 'href="(6\.12\.[0-9]+)/"'
+select = "max"
+version = "6.12.0"
+comments = """
+qtwayland -- Qt 6.12 LTS family (32 modules), all released together from one
+download.qt.io directory. TEMPORARY MIRROR of ::gentoo's 6.12.9999 ebuild,
+shipped ahead of ::gentoo: once ::gentoo carries dev-qt/qtwayland-6.12.x, remove the
+ebuild and set enabled = false here. The URL pins the 6.12 series on purpose:
+6.13 is a new decision, not a bump. Bumped in lockstep with every module,
+since each ebuild pins ~dev-qt/qtbase-${PV}. qtwebengine is NOT part of this
+family any more (see its own record).
+"""
+# END
+
+["dev-qt/qtwebchannel"]
+url = "https://download.qt.io/official_releases/qt/6.12/"
+parser = "regex"
+pattern = 'href="(6\.12\.[0-9]+)/"'
+select = "max"
+version = "6.12.0"
+comments = """
+qtwebchannel -- Qt 6.12 LTS family (32 modules), all released together from one
+download.qt.io directory. TEMPORARY MIRROR of ::gentoo's 6.12.9999 ebuild,
+shipped ahead of ::gentoo: once ::gentoo carries dev-qt/qtwebchannel-6.12.x, remove the
+ebuild and set enabled = false here. The URL pins the 6.12 series on purpose:
+6.13 is a new decision, not a bump. Bumped in lockstep with every module,
+since each ebuild pins ~dev-qt/qtbase-${PV}. qtwebengine is NOT part of this
+family any more (see its own record).
+"""
+# END
+
+["dev-qt/qtwebsockets"]
+url = "https://download.qt.io/official_releases/qt/6.12/"
+parser = "regex"
+pattern = 'href="(6\.12\.[0-9]+)/"'
+select = "max"
+version = "6.12.0"
+comments = """
+qtwebsockets -- Qt 6.12 LTS family (32 modules), all released together from one
+download.qt.io directory. TEMPORARY MIRROR of ::gentoo's 6.12.9999 ebuild,
+shipped ahead of ::gentoo: once ::gentoo carries dev-qt/qtwebsockets-6.12.x, remove the
+ebuild and set enabled = false here. The URL pins the 6.12 series on purpose:
+6.13 is a new decision, not a bump. Bumped in lockstep with every module,
+since each ebuild pins ~dev-qt/qtbase-${PV}. qtwebengine is NOT part of this
+family any more (see its own record).
+"""
+# END
+
+["dev-qt/qtwebview"]
+url = "https://download.qt.io/official_releases/qt/6.12/"
+parser = "regex"
+pattern = 'href="(6\.12\.[0-9]+)/"'
+select = "max"
+version = "6.12.0"
+comments = """
+qtwebview -- Qt 6.12 LTS family (32 modules), all released together from one
+download.qt.io directory. TEMPORARY MIRROR of ::gentoo's 6.12.9999 ebuild,
+shipped ahead of ::gentoo: once ::gentoo carries dev-qt/qtwebview-6.12.x, remove the
+ebuild and set enabled = false here. The URL pins the 6.12 series on purpose:
+6.13 is a new decision, not a bump. Bumped in lockstep with every module,
+since each ebuild pins ~dev-qt/qtbase-${PV}. qtwebengine is NOT part of this
+family any more (see its own record).
+"""
+# END
+
+["dev-qt/qtwebengine"]
+hold = true
+url = "https://download.qt.io/development_releases/qtwebengine/"
+parser = "regex"
+pattern = 'href="(6\.[0-9]+\.[0-9]+-(?:rc|beta[0-9]*))/"'
+transform = [['-', "_"]]
+select = "max"
+version = "6.140.0_rc"
+comments = """
+qtwebengine -- since 6.140 released apart from Qt and numbered after its
+Chromium base; 6.11.2 was the last one inside the Qt release and it pins
+~qtbase-6.11.2, so the 6.12 family needs this one. HELD: the RC lives under
+development_releases/qtwebengine/<ver>/ with no submodules/ dir, and the
+final's path is not known until it ships -- the SRC_URI is hand-written in
+the ebuild. Also carries ionen's 6.11-patchset-5 like ::gentoo's 6.140.9999.
+TEMPORARY MIRROR: remove once ::gentoo ships any qtwebengine-6.140.
+"""
+# END
