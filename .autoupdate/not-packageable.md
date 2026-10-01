@@ -275,3 +275,73 @@ Secondary, but each would have needed its own workaround:
 commits, or an actively maintained fork takes over (with a ggml that tracks
 `ggml-org/ggml`). TTS on ggml in the meantime: `sci-ml/koboldcpp` already ships
 TTS (bundled TTS.cpp).
+
+---
+
+## `com.collaboraoffice.Office` — Collabora Office (desktop)
+
+**Assessed:** 2026-10-01 · **Upstream version then:** `26.04.3.3-1` (Flathub
+commit dated 2026-09-14, MPL-2.0) · **Verdict:** not packageable as a native
+ebuild for now.
+
+Collabora's desktop suite is LibreOffice core plus the Collabora Online UI,
+shipped in a Qt WebEngine shell (`coda-qt`). For Linux it is published **only**
+as a Flatpak (Flathub) and a Snap; the official page links to Flathub and
+nothing else — no tarball, `.deb`, `.rpm` or AppImage.
+
+| Path | Why not |
+|---|---|
+| Repack the Flatpak payload | built against `org.kde.Platform/x86_64/6.10` with base `io.qt.qtwebengine.BaseApp/6.10`; an ebuild would have to rebuild that runtime layout under `/app` and re-patch it every release (454 MB download, 1.2 GB installed) |
+| Build from source | a second LibreOffice build (Collabora's `core` branch) plus the `online` browser UI and the Qt shell — hours per bump and a maintenance load out of proportion for a catalog alternative to `app-office/libreoffice` |
+
+Users are served by `sys-apps/flatpak`:
+
+```bash
+flatpak install flathub com.collaboraoffice.Office
+```
+
+### How to re-verify
+
+```bash
+flatpak remote-info flathub com.collaboraoffice.Office      # version, runtime, date
+flatpak remote-info -m flathub com.collaboraoffice.Office   # runtime/base/command
+curl -sL https://www.collaboraonline.com/collabora-office/ \
+  | grep -oiE 'href="[^"]*\.(appimage|deb|rpm|tar\.[a-z]+|tgz)"'
+```
+
+**Condition that reopens this:** Collabora publishes a standalone Linux
+artifact (tarball, `.deb`, `.rpm` or AppImage).
+
+---
+
+## `Euro-Office/DesktopEditors` — Euro-Office desktop editors
+
+**Assessed:** 2026-10-01 · **Upstream version then:** tag `v9.4.0` (no GitHub
+release), default branch at `16d1a01` (2026-07-02) · **Verdict:** not
+packageable yet — no binary release, and the source build is not ebuild-shaped.
+
+Euro-Office is the European fork of ONLYOFFICE (Nextcloud, IONOS and others).
+`DesktopEditors` is a superproject of submodules (`core`, `sdkjs`, `web-apps`,
+`desktop-apps`, `desktop-sdk`, …) and the repository has tags but **no
+releases, so no downloadable Linux artifact**. GitHub does not detect a license
+(`NOASSERTION`): the top-level `LICENSE` is the inherited Ascensio text.
+
+| Path | Why not |
+|---|---|
+| Binary | none published |
+| Build from source | the Linux build is driven by Docker (`build/docker-bake.hcl`, `build/.docker`), not by a build system Portage can run in its sandbox |
+
+The upstream it forks is already available: `app-office/onlyoffice-bin`
+(::gentoo).
+
+### How to re-verify
+
+```bash
+gh api repos/Euro-Office/DesktopEditors/releases --jq '.[0:3][] | "\(.tag_name) \([.assets[].name]|join(","))"'
+gh api repos/Euro-Office/DesktopEditors/tags --jq '.[0:3][].name'
+gh api repos/Euro-Office/DesktopEditors/contents/build --jq '.[].name'
+```
+
+**Condition that reopens this:** a GitHub release with a Linux binary asset
+(tarball, `.deb`, `.rpm` or AppImage), which would make an `-bin` ebuild like
+`onlyoffice-bin` possible.
