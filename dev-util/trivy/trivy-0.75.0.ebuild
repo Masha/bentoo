@@ -22,10 +22,8 @@ RESTRICT="network-sandbox test"
 
 # Go 1.27 is the floor, not a preference: pkg/x/json and the CloudFormation
 # parser use encoding/json/v2, which graduated from GOEXPERIMENT to a
-# default-on package in 1.27, and the patch below targets that finalized API.
+# default-on package in 1.27, and upstream now targets that finalized API.
 BDEPEND=">=dev-lang/go-1.27.0"
-
-PATCHES=( "${FILESDIR}"/${PN}-json-v2-errunsupported.patch )
 
 src_unpack() {
 	default

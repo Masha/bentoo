@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@proton.me</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<longdescription lang="en">
+		Cline for Desktop (beta) is a standalone desktop application for the
+		Cline autonomous coding agent: it plans and applies multi-file edits,
+		runs commands, works on remote machines over SSH, schedules recurring
+		agent runs and installs skills, MCP servers and plugins from a
+		marketplace, using an API key from any of the supported providers.
+
+		It is a Tauri app on top of the system WebKitGTK, with the agent itself
+		running in a bundled Bun executable. This package installs the
+		upstream prebuilt .deb unchanged. A from-source build of the cline
+		monorepo is not offered (its bun workspace pulls about 3300 npm
+		packages), see .autoupdate/not-packageable.md in the overlay.
+
+		The terminal build of Cline is a separate package,
+		dev-util/cline-bin, and installs alongside this one.
+	</longdescription>
+	<upstream>
+		<remote-id type="github">cline/cline</remote-id>
+		<bugs-to>https://github.com/cline/cline/issues</bugs-to>
+		<doc lang="en">https://docs.cline.bot/usage/cline-desktop</doc>
+	</upstream>
+</pkgmetadata>

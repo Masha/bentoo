@@ -185,7 +185,7 @@
 url = "https://registry.npmjs.org/@anthropic-ai/claude-code"
 parser = "json"
 path = "dist-tags.latest"
-version = "2.1.286"
+version = "2.1.287"
 comments = """
 claude-code — npm @anthropic-ai/claude-code; dist-tags.latest is the stable channel.
 
@@ -1562,7 +1562,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.31.1"
+version = "0.32.0"
 comments = """
 bentoolkit — releases/latest devolve tag_name "vX.Y.Z"; o transform tira o "v",
 senao o bump gera um PV invalido (bentoolkit-v0.17.0).
@@ -1826,7 +1826,7 @@ parser = "json"
 path = "tag_name"
 transform = [["^v", ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "2.3.3"
+version = "2.5.1"
 comments = """
 oidn -- GitHub release tag "vX.Y.Z"; the transform strips the "v".
 
@@ -1919,7 +1919,7 @@ commit_sha_path = "[0].id"
 base_from = "file"
 base_url = "https://code.videolan.org/videolan/vlc/-/raw/master/configure.ac"
 base_pattern = 'AC_INIT\(\[vlc\], \[([0-9][0-9.]*)-dev\]\)'
-version = "4.0.0_pre20260929"
+version = "4.0.0_pre20261001"
 comments = """
 vlc — 4.0 development snapshot, commit-tracked on master; _pre suffix
 preserved from the current ebuild. Only the 4.0 line lives here: 3.0.x is
@@ -3049,7 +3049,7 @@ transform = [['T.*', ""], ['-', ""]]
 commit_sha_path = "[0].sha"
 base_from = "none"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.1.0_p20261001"
+version = "0.1.0_p20261001-r2"
 comments = """
 zeo — commit-tracked on Zed's main; the snapshot plus the bentoo patch series and
 the rebrand. 2026-10-01: this entry WAS app-editors/zed, which now builds
@@ -3730,7 +3730,7 @@ base_from = "tag"
 base_url = "https://api.github.com/repos/KhronosGroup/SPIRV-Tools/git/refs/tags"
 base_tag_pattern = '^vulkan-sdk-([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)$'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.363.0_p20260930"
+version = "1.4.363.0_p20261001"
 comments = """
 spirv-tools — commit-tracked on main; scans titles for vulkan-sdk-X.Y.Z.W to detect base bump.
 """
@@ -9713,7 +9713,7 @@ url = "https://api.github.com/repos/aquasecurity/trivy/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.74.0-r1"
+version = "0.75.0"
 comments = """
 Trivy — GitHub releases/latest tag "vX.Y.Z" (leading v stripped). Live=v0.72.0.
 
@@ -9957,7 +9957,7 @@ url = "https://api.github.com/repos/digitalocean/doctl/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.175.0"
+version = "1.177.0"
 comments = """
 doctl (DigitalOcean CLI, historically "doit"/DoCli) — GitHub releases/latest
 tag "vX.Y.Z"; the leading v is normalized away by the autoupdate. Verified
@@ -10995,7 +10995,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "2.5.0"
+version = "2.6.0"
 comments = """
 ai-jail — releases/latest on akitaonrails/ai-jail; tag_name is "vX.Y.Z" and the
 transform strips the v.  Verified by real download on 2026-09-07: tag_name
@@ -11029,7 +11029,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "2.5.0"
+version = "2.6.0"
 comments = """
 ai-jail-bin — same endpoint and same release as sys-apps/ai-jail; this record
 exists separately only because the two are separate packages.  Bump them
@@ -11243,7 +11243,7 @@ parser = "regex"
 pattern = '"tag_name":"v([0-9]+\.[0-9]+\.[0-9]+)","target_commitish":"[^"]*","name":"[^"]*","draft":false,"immutable":[a-z]+,"prerelease":false'
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "7.8.1"
+version = "7.8.3"
 comments = """
 Kilo Code — releases land several times a day (v7.6.1 and v7.6.2 shipped within
 hours of each other), so expect this record to move often.
@@ -11272,7 +11272,7 @@ parser = "regex"
 pattern = '"tag_name":\s*"v([0-9]+\.[0-9]+\.[0-9]+)"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "1.0.90"
+version = "1.0.91"
 comments = """
 GitHub Copilot CLI — TWO PARALLEL TRAINS out of one repository, and picking the
 wrong one is the whole trap here:
@@ -11301,9 +11301,14 @@ pattern = '"version":"([0-9]+\.[0-9]+\.[0-9]+)"'
 type = "bin"
 version = "3.0.67"
 comments = """
-Cline — probed on npm, NOT on GitHub, and that is deliberate: the GitHub
-releases only carry the macOS/Windows desktop app (Cline_*.dmg / *-setup.exe),
-so a GitHub probe would track a version this package does not ship.
+Cline CLI — probed on npm, NOT on GitHub, and that is deliberate: the
+cline/cline repository publishes several product lines under one releases
+list, and none of them is this package's payload. The cli-v* releases carry no
+assets at all (cli-v3.0.67 has an empty asset list), v4.1.* is the VS Code
+extension (.vsix), and desktop-v* is the Tauri desktop app -- which does ship
+Linux .deb/.rpm since the 0.0.x beta, packaged separately as
+dev-util/cline-desktop-bin (see the next record). A GitHub probe here would
+track a version this package does not ship.
 
 Upstream publishes the Linux CLI as per-platform packages behind the
 optionalDependencies of the "cline" wrapper -- @cline/cli-linux-x64 and
@@ -11313,6 +11318,38 @@ pnpm 12, see the pnpm record.
 The probe deliberately targets the x64 payload rather than the "cline" wrapper:
 both report the same version today, but only this one is a distfile the ebuild
 actually fetches, so a bump can never claim a version whose asset is missing.
+"""
+# END
+
+["dev-util/cline-desktop-bin"]
+url = "https://api.github.com/repos/cline/cline/releases?per_page=30"
+parser = "regex"
+pattern = '"tag_name":\s*"desktop-v([0-9]+\.[0-9]+\.[0-9]+)"'
+headers = { "User-Agent" = "bentoo-autoupdate" }
+type = "bin"
+version = "0.0.40"
+comments = """
+Cline for Desktop (beta, Tauri) -- the Linux .deb from the desktop-v* GitHub
+releases. Same repository as dev-util/cline-bin, different product.
+
+Why the releases LIST and not /releases/latest: cline/cline publishes four
+product lines into one releases feed -- v4.1.* (VS Code extension, .vsix),
+cli-v* (empty, the CLI ships on npm), sdk/sdk/v* and desktop-v*. "latest" is
+whichever of them GitHub last marked, so today it happens to be desktop-v0.0.40
+but tomorrow it can be an extension or SDK tag, and the regex would find
+nothing. The list is newest-first, so group 1 of the first desktop-v match is
+the newest desktop release. per_page=30 is headroom: at the 2026-09 cadence
+(~daily desktop releases interleaved with the other three lines) 30 entries
+always hold several desktop tags.
+
+Caveat: a desktop-v* marked prerelease would be matched too; none has been so
+far (0.0.31..0.0.40 are all full releases). If one appears, filter on it.
+
+Bump is PV-only as long as the asset names stay Cline_${PV}_{amd64,arm64}.deb
+and the payload keeps the /usr/bin + /usr/lib/Cline layout the ebuild copies
+verbatim (identical in both 0.0.40 .debs). Upstream also ships latest.json (Tauri updater feed)
+at the moving tag desktop-latest; it is not used as the probe because the
+tagged list above is what the SRC_URI actually points at.
 """
 # END
 
