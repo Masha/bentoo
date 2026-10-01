@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@proton.me</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<longdescription lang="en">
+		Shidashi builds the Bentoo images from an official, verified Gentoo
+		stage3: every stage of the chain (base, minimal, desktop, flavor) is built
+		in an isolated systemd-nspawn container, the packages it compiles land in
+		a binhost as binpkgs, and the live ISOs are assembled from that binhost
+		without compiling anything. The ::gentoo snapshot and the overlays are
+		pinned, and every run leaves an audit trail.
+	</longdescription>
+	<use>
+		<flag name="iso">Pull in the tools that assemble the live ISO: <pkg>sys-fs/squashfs-tools</pkg> (the root filesystem), <pkg>dev-libs/libisoburn</pkg> (xorriso) and <pkg>sys-boot/grub</pkg> with <pkg>sys-fs/mtools</pkg> (the hybrid BIOS and UEFI medium made by grub-mkrescue)</flag>
+		<flag name="vm">Pull in what 'shidashi vm' needs to boot an ISO and test it: <pkg>app-emulation/qemu</pkg>, the OVMF firmware for UEFI boots, and an SSH client to drive the VM over vsock</flag>
+	</use>
+	<upstream>
+		<remote-id type="github">obentoo/shidashi</remote-id>
+		<bugs-to>https://github.com/obentoo/shidashi/issues</bugs-to>
+	</upstream>
+</pkgmetadata>
