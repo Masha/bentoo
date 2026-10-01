@@ -44,7 +44,7 @@ this work lives now, and where protocol breakage is reported first.
 ---
 
 diff --git a/Cargo.lock b/Cargo.lock
-index fd3702c..b7d5457 100644
+index 51656b1..bf6c3cc 100644
 --- a/Cargo.lock
 +++ b/Cargo.lock
 @@ -3106,6 +3106,31 @@ version = "0.7.6"
@@ -79,7 +79,7 @@ index fd3702c..b7d5457 100644
  [[package]]
  name = "cli"
  version = "0.1.0"
-@@ -22806,6 +22831,7 @@ dependencies = [
+@@ -22822,6 +22847,7 @@ dependencies = [
   "channel",
   "chrono",
   "clap",
@@ -88,7 +88,7 @@ index fd3702c..b7d5457 100644
   "client",
   "clock",
 diff --git a/Cargo.toml b/Cargo.toml
-index 1a61f86..9bce877 100644
+index 9388515..b65fa74 100644
 --- a/Cargo.toml
 +++ b/Cargo.toml
 @@ -27,6 +27,7 @@ members = [
@@ -99,7 +99,7 @@ index 1a61f86..9bce877 100644
      "crates/cli",
      "crates/client",
      "crates/clock",
-@@ -303,6 +304,7 @@ buffer_diff = { path = "crates/buffer_diff" }
+@@ -304,6 +305,7 @@ buffer_diff = { path = "crates/buffer_diff" }
  call = { path = "crates/call" }
  call_hierarchy = { path = "crates/call_hierarchy" }
  channel = { path = "crates/channel" }
@@ -2040,7 +2040,7 @@ index c940607..3ece6e1 100644
              project.update(cx, move |_, cx| {
                  match remote_client {
 diff --git a/crates/zed/Cargo.toml b/crates/zed/Cargo.toml
-index f759f2f..8d4cca6 100644
+index 413d7e8..a7a2e3b 100644
 --- a/crates/zed/Cargo.toml
 +++ b/crates/zed/Cargo.toml
 @@ -84,6 +84,7 @@ call.workspace = true

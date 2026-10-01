@@ -236,7 +236,7 @@ index f943a3c..9727fae 100644
              | AcpThreadEvent::SubagentSpawned(_)
              | AcpThreadEvent::EntriesRemoved(_)
 diff --git a/crates/agent_ui/src/conversation_view.rs b/crates/agent_ui/src/conversation_view.rs
-index dd636d9..34ca6da 100644
+index 6b14498..da6e0f8 100644
 --- a/crates/agent_ui/src/conversation_view.rs
 +++ b/crates/agent_ui/src/conversation_view.rs
 @@ -339,6 +339,7 @@ impl Conversation {
@@ -255,7 +255,7 @@ index dd636d9..34ca6da 100644
          | AcpThreadEvent::PromptCapabilitiesUpdated
          | AcpThreadEvent::AvailableCommandsUpdated(_)
          | AcpThreadEvent::ModeUpdated(_)
-@@ -1942,6 +1944,10 @@ impl ConversationView {
+@@ -1954,6 +1956,10 @@ impl ConversationView {
                      });
                  }
              }

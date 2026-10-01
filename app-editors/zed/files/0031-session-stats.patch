@@ -47,7 +47,7 @@ claude-agent-acp-plus flag BY CHOICE, like 0010, 0012, 0014 and 0026.
 ---
 
 diff --git a/crates/agent_ui/src/conversation_view.rs b/crates/agent_ui/src/conversation_view.rs
-index 48634f1..1c7841a 100644
+index 3ad1469..7e003b0 100644
 --- a/crates/agent_ui/src/conversation_view.rs
 +++ b/crates/agent_ui/src/conversation_view.rs
 @@ -104,13 +104,13 @@ use crate::{
