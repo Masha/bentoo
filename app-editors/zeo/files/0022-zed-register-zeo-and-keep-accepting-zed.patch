@@ -45,12 +45,6 @@ whole backend as Zed's, and a share link is a zed.dev address, not a brand.
 
 Decision D10 in zeo/docs/REBRAND.md, widened by measurement.
 ---
- crates/cli/src/main.rs                        | 9 ++++++++-
- crates/client/src/client.rs                   | 7 +++++++
- crates/install_cli/src/register_zed_scheme.rs | 6 +++---
- crates/zed/src/main.rs                        | 1 +
- crates/zed/src/zed.rs                         | 4 ++--
- 5 files changed, 21 insertions(+), 6 deletions(-)
 
 diff --git a/crates/cli/src/main.rs b/crates/cli/src/main.rs
 index 0f4d674..be97811 100644
@@ -73,10 +67,10 @@ index 0f4d674..be97811 100644
  struct Detect;
  
 diff --git a/crates/client/src/client.rs b/crates/client/src/client.rs
-index c12ea19..c37c077 100644
+index 5fcbfd3..f534eac 100644
 --- a/crates/client/src/client.rs
 +++ b/crates/client/src/client.rs
-@@ -1941,6 +1941,9 @@ impl ProtoClient for Client {
+@@ -1929,6 +1929,9 @@ impl ProtoClient for Client {
  /// prefix for the zed:// url scheme
  pub const ZED_URL_SCHEME: &str = "zed";
  
@@ -86,7 +80,7 @@ index c12ea19..c37c077 100644
  /// A parsed Zed link that can be handled internally by the application.
  #[derive(Debug, Clone, PartialEq, Eq)]
  pub enum ZedLink {
-@@ -1966,6 +1969,10 @@ pub fn parse_zed_link(link: &str, cx: &App) -> Option<ZedLink> {
+@@ -1954,6 +1957,10 @@ pub fn parse_zed_link(link: &str, cx: &App) -> Option<ZedLink> {
          .or_else(|| {
              link.strip_prefix(ZED_URL_SCHEME)
                  .and_then(|result| result.strip_prefix("://"))
@@ -120,10 +114,10 @@ index 048b2dd..ec48354 100644
 +    cx.update(|cx| cx.register_url_scheme(ZEO_URL_SCHEME)).await
  }
 diff --git a/crates/zed/src/main.rs b/crates/zed/src/main.rs
-index ec31980..e081e1c 100644
+index 2a70b77..3a5d479 100644
 --- a/crates/zed/src/main.rs
 +++ b/crates/zed/src/main.rs
-@@ -1812,6 +1812,7 @@ fn parse_url_arg(arg: &str, cx: &App) -> String {
+@@ -1893,6 +1893,7 @@ fn parse_url_arg(arg: &str, cx: &App) -> String {
          Ok(path) => format!("file://{}", path.display()),
          Err(_) => {
              if arg.starts_with("file://")
@@ -132,10 +126,10 @@ index ec31980..e081e1c 100644
                  || arg.starts_with("zed-cli://")
                  || arg.starts_with("ssh://")
 diff --git a/crates/zed/src/zed.rs b/crates/zed/src/zed.rs
-index c4bf14e..0e0e33d 100644
+index 6ae5bda..6ab5548 100644
 --- a/crates/zed/src/zed.rs
 +++ b/crates/zed/src/zed.rs
-@@ -1278,7 +1278,7 @@ fn register_actions(
+@@ -1279,7 +1279,7 @@ fn register_actions(
                          Toast::new(
                              NotificationId::unique::<RegisterZedScheme>(),
                              format!(
@@ -144,7 +138,7 @@ index c4bf14e..0e0e33d 100644
                                  ReleaseChannel::global(cx).display_name()
                              ),
                          ),
-@@ -1288,7 +1288,7 @@ fn register_actions(
+@@ -1289,7 +1289,7 @@ fn register_actions(
                  Ok(())
              })
              .detach_and_prompt_err(
@@ -153,6 +147,3 @@ index c4bf14e..0e0e33d 100644
                  window,
                  cx,
                  |_, _, _| None,
--- 
-2.55.0
-

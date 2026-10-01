@@ -1575,6 +1575,13 @@ declare -A GIT_CRATES=(
 	[zed-xim]='https://github.com/zed-industries/xim-rs;16f35a2c881b815a2b6cdfd6687988e84f8447d8;xim-rs-%commit%'
 )
 
+# Zeo versions itself: ${PV} is Zeo's own version and says nothing about the Zed
+# it is built from. Gentoo's version grammar (PMS 3.2) cannot carry two upstream
+# versions, so the Zed source is named by EGIT_COMMIT alone -- and the distfile
+# after it, which is what lets the overlay autoupdate bump this ebuild (it
+# rewrites the date and EGIT_COMMIT; a second version variable it could not
+# keep current would leave a new tarball under an old, already-manifested name).
+
 EGIT_COMMIT="71456c40f3971ee763e620a513c5fb98390d93e3"
 LLVM_COMPAT=( 22 )
 RUST_MIN_VER="1.98.1"
@@ -1589,9 +1596,8 @@ inherit cargo check-reqs desktop flag-o-matic llvm-r1 toolchain-funcs xdg
 
 # BENTOO-DIVERGENCE: metadata.xml - a <use> block describing fourteen flags,
 # where ::gentoo's file has none. Every one of them is a flag this overlay adds
-# (see the IUSE tag): X, wayland, collab, neovim, mimalloc, tracy, inspector,
-# remote-server, the three claude-agent ones and the rest. ::gentoo has nothing
-# to describe because it exposes none of them.
+# (see the IUSE tag). ::gentoo has nothing to describe because it exposes none
+# of them, and no ::gentoo package corresponds to this one at all.
 # BENTOO-DIVERGENCE: KEYWORDS - no ~arm64, where ::gentoo has it. Measured
 # 2026-09-07 by keywording it and running pkgcheck: dev-util/claude-agent-acp-plus
 # and dev-util/claude-agent-acp-tui are both DEFAULT-ON here and both ship a
@@ -1599,10 +1605,10 @@ inherit cargo check-reqs desktop flag-o-matic llvm-r1 toolchain-funcs xdg
 # so an arm64 user would get an uninstallable package out of the box.
 # Arch-guarding the IUSE is not the answer - that poisons md5-cache. Reopen this
 # when those two gain an arm64 build; nothing else here is amd64-bound.
-DESCRIPTION="The fast, collaborative code editor"
-HOMEPAGE="https://zed.dev https://github.com/zed-industries/zed"
+DESCRIPTION="Zeo - the Zed editor, rebranded, with the bentoo patch series"
+HOMEPAGE="https://github.com/lucascouts/zeo https://zed.dev"
 SRC_URI="
-	https://github.com/zed-industries/zed/archive/${EGIT_COMMIT}.tar.gz -> ${PF}.tar.gz
+	https://github.com/zed-industries/zed/archive/${EGIT_COMMIT}.tar.gz -> zed-${EGIT_COMMIT}.tar.gz
 	amd64? (
 		https://github.com/zed-industries/livekit-rust-sdks/releases/download/webrtc-${WEBRTC_COMMIT}/webrtc-linux-x64-release.zip ->
 			webrtc-${WEBRTC_COMMIT}-linux-x64-release.zip
@@ -1613,7 +1619,9 @@ SRC_URI="
 	)
 	${CARGO_CRATE_URIS}"
 
-S="${WORKDIR}/${PN}-${EGIT_COMMIT}"
+# The upstream tarball unpacks to zed-<commit>; ${PN} is "zeo" here, so the
+# directory must be named explicitly rather than derived from it.
+S="${WORKDIR}/zed-${EGIT_COMMIT}"
 # BENTOO-DIVERGENCE: LICENSE - the vendored crate set differs six series on, so
 # the LICENSE+= block below names licences 1.14 never pulled in, among them
 # CDLA-Permissive-2.0.
@@ -1642,16 +1650,17 @@ KEYWORDS="~amd64"
 # media-plugins/alsa-plugins[pulseaudio], which is a runtime choice, not a
 # property of this binary.
 #
-# inserted the same day: inspector (the GPUI UI inspector, upstream feature
-# zed/inspector) and remote-server (crates/remote_server, the SSH remote-editing
-# daemon Zed otherwise downloads from zed.dev at run time -- packaging it is
-# what lets a server host serve it from portage instead).
+# inspector is the GPUI UI inspector.
 #
 # test is not a Zed feature: src_test has existed here without it, which left
 # RESTRICT unable to say the suite is optional.
-IUSE="+X +claude-agent-acp-plus +claude-agent-acp-tui +claude-code-ide collab
-	extensions-cli inspector +mimalloc neovim remote-server screen-capture test
-	tracy +wayland"
+#
+# collab, extensions-cli and remote-server are deliberately NOT offered here.
+# Each installs a binary under a name app-editors/zed uses -- collab,
+# zed-extension, zed-remote-server -- and renaming Zed's server infrastructure is
+# not what a rebrand of the editor is for.
+IUSE="+X +claude-agent-acp-plus +claude-agent-acp-tui +claude-code-ide inspector
+	+mimalloc neovim screen-capture test tracy +wayland"
 # BENTOO-DIVERGENCE: REQUIRED_USE - the || ( X wayland ) clause, which follows
 # from the X and wayland flags this overlay adds (see the IUSE tag). ::gentoo
 # exposes neither, so it has nothing to constrain.
@@ -1702,8 +1711,15 @@ DEPEND="
 "
 # BENTOO-DIVERGENCE: RDEPEND - dbus as above, plus dev-util/claude-agent-acp-plus
 # and -tui, which exist only in this overlay.
+# Exactly one editor of the family is installed at a time, by decision
+# (2026-10-01) rather than by a file collision with zed or zed-bin: zeo owns
+# /usr/bin/zeo, /usr/libexec/zeo-editor and dev.zeo.Zeo.*, which neither
+# installs. zeo-bin installs those same paths, so that one is a real collision.
 RDEPEND="
 	${DEPEND}
+	!app-editors/zed
+	!app-editors/zed-bin
+	!app-editors/zeo-bin
 	claude-agent-acp-plus? ( dev-util/claude-agent-acp-plus )
 	claude-agent-acp-tui? ( dev-util/claude-agent-acp-tui )
 	neovim? ( app-editors/neovim )
@@ -1724,11 +1740,8 @@ BDEPEND="
 "
 
 QA_FLAGS_IGNORED="
-	usr/bin/zedit
-	usr/libexec/zed-editor
-	usr/bin/collab
-	usr/bin/zed-extension
-	usr/bin/zed-remote-server
+	usr/bin/zeo
+	usr/libexec/zeo-editor
 "
 
 pkg_setup() {
@@ -1761,9 +1774,33 @@ src_prepare() {
 	# Nothing about it needs an adapter -- the session id it takes is the agent
 	# session id, which AgentPanel::open_thread already resolved, so gating it on
 	# claude-agent-acp-plus would withhold it from every other agent for no
-	# reason. Numbered 0024 because 0019-0023 belong to app-editors/zeo, which
-	# shares this files/ directory.
+	# reason. Numbered 0024 because 0019-0023 were already the rebrand's.
 	PATCHES+=( "${FILESDIR}/0024-agent-deep-link-session.patch" )
+	# 0019-0023 are what make this package Zeo rather than Zed, so they carry no
+	# USE flag: without them this ebuild would build app-editors/zed under a
+	# different name and install it over the top of it.
+	PATCHES+=(
+		"${FILESDIR}/0019-paths-use-Zeo-state-directories.patch"
+		"${FILESDIR}/0020-zed-name-the-application-binary-zeo.patch"
+		"${FILESDIR}/0021-release_channel-add-the-Zeo-channel.patch"
+		"${FILESDIR}/0022-zed-register-zeo-and-keep-accepting-zed.patch"
+		# 0023 fixes what 0020 broke: the CLI finds the application through a
+		# fixed list of path literals, and renaming the [[bin]] target left that
+		# list pointing at a binary that no longer exists. Nothing connects the
+		# literals to the Cargo target, so it compiles clean and fails at run
+		# time. It also decides src_install below: the list is Zeo-only, so the
+		# application MUST land at libexec/zeo-editor.
+		"${FILESDIR}/0023-cli-point-the-launcher-at-the-Zeo-application-binary.patch"
+		# 0025 renames the product in the strings a user actually reads. It is
+		# 21 literals out of 404 containing "Zed" in the tree: most of the rest
+		# name Zed Industries -- the vendor, the plans, the team, the hosted
+		# models -- or are font-family lookup keys, a User-Agent, or theme names
+		# referenced from user settings, and renaming any of those breaks
+		# something. The window title is not here because it never needed a
+		# patch: it resolves through display_name(), which 0021 already made
+		# return "Zeo". Numbered 0025 because app-editors/zed took 0024.
+		"${FILESDIR}/0025-zed-say-Zeo-in-the-strings-a-user-actually-reads.patch"
+	)
 
 	if use claude-agent-acp-plus; then
 		PATCHES+=(
@@ -1894,16 +1931,25 @@ src_prepare() {
 		PATCHES+=( "${FILESDIR}/0002-claude-code-ide-integration.patch" )
 	fi
 
+	# The Zeo mark cannot ride in the series: GNU patch refuses a git binary
+	# hunk outright ("git binary diffs are not supported"), and eapply is
+	# `patch -p1`. So the art is installed here, before eapply, and its source of
+	# truth is brand/rendered/ in the zeo repository, reproducible from
+	# brand/build-icon.py and checksummed there.
+	cp "${FILESDIR}/app-icon-zeo.png" crates/zed/resources/ || die
+	cp "${FILESDIR}/app-icon-zeo@2x.png" crates/zed/resources/ || die
+
 	default
 
-	export APP_CLI="zedit"
-	# The ebuild forces RELEASE_CHANNEL="nightly" below, so the runtime app_id
-	# (Wayland app_id / X11 WM_CLASS) is "dev.zed.Zed-Nightly". The .desktop
-	# filename, the Icon name and StartupWMClass MUST all match it, or Wayland
-	# compositors draw the generic icon instead of Zed's.
-	export APP_ID="dev.zed.Zed-Nightly"
+	export APP_CLI="zeo"
+	# Patch 0021 gives ReleaseChannel::Zeo the app_id "dev.zeo.Zeo", and the
+	# RELEASE_CHANNEL file below selects that channel, so this is the runtime
+	# Wayland app_id / X11 WM_CLASS. The .desktop filename, the Icon name and
+	# StartupWMClass must all equal it, or the compositor has nothing to match
+	# the window against and draws a generic icon.
+	export APP_ID="dev.zeo.Zeo"
 	export APP_ICON="${APP_ID}"
-	export APP_NAME="Zed Nightly"
+	export APP_NAME="Zeo"
 	export APP_ARGS="%U"
 	export DO_STARTUP_NOTIFY="true"
 	envsubst < "crates/zed/resources/zed.desktop.in" > ${APP_ID}.desktop || die
@@ -1912,9 +1958,24 @@ src_prepare() {
 	# line) for X11 compatibility and as the Wayland compositor fall-back.
 	sed -i "/^Actions=/i StartupWMClass=${APP_ID}" "${APP_ID}.desktop" || die
 
-	# Set release channel to nightly so the remote_server auto-download
-	# works (dev channel hard-fails, nightly fetches "latest" from zed.dev).
-	echo "nightly" > crates/zed/RELEASE_CHANNEL || die
+	# Upstream's template declares x-scheme-handler/zed, and envsubst does not
+	# touch it -- so an unedited Zeo entry advertises itself as a handler for
+	# ZED's URLs and declares none of its own. Measured on a real install: the
+	# system mimeinfo.cache listed dev.zeo.Zeo.desktop beside Zed's under
+	# x-scheme-handler/zed, and zeo:// resolved to nothing at all. Patch 0022
+	# registers zeo:// at run time, but the desktop file is what the desktop
+	# environment reads to route a link, and it is the half that decides which
+	# editor opens someone else's zed:// link.
+	sed -i "s|x-scheme-handler/zed|x-scheme-handler/zeo|" "${APP_ID}.desktop" || die
+	# Keywords is what an application launcher searches. Keep "zed" so people
+	# looking for the editor Zeo is built from still find it, and add "zeo".
+	sed -i "s|^Keywords=zed;|Keywords=zeo;zed;|" "${APP_ID}.desktop" || die
+
+	# The file drives the runtime ReleaseChannel enum through include_str!.
+	# src_compile exports the identically named ENVIRONMENT VARIABLE, which is a
+	# different input read by build.rs; both are needed and they are not
+	# interchangeable.
+	echo "zeo" > crates/zed/RELEASE_CHANNEL || die
 
 	# Cargo offline fetch workaround
 	local ASYNC_PROCESS_COMMIT="0b6d6713570af61806e1e5cb40e0f757cb93fd9d"
@@ -2020,7 +2081,15 @@ src_prepare() {
 
 src_compile() {
 	export RELEASE_VERSION="${PV}"
-	export ZED_UPDATE_EXPLANATION='Updates are handled by portage'
+	export ZED_UPDATE_EXPLANATION='Zeo updates are handled by portage'
+	# crates/zed/build.rs reads RELEASE_CHANNEL as an ENVIRONMENT VARIABLE, via
+	# option_env!, to pick the icon it embeds -- a different input from the
+	# crates/zed/RELEASE_CHANNEL file src_prepare writes, which drives the
+	# runtime ReleaseChannel enum. Its match is on a string with a `_ => "-dev"`
+	# arm, so leaving this unset compiles clean and embeds Zed's development
+	# icon. app-editors/zed has exactly that gap today; it is masked on Wayland
+	# because the compositor resolves the INSTALLED icon by app_id instead.
+	export RELEASE_CHANNEL="zeo"
 	if use arm64; then
 		export LK_CUSTOM_WEBRTC="${WORKDIR}/linux-arm64-release"
 	elif use amd64; then
@@ -2039,15 +2108,6 @@ src_compile() {
 		--package zed
 		--package cli
 	)
-	use collab && packages+=( --package collab )
-	use extensions-cli && packages+=( --package extension_cli )
-	# remote_server is built from this same workspace rather than upstream's
-	# separate musl target, so it links the system libraries the rest of the
-	# package already depends on. That is what makes it usable on a host that
-	# has this package installed, and it is why it is not a drop-in replacement
-	# for the static binary zed.dev serves.
-	use remote-server && packages+=( --package remote_server )
-
 	# "${features[*]}" alone would be an empty --features argument when no flag
 	# is on; the count is what decides whether the option appears at all.
 	local feature_args=()
@@ -2059,33 +2119,24 @@ src_compile() {
 src_install() {
 	newbin "$(cargo_target_dir)"/cli "${APP_CLI}"
 	exeinto "/usr/libexec"
-	newexe "$(cargo_target_dir)"/zed zed-editor
+	# zeo-editor, not zed-editor: patch 0023 leaves the launcher looking only for
+	# ../libexec/zeo-editor, and this is also what keeps the file off
+	# app-editors/zed's path so the two can be installed together.
+	newexe "$(cargo_target_dir)"/zeo zeo-editor
 
-	if use collab; then
-		dobin "$(cargo_target_dir)"/collab
-	fi
-
-	if use extensions-cli; then
-		newbin "$(cargo_target_dir)"/zed-extension zed-extension
-	fi
-
-	# The client looks the daemon up by a name it builds at run time, under the
-	# remote user's ~/.zed_server -- a path no ebuild can write to. Installing
-	# it here is therefore half the job; pkg_postinst spells out the other half.
-	if use remote-server; then
-		newbin "$(cargo_target_dir)"/remote_server zed-remote-server
-	fi
-
-	# The nightly channel's own icon set, which the source ships, installed
-	# under the APP_ID name so Wayland compositors resolve it.
-	newicon -s 512 crates/zed/resources/app-icon-nightly.png "${APP_ID}.png"
-	newicon -s 1024 crates/zed/resources/app-icon-nightly@2x.png "${APP_ID}.png"
+	# The Zeo mark, installed under the APP_ID name because that is how a Wayland
+	# compositor resolves a window's icon: it matches the app_id against the
+	# installed icon file name, not against anything inside the binary.
+	newicon -s 512 crates/zed/resources/app-icon-zeo.png "${APP_ID}.png"
+	newicon -s 1024 crates/zed/resources/app-icon-zeo@2x.png "${APP_ID}.png"
 	domenu "${S}/${APP_ID}.desktop"
 }
 
 src_test () {
-	mkdir -p "${HOME}/.config/zed" || die
-	mkdir -p "${HOME}/.local/share/zed/logs/" || die
+	# Patch 0019 moves APP_NAME to "Zeo", so the suite writes under zeo/ - these
+	# are the directories the tests expect to exist, not zed/ ones.
+	mkdir -p "${HOME}/.config/zeo" || die
+	mkdir -p "${HOME}/.local/share/zeo/logs/" || die
 
 	SHELL=/usr/bin/sh RUST_BACKTRACE=full cargo_src_test -vv \
 		-- --skip zed::tests::test_window_edit_state_restoring_enabled
@@ -2097,40 +2148,18 @@ pkg_postinst() {
 	if use claude-agent-acp-tui; then
 		elog ""
 		elog "The claude-agent-acp-tui ACP bridge was installed as 'claude-agent-acp-tui'."
-		elog "To enable it in Zed, add to ~/.config/zed/settings.json:"
+		elog "To enable it in Zeo, add to ~/.config/zeo/settings.json:"
 		elog ""
 		elog "    \"agent_servers\": {"
 		elog "        \"Claude Agent TUI\": { \"command\": \"claude-agent-acp-tui\", \"args\": [] }"
 		elog "    }"
 	fi
 
-	if use remote-server; then
-		elog ""
-		elog "The remote editing daemon was installed as 'zed-remote-server'."
-		elog "Installing it is only half of what makes it used: a Zed client"
-		elog "looks the daemon up on the remote host by a name it builds at run"
-		elog "time, under that user's home:"
-		elog ""
-		elog "    ~/.zed_server/zed-remote-server-nightly-<VERSION>"
-		elog ""
-		elog "so the daemon has to be reachable under exactly that name. Connect"
-		elog "once without it and Zed downloads its own copy there -- the name it"
-		elog "wrote is the name to use:"
-		elog ""
-		elog "    mkdir -p ~/.zed_server"
-		elog "    ln -sf /usr/bin/zed-remote-server \\"
-		elog "        ~/.zed_server/zed-remote-server-nightly-<VERSION>"
-		elog ""
-		elog "This build comes from the same workspace as the editor, not from"
-		elog "upstream's separate static musl target, so it needs this package's"
-		elog "shared libraries present on the host that runs it."
-	fi
-
 	if use claude-code-ide; then
 		elog ""
 		elog "Claude Code IDE integration uses an unofficial, reverse-engineered"
 		elog "protocol that may break without notice."
-		elog "It activates automatically in Zed-spawned terminals via environment"
+		elog "It activates automatically in Zeo-spawned terminals via environment"
 		elog "variables; no settings.json configuration is needed."
 		elog "The 'claude' CLI is required at runtime; it is distributed via npm"
 		elog "and is not packaged by this overlay."

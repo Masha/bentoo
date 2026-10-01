@@ -51,8 +51,6 @@ not in the binary's name, it is in everything that had been told the old one.
 Keeping it apart records that the cost of renaming a binary is paid by its
 consumers, and that the only thing that found them was running the program.
 ---
- crates/cli/src/main.rs | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
 
 diff --git a/crates/cli/src/main.rs b/crates/cli/src/main.rs
 index be97811..55e1b06 100644
@@ -108,6 +106,3 @@ index be97811..55e1b06 100644
          }
  
          fn launch(&self, url: String, user_data_dir: Option<&str>) -> anyhow::Result<()> {
--- 
-2.55.0
-

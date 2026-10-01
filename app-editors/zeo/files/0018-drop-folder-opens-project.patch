@@ -63,7 +63,7 @@ Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>
 ---
 
 diff --git a/assets/settings/default.json b/assets/settings/default.json
-index fd52963..d1003a1 100644
+index 1228f8b..721ef88 100644
 --- a/assets/settings/default.json
 +++ b/assets/settings/default.json
 @@ -181,6 +181,17 @@
@@ -85,10 +85,10 @@ index fd52963..d1003a1 100644
    // The state is stored per pane.
    // When disabled, defaults are applied instead of the state restoration.
 diff --git a/crates/settings/src/vscode_import.rs b/crates/settings/src/vscode_import.rs
-index fbf9df9..ae5d1f6 100644
+index 7248c1a..4c6fb68 100644
 --- a/crates/settings/src/vscode_import.rs
 +++ b/crates/settings/src/vscode_import.rs
-@@ -1052,6 +1052,7 @@ impl VsCodeSettings {
+@@ -1067,6 +1067,7 @@ impl VsCodeSettings {
              centered_layout: None,
              cli_default_open_behavior: None,
              default_open_behavior: None,
@@ -97,7 +97,7 @@ index fbf9df9..ae5d1f6 100644
              close_panel_on_toggle: None,
              command_aliases: Default::default(),
 diff --git a/crates/settings_content/src/workspace.rs b/crates/settings_content/src/workspace.rs
-index e38b902..7120254 100644
+index dbcb6fc..b9e403d 100644
 --- a/crates/settings_content/src/workspace.rs
 +++ b/crates/settings_content/src/workspace.rs
 @@ -58,6 +58,13 @@ pub struct WorkspaceSettingsContent {
@@ -148,7 +148,7 @@ index e38b902..7120254 100644
      Copy,
      Clone,
 diff --git a/crates/workspace/src/pane.rs b/crates/workspace/src/pane.rs
-index 56338cb..275d7d6 100644
+index 25771a8..64eea99 100644
 --- a/crates/workspace/src/pane.rs
 +++ b/crates/workspace/src/pane.rs
 @@ -1,5 +1,5 @@
@@ -212,7 +212,7 @@ index 56338cb..275d7d6 100644
                      if let Ok((open_task, to_pane)) =
                          workspace.update_in(cx, |workspace, window, cx| {
                              if let Some(split_direction) = split_direction {
-@@ -5078,6 +5116,26 @@ impl Render for DraggedTab {
+@@ -5080,6 +5118,26 @@ impl Render for DraggedTab {
      }
  }
  
@@ -239,7 +239,7 @@ index 56338cb..275d7d6 100644
  #[cfg(test)]
  mod tests {
      use std::{cell::Cell, iter::zip, num::NonZero, rc::Rc};
-@@ -9662,4 +9720,42 @@ mod tests {
+@@ -9664,4 +9722,42 @@ mod tests {
              }
          }
      }

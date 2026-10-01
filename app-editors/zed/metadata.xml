@@ -7,9 +7,6 @@
 	</maintainer>
 	<use>
 		<flag name="X">Enable X11 display server support</flag>
-		<flag name="claude-agent-acp-plus">Install the claude-agent-acp-plus ACP agent and apply source patches that force-enable Zed's acp-beta feature flag (which now gates the per-turn token count and stabilized terminal authentication) plus agent panel UI improvements: multiline elicitation fields, collapsible markdown option previews, a manual-mode badge, clickable file mentions in replayed messages, and adoption of the agent's config-option response; also makes a thread menu choice (permission mode, model, thinking effort, agent config option) apply to that thread only, with Shift to make it the default for new threads</flag>
-		<flag name="claude-agent-acp-tui">Install the claude-agent-acp-tui ACP bridge to run the Claude Code TUI in Zed's agent panel</flag>
-		<flag name="claude-code-ide">Native Claude Code CLI editor integration (unofficial reverse-engineered IDE protocol, WebSocket MCP server) via a source patch</flag>
 		<flag name="collab">Build the collaboration server</flag>
 		<flag name="extensions-cli">Build the zed-extension CLI for managing extensions</flag>
 		<flag name="inspector">Build the GPUI UI inspector, which shows the element tree, layout and styles of Zed's own interface at run time</flag>
@@ -22,8 +19,10 @@
 	</use>
 	<longdescription lang="en">
 		Zed is a high-performance, multiplayer code editor from the creators
-		of Atom and Tree-sitter. This is the source-compiled version.
-		For the pre-built binary package, use app-editors/zed-bin instead.
+		of Atom and Tree-sitter. This is the source-compiled version of
+		upstream's tagged releases (stable and preview), unpatched. For the
+		pre-built binary package, use app-editors/zed-bin instead; for the
+		snapshot carrying this overlay's Claude integration, app-editors/zeo.
 	</longdescription>
 	<upstream>
 		<remote-id type="github">zed-industries/zed</remote-id>

@@ -1,0 +1,53 @@
+Title: zed now builds releases; patched one is zeo
+Author: Lucas Couto <lucascs@protonmail.com>
+Posted: 2026-10-01
+Revision: 1
+News-Item-Format: 2.0
+Display-If-Installed: app-editors/zed
+
+Until now app-editors/zed in this overlay was a daily snapshot of Zed's
+main branch carrying the bentoo patch series: the Claude agent
+integrations (USE claude-agent-acp-plus, claude-agent-acp-tui,
+claude-code-ide) and the agent-panel changes that ride on them.
+
+That package is split in two:
+
+- app-editors/zed builds upstream's tagged releases from source, with no
+  patches -- the source counterpart of app-editors/zed-bin. Stable
+  versions (1.22.0) and pre-releases (1.23.1_pre) are both offered.
+- app-editors/zeo is the snapshot plus the patch series, as it was,
+  with Zed's identity replaced by Zeo's: the command is "zeo", settings
+  live in ~/.config/zeo/, and it opens zeo:// links (zed:// still
+  works). app-editors/zeo-bin is the same build, prebuilt for x86-64-v3
+  CPUs (Haswell, Zen 1 and newer).
+
+Only one of zed, zed-bin, zeo and zeo-bin can be installed at a time.
+
+
+Keeping the patched editor
+==========================
+
+1) Switch packages. Portage resolves the blocker by unmerging zed:
+
+       emerge --ask app-editors/zeo      # or app-editors/zeo-bin
+       emerge --ask --deselect app-editors/zed
+
+2) Move per-package configuration from app-editors/zed to
+   app-editors/zeo in /etc/portage (package.use, package.env,
+   package.accept_keywords).
+
+3) Copy your settings once, if ~/.config/zeo does not exist yet (this
+   overwrites it). Zeo does not read Zed's directories:
+
+       cp -a ~/.config/zed/. ~/.config/zeo/
+       cp -a ~/.local/share/zed/. ~/.local/share/zeo/
+
+
+Staying on plain Zed
+====================
+
+The installed snapshot (1.24.0_pre20261001) is numbered above the
+newest release, so the next world update shows a DOWNGRADE of
+app-editors/zed to a release. That is expected. The USE flags
+claude-agent-acp-plus, claude-agent-acp-tui and claude-code-ide no
+longer exist on zed; drop them from package.use.

@@ -18,19 +18,20 @@
 		<flag name="wayland">Enable Wayland display server support</flag>
 	</use>
 	<longdescription lang="en">
-		Zeo is the Zed editor with a distinct visual identity: its own name,
-		icon, release channel, application binary, URL scheme and state
-		directories. It is not a fork - it is built from the same upstream
-		commit app-editors/zed packages, with a rebrand applied as patches
-		0019-0023 on top of that package's series.
+		Zeo is the Zed editor carrying the bentoo patch series - the Claude
+		agent integrations and the agent-panel changes built on them - with
+		a distinct identity of its own: name, icon, release channel,
+		application binary, URL scheme and state directories. It is built
+		from a snapshot of Zed's main branch named by EGIT_COMMIT and
+		versions itself; app-editors/zed builds upstream's releases
+		unpatched.
 
-		Because the identity is separate all the way down, Zeo installs
-		alongside app-editors/zed with no blocker: /usr/bin/zeo,
-		/usr/libexec/zeo-editor, dev.zeo.Zeo.desktop and ~/.config/zeo.
+		Exactly one of app-editors/zed, zed-bin, zeo and zeo-bin is
+		installed at a time. app-editors/zeo-bin is this package prebuilt
+		for x86-64-v3.
 
 		The collab, extensions-cli and remote-server flags app-editors/zed
-		offers are deliberately absent here, because each installs a binary
-		under a name that package already uses.
+		offers are absent here: each installs a binary under a Zed name.
 	</longdescription>
 	<upstream>
 		<remote-id type="github">lucascouts/zeo</remote-id>

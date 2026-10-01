@@ -30,8 +30,6 @@ settings from Zed is a copy the user makes, knowingly, once.
 
 Decision D4 in zeo/docs/REBRAND.md.
 ---
- crates/paths/src/paths.rs | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/crates/paths/src/paths.rs b/crates/paths/src/paths.rs
 index 9c16f1d..7a33c67 100644
@@ -46,6 +44,3 @@ index 9c16f1d..7a33c67 100644
  
  /// Lowercased form of [`APP_NAME`], for use in XDG-style paths on
  /// Linux/FreeBSD and the macOS `~/.config` fallback.
--- 
-2.55.0
-

@@ -8,7 +8,7 @@ Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 ---
 
 diff --git a/crates/agent_ui/src/conversation_view/elicitation.rs b/crates/agent_ui/src/conversation_view/elicitation.rs
-index 4efb8f8..d8a2fa7 100644
+index 872eafb..599bc1d 100644
 --- a/crates/agent_ui/src/conversation_view/elicitation.rs
 +++ b/crates/agent_ui/src/conversation_view/elicitation.rs
 @@ -57,7 +57,7 @@ impl ElicitationFormState {
@@ -20,7 +20,7 @@ index 4efb8f8..d8a2fa7 100644
                              if let Some(default) = &schema.default {
                                  editor.set_text(default.clone(), window, cx);
                              }
-@@ -821,6 +821,36 @@ mod tests {
+@@ -1166,6 +1166,36 @@ mod tests {
              Editor::single_line(window, cx)
          });
      }

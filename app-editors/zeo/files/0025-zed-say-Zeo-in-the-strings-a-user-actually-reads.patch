@@ -64,25 +64,12 @@ the rebrand. Converting those sites properly is a separate change, and one worth
 offering upstream rather than carrying: Zed Nightly displays "Zed" in these same
 strings today, where it should display its own channel name.
 ---
- crates/auto_update/src/auto_update.rs                     | 2 +-
- crates/cli/src/main.rs                                    | 2 +-
- crates/install_cli/src/install_cli_binary.rs              | 4 ++--
- crates/oauth_callback_server/src/oauth_callback_server.rs | 4 ++--
- crates/onboarding/src/onboarding.rs                       | 2 +-
- crates/recent_projects/src/remote_servers.rs              | 2 +-
- crates/settings_ui/src/settings_ui.rs                     | 2 +-
- crates/title_bar/src/title_bar.rs                         | 6 +++---
- crates/ui/src/components/collab/update_button.rs          | 6 +++---
- crates/workspace/src/notifications.rs                     | 4 ++--
- crates/workspace/src/welcome.rs                           | 4 ++--
- crates/zed/src/main.rs                                    | 4 ++--
- 12 files changed, 21 insertions(+), 21 deletions(-)
 
 diff --git a/crates/auto_update/src/auto_update.rs b/crates/auto_update/src/auto_update.rs
-index 4549560..60d2f46 100644
+index 0b6a761..711efbc 100644
 --- a/crates/auto_update/src/auto_update.rs
 +++ b/crates/auto_update/src/auto_update.rs
-@@ -309,7 +309,7 @@ pub fn check(_: &Check, window: &mut Window, cx: &mut App) {
+@@ -314,7 +314,7 @@ pub fn check(_: &Check, window: &mut Window, cx: &mut App) {
      {
          drop(window.prompt(
              gpui::PromptLevel::Info,
@@ -173,10 +160,10 @@ index 9861d72..f151fd8 100644
                                              window.dispatch_action(Box::new(OpenLog), cx);
                                              cx.emit(DismissEvent);
 diff --git a/crates/settings_ui/src/settings_ui.rs b/crates/settings_ui/src/settings_ui.rs
-index 12ede65..76e662e 100644
+index 0ca7504..614fd18 100644
 --- a/crates/settings_ui/src/settings_ui.rs
 +++ b/crates/settings_ui/src/settings_ui.rs
-@@ -891,7 +891,7 @@ fn open_settings_editor_with(
+@@ -892,7 +892,7 @@ fn open_settings_editor_with(
          cx.open_window(
              WindowOptions {
                  titlebar: Some(TitlebarOptions {
@@ -215,7 +202,7 @@ index 09c36b3..41859d0 100644
                                          Icon::new(IconName::Download)
                                              .size(IconSize::Small)
 diff --git a/crates/ui/src/components/collab/update_button.rs b/crates/ui/src/components/collab/update_button.rs
-index 0b94072..ba54ee7 100644
+index 9c17f49..c2c3411 100644
 --- a/crates/ui/src/components/collab/update_button.rs
 +++ b/crates/ui/src/components/collab/update_button.rs
 @@ -100,19 +100,19 @@ impl UpdateButton {
@@ -280,7 +267,7 @@ index 837418e..990abed 100644
  
          h_flex()
 diff --git a/crates/zed/src/main.rs b/crates/zed/src/main.rs
-index e081e1c..81bec29 100644
+index 3a5d479..0aa7633 100644
 --- a/crates/zed/src/main.rs
 +++ b/crates/zed/src/main.rs
 @@ -94,7 +94,7 @@ fn build_application() -> Application {
@@ -301,6 +288,3 @@ index e081e1c..81bec29 100644
                          .body(Some(
                              format!(
                                  "{e:?}. See https://zed.dev/docs/linux for troubleshooting steps."
--- 
-2.55.0
-

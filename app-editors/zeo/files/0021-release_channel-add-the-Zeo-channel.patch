@@ -61,22 +61,12 @@ the ebuild has to set both.
 
 Decisions D2 and D3 in zeo/docs/REBRAND.md.
 ---
- crates/auto_update/src/auto_update.rs         |  1 +
- crates/auto_update_ui/src/auto_update_ui.rs   |  7 ++++---
- crates/client/src/zed_urls.rs                 |  2 +-
- crates/extension_host/src/wasm_host/wit.rs    |  6 ++++--
- crates/release_channel/src/lib.rs             | 21 ++++++++++++++++---
- crates/remote_server/src/server.rs            |  6 ++++--
- crates/zed/build.rs                           |  1 +
- crates/zed/src/zed.rs                         |  1 +
- .../src/zed_credentials_provider.rs           |  8 ++++++-
- 9 files changed, 41 insertions(+), 12 deletions(-)
 
 diff --git a/crates/auto_update/src/auto_update.rs b/crates/auto_update/src/auto_update.rs
-index 0d86651..4549560 100644
+index 38324d5..0b6a761 100644
 --- a/crates/auto_update/src/auto_update.rs
 +++ b/crates/auto_update/src/auto_update.rs
-@@ -354,6 +354,7 @@ pub fn release_notes_url(cx: &mut App) -> Option<String> {
+@@ -359,6 +359,7 @@ pub fn release_notes_url(cx: &mut App) -> Option<String> {
              "https://github.com/zed-industries/zed/commits/nightly/".to_string()
          }
          ReleaseChannel::Dev => "https://github.com/zed-industries/zed/commits/main/".to_string(),
@@ -84,24 +74,6 @@ index 0d86651..4549560 100644
      };
      Some(url)
  }
-diff --git a/crates/auto_update_ui/src/auto_update_ui.rs b/crates/auto_update_ui/src/auto_update_ui.rs
-index b6f4fae..fa4de6b 100644
---- a/crates/auto_update_ui/src/auto_update_ui.rs
-+++ b/crates/auto_update_ui/src/auto_update_ui.rs
-@@ -209,9 +209,10 @@ impl Dismissable for SkillsAnnouncement {
- fn announcement_for_version(version: &Version, cx: &App) -> Option<AnnouncementContent> {
-     let version_with_skills = match ReleaseChannel::global(cx) {
-         ReleaseChannel::Stable => Version::new(1, 4, 0),
--        ReleaseChannel::Dev | ReleaseChannel::Nightly | ReleaseChannel::Preview => {
--            Version::new(1, 4, 0)
--        }
-+        ReleaseChannel::Dev
-+        | ReleaseChannel::Nightly
-+        | ReleaseChannel::Preview
-+        | ReleaseChannel::Zeo => Version::new(1, 4, 0),
-     };
- 
-     if *version >= version_with_skills && !SkillsAnnouncement::dismissed(cx) {
 diff --git a/crates/client/src/zed_urls.rs b/crates/client/src/zed_urls.rs
 index d9cd625..7f7cdaf 100644
 --- a/crates/client/src/zed_urls.rs
@@ -263,10 +235,10 @@ index 6a4bf3d..14fa1fc 100644
          let commit_sha = option_env!("ZED_COMMIT_SHA").unwrap_or("missing-zed-commit-sha");
          let build_identifier = option_env!("ZED_BUILD_ID");
 diff --git a/crates/zed/build.rs b/crates/zed/build.rs
-index f49396a..7b18526 100644
+index 92407a3..d78ba82 100644
 --- a/crates/zed/build.rs
 +++ b/crates/zed/build.rs
-@@ -227,6 +227,7 @@ fn icon_path() -> std::path::PathBuf {
+@@ -228,6 +228,7 @@ fn icon_path() -> std::path::PathBuf {
          "preview" => "-preview",
          "nightly" => "-nightly",
          "dev" => "-dev",
@@ -275,10 +247,10 @@ index f49396a..7b18526 100644
      };
  
 diff --git a/crates/zed/src/zed.rs b/crates/zed/src/zed.rs
-index c4bf14e..2524522 100644
+index a5d947b..6ae5bda 100644
 --- a/crates/zed/src/zed.rs
 +++ b/crates/zed/src/zed.rs
-@@ -1533,6 +1533,7 @@ fn open_about_window(cx: &mut App) {
+@@ -1536,6 +1536,7 @@ fn open_about_window(cx: &mut App) {
                  include_bytes!("../resources/app-icon-preview.png").as_slice()
              }
              ReleaseChannel::Stable => include_bytes!("../resources/app-icon.png").as_slice(),
@@ -305,6 +277,3 @@ index 6705e58..b65bf51 100644
              false
          }
      };
--- 
-2.55.0
-

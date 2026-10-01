@@ -25,14 +25,12 @@ time, mirroring upstream's own cli -> zed relationship.
 
 Decision D9 in zeo/docs/REBRAND.md.
 ---
- crates/zed/Cargo.toml | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/crates/zed/Cargo.toml b/crates/zed/Cargo.toml
-index d9562b6..5adc4d7 100644
+index 413d7e8..0f862d9 100644
 --- a/crates/zed/Cargo.toml
 +++ b/crates/zed/Cargo.toml
-@@ -6,7 +6,7 @@ version = "1.21.0"
+@@ -6,7 +6,7 @@ version = "1.24.0"
  publish.workspace = true
  license = "GPL-3.0-or-later"
  authors = ["Zed Team <hi@zed.dev>"]
@@ -41,7 +39,7 @@ index d9562b6..5adc4d7 100644
  
  [lints]
  workspace = true
-@@ -59,7 +59,7 @@ visual-tests = [
+@@ -54,7 +54,7 @@ visual-tests = [
  ]
  
  [[bin]]
@@ -50,6 +48,3 @@ index d9562b6..5adc4d7 100644
  path = "src/main.rs"
  
  [[bin]]
--- 
-2.55.0
-

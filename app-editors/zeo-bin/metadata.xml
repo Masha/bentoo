@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@proton.me</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<use>
+		<flag name="claude-agent-acp-plus">Pull in <pkg>dev-util/claude-agent-acp-plus</pkg>, the ACP agent the compiled-in integration patches talk to</flag>
+		<flag name="claude-agent-acp-tui">Pull in <pkg>dev-util/claude-agent-acp-tui</pkg>, the ACP bridge that runs the Claude Code TUI in the agent panel</flag>
+	</use>
+	<longdescription lang="en">
+		The prebuilt form of app-editors/zeo at the same version: the same
+		Zed commit, the same patch series and the default USE set, compiled
+		for x86-64-v3 (Haswell / Zen 1 and newer). PROVENANCE.txt, installed
+		with the documentation, names the commit, every patch with its
+		sha256, the USE set and the compiler flags.
+	</longdescription>
+	<upstream>
+		<remote-id type="github">lucascouts/zeo</remote-id>
+		<bugs-to>https://github.com/lucascouts/zeo/issues</bugs-to>
+	</upstream>
+</pkgmetadata>

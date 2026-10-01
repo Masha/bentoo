@@ -15,16 +15,18 @@ CRATES="
 	addr2line@0.25.1
 	addr2line@0.26.1
 	adler2@2.0.1
+	adler32@1.2.0
 	aes@0.8.4
-	agent-client-protocol-derive@2.1.0
-	agent-client-protocol-schema@1.7.0
-	agent-client-protocol@2.1.0
+	agent-client-protocol-derive@2.2.0
+	agent-client-protocol-schema@1.9.1
+	agent-client-protocol@2.2.0
 	ahash@0.7.8
 	ahash@0.8.12
 	aho-corasick@1.1.3
 	aliasable@0.1.3
 	aligned-vec@0.6.4
 	aligned@0.4.3
+	alloca@0.4.0
 	allocator-api2@0.2.21
 	alsa-sys@0.3.1
 	alsa@0.10.0
@@ -164,11 +166,12 @@ CRATES="
 	bzip2-sys@0.1.13+1.0.8
 	bzip2@0.4.4
 	bzip2@0.6.1
+	c-enum@0.2.3
 	cached@0.56.0
 	cached_proc_macro@0.25.0
 	cached_proc_macro_types@0.1.1
 	calloop-wayland-source@0.4.1
-	camino@1.2.1
+	camino@1.2.6
 	cap-fs-ext@4.0.3
 	cap-primitives@4.0.3
 	cap-std@4.0.3
@@ -185,7 +188,6 @@ CRATES="
 	cexpr@0.6.0
 	cfg-expr@0.20.9
 	cfg-if@1.0.4
-	cfg_aliases@0.1.1
 	cfg_aliases@0.2.1
 	cgl@0.3.2
 	chacha20@0.10.1
@@ -269,14 +271,13 @@ CRATES="
 	crc-fast@1.9.0
 	crc32fast@1.5.0
 	crc@3.3.0
-	criterion-plot@0.5.0
-	criterion@0.5.1
+	criterion-plot@0.8.2
+	criterion@0.8.2
 	crossbeam-channel@0.5.15
 	crossbeam-deque@0.8.6
 	crossbeam-epoch@0.9.18
 	crossbeam-queue@0.3.12
 	crossbeam-utils@0.8.21
-	crossbeam@0.8.4
 	crunchy@0.2.4
 	crypto-bigint@0.4.9
 	crypto-bigint@0.5.5
@@ -301,11 +302,13 @@ CRATES="
 	darling_macro@0.20.11
 	darling_macro@0.21.3
 	darling_macro@0.23.0
+	dary_heap@0.3.9
 	dashmap@6.1.0
 	dasp_sample@0.11.0
 	data-encoding@2.9.0
 	data-url@0.3.2
 	dbus@0.9.9
+	debug-ignore@1.0.5
 	debugid@0.8.0
 	deflate64@0.1.10
 	der@0.6.1
@@ -458,8 +461,10 @@ CRATES="
 	gpu-descriptor@0.3.2
 	granit-parser@1.0.0
 	group@0.12.1
+	guppy-workspace-hack@0.1.0
+	guppy@0.18.0
 	h2@0.3.27
-	h2@0.4.12
+	h2@0.4.19
 	half@2.7.1
 	handlebars@4.5.0
 	handlebars@5.1.2
@@ -500,13 +505,12 @@ CRATES="
 	httpdate@1.0.3
 	human_bytes@0.4.3
 	humantime@2.3.0
-	hyper-rustls@0.24.2
 	hyper-rustls@0.27.9
 	hyper-timeout@0.5.2
 	hyper-tls@0.5.0
 	hyper-util@0.1.17
 	hyper@0.14.32
-	hyper@1.7.0
+	hyper@1.11.1
 	iana-time-zone-haiku@0.1.2
 	iana-time-zone@0.1.64
 	icu_collator@2.3.0
@@ -530,6 +534,9 @@ CRATES="
 	imagesize@0.14.0
 	imara-diff@0.2.0
 	imgref@1.12.0
+	include-flate-codegen@0.3.4
+	include-flate-compress@0.3.4
+	include-flate@0.3.4
 	indenter@0.3.4
 	indexmap@1.9.3
 	indexmap@2.14.0
@@ -555,7 +562,7 @@ CRATES="
 	is_executable@1.0.5
 	is_terminal_polyfill@1.70.1
 	itertools@0.10.5
-	itertools@0.11.0
+	itertools@0.13.0
 	itertools@0.14.0
 	itertools@0.15.0
 	itoa@1.0.18
@@ -572,7 +579,6 @@ CRATES="
 	jobserver@0.1.34
 	js-sys@0.3.97
 	json5@1.3.1
-	json_dotpath@1.1.0
 	jsonschema-regex@0.51.0
 	jsonschema-value@0.51.0
 	jsonschema@0.51.0
@@ -595,6 +601,8 @@ CRATES="
 	libbz2-rs-sys@0.2.2
 	libc@0.2.186
 	libdbus-sys@0.2.6
+	libflate@2.3.1
+	libflate_lz77@2.3.0
 	libfuzzer-sys@0.4.10
 	libloading@0.8.9
 	libm@0.2.16
@@ -678,9 +686,10 @@ CRATES="
 	ndk-context@0.1.1
 	ndk-sys@0.6.0+11769913
 	ndk@0.9.0
+	nested@0.1.1
 	new_debug_unreachable@1.0.6
-	nix@0.28.0
 	nix@0.30.1
+	no_std_io2@0.9.4
 	nom@7.1.3
 	nom@8.0.0
 	noop_proc_macro@0.3.0
@@ -722,7 +731,9 @@ CRATES="
 	objc2-core-graphics@0.3.2
 	objc2-core-image@0.2.2
 	objc2-core-location@0.3.2
+	objc2-core-media@0.3.2
 	objc2-core-services@0.3.2
+	objc2-core-video@0.3.2
 	objc2-encode@4.1.0
 	objc2-foundation@0.2.2
 	objc2-foundation@0.3.2
@@ -788,6 +799,9 @@ CRATES="
 	pem-rfc7468@0.7.0
 	pem@3.0.6
 	percent-encoding@2.3.2
+	perf-event-data@0.1.8
+	perf-event-open-sys2@5.0.6
+	perf-event2@0.7.4
 	pest@2.8.3
 	pest_derive@2.8.3
 	pest_generator@2.8.3
@@ -827,7 +841,6 @@ CRATES="
 	pori@0.0.0
 	portable-atomic-util@0.2.4
 	portable-atomic@1.11.1
-	portable-pty@0.9.0
 	postage@0.5.0
 	postcard@1.1.3
 	potential_utf@0.1.3
@@ -838,7 +851,9 @@ CRATES="
 	pretty_assertions@1.4.1
 	prettyplease@0.2.37
 	proc-macro-crate@3.4.0
+	proc-macro-error-attr3@3.1.1
 	proc-macro-error-attr@1.0.4
+	proc-macro-error3@3.1.1
 	proc-macro-error@1.0.4
 	proc-macro2-diagnostics@0.10.1
 	proc-macro2@1.0.107
@@ -931,6 +946,7 @@ CRATES="
 	ring@0.17.14
 	rkyv@0.7.45
 	rkyv_derive@0.7.45
+	rle-decode-fast@1.0.3
 	rmp@0.8.14
 	rmpv@1.3.0
 	roughr-merman@0.12.3
@@ -958,9 +974,7 @@ CRATES="
 	rustls-pki-types@1.12.0
 	rustls-platform-verifier-android@0.1.1
 	rustls-platform-verifier@0.7.0
-	rustls-webpki@0.101.7
 	rustls-webpki@0.103.13
-	rustls@0.21.12
 	rustls@0.23.40
 	rustversion@1.0.22
 	rusty-fork@0.3.1
@@ -980,7 +994,6 @@ CRATES="
 	screencapturekit@0.2.8
 	scroll@0.12.0
 	scroll_derive@0.12.1
-	sct@0.7.1
 	sdd@4.6.2
 	sea-bae@0.2.2
 	sea-orm-macros@1.1.10
@@ -995,11 +1008,12 @@ CRATES="
 	security-framework@3.5.1
 	selectors@0.37.0
 	self_cell@1.2.2
-	semver@1.0.27
-	serde@1.0.228
+	semver@1.0.28
+	send_wrapper@0.6.0
+	serde@1.0.229
 	serde_bytes@0.11.19
-	serde_core@1.0.228
-	serde_derive@1.0.228
+	serde_core@1.0.229
+	serde_derive@1.0.229
 	serde_derive_internals@0.29.1
 	serde_fmt@1.0.3
 	serde_json@1.0.151
@@ -1013,14 +1027,12 @@ CRATES="
 	serde_with_macros@3.22.0
 	serde_yaml@0.9.34+deprecated
 	serde_yaml_ng@0.10.0
-	serial2@0.2.33
 	servo_arc@0.4.3
 	sha-1@0.10.1
 	sha1@0.10.6
 	sha1_smol@1.0.1
 	sha2@0.10.9
 	sharded-slab@0.1.7
-	shared_library@0.1.9
 	shell-words@1.1.0
 	shellexpand@3.1.1
 	shingles@0.1.1
@@ -1044,7 +1056,7 @@ CRATES="
 	skrifa@0.40.0
 	slab@0.4.11
 	slotmap@1.0.7
-	smallvec@1.15.1
+	smallvec@1.16.1
 	smart-default@0.7.1
 	smol@2.0.2
 	smol_str@0.3.6
@@ -1093,17 +1105,10 @@ CRATES="
 	svg_fmt@0.4.5
 	svgtypes@0.16.1
 	swash@0.2.6
-	symphonia-bundle-flac@0.5.5
-	symphonia-bundle-mp3@0.5.5
-	symphonia-codec-aac@0.5.5
 	symphonia-codec-pcm@0.5.5
-	symphonia-codec-vorbis@0.5.5
 	symphonia-core@0.5.5
-	symphonia-format-isomp4@0.5.5
-	symphonia-format-ogg@0.5.5
 	symphonia-format-riff@0.5.5
 	symphonia-metadata@0.5.5
-	symphonia-utils-xiph@0.5.5
 	symphonia@0.5.5
 	syn@1.0.109
 	syn@2.0.117
@@ -1122,10 +1127,10 @@ CRATES="
 	system-deps@7.0.7
 	taffy@0.13.0
 	tagptr@0.2.0
-	take-until@0.2.0
 	tao-core-video-sys@0.2.0
 	tap@1.0.1
 	target-lexicon@0.13.5
+	target-spec@3.7.0
 	tauri-winrt-notification@0.7.3
 	tempfile@3.27.0
 	tendril@0.5.1
@@ -1151,7 +1156,6 @@ CRATES="
 	tokio-io@0.1.13
 	tokio-macros@2.7.0
 	tokio-native-tls@0.3.1
-	tokio-rustls@0.24.1
 	tokio-rustls@0.26.4
 	tokio-socks@0.5.2
 	tokio-stream@0.1.17
@@ -1299,7 +1303,6 @@ CRATES="
 	wasmtime-wasi-io@48.0.1
 	wasmtime-wasi@48.0.1
 	wasmtime@48.0.1
-	wast@35.0.2
 	wax@0.7.0
 	wayland-backend@0.3.15
 	wayland-client@0.31.11
@@ -1327,9 +1330,6 @@ CRATES="
 	wgpu@29.0.4
 	which@8.0.5
 	whoami@1.6.1
-	wiggle-generate@48.0.1
-	wiggle-macro@48.0.1
-	wiggle@48.0.1
 	winapi-i686-pc-windows-gnu@0.4.0
 	winapi-util@0.1.11
 	winapi-x86_64-pc-windows-gnu@0.4.0
@@ -1416,7 +1416,6 @@ CRATES="
 	windows_x86_64_msvc@0.53.1
 	winnow@0.7.13
 	winnow@1.0.2
-	winreg@0.10.1
 	winreg@0.50.0
 	winreg@0.55.0
 	winresource@0.1.23
@@ -1445,11 +1444,9 @@ CRATES="
 	wit-parser@0.227.1
 	wit-parser@0.244.0
 	wit-parser@0.254.0
-	witx@0.9.1
 	write16@1.0.0
 	writeable@0.6.4
 	wyz@0.5.1
-	x11-clipboard@0.9.3
 	x11@2.21.0
 	x11rb-protocol@0.13.2
 	x11rb@0.13.2
@@ -1466,6 +1463,7 @@ CRATES="
 	y4m@0.8.0
 	yaml-rust2@0.8.1
 	yansi@1.0.1
+	yawc@0.4.2
 	yazi@0.2.1
 	yeslogic-fontconfig-sys@6.0.0
 	yoke-derive@0.8.2
@@ -1492,8 +1490,10 @@ CRATES="
 	zip@0.6.6
 	zmij@1.0.23
 	zstd-safe@5.0.2+zstd.1.5.2
+	zstd-safe@7.3.0
 	zstd-sys@2.0.16+zstd.1.5.7
 	zstd@0.11.2+zstd.1.5.2
+	zstd@0.13.3
 	zune-core@0.5.1
 	zune-inflate@0.2.54
 	zune-jpeg@0.5.15
@@ -1569,21 +1569,16 @@ declare -A GIT_CRATES=(
 	[wprcontrol]='https://github.com/zed-industries/wprcontrol;cd811f7d744f65291e13131b1d907fda63ed91a1;wprcontrol-%commit%'
 	[xim-ctext]='https://github.com/zed-industries/xim-rs;16f35a2c881b815a2b6cdfd6687988e84f8447d8;xim-rs-%commit%/xim-ctext'
 	[xim-parser]='https://github.com/zed-industries/xim-rs;16f35a2c881b815a2b6cdfd6687988e84f8447d8;xim-rs-%commit%/xim-parser'
-	[yawc]='https://github.com/zed-industries/yawc;71a452f551cac178367eaac5d7418a09afa1f3a2;yawc-%commit%'
 	[zed-font-kit]='https://github.com/zed-industries/font-kit;94b0f28166665e8fd2f53ff6d268a14955c82269;font-kit-%commit%'
 	[zed-reqwest]='https://github.com/zed-industries/reqwest;33bc764aa15ff7b200bf7c93bd96e24878d53e14;reqwest-%commit%'
 	[zed-scap]='https://github.com/zed-industries/scap;4afea48c3b002197176fb19cd0f9b180dd36eaac;scap-%commit%'
 	[zed-xim]='https://github.com/zed-industries/xim-rs;16f35a2c881b815a2b6cdfd6687988e84f8447d8;xim-rs-%commit%'
 )
-
-# Zeo versions itself. ${PV} is Zeo's own version and says nothing about the Zed
-# it is built from -- Gentoo's version grammar (PMS 3.2) has no way to carry two
-# upstream versions, since a suffix number is a plain integer and no dot may
-# follow it. The Zed base is therefore a variable, exactly as EGIT_COMMIT already
-# is, and it is what the distfile is named after so both packages share one.
-ZED_PV="1.21.0_pre20260912"
-
-EGIT_COMMIT="9d272b036335401f339d024ea94968fd51016c40"
+# Built from upstream's tagged release, unpatched: this package is the source
+# twin of app-editors/zed-bin. The patched snapshot with the Claude integration
+# ships as app-editors/zeo. Upstream tags a preview "vX.Y.Z-pre", which Gentoo
+# spells X.Y.Z_pre.
+MY_PV="${PV/_pre/-pre}"
 LLVM_COMPAT=( 22 )
 RUST_MIN_VER="1.98.1"
 RUST_NEEDS_LLVM=1
@@ -1591,25 +1586,22 @@ WEBRTC_COMMIT="0001d84-4"
 
 # BENTOO-DIVERGENCE: INHERIT - llvm-r1, because series 1.20 needs a pinned LLVM
 # slot to build; 1.14 in ::gentoo does not.
-# BENTOO-DIVERGENCE: PATCHES - overlay-only, all of them wiring the
-# claude-agent-acp integrations; ::gentoo carries none.
 inherit cargo check-reqs desktop flag-o-matic llvm-r1 toolchain-funcs xdg
 
 # BENTOO-DIVERGENCE: metadata.xml - a <use> block describing fourteen flags,
 # where ::gentoo's file has none. Every one of them is a flag this overlay adds
-# (see the IUSE tag). ::gentoo has nothing to describe because it exposes none
-# of them, and no ::gentoo package corresponds to this one at all.
-# BENTOO-DIVERGENCE: KEYWORDS - no ~arm64, where ::gentoo has it. Measured
-# 2026-09-07 by keywording it and running pkgcheck: dev-util/claude-agent-acp-plus
-# and dev-util/claude-agent-acp-tui are both DEFAULT-ON here and both ship a
-# prebuilt x64 binary (claude-agent-sdk-linux-x64/claude, node-pty's pty.node),
-# so an arm64 user would get an uninstallable package out of the box.
-# Arch-guarding the IUSE is not the answer - that poisons md5-cache. Reopen this
-# when those two gain an arm64 build; nothing else here is amd64-bound.
-DESCRIPTION="Zeo - the Zed editor, rebranded, built from Zed ${ZED_PV}"
-HOMEPAGE="https://github.com/lucascouts/zeo https://zed.dev"
+# (see the IUSE tag): X, wayland, collab, neovim, mimalloc, tracy, inspector,
+# remote-server and the rest. ::gentoo has nothing to describe because it
+# exposes none of them.
+# BENTOO-DIVERGENCE: KEYWORDS - no ~arm64, where ::gentoo has it. It was
+# dropped while this package carried the Claude adapters, which ship x64-only
+# binaries; those now belong to app-editors/zeo. Nothing here is amd64-bound
+# any more, but no arm64 build of this package has been run, so the keyword is
+# not restored on faith.
+DESCRIPTION="The fast, collaborative code editor"
+HOMEPAGE="https://zed.dev https://github.com/zed-industries/zed"
 SRC_URI="
-	https://github.com/zed-industries/zed/archive/${EGIT_COMMIT}.tar.gz -> zed-${ZED_PV}.tar.gz
+	https://github.com/zed-industries/zed/archive/refs/tags/v${MY_PV}.tar.gz -> ${P}.tar.gz
 	amd64? (
 		https://github.com/zed-industries/livekit-rust-sdks/releases/download/webrtc-${WEBRTC_COMMIT}/webrtc-linux-x64-release.zip ->
 			webrtc-${WEBRTC_COMMIT}-linux-x64-release.zip
@@ -1620,9 +1612,7 @@ SRC_URI="
 	)
 	${CARGO_CRATE_URIS}"
 
-# The upstream tarball unpacks to zed-<commit>; ${PN} is "zeo" here, so the
-# directory must be named explicitly rather than derived from it.
-S="${WORKDIR}/zed-${EGIT_COMMIT}"
+S="${WORKDIR}/${PN}-${MY_PV}"
 # BENTOO-DIVERGENCE: LICENSE - the vendored crate set differs six series on, so
 # the LICENSE+= block below names licences 1.14 never pulled in, among them
 # CDLA-Permissive-2.0.
@@ -1637,12 +1627,9 @@ LICENSE+="
 "
 SLOT="0"
 # The arm64 half of SRC_URI and of src_compile's LK_CUSTOM_WEBRTC is kept even
-# though KEYWORDS carries no ~arm64: it is what a future re-keyword needs, and
-# the only thing standing in the way is the two Claude agents named above.
+# though KEYWORDS carries no ~arm64: it is what a future re-keyword needs.
 KEYWORDS="~amd64"
-# BENTOO-DIVERGENCE: IUSE - claude-agent-acp-plus, claude-agent-acp-tui and
-# claude-code-ide gate integrations with overlay-only packages; X is exposed
-# separately from wayland here.
+# BENTOO-DIVERGENCE: IUSE - X is exposed separately from wayland here.
 #
 # pulseaudio was dropped on 2026-09-09 rather than carried: it changed no part
 # of the build. Zed's audio path is cpal, which on Linux is ALSA -- the lockfile
@@ -1651,19 +1638,15 @@ KEYWORDS="~amd64"
 # media-plugins/alsa-plugins[pulseaudio], which is a runtime choice, not a
 # property of this binary.
 #
-# inspector is the GPUI UI inspector, upstream feature zed/inspector.
+# inserted the same day: inspector (the GPUI UI inspector) and remote-server
+# (crates/remote_server, the SSH remote-editing daemon Zed otherwise downloads
+# from zed.dev at run time -- packaging it is what lets a server host serve it
+# from portage instead).
 #
-# test is not an upstream feature: src_test has existed here without it, which
-# left RESTRICT unable to say the suite is optional.
-#
-# collab, extensions-cli and remote-server are deliberately NOT offered here.
-# Each installs a binary under a name app-editors/zed already uses -- collab,
-# zed-extension, zed-remote-server -- and renaming Zed's server infrastructure is
-# not what a rebrand of the editor is for. Dropping them is what lets the two
-# packages coexist with no blocker at all: zeo owns /usr/bin/zeo,
-# /usr/libexec/zeo-editor and dev.zeo.Zeo.*, and collides with nothing.
-IUSE="+X +claude-agent-acp-plus +claude-agent-acp-tui +claude-code-ide inspector
-	+mimalloc neovim screen-capture test tracy +wayland"
+# test is not a Zed feature: src_test has existed here without it, which left
+# RESTRICT unable to say the suite is optional.
+IUSE="+X collab extensions-cli inspector +mimalloc neovim remote-server
+	screen-capture test tracy +wayland"
 # BENTOO-DIVERGENCE: REQUIRED_USE - the || ( X wayland ) clause, which follows
 # from the X and wayland flags this overlay adds (see the IUSE tag). ::gentoo
 # exposes neither, so it has nothing to constrain.
@@ -1712,12 +1695,9 @@ DEPEND="
 		x11-libs/libxkbcommon[X]
 	)
 "
-# BENTOO-DIVERGENCE: RDEPEND - dbus as above, plus dev-util/claude-agent-acp-plus
-# and -tui, which exist only in this overlay.
+# BENTOO-DIVERGENCE: RDEPEND - dbus as above.
 RDEPEND="
 	${DEPEND}
-	claude-agent-acp-plus? ( dev-util/claude-agent-acp-plus )
-	claude-agent-acp-tui? ( dev-util/claude-agent-acp-tui )
 	neovim? ( app-editors/neovim )
 "
 BDEPEND="
@@ -1736,8 +1716,11 @@ BDEPEND="
 "
 
 QA_FLAGS_IGNORED="
-	usr/bin/zeo
-	usr/libexec/zeo-editor
+	usr/bin/zedit
+	usr/libexec/zed-editor
+	usr/bin/collab
+	usr/bin/zed-extension
+	usr/bin/zed-remote-server
 "
 
 pkg_setup() {
@@ -1759,134 +1742,16 @@ pkg_setup() {
 }
 
 src_prepare() {
-	# 0018 carries no USE flag on purpose. It adds the drop_folder_behavior
-	# setting, whose default is the behaviour Zed already had, so applying it
-	# unconditionally changes nothing for anyone who does not set it -- and a
-	# flag would only hide a setting behind a rebuild.
-	PATCHES+=( "${FILESDIR}/0018-drop-folder-opens-project.patch" )
-
-	# 0019-0023 are what make this package Zeo rather than Zed, so they carry no
-	# USE flag: without them this ebuild would build app-editors/zed under a
-	# different name and install it over the top of it.
-	PATCHES+=(
-		"${FILESDIR}/0019-paths-use-Zeo-state-directories.patch"
-		"${FILESDIR}/0020-zed-name-the-application-binary-zeo.patch"
-		"${FILESDIR}/0021-release_channel-add-the-Zeo-channel.patch"
-		"${FILESDIR}/0022-zed-register-zeo-and-keep-accepting-zed.patch"
-		# 0023 fixes what 0020 broke: the CLI finds the application through a
-		# fixed list of path literals, and renaming the [[bin]] target left that
-		# list pointing at a binary that no longer exists. Nothing connects the
-		# literals to the Cargo target, so it compiles clean and fails at run
-		# time. It also decides src_install below: the list is Zeo-only, so the
-		# application MUST land at libexec/zeo-editor.
-		"${FILESDIR}/0023-cli-point-the-launcher-at-the-Zeo-application-binary.patch"
-		# 0025 renames the product in the strings a user actually reads. It is
-		# 21 literals out of 404 containing "Zed" in the tree: most of the rest
-		# name Zed Industries -- the vendor, the plans, the team, the hosted
-		# models -- or are font-family lookup keys, a User-Agent, or theme names
-		# referenced from user settings, and renaming any of those breaks
-		# something. The window title is not here because it never needed a
-		# patch: it resolves through display_name(), which 0021 already made
-		# return "Zeo". Numbered 0025 because app-editors/zed took 0024.
-		"${FILESDIR}/0025-zed-say-Zeo-in-the-strings-a-user-actually-reads.patch"
-	)
-
-	if use claude-agent-acp-plus; then
-		PATCHES+=(
-			"${FILESDIR}/0001-force-enable-claude-agent-acp-plus.patch"
-			# 0003/0004 (per-option _meta description + preview) dropped: upstream
-			# 950ec79 now surfaces option descriptions natively via the ACP
-			# EnumOption.description field, superseding the _claude/askUserQuestionOption
-			# _meta machinery (and renamed MultiSelectItems::Untitled -> String).
-			"${FILESDIR}/0005-elicitation-multiline-fields.patch"
-			"${FILESDIR}/0006-elicitation-option-previews.patch"
-			"${FILESDIR}/0007-manual-mode-badge.patch"
-			"${FILESDIR}/0008-clickable-attachments.patch"
-			# 0009: adopt the agent's config-option response when applying
-			# per-agent defaults, so options that appear as a side effect (Fast
-			# mode once the resolved model supports it) surface without a manual
-			# model switch.
-			"${FILESDIR}/0009-Adopt-agent-s-config-option-response-when-applying-d.patch"
-			# 0010: a thread menu choice (permission mode, model, thinking effort,
-			# an ACP agent's config options) applies to that thread only; Shift
-			# also makes it the default for new threads. It applies to the packaged
-			# source on its own, so it rides this flag by choice rather than by
-			# dependency -- it also covers the native agent's own menus.
-			"${FILESDIR}/0010-shift-to-set-as-default.patch"
-			# 0011: an "Account" section in the context tooltip -- the account
-			# quota windows (5-hour, weekly, per-model) that the adapter already
-			# forwards under _meta["_claude/rateLimit"] and Zed discarded. Rides
-			# this flag by dependency: no other agent sends that key.
-			"${FILESDIR}/0011-account-usage-panel.patch"
-			# 0012: a "Worktrees" entry in the agent panel menu, dispatching the
-			# existing zero-arg zed_actions::git::Worktree so the picker chooses
-			# between creating a worktree and switching to one. Zed ships
-			# worktrees end to end and the panel already reaches them -- but only
-			# under request.use_new_worktree, an input of the create_thread AGENT
-			# TOOL, so the model could open one and the user could not. It applies
-			# to the packaged source on its own, so like 0010 it rides this flag
-			# by choice rather than by dependency.
-			"${FILESDIR}/0012-agent-panel-worktree-entry.patch"
-			# 0013: the per-model quota row. The adapter forwards every
-			# rate_limits.model_scoped[] entry under one wire kind, and from_wire
-			# had no arm for it, so the row 0011's Account section was built to
-			# show never arrived. Adds a dynamic variant carrying the display name
-			# the server sends -- it adds a name, it does not open the enum.
-			# Rides this flag by DEPENDENCY, like 0011: no other agent sends the key.
-			"${FILESDIR}/0013-model-scoped-quota-window.patch"
-			# 0014: a copy button on the user's own message, yielding the string
-			# the edit path already serialises rather than a second serialisation.
-			# It sits on the shared container before the editable/non-editable
-			# branch, so subagent messages -- always non-editable -- get it too.
-			# Pure Zed, so it rides this flag by CHOICE, like 0010 and 0012.
-			"${FILESDIR}/0014-copy-the-user-s-own-message.patch"
-			# 0015: the thread archive scoped to its project. Three reads were
-			# global, not one -- the list, the ArchivedOnly fall-back guard, and
-			# the archived-only toggle's disabled state. Deliberately not via the
-			# store's entries_for_path, which drops archived threads: correct for
-			# the sidebar, fatal for an archive view. Pure Zed, by CHOICE.
-			"${FILESDIR}/0015-scoped-thread-history.patch"
-			# 0016: a rendered-markdown preview of the composer draft, through the
-			# same MarkdownElement that draws every agent response, reached by the
-			# ToggleMessagePreview action. The only one of these five that is new
-			# UI rather than an affordance over existing machinery. Pure Zed, by
-			# CHOICE.
-			"${FILESDIR}/0016-composer-markdown-preview.patch"
-			# 0017: native rendering for a compaction the adapter reports. The ACP
-			# compaction_update variant is unreachable here -- agent-client-protocol
-			# 2.0.0 carries zero occurrences of "compaction" -- so this reads the
-			# adapter's versioned _meta.contextCompaction and dispatches into the
-			# existing push_context_compaction; an unknown version falls through to
-			# the generic tool row. Rides this flag by DEPENDENCY: only this
-			# adapter emits that key.
-			"${FILESDIR}/0017-native-compaction-entry.patch"
-		)
-	fi
-
-	# terminal-ide story 001: Claude Code IDE integration (upstream PR #58300 + API-drift fixes).
-	if use claude-code-ide; then
-		PATCHES+=( "${FILESDIR}/0002-claude-code-ide-integration.patch" )
-	fi
-
-	# The Zeo mark cannot ride in the series: GNU patch refuses a git binary
-	# hunk outright ("git binary diffs are not supported"), and eapply is
-	# `patch -p1`. So the art is installed here, before eapply, and its source of
-	# truth is brand/rendered/ in the zeo repository, reproducible from
-	# brand/build-icon.py and checksummed there.
-	cp "${FILESDIR}/app-icon-zeo.png" crates/zed/resources/ || die
-	cp "${FILESDIR}/app-icon-zeo@2x.png" crates/zed/resources/ || die
-
 	default
 
-	export APP_CLI="zeo"
-	# Patch 0021 gives ReleaseChannel::Zeo the app_id "dev.zeo.Zeo", and the
-	# RELEASE_CHANNEL file below selects that channel, so this is the runtime
-	# Wayland app_id / X11 WM_CLASS. The .desktop filename, the Icon name and
-	# StartupWMClass must all equal it, or the compositor has nothing to match
-	# the window against and draws a generic icon.
-	export APP_ID="dev.zeo.Zeo"
+	export APP_CLI="zedit"
+	# RELEASE_CHANNEL is "preview" below, so the runtime app_id (Wayland
+	# app_id / X11 WM_CLASS) is "dev.zed.Zed-Preview". The .desktop filename,
+	# the Icon name and StartupWMClass MUST all match it, or Wayland
+	# compositors draw the generic icon instead of Zed's.
+	export APP_ID="dev.zed.Zed-Preview"
 	export APP_ICON="${APP_ID}"
-	export APP_NAME="Zeo"
+	export APP_NAME="Zed Preview"
 	export APP_ARGS="%U"
 	export DO_STARTUP_NOTIFY="true"
 	envsubst < "crates/zed/resources/zed.desktop.in" > ${APP_ID}.desktop || die
@@ -1895,24 +1760,11 @@ src_prepare() {
 	# line) for X11 compatibility and as the Wayland compositor fall-back.
 	sed -i "/^Actions=/i StartupWMClass=${APP_ID}" "${APP_ID}.desktop" || die
 
-	# Upstream's template declares x-scheme-handler/zed, and envsubst does not
-	# touch it -- so an unedited Zeo entry advertises itself as a handler for
-	# ZED's URLs and declares none of its own. Measured on a real install: the
-	# system mimeinfo.cache listed dev.zeo.Zeo.desktop beside Zed's under
-	# x-scheme-handler/zed, and zeo:// resolved to nothing at all. Patch 0022
-	# registers zeo:// at run time, but the desktop file is what the desktop
-	# environment reads to route a link, and it is the half that decides which
-	# editor opens someone else's zed:// link.
-	sed -i "s|x-scheme-handler/zed|x-scheme-handler/zeo|" "${APP_ID}.desktop" || die
-	# Keywords is what an application launcher searches. Keep "zed" so people
-	# looking for the editor Zeo is built from still find it, and add "zeo".
-	sed -i "s|^Keywords=zed;|Keywords=zeo;zed;|" "${APP_ID}.desktop" || die
-
-	# The file drives the runtime ReleaseChannel enum through include_str!.
-	# src_compile exports the identically named ENVIRONMENT VARIABLE, which is a
-	# different input read by build.rs; both are needed and they are not
-	# interchangeable.
-	echo "zeo" > crates/zed/RELEASE_CHANNEL || die
+	# The channel this tag was released on. The tag already ships the file with
+	# this value; writing it keeps the ebuild the one place that decides. It
+	# also names the remote_server zed.dev serves for this exact version, so the
+	# auto-download finds a matching daemon (the dev channel hard-fails there).
+	echo "preview" > crates/zed/RELEASE_CHANNEL || die
 
 	# Cargo offline fetch workaround
 	local ASYNC_PROCESS_COMMIT="0b6d6713570af61806e1e5cb40e0f757cb93fd9d"
@@ -2017,23 +1869,23 @@ src_prepare() {
 }
 
 src_compile() {
-	export RELEASE_VERSION="${PV}"
-	export ZED_UPDATE_EXPLANATION='Zeo updates are handled by portage'
-	# crates/zed/build.rs reads RELEASE_CHANNEL as an ENVIRONMENT VARIABLE, via
-	# option_env!, to pick the icon it embeds -- a different input from the
-	# crates/zed/RELEASE_CHANNEL file src_prepare writes, which drives the
-	# runtime ReleaseChannel enum. Its match is on a string with a `_ => "-dev"`
-	# arm, so leaving this unset compiles clean and embeds Zed's development
-	# icon. app-editors/zed has exactly that gap today; it is masked on Wayland
-	# because the compositor resolves the INSTALLED icon by app_id instead.
-	export RELEASE_CHANNEL="zeo"
+	export RELEASE_VERSION="${MY_PV}"
+	export ZED_UPDATE_EXPLANATION='Updates are handled by portage'
+	# crates/zed/build.rs reads RELEASE_CHANNEL as an ENVIRONMENT VARIABLE to
+	# pick the icon it embeds -- a different input from the RELEASE_CHANNEL file
+	# src_prepare writes, which drives the runtime ReleaseChannel enum. Unset,
+	# its `_ => "-dev"` arm embeds the development icon.
+	export RELEASE_CHANNEL="preview"
 	if use arm64; then
 		export LK_CUSTOM_WEBRTC="${WORKDIR}/linux-arm64-release"
 	elif use amd64; then
 		export LK_CUSTOM_WEBRTC="${WORKDIR}/linux-x64-release"
 	fi
 	local features=()
-	use inspector && features+=( zed/inspector )
+	# gpui/inspector, not zed/inspector: upstream reverted "Implement
+	# `inspector` flag" (#62920) on 2026-09-15, and this tag's crates/zed has no
+	# such feature. gpui is a direct dependency of zed, so dep/feature resolves.
+	use inspector && features+=( gpui/inspector )
 	use mimalloc && features+=( zed/mimalloc )
 	use tracy && features+=( zed/tracy )
 
@@ -2041,6 +1893,15 @@ src_compile() {
 		--package zed
 		--package cli
 	)
+	use collab && packages+=( --package collab )
+	use extensions-cli && packages+=( --package extension_cli )
+	# remote_server is built from this same workspace rather than upstream's
+	# separate musl target, so it links the system libraries the rest of the
+	# package already depends on. That is what makes it usable on a host that
+	# has this package installed, and it is why it is not a drop-in replacement
+	# for the static binary zed.dev serves.
+	use remote-server && packages+=( --package remote_server )
+
 	# "${features[*]}" alone would be an empty --features argument when no flag
 	# is on; the count is what decides whether the option appears at all.
 	local feature_args=()
@@ -2052,24 +1913,33 @@ src_compile() {
 src_install() {
 	newbin "$(cargo_target_dir)"/cli "${APP_CLI}"
 	exeinto "/usr/libexec"
-	# zeo-editor, not zed-editor: patch 0023 leaves the launcher looking only for
-	# ../libexec/zeo-editor, and this is also what keeps the file off
-	# app-editors/zed's path so the two can be installed together.
-	newexe "$(cargo_target_dir)"/zeo zeo-editor
+	newexe "$(cargo_target_dir)"/zed zed-editor
 
-	# The Zeo mark, installed under the APP_ID name because that is how a Wayland
-	# compositor resolves a window's icon: it matches the app_id against the
-	# installed icon file name, not against anything inside the binary.
-	newicon -s 512 crates/zed/resources/app-icon-zeo.png "${APP_ID}.png"
-	newicon -s 1024 crates/zed/resources/app-icon-zeo@2x.png "${APP_ID}.png"
+	if use collab; then
+		dobin "$(cargo_target_dir)"/collab
+	fi
+
+	if use extensions-cli; then
+		newbin "$(cargo_target_dir)"/zed-extension zed-extension
+	fi
+
+	# The client looks the daemon up by a name it builds at run time, under the
+	# remote user's ~/.zed_server -- a path no ebuild can write to. Installing
+	# it here is therefore half the job; pkg_postinst spells out the other half.
+	if use remote-server; then
+		newbin "$(cargo_target_dir)"/remote_server zed-remote-server
+	fi
+
+	# The preview channel's own icon set, which the source ships, installed
+	# under the APP_ID name so Wayland compositors resolve it.
+	newicon -s 512 crates/zed/resources/app-icon-preview.png "${APP_ID}.png"
+	newicon -s 1024 crates/zed/resources/app-icon-preview@2x.png "${APP_ID}.png"
 	domenu "${S}/${APP_ID}.desktop"
 }
 
 src_test () {
-	# Patch 0019 moves APP_NAME to "Zeo", so the suite writes under zeo/ - these
-	# are the directories the tests expect to exist, not zed/ ones.
-	mkdir -p "${HOME}/.config/zeo" || die
-	mkdir -p "${HOME}/.local/share/zeo/logs/" || die
+	mkdir -p "${HOME}/.config/zed" || die
+	mkdir -p "${HOME}/.local/share/zed/logs/" || die
 
 	SHELL=/usr/bin/sh RUST_BACKTRACE=full cargo_src_test -vv \
 		-- --skip zed::tests::test_window_edit_state_restoring_enabled
@@ -2078,24 +1948,25 @@ src_test () {
 pkg_postinst() {
 	xdg_pkg_postinst
 
-	if use claude-agent-acp-tui; then
+	if use remote-server; then
 		elog ""
-		elog "The claude-agent-acp-tui ACP bridge was installed as 'claude-agent-acp-tui'."
-		elog "To enable it in Zeo, add to ~/.config/zeo/settings.json:"
+		elog "The remote editing daemon was installed as 'zed-remote-server'."
+		elog "Installing it is only half of what makes it used: a Zed client"
+		elog "looks the daemon up on the remote host by a name it builds at run"
+		elog "time, under that user's home:"
 		elog ""
-		elog "    \"agent_servers\": {"
-		elog "        \"Claude Agent TUI\": { \"command\": \"claude-agent-acp-tui\", \"args\": [] }"
-		elog "    }"
-	fi
-
-	if use claude-code-ide; then
+		elog "    ~/.zed_server/zed-remote-server-preview-<VERSION>"
 		elog ""
-		elog "Claude Code IDE integration uses an unofficial, reverse-engineered"
-		elog "protocol that may break without notice."
-		elog "It activates automatically in Zeo-spawned terminals via environment"
-		elog "variables; no settings.json configuration is needed."
-		elog "The 'claude' CLI is required at runtime; it is distributed via npm"
-		elog "and is not packaged by this overlay."
-		elog "Verify the connection by running /ide inside 'claude'."
+		elog "so the daemon has to be reachable under exactly that name. Connect"
+		elog "once without it and Zed downloads its own copy there -- the name it"
+		elog "wrote is the name to use:"
+		elog ""
+		elog "    mkdir -p ~/.zed_server"
+		elog "    ln -sf /usr/bin/zed-remote-server \\"
+		elog "        ~/.zed_server/zed-remote-server-preview-<VERSION>"
+		elog ""
+		elog "This build comes from the same workspace as the editor, not from"
+		elog "upstream's separate static musl target, so it needs this package's"
+		elog "shared libraries present on the host that runs it."
 	fi
 }

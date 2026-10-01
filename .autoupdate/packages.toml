@@ -3040,19 +3040,30 @@ mesa_clc — part of the mesa tree; same source/rule as media-libs/mesa.
 """
 # END
 
-["app-editors/zed"]
+["app-editors/zeo"]
 track = "commit"
 url = "https://api.github.com/repos/zed-industries/zed/commits?sha=main&per_page=50"
 parser = "json"
 path = "[0].commit.committer.date"
 transform = [['T.*', ""], ['-', ""]]
 commit_sha_path = "[0].sha"
-base_from = "file"
-base_url = "https://api.github.com/repos/zed-industries/zed/contents/crates/zed/Cargo.toml?ref=main"
-base_pattern = '(?m)^version = "([0-9][0-9.]*)"'
-headers = { "User-Agent" = "bentoo-autoupdate", "Accept" = "application/vnd.github.raw" }
-version = "1.24.0_pre20261001"
+base_from = "none"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "0.1.0_p20261001"
 comments = """
+zeo — commit-tracked on Zed's main; the snapshot plus the bentoo patch series and
+the rebrand. 2026-10-01: this entry WAS app-editors/zed, which now builds
+upstream's releases unpatched (see the zed@stable/zed@preview entries); the
+snapshot line and its history moved here with the package.
+base_from = "none": Zeo versions itself (0.1.0), so a bump only moves the _p date
+and EGIT_COMMIT. That is also why the distfile is zed-${EGIT_COMMIT}.tar.gz and
+the ebuild carries no Zed version variable -- nothing here could keep a second
+version current, and a stale one would name new bytes after an old distfile.
+Every bump is still a manual follow-up the applier cannot do: regenerate CRATES/
+GIT_CRATES (pycargoebuild from crates/zed), re-check the eleven `local *_COMMIT`
+sed anchors, and carry the series with zed-patches/scripts/bump.sh. zeo-bin is
+then rebuilt with zed-patches/scripts/release-zeo-bin.sh and uploaded by hand.
+History below is the snapshot line's, from when it was named zed:
 zed — commit-tracked on main; _pre suffix preserved from current ebuild.
 2026-08-06: 2 commits landed same UTC day (d61e80b -> 6b2aa1c), so the date
 component alone did not change; bumped as -r1 (same-day revision) instead.
@@ -3516,6 +3527,59 @@ there is no version to read anywhere: the Makefile derives one from
 `git describe`, falling back to a VERSION file the repo does not contain. PV
 base stays "0"; the _p suffix carries the commit date. The 40-hex COMMIT="..."
 in the ebuild is what the applier rewrites.
+"""
+# END
+
+["app-editors/zed@stable"]
+url = "https://api.github.com/repos/zed-industries/zed/releases/latest"
+parser = "json"
+path = "tag_name"
+transform = [['^v', ""]]
+headers = { "User-Agent" = "bentoo-autoupdate" }
+type = "source"
+series = '^[0-9.]+$'
+version = "1.22.0"
+comments = """
+zed (stable channel), from source — since 2026-10-01 app-editors/zed builds
+upstream's tagged releases with no patches; the patched snapshot is app-editors/
+zeo. Mirrors zed-bin@stable: releases/latest is the stable release by definition,
+and series matches on the absence of a suffix.
+A bump is not finished by the applier: regenerate CRATES/GIT_CRATES with
+pycargoebuild from crates/zed of the new tag, and re-check WEBRTC_COMMIT
+(corgi.toml), RUST_MIN_VER (rust-toolchain.toml), the eleven `local *_COMMIT`
+sed anchors against the tag's root Cargo.toml, and whether the inspector
+feature lives in zed or gpui. At 1.22.0 and 1.23.1-pre: webrtc 0001d84-4, rust
+1.98.1, gpui/inspector.
+"""
+# END
+
+["app-editors/zed@preview"]
+url = "https://api.github.com/repos/zed-industries/zed/releases?per_page=20"
+parser = "regex"
+pattern = '"tag_name":\s*"v([0-9.]+-pre)"'
+transform = [['-pre$', "_pre"]]
+select = "max"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+type = "source"
+series = '_pre$'
+version = "1.23.1_pre"
+comments = """
+zed (preview channel), from source — mirrors zed-bin@preview; the same manual
+follow-up as zed@stable applies to every bump.
+"""
+# END
+
+["app-editors/zeo-bin"]
+enabled = false
+disabled_by = "released by hand: zed-patches/scripts/release-zeo-bin.sh builds it from app-editors/zeo and the tarball is uploaded to R2 after review"
+url = "https://api.github.com/repos/zed-industries/zed/commits?sha=main&per_page=1"
+parser = "json"
+path = "[0].commit.committer.date"
+version = "0.1.0_p20261001"
+comments = """
+zeo-bin — the prebuilt app-editors/zeo at the same PV, x86-64-v3, hosted at
+distfiles.obentoo.org. Never bumped automatically: a new PV needs a ~25 min
+release build and an upload, and its Manifest must describe the uploaded bytes.
 """
 # END
 
