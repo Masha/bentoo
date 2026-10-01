@@ -1,3 +1,18 @@
+# Lucas C.S. <lucascs@protonmail.com> (2026-09-29)
+# simdjson 5.0.1, a major release published 2026-09-28. Masked for two reasons:
+# it is younger than the 7-day floor for new dependency versions, and
+# net-libs/nodejs (24 and 26) depends on >=dev-libs/simdjson-4.6.1:= with no
+# upper bound, so unmasking it rebuilds every nodejs install against a new ABI
+# (subslot 0/33 -> 0/34) that no nodejs build has been tested against yet.
+#
+# The atom is deliberately unqualified: Portage stamps it "::bentoo", so only
+# this copy is masked and nodejs keeps resolving to ::gentoo's 4.6.x.
+#
+# Lift it once both hold: the date is past 2026-10-05, and net-libs/nodejs
+# (every slot in the tree, --shared-simdjson) builds and passes its tests
+# against 5.x.
+=dev-libs/simdjson-5.0.1
+
 # Lucas C.S. <lucascs@protonmail.com> (2026-09-25)
 # KDE Plasma 6.8 beta 2 (6.7.91), opt-in only. Plasma numbers the next
 # series' betas x.y.90 / x.y.91, so every atom below is a pre-release of 6.8.

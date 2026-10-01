@@ -1602,6 +1602,20 @@ libayatana-appindicator-glib — no releases (404); tags[0] is bare "X.Y.Z".
 """
 # END
 
+["dev-libs/simdjson"]
+url = "https://api.github.com/repos/simdjson/simdjson/releases/latest"
+parser = "json"
+path = "tag_name"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "5.0.1"
+comments = """
+simdjson - tag "vX.Y.Z". A major bump moves SIMDJSON_LIB_SOVERSION in the top
+CMakeLists.txt (4.x = 33, 5.0 = 34): SLOT's subslot must follow it by hand.
+Also re-check the simdjson-data commit pinned in dependencies/CMakeLists.txt
+against SIMDJSON_DATA_HASH.
+"""
+# END
+
 ["dev-libs/sentry-native"]
 url = "https://api.github.com/repos/getsentry/sentry-native/releases/latest"
 parser = "json"
