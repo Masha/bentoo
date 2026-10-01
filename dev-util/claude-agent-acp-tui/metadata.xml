@@ -15,7 +15,7 @@
 		node-pty addon), so no compilation happens at merge time.
 	</longdescription>
 	<upstream>
-		<bugs-to>https://github.com/lucascouts/claude-agent-tui/issues</bugs-to>
-		<remote-id type="github">lucascouts/claude-agent-tui</remote-id>
+		<bugs-to>https://github.com/zeo-workspace/claude-agent-tui/issues</bugs-to>
+		<remote-id type="github">zeo-workspace/claude-agent-tui</remote-id>
 	</upstream>
 </pkgmetadata>

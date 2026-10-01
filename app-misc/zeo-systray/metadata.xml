@@ -39,7 +39,7 @@
 		on the Notification event. That boundary is covered by upstream tests.
 	</longdescription>
 	<upstream>
-		<remote-id type="github">lucascouts/zeo-systray</remote-id>
-		<bugs-to>https://github.com/lucascouts/zeo-systray/issues</bugs-to>
+		<remote-id type="github">zeo-workspace/zeo-systray</remote-id>
+		<bugs-to>https://github.com/zeo-workspace/zeo-systray/issues</bugs-to>
 	</upstream>
 </pkgmetadata>

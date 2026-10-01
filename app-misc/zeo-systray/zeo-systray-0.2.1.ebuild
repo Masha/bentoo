@@ -155,9 +155,9 @@ RUST_MIN_VER="1.89.0"
 inherit cargo desktop systemd xdg-utils
 
 DESCRIPTION="Desktop tray indicator for Claude Code agent sessions, fed by hooks"
-HOMEPAGE="https://github.com/lucascouts/zeo-systray"
+HOMEPAGE="https://github.com/zeo-workspace/zeo-systray"
 SRC_URI="
-	https://github.com/lucascouts/zeo-systray/archive/v${PV}.tar.gz -> ${P}.tar.gz
+	https://github.com/zeo-workspace/zeo-systray/archive/v${PV}.tar.gz -> ${P}.tar.gz
 	${CARGO_CRATE_URIS}
 "
 

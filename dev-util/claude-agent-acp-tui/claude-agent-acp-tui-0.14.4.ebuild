@@ -4,11 +4,11 @@
 EAPI=8
 
 DESCRIPTION="Run the Claude Code TUI in Zed's agent panel via an ACP-over-PTY bridge"
-HOMEPAGE="https://github.com/lucascouts/claude-agent-tui"
+HOMEPAGE="https://github.com/zeo-workspace/claude-agent-tui"
 # Upstream GitHub repo/release asset is still named 'claude-agent-tui'; the
 # package was renamed to claude-agent-acp-tui, so fetch the upstream tarball
 # and rename it to ${P} (and set S to the upstream-named extracted dir).
-SRC_URI="https://github.com/lucascouts/claude-agent-tui/releases/download/v${PV}/claude-agent-tui-${PV}.tar.gz -> ${P}.tar.gz"
+SRC_URI="https://github.com/zeo-workspace/claude-agent-tui/releases/download/v${PV}/claude-agent-tui-${PV}.tar.gz -> ${P}.tar.gz"
 S="${WORKDIR}/claude-agent-tui-${PV}"
 
 LICENSE="Apache-2.0"

@@ -9145,14 +9145,14 @@ WHY it came back is what stops the same case being re-argued from scratch.
 # END
 
 ["dev-util/claude-agent-acp-tui"]
-url = "https://api.github.com/repos/lucascouts/claude-agent-tui/releases/latest"
+url = "https://api.github.com/repos/zeo-workspace/claude-agent-tui/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 version = "0.14.4"
 comments = """
 Renamed from dev-util/claude-agent-tui (commit e8a05fdc: del old ebuild + add
-claude-agent-acp-tui, same upstream repo lucascouts/claude-agent-tui, same PV).
+claude-agent-acp-tui, same upstream repo zeo-workspace/claude-agent-tui, same PV).
 GitHub Releases; tag "vX.Y.Z" (leading v stripped). releases/latest excludes
 drafts/prereleases. SRC_URI uses releases/download/v${PV}/claude-agent-tui-${PV}.tar.gz.
 Live=v0.7.0.
@@ -9791,7 +9791,7 @@ archive/v${PV}.tar.gz; linux-mod but version comes from the tag. Live=v3.12.4.
 # END
 
 ["dev-util/claude-agent-acp-plus"]
-url = "https://api.github.com/repos/lucascouts/claude-agent-acp-plus/releases/latest"
+url = "https://api.github.com/repos/zeo-workspace/claude-agent-acp-plus/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }

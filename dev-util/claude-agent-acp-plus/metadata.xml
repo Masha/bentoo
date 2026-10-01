@@ -16,7 +16,7 @@
 		merge time.
 	</longdescription>
 	<upstream>
-		<bugs-to>https://github.com/lucascouts/claude-agent-acp-plus/issues</bugs-to>
-		<remote-id type="github">lucascouts/claude-agent-acp-plus</remote-id>
+		<bugs-to>https://github.com/zeo-workspace/claude-agent-acp-plus/issues</bugs-to>
+		<remote-id type="github">zeo-workspace/claude-agent-acp-plus</remote-id>
 	</upstream>
 </pkgmetadata>

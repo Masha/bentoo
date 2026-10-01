@@ -1606,7 +1606,7 @@ inherit cargo check-reqs desktop flag-o-matic llvm-r1 toolchain-funcs xdg
 # Arch-guarding the IUSE is not the answer - that poisons md5-cache. Reopen this
 # when those two gain an arm64 build; nothing else here is amd64-bound.
 DESCRIPTION="Zeo - the Zed editor, rebranded, with the bentoo patch series"
-HOMEPAGE="https://github.com/lucascouts/zeo https://zed.dev"
+HOMEPAGE="https://github.com/zeo-workspace/zeo https://zed.dev"
 SRC_URI="
 	https://github.com/zed-industries/zed/archive/${EGIT_COMMIT}.tar.gz -> zed-${EGIT_COMMIT}.tar.gz
 	amd64? (

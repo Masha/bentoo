@@ -4,8 +4,8 @@
 EAPI=8
 
 DESCRIPTION="ACP adapter for the Claude Agent SDK, VS Code-parity fork (checkbox-capable)"
-HOMEPAGE="https://github.com/lucascouts/claude-agent-acp-plus"
-SRC_URI="https://github.com/lucascouts/claude-agent-acp-plus/releases/download/v${PV}/${P}-bundle.tar.gz -> ${P}.tar.gz"
+HOMEPAGE="https://github.com/zeo-workspace/claude-agent-acp-plus"
+SRC_URI="https://github.com/zeo-workspace/claude-agent-acp-plus/releases/download/v${PV}/${P}-bundle.tar.gz -> ${P}.tar.gz"
 # The release bundle has no top-level directory (dist/, node_modules/,
 # package.json at the tarball root).
 S="${WORKDIR}"

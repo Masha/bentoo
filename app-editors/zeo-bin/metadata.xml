@@ -17,7 +17,7 @@
 		sha256, the USE set and the compiler flags.
 	</longdescription>
 	<upstream>
-		<remote-id type="github">lucascouts/zeo</remote-id>
-		<bugs-to>https://github.com/lucascouts/zeo/issues</bugs-to>
+		<remote-id type="github">zeo-workspace/zeo</remote-id>
+		<bugs-to>https://github.com/zeo-workspace/zeo/issues</bugs-to>
 	</upstream>
 </pkgmetadata>
