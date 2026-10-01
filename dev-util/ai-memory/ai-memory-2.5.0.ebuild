@@ -3,7 +3,7 @@
 
 EAPI=8
 
-# CRATES is deliberately empty: the 492 crates come from a single tarball in
+# CRATES is deliberately empty: the 494 crates come from a single tarball in
 # SRC_URI instead. Listing them inline works -- it is what this package did
 # first, and it built -- but Portage answers it with
 #
@@ -38,8 +38,8 @@ EAPI=8
 # aborted one finishes in seconds without them. `-M` keeps it from calling
 # `pkgdev manifest` on the whole overlay by itself.
 #
-# Verified for 2.1.0, 2.2.2 and 2.4.0: the member-scoped run covers all
-# 492 external crates the workspace resolves -- generated list and the previous
+# Verified for 2.1.0, 2.2.2, 2.4.0 and 2.5.0: the member-scoped run covers all
+# 494 external crates the workspace resolves -- generated list and the previous
 # inline CRATES list were compared entry by entry, with no difference in either
 # direction.
 CRATES="
@@ -62,10 +62,14 @@ CRATES="
 # (490 -> 492 crates), and the build died with "failed to select a version for
 # the requirement `rmcp = "^2.2"` (locked to 2.2.0)". Same shape, same fix.
 #
+# 2.5.0, a third time: zip 8.6 pulled in zopfli 0.8.3 and zlib-rs 0.6.3
+# (492 -> 494), and the build died with "no matching package named `zopfli`
+# found ... required by package `zip v8.6.0`".
+#
 # BUMP THIS to ${PV} (and run the recipe above) the moment the lock's external
 # packages change -- a stale tarball still FETCHES, so the failure would land
 # in src_compile as a missing crate rather than here.
-CRATES_PV="2.4.0"
+CRATES_PV="2.5.0"
 
 # Upstream pins channel 1.95 in rust-toolchain.toml; the workspace is
 # edition 2024 and declares rust-version = "1.95".
