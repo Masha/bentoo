@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>diego.evangelista5642@gmail.com</email>
+		<name>lucascouts</name>
+	</maintainer>
+	<longdescription lang="en">
+		Converts documents (doc, docx, odt, rtf, epub, pdf, presentations,
+		spreadsheets, csv) to GitHub-Flavored Markdown, in Rust exposed to
+		Python through pyo3. Imports as the anydoc module.
+	</longdescription>
+	<upstream>
+		<remote-id type="github">firecrawl/anydoc</remote-id>
+		<remote-id type="pypi">firecrawl-anydoc</remote-id>
+	</upstream>
+</pkgmetadata>

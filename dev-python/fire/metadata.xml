@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>diego.evangelista5642@gmail.com</email>
+		<name>lucascouts</name>
+	</maintainer>
+	<longdescription lang="en">
+		Python Fire turns any Python object (function, class, module or
+		dictionary) into a command line interface, deriving arguments and
+		help text from its signature and docstrings.
+	</longdescription>
+	<upstream>
+		<remote-id type="github">google/python-fire</remote-id>
+		<remote-id type="pypi">fire</remote-id>
+	</upstream>
+</pkgmetadata>

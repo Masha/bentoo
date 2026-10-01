@@ -9253,6 +9253,60 @@ written, which is why the probe reads the JSON API.
 """
 # END
 
+["app-misc/hermes-agent"]
+url = "https://api.github.com/repos/NousResearch/hermes-agent/releases/latest"
+parser = "regex"
+pattern = '"name":\s*"Hermes Agent v([0-9]+\.[0-9]+\.[0-9]+)'
+headers = { "User-Agent" = "bentoo-autoupdate" }
+aux_var = "MY_TAG"
+aux_pattern = '"tag_name":\s*"v([0-9]+\.[0-9]+\.[0-9]+)"'
+version = "0.21.5"
+comments = """
+hermes-agent -- tags are dated (v2026.9.24) while PV is the pyproject SemVer
+(0.21.5); the release name carries both: "Hermes Agent v0.21.5 (v2026.9.24)".
+The pattern reads PV from the name, aux_var keeps MY_TAG in step with the tag.
+Do NOT probe PyPI: upstream retired the pip channel and PyPI is frozen at 0.19.0.
+A bump may also need RDEPEND floors raised: upstream exact-pins every core dep
+in pyproject.toml, and a new pin above what ::gentoo carries is a real break.
+"""
+# END
+
+["dev-python/fire"]
+url = "https://pypi.org/pypi/fire/json"
+parser = "json"
+path = "info.version"
+version = "0.7.1"
+comments = """
+fire -- Google's python-fire, dep of app-misc/hermes-agent. info.version is
+clean X.Y.Z.
+"""
+# END
+
+["dev-python/firecrawl-anydoc"]
+url = "https://pypi.org/pypi/firecrawl-anydoc/json"
+parser = "json"
+path = "info.version"
+version = "0.2.4"
+comments = """
+firecrawl-anydoc -- pyo3/maturin extension, dep of app-misc/hermes-agent.
+info.version is clean X.Y.Z. A bump is NOT just PV: regenerate the CRATES block
+with pycargoebuild from the new sdist root (the root Cargo.lock covers the
+python/ member named in tool.maturin.manifest-path).
+"""
+# END
+
+["dev-python/pillow-heif"]
+url = "https://pypi.org/pypi/pillow-heif/json"
+parser = "json"
+path = "info.version"
+version = "1.8.0"
+comments = """
+pillow-heif -- dep of app-misc/hermes-agent, builds against the system libheif.
+info.version is clean X.Y.Z. On a bump, re-read the LIBHEIF_HAVE_VERSION floor
+at the top of pillow_heif/_pillow_heif.c and move the DEPEND floor with it.
+"""
+# END
+
 ["dev-util/cargo-deny"]
 url = "https://crates.io/api/v1/crates/cargo-deny"
 parser = "json"

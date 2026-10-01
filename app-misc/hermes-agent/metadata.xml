@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>diego.evangelista5642@gmail.com</email>
+		<name>lucascouts</name>
+	</maintainer>
+	<longdescription lang="en">
+		Hermes Agent is a terminal AI agent by Nous Research that writes and
+		refines its own skills from experience, schedules jobs, and can be
+		reached through messaging gateways. It drives any OpenAI-compatible
+		model endpoint.
+
+		The wrappers in /usr/bin disable runtime pip installs and the
+		automatic download of the tirith command scanner; extras that are
+		not packaged report themselves unavailable instead.
+	</longdescription>
+	<upstream>
+		<bugs-to>https://github.com/NousResearch/hermes-agent/issues</bugs-to>
+		<remote-id type="github">NousResearch/hermes-agent</remote-id>
+	</upstream>
+</pkgmetadata>

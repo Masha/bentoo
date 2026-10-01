@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>diego.evangelista5642@gmail.com</email>
+		<name>lucascouts</name>
+	</maintainer>
+	<longdescription lang="en">
+		Pillow plugin that opens and saves HEIF, HEIC and AVIF images through
+		the system libheif.
+	</longdescription>
+	<upstream>
+		<remote-id type="github">bigcat88/pillow_heif</remote-id>
+		<remote-id type="pypi">pillow-heif</remote-id>
+	</upstream>
+</pkgmetadata>
