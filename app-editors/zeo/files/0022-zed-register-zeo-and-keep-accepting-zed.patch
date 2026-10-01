@@ -1,4 +1,4 @@
-From 1d4307794e9f4b373c49c22455f1c88617634ea6 Mon Sep 17 00:00:00 2001
+From bf6cac92a200fe54e857b35469421814af1c1f83 Mon Sep 17 00:00:00 2001
 From: zed-patches <zed-patches@localhost>
 Date: Sun, 13 Sep 2026 13:36:18 -0300
 Subject: [PATCH] zed: register zeo:// and keep accepting zed://
@@ -39,12 +39,29 @@ nine sites with three different natures, and only the first two are safe to move
   registered. They are text, not behaviour, but a toast announcing "zed:// links
   will now open in Zeo" after registering zeo:// is simply wrong.
 
+  zed/src/zed/open_listener.rs - added 2026-10-01, after measuring the gap
+  the list above left. Accepting zeo:// in parse_zed_link covered channel
+  links only: OpenRequest::parse matches every other link -- agent, settings,
+  file, extension, git, open -- as a literal "zed://..." prefix, and reaches
+  parse_zed_link last. So zeo://agent?session=<id>, the form the desktop hands
+  over, opened nothing. The loop now rewrites a zeo:// scheme to zed:// once,
+  before the first arm, rather than widening each arm: the next arm upstream
+  adds would otherwise match zed:// only. test_parse_zeo_scheme_urls fails
+  without the rewrite, on zeo://agent.
+
 Left alone on purpose: the generators above, and client/src/zed_urls.rs, which
 builds share links against the configured server - REBRAND.md section 3 keeps the
 whole backend as Zed's, and a share link is a zed.dev address, not a brand.
 
 Decision D10 in zeo/docs/REBRAND.md, widened by measurement.
 ---
+ crates/cli/src/main.rs                        |  9 +++-
+ crates/client/src/client.rs                   |  7 +++
+ crates/install_cli/src/register_zed_scheme.rs |  6 +--
+ crates/zed/src/main.rs                        |  1 +
+ crates/zed/src/zed.rs                         |  4 +-
+ crates/zed/src/zed/open_listener.rs           | 44 +++++++++++++++++++
+ 6 files changed, 65 insertions(+), 6 deletions(-)
 
 diff --git a/crates/cli/src/main.rs b/crates/cli/src/main.rs
 index 0f4d674..be97811 100644
@@ -147,3 +164,68 @@ index 6ae5bda..6ab5548 100644
                  window,
                  cx,
                  |_, _, _| None,
+diff --git a/crates/zed/src/zed/open_listener.rs b/crates/zed/src/zed/open_listener.rs
+index 2083b10..4d72540 100644
+--- a/crates/zed/src/zed/open_listener.rs
++++ b/crates/zed/src/zed/open_listener.rs
+@@ -175,6 +175,15 @@ impl OpenRequest {
+         }
+ 
+         for url in request.urls {
++            // Zeo registers zeo:// with the desktop, so that is the spelling a
++            // link from outside arrives in -- and every arm below matches
++            // zed://. Rewriting the scheme once, here, is what makes each of
++            // them accept both; widening them one by one would leave the next
++            // arm upstream adds matching zed:// only.
++            let url = match url.strip_prefix("zeo://") {
++                Some(rest) => format!("zed://{rest}"),
++                None => url,
++            };
+             if let Some(server_name) = url.strip_prefix("zed-cli://") {
+                 this.kind = Some(OpenRequestKind::CliConnection(connect_to_cli(server_name)?));
+             } else if let Some(action_index) = url.strip_prefix("zed-dock-action://") {
+@@ -1545,6 +1554,41 @@ mod tests {
+         }
+     }
+ 
++    /// Zeo registers zeo:// with the desktop, so a link from outside arrives
++    /// spelled that way, while every arm of the parser matches zed://. Each of
++    /// these fell through to "unrecognized" before the scheme was rewritten.
++    #[gpui::test]
++    fn test_parse_zeo_scheme_urls(cx: &mut TestAppContext) {
++        let _app_state = init_test(cx);
++
++        let parse = |url: &str, cx: &mut TestAppContext| {
++            cx.update(|cx| {
++                OpenRequest::parse(
++                    RawOpenRequest {
++                        urls: vec![url.into()],
++                        ..Default::default()
++                    },
++                    cx,
++                )
++                .unwrap()
++            })
++            .kind
++        };
++
++        assert!(matches!(
++            parse("zeo://agent", cx),
++            Some(OpenRequestKind::AgentPanel { .. })
++        ));
++        assert!(matches!(
++            parse("zeo://settings", cx),
++            Some(OpenRequestKind::Setting { setting_path: None })
++        ));
++        assert!(matches!(
++            parse("zeo://", cx),
++            Some(OpenRequestKind::FocusApp)
++        ));
++    }
++
+     #[gpui::test]
+     fn test_parse_skill_install_url(cx: &mut TestAppContext) {
+         let _app_state = init_test(cx);
+-- 
+2.56.0
+

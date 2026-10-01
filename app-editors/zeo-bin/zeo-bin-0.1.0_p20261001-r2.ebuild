@@ -30,10 +30,12 @@ LICENSE="GPL-3+
 "
 SLOT="0"
 KEYWORDS="-* ~amd64"
-# Only the dependency half of the adapter flags is honest on a binary: the
-# integration patches are compiled in either way, and these decide whether the
-# adapters they talk to are pulled in.
-IUSE="+claude-agent-acp-plus +claude-agent-acp-tui"
+# Only the dependency half of these flags is honest on a binary: the
+# integration patches are compiled in either way, and these decide whether what
+# they talk to is pulled in -- the two ACP adapters, and for claude-code-ide
+# (patch 0002) the claude CLI that connects to the IDE server in Zeo-spawned
+# terminals.
+IUSE="+claude-agent-acp-plus +claude-agent-acp-tui +claude-code-ide"
 # Never bindist: redistributing this binary is the reason the package exists.
 RESTRICT="mirror strip"
 
@@ -59,6 +61,7 @@ RDEPEND="
 	)
 	claude-agent-acp-plus? ( dev-util/claude-agent-acp-plus )
 	claude-agent-acp-tui? ( dev-util/claude-agent-acp-tui )
+	claude-code-ide? ( dev-util/claude-code )
 "
 
 QA_PREBUILT="
@@ -103,5 +106,14 @@ pkg_postinst() {
 		elog "    \"agent_servers\": {"
 		elog "        \"Claude Agent Plus\": { \"command\": \"claude-agent-acp-plus\", \"args\": [] }"
 		elog "    }"
+	fi
+
+	if use claude-code-ide; then
+		elog ""
+		elog "Claude Code IDE integration uses an unofficial, reverse-engineered"
+		elog "protocol that may break without notice."
+		elog "It activates automatically in Zeo-spawned terminals via environment"
+		elog "variables; no settings.json configuration is needed."
+		elog "Verify the connection by running /ide inside 'claude'."
 	fi
 }
