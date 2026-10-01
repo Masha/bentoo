@@ -1,0 +1,9 @@
+#!/bin/sh
+# Launch SoftMaker Office 2024 Presentations.  Like upstream's launcher, a
+# slide show file (.prs, .pps, .ppsx) opens straight into the show (-S).
+case "$(printf '%s' "${1##*.}" | tr '[:upper:]' '[:lower:]')" in
+	prs|pps|ppsx)
+		[ $# -eq 1 ] && exec /opt/softmaker-office/presentations "-S$1"
+		;;
+esac
+exec /opt/softmaker-office/presentations "$@"

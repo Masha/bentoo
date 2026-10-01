@@ -8576,6 +8576,19 @@ freeoffice — download page states "Revision NNNN | date" (the ebuild's PV); SS
 """
 # END
 
+["app-office/softmaker-office"]
+url = "https://www.softmaker.com/en/support/installation/linux/office-2024"
+parser = "regex"
+pattern = 'softmaker-office-2024-([0-9]+)-amd64\.tgz'
+type = "bin"
+version = "1234"
+comments = """
+softmaker-office — the official Linux install page links the current .tgz,
+whose revision NNNN is the ebuild's PV; SSR. The installer's "-latest" link
+can point to a newer, not yet listed revision; this page is the vetted one.
+"""
+# END
+
 ["sci-biology/foldingathome"]
 url = "https://download.foldingathome.org/releases/public/fah-client/meta.json"
 parser = "regex"

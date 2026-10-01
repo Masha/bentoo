@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@proton.me</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<longdescription lang="en">
+		SoftMaker Office 2024 is a commercial, perpetually licensed office suite
+		by SoftMaker Software GmbH: the TextMaker word processor, the PlanMaker
+		spreadsheet and the Presentations slide software, with native support
+		for Microsoft Office file formats. It needs a purchased product key; a
+		trial key is available from the vendor.
+
+		The suite installs to /opt/softmaker-office and can coexist with
+		app-office/freeoffice. Launchers: softmaker-office-textmaker,
+		softmaker-office-planmaker, softmaker-office-presentations, plus the
+		upstream names textmaker24, planmaker24 and presentations24.
+	</longdescription>
+	<upstream>
+		<bugs-to>https://forum.softmaker.com</bugs-to>
+	</upstream>
+</pkgmetadata>

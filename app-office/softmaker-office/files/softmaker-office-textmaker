@@ -1,0 +1,3 @@
+#!/bin/sh
+# Launch SoftMaker Office 2024 TextMaker.
+exec /opt/softmaker-office/textmaker "$@"
