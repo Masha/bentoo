@@ -11101,6 +11101,7 @@ it must be DROPPED, not forced, once a release carries the fix).
 # END
 
 ["www-client/opera"]
+enabled = false
 url = "https://deb.opera.com/opera-stable/dists/stable/non-free/binary-amd64/Packages"
 parser = "regex"
 pattern = 'Package: opera-stable\nVersion: ([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)'
@@ -11130,6 +11131,13 @@ build error). After merging:
 
 and set CHROMIUM_VERSION to that major. Drop this package outright once
 ::gentoo's own pin matches the Chromium the stable channel actually ships.
+
+Removed from the overlay on 2026-10-01: that condition was met. The 151 pin was
+measured on 136.0.6008.52 and the applier carried it to .73 and .80, but the
+.80 binary reads Chrome/152.0.7977.134 and its bundled libffmpeg.so is Lavf63,
+the avformat major ffmpeg-chromium:152 brings. ::gentoo pins 152 for that same
+PV, so ours had become the wrong one. The probe stays recorded, verified, so a
+future return needs no re-verification -- re-derive the pin from the binary.
 """
 # END
 
