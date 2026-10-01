@@ -14,8 +14,11 @@ EGIT_COMMIT="71456c40f3971ee763e620a513c5fb98390d93e3"
 
 DESCRIPTION="Zeo - the Zed editor, rebranded, with the bentoo patch series (binary)"
 HOMEPAGE="https://github.com/zeo-workspace/zeo https://zed.dev"
-SRC_URI="https://distfiles.obentoo.org/${P}-amd64.tar.xz"
-S="${WORKDIR}/${P}"
+# ${PF}, not ${P}: the tarball is named after zeo's full version, revision
+# included, because a zeo revbump is a different binary and R2 must not serve
+# new bytes under a name an older Manifest already pins.
+SRC_URI="https://distfiles.obentoo.org/${PF}-amd64.tar.xz"
+S="${WORKDIR}/${PF}"
 
 # The Corresponding Source of this binary (GPL-3 section 6) is the Zed tarball
 # named by EGIT_COMMIT plus the patches in app-editors/zeo/files/ at this ${PV};
