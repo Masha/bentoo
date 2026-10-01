@@ -1806,6 +1806,26 @@ lcevc_dec — release tag bare semver.
 """
 # END
 
+["media-libs/oidn"]
+url = "https://api.github.com/repos/RenderKit/oidn/releases/latest"
+parser = "json"
+path = "tag_name"
+transform = [["^v", ""]]
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "2.3.3"
+comments = """
+oidn -- GitHub release tag "vX.Y.Z"; the transform strips the "v".
+
+bentoo carries a copy of ::gentoo's 2.3.3-r1 only to widen PYTHON_COMPAT to
+python3_14 (see the BENTOO-DIVERGENCE tag); ::gentoo stops at 3.13, which kept
+dev-lang/python:3.13 installed on 3.14-only systems via media-gfx/blender.
+Upstream was already at 2.5.1 when this was added (2026-10-01): a bump is two
+series and a subslot change (SLOT 0/${PV} rebuilds blender), and the
+amdgpu-targets patch needs a rebase -- not an in-place PV edit. Remove the
+ebuild and set enabled = false once ::gentoo lists python3_14.
+"""
+# END
+
 ["media-libs/opencv"]
 url = "https://api.github.com/repos/opencv/opencv/releases/latest"
 parser = "json"
@@ -2245,6 +2265,25 @@ held back by a collection that has not been refreshed.
 lists nothing after it, and ~mpagano and ~sam agree. Raise both this suffix and
 the ebuild's _p by hand when a newer one appears -- the applier only rewrites
 the Intel date.
+"""
+# END
+
+["sys-firmware/seabios"]
+url = "https://www.seabios.org/downloads/"
+parser = "regex"
+pattern = 'seabios-([0-9]+\.[0-9]+\.[0-9]+)\.tar\.gz'
+select = "max"
+version = "1.17.0"
+comments = """
+seabios -- the release directory is an Apache listing sorted by name, so
+select = "max" is load-bearing: the first match is the oldest tarball.
+
+bentoo carries this package to widen PYTHON_COMPAT to python3_14 (see the
+BENTOO-DIVERGENCE tag in the ebuild); ::gentoo stops at 3.13 on 1.16.3, which
+kept dev-lang/python:3.13 installed on 3.14-only systems via app-emulation/qemu.
+1.17.0 removed the built-in DSDT and the "iasl" make target, so the ebuild no
+longer calls it nor depends on sys-power/iasl. Remove the ebuild and set
+enabled = false once ::gentoo ships 1.17.0 with python3_14.
 """
 # END
 

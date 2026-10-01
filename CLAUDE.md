@@ -116,8 +116,11 @@ knowing:
 - **orphan files** under `files/` that no ebuild names -- went 50 to 4. It will
   not reach 0: `app-office/libreoffice-l10n/files/lo_gen_langs.sh` is a
   maintainer tool, never referenced by design, and the three LibreWolf entries
-  sit beside `## Disabled for` blocks that document why they are kept. **Treat
-  4 as the floor, not as a backlog.**
+  sit beside `## Disabled for` blocks that document why they are kept. A fifth,
+  `sys-firmware/seabios/files/seabios/config.seabios-128k`, is unused in
+  `::gentoo` too: bentoo carries seabios only for `PYTHON_COMPAT`, so its
+  `files/` stays identical to `::gentoo`'s rather than diverging. It leaves
+  with the package. **Treat 5 as the floor, not as a backlog.**
 - **md5-cache entries with no ebuild** -- went 548 of 916 to 0. This one's
   floor IS 0, and it climbs on its own: every bump leaves the previous entry
   behind unless `egencache` is re-run for that package.
