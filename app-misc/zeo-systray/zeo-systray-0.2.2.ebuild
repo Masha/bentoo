@@ -18,15 +18,11 @@ CRATES="
 	atomic-waker@1.1.2
 	autocfg@1.5.1
 	bitflags@2.13.2
-	block2@0.6.2
 	blocking@1.7.0
 	bumpalo@3.20.3
-	cc@1.4.6
 	cfg-if@1.0.4
 	concurrent-queue@2.5.0
 	crossbeam-utils@0.8.23
-	deranged@0.5.8
-	dispatch2@0.3.1
 	endi@1.1.1
 	enumflags2@0.7.12
 	enumflags2_derive@0.7.12
@@ -35,7 +31,6 @@ CRATES="
 	event-listener-strategy@0.5.4
 	event-listener@5.4.2
 	fastrand@2.5.0
-	find-msvc-tools@0.1.12
 	futures-channel@0.3.34
 	futures-core@0.3.34
 	futures-io@0.3.34
@@ -55,17 +50,10 @@ CRATES="
 	libc@0.2.189
 	linux-raw-sys@0.12.1
 	log@0.4.34
-	mac-notification-sys@0.6.15
 	matchers@0.2.0
 	memchr@2.8.3
 	memoffset@0.9.1
-	notify-rust@4.18.0
 	nu-ansi-term@0.50.3
-	num-conv@0.2.2
-	objc2-core-foundation@0.3.2
-	objc2-encode@4.1.0
-	objc2-foundation@0.3.2
-	objc2@0.6.4
 	once_cell@1.21.4
 	ordered-stream@0.2.0
 	parking@2.2.1
@@ -73,7 +61,6 @@ CRATES="
 	pin-project-lite@0.2.17
 	piper@0.2.5
 	polling@3.11.0
-	powerfmt@0.2.0
 	proc-macro-crate@3.5.0
 	proc-macro2@1.0.107
 	quote@1.0.47
@@ -88,20 +75,14 @@ CRATES="
 	serde_json@1.0.151
 	serde_repr@0.1.21
 	sharded-slab@0.1.7
-	shlex@2.0.1
 	signal-hook-registry@1.4.8
 	slab@0.4.12
 	smallvec@1.16.1
 	syn@2.0.119
 	syn@3.0.5
 	task-local@0.1.1
-	tauri-winrt-notification@0.7.3
 	tempfile@3.27.0
-	thiserror-impl@2.0.20
-	thiserror@2.0.20
 	thread_local@1.1.10
-	time-core@0.1.8
-	time@0.3.47
 	toml_datetime@1.1.1+spec-1.1.0
 	toml_edit@0.25.15+spec-1.1.0
 	toml_parser@1.1.3+spec-1.1.0
@@ -119,20 +100,8 @@ CRATES="
 	wasm-bindgen-macro@0.2.128
 	wasm-bindgen-shared@0.2.128
 	wasm-bindgen@0.2.128
-	windows-collections@0.2.0
-	windows-core@0.61.2
-	windows-future@0.2.1
-	windows-implement@0.60.2
-	windows-interface@0.59.3
-	windows-link@0.1.3
 	windows-link@0.2.1
-	windows-numerics@0.2.0
-	windows-result@0.3.4
-	windows-strings@0.4.2
 	windows-sys@0.61.2
-	windows-threading@0.1.0
-	windows-version@0.1.7
-	windows@0.61.3
 	winnow@0.7.15
 	winnow@1.0.4
 	zbus@5.13.2
@@ -144,13 +113,11 @@ CRATES="
 	zvariant_utils@3.3.0
 "
 
-# NOT upstream's own floor, which is rust-version = "1.85" (the edition 2024
-# minimum). The real floor comes from a dependency: notify-rust-4.18.0 declares
-# rust-version = "1.89.0", the highest in the resolved crate set, and cargo.eclass
-# checks every vendored Cargo.toml -- building with 1.85 raises a QA notice
-# naming exactly this. Re-derive on every bump; the dependency moves this, not
-# the package.
-RUST_MIN_VER="1.89.0"
+# Upstream's own floor, rust-version = "1.85" (the edition 2024 minimum), is
+# also the highest in the resolved crate set since 0.2.2 dropped notify-rust,
+# whose 1.89.0 used to set it. cargo.eclass checks every vendored Cargo.toml,
+# so re-derive on every bump; a dependency can move this, not only the package.
+RUST_MIN_VER="1.85.0"
 
 inherit cargo desktop systemd xdg-utils
 
