@@ -7,6 +7,9 @@ EAPI=8
 # scripts/blob_to_cpp.py at build time, which works on it; ::gentoo stopping
 # at 3.13 kept dev-lang/python:3.13 installed on 3.14-only systems via
 # media-gfx/blender. Drop this copy once ::gentoo lists python3_14.
+# BENTOO-DIVERGENCE: PATCHES - amdgpu-targets rebased onto 2.5.1, whose
+# devices/hip target list gained gfx1150-gfx1152; the ::gentoo 2.3.3 copy no
+# longer applies. Same behaviour, new context.
 PYTHON_COMPAT=( python3_{12..14} )
 ROCM_VERSION=6.3
 CUDA_DEVICE_TARGETS=1
@@ -38,7 +41,7 @@ RDEPEND="
 	dev-cpp/tbb:=
 	dev-lang/ispc
 	cuda? (
-		dev-util/nvidia-cuda-toolkit:=
+		>=dev-util/nvidia-cuda-toolkit-12.8:=
 		dev-libs/cutlass
 	)
 	hip? (
@@ -50,7 +53,7 @@ DEPEND="${RDEPEND}"
 BDEPEND="${PYTHON_DEPS}"
 
 PATCHES=(
-	"${FILESDIR}/${PN}-2.3.3-amdgpu-targets.patch"
+	"${FILESDIR}/${PN}-2.5.1-amdgpu-targets.patch"
 )
 
 src_prepare() {
@@ -65,12 +68,12 @@ src_prepare() {
 	fi
 
 	# do not fortify source -- bug 895018
-	sed -e "s/-D_FORTIFY_SOURCE=2//g" -i {cmake/oidn_platform,external/mkl-dnn/cmake/SDL}.cmake || die
+	sed -e "s/-D_FORTIFY_SOURCE=2//g" -i cmake/oidn_platform.cmake || die
 
 	# Don't de-bundle composable_kernel for two reasons:
 	# 1. sci-libs/composable-kernel takes a very long time to compile and oidn only uses a subset of it.
 	# 2. We've run into compilation issues when trying to debundle it. See #955869
-	rm -r external/{cutlass,mkl-dnn} || die
+	rm -r external/cutlass || die
 
 	cmake_src_prepare
 }
