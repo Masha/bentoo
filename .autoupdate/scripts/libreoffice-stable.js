@@ -27,8 +27,16 @@
 		}
 		return 0;
 	};
-	const released = [...document.querySelectorAll("a[href]")]
-		.map(a => (a.getAttribute("href") || "").match(dirRe))
+	const hrefs = [...document.querySelectorAll("a[href]")]
+		.map(a => a.getAttribute("href") || "");
+	// No X.Y.Z/ directory of ANY line means the listing never loaded (timeout,
+	// reset, error page), not that the series is gone -- say so, or a mirror
+	// hiccup reads like a release line that vanished.
+	if (!hrefs.some(h => /^\d+\.\d+\.\d+\/$/.test(h))) {
+		throw new Error(`stable/ listing unavailable: no release directories at all (${location.href})`);
+	}
+	const released = hrefs
+		.map(h => h.match(dirRe))
 		.filter(Boolean)
 		.map(m => m[1])
 		.sort(cmp);

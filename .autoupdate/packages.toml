@@ -624,7 +624,7 @@ url = "https://api.github.com/repos/watchexec/watchexec/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "2.7.3"
+version = "2.7.4"
 comments = """
 watchexec - PROBE THE RELEASES, NOT THE TAGS. The repository is a workspace
 that tags every crate from one space, and the library crate is far ahead of the
@@ -753,7 +753,7 @@ url = "https://dl.pstmn.io/api/version/latest?platform=linux64&channel=stable"
 parser = "json"
 path = "version"
 type = "bin"
-version = "12.30.5"
+version = "12.30.6"
 comments = """
 Postman — official version API; clean {"version":"..."}.
 """
@@ -952,7 +952,7 @@ transform strips the "go" prefix to match PV. Live=1.26.5.
 url = "https://persistent.oaistatic.com/codex-app-prod/linux/deb/dists/stable/main/binary-amd64/Packages"
 parser = "regex"
 pattern = 'Package: chatgpt\nVersion: ([0-9]+\.[0-9]+\.[0-9]+)'
-version = "26.928.40906"
+version = "26.930.21537"
 comments = """
 OpenAI Codex/ChatGPT desktop app — read the APT index of the very repo that
 SRC_URI pulls from. Both openai.com and chatgpt.com sit behind Cloudflare and
@@ -1656,7 +1656,7 @@ url = "https://api.github.com/repos/conda/conda/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "26.9.0"
+version = "26.9.1"
 comments = """
 conda — tag bare "X.Y.Z".
 """
@@ -1932,7 +1932,7 @@ commit_sha_path = "[0].id"
 base_from = "file"
 base_url = "https://code.videolan.org/videolan/vlc/-/raw/master/configure.ac"
 base_pattern = 'AC_INIT\(\[vlc\], \[([0-9][0-9.]*)-dev\]\)'
-version = "4.0.0_pre20261001"
+version = "4.0.0_pre20261002"
 comments = """
 vlc — 4.0 development snapshot, commit-tracked on master; _pre suffix
 preserved from the current ebuild. Only the 4.0 line lives here: 3.0.x is
@@ -1986,7 +1986,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "1.4.9-r1"
+version = "1.5.0"
 comments = """
 rustdesk-bin — same upstream repo.
 """
@@ -2319,7 +2319,7 @@ url = "https://api.github.com/repos/chromium-linux-tarballs/chromium-tarballs/re
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "154.0.8037.92"
+version = "154.0.8037.97"
 comments = """
 chromium — probes the TARBALL repo, not chromiumdash or the Chrome release
 feed, because that repo is what actually gates a bump: SRC_URI points at
@@ -2628,12 +2628,20 @@ dav2d — default tag order (new project).
 # END
 
 ["net-dns/bind-tools"]
-url = "https://gitlab.isc.org/api/v4/projects/isc-projects%2Fbind9/repository/tags?search=v9.20&order_by=version&sort=desc"
-parser = "json"
-path = "[0].name"
+url = "https://downloads.isc.org/isc/bind9/"
+parser = "regex"
+pattern = 'href="(9\.20\.[0-9]+)/"'
+select = "max"
 version = "9.20.29"
 comments = """
-bind-tools — pinned to the 9.20 stable branch via search; "v" stripped.
+bind-tools — pinned to the 9.20 stable branch by the pattern; select=max
+because the directory listing is sorted lexically, not by version.
+
+Probes ISC's release directory, not gitlab.isc.org, since 2026-10-02: the GitLab
+tags API refused TCP connections outright (connect: connection refused) while
+www.isc.org and downloads.isc.org answered 200. downloads.isc.org is where a
+release is published, so it is also the more authoritative signal. GitHub's
+isc-projects/bind9 mirror carries the same tags if this host ever fails too.
 """
 # END
 
@@ -3062,7 +3070,7 @@ transform = [['T.*', ""], ['-', ""]]
 commit_sha_path = "[0].sha"
 base_from = "none"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.1.0_p20261001-r2"
+version = "0.1.0_p20261002"
 comments = """
 zeo — commit-tracked on Zed's main; the snapshot plus the bentoo patch series and
 the rebrand. 2026-10-01: this entry WAS app-editors/zed, which now builds
@@ -3743,7 +3751,7 @@ base_from = "tag"
 base_url = "https://api.github.com/repos/KhronosGroup/SPIRV-Tools/git/refs/tags"
 base_tag_pattern = '^vulkan-sdk-([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)$'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.363.0_p20261001"
+version = "1.4.363.0_p20261002"
 comments = """
 spirv-tools — commit-tracked on main; scans titles for vulkan-sdk-X.Y.Z.W to detect base bump.
 """
@@ -3760,7 +3768,7 @@ base_from = "tag"
 base_url = "https://api.github.com/repos/KhronosGroup/Vulkan-Headers/git/refs/tags"
 base_tag_pattern = '^v([0-9]+\.[0-9]+\.[0-9]+)$'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.364_p20260925"
+version = "1.4.365_p20261002"
 comments = """
 vulkan-headers — commit-tracked on main; scans titles "Update for Vulkan-Docs X.Y.Z" to detect base bump.
 """
@@ -3777,7 +3785,7 @@ base_from = "file"
 base_url = "https://raw.githubusercontent.com/KhronosGroup/Vulkan-Tools/main/CMakeLists.txt"
 base_pattern = '(?m)^project\([A-Za-z_-]+ VERSION ([0-9][0-9.]*)'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.364_p20260930"
+version = "1.4.365_p20261002"
 comments = """
 vulkan-tools — commit-tracked on main; scans titles "Update for Vulkan-Docs X.Y.Z" to detect base bump.
 """
@@ -3794,7 +3802,7 @@ base_from = "tag"
 base_url = "https://api.github.com/repos/KhronosGroup/Vulkan-Utility-Libraries/git/refs/tags"
 base_tag_pattern = '^v([0-9]+\.[0-9]+\.[0-9]+)$'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.364_p20260929"
+version = "1.4.365"
 comments = """
 vulkan-utility-libraries — commit-tracked on main, same shape as vulkan-headers.
 
@@ -3820,7 +3828,7 @@ base_from = "file"
 base_url = "https://raw.githubusercontent.com/KhronosGroup/Vulkan-ValidationLayers/main/CMakeLists.txt"
 base_pattern = '(?m)^project\([A-Za-z_-]+ VERSION ([0-9][0-9.]*)'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.363_p20261001"
+version = "1.4.365_p20261002"
 comments = """
 vulkan-layers — commit-tracked on main (Vulkan-ValidationLayers); scans for "Update for Vulkan-Docs X.Y.Z".
 """
@@ -3837,7 +3845,7 @@ base_from = "file"
 base_url = "https://raw.githubusercontent.com/KhronosGroup/Vulkan-Loader/main/CMakeLists.txt"
 base_pattern = '(?m)^project\([A-Za-z_-]+ VERSION ([0-9][0-9.]*)'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.364_p20261001"
+version = "1.4.365_p20261002"
 comments = """
 vulkan-loader — commit-tracked on main; scans for "Update for Vulkan-Docs X.Y.Z" to detect base bump.
 """
@@ -9301,7 +9309,7 @@ is a workspace and pycargoebuild refuses it.
 url = "https://pypi.org/pypi/openai/json"
 parser = "json"
 path = "info.version"
-version = "3.23.0"
+version = "3.24.0"
 comments = """
 openai — official Python SDK; core dep of sci-ml/amd-gaia. info.version is
 clean X.Y.Z. Live=3.0.0 == current PV.
@@ -9568,7 +9576,7 @@ parser = "regex"
 pattern = 'webkitgtk-(2\.54\.[0-9]+)\.tar\.xz'
 select = "max"
 revision = 410
-version = "2.54.0-r410"
+version = "2.54.1-r410"
 comments = """
 revision is the SLOT's BASE revision, not whatever the current ebuild carries.
 -r411 is a revbump WITHIN a PV; a PV change resets it to the base, exactly as
@@ -9593,7 +9601,7 @@ parser = "regex"
 pattern = 'webkitgtk-(2\.54\.[0-9]+)\.tar\.xz'
 select = "max"
 revision = 600
-version = "2.54.0-r600"
+version = "2.54.1-r600"
 comments = """
 600 is the base for this SLOT (::gentoo ships -r600 for every PV and -r601 as
 the revbump), and the overlay now follows it: the ebuild is
@@ -10366,7 +10374,7 @@ transform = [['T.*', ""], ['-', ""]]
 commit_sha_path = "sha"
 base_from = "none"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0_pre20261001"
+version = "0_pre20261002"
 comments = """
 ik_llama-cpp — base_from = "none": upstream publishes no usable release
 series.  Verified 2026-07-19 and again 2026-08-04: the repo has exactly ONE
@@ -11312,7 +11320,7 @@ url = "https://registry.npmjs.org/@cline/cli-linux-x64/latest"
 parser = "regex"
 pattern = '"version":"([0-9]+\.[0-9]+\.[0-9]+)"'
 type = "bin"
-version = "3.0.67"
+version = "3.0.68"
 comments = """
 Cline CLI — probed on npm, NOT on GitHub, and that is deliberate: the
 cline/cline repository publishes several product lines under one releases
@@ -11340,7 +11348,7 @@ parser = "regex"
 pattern = '"tag_name":\s*"desktop-v([0-9]+\.[0-9]+\.[0-9]+)"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "0.0.40"
+version = "0.0.42"
 comments = """
 Cline for Desktop (beta, Tauri) -- the Linux .deb from the desktop-v* GitHub
 releases. Same repository as dev-util/cline-bin, different product.
