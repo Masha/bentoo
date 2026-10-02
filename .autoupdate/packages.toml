@@ -1523,6 +1523,19 @@ version came from, so the two always describe one release.
 """
 # END
 
+["app-emulation/virtiofsd"]
+url = "https://gitlab.com/api/v4/projects/virtio-fs%2Fvirtiofsd/releases?per_page=5"
+parser = "json"
+path = "[0].tag_name"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "1.14.0"
+comments = """
+virtiofsd — GitLab releases, newest first, tag "vX.Y.Z". Rust: every bump needs
+CRATES regenerated from the new Cargo.lock (pycargoebuild -C), the applier only
+moves PV. kata-containers' versions.yaml pins the same release.
+"""
+# END
+
 ["app-emulation/wine-vanilla"]
 enabled = false
 disabled_by = "auto"
