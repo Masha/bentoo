@@ -20,7 +20,7 @@ RESTRICT="bindist mirror strip"
 
 QA_PREBUILT="*"
 
-# This release bundles Dart SDK 3.13.4 (see dart_sdk_version in upstream's
+# This release bundles Dart SDK 3.13.5 (see dart_sdk_version in upstream's
 # releases_linux.json). src_install replaces the bundled SDK with the system
 # one, so the version must match exactly: bin/cache/flutter_tools.snapshot only
 # loads on the Dart VM it was compiled against. Keep this pin in sync with the
@@ -30,10 +30,12 @@ QA_PREBUILT="*"
 # The pin is what the revision is for: .autoupdate bumps PV without reading
 # RDEPEND, so every bump arrives carrying the PREVIOUS release's pin and merges
 # against a Dart the snapshot was not built on. A plain edit would not reinstall
-# it -- only a revbump does. Three bumps in a row have now arrived this way:
+# it -- only a revbump does. Four bumps in a row have now arrived this way:
 # 3.47.2 needed -r1 (5810abcc9), 3.47.3 landed in 941ba854d still pinning
-# 3.13.2 after upstream moved the stable channel to 3.13.3 on 2026-09-09, and
-# 3.47.5 landed pinning 3.13.3 after the channel moved to 3.13.4 on 2026-09-15.
+# 3.13.2 after upstream moved the stable channel to 3.13.3 on 2026-09-09,
+# 3.47.5 landed pinning 3.13.3 after the channel moved to 3.13.4 on 2026-09-15,
+# and 3.47.6 landed in 98aa62c2e pinning 3.13.4 after 3.13.5 shipped on
+# 2026-09-29.
 # Nothing in the tree catches it -- "emerge -pv" stays green and only the
 # flutter binary fails, at runtime. Treat a flutter bump as unfinished until
 # this line is re-derived from the source, never from the changelog:
@@ -47,7 +49,7 @@ QA_PREBUILT="*"
 DEPEND="acct-group/flutter"
 RDEPEND="
 	${DEPEND}
-	~dev-lang/dart-3.13.4
+	~dev-lang/dart-3.13.5
 "
 
 DOC_CONTENTS="The Flutter SDK is installed in /opt/flutter.

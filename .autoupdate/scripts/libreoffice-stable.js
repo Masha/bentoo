@@ -1,7 +1,11 @@
 // Newest RELEASED LibreOffice build of one release line, as a 4-segment
 // version ("26.8.1.2"). Evaluated by bentoolkit's "script" parser against
-//   https://download.documentfoundation.org/libreoffice/stable/#<X.Y>
+//   <mirror>/libreoffice/stable/#<X.Y>
 // The fragment names the release line; the page itself is never reloaded.
+// src/ is resolved relative to the loaded stable/ page, so any full TDF mirror
+// works: the records point at ftp.fau.de because the master,
+// download.documentfoundation.org, timed out or reset repeatedly on 2026-10-02.
+// The script parser has no fallback_url, so the mirror IS the single source.
 //
 // Two listings, because neither answers alone:
 //   stable/        lists a release only once it is PROMOTED, but names it
@@ -44,7 +48,7 @@
 		throw new Error(`stable/ lists no ${series}.x release`);
 	}
 	const v = released[released.length - 1];
-	const res = await fetch(`/libreoffice/src/${v}/`);
+	const res = await fetch(new URL(`../src/${v}/`, location.href));
 	if (!res.ok) throw new Error(`src/${v}/ answered HTTP ${res.status}`);
 	const body = await res.text();
 	const vesc = v.replace(/\./g, "\\.");

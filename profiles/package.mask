@@ -278,7 +278,7 @@
 # Lucas C.S. <lucascs@protonmail.com> (2026-09-19)
 # dev-lang/flutter unbundles the Dart SDK -- src_install removes
 # bin/cache/dart-sdk and symlinks it to /usr/lib/dart -- so it pins the exact
-# version it was built against: RDEPEND="~dev-lang/dart-3.13.4". That pin is
+# version it was built against: RDEPEND="~dev-lang/dart-3.13.5". That pin is
 # not caution, it is the ABI. bin/cache/flutter_tools.snapshot only loads on
 # the Dart VM it was compiled for; on any other one every flutter command dies
 # with "Wrong full snapshot version, expected '<new>' found '<old>'".
@@ -294,6 +294,7 @@
 # The floor did NOT move on 2026-09-19, and that is the normal case: upstream
 # Dart released 3.13.4 (2026-09-15) and Flutter stable 3.47.5 shipped it, so
 # the pair was promoted 3.13.3 -> 3.13.4 while the floor stayed where it is.
+# Same again on 2026-10-02: 3.13.5 (2026-09-29) via Flutter 3.47.6.
 # A Dart release only raises this floor when it OVERTAKES the floor; patch
 # releases underneath it are promotions, not mask work.
 #
@@ -305,7 +306,7 @@
 # every ebuild no registry entry claims. The claim is what protects the file:
 # packages.toml carries dev-lang/dart@stable (the line Flutter runs, exact
 # series so it can never auto-bump) and dev-lang/dart@testing (upstream's
-# stable channel, the line this mask covers). Both now point at 3.13.4, which
+# stable channel, the line this mask covers). Both now point at 3.13.5, which
 # is expected -- they converge whenever Flutter catches up and diverge again on
 # upstream's next release. Promote them together with the floor; deleting
 # either record re-arms the sweep.
