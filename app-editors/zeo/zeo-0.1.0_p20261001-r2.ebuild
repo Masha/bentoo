@@ -1715,6 +1715,13 @@ DEPEND="
 # (2026-10-01) rather than by a file collision with zed or zed-bin: zeo owns
 # /usr/bin/zeo, /usr/libexec/zeo-editor and dev.zeo.Zeo.*, which neither
 # installs. zeo-bin installs those same paths, so that one is a real collision.
+# TODO(next bump, not a revbump of its own): add
+# "claude-code-ide? ( dev-util/claude-code )" here, as app-editors/zeo-bin has
+# had since -r2, and replace the "distributed via npm and is not packaged by
+# this overlay" lines in pkg_postinst with "The 'claude' CLI it talks to comes
+# from dev-util/claude-code, which this USE flag pulls in." Deferred on
+# 2026-10-01 because a revbump here forces a zeo-bin rebuild for an optional
+# dependency and a message; delete this note once both are done.
 RDEPEND="
 	${DEPEND}
 	!app-editors/zed
