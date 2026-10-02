@@ -12010,6 +12010,8 @@ is and this source build can be simplified.
 # END
 
 ["dev-qt/qt3d"]
+enabled = false
+disabled_by = "removed 2026-10-01: ::gentoo now ships the same 6.12.0 (masked until 6.12.1 by ionen), and the mirror was identical or behind it (qtbase lacked QTBUG-148575); the ::gentoo mask reached these ebuilds anyway. Reopen only if ::gentoo falls behind the 6.12 series again."
 url = "https://download.qt.io/official_releases/qt/6.12/"
 parser = "regex"
 pattern = 'href="(6\.12\.[0-9]+)/"'
@@ -12027,6 +12029,8 @@ family any more (see its own record).
 # END
 
 ["dev-qt/qt5compat"]
+enabled = false
+disabled_by = "removed 2026-10-01: ::gentoo now ships the same 6.12.0 (masked until 6.12.1 by ionen), and the mirror was identical or behind it (qtbase lacked QTBUG-148575); the ::gentoo mask reached these ebuilds anyway. Reopen only if ::gentoo falls behind the 6.12 series again."
 url = "https://download.qt.io/official_releases/qt/6.12/"
 parser = "regex"
 pattern = 'href="(6\.12\.[0-9]+)/"'
@@ -12044,6 +12048,8 @@ family any more (see its own record).
 # END
 
 ["dev-qt/qtbase"]
+enabled = false
+disabled_by = "removed 2026-10-01: ::gentoo now ships the same 6.12.0 (masked until 6.12.1 by ionen), and the mirror was identical or behind it (qtbase lacked QTBUG-148575); the ::gentoo mask reached these ebuilds anyway. Reopen only if ::gentoo falls behind the 6.12 series again."
 url = "https://download.qt.io/official_releases/qt/6.12/"
 parser = "regex"
 pattern = 'href="(6\.12\.[0-9]+)/"'
@@ -12061,6 +12067,8 @@ family any more (see its own record).
 # END
 
 ["dev-qt/qtcharts"]
+enabled = false
+disabled_by = "removed 2026-10-01: ::gentoo now ships the same 6.12.0 (masked until 6.12.1 by ionen), and the mirror was identical or behind it (qtbase lacked QTBUG-148575); the ::gentoo mask reached these ebuilds anyway. Reopen only if ::gentoo falls behind the 6.12 series again."
 url = "https://download.qt.io/official_releases/qt/6.12/"
 parser = "regex"
 pattern = 'href="(6\.12\.[0-9]+)/"'
@@ -12078,6 +12086,8 @@ family any more (see its own record).
 # END
 
 ["dev-qt/qtconnectivity"]
+enabled = false
+disabled_by = "removed 2026-10-01: ::gentoo now ships the same 6.12.0 (masked until 6.12.1 by ionen), and the mirror was identical or behind it (qtbase lacked QTBUG-148575); the ::gentoo mask reached these ebuilds anyway. Reopen only if ::gentoo falls behind the 6.12 series again."
 url = "https://download.qt.io/official_releases/qt/6.12/"
 parser = "regex"
 pattern = 'href="(6\.12\.[0-9]+)/"'
@@ -12095,23 +12105,26 @@ family any more (see its own record).
 # END
 
 ["dev-qt/qtdeclarative"]
+hold = true
 url = "https://download.qt.io/official_releases/qt/6.12/"
 parser = "regex"
 pattern = 'href="(6\.12\.[0-9]+)/"'
 select = "max"
 version = "6.12.0"
 comments = """
-qtdeclarative -- Qt 6.12 LTS family (32 modules), all released together from one
-download.qt.io directory. TEMPORARY MIRROR of ::gentoo's 6.12.9999 ebuild,
-shipped ahead of ::gentoo: once ::gentoo carries dev-qt/qtdeclarative-6.12.x, remove the
-ebuild and set enabled = false here. The URL pins the 6.12 series on purpose:
-6.13 is a new decision, not a bump. Bumped in lockstep with every module,
-since each ebuild pins ~dev-qt/qtbase-${PV}. qtwebengine is NOT part of this
-family any more (see its own record).
+qtdeclarative -- the one survivor of the Qt 6.12 mirror. On 2026-10-01
+::gentoo shipped all 32 modules at 6.12.0 (masked until 6.12.1) and the other
+31 records went enabled = false. This ebuild stays because it carries the
+QTBUG-149607 pick (KDE #508377) that ::gentoo's 6.12.0 lacks; at the same PVR
+bentoo's repo priority makes it win. HELD: it pins ~dev-qt/qtbase-${PV}, so a
+lone bump to 6.12.1 would require a qtbase only ::gentoo can provide. On
+6.12.1 the fix is in the tarball: remove the ebuild and set enabled = false.
 """
 # END
 
 ["dev-qt/qtgraphs"]
+enabled = false
+disabled_by = "removed 2026-10-01: ::gentoo now ships the same 6.12.0 (masked until 6.12.1 by ionen), and the mirror was identical or behind it (qtbase lacked QTBUG-148575); the ::gentoo mask reached these ebuilds anyway. Reopen only if ::gentoo falls behind the 6.12 series again."
 url = "https://download.qt.io/official_releases/qt/6.12/"
 parser = "regex"
 pattern = 'href="(6\.12\.[0-9]+)/"'
@@ -12129,6 +12142,8 @@ family any more (see its own record).
 # END
 
 ["dev-qt/qthttpserver"]
+enabled = false
+disabled_by = "removed 2026-10-01: ::gentoo now ships the same 6.12.0 (masked until 6.12.1 by ionen), and the mirror was identical or behind it (qtbase lacked QTBUG-148575); the ::gentoo mask reached these ebuilds anyway. Reopen only if ::gentoo falls behind the 6.12 series again."
 url = "https://download.qt.io/official_releases/qt/6.12/"
 parser = "regex"
 pattern = 'href="(6\.12\.[0-9]+)/"'
@@ -12146,6 +12161,8 @@ family any more (see its own record).
 # END
 
 ["dev-qt/qtimageformats"]
+enabled = false
+disabled_by = "removed 2026-10-01: ::gentoo now ships the same 6.12.0 (masked until 6.12.1 by ionen), and the mirror was identical or behind it (qtbase lacked QTBUG-148575); the ::gentoo mask reached these ebuilds anyway. Reopen only if ::gentoo falls behind the 6.12 series again."
 url = "https://download.qt.io/official_releases/qt/6.12/"
 parser = "regex"
 pattern = 'href="(6\.12\.[0-9]+)/"'
@@ -12163,6 +12180,8 @@ family any more (see its own record).
 # END
 
 ["dev-qt/qtlanguageserver"]
+enabled = false
+disabled_by = "removed 2026-10-01: ::gentoo now ships the same 6.12.0 (masked until 6.12.1 by ionen), and the mirror was identical or behind it (qtbase lacked QTBUG-148575); the ::gentoo mask reached these ebuilds anyway. Reopen only if ::gentoo falls behind the 6.12 series again."
 url = "https://download.qt.io/official_releases/qt/6.12/"
 parser = "regex"
 pattern = 'href="(6\.12\.[0-9]+)/"'
@@ -12180,6 +12199,8 @@ family any more (see its own record).
 # END
 
 ["dev-qt/qtlocation"]
+enabled = false
+disabled_by = "removed 2026-10-01: ::gentoo now ships the same 6.12.0 (masked until 6.12.1 by ionen), and the mirror was identical or behind it (qtbase lacked QTBUG-148575); the ::gentoo mask reached these ebuilds anyway. Reopen only if ::gentoo falls behind the 6.12 series again."
 url = "https://download.qt.io/official_releases/qt/6.12/"
 parser = "regex"
 pattern = 'href="(6\.12\.[0-9]+)/"'
@@ -12197,6 +12218,8 @@ family any more (see its own record).
 # END
 
 ["dev-qt/qtmultimedia"]
+enabled = false
+disabled_by = "removed 2026-10-01: ::gentoo now ships the same 6.12.0 (masked until 6.12.1 by ionen), and the mirror was identical or behind it (qtbase lacked QTBUG-148575); the ::gentoo mask reached these ebuilds anyway. Reopen only if ::gentoo falls behind the 6.12 series again."
 url = "https://download.qt.io/official_releases/qt/6.12/"
 parser = "regex"
 pattern = 'href="(6\.12\.[0-9]+)/"'
@@ -12214,6 +12237,8 @@ family any more (see its own record).
 # END
 
 ["dev-qt/qtnetworkauth"]
+enabled = false
+disabled_by = "removed 2026-10-01: ::gentoo now ships the same 6.12.0 (masked until 6.12.1 by ionen), and the mirror was identical or behind it (qtbase lacked QTBUG-148575); the ::gentoo mask reached these ebuilds anyway. Reopen only if ::gentoo falls behind the 6.12 series again."
 url = "https://download.qt.io/official_releases/qt/6.12/"
 parser = "regex"
 pattern = 'href="(6\.12\.[0-9]+)/"'
@@ -12231,6 +12256,8 @@ family any more (see its own record).
 # END
 
 ["dev-qt/qtpositioning"]
+enabled = false
+disabled_by = "removed 2026-10-01: ::gentoo now ships the same 6.12.0 (masked until 6.12.1 by ionen), and the mirror was identical or behind it (qtbase lacked QTBUG-148575); the ::gentoo mask reached these ebuilds anyway. Reopen only if ::gentoo falls behind the 6.12 series again."
 url = "https://download.qt.io/official_releases/qt/6.12/"
 parser = "regex"
 pattern = 'href="(6\.12\.[0-9]+)/"'
@@ -12248,6 +12275,8 @@ family any more (see its own record).
 # END
 
 ["dev-qt/qtquick3d"]
+enabled = false
+disabled_by = "removed 2026-10-01: ::gentoo now ships the same 6.12.0 (masked until 6.12.1 by ionen), and the mirror was identical or behind it (qtbase lacked QTBUG-148575); the ::gentoo mask reached these ebuilds anyway. Reopen only if ::gentoo falls behind the 6.12 series again."
 url = "https://download.qt.io/official_releases/qt/6.12/"
 parser = "regex"
 pattern = 'href="(6\.12\.[0-9]+)/"'
@@ -12265,6 +12294,8 @@ family any more (see its own record).
 # END
 
 ["dev-qt/qtquicktimeline"]
+enabled = false
+disabled_by = "removed 2026-10-01: ::gentoo now ships the same 6.12.0 (masked until 6.12.1 by ionen), and the mirror was identical or behind it (qtbase lacked QTBUG-148575); the ::gentoo mask reached these ebuilds anyway. Reopen only if ::gentoo falls behind the 6.12 series again."
 url = "https://download.qt.io/official_releases/qt/6.12/"
 parser = "regex"
 pattern = 'href="(6\.12\.[0-9]+)/"'
@@ -12282,6 +12313,8 @@ family any more (see its own record).
 # END
 
 ["dev-qt/qtremoteobjects"]
+enabled = false
+disabled_by = "removed 2026-10-01: ::gentoo now ships the same 6.12.0 (masked until 6.12.1 by ionen), and the mirror was identical or behind it (qtbase lacked QTBUG-148575); the ::gentoo mask reached these ebuilds anyway. Reopen only if ::gentoo falls behind the 6.12 series again."
 url = "https://download.qt.io/official_releases/qt/6.12/"
 parser = "regex"
 pattern = 'href="(6\.12\.[0-9]+)/"'
@@ -12299,6 +12332,8 @@ family any more (see its own record).
 # END
 
 ["dev-qt/qtscxml"]
+enabled = false
+disabled_by = "removed 2026-10-01: ::gentoo now ships the same 6.12.0 (masked until 6.12.1 by ionen), and the mirror was identical or behind it (qtbase lacked QTBUG-148575); the ::gentoo mask reached these ebuilds anyway. Reopen only if ::gentoo falls behind the 6.12 series again."
 url = "https://download.qt.io/official_releases/qt/6.12/"
 parser = "regex"
 pattern = 'href="(6\.12\.[0-9]+)/"'
@@ -12316,6 +12351,8 @@ family any more (see its own record).
 # END
 
 ["dev-qt/qtsensors"]
+enabled = false
+disabled_by = "removed 2026-10-01: ::gentoo now ships the same 6.12.0 (masked until 6.12.1 by ionen), and the mirror was identical or behind it (qtbase lacked QTBUG-148575); the ::gentoo mask reached these ebuilds anyway. Reopen only if ::gentoo falls behind the 6.12 series again."
 url = "https://download.qt.io/official_releases/qt/6.12/"
 parser = "regex"
 pattern = 'href="(6\.12\.[0-9]+)/"'
@@ -12333,6 +12370,8 @@ family any more (see its own record).
 # END
 
 ["dev-qt/qtserialbus"]
+enabled = false
+disabled_by = "removed 2026-10-01: ::gentoo now ships the same 6.12.0 (masked until 6.12.1 by ionen), and the mirror was identical or behind it (qtbase lacked QTBUG-148575); the ::gentoo mask reached these ebuilds anyway. Reopen only if ::gentoo falls behind the 6.12 series again."
 url = "https://download.qt.io/official_releases/qt/6.12/"
 parser = "regex"
 pattern = 'href="(6\.12\.[0-9]+)/"'
@@ -12350,6 +12389,8 @@ family any more (see its own record).
 # END
 
 ["dev-qt/qtserialport"]
+enabled = false
+disabled_by = "removed 2026-10-01: ::gentoo now ships the same 6.12.0 (masked until 6.12.1 by ionen), and the mirror was identical or behind it (qtbase lacked QTBUG-148575); the ::gentoo mask reached these ebuilds anyway. Reopen only if ::gentoo falls behind the 6.12 series again."
 url = "https://download.qt.io/official_releases/qt/6.12/"
 parser = "regex"
 pattern = 'href="(6\.12\.[0-9]+)/"'
@@ -12367,6 +12408,8 @@ family any more (see its own record).
 # END
 
 ["dev-qt/qtshadertools"]
+enabled = false
+disabled_by = "removed 2026-10-01: ::gentoo now ships the same 6.12.0 (masked until 6.12.1 by ionen), and the mirror was identical or behind it (qtbase lacked QTBUG-148575); the ::gentoo mask reached these ebuilds anyway. Reopen only if ::gentoo falls behind the 6.12 series again."
 url = "https://download.qt.io/official_releases/qt/6.12/"
 parser = "regex"
 pattern = 'href="(6\.12\.[0-9]+)/"'
@@ -12384,6 +12427,8 @@ family any more (see its own record).
 # END
 
 ["dev-qt/qtspeech"]
+enabled = false
+disabled_by = "removed 2026-10-01: ::gentoo now ships the same 6.12.0 (masked until 6.12.1 by ionen), and the mirror was identical or behind it (qtbase lacked QTBUG-148575); the ::gentoo mask reached these ebuilds anyway. Reopen only if ::gentoo falls behind the 6.12 series again."
 url = "https://download.qt.io/official_releases/qt/6.12/"
 parser = "regex"
 pattern = 'href="(6\.12\.[0-9]+)/"'
@@ -12401,6 +12446,8 @@ family any more (see its own record).
 # END
 
 ["dev-qt/qtsvg"]
+enabled = false
+disabled_by = "removed 2026-10-01: ::gentoo now ships the same 6.12.0 (masked until 6.12.1 by ionen), and the mirror was identical or behind it (qtbase lacked QTBUG-148575); the ::gentoo mask reached these ebuilds anyway. Reopen only if ::gentoo falls behind the 6.12 series again."
 url = "https://download.qt.io/official_releases/qt/6.12/"
 parser = "regex"
 pattern = 'href="(6\.12\.[0-9]+)/"'
@@ -12418,6 +12465,8 @@ family any more (see its own record).
 # END
 
 ["dev-qt/qttasktree"]
+enabled = false
+disabled_by = "removed 2026-10-01: ::gentoo now ships the same 6.12.0 (masked until 6.12.1 by ionen), and the mirror was identical or behind it (qtbase lacked QTBUG-148575); the ::gentoo mask reached these ebuilds anyway. Reopen only if ::gentoo falls behind the 6.12 series again."
 url = "https://download.qt.io/official_releases/qt/6.12/"
 parser = "regex"
 pattern = 'href="(6\.12\.[0-9]+)/"'
@@ -12435,6 +12484,8 @@ family any more (see its own record).
 # END
 
 ["dev-qt/qttools"]
+enabled = false
+disabled_by = "removed 2026-10-01: ::gentoo now ships the same 6.12.0 (masked until 6.12.1 by ionen), and the mirror was identical or behind it (qtbase lacked QTBUG-148575); the ::gentoo mask reached these ebuilds anyway. Reopen only if ::gentoo falls behind the 6.12 series again."
 url = "https://download.qt.io/official_releases/qt/6.12/"
 parser = "regex"
 pattern = 'href="(6\.12\.[0-9]+)/"'
@@ -12452,6 +12503,8 @@ family any more (see its own record).
 # END
 
 ["dev-qt/qttranslations"]
+enabled = false
+disabled_by = "removed 2026-10-01: ::gentoo now ships the same 6.12.0 (masked until 6.12.1 by ionen), and the mirror was identical or behind it (qtbase lacked QTBUG-148575); the ::gentoo mask reached these ebuilds anyway. Reopen only if ::gentoo falls behind the 6.12 series again."
 url = "https://download.qt.io/official_releases/qt/6.12/"
 parser = "regex"
 pattern = 'href="(6\.12\.[0-9]+)/"'
@@ -12469,6 +12522,8 @@ family any more (see its own record).
 # END
 
 ["dev-qt/qtvirtualkeyboard"]
+enabled = false
+disabled_by = "removed 2026-10-01: ::gentoo now ships the same 6.12.0 (masked until 6.12.1 by ionen), and the mirror was identical or behind it (qtbase lacked QTBUG-148575); the ::gentoo mask reached these ebuilds anyway. Reopen only if ::gentoo falls behind the 6.12 series again."
 url = "https://download.qt.io/official_releases/qt/6.12/"
 parser = "regex"
 pattern = 'href="(6\.12\.[0-9]+)/"'
@@ -12486,6 +12541,8 @@ family any more (see its own record).
 # END
 
 ["dev-qt/qtwayland"]
+enabled = false
+disabled_by = "removed 2026-10-01: ::gentoo now ships the same 6.12.0 (masked until 6.12.1 by ionen), and the mirror was identical or behind it (qtbase lacked QTBUG-148575); the ::gentoo mask reached these ebuilds anyway. Reopen only if ::gentoo falls behind the 6.12 series again."
 url = "https://download.qt.io/official_releases/qt/6.12/"
 parser = "regex"
 pattern = 'href="(6\.12\.[0-9]+)/"'
@@ -12503,6 +12560,8 @@ family any more (see its own record).
 # END
 
 ["dev-qt/qtwebchannel"]
+enabled = false
+disabled_by = "removed 2026-10-01: ::gentoo now ships the same 6.12.0 (masked until 6.12.1 by ionen), and the mirror was identical or behind it (qtbase lacked QTBUG-148575); the ::gentoo mask reached these ebuilds anyway. Reopen only if ::gentoo falls behind the 6.12 series again."
 url = "https://download.qt.io/official_releases/qt/6.12/"
 parser = "regex"
 pattern = 'href="(6\.12\.[0-9]+)/"'
@@ -12520,6 +12579,8 @@ family any more (see its own record).
 # END
 
 ["dev-qt/qtwebsockets"]
+enabled = false
+disabled_by = "removed 2026-10-01: ::gentoo now ships the same 6.12.0 (masked until 6.12.1 by ionen), and the mirror was identical or behind it (qtbase lacked QTBUG-148575); the ::gentoo mask reached these ebuilds anyway. Reopen only if ::gentoo falls behind the 6.12 series again."
 url = "https://download.qt.io/official_releases/qt/6.12/"
 parser = "regex"
 pattern = 'href="(6\.12\.[0-9]+)/"'
@@ -12537,6 +12598,8 @@ family any more (see its own record).
 # END
 
 ["dev-qt/qtwebview"]
+enabled = false
+disabled_by = "removed 2026-10-01: ::gentoo now ships the same 6.12.0 (masked until 6.12.1 by ionen), and the mirror was identical or behind it (qtbase lacked QTBUG-148575); the ::gentoo mask reached these ebuilds anyway. Reopen only if ::gentoo falls behind the 6.12 series again."
 url = "https://download.qt.io/official_releases/qt/6.12/"
 parser = "regex"
 pattern = 'href="(6\.12\.[0-9]+)/"'
