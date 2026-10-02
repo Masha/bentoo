@@ -8857,7 +8857,7 @@ url = "https://ftp.fau.de/tdf/libreoffice/stable/#26.8"
 parser = "script"
 script = "@libreoffice-stable.js"
 series = '^26\.8\.'
-version = "26.8.0.3"
+version = "26.8.1.1"
 comments = """
 libreoffice (stable line) — old/ lists every 4-segment release directory of every
 release line, so series pins this entry to 26.8.x and select=max takes the newest
@@ -8953,7 +8953,7 @@ url = "https://ftp.fau.de/tdf/libreoffice/stable/#26.8"
 parser = "script"
 script = "@libreoffice-stable.js"
 series = '^26\.8\.'
-version = "26.8.0.3"
+version = "26.8.1.1"
 comments = """
 libreoffice-l10n (stable line) — follows the core release, so it runs the same
 probe script as app-office/libreoffice@stable: only a release stable/ lists
@@ -9030,7 +9030,7 @@ url = "https://ftp.fau.de/tdf/libreoffice/stable/#26.8"
 parser = "script"
 script = "@libreoffice-stable.js"
 series = '^26\.8\.'
-version = "26.8.0.3"
+version = "26.8.1.1"
 comments = """
 myspell-hu — PV=LO_VER; the hu langpack ships in the LibreOffice archive tree the
 ebuild's SRC_URI pulls from, so it runs the same probe script as
