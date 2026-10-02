@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@protonmail.com</email>
+		<name>Lucas Couto</name>
+	</maintainer>
+	<longdescription>
+		The kernel that boots inside each Kata Containers micro-VM. It is built
+		from kernel.org sources with the configuration fragments and patches
+		that Kata ships for the pinned kernel version, has no loadable modules,
+		and is installed under /usr/share/kata-containers. It is never used to
+		boot the host.
+	</longdescription>
+	<upstream>
+		<remote-id type="github">kata-containers/kata-containers</remote-id>
+	</upstream>
+</pkgmetadata>

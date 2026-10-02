@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@protonmail.com</email>
+		<name>Lucas Couto</name>
+	</maintainer>
+	<longdescription>
+		Kata Containers runs each container or pod inside a lightweight virtual
+		machine, so workloads get hypervisor isolation while still being driven
+		by containerd or CRI-O. This package builds the Rust runtime
+		(containerd-shim-kata-v2), kata-ctl and the in-guest kata-agent from
+		source, and assembles the guest initrd from the agent and the libraries
+		it links on this system. The guest kernel comes from
+		sys-kernel/kata-guest-kernel and QEMU is the configured hypervisor.
+	</longdescription>
+	<use>
+		<flag name="seccomp">Build the in-guest agent with seccomp filtering for container processes</flag>
+	</use>
+	<upstream>
+		<remote-id type="github">kata-containers/kata-containers</remote-id>
+	</upstream>
+</pkgmetadata>

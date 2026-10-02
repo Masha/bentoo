@@ -1,0 +1,13 @@
+BDEPEND=app-alternatives/bc app-alternatives/cpio dev-lang/perl sys-devel/bison sys-devel/flex virtual/libelf
+DEFINED_PHASES=compile configure install prepare unpack
+DESCRIPTION=Linux kernel for Kata Containers guest VMs, built from Kata's config fragments
+EAPI=8
+HOMEPAGE=https://katacontainers.io/ https://github.com/kata-containers/kata-containers
+INHERIT=toolchain-funcs
+KEYWORDS=~amd64 ~arm64
+LICENSE=GPL-2
+RESTRICT=test
+SLOT=0
+SRC_URI=https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.18.35.tar.xz https://github.com/kata-containers/kata-containers/archive/refs/tags/4.2.0.tar.gz -> kata-containers-4.2.0.tar.gz
+_eclasses_=toolchain-funcs	58a918e3a42d0156f010dcfd43725be5
+_md5_=102525e20f4b41b1b4fea081e2dd7eef

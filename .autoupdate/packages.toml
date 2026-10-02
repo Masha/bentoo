@@ -1376,6 +1376,24 @@ qBittorrent — tag "release-X.Y.Z" ("release-" stripped).
 """
 # END
 
+["app-containers/kata-containers"]
+url = "https://api.github.com/repos/kata-containers/kata-containers/releases/latest"
+parser = "json"
+path = "tag_name"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "4.2.0"
+comments = """
+Kata Containers — tag "X.Y.Z", no prefix. The applier only moves PV; a bump
+also needs, from the new release's versions.yaml and tools/packaging/kernel:
+  - sys-kernel/kata-guest-kernel: assets.kernel.version + kata_config_version
+    form its PV (6.18.35_p202), and its KATA_PV names this release. It has no
+    record of its own because its version is dictated here, then the ~ pin in
+    this ebuild's RDEPEND moves with it;
+  - app-emulation/virtiofsd: externals.virtiofsd.version;
+  - the crate license survey in LICENSE (cargo tree --format {l}).
+"""
+# END
+
 ["app-containers/podman"]
 enabled = false
 disabled_by = "auto"
