@@ -1,3 +1,32 @@
+# Lucas C.S. <lucascs@protonmail.com> (2026-10-02)
+# The Qt 6.12 family, opt-in only: this overlay's two survivors of the 6.12
+# mirror (fb3c2d3c7, trimmed in 7d5bb0165). qtdeclarative-6.12.0 is a .0
+# release that pins ~dev-qt/qtbase-${PV}, and qtwebengine-6.140.0_rc is a
+# release candidate.
+#
+# Today ::gentoo's own 6.12.0 mask (ionen, 2026-10-01) already reaches both --
+# measured: with no local unmask, emerge refuses them citing
+# /var/db/repos/gentoo/profiles/package.mask. That is exactly why this entry
+# exists: it is someone else's mask, and it lifts on someone else's schedule.
+# ionen's note says qtwebengine will be "treated separately" from the 6.12
+# block, so the RC could become reachable the day that block is rewritten,
+# with nothing here deciding it. A pre-release stays masked because bentoo
+# says so, not because ::gentoo happens to.
+#
+# The atoms are deliberately unqualified: Portage stamps them "::bentoo",
+# which is where these ebuilds live. ::gentoo's copies stay under its own
+# mask. To opt in, the same lines ::gentoo suggests cancel both masks, since
+# an unqualified unmask matches every repository:
+#
+#   dev-qt/*:6/6.12.0
+#   dev-qt/qtwebengine:6/6.140.0
+#
+# Remove each line together with its ebuild: qtdeclarative on 6.12.1 (the
+# QTBUG-149607 pick is in that tarball), qtwebengine once ::gentoo ships any
+# 6.140 release. Both .autoupdate records are held for the same reasons.
+=dev-qt/qtdeclarative-6.12.0*
+=dev-qt/qtwebengine-6.140.0*
+
 # Lucas C.S. <lucascs@protonmail.com> (2026-09-29)
 # simdjson 5.0.1, a major release published 2026-09-28. Masked for two reasons:
 # it is younger than the 7-day floor for new dependency versions, and
