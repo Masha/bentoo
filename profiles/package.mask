@@ -1,4 +1,27 @@
 # Lucas C.S. <lucascs@protonmail.com> (2026-10-02)
+# Linux 7.3 release candidates as a dist-kernel, opt-in only. ::gentoo never
+# ships an -rc dist-kernel (its -rc kernels are git-sources, sources only), so
+# this pair has nothing upstream to defer to. It must stay masked because
+# 7.3_rc5 sorts above 7.2.x: unmasked, every ~arch user's next world update
+# would move them onto a release candidate, and out-of-tree modules such as
+# nvidia-drivers still cap MODULES_KERNEL_MAX at 7.2.
+#
+# The virtual is masked with the kernel. It RDEPENDs on the exact
+# ~sys-kernel/gentoo-kernel-${PV}, so an unmasked 7.3_rc virtual would be
+# visible while the only kernel that satisfies it is not.
+#
+# The atoms are deliberately unqualified: Portage stamps them "::bentoo",
+# which is where these ebuilds live. To opt in, unmask both:
+#
+#   =sys-kernel/gentoo-kernel-7.3_rc*
+#   =virtual/dist-kernel-7.3_rc*
+#
+# Remove this entry with the last 7.3_rc ebuild, once ::gentoo ships its first
+# 7.3 dist-kernel.
+=sys-kernel/gentoo-kernel-7.3_rc*
+=virtual/dist-kernel-7.3_rc*
+
+# Lucas C.S. <lucascs@protonmail.com> (2026-10-02)
 # The Qt 6.12 family, opt-in only: this overlay's two survivors of the 6.12
 # mirror (fb3c2d3c7, trimmed in 7d5bb0165). qtdeclarative-6.12.0 is a .0
 # release that pins ~dev-qt/qtbase-${PV}, and qtwebengine-6.140.0_rc is a
