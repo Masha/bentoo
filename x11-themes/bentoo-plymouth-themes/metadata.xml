@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@proton.me</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<longdescription>
+		Nine script-based Plymouth themes (bentoo-compile-it, bentoo-compile-it-v2,
+		compile-it, funtoo, funtoo-next, funtoo-tux, gentoo, gentoo-maskots,
+		gnu-meditate) derived from darwin-plymouth. They share one script that
+		handles the LUKS passphrase, the TPM2 and security-token PIN prompts of
+		systemd-cryptsetup with a retry warning, question prompts, and boot
+		messages.
+	</longdescription>
+	<upstream>
+		<remote-id type="github">obentoo/bentoo</remote-id>
+	</upstream>
+</pkgmetadata>

@@ -1,0 +1,320 @@
+# Shared Plymouth script for the bentoo themes.
+#
+# Original concept: darwin-plymouth by Lozano Juan Pablo <libredeb@gmail.com>
+# (GPL-3.0). Adapted by Fabián Alexis and by Lucas C.S.
+#
+# The ebuild installs one copy per theme and replaces the four @...@ layout
+# values below. Everything else is identical across themes, so a fix made here
+# reaches all of them.
+
+layout.logo_y = @LOGO_Y@;       # logo top, as a fraction of the screen height
+layout.anim_y = @ANIM_Y@;       # spinner top, as a fraction of the screen height
+layout.box_y_div = @BOX_Y_DIV@; # password box bottom = screen height / this
+layout.text = @TEXT_SHADE@;     # gray level of the prompt and message text
+
+# Light backgrounds get dark text, so the warning red follows the same choice.
+if (layout.text > 0.5) {
+  warning.r = 1.0; warning.g = 0.55; warning.b = 0.55;
+} else {
+  warning.r = 0.75; warning.g = 0.1; warning.b = 0.1;
+}
+
+Window.GetMaxWidth = fun () {
+  i = 0;
+  width = 0;
+  while (Window.GetWidth(i)) {
+    width = Math.Max(width, Window.GetWidth(i));
+    i++;
+  }
+  return width;
+};
+
+Window.GetMaxHeight = fun () {
+  i = 0;
+  height = 0;
+  while (Window.GetHeight(i)) {
+    height = Math.Max(height, Window.GetHeight(i));
+    i++;
+  }
+  return height;
+};
+
+mode = Plymouth.GetMode();
+sleeping = (mode == "suspend" || mode == "resume");
+
+#----------------------------------------- Background, logo, spinner ----------
+
+if (sleeping) {
+  background.original_image = Image("suspend.png");
+  Window.SetBackgroundTopColor(1, 0, 0);
+  Window.SetBackgroundBottomColor(0, 1, 0);
+} else {
+  background.original_image = Image("background.png");
+  Window.SetBackgroundTopColor(0.180, 0.545, 0.020);
+  Window.SetBackgroundBottomColor(0.439, 0.573, 0.333);
+}
+
+background.image = background.original_image.Scale(Window.GetMaxWidth(), Window.GetMaxHeight());
+background.sprite = Sprite(background.image);
+background.sprite.SetPosition(Window.GetX(), Window.GetY(), -10);
+
+anim.imagecount = 32;
+anim.target_width = 0.2 * 0.46 * Window.GetWidth();
+anim.target_height = 0.2 * 0.46 * Window.GetWidth();
+
+fun RotatedImage (index) {
+  index = Math.Int(index);
+  if (!RotatedImageCache[index])
+    RotatedImageCache[index] = anim.original_image.Rotate((Math.Pi * 2 * index) / anim.imagecount).Scale(anim.target_width, anim.target_height);
+  return RotatedImageCache[index];
+}
+
+# The logo and the spinner only exist outside suspend/resume: logo.png is not
+# loaded there, and scaling a missing image used to error out on every frame.
+if (!sleeping) {
+  logo.original_image = Image("logo.png");
+  logo.ratio = logo.original_image.GetWidth() / logo.original_image.GetHeight();
+  logo.image = logo.original_image.Scale(0.5 * Window.GetMaxWidth(), 0.5 / logo.ratio * Window.GetMaxWidth());
+  logo.sprite = Sprite(logo.image);
+  logo.sprite.SetX((Window.GetX() + Window.GetMaxWidth() - logo.image.GetWidth()) / 2);
+  logo.sprite.SetY(Window.GetY() + Window.GetHeight() * layout.logo_y);
+
+  anim.original_image = Image("animation.png").Scale(anim.target_width, anim.target_width);
+  anim.sprite = Sprite(RotatedImage(0));
+  anim.sprite.SetX((Window.GetX() + Window.GetWidth() - RotatedImage(0).GetWidth()) / 2);
+  anim.sprite.SetY(Window.GetY() + Window.GetHeight() * layout.anim_y);
+  anim.index = 0;
+}
+
+status = "normal";
+has_answer = 0;
+current_prompt = "";
+answered_prompt = "";
+
+fun refresh_callback () {
+  if (global.status == "normal") {
+    anim.index = (anim.index + 1) % anim.imagecount;
+    anim.sprite.SetImage(RotatedImage(anim.index));
+    # Restore the spinner after a prompt: it used to stay hidden for the
+    # rest of the boot once a password had been asked.
+    anim.sprite.SetOpacity(1);
+  } else {
+    anim.sprite.SetOpacity(0);
+  }
+}
+
+if (!sleeping)
+  Plymouth.SetRefreshFunction(refresh_callback);
+
+#----------------------------------------- Dialog -----------------------------
+#
+# Used for every prompt: the LUKS passphrase, the TPM2 / security token PIN
+# asked by systemd-cryptsetup, and question prompts. The prompt text is drawn
+# centered above the box, so "PIN" and "passphrase" read differently.
+#
+# Retry warning: after Enter, plymouthd drops the request and calls
+# display_normal before the next one arrives, while Backspace only lowers the
+# bullet count. So the same prompt coming back right after an answer means the
+# answer was rejected, and the warning is shown until typing starts again.
+
+fun dialog_setup () {
+  local.box;
+  local.lock;
+  local.entry;
+
+  box.image = Image("box.png");
+  lock.image = Image("lock.png");
+  entry.image = Image("entry.png");
+
+  box.sprite = Sprite(box.image);
+  box.x = Window.GetX() + Window.GetWidth() / 2 - box.image.GetWidth() / 2;
+  box.y = Window.GetY() + Window.GetHeight() / layout.box_y_div - box.image.GetHeight();
+  box.z = 10000;
+  box.sprite.SetPosition(box.x, box.y, box.z);
+
+  lock.sprite = Sprite(lock.image);
+  lock.x = box.x + box.image.GetWidth() / 2 - (lock.image.GetWidth() + entry.image.GetWidth()) / 2;
+  lock.y = box.y + box.image.GetHeight() / 2 - lock.image.GetHeight() / 2;
+  lock.z = box.z + 1;
+  lock.sprite.SetPosition(lock.x - 10, lock.y, lock.z);
+
+  entry.sprite = Sprite(entry.image);
+  entry.x = lock.x + lock.image.GetWidth();
+  entry.y = box.y + box.image.GetHeight() / 2 - entry.image.GetHeight() / 2;
+  entry.z = box.z + 1;
+  entry.sprite.SetPosition(entry.x, entry.y, entry.z);
+
+  global.dialog.box = box;
+  global.dialog.lock = lock;
+  global.dialog.entry = entry;
+  global.dialog.bullet_image = Image("bullet.png");
+  global.dialog.bullet_step = global.dialog.bullet_image.GetWidth() / 0.9;
+  # As many bullets as fit in the entry; longer input keeps the row full
+  # instead of overflowing the box.
+  global.dialog.max_bullets = Math.Max(1, Math.Int((entry.image.GetWidth() - 20) / global.dialog.bullet_step));
+  global.dialog.prompt_sprite = Sprite();
+  global.dialog.answer_sprite = Sprite();
+  global.dialog.warning_sprite = Sprite();
+  global.dialog.warning_image = Image.Text("Not accepted. Please try again.", warning.r, warning.g, warning.b);
+  dialog_opacity(1);
+}
+
+fun dialog_opacity (opacity) {
+  dialog.box.sprite.SetOpacity(opacity);
+  dialog.lock.sprite.SetOpacity(opacity);
+  dialog.entry.sprite.SetOpacity(opacity);
+  dialog.prompt_sprite.SetOpacity(opacity);
+  dialog.answer_sprite.SetOpacity(opacity);
+  if (opacity == 0)
+    dialog.warning_sprite.SetOpacity(0);
+  for (index = 0; dialog.bullet[index]; index++)
+    dialog.bullet[index].sprite.SetOpacity(opacity);
+}
+
+# Centers an image horizontally on the box, at the given top coordinate.
+fun dialog_place (sprite, image, y) {
+  sprite.SetImage(image);
+  sprite.SetPosition(dialog.box.x + (dialog.box.image.GetWidth() - image.GetWidth()) / 2, y, dialog.box.z + 2);
+}
+
+# Shared entry point of both prompt kinds; returns nothing, updates the state.
+fun dialog_begin (kind, prompt) {
+  local.fresh = (global.status != kind || prompt != global.current_prompt);
+  if (fresh) {
+    # Two queued prompts can follow each other with no display_normal in
+    # between; the one being replaced was answered all the same.
+    if (global.status == "password" || global.status == "question")
+      dialog_answered();
+    # Comparing against an unset variable is true in plymouth's script
+    # language, hence the explicit flag instead of a bare comparison.
+    global.retry = (global.has_answer && prompt == global.answered_prompt);
+  }
+  global.status = kind;
+  global.current_prompt = prompt;
+
+  dialog_opacity(1);
+  anim.sprite.SetOpacity(0);
+
+  local.prompt_image = Image.Text(prompt, layout.text, layout.text, layout.text);
+  dialog_place(dialog.prompt_sprite, prompt_image, dialog.box.y - prompt_image.GetHeight() - 8);
+}
+
+fun dialog_warning () {
+  if (global.retry) {
+    dialog_place(dialog.warning_sprite, dialog.warning_image, dialog.box.y + dialog.box.image.GetHeight() + 8);
+    dialog.warning_sprite.SetOpacity(1);
+  } else {
+    dialog.warning_sprite.SetOpacity(0);
+  }
+}
+
+fun dialog_answered () {
+  global.answered_prompt = global.current_prompt;
+  global.has_answer = 1;
+}
+
+fun display_normal_callback () {
+  if (global.status == "password" || global.status == "question")
+    dialog_answered();
+  global.status = "normal";
+  dialog_opacity(0);
+}
+
+fun display_password_callback (prompt, bullets) {
+  dialog_begin("password", prompt);
+  if (bullets > 0)
+    global.retry = 0;
+  dialog_warning();
+
+  dialog.answer_sprite.SetOpacity(0);
+  for (index = 0; dialog.bullet[index] || index < dialog.max_bullets; index++) {
+    if (!dialog.bullet[index]) {
+      dialog.bullet[index].sprite = Sprite(dialog.bullet_image);
+      dialog.bullet[index].x = dialog.entry.x + index * dialog.bullet_step;
+      dialog.bullet[index].y = dialog.entry.y + dialog.entry.image.GetHeight() / 2 - dialog.bullet_image.GetHeight() / 2;
+      dialog.bullet[index].z = dialog.entry.z + 1;
+      dialog.bullet[index].sprite.SetPosition(dialog.bullet[index].x + 10, dialog.bullet[index].y, dialog.bullet[index].z);
+    }
+    if (index < bullets)
+      dialog.bullet[index].sprite.SetOpacity(1);
+    else
+      dialog.bullet[index].sprite.SetOpacity(0);
+  }
+}
+
+# Question prompts echo what is typed, so the text is drawn in the entry.
+fun display_question_callback (prompt, entry_text) {
+  dialog_begin("question", prompt);
+  if (entry_text != "")
+    global.retry = 0;
+  dialog_warning();
+
+  for (index = 0; dialog.bullet[index]; index++)
+    dialog.bullet[index].sprite.SetOpacity(0);
+
+  # entry.png is light, so the text is dark, like the bullets.
+  local.answer_image = Image.Text(entry_text, 0.1, 0.1, 0.1);
+  dialog.answer_sprite.SetImage(answer_image);
+  dialog.answer_sprite.SetPosition(dialog.entry.x + 10, dialog.entry.y + (dialog.entry.image.GetHeight() - answer_image.GetHeight()) / 2, dialog.entry.z + 1);
+  dialog.answer_sprite.SetOpacity(1);
+}
+
+# Instantiate the dialog at startup, so every image is loaded before the
+# initrd is unmounted, in case /usr is not mounted yet.
+dialog_setup();
+dialog_opacity(0);
+Plymouth.SetDisplayNormalFunction(display_normal_callback);
+Plymouth.SetDisplayPasswordFunction(display_password_callback);
+Plymouth.SetDisplayQuestionFunction(display_question_callback);
+
+#----------------------------------------- Messages ---------------------------
+#
+# plymouth 22.02 has no SetMessageFunction (the name these themes used to
+# register), so boot messages were silently dropped.
+
+message.sprite = Sprite();
+
+fun display_message_callback (text) {
+  message.image = Image.Text(text, layout.text, layout.text, layout.text);
+  message.sprite.SetImage(message.image);
+  message.sprite.SetPosition(Window.GetX() + (Window.GetWidth() - message.image.GetWidth()) / 2, Window.GetY() + Window.GetHeight() * 0.93, 2);
+  message.sprite.SetOpacity(1);
+}
+
+fun hide_message_callback (text) {
+  message.sprite.SetOpacity(0);
+}
+
+Plymouth.SetDisplayMessageFunction(display_message_callback);
+Plymouth.SetHideMessageFunction(hide_message_callback);
+
+#----------------------------------------- Progress bar -----------------------
+
+progress_box.image = Image("progress_box.png");
+progress_box.sprite = Sprite(progress_box.image);
+progress_box.x = Window.GetX() + Window.GetWidth() / 2 - progress_box.image.GetWidth() / 2;
+progress_box.y = Window.GetY() + Window.GetHeight() * 0.65 - progress_box.image.GetHeight() / 2;
+progress_box.sprite.SetPosition(progress_box.x, progress_box.y, 0);
+
+progress_bar.original_image = Image("progress_bar.png");
+progress_bar.sprite = Sprite();
+progress_bar.x = Window.GetX() + Window.GetWidth() / 2 - progress_bar.original_image.GetWidth() / 2;
+progress_bar.y = progress_box.y + (progress_box.image.GetHeight() - progress_bar.original_image.GetHeight()) / 2;
+progress_bar.sprite.SetPosition(progress_bar.x, progress_bar.y, 1);
+
+fun progress_callback (duration, progress) {
+  if (progress_bar.image.GetWidth() != Math.Int(progress_bar.original_image.GetWidth() * progress)) {
+    progress_bar.image = progress_bar.original_image.Scale(progress_bar.original_image.GetWidth() * progress, progress_bar.original_image.GetHeight());
+    progress_bar.sprite.SetImage(progress_bar.image);
+  }
+}
+
+Plymouth.SetBootProgressFunction(progress_callback);
+
+#----------------------------------------- Quit -------------------------------
+
+fun quit_callback () {
+  anim.sprite.SetOpacity(0);
+}
+
+Plymouth.SetQuitFunction(quit_callback);

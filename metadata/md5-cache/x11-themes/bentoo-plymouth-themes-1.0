@@ -1,0 +1,10 @@
+DEFINED_PHASES=compile install postinst
+DESCRIPTION=Plymouth boot splash themes from the bentoo distribution
+EAPI=8
+HOMEPAGE=https://github.com/obentoo/bentoo
+KEYWORDS=~amd64 ~arm64
+LICENSE=GPL-3
+RDEPEND=sys-boot/plymouth
+SLOT=0
+SRC_URI=https://distfiles.obentoo.org/bentoo-plymouth-themes-1.0.tar.xz
+_md5_=b53f4647b63fa6bdc566a648102dc992
