@@ -64,9 +64,9 @@ QA_PREBUILT="usr/share/afl/testcases/others/elf/small_exec.elf"
 # series.  They are rebased here and kept in ${FILESDIR} so the package does
 # not depend on a distfile nobody regenerates.  Rebase them on every bump.
 PATCHES=(
-	"${FILESDIR}"/${P}-respect-flags.patch
-	"${FILESDIR}"/${P}-makefile-errors.patch
-	"${FILESDIR}"/${P}-test-instr-flags.patch
+	"${FILESDIR}"/${PN}-5.03c-respect-flags.patch
+	"${FILESDIR}"/${PN}-5.03c-makefile-errors.patch
+	"${FILESDIR}"/${PN}-5.03c-test-instr-flags.patch
 )
 
 pkg_setup() {

@@ -43,7 +43,7 @@ BDEPEND="
 # dev-util/mdds at 3.2.1 where ::gentoo is on 3.0.0, and libetonyek does not
 # build against the newer API unpatched.
 PATCHES=(
-	"${FILESDIR}/${P}-mdds-3.0.patch"
+	"${FILESDIR}/${PN}-0.1.13-mdds-3.0.patch"
 )
 
 src_prepare() {

@@ -666,7 +666,7 @@ Obsidian — official release manifest consumed by the updater.
 url = "https://storage.googleapis.com/flutter_infra_release/releases/releases_linux.json"
 parser = "regex"
 pattern = '"channel": "stable",\s+"version": "[0-9.]+",\s+"dart_sdk_version": "([0-9.]+)"'
-series = '^3\.13\.5$'
+series = '^3\.13\.5(?:-r[0-9]+)?$'
 version = "3.13.5"
 comments = """
 Dart (the line dev-lang/flutter can actually run) — "@stable" here is the
@@ -1871,7 +1871,7 @@ url = "https://api.github.com/repos/mltframework/shotcut/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-series = '^[0-9.]+$'
+series = '^[0-9.]+(?:-r[0-9]+)?$'
 version = "26.9.27"
 comments = """
 shotcut (stable channel) — tag "vX.Y.Z" ("v" stripped); releases/latest is the
@@ -1895,7 +1895,7 @@ pattern = '"tag_name":"v([0-9.]+)","target_commitish":"[^"]*","name":"[^"]*","dr
 transform = [['$', "_beta"]]
 select = "max"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-series = '_beta$'
+series = '_beta(?:-r[0-9]+)?$'
 version = "26.9.6_beta"
 comments = """
 shotcut (beta channel) — the hard part here is that upstream gives the two
@@ -3567,7 +3567,7 @@ path = "tag_name"
 transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "source"
-series = '^[0-9.]+$'
+series = '^[0-9.]+(?:-r[0-9]+)?$'
 version = "1.22.0"
 comments = """
 zed (stable channel), from source — since 2026-10-01 app-editors/zed builds
@@ -3591,7 +3591,7 @@ transform = [['-pre$', "_pre"]]
 select = "max"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "source"
-series = '_pre$'
+series = '_pre(?:-r[0-9]+)?$'
 version = "1.23.1_pre"
 comments = """
 zed (preview channel), from source — mirrors zed-bin@preview; the same manual
@@ -3619,7 +3619,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-series = '^[0-9.]+$'
+series = '^[0-9.]+(?:-r[0-9]+)?$'
 version = "1.22.0"
 comments = """
 zed-bin (stable channel) — releases/latest is the stable release by definition
@@ -3644,7 +3644,7 @@ transform = [['-pre$', "_pre"]]
 select = "max"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-series = '_pre$'
+series = '_pre(?:-r[0-9]+)?$'
 version = "1.23.1_pre"
 comments = """
 zed-bin (preview channel) — releases/latest never returns a prerelease, so the

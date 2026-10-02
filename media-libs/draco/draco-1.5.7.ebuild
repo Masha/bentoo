@@ -25,7 +25,7 @@ PATCHES=(
 	# Upstream fills draco.pc from the RELATIVE GNUInstallDirs values, so the
 	# installed file reads "-Iinclude -Llib64" and pkg-config hands consumers
 	# two paths that do not exist.  cmake_src_prepare applies this.
-	"${FILESDIR}"/${P}-pkgconfig-absolute-paths.patch
+	"${FILESDIR}"/${PN}-1.5.7-pkgconfig-absolute-paths.patch
 )
 
 src_configure() {

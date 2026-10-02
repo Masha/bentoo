@@ -29,7 +29,7 @@ BDEPEND=">=dev-lang/go-1.26"
 # prefers the build info when it carries something meaningful. Without it the
 # installed binary cannot answer `shfmt --version`.
 PATCHES=(
-	"${FILESDIR}"/${P}-report-real-version.patch
+	"${FILESDIR}"/${PN}-3.14.1-report-real-version.patch
 )
 
 src_compile() {

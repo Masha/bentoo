@@ -37,7 +37,7 @@ RESTRICT="test"
 # the scanner calls itself govulncheck@v0.0.0 -- in output people paste into
 # reports. The patch short-circuits that fallback.
 PATCHES=(
-	"${FILESDIR}"/${P}-report-real-version.patch
+	"${FILESDIR}"/${PN}-1.8.0-report-real-version.patch
 )
 
 src_compile() {

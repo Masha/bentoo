@@ -55,7 +55,7 @@ declare -A GIT_CRATES=(
 	[x11]='https://github.com/bjornsnoen/x11-rs;c2e9bfaa7b196938f8700245564d8ac5d447786a;x11-rs-%commit%/x11'
 )
 
-# LLVM 22+ NEEDS THE scrap BINDGEN PATCH (files/${P}-scrap-bindgen-0.72.patch).
+# LLVM 22+ NEEDS THE scrap BINDGEN PATCH (files/${PN}-1.4.9-scrap-bindgen-0.72.patch).
 # libs/scrap asks for bindgen 0.65 (May 2023), which cannot parse the
 # libvpx/libaom headers through libclang >= 22: it gives up on the types and
 # emits `_address` as their only field, so `scrap` dies with 64 errors like
@@ -211,7 +211,7 @@ QA_PRESTRIPPED="
 "
 
 PATCHES=(
-	"${FILESDIR}"/${P}-scrap-bindgen-0.72.patch
+	"${FILESDIR}"/${PN}-1.4.9-scrap-bindgen-0.72.patch
 )
 
 pkg_setup() {
