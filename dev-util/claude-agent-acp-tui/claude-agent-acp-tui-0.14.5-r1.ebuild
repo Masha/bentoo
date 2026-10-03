@@ -23,6 +23,19 @@ RDEPEND="
 
 QA_PREBUILT="usr/lib/node_modules/${PN}/node_modules/node-pty/build/Release/pty.node"
 
+src_prepare() {
+	default
+
+	# The bundle vendors the SDK's native Claude CLI (~200 MB), but the bridge
+	# never runs it: claude-path.js resolves `claude` from PATH only, with no
+	# native-binary fallback, and that PATH entry is dev-util/claude-code. The
+	# SDK itself is used here only for session/settings file helpers, which
+	# work without the platform package.
+	local sdk_bin=node_modules/@anthropic-ai/claude-agent-sdk-linux-x64
+	[[ -d ${sdk_bin} ]] || die "${sdk_bin} is gone; drop this removal"
+	rm -r "${sdk_bin}" || die
+}
+
 src_compile() {
 	:
 }
@@ -49,6 +62,6 @@ pkg_postinst() {
 	elog "To enable it in Zed, add the following to ~/.config/zed/settings.json:"
 	elog ""
 	elog "    \"agent_servers\": {"
-	elog "        \"Claude Agent TUI\": { \"command\": \"claude-agent-acp\", \"args\": [] }"
+	elog "        \"Claude Agent TUI\": { \"command\": \"claude-agent-acp-tui\", \"args\": [] }"
 	elog "    }"
 }

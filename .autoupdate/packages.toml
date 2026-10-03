@@ -9197,7 +9197,7 @@ url = "https://api.github.com/repos/zeo-workspace/claude-agent-tui/releases/late
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.14.5"
+version = "0.14.5-r1"
 comments = """
 Renamed from dev-util/claude-agent-tui (commit e8a05fdc: del old ebuild + add
 claude-agent-acp-tui, same upstream repo zeo-workspace/claude-agent-tui, same PV).
