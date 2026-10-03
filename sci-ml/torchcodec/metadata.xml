@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@protonmail.com</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<longdescription lang="en">
+		TorchCodec decodes and encodes video, audio and images straight into
+		PyTorch tensors, using the system FFmpeg (4 through 9). Since
+		torchaudio 2.9 it is the backend behind torchaudio.load() and
+		torchaudio.save(). This build links the system FFmpeg and image
+		libraries instead of the S3-hosted copies upstream's wheels bundle;
+		AVIF stays disabled for that reason, since upstream offers no way to
+		use a system libavif.
+	</longdescription>
+	<use>
+		<flag name="cuda">Build the NVIDIA GPU decoders (NVDEC through FFmpeg, nvJPEG)</flag>
+		<flag name="gif">Build GIF decoding from the vendored giflib 5.2.2 copy (not <pkg>media-libs/giflib</pkg>; it does not receive that package's security fixes)</flag>
+		<flag name="heif">Build HEIC image decoding against <pkg>media-libs/libheif</pkg></flag>
+	</use>
+	<upstream>
+		<remote-id type="github">meta-pytorch/torchcodec</remote-id>
+		<remote-id type="pypi">torchcodec</remote-id>
+		<bugs-to>https://github.com/meta-pytorch/torchcodec/issues</bugs-to>
+	</upstream>
+</pkgmetadata>

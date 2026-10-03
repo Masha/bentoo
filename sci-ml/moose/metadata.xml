@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@proton.me</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<longdescription lang="en">
+		Moose is a GTK4/libadwaita desktop client for chatting with large
+		language models served by Ollama. It keeps conversations in a local
+		SQLite database with full-text search, can attach PDFs (text is
+		extracted with Poppler's pdftotext) and images for vision models,
+		and renders Markdown and LaTeX in replies.
+
+		It does not run models itself: point it at a local or remote Ollama
+		instance. GPU acceleration is therefore a property of the Ollama
+		server, not of this package.
+	</longdescription>
+	<upstream>
+		<remote-id type="github">moooossee/moose</remote-id>
+		<bugs-to>https://github.com/moooossee/moose/issues</bugs-to>
+	</upstream>
+</pkgmetadata>

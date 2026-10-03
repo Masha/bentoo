@@ -1,0 +1,17 @@
+BDEPEND=python_single_target_python3_12? ( dev-python/pybind11[python_targets_python3_12(-)] ) python_single_target_python3_13? ( dev-python/pybind11[python_targets_python3_13(-)] ) python_single_target_python3_14? ( dev-python/pybind11[python_targets_python3_14(-)] ) virtual/pkgconfig python_single_target_python3_12? ( dev-lang/python:3.12 ) python_single_target_python3_13? ( dev-lang/python:3.13 ) python_single_target_python3_14? ( dev-lang/python:3.14 ) python_single_target_python3_12? ( >=dev-python/gpep517-16[python_targets_python3_12(-)] dev-python/scikit-build-core[python_targets_python3_12(-)] ) python_single_target_python3_13? ( >=dev-python/gpep517-16[python_targets_python3_13(-)] dev-python/scikit-build-core[python_targets_python3_13(-)] ) python_single_target_python3_14? ( >=dev-python/gpep517-16[python_targets_python3_14(-)] dev-python/scikit-build-core[python_targets_python3_14(-)] )
+DEFINED_PHASES=compile configure install prepare setup test
+DEPEND=<media-video/ffmpeg-10:= >=sci-ml/pytorch-2.13[python_single_target_python3_12(-)?,python_single_target_python3_13(-)?,python_single_target_python3_14(-)?,cuda?] cuda? ( dev-util/nvidia-cuda-toolkit:= ) heif? ( media-libs/libheif:= ) jpeg? ( media-libs/libjpeg-turbo:= ) png? ( media-libs/libpng:= ) webp? ( media-libs/libwebp:= ) python_single_target_python3_12? ( dev-lang/python:3.12 ) python_single_target_python3_13? ( dev-lang/python:3.13 ) python_single_target_python3_14? ( dev-lang/python:3.14 )
+DESCRIPTION=Decode and encode video, audio and images into PyTorch tensors via FFmpeg
+EAPI=8
+HOMEPAGE=https://github.com/meta-pytorch/torchcodec https://pypi.org/project/torchcodec/
+INHERIT=cuda distutils-r1
+IUSE=cuda +gif heif +jpeg +png +webp python_single_target_python3_12 python_single_target_python3_13 python_single_target_python3_14 debug
+KEYWORDS=~amd64 ~arm64
+LICENSE=BSD gif? ( MIT )
+RDEPEND=<media-video/ffmpeg-10:= >=sci-ml/pytorch-2.13[python_single_target_python3_12(-)?,python_single_target_python3_13(-)?,python_single_target_python3_14(-)?,cuda?] cuda? ( dev-util/nvidia-cuda-toolkit:= ) heif? ( media-libs/libheif:= ) jpeg? ( media-libs/libjpeg-turbo:= ) png? ( media-libs/libpng:= ) webp? ( media-libs/libwebp:= ) python_single_target_python3_12? ( dev-lang/python:3.12 ) python_single_target_python3_13? ( dev-lang/python:3.13 ) python_single_target_python3_14? ( dev-lang/python:3.14 )
+REQUIRED_USE=^^ ( python_single_target_python3_12 python_single_target_python3_13 python_single_target_python3_14 )
+RESTRICT=test
+SLOT=0
+SRC_URI=https://github.com/meta-pytorch/torchcodec/archive/refs/tags/v0.17.0.tar.gz -> torchcodec-0.17.0.gh.tar.gz
+_eclasses_=toolchain-funcs	58a918e3a42d0156f010dcfd43725be5	flag-o-matic	fd3558f73f6503093adee69adf41020d	cuda	8b660e223a1695e3884ee4c7dc2c5059	eapi9-pipestatus	d2c134036ac31c3085aebc9147f572bd	out-of-source-utils	8e5093bd27b7f541a1913271f25d633a	multibuild	83db098a835f71feb71761f72a694aa2	multilib	fc812e8eb2170022c28272d80a1f9e77	multiprocessing	45d0620f25c2f063ad6276ecd9ed9399	ninja-utils	d063ea1900a793f93eb095010d6d9156	python-utils-r1	025367880f07ae6444e6035a49db0dab	python-single-r1	47d8ac9be330c9366112b78fd4f8ce57	distutils-r1	e19039519d3638744fa057e656909937
+_md5_=7b47eca4892592af427f77bd027c0843

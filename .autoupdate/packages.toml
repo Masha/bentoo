@@ -1688,7 +1688,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "0.12.22"
+version = "0.12.23"
 comments = """
 uv (uv-bin) — tag bare "X.Y.Z".
 """
@@ -3097,7 +3097,7 @@ transform = [['T.*', ""], ['-', ""]]
 commit_sha_path = "[0].sha"
 base_from = "none"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.1.0_p20261003"
+version = "0.1.0_p20261003-r1"
 comments = """
 zeo — commit-tracked on Zed's main; the snapshot plus the bentoo patch series and
 the rebrand. 2026-10-01: this entry WAS app-editors/zed, which now builds
@@ -9197,7 +9197,7 @@ url = "https://api.github.com/repos/zeo-workspace/claude-agent-tui/releases/late
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.14.4"
+version = "0.14.5"
 comments = """
 Renamed from dev-util/claude-agent-tui (commit e8a05fdc: del old ebuild + add
 claude-agent-acp-tui, same upstream repo zeo-workspace/claude-agent-tui, same PV).
@@ -9843,7 +9843,7 @@ url = "https://api.github.com/repos/zeo-workspace/claude-agent-acp-plus/releases
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.23.0"
+version = "0.23.1"
 comments = """
 claude-agent-acp-plus — GitHub releases/latest tag "vX.Y.Z" (v stripped).
 SRC_URI releases/download/v${PV}/${P}-bundle.tar.gz. Live=v0.2.0.
@@ -10155,6 +10155,25 @@ dev-util/trivy and dev-util/act.  If that is ever traded for a generated vendor
 tarball hosted on distfiles.obentoo.org, this record must gain hold = true —
 the bump would then require publishing the tarball first, exactly as
 dev-build/gn documents.  While it stays as-is, auto-bumping is safe.
+"""
+# END
+
+["sci-ml/moose"]
+url = "https://api.github.com/repos/moooossee/moose/releases/latest"
+parser = "json"
+path = "tag_name"
+transform = [['^v', ""]]
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "0.5.0"
+comments = """
+moose - GitHub releases/latest; tag_name is "vX.Y.Z", transform strips the v.
+Releases carry no assets: the ebuild builds from the tag tarball. Verified on
+2026-10-03: tag_name "v0.5.0".
+
+Rust + meson: a bump must regenerate CRATES (pycargoebuild against the new
+Cargo.lock) and re-check rust-version in Cargo.toml (RUST_MIN_VER) and the
+gtk4/libadwaita crate features (DEPEND floors). In 0.5.0 the non-gui binary is
+an empty main(); if upstream gives it a real CLI/daemon, revisit USE=gui.
 """
 # END
 
@@ -12967,7 +12986,7 @@ url = "https://download.gnome.org/sources/gnome-desktop/cache.json"
 parser = "regex"
 pattern = 'gnome\-desktop-([0-9]+\.[0-9]+(?:\.[0-9]+)*)\.tar\.xz'
 select = "max"
-version = "51.0"
+version = "51.0-r400"
 comments = """
 gnome-desktop -- GNOME 51 mirror ahead of ::gentoo. download.gnome.org cache.json for
 module "gnome-desktop"; matching tarball names excludes .alpha/.beta/.rc, select = "max".

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@protonmail.com</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<longdescription lang="en">
+		AMD's own debugging tools for Zen platforms, written at AMD by
+		Mario Limonciello. They ship
+		in the AMD Ryzen AI Developer Platform image:
+		amd-s2idle (analyze entry into and exit from suspend-to-idle),
+		amd-bios (toggle BIOS AML debug logging and parse it from the kernel log),
+		amd-pstate (capture amd-pstate driver and MSR state for triage) and
+		amd-ttm (query and change the TTM pages_limit, i.e. how much system
+		memory the GPU of an APU may use).
+	</longdescription>
+	<use>
+		<flag name="systemd">Read the kernel log from the systemd journal through <pkg>dev-python/python-systemd</pkg> instead of dmesg</flag>
+	</use>
+	<upstream>
+		<maintainer>
+			<name>Mario Limonciello</name>
+			<email>superm1@kernel.org</email>
+		</maintainer>
+		<remote-id type="github">superm1/amd-debug-tools</remote-id>
+		<remote-id type="pypi">amd-debug-tools</remote-id>
+		<doc>https://git.kernel.org/pub/scm/linux/kernel/git/superm1/amd-debug-tools.git/about/</doc>
+	</upstream>
+</pkgmetadata>
