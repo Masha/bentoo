@@ -1,0 +1,9 @@
+Fixes crash with touchscreens when attempting to drag windows
+
+https://gitlab.gnome.org/GNOME/mutter/-/work_items/4887
+
+--- a/src/wayland/meta-wayland-touch.c
++++ b/src/wayland/meta-wayland-touch.c
+@@ -662,1 +662,1 @@
+-  if (touch_info->focus_surface->surface == surface)
++  if (touch_info->focus_surface && touch_info->focus_surface->surface == surface)

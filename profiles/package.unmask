@@ -47,3 +47,23 @@
 # with google-chrome, vivaldi, opera and others, so it is not expected to
 # leave with the package; recheck `inherit` if it ever does.
 www-client/chromium
+
+# Lucas C.S. <lucascs@protonmail.com> (2026-10-03)
+# ::gentoo masks =media-libs/gexiv2-0.16* together with its consumers
+# >=gnome-base/nautilus-50 (bug 982084, 2026-09-06): most gexiv2 revdeps were
+# not yet ported to 0.16. That is a statement about OTHER packages, not about
+# gexiv2 0.16 itself, and it is SLOTted (0.16/4) beside the :0 that unported
+# revdeps keep using -- installing it does not move them.
+#
+# The GNOME 51 mirror needs it: nautilus 51 requires gexiv2:0.16/4, and sushi
+# 51 requires nautilus 51. This overlay therefore carries an unmodified copy of
+# gexiv2-0.16.2 and lifts the mask for it and for its own nautilus.
+#
+# Bare atoms, for the reason the calibre entry above explains: only the
+# ::bentoo-stamped copy of the master's mask covers this overlay's ebuilds.
+# app-misc/localsearch stays masked from 3.12 on: nautilus 51 needs only
+# >=3.0, so the overlay does not vouch for it.
+#
+# Remove both lines, and media-libs/gexiv2 itself, when ::gentoo lifts the mask.
+=media-libs/gexiv2-0.16*
+>=gnome-base/nautilus-50

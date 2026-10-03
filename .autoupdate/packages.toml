@@ -12682,3 +12682,822 @@ the ebuild. Also carries ionen's 6.11-patchset-5 like ::gentoo's 6.140.9999.
 TEMPORARY MIRROR: remove once ::gentoo ships any qtwebengine-6.140.
 """
 # END
+
+["app-accessibility/at-spi2-core"]
+hold = true
+url = "https://download.gnome.org/sources/at-spi2-core/cache.json"
+parser = "regex"
+pattern = 'at\-spi2\-core-([0-9]+\.[0-9]*[02468](?:\.[0-9]+)*)\.tar\.xz'
+select = "max"
+version = "2.62.0.1"
+comments = """
+at-spi2-core -- GNOME 51 mirror ahead of ::gentoo. download.gnome.org cache.json for
+module "at-spi2-core"; matching tarball names excludes .alpha/.beta/.rc, select = "max".
+Even-minor only: odd minors are this module's development series.
+HELD: a GNOME series bump is never mechanical (patch rebases, floors, SLOTs);
+the probe only reports. TEMPORARY MIRROR: remove when ::gentoo reaches it.
+"""
+# END
+
+["app-accessibility/orca"]
+hold = true
+url = "https://download.gnome.org/sources/orca/cache.json"
+parser = "regex"
+pattern = 'orca-([0-9]+\.[0-9]+(?:\.[0-9]+)*)\.tar\.xz'
+select = "max"
+version = "51.0"
+comments = """
+orca -- GNOME 51 mirror ahead of ::gentoo. download.gnome.org cache.json for
+module "orca"; matching tarball names excludes .alpha/.beta/.rc, select = "max".
+HELD: a GNOME series bump is never mechanical (patch rebases, floors, SLOTs);
+the probe only reports. TEMPORARY MIRROR: remove when ::gentoo reaches it.
+"""
+# END
+
+["app-editors/gnome-text-editor"]
+hold = true
+url = "https://download.gnome.org/sources/gnome-text-editor/cache.json"
+parser = "regex"
+pattern = 'gnome\-text\-editor-([0-9]+\.[0-9]+(?:\.[0-9]+)*)\.tar\.xz'
+select = "max"
+version = "51.0"
+comments = """
+gnome-text-editor -- GNOME 51 mirror ahead of ::gentoo. download.gnome.org cache.json for
+module "gnome-text-editor"; matching tarball names excludes .alpha/.beta/.rc, select = "max".
+HELD: a GNOME series bump is never mechanical (patch rebases, floors, SLOTs);
+the probe only reports. TEMPORARY MIRROR: remove when ::gentoo reaches it.
+"""
+# END
+
+["app-text/papers"]
+hold = true
+url = "https://download.gnome.org/sources/papers/cache.json"
+parser = "regex"
+pattern = 'papers-([0-9]+\.[0-9]+(?:\.[0-9]+)*)\.tar\.xz'
+select = "max"
+version = "51.0"
+comments = """
+papers -- GNOME 51 mirror ahead of ::gentoo. download.gnome.org cache.json for
+module "papers"; matching tarball names excludes .alpha/.beta/.rc, select = "max".
+HELD: a GNOME series bump is never mechanical (patch rebases, floors, SLOTs);
+the probe only reports. TEMPORARY MIRROR: remove when ::gentoo reaches it.
+"""
+# END
+
+["dev-cpp/glibmm"]
+hold = true
+url = "https://download.gnome.org/sources/glibmm/cache.json"
+parser = "regex"
+pattern = 'glibmm-([0-9]+\.[0-9]*[02468](?:\.[0-9]+)*)\.tar\.xz'
+select = "max"
+version = "2.90.0"
+comments = """
+glibmm -- GNOME 51 mirror ahead of ::gentoo. download.gnome.org cache.json for
+module "glibmm"; matching tarball names excludes .alpha/.beta/.rc, select = "max".
+Even-minor only: odd minors are this module's development series.
+HELD: a GNOME series bump is never mechanical (patch rebases, floors, SLOTs);
+the probe only reports. TEMPORARY MIRROR: remove when ::gentoo reaches it.
+"""
+# END
+
+["dev-libs/gjs"]
+hold = true
+url = "https://download.gnome.org/sources/gjs/cache.json"
+parser = "regex"
+pattern = 'gjs-([0-9]+\.[0-9]*[02468](?:\.[0-9]+)*)\.tar\.xz'
+select = "max"
+version = "1.90.0"
+comments = """
+gjs -- GNOME 51 mirror ahead of ::gentoo. download.gnome.org cache.json for
+module "gjs"; matching tarball names excludes .alpha/.beta/.rc, select = "max".
+Even-minor only: odd minors are this module's development series.
+HELD: a GNOME series bump is never mechanical (patch rebases, floors, SLOTs);
+the probe only reports. TEMPORARY MIRROR: remove when ::gentoo reaches it.
+"""
+# END
+
+["dev-libs/glib"]
+hold = true
+url = "https://download.gnome.org/sources/glib/cache.json"
+parser = "regex"
+pattern = 'glib-([0-9]+\.[0-9]*[02468](?:\.[0-9]+)*)\.tar\.xz'
+select = "max"
+version = "2.90.0"
+comments = """
+glib -- GNOME 51 mirror ahead of ::gentoo. download.gnome.org cache.json for
+module "glib"; matching tarball names excludes .alpha/.beta/.rc, select = "max".
+Even-minor only: odd minors are this module's development series.
+Bump together with: dev-util/glib-utils, dev-util/gdbus-codegen (same tarball; glib blocks !<gdbus-codegen-${PV}).
+HELD: a GNOME series bump is never mechanical (patch rebases, floors, SLOTs);
+the probe only reports. TEMPORARY MIRROR: remove when ::gentoo reaches it.
+"""
+# END
+
+["dev-util/gdbus-codegen"]
+hold = true
+url = "https://download.gnome.org/sources/glib/cache.json"
+parser = "regex"
+pattern = 'glib-([0-9]+\.[0-9]*[02468](?:\.[0-9]+)*)\.tar\.xz'
+select = "max"
+version = "2.90.0"
+comments = """
+gdbus-codegen -- GNOME 51 mirror ahead of ::gentoo. download.gnome.org cache.json for
+module "glib"; matching tarball names excludes .alpha/.beta/.rc, select = "max".
+Even-minor only: odd minors are this module's development series.
+Bump together with: dev-libs/glib.
+HELD: a GNOME series bump is never mechanical (patch rebases, floors, SLOTs);
+the probe only reports. TEMPORARY MIRROR: remove when ::gentoo reaches it.
+"""
+# END
+
+["dev-util/glib-utils"]
+hold = true
+url = "https://download.gnome.org/sources/glib/cache.json"
+parser = "regex"
+pattern = 'glib-([0-9]+\.[0-9]*[02468](?:\.[0-9]+)*)\.tar\.xz'
+select = "max"
+version = "2.90.0"
+comments = """
+glib-utils -- GNOME 51 mirror ahead of ::gentoo. download.gnome.org cache.json for
+module "glib"; matching tarball names excludes .alpha/.beta/.rc, select = "max".
+Even-minor only: odd minors are this module's development series.
+Bump together with: dev-libs/glib.
+HELD: a GNOME series bump is never mechanical (patch rebases, floors, SLOTs);
+the probe only reports. TEMPORARY MIRROR: remove when ::gentoo reaches it.
+"""
+# END
+
+["dev-util/sysprof"]
+hold = true
+url = "https://download.gnome.org/sources/sysprof/cache.json"
+parser = "regex"
+pattern = 'sysprof-([0-9]+\.[0-9]+(?:\.[0-9]+)*)\.tar\.xz'
+select = "max"
+version = "51.0"
+comments = """
+sysprof -- GNOME 51 mirror ahead of ::gentoo. download.gnome.org cache.json for
+module "sysprof"; matching tarball names excludes .alpha/.beta/.rc, select = "max".
+Bump together with: dev-util/sysprof-capture, dev-util/sysprof-common (same tarball).
+HELD: a GNOME series bump is never mechanical (patch rebases, floors, SLOTs);
+the probe only reports. TEMPORARY MIRROR: remove when ::gentoo reaches it.
+"""
+# END
+
+["dev-util/sysprof-capture"]
+hold = true
+url = "https://download.gnome.org/sources/sysprof/cache.json"
+parser = "regex"
+pattern = 'sysprof-([0-9]+\.[0-9]+(?:\.[0-9]+)*)\.tar\.xz'
+select = "max"
+version = "51.0"
+comments = """
+sysprof-capture -- GNOME 51 mirror ahead of ::gentoo. download.gnome.org cache.json for
+module "sysprof"; matching tarball names excludes .alpha/.beta/.rc, select = "max".
+Bump together with: dev-util/sysprof.
+HELD: a GNOME series bump is never mechanical (patch rebases, floors, SLOTs);
+the probe only reports. TEMPORARY MIRROR: remove when ::gentoo reaches it.
+"""
+# END
+
+["dev-util/sysprof-common"]
+hold = true
+url = "https://download.gnome.org/sources/sysprof/cache.json"
+parser = "regex"
+pattern = 'sysprof-([0-9]+\.[0-9]+(?:\.[0-9]+)*)\.tar\.xz'
+select = "max"
+version = "51.0"
+comments = """
+sysprof-common -- GNOME 51 mirror ahead of ::gentoo. download.gnome.org cache.json for
+module "sysprof"; matching tarball names excludes .alpha/.beta/.rc, select = "max".
+Bump together with: dev-util/sysprof.
+HELD: a GNOME series bump is never mechanical (patch rebases, floors, SLOTs);
+the probe only reports. TEMPORARY MIRROR: remove when ::gentoo reaches it.
+"""
+# END
+
+["gnome-base/gdm"]
+hold = true
+url = "https://download.gnome.org/sources/gdm/cache.json"
+parser = "regex"
+pattern = 'gdm-([0-9]+\.[0-9]+(?:\.[0-9]+)*)\.tar\.xz'
+select = "max"
+version = "51.0"
+comments = """
+gdm -- GNOME 51 mirror ahead of ::gentoo. download.gnome.org cache.json for
+module "gdm"; matching tarball names excludes .alpha/.beta/.rc, select = "max".
+HELD: a GNOME series bump is never mechanical (patch rebases, floors, SLOTs);
+the probe only reports. TEMPORARY MIRROR: remove when ::gentoo reaches it.
+"""
+# END
+
+["gnome-base/gnome-control-center"]
+hold = true
+url = "https://download.gnome.org/sources/gnome-control-center/cache.json"
+parser = "regex"
+pattern = 'gnome\-control\-center-([0-9]+\.[0-9]+(?:\.[0-9]+)*)\.tar\.xz'
+select = "max"
+version = "51.0"
+comments = """
+gnome-control-center -- GNOME 51 mirror ahead of ::gentoo. download.gnome.org cache.json for
+module "gnome-control-center"; matching tarball names excludes .alpha/.beta/.rc, select = "max".
+HELD: a GNOME series bump is never mechanical (patch rebases, floors, SLOTs);
+the probe only reports. TEMPORARY MIRROR: remove when ::gentoo reaches it.
+"""
+# END
+
+["gnome-base/gnome-desktop"]
+hold = true
+url = "https://download.gnome.org/sources/gnome-desktop/cache.json"
+parser = "regex"
+pattern = 'gnome\-desktop-([0-9]+\.[0-9]+(?:\.[0-9]+)*)\.tar\.xz'
+select = "max"
+version = "51.0"
+comments = """
+gnome-desktop -- GNOME 51 mirror ahead of ::gentoo. download.gnome.org cache.json for
+module "gnome-desktop"; matching tarball names excludes .alpha/.beta/.rc, select = "max".
+Bump together with: two slot ebuilds (-r300 gtk3, -r400 gtk4) bump together.
+HELD: a GNOME series bump is never mechanical (patch rebases, floors, SLOTs);
+the probe only reports. TEMPORARY MIRROR: remove when ::gentoo reaches it.
+"""
+# END
+
+["gnome-base/gnome-session"]
+hold = true
+url = "https://download.gnome.org/sources/gnome-session/cache.json"
+parser = "regex"
+pattern = 'gnome\-session-([0-9]+\.[0-9]+(?:\.[0-9]+)*)\.tar\.xz'
+select = "max"
+version = "51.0"
+comments = """
+gnome-session -- GNOME 51 mirror ahead of ::gentoo. download.gnome.org cache.json for
+module "gnome-session"; matching tarball names excludes .alpha/.beta/.rc, select = "max".
+HELD: a GNOME series bump is never mechanical (patch rebases, floors, SLOTs);
+the probe only reports. TEMPORARY MIRROR: remove when ::gentoo reaches it.
+"""
+# END
+
+["gnome-base/gnome-settings-daemon"]
+hold = true
+url = "https://download.gnome.org/sources/gnome-settings-daemon/cache.json"
+parser = "regex"
+pattern = 'gnome\-settings\-daemon-([0-9]+\.[0-9]+(?:\.[0-9]+)*)\.tar\.xz'
+select = "max"
+version = "51.0"
+comments = """
+gnome-settings-daemon -- GNOME 51 mirror ahead of ::gentoo. download.gnome.org cache.json for
+module "gnome-settings-daemon"; matching tarball names excludes .alpha/.beta/.rc, select = "max".
+HELD: a GNOME series bump is never mechanical (patch rebases, floors, SLOTs);
+the probe only reports. TEMPORARY MIRROR: remove when ::gentoo reaches it.
+"""
+# END
+
+["gnome-base/gnome-shell"]
+hold = true
+url = "https://download.gnome.org/sources/gnome-shell/cache.json"
+parser = "regex"
+pattern = 'gnome\-shell-([0-9]+\.[0-9]+(?:\.[0-9]+)*)\.tar\.xz'
+select = "max"
+version = "51.0"
+comments = """
+gnome-shell -- GNOME 51 mirror ahead of ::gentoo. download.gnome.org cache.json for
+module "gnome-shell"; matching tarball names excludes .alpha/.beta/.rc, select = "max".
+Bump together with: x11-wm/mutter.
+HELD: a GNOME series bump is never mechanical (patch rebases, floors, SLOTs);
+the probe only reports. TEMPORARY MIRROR: remove when ::gentoo reaches it.
+"""
+# END
+
+["gnome-base/gsettings-desktop-schemas"]
+hold = true
+url = "https://download.gnome.org/sources/gsettings-desktop-schemas/cache.json"
+parser = "regex"
+pattern = 'gsettings\-desktop\-schemas-([0-9]+\.[0-9]+(?:\.[0-9]+)*)\.tar\.xz'
+select = "max"
+version = "51.0"
+comments = """
+gsettings-desktop-schemas -- GNOME 51 mirror ahead of ::gentoo. download.gnome.org cache.json for
+module "gsettings-desktop-schemas"; matching tarball names excludes .alpha/.beta/.rc, select = "max".
+HELD: a GNOME series bump is never mechanical (patch rebases, floors, SLOTs);
+the probe only reports. TEMPORARY MIRROR: remove when ::gentoo reaches it.
+"""
+# END
+
+["gnome-base/gvfs"]
+hold = true
+url = "https://download.gnome.org/sources/gvfs/cache.json"
+parser = "regex"
+pattern = 'gvfs-([0-9]+\.[0-9]*[02468](?:\.[0-9]+)*)\.tar\.xz'
+select = "max"
+version = "1.62.0"
+comments = """
+gvfs -- GNOME 51 mirror ahead of ::gentoo. download.gnome.org cache.json for
+module "gvfs"; matching tarball names excludes .alpha/.beta/.rc, select = "max".
+Even-minor only: odd minors are this module's development series.
+HELD: a GNOME series bump is never mechanical (patch rebases, floors, SLOTs);
+the probe only reports. TEMPORARY MIRROR: remove when ::gentoo reaches it.
+"""
+# END
+
+["gnome-base/librsvg"]
+hold = true
+url = "https://download.gnome.org/sources/librsvg/cache.json"
+parser = "regex"
+pattern = 'librsvg-([0-9]+\.[0-9]+(?:\.[0-9]+)*)\.tar\.xz'
+select = "max"
+version = "2.63.2"
+comments = """
+librsvg -- GNOME 51 mirror ahead of ::gentoo. download.gnome.org cache.json for
+module "librsvg"; matching tarball names excludes .alpha/.beta/.rc, select = "max".
+HELD: a GNOME series bump is never mechanical (patch rebases, floors, SLOTs);
+the probe only reports. TEMPORARY MIRROR: remove when ::gentoo reaches it.
+"""
+# END
+
+["gnome-base/nautilus"]
+hold = true
+url = "https://download.gnome.org/sources/nautilus/cache.json"
+parser = "regex"
+pattern = 'nautilus-([0-9]+\.[0-9]+(?:\.[0-9]+)*)\.tar\.xz'
+select = "max"
+version = "51.0.1"
+comments = """
+nautilus -- GNOME 51 mirror ahead of ::gentoo. download.gnome.org cache.json for
+module "nautilus"; matching tarball names excludes .alpha/.beta/.rc, select = "max".
+HELD: a GNOME series bump is never mechanical (patch rebases, floors, SLOTs);
+the probe only reports. TEMPORARY MIRROR: remove when ::gentoo reaches it.
+"""
+# END
+
+["gnome-extra/gnome-calculator"]
+hold = true
+url = "https://download.gnome.org/sources/gnome-calculator/cache.json"
+parser = "regex"
+pattern = 'gnome\-calculator-([0-9]+\.[0-9]+(?:\.[0-9]+)*)\.tar\.xz'
+select = "max"
+version = "51.0"
+comments = """
+gnome-calculator -- GNOME 51 mirror ahead of ::gentoo. download.gnome.org cache.json for
+module "gnome-calculator"; matching tarball names excludes .alpha/.beta/.rc, select = "max".
+HELD: a GNOME series bump is never mechanical (patch rebases, floors, SLOTs);
+the probe only reports. TEMPORARY MIRROR: remove when ::gentoo reaches it.
+"""
+# END
+
+["gnome-extra/gnome-calendar"]
+hold = true
+url = "https://download.gnome.org/sources/gnome-calendar/cache.json"
+parser = "regex"
+pattern = 'gnome\-calendar-([0-9]+\.[0-9]+(?:\.[0-9]+)*)\.tar\.xz'
+select = "max"
+version = "51.0"
+comments = """
+gnome-calendar -- GNOME 51 mirror ahead of ::gentoo. download.gnome.org cache.json for
+module "gnome-calendar"; matching tarball names excludes .alpha/.beta/.rc, select = "max".
+HELD: a GNOME series bump is never mechanical (patch rebases, floors, SLOTs);
+the probe only reports. TEMPORARY MIRROR: remove when ::gentoo reaches it.
+"""
+# END
+
+["gnome-extra/gnome-characters"]
+hold = true
+url = "https://download.gnome.org/sources/gnome-characters/cache.json"
+parser = "regex"
+pattern = 'gnome\-characters-([0-9]+\.[0-9]+(?:\.[0-9]+)*)\.tar\.xz'
+select = "max"
+version = "51.0"
+comments = """
+gnome-characters -- GNOME 51 mirror ahead of ::gentoo. download.gnome.org cache.json for
+module "gnome-characters"; matching tarball names excludes .alpha/.beta/.rc, select = "max".
+HELD: a GNOME series bump is never mechanical (patch rebases, floors, SLOTs);
+the probe only reports. TEMPORARY MIRROR: remove when ::gentoo reaches it.
+"""
+# END
+
+["gnome-extra/gnome-clocks"]
+hold = true
+url = "https://download.gnome.org/sources/gnome-clocks/cache.json"
+parser = "regex"
+pattern = 'gnome\-clocks-([0-9]+\.[0-9]+(?:\.[0-9]+)*)\.tar\.xz'
+select = "max"
+version = "51.0"
+comments = """
+gnome-clocks -- GNOME 51 mirror ahead of ::gentoo. download.gnome.org cache.json for
+module "gnome-clocks"; matching tarball names excludes .alpha/.beta/.rc, select = "max".
+HELD: a GNOME series bump is never mechanical (patch rebases, floors, SLOTs);
+the probe only reports. TEMPORARY MIRROR: remove when ::gentoo reaches it.
+"""
+# END
+
+["gnome-extra/gnome-contacts"]
+hold = true
+url = "https://download.gnome.org/sources/gnome-contacts/cache.json"
+parser = "regex"
+pattern = 'gnome\-contacts-([0-9]+\.[0-9]+(?:\.[0-9]+)*)\.tar\.xz'
+select = "max"
+version = "51.0"
+comments = """
+gnome-contacts -- GNOME 51 mirror ahead of ::gentoo. download.gnome.org cache.json for
+module "gnome-contacts"; matching tarball names excludes .alpha/.beta/.rc, select = "max".
+HELD: a GNOME series bump is never mechanical (patch rebases, floors, SLOTs);
+the probe only reports. TEMPORARY MIRROR: remove when ::gentoo reaches it.
+"""
+# END
+
+["gnome-extra/gnome-software"]
+hold = true
+url = "https://download.gnome.org/sources/gnome-software/cache.json"
+parser = "regex"
+pattern = 'gnome\-software-([0-9]+\.[0-9]+(?:\.[0-9]+)*)\.tar\.xz'
+select = "max"
+version = "51.0"
+comments = """
+gnome-software -- GNOME 51 mirror ahead of ::gentoo. download.gnome.org cache.json for
+module "gnome-software"; matching tarball names excludes .alpha/.beta/.rc, select = "max".
+HELD: a GNOME series bump is never mechanical (patch rebases, floors, SLOTs);
+the probe only reports. TEMPORARY MIRROR: remove when ::gentoo reaches it.
+"""
+# END
+
+["gnome-extra/gnome-system-monitor"]
+hold = true
+url = "https://download.gnome.org/sources/gnome-system-monitor/cache.json"
+parser = "regex"
+pattern = 'gnome\-system\-monitor-([0-9]+\.[0-9]+(?:\.[0-9]+)*)\.tar\.xz'
+select = "max"
+version = "51.0"
+comments = """
+gnome-system-monitor -- GNOME 51 mirror ahead of ::gentoo. download.gnome.org cache.json for
+module "gnome-system-monitor"; matching tarball names excludes .alpha/.beta/.rc, select = "max".
+HELD: a GNOME series bump is never mechanical (patch rebases, floors, SLOTs);
+the probe only reports. TEMPORARY MIRROR: remove when ::gentoo reaches it.
+"""
+# END
+
+["gnome-extra/gnome-user-docs"]
+hold = true
+url = "https://download.gnome.org/sources/gnome-user-docs/cache.json"
+parser = "regex"
+pattern = 'gnome\-user\-docs-([0-9]+\.[0-9]+(?:\.[0-9]+)*)\.tar\.xz'
+select = "max"
+version = "51.0"
+comments = """
+gnome-user-docs -- GNOME 51 mirror ahead of ::gentoo. download.gnome.org cache.json for
+module "gnome-user-docs"; matching tarball names excludes .alpha/.beta/.rc, select = "max".
+HELD: a GNOME series bump is never mechanical (patch rebases, floors, SLOTs);
+the probe only reports. TEMPORARY MIRROR: remove when ::gentoo reaches it.
+"""
+# END
+
+["gnome-extra/sushi"]
+hold = true
+url = "https://download.gnome.org/sources/sushi/cache.json"
+parser = "regex"
+pattern = 'sushi-([0-9]+\.[0-9]+(?:\.[0-9]+)*)\.tar\.xz'
+select = "max"
+version = "51.1"
+comments = """
+sushi -- GNOME 51 mirror ahead of ::gentoo. download.gnome.org cache.json for
+module "sushi"; matching tarball names excludes .alpha/.beta/.rc, select = "max".
+HELD: a GNOME series bump is never mechanical (patch rebases, floors, SLOTs);
+the probe only reports. TEMPORARY MIRROR: remove when ::gentoo reaches it.
+"""
+# END
+
+["gnome-extra/tecla"]
+hold = true
+url = "https://download.gnome.org/sources/tecla/cache.json"
+parser = "regex"
+pattern = 'tecla-([0-9]+\.[0-9]+(?:\.[0-9]+)*)\.tar\.xz'
+select = "max"
+version = "51.0"
+comments = """
+tecla -- GNOME 51 mirror ahead of ::gentoo. download.gnome.org cache.json for
+module "tecla"; matching tarball names excludes .alpha/.beta/.rc, select = "max".
+HELD: a GNOME series bump is never mechanical (patch rebases, floors, SLOTs);
+the probe only reports. TEMPORARY MIRROR: remove when ::gentoo reaches it.
+"""
+# END
+
+["gui-apps/gnome-console"]
+hold = true
+url = "https://download.gnome.org/sources/gnome-console/cache.json"
+parser = "regex"
+pattern = 'gnome\-console-([0-9]+\.[0-9]+(?:\.[0-9]+)*)\.tar\.xz'
+select = "max"
+version = "51.0"
+comments = """
+gnome-console -- GNOME 51 mirror ahead of ::gentoo. download.gnome.org cache.json for
+module "gnome-console"; matching tarball names excludes .alpha/.beta/.rc, select = "max".
+HELD: a GNOME series bump is never mechanical (patch rebases, floors, SLOTs);
+the probe only reports. TEMPORARY MIRROR: remove when ::gentoo reaches it.
+"""
+# END
+
+["gui-libs/gtk"]
+hold = true
+url = "https://download.gnome.org/sources/gtk/cache.json"
+parser = "regex"
+pattern = 'gtk-([0-9]+\.[0-9]*[02468](?:\.[0-9]+)*)\.tar\.xz'
+select = "max"
+version = "4.24.1"
+comments = """
+gtk -- GNOME 51 mirror ahead of ::gentoo. download.gnome.org cache.json for
+module "gtk"; matching tarball names excludes .alpha/.beta/.rc, select = "max".
+Even-minor only: odd minors are this module's development series.
+HELD: a GNOME series bump is never mechanical (patch rebases, floors, SLOTs);
+the probe only reports. TEMPORARY MIRROR: remove when ::gentoo reaches it.
+"""
+# END
+
+["gui-libs/gtksourceview"]
+hold = true
+url = "https://download.gnome.org/sources/gtksourceview/cache.json"
+parser = "regex"
+pattern = 'gtksourceview-([0-9]+\.[0-9]*[02468](?:\.[0-9]+)*)\.tar\.xz'
+select = "max"
+version = "5.22.0"
+comments = """
+gtksourceview -- GNOME 51 mirror ahead of ::gentoo. download.gnome.org cache.json for
+module "gtksourceview"; matching tarball names excludes .alpha/.beta/.rc, select = "max".
+Even-minor only: odd minors are this module's development series.
+HELD: a GNOME series bump is never mechanical (patch rebases, floors, SLOTs);
+the probe only reports. TEMPORARY MIRROR: remove when ::gentoo reaches it.
+"""
+# END
+
+["gui-libs/libadwaita"]
+hold = true
+url = "https://download.gnome.org/sources/libadwaita/cache.json"
+parser = "regex"
+pattern = 'libadwaita-([0-9]+\.[0-9]+(?:\.[0-9]+)*)\.tar\.xz'
+select = "max"
+version = "1.10.0"
+comments = """
+libadwaita -- GNOME 51 mirror ahead of ::gentoo. download.gnome.org cache.json for
+module "libadwaita"; matching tarball names excludes .alpha/.beta/.rc, select = "max".
+HELD: a GNOME series bump is never mechanical (patch rebases, floors, SLOTs);
+the probe only reports. TEMPORARY MIRROR: remove when ::gentoo reaches it.
+"""
+# END
+
+["media-fonts/adwaita-fonts"]
+hold = true
+url = "https://download.gnome.org/sources/adwaita-fonts/cache.json"
+parser = "regex"
+pattern = 'adwaita\-fonts-([0-9]+\.[0-9]+(?:\.[0-9]+)*)\.tar\.xz'
+select = "max"
+version = "51.0"
+comments = """
+adwaita-fonts -- GNOME 51 mirror ahead of ::gentoo. download.gnome.org cache.json for
+module "adwaita-fonts"; matching tarball names excludes .alpha/.beta/.rc, select = "max".
+HELD: a GNOME series bump is never mechanical (patch rebases, floors, SLOTs);
+the probe only reports. TEMPORARY MIRROR: remove when ::gentoo reaches it.
+"""
+# END
+
+["media-gfx/loupe"]
+hold = true
+url = "https://download.gnome.org/sources/loupe/cache.json"
+parser = "regex"
+pattern = 'loupe-([0-9]+\.[0-9]+(?:\.[0-9]+)*)\.tar\.xz'
+select = "max"
+version = "51.0"
+comments = """
+loupe -- GNOME 51 mirror ahead of ::gentoo. download.gnome.org cache.json for
+module "loupe"; matching tarball names excludes .alpha/.beta/.rc, select = "max".
+HELD: a GNOME series bump is never mechanical (patch rebases, floors, SLOTs);
+the probe only reports. TEMPORARY MIRROR: remove when ::gentoo reaches it.
+"""
+# END
+
+["media-libs/glycin"]
+hold = true
+url = "https://download.gnome.org/sources/glycin/cache.json"
+parser = "regex"
+pattern = 'glycin-([0-9]+\.[0-9]+(?:\.[0-9]+)*)\.tar\.xz'
+select = "max"
+version = "2.2.1"
+comments = """
+glycin -- GNOME 51 mirror ahead of ::gentoo. download.gnome.org cache.json for
+module "glycin"; matching tarball names excludes .alpha/.beta/.rc, select = "max".
+HELD: a GNOME series bump is never mechanical (patch rebases, floors, SLOTs);
+the probe only reports. TEMPORARY MIRROR: remove when ::gentoo reaches it.
+"""
+# END
+
+["net-libs/glib-networking"]
+hold = true
+url = "https://download.gnome.org/sources/glib-networking/cache.json"
+parser = "regex"
+pattern = 'glib\-networking-([0-9]+\.[0-9]*[02468](?:\.[0-9]+)*)\.tar\.xz'
+select = "max"
+version = "2.90.0"
+comments = """
+glib-networking -- GNOME 51 mirror ahead of ::gentoo. download.gnome.org cache.json for
+module "glib-networking"; matching tarball names excludes .alpha/.beta/.rc, select = "max".
+Even-minor only: odd minors are this module's development series.
+HELD: a GNOME series bump is never mechanical (patch rebases, floors, SLOTs);
+the probe only reports. TEMPORARY MIRROR: remove when ::gentoo reaches it.
+"""
+# END
+
+["net-libs/libsoup"]
+hold = true
+url = "https://download.gnome.org/sources/libsoup/cache.json"
+parser = "regex"
+pattern = 'libsoup-([0-9]+\.[0-9]*[02468](?:\.[0-9]+)*)\.tar\.xz'
+select = "max"
+version = "3.8.0"
+comments = """
+libsoup -- GNOME 51 mirror ahead of ::gentoo. download.gnome.org cache.json for
+module "libsoup"; matching tarball names excludes .alpha/.beta/.rc, select = "max".
+Even-minor only: odd minors are this module's development series.
+HELD: a GNOME series bump is never mechanical (patch rebases, floors, SLOTs);
+the probe only reports. TEMPORARY MIRROR: remove when ::gentoo reaches it.
+"""
+# END
+
+["net-misc/gnome-connections"]
+hold = true
+url = "https://download.gnome.org/sources/gnome-connections/cache.json"
+parser = "regex"
+pattern = 'gnome\-connections-([0-9]+\.[0-9]+(?:\.[0-9]+)*)\.tar\.xz'
+select = "max"
+version = "51.0"
+comments = """
+gnome-connections -- GNOME 51 mirror ahead of ::gentoo. download.gnome.org cache.json for
+module "gnome-connections"; matching tarball names excludes .alpha/.beta/.rc, select = "max".
+HELD: a GNOME series bump is never mechanical (patch rebases, floors, SLOTs);
+the probe only reports. TEMPORARY MIRROR: remove when ::gentoo reaches it.
+"""
+# END
+
+["net-misc/gnome-remote-desktop"]
+hold = true
+url = "https://download.gnome.org/sources/gnome-remote-desktop/cache.json"
+parser = "regex"
+pattern = 'gnome\-remote\-desktop-([0-9]+\.[0-9]+(?:\.[0-9]+)*)\.tar\.xz'
+select = "max"
+version = "51.0"
+comments = """
+gnome-remote-desktop -- GNOME 51 mirror ahead of ::gentoo. download.gnome.org cache.json for
+module "gnome-remote-desktop"; matching tarball names excludes .alpha/.beta/.rc, select = "max".
+HELD: a GNOME series bump is never mechanical (patch rebases, floors, SLOTs);
+the probe only reports. TEMPORARY MIRROR: remove when ::gentoo reaches it.
+"""
+# END
+
+["sci-geosciences/gnome-maps"]
+hold = true
+url = "https://download.gnome.org/sources/gnome-maps/cache.json"
+parser = "regex"
+pattern = 'gnome\-maps-([0-9]+\.[0-9]+(?:\.[0-9]+)*)\.tar\.xz'
+select = "max"
+version = "51.1"
+comments = """
+gnome-maps -- GNOME 51 mirror ahead of ::gentoo. download.gnome.org cache.json for
+module "gnome-maps"; matching tarball names excludes .alpha/.beta/.rc, select = "max".
+HELD: a GNOME series bump is never mechanical (patch rebases, floors, SLOTs);
+the probe only reports. TEMPORARY MIRROR: remove when ::gentoo reaches it.
+"""
+# END
+
+["www-client/epiphany"]
+hold = true
+url = "https://download.gnome.org/sources/epiphany/cache.json"
+parser = "regex"
+pattern = 'epiphany-([0-9]+\.[0-9]+(?:\.[0-9]+)*)\.tar\.xz'
+select = "max"
+version = "51.1"
+comments = """
+epiphany -- GNOME 51 mirror ahead of ::gentoo. download.gnome.org cache.json for
+module "epiphany"; matching tarball names excludes .alpha/.beta/.rc, select = "max".
+HELD: a GNOME series bump is never mechanical (patch rebases, floors, SLOTs);
+the probe only reports. TEMPORARY MIRROR: remove when ::gentoo reaches it.
+"""
+# END
+
+["x11-themes/adwaita-icon-theme"]
+hold = true
+url = "https://download.gnome.org/sources/adwaita-icon-theme/cache.json"
+parser = "regex"
+pattern = 'adwaita\-icon\-theme-([0-9]+\.[0-9]+(?:\.[0-9]+)*)\.tar\.xz'
+select = "max"
+version = "51.0"
+comments = """
+adwaita-icon-theme -- GNOME 51 mirror ahead of ::gentoo. download.gnome.org cache.json for
+module "adwaita-icon-theme"; matching tarball names excludes .alpha/.beta/.rc, select = "max".
+HELD: a GNOME series bump is never mechanical (patch rebases, floors, SLOTs);
+the probe only reports. TEMPORARY MIRROR: remove when ::gentoo reaches it.
+"""
+# END
+
+["x11-themes/gnome-backgrounds"]
+hold = true
+url = "https://download.gnome.org/sources/gnome-backgrounds/cache.json"
+parser = "regex"
+pattern = 'gnome\-backgrounds-([0-9]+\.[0-9]+(?:\.[0-9]+)*)\.tar\.xz'
+select = "max"
+version = "51.0.1"
+comments = """
+gnome-backgrounds -- GNOME 51 mirror ahead of ::gentoo. download.gnome.org cache.json for
+module "gnome-backgrounds"; matching tarball names excludes .alpha/.beta/.rc, select = "max".
+HELD: a GNOME series bump is never mechanical (patch rebases, floors, SLOTs);
+the probe only reports. TEMPORARY MIRROR: remove when ::gentoo reaches it.
+"""
+# END
+
+["x11-wm/mutter"]
+hold = true
+url = "https://download.gnome.org/sources/mutter/cache.json"
+parser = "regex"
+pattern = 'mutter-([0-9]+\.[0-9]+(?:\.[0-9]+)*)\.tar\.xz'
+select = "max"
+version = "51.0"
+comments = """
+mutter -- GNOME 51 mirror ahead of ::gentoo. download.gnome.org cache.json for
+module "mutter"; matching tarball names excludes .alpha/.beta/.rc, select = "max".
+Bump together with: gnome-base/gnome-shell (SLOT 0/<libmutter_api_version>, read it from meson.build).
+HELD: a GNOME series bump is never mechanical (patch rebases, floors, SLOTs);
+the probe only reports. TEMPORARY MIRROR: remove when ::gentoo reaches it.
+"""
+# END
+
+["dev-libs/libglib-testing"]
+hold = true
+url = "https://gitlab.gnome.org/api/v4/projects/pwithnall%2Flibglib-testing/repository/tags"
+parser = "json"
+path = "[0].name"
+version = "0.2.0"
+comments = """
+libglib-testing -- gitlab.gnome.org tags API, default (commit-recency) order. Mirrored at 0.2.0
+because gnome-software 51 needs it (::gentoo has 0.1.1). HELD with the GNOME 51 mirror.
+TEMPORARY MIRROR: remove when ::gentoo reaches it.
+"""
+# END
+
+["gnome-base/gnome-session-openrc"]
+hold = true
+track = "commit"
+url = "https://api.github.com/repos/swagtoy/gnome-session-openrc/commits?sha=master&per_page=50"
+parser = "json"
+path = "[0].commit.committer.date"
+transform = [['T.*', ""], ['-', ""]]
+commit_sha_path = "[0].sha"
+base_from = "none"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "51.0_p20260809"
+comments = """
+gnome-session-openrc -- OpenRC session leader for GNOME, commit-tracked on master.
+Upstream (one maintainer) has only tag v50.0 and meson.build still says 50.0, but
+gnome-session 51 RDEPENDs on >=gnome-session-openrc-51 under !systemd. The
+snapshot is therefore named for the GNOME series it serves; base_from = "none"
+keeps 51.0 and only the _p date moves. The ebuild pins COMMIT, not EGIT_COMMIT.
+HELD with the GNOME 51 mirror. Switch to tag tracking once upstream tags v51.
+"""
+# END
+
+["sys-apps/amd-debug-tools"]
+url = "https://pypi.org/pypi/amd-debug-tools/json"
+parser = "json"
+path = "info.version"
+version = "0.2.21"
+comments = """
+amd-debug-tools -- AMD's Zen debugging tools (amd-s2idle, amd-bios,
+amd-pstate, amd-ttm), shipped in the AMD Ryzen AI Developer Platform image.
+PyPI, not the kernel.org cgit: the sdist carries the tests and the bash
+completion, and info.version is clean X.Y.Z. Live=0.2.21 == current PV.
+On a bump, recheck src_prepare: it pins [tool.setuptools] packages because
+upstream's package-dir auto-discovery installs test_*.py loose into
+site-packages, and it dies if that pyproject line moves.
+PYPI_VERIFY_REPO pins the PEP 740 publisher (github superm1/amd-debug-tools,
+ci.yml); a release without an attestation fails USE=verify-provenance.
+"""
+# END
+
+["sci-ml/torchcodec"]
+url = "https://pypi.org/pypi/torchcodec/json"
+parser = "json"
+path = "info.version"
+version = "0.17.0"
+comments = """
+torchcodec -- FFmpeg-backed media I/O for PyTorch; hard dependency of
+sci-ml/torchaudio (its load/save). PyPI info.version is clean X.Y.Z; the
+SRC_URI is the GitHub tag tarball. Live=0.17.0 == current PV.
+On a bump, recheck ffmpeg_versions.cmake (the <media-video/ffmpeg-10 cap
+tracks its highest libavcodec major) and whether AVIF still downloads from S3.
+"""
+# END
+
+["sci-ml/torchaudio"]
+url = "https://pypi.org/pypi/torchaudio/json"
+parser = "json"
+path = "info.version"
+version = "2.11.0"
+comments = """
+torchaudio -- upstream README declares a maintenance phase since 2.9; expect
+rare releases. Shipped by the AMD Ryzen AI Developer Platform image next to
+pytorch/torchvision. PyPI info.version is clean X.Y.Z; the SRC_URI is the
+GitHub tag tarball. Live=2.11.0 == current PV.
+"""
+# END

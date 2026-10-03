@@ -1,0 +1,523 @@
+Optionalise kerberos, cups, NetworkManager, bluetooth, wacom and GOA; replace absolute paths.
+Rebased for 51.0 from the ::gentoo (pacho) 50.4 patchset 0001-0005, merged into one patch.
+
+diff -ruN a/meson.build b/meson.build
+--- a/meson.build
++++ b/meson.build
+@@ -232,7 +232,7 @@
+ gnome_bg_dep = dependency('gnome-bg-4')
+ gnome_qr_gtk_dep = dependency('gnome-qr-gtk-4')
+ gnome_settings_dep = dependency('gnome-settings-daemon', version: '>= 48.rc', fallback: 'gsd')
+-goa_dep = dependency('goa-1.0', version: goa_req_version, fallback: 'goa')
++goa_dep = dependency('goa-1.0', version: goa_req_version, required: get_option('goa'))
+ gsettings_desktop_dep = dependency('gsettings-desktop-schemas', version: '>= 51.beta')
+ libxml_dep = dependency('libxml-2.0')
+ pulse_dep = dependency('libpulse', version: pulse_req_version)
+@@ -245,6 +245,10 @@
+ 
+ m_dep = cc.find_library('m')
+ 
++enable_goa = goa_dep.found()
++config_h.set('BUILD_GOA', enable_goa,
++             description: 'Define to 1 to build the Online Accounts panel')
++
+ common_deps = [
+   gio_dep,
+   glib_dep,
+@@ -270,29 +274,35 @@
+                description: 'Define if langinfo.h supports _NL_TIME_FIRST_WEEKDAY')
+ endif
+ 
+-# Check for CUPS 1.4 or newer
+-cups_dep = dependency('cups', version : '>= 1.4', required: false)
+-assert(cups_dep.found(), 'CUPS 1.4 or newer not found')
+-
+-# https://bugzilla.gnome.org/show_bug.cgi?id=696766
+-cups_cflags = []
+-if cups_dep.version().version_compare('>= 1.6')
+-  cups_cflags += '-D_PPD_DEPRECATED='
+-endif
+-
+-# cups headers
+-check_headers = [
+-  ['HAVE_CUPS_CUPS_H', 'cups/cups.h'],
+-  ['HAVE_CUPS_PPD_H', 'cups/ppd.h']
+-]
+-
+-foreach header: check_headers
+-  assert(cc.has_header(header[1], args: cups_cflags), 'CUPS headers not found: ' + header[1])
+-endforeach
++# Optional dependency for the printers panel
++enable_cups = get_option('cups')
++if enable_cups
++  # Check for CUPS 1.4 or newer
++  cups_dep = dependency('cups', version : '>= 1.4', required: false)
++  assert(cups_dep.found(), 'CUPS 1.4 or newer not found')
++
++  # https://bugzilla.gnome.org/show_bug.cgi?id=696766
++  cups_cflags = []
++  if cups_dep.version().version_compare('>= 1.6')
++    cups_cflags += '-D_PPD_DEPRECATED='
++  endif
++
++  # cups headers
++  check_headers = [
++    ['HAVE_CUPS_CUPS_H', 'cups/cups.h'],
++    ['HAVE_CUPS_PPD_H', 'cups/ppd.h']
++  ]
+ 
+-config_h.set10('HAVE_CUPS_HTTPCONNECT2',
+-               cc.has_function('httpConnect2', dependencies: cups_dep),
+-               description: 'Define if httpConnect2() is available in CUPS')
++  foreach header: check_headers
++    assert(cc.has_header(header[1], args: cups_cflags), 'CUPS headers not found: ' + header[1])
++  endforeach
++
++  config_h.set10('HAVE_CUPS_HTTPCONNECT2',
++                 cc.has_function('httpConnect2', dependencies: cups_dep),
++                 description: 'Define if httpConnect2() is available in CUPS')
++endif
++config_h.set('HAVE_CUPS', enable_cups,
++             description: 'Defined if cups support is enabled')
+ 
+ 
+ # IBus support
+@@ -303,6 +313,16 @@
+ config_h.set('HAVE_IBUS', enable_ibus,
+              description: 'Defined if IBus support is enabled')
+ 
++# Kerberos support
++enable_kerberos = get_option('kerberos')
++if enable_kerberos
++    kerberos_deps = [
++      dependency('krb5')
++    ]
++endif
++config_h.set('HAVE_KERBEROS', enable_kerberos,
++             description: 'Defined if kerberos support is enabled')
++
+ # thunderbolt
+ config_h.set10('HAVE_FN_EXPLICIT_BZERO',
+                cc.has_function('explicit_bzero', prefix: '''#include <string.h>'''),
+@@ -347,7 +367,8 @@
+ config_h.set('HAVE_SSH_SOCKET_ACTIVATION', ssh_socket_activation,
+              description: 'Whether SSH socket activation is enabled')
+ 
+-if host_is_linux
++enable_network_manager = get_option('network_manager')
++if enable_network_manager
+   # ModemManager
+   mm_dep =  dependency('mm-glib', version: '>= 0.7')
+   # NetworkManager
+@@ -358,35 +379,42 @@
+     mm_dep,
+   ]
+ endif
+-config_h.set('BUILD_NETWORK', host_is_linux,
++config_h.set('BUILD_NETWORK', enable_network_manager,
+              description: 'Define to 1 to build the Network panel')
+-config_h.set('HAVE_NETWORK_MANAGER', host_is_linux,
++config_h.set('HAVE_NETWORK_MANAGER', enable_network_manager,
+              description: 'Define to 1 if NetworkManager is available')
+-config_h.set('BUILD_WWAN', host_is_linux,
++config_h.set('BUILD_WWAN', enable_network_manager,
+              description: 'Define to 1 to build the WWan panel')
+-config_h.set('HAVE_WWAN', host_is_linux,
++config_h.set('HAVE_WWAN', enable_network_manager,
+              description: 'Define to 1 if WWan is available')
+ 
+-if host_is_linux_not_s390
++enable_bluetooth = get_option('bluetooth')
++if enable_bluetooth
+   # gnome-bluetooth
+   gnome_bluetooth_dep = dependency('gnome-bluetooth-ui-3.0')
++endif
+ 
++enable_wacom = get_option('wacom')
++if enable_wacom
++  # Wacom
+   libwacom_dep = dependency('libwacom', version: '>= 1.4')
+ 
+   wacom_deps = [
+     libwacom_dep,
+   ]
+-else
+-  message('Bluetooth and Wacom panels will not be built (no USB support on this platform)')
++endif
++
++if not host_is_linux_not_s390
+   message('Thunderbolt panel will not be built (not supported on this platform)')
+ endif
+-config_h.set('BUILD_BLUETOOTH', host_is_linux_not_s390,
++
++config_h.set('BUILD_BLUETOOTH', enable_bluetooth,
+              description: 'Define to 1 to build the Bluetooth panel')
+-config_h.set('HAVE_BLUETOOTH', host_is_linux_not_s390,
++config_h.set('HAVE_BLUETOOTH', enable_bluetooth,
+              description: 'Define to 1 if bluetooth support is available')
+-config_h.set('BUILD_WACOM', host_is_linux_not_s390,
++config_h.set('BUILD_WACOM', enable_wacom,
+              description: 'Define to 1 to build the Wacom panel')
+-config_h.set('HAVE_WACOM', host_is_linux_not_s390,
++config_h.set('HAVE_WACOM', enable_wacom,
+              description: 'Define to 1 if Wacom is supportted')
+ config_h.set('BUILD_THUNDERBOLT', host_is_linux_not_s390,
+              description: 'Define to 1 to build the Thunderbolt panel')
+@@ -441,16 +469,18 @@
+ )
+ 
+ summary({
+-    'GNOME Bluetooth': host_is_linux_not_s390,
+-    'NetworkManager': host_is_linux,
+-    'Wacom': host_is_linux_not_s390,
++    'GNOME Bluetooth': enable_bluetooth,
++    'NetworkManager': enable_network_manager,
++    'Wacom': enable_wacom,
+   },
+   section: 'Dependencies',
+   bool_yn: true,
+ )
+ 
+ summary({
++    'Cups': enable_cups,
+     'IBus': enable_ibus,
++    'Kerberos': enable_kerberos,
+     'Snap': enable_snap,
+     'Malcontent': enable_malcontent,
+   },
+diff -ruN a/meson_options.txt b/meson_options.txt
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -1,10 +1,16 @@
++option('bluetooth', type: 'boolean', value: true, description: 'build with Bluetooth support')
+ option('deprecated-declarations', type: 'feature', value: 'disabled', description: 'build with deprecated declaration warnings')
++option('cups', type: 'boolean', value: true, description: 'build with cups support')
+ option('documentation', type: 'boolean', value: false, description: 'build documentation')
+ option('location-services', type: 'feature', value: 'enabled', description: 'build with location services')
++option('goa', type: 'feature', value: 'auto', description: 'build with gnome-online-accounts support')
+ option('ibus', type: 'boolean', value: true, description: 'build with IBus support')
++option('network_manager', type: 'boolean', value: true, description: 'build with NetworkManager support')
++option('kerberos', type: 'boolean', value: true, description: 'build with kerberos support')
+ option('privileged_group', type: 'string', value: 'wheel', description: 'name of group that has elevated permissions')
+ option('snap', type: 'boolean', value: true, description: 'build with Snap support')
+ option('tests', type: 'boolean', value: true, description: 'build tests')
++option('wacom', type: 'boolean', value: true, description: 'build with Wacom support')
+ option('malcontent', type: 'boolean', value: false, description: 'build with malcontent support')
+ option('ssh_socket_activation', type: 'boolean', value: false, description: 'build with SSH socket activation support')
+ option('distributor_logo', type: 'string', description: 'absolute path to distributor logo for the About panel')
+diff -ruN a/panels/applications/meson.build b/panels/applications/meson.build
+--- a/panels/applications/meson.build
++++ b/panels/applications/meson.build
+@@ -62,7 +62,7 @@
+ 
+ deps = common_deps + [keyboard_shortcuts_dep]
+ 
+-if host_is_linux
++if enable_network_manager
+   deps += mm_dep
+ endif
+ 
+diff -ruN a/panels/meson.build b/panels/meson.build
+--- a/panels/meson.build
++++ b/panels/meson.build
+@@ -12,9 +12,7 @@
+   'mouse',
+   'multitasking',
+   'notifications',
+-  'online-accounts',
+   'power',
+-  'printers',
+   'privacy',
+   'search',
+   'sharing',
+@@ -22,18 +20,26 @@
+   'system',
+   'universal-access',
+   'wellbeing',
+-  'wwan',
+ ]
+ 
+-if host_is_linux
+-  panels += ['network']
++if enable_cups
++  panels += ['printers']
+ endif
+ 
+-if host_is_linux_not_s390
+-  panels += [
+-    'bluetooth',
+-    'wacom'
+-  ]
++if enable_goa
++  panels += ['online-accounts']
++endif
++
++if enable_network_manager
++  panels += ['network', 'wwan']
++endif
++
++if enable_bluetooth
++  panels += [ 'bluetooth' ]
++endif
++
++if enable_wacom
++  panels += [ 'wacom' ]
+ endif
+ 
+ panels_list = []
+diff -ruN a/panels/printers/meson.build b/panels/printers/meson.build
+--- a/panels/printers/meson.build
++++ b/panels/printers/meson.build
+@@ -76,6 +76,11 @@
+   sources += 'pp-samba-stub.c'
+ endif
+ 
++cflags += [
++  '-DDATADIR="@0@"'.format(control_center_datadir),
++  '-DLIBEXECDIR="@0@"'.format(control_center_libexecdir)
++]
++
+ printers_panel_lib = static_library(
+   cappletname,
+   sources: sources,
+diff -ruN a/panels/printers/pp-host.c b/panels/printers/pp-host.c
+--- a/panels/printers/pp-host.c
++++ b/panels/printers/pp-host.c
+@@ -214,7 +214,7 @@
+     devices = g_ptr_array_new_with_free_func (g_object_unref);
+ 
+     argv = g_new0 (gchar *, 3);
+-    argv[0] = g_strdup ("/usr/lib/cups/backend/snmp");
++    argv[0] = g_strdup (LIBEXECDIR "/cups/backend/snmp");
+     argv[1] = g_strdup (priv->hostname);
+ 
+     /* Use SNMP to get printer's informations */
+diff -ruN a/panels/printers/pp-options-dialog.c b/panels/printers/pp-options-dialog.c
+--- a/panels/printers/pp-options-dialog.c
++++ b/panels/printers/pp-options-dialog.c
+@@ -641,7 +641,7 @@
+     gint i;
+ 
+     if (self->printer_name) {
+-        const gchar *const dirs[] = { "/usr/share/cups", "/usr/local/share/cups", NULL };
++        const gchar *const dirs[] = { DATADIR "/cups", "/usr/local/share/cups", NULL };
+         const gchar *datadir = NULL;
+         g_autofree gchar *filename = NULL;
+ 
+diff -ruN a/panels/system/datetime/tz.h b/panels/system/datetime/tz.h
+--- a/panels/system/datetime/tz.h
++++ b/panels/system/datetime/tz.h
+@@ -28,9 +28,9 @@
+ G_BEGIN_DECLS
+ 
+ #ifndef __sun
+-#define TZ_DATA_FILE "/usr/share/zoneinfo/zone.tab"
++#define TZ_DATA_FILE DATADIR "/zoneinfo/zone.tab"
+ #else
+-#define TZ_DATA_FILE "/usr/share/lib/zoneinfo/tab/zone_sun.tab"
++#define TZ_DATA_FILE DATADIR "/lib/zoneinfo/tab/zone_sun.tab"
+ #endif
+ 
+ typedef struct _TzDB TzDB;
+diff -ruN a/panels/system/meson.build b/panels/system/meson.build
+--- a/panels/system/meson.build
++++ b/panels/system/meson.build
+@@ -91,8 +91,7 @@
+ udisks2 = dependency('udisks2', version: '>= 2.8.2')
+ 
+ # Kerberos support
+-krb_dep = dependency('krb5', required: false)
+-assert(krb_dep.found(), 'kerberos libraries not found in your path')
++krb_dep = dependency('krb5', required: enable_kerberos)
+ 
+ deps = common_deps + [
+   accounts_dep,
+@@ -104,7 +103,6 @@
+   libgtop2,
+   liblanguage_dep,
+   libsecret_dep,
+-  krb_dep,
+   polkit_gobject_dep,
+   pwquality_dep,
+   udisks2,
+@@ -122,6 +120,10 @@
+   deps += malcontent_dep
+ endif
+ 
++if enable_kerberos
++  deps += krb_dep
++endif
++
+ settings_daemon = 'org.gnome.SettingsDaemon'
+ gsd_gdbus = settings_daemon + '.Sharing'
+ 
+diff -ruN a/panels/system/users/cc-realm-manager.c b/panels/system/users/cc-realm-manager.c
+--- a/panels/system/users/cc-realm-manager.c
++++ b/panels/system/users/cc-realm-manager.c
+@@ -22,7 +22,9 @@
+ 
+ #include "cc-realm-manager.h"
+ 
++#if defined(HAVE_KERBEROS)
+ #include <krb5/krb5.h>
++#endif
+ 
+ #include <glib.h>
+ #include <glib/gi18n.h>
+@@ -535,6 +537,7 @@
+     g_slice_free (LoginClosure, login);
+ }
+ 
++#if defined(HAVE_KERBEROS)
+ static krb5_error_code
+ login_perform_kinit (krb5_context k5, const gchar *realm, const gchar *login, const gchar *password,
+                      const gchar *filename)
+@@ -664,6 +667,7 @@
+     if (k5)
+         krb5_free_context (k5);
+ }
++#endif
+ 
+ void
+ cc_realm_login (CcRealmObject *realm, const gchar *user, const gchar *password, GCancellable *cancellable,
+@@ -692,7 +696,12 @@
+     g_task_set_task_data (task, login, login_closure_free);
+ 
+     g_task_set_return_on_cancel (task, TRUE);
++#if defined(HAVE_KERBEROS)
+     g_task_run_in_thread (task, kinit_thread_func);
++#else
++        g_task_return_new_error (task, CC_REALM_ERROR, CC_REALM_ERROR_NOT_SUPPORTED,
++                                 _("kerberos based authentication support is disabled"));
++#endif
+ }
+ 
+ GBytes *
+diff -ruN a/panels/system/users/cc-realm-manager.h b/panels/system/users/cc-realm-manager.h
+--- a/panels/system/users/cc-realm-manager.h
++++ b/panels/system/users/cc-realm-manager.h
+@@ -30,6 +30,7 @@
+     CC_REALM_ERROR_CANNOT_AUTH,
+     CC_REALM_ERROR_BAD_HOSTNAME,
+     CC_REALM_ERROR_GENERIC,
++        CC_REALM_ERROR_NOT_SUPPORTED,
+ } CcRealmErrors;
+ 
+ #define CC_REALM_ERROR (cc_realm_error_get_quark ())
+diff -ruN a/panels/system/users/meson.build b/panels/system/users/meson.build
+--- a/panels/system/users/meson.build
++++ b/panels/system/users/meson.build
+@@ -95,11 +95,11 @@
+ )
+ 
+ # Kerberos support
+-krb_dep = dependency('krb5', required: false)
+-assert(krb_dep.found(), 'kerberos libraries not found in your path')
++krb_dep = dependency('krb5', required: enable_kerberos)
+ 
+ cflags += [
+   '-DGNOMELOCALEDIR="@0@"'.format(control_center_localedir),
++  '-DBINDIR="@0@"'.format(control_center_bindir),
+   '-DHAVE_LIBPWQUALITY',
+   '-DUM_PIXMAP_DIR="@0@"'.format(join_paths(control_center_pkgdatadir, 'pixmaps'))
+ ]
+diff -ruN a/panels/system/users/run-passwd.c b/panels/system/users/run-passwd.c
+--- a/panels/system/users/run-passwd.c
++++ b/panels/system/users/run-passwd.c
+@@ -144,7 +144,7 @@
+     gchar **envp;
+     gint my_stdin, my_stdout;
+ 
+-    argv[0] = "/usr/bin/passwd"; /* Is it safe to rely on a hard-coded path? */
++    argv[0] = BINDIR "/passwd";
+     argv[1] = NULL;
+ 
+     envp = g_get_environ ();
+diff -ruN a/shell/cc-panel-loader.c b/shell/cc-panel-loader.c
+--- a/shell/cc-panel-loader.c
++++ b/shell/cc-panel-loader.c
+@@ -47,9 +47,13 @@
+ extern GType cc_wifi_panel_get_type (void);
+ #endif /* BUILD_NETWORK */
+ extern GType cc_notifications_panel_get_type (void);
++#ifdef BUILD_GOA
+ extern GType cc_online_accounts_panel_get_type (void);
++#endif /* BUILD_GOA */
+ extern GType cc_power_panel_get_type (void);
++#ifdef HAVE_CUPS
+ extern GType cc_printers_panel_get_type (void);
++#endif /* HAVE_CUPS */
+ extern GType cc_privacy_panel_get_type (void);
+ extern GType cc_search_panel_get_type (void);
+ extern GType cc_sharing_panel_get_type (void);
+@@ -100,9 +104,13 @@
+     PANEL_TYPE ("wifi", cc_wifi_panel_get_type, cc_wifi_panel_static_init_func),
+ #endif
+     PANEL_TYPE ("notifications", cc_notifications_panel_get_type, NULL),
++#ifdef BUILD_GOA
+     PANEL_TYPE ("online-accounts", cc_online_accounts_panel_get_type, NULL),
++#endif
+     PANEL_TYPE ("power", cc_power_panel_get_type, NULL),
++#ifdef HAVE_CUPS
+     PANEL_TYPE ("printers", cc_printers_panel_get_type, NULL),
++#endif
+     PANEL_TYPE ("privacy", cc_privacy_panel_get_type, NULL),
+     PANEL_TYPE ("search", cc_search_panel_get_type, NULL),
+     PANEL_TYPE ("sharing", cc_sharing_panel_get_type, cc_sharing_panel_static_init_func),
+diff -ruN a/shell/meson.build b/shell/meson.build
+--- a/shell/meson.build
++++ b/shell/meson.build
+@@ -120,7 +120,7 @@
+   libshell_dep,
+ ]
+ 
+-if host_is_linux_not_s390
++if enable_wacom
+   shell_deps += wacom_deps
+ endif
+ 
+diff -ruN a/tests/printers/meson.build b/tests/printers/meson.build
+--- a/tests/printers/meson.build
++++ b/tests/printers/meson.build
+@@ -1,22 +1,23 @@
+ 
+-test_units = [
+-  #'test-canonicalization',
+-  'test-shift'
+-]
++if enable_cups
++  test_units = [
++    #'test-canonicalization',
++    'test-shift'
++  ]
+ 
+-includes = [top_inc, include_directories('../../panels/printers')]
+-cflags = '-DTEST_SRCDIR="@0@"'.format(meson.current_source_dir())
++  includes = [top_inc, include_directories('../../panels/printers')]
++  cflags = '-DTEST_SRCDIR="@0@"'.format(meson.current_source_dir())
+ 
+-foreach unit: test_units
+-  exe = executable(
+-                    unit,
+-           [unit + '.c'],
+-    include_directories : includes,
+-           dependencies : common_deps,
+-              link_with : [printers_panel_lib],
+-                 c_args : cflags
+-  )
+-
+-  test(unit, exe)
+-endforeach
++  foreach unit: test_units
++    exe = executable(
++                      unit,
++             [unit + '.c'],
++      include_directories : includes,
++             dependencies : common_deps,
++                link_with : [printers_panel_lib],
++                   c_args : cflags
++    )
+ 
++    test(unit, exe)
++  endforeach
++endif

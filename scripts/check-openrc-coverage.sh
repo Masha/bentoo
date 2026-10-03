@@ -156,6 +156,12 @@ NON_PACKAGE_TOPLEVEL=( metadata profiles scripts licenses eclass )
 declare -A ALLOWLIST=(
 	[sys-apps/flatpak]=$'its units are a Type=oneshot updater plus a timer, not a daemon: there\nis nothing to supervise, and an init script wrapping a one-shot would\nshow up as crashed in rc-status. The two files are byte-identical to\n::gentoo\'s. The honest OpenRC analogue is a cron.daily drop-in, which\nwould add a virtual/cron dependency to a package that has none.'
 	[sys-power/upower]=$'its unit is D-Bus activated, not supervised: upower.service is\nType=dbus with BusName=org.freedesktop.UPower, and the package installs\n/usr/share/dbus-1/system-services/org.freedesktop.UPower.service. The\nactivating process is dbus-daemon, which OpenRC systems run too, so the\ndaemon already starts on demand there -- with no init script and no\nsystemd. Adding one would not close a gap, it would open a second start\npath racing the bus activation for the same well-known name.\nThe ebuild is byte-identical to ::gentoo\'s upower-1.91.3 (bentoo mirrors\nit one release ahead), and ::gentoo ships no init script either, so there\nis no downstream decision here to correct.'
+	[dev-util/sysprof]=$'its unit is D-Bus activated, not supervised: sysprof3.service is\nType=dbus with BusName=org.gnome.Sysprof3, and the package installs the\nmatching org.gnome.Sysprof3.service system bus activation file. dbus-daemon\nstarts sysprofd on demand on OpenRC too, so an init script would only add a\nsecond start path racing the bus activation, as with sys-power/upower.\nGNOME 51 mirror (2026-10-03); ::gentoo ships no init script either.'
+	[dev-util/sysprof-capture]=$'a false positive of the classifier: the ebuild passes\n-Dsystemdunitdir only because meson.build reads the option, but it also\npasses -Dsysprofd=none, so no unit is built or installed -- the unit lives in\ndev-util/sysprof, which is allowlisted above for its own reason.'
+	[app-accessibility/at-spi2-core]=$'its user unit is D-Bus activated: at-spi-dbus-bus.service is\nType=dbus with BusName=org.a11y.Bus, and the package installs the\norg.a11y.Bus session bus activation file. The session bus starts it on demand\nunder OpenRC; a user init script would race that activation.\nGNOME 51 mirror (2026-10-03); ::gentoo ships none either.'
+	[gnome-base/gvfs]=$'every user unit is D-Bus activated: gvfs-daemon, gvfs-metadata and\nthe five volume monitors are all Type=dbus with a BusName, each paired with an\norg.gtk.vfs.*.service session bus activation file the package installs. The\nsession bus starts them on demand under OpenRC.\nGNOME 51 mirror (2026-10-03); ::gentoo ships none either.'
+	[gnome-base/gnome-session]=$'its user units are the systemd flavour of the GNOME session\nitself (gnome-session-manager@, -monitor, -signal-init, -restart-dbus). The\nOpenRC flavour is a separate package by design: gnome-base/gnome-session-openrc\n(the session leader plus its user-scope OpenRC scripts), which this ebuild\nRDEPENDs on under !systemd. The counterpart exists; it lives one package over.'
+	[gnome-base/gdm]=$'its system unit is covered by gui-libs/display-manager-init, which\nthis ebuild RDEPENDs on unconditionally (bentoo addition, 2026-10-03):\nDISPLAYMANAGER=gdm in /etc/conf.d/display-manager plus rc-update add\ndisplay-manager starts gdm under OpenRC. KNOWN GAP, kept visible here on\npurpose: the user unit gnome-headless-session@.service (remote headless login,\nsee net-misc/gnome-remote-desktop) has no OpenRC equivalent.'
 )
 
 ### command line #####################################################
@@ -1318,9 +1324,31 @@ self_test_assertions() {
 	# code path, not by an assertion. Restoring it means asserting against a
 	# synthetic multi-gap fixture rather than against the live overlay; that is
 	# a deliberate follow-up, not something to fake by keeping a red pin.
+	#
+	# THE PIN MOVED TO 8 ALLOWLISTED + 1 WARN ON 2026-10-03, with the GNOME 51
+	# mirror (49 packages taken over from ::gentoo, all previously out of this
+	# guard's reach). Six entries were added, each with its reason in ALLOWLIST:
+	# sysprof, at-spi2-core and gvfs (Type=dbus units paired with D-Bus
+	# activation files -- the upower class), sysprof-capture (classifier false
+	# positive: -Dsysprofd=none builds no unit), gnome-session (its OpenRC
+	# counterpart is the separate gnome-session-openrc, an RDEPEND) and gdm
+	# (display-manager-init, made an unconditional RDEPEND in the same change).
+	#
+	# THE EVIDENCE IS WEAKER THAN THE STANDARD ABOVE, and that is stated here
+	# rather than hidden: it was read from the unit and .service.in files in the
+	# release TARBALLS (Type=, BusName=, the paired activation file), not from
+	# an installed image. The image could not be produced: these packages need
+	# glib >= 2.89, which an unprivileged host cannot merge underneath them.
+	# Re-verify with qfile on the first machine that merges the stack.
+	#
+	# The one finding left is REAL and deliberately not allowlisted:
+	# net-misc/gnome-remote-desktop's user unit (the RDP server) has no D-Bus
+	# activation file and no OpenRC script. gdm's headless-session user unit is
+	# the same gap, recorded in gdm's ALLOWLIST text because the allowlist is
+	# per package. Both are WARN (user scope), so the exit code stays 0.
 	assert_eq A12 \
-		'a clean run reports zero findings and still prints the allowlist (was R3.5)' \
-		'exit=0 rows=0 findings=0 allowlisted=2' \
+		'a run with no system-scope gap exits 0 and prints the allowlist (was R3.5)' \
+		'exit=0 rows=1 findings=1 allowlisted=8' \
 		"$(full_run "${SELF_TEST_SCRATCH}")"
 
 	# --- exit 2: nothing was compared ---------------------------------
