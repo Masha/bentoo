@@ -57,10 +57,10 @@ claude-agent-acp-plus flag BY DEPENDENCY, like 0011 and 0013.
 ---
 
 diff --git a/crates/acp_thread/src/acp_thread.rs b/crates/acp_thread/src/acp_thread.rs
-index 1c76b1f..5b3f348 100644
+index 8f89356..e9612b9 100644
 --- a/crates/acp_thread/src/acp_thread.rs
 +++ b/crates/acp_thread/src/acp_thread.rs
-@@ -3493,6 +3493,15 @@ impl AccountUsage {
+@@ -3562,6 +3562,15 @@ impl AccountUsage {
  /// forwards the SDK's `rate_limit_event` here instead of dropping it.
  const CLAUDE_RATE_LIMIT_META_KEY: &str = "_claude/rateLimit";
  
@@ -76,7 +76,7 @@ index 1c76b1f..5b3f348 100644
  pub const TOKEN_USAGE_WARNING_THRESHOLD: f32 = 0.8;
  
  impl TokenUsage {
-@@ -3591,6 +3600,7 @@ pub struct AcpThread {
+@@ -3661,6 +3670,7 @@ pub struct AcpThread {
      activity: SessionActivity,
      token_usage: Option<TokenUsage>,
      account_usage: AccountUsage,
@@ -84,15 +84,15 @@ index 1c76b1f..5b3f348 100644
      cost: Option<SessionCost>,
      prompt_capabilities: acp_v1::PromptCapabilities,
      available_commands: Vec<acp_v1::AvailableCommand>,
-@@ -3716,6 +3726,7 @@ pub enum AcpThreadEvent {
+@@ -3786,6 +3796,7 @@ pub enum AcpThreadEvent {
      NoticesUpdated,
      TokenUsageUpdated,
      AccountUsageUpdated,
 +    BackgroundTasksUpdated,
      EntryUpdated(usize),
      EntriesRemoved(Range<usize>),
-     ToolAuthorizationRequested(acp_v1::ToolCallId),
-@@ -3867,6 +3878,7 @@ impl AcpThread {
+     ToolAuthorizationRequested(PermissionRequestId),
+@@ -3937,6 +3948,7 @@ impl AcpThread {
                  | AcpThreadEvent::NoticesUpdated
                  | AcpThreadEvent::TokenUsageUpdated
                  | AcpThreadEvent::AccountUsageUpdated
@@ -100,7 +100,7 @@ index 1c76b1f..5b3f348 100644
                  | AcpThreadEvent::EntryUpdated(_)
                  | AcpThreadEvent::Retry(_)
                  | AcpThreadEvent::SubagentSpawned(_)
-@@ -3921,6 +3933,7 @@ impl AcpThread {
+@@ -3992,6 +4004,7 @@ impl AcpThread {
              session_id,
              token_usage: None,
              account_usage: AccountUsage::default(),
@@ -108,7 +108,7 @@ index 1c76b1f..5b3f348 100644
              cost: None,
              prompt_capabilities,
              available_commands: Vec::new(),
-@@ -4328,6 +4341,12 @@ impl AcpThread {
+@@ -4412,6 +4425,12 @@ impl AcpThread {
          (!self.account_usage.is_empty()).then_some(&self.account_usage)
      }
  
@@ -121,7 +121,7 @@ index 1c76b1f..5b3f348 100644
      pub fn cost(&self) -> Option<&SessionCost> {
          self.cost.as_ref()
      }
-@@ -4503,6 +4522,22 @@ impl AcpThread {
+@@ -4587,6 +4606,22 @@ impl AcpThread {
                          cx.emit(AcpThreadEvent::TitleUpdated);
                      }
                  }
@@ -144,7 +144,7 @@ index 1c76b1f..5b3f348 100644
              }
              acp_v1::SessionUpdate::AvailableCommandsUpdate(acp_v1::AvailableCommandsUpdate {
                  available_commands,
-@@ -18186,6 +18221,78 @@ mod tests {
+@@ -18781,6 +18816,78 @@ mod tests {
          );
      }
  
@@ -236,7 +236,7 @@ index f943a3c..9727fae 100644
              | AcpThreadEvent::SubagentSpawned(_)
              | AcpThreadEvent::EntriesRemoved(_)
 diff --git a/crates/agent_ui/src/conversation_view.rs b/crates/agent_ui/src/conversation_view.rs
-index 6b14498..da6e0f8 100644
+index ea61856..ab926d7 100644
 --- a/crates/agent_ui/src/conversation_view.rs
 +++ b/crates/agent_ui/src/conversation_view.rs
 @@ -339,6 +339,7 @@ impl Conversation {
@@ -247,7 +247,7 @@ index 6b14498..da6e0f8 100644
                      | AcpThreadEvent::EntryUpdated(_)
                      | AcpThreadEvent::EntriesRemoved(_)
                      | AcpThreadEvent::Retry(_)
-@@ -619,6 +620,7 @@ fn affects_thread_metadata(event: &AcpThreadEvent) -> bool {
+@@ -759,6 +760,7 @@ fn affects_thread_metadata(event: &AcpThreadEvent) -> bool {
          | AcpThreadEvent::Retry(_)
          | AcpThreadEvent::TokenUsageUpdated
          | AcpThreadEvent::AccountUsageUpdated
@@ -255,7 +255,7 @@ index 6b14498..da6e0f8 100644
          | AcpThreadEvent::PromptCapabilitiesUpdated
          | AcpThreadEvent::AvailableCommandsUpdated(_)
          | AcpThreadEvent::ModeUpdated(_)
-@@ -1954,6 +1956,10 @@ impl ConversationView {
+@@ -2094,6 +2096,10 @@ impl ConversationView {
                      });
                  }
              }

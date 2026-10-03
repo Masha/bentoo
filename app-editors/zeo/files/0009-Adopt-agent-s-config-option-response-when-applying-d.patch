@@ -30,13 +30,13 @@ Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 ---
 
 diff --git a/crates/agent_servers/src/acp.rs b/crates/agent_servers/src/acp.rs
-index 9968cff..81752e8 100644
+index 1b912eb..51e7a2c 100644
 --- a/crates/agent_servers/src/acp.rs
 +++ b/crates/agent_servers/src/acp.rs
 @@ -1239,6 +1239,7 @@ impl AcpConnection {
+                     };
+ 
                      if let Some(_thread) = thread.upgrade() {
-                         let (modes, config_options) =
-                             config_state(response.modes, response.config_options);
 +                        let config_options = config_options.map(ConfigOptions::new);
                          {
                              let mut sessions = connection_state.sessions.borrow_mut();
@@ -54,7 +54,7 @@ index 9968cff..81752e8 100644
      fn apply_default_config_options(
          &self,
          session_id: &acp::SessionId,
--        config_options: &Rc<RefCell<Vec<acp::SessionConfigOption>>>,
+-        config_options: &Rc<RefCell<Vec<acp_v2::SessionConfigOption>>>,
 +        config_options: &ConfigOptions,
          cx: &mut AsyncApp,
      ) {
@@ -64,7 +64,7 @@ index 9968cff..81752e8 100644
          let defaults_to_apply: Vec<_> = {
              let config_opts_ref = config_options.borrow();
              config_opts_ref
-@@ -1374,6 +1377,7 @@ impl AcpConnection {
+@@ -1378,6 +1381,7 @@ impl AcpConnection {
                  let session_id = session_id.clone();
                  let config_id_clone = config_id.clone();
                  let config_opts = config_options.clone();
@@ -72,61 +72,30 @@ index 9968cff..81752e8 100644
                  let conn = self.connection.clone();
                  async move |_| {
                      let result = conn
-@@ -1386,23 +1390,37 @@ impl AcpConnection {
+@@ -1390,7 +1394,21 @@ impl AcpConnection {
                          .await
                          .log_err();
  
 -                    if result.is_none() {
--                        let mut opts = config_opts.borrow_mut();
--                        if let Some(opt) = opts.iter_mut().find(|o| o.id == config_id_clone) {
--                            match (&mut opt.kind, &initial_value) {
--                                (
--                                    acp::SessionConfigKind::Select(select),
--                                    acp::SessionConfigOptionValue::ValueId { value },
--                                ) => {
--                                    select.current_value = value.clone();
--                                }
--                                (
--                                    acp::SessionConfigKind::Boolean(boolean),
--                                    acp::SessionConfigOptionValue::Boolean { value },
--                                ) => {
--                                    boolean.current_value = *value;
-+                    match result {
-+                        Some(response) => {
-+                            // Adopt the agent's authoritative post-change option
-+                            // list, which may ADD or REMOVE options (e.g. the Fast
-+                            // mode toggle that only exists once the resolved model
-+                            // supports it) — not just tweak existing values — then
-+                            // wake the config-options watch so the UI rebuilds its
-+                            // selectors. Without this, an option that appears as a
-+                            // side effect of applying a default stays hidden until
-+                            // the next manual `set_config_option`.
-+                            *config_opts.borrow_mut() = response.config_options;
-+                            watch_tx.borrow_mut().send(()).ok();
-+                        }
-+                        None => {
-+                            let mut opts = config_opts.borrow_mut();
-+                            if let Some(opt) = opts.iter_mut().find(|o| o.id == config_id_clone) {
-+                                match (&mut opt.kind, &initial_value) {
-+                                    (
-+                                        acp::SessionConfigKind::Select(select),
-+                                        acp::SessionConfigOptionValue::ValueId { value },
-+                                    ) => {
-+                                        select.current_value = value.clone();
-+                                    }
-+                                    (
-+                                        acp::SessionConfigKind::Boolean(boolean),
-+                                        acp::SessionConfigOptionValue::Boolean { value },
-+                                    ) => {
-+                                        boolean.current_value = *value;
-+                                    }
-+                                    _ => {}
-                                 }
--                                _ => {}
-                             }
-                         }
-                     }
-@@ -1662,6 +1680,7 @@ impl AgentConnection for AcpConnection {
++                    // Adopt the agent's authoritative post-change option list,
++                    // which may ADD or REMOVE options (e.g. the Fast mode toggle
++                    // that only exists once the resolved model supports it) --
++                    // not just tweak existing values -- then wake the
++                    // config-options watch so the UI rebuilds its selectors.
++                    // Without this, an option that appears as a side effect of
++                    // applying a default stays hidden until the next manual
++                    // `set_config_option`, which already adopts its response.
++                    let adopted = result.and_then(|response| {
++                        acp_thread::config_options::from_v1(response.config_options).log_err()
++                    });
++                    if let Some(options) = adopted {
++                        *config_opts.borrow_mut() = options;
++                        watch_tx.borrow_mut().send(()).ok();
++                    } else {
+                         let mut opts = config_opts.borrow_mut();
+                         if let Some(opt) = opts
+                             .iter_mut()
+@@ -1669,6 +1687,7 @@ impl AgentConnection for AcpConnection {
                  }
              }
  
@@ -134,7 +103,7 @@ index 9968cff..81752e8 100644
              if let Some(config_opts) = config_options.as_ref() {
                  self.apply_default_config_options(&response.session_id, config_opts, cx);
              }
-@@ -1689,7 +1708,7 @@ impl AgentConnection for AcpConnection {
+@@ -1696,7 +1715,7 @@ impl AgentConnection for AcpConnection {
                      response.session_id,
                      &thread,
                      modes,
@@ -143,55 +112,63 @@ index 9968cff..81752e8 100644
                      cx,
                  )
              });
-@@ -4078,11 +4097,9 @@ mod tests {
+@@ -4085,11 +4104,9 @@ mod tests {
                  AgentConfigOptionValue::Boolean(true),
              )]),
          );
--        let config_options = Rc::new(RefCell::new(vec![acp::SessionConfigOption::boolean(
+-        let config_options = Rc::new(RefCell::new(vec![acp_v2::SessionConfigOption::boolean(
 -            "web_search",
 -            "Web Search",
 -            false,
 -        )]));
 +        let config_options = ConfigOptions::new(Rc::new(RefCell::new(vec![
-+            acp::SessionConfigOption::boolean("web_search", "Web Search", false),
++            acp_v2::SessionConfigOption::boolean("web_search", "Web Search", false),
 +        ])));
  
          let mut async_cx = cx.to_async();
          connection.apply_default_config_options(
-@@ -4106,10 +4123,19 @@ mod tests {
-             acp::SessionConfigOptionValue::boolean(true)
+@@ -4111,10 +4128,19 @@ mod tests {
+             })]
          );
  
 -        let options = config_options.borrow();
 +        // On success the local state adopts the agent's authoritative response, so an
 +        // option that only appears as a side effect of applying the default
-+        // (`appeared`) is now present — this is the regression the fix addresses.
++        // (`appeared`) is now present -- the regression this fix addresses.
 +        let options = config_options.config_options.borrow();
 +        assert_eq!(options.len(), 2);
          assert!(
-             matches!(&options[0].kind, acp::SessionConfigKind::Boolean(boolean) if boolean.current_value)
+             matches!(&options[0].kind, acp_v2::SessionConfigKind::Boolean(boolean) if boolean.current_value)
          );
 +        assert!(
 +            options
 +                .iter()
-+                .any(|o| o.id == acp::SessionConfigId::new("appeared"))
++                .any(|o| o.config_id == acp_v2::SessionConfigId::new("appeared"))
 +        );
      }
  
-     async fn connect_config_defaults_test_agent(
-@@ -4134,7 +4160,14 @@ mod tests {
-                                 .expect("set config requests mutex poisoned")
-                                 .push(req);
- 
--                            responder.respond(acp::SetSessionConfigOptionResponse::new(Vec::new()))
-+                            // A real agent echoes the full, authoritative option list
-+                            // after the change — which may include options that only
-+                            // appear as a side effect (here `appeared`, standing in for
-+                            // the Fast mode toggle once the resolved model supports it).
-+                            responder.respond(acp::SetSessionConfigOptionResponse::new(vec![
+     #[gpui::test]
+@@ -4208,8 +4234,21 @@ mod tests {
+                 .builder()
+                 .name("config-defaults-test-agent")
+                 .on_receive_request(
+-                    async move |_request: acp::SetSessionConfigOptionRequest, responder, _cx| {
+-                        responder.respond(acp::SetSessionConfigOptionResponse::new(Vec::new()))
++                    async move |request: acp::SetSessionConfigOptionRequest, responder, _cx| {
++                        // A real agent echoes the full, authoritative option list after
++                        // the change, which may include options that only appear as a
++                        // side effect (here `appeared`, standing in for the Fast mode
++                        // toggle once the resolved model supports it). Other config ids
++                        // keep the empty answer the wire-shape test expects.
++                        let options = if request.config_id.0.as_ref() == "web_search" {
++                            vec![
 +                                acp::SessionConfigOption::boolean("web_search", "Web Search", true),
 +                                acp::SessionConfigOption::boolean("appeared", "Appeared", false),
-+                            ]))
-                         }
++                            ]
++                        } else {
++                            Vec::new()
++                        };
++                        responder.respond(acp::SetSessionConfigOptionResponse::new(options))
                      },
                      agent_client_protocol::on_receive_request!(),
+                 )

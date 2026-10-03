@@ -45,7 +45,7 @@ Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>
 ---
 
 diff --git a/crates/acp_thread/src/connection.rs b/crates/acp_thread/src/connection.rs
-index 2c1f0ce..91fc7e0 100644
+index 8c72705..43754d0 100644
 --- a/crates/acp_thread/src/connection.rs
 +++ b/crates/acp_thread/src/connection.rs
 @@ -486,11 +486,27 @@ pub trait AgentModelSelector: 'static {
@@ -77,7 +77,7 @@ index 2c1f0ce..91fc7e0 100644
  
      /// Retrieves the currently selected model for a specific session (thread).
      ///
-@@ -1244,7 +1260,12 @@ mod test_support {
+@@ -1264,7 +1280,12 @@ mod test_support {
              Task::ready(Ok(AgentModelList::Flat(vec![model])))
          }
  
@@ -371,7 +371,7 @@ index a3d072c..e255b51 100644
          thread.read_with(cx, |thread, _| {
              assert_eq!(thread.model().unwrap().id().0.as_ref(), "other-model-id");
 diff --git a/crates/agent_ui/src/agent_ui.rs b/crates/agent_ui/src/agent_ui.rs
-index 7d28603..653279d 100644
+index e40c40e..e45281b 100644
 --- a/crates/agent_ui/src/agent_ui.rs
 +++ b/crates/agent_ui/src/agent_ui.rs
 @@ -24,6 +24,7 @@ mod mode_selector;
@@ -383,7 +383,7 @@ index 7d28603..653279d 100644
  mod terminal_inline_assistant;
  pub mod terminal_thread_metadata_store;
 diff --git a/crates/agent_ui/src/config_options.rs b/crates/agent_ui/src/config_options.rs
-index 196dc74..a93fea9 100644
+index fe98bdf..320ceb9 100644
 --- a/crates/agent_ui/src/config_options.rs
 +++ b/crates/agent_ui/src/config_options.rs
 @@ -22,6 +22,9 @@ use unicode_segmentation::UnicodeSegmentation;
@@ -415,7 +415,7 @@ index 196dc74..a93fea9 100644
          let task = self
              .config_options
              .set_config_option(config_id, next_value, cx);
-@@ -581,6 +579,14 @@ impl Render for ConfigOptionSelector {
+@@ -594,6 +592,14 @@ impl Render for ConfigOptionSelector {
                                  .color(Color::Muted),
                          );
                      }
@@ -430,12 +430,18 @@ index 196dc74..a93fea9 100644
                      content.into_any()
                  });
  
-@@ -611,14 +617,16 @@ impl Render for ConfigOptionSelector {
+@@ -624,7 +630,7 @@ impl Render for ConfigOptionSelector {
                          .label_size(LabelSize::Small)
                          .label_color(Color::Muted)
                          .disabled(self.setting_value)
 -                        .on_click(move |state, _window, cx| {
 +                        .on_click(move |state, window, cx| {
+                             if !config_options.config_options().iter().any(|option| {
+                                 option.config_id == config_id
+                                     && matches!(&option.kind, acp::SessionConfigKind::Boolean(_))
+@@ -633,12 +639,14 @@ impl Render for ConfigOptionSelector {
+                             }
+ 
                              let next_value = matches!(state, ToggleState::Selected);
 -                            agent_server.set_default_config_option(
 -                                config_id.0.as_ref(),
@@ -454,7 +460,7 @@ index 196dc74..a93fea9 100644
  
                              let task = config_options.set_config_option(
                                  config_id.clone(),
-@@ -799,16 +807,18 @@ impl PickerDelegate for ConfigOptionPickerDelegate {
+@@ -823,7 +831,7 @@ impl PickerDelegate for ConfigOptionPickerDelegate {
          })
      }
  
@@ -463,6 +469,10 @@ index 196dc74..a93fea9 100644
          if let Some(ConfigOptionPickerEntry::Option(option)) =
              self.filtered_entries.get(self.selected_index)
          {
+@@ -835,12 +843,14 @@ impl PickerDelegate for ConfigOptionPickerDelegate {
+                 return;
+             }
+ 
 -            self.agent_server.set_default_config_option(
 -                self.config_id.0.as_ref(),
 -                Some(AgentConfigOptionValue::ValueId(option.value.0.to_string())),
@@ -479,8 +489,8 @@ index 196dc74..a93fea9 100644
 +            }
              let task = self.config_options.set_config_option(
                  self.config_id.clone(),
-                 acp::SessionConfigOptionValue::value_id(option.value.clone()),
-@@ -857,6 +867,13 @@ impl PickerDelegate for ConfigOptionPickerDelegate {
+                 acp::SessionConfigOptionValue::id(option.value.clone()),
+@@ -889,6 +899,13 @@ impl PickerDelegate for ConfigOptionPickerDelegate {
                  let current_value = self.current_value();
                  let is_selected = current_value.as_ref() == Some(&option.value);
  
@@ -494,7 +504,7 @@ index 196dc74..a93fea9 100644
                  let is_favorite = self.favorites.contains(&option.value);
  
                  let option_name = option.name.clone();
-@@ -883,9 +900,22 @@ impl PickerDelegate for ConfigOptionPickerDelegate {
+@@ -915,9 +932,22 @@ impl PickerDelegate for ConfigOptionPickerDelegate {
                                  .spacing(ListItemSpacing::Sparse)
                                  .toggle_state(selected)
                                  .child(h_flex().w_full().child(Label::new(option_name).truncate()))
@@ -520,7 +530,7 @@ index 196dc74..a93fea9 100644
                                  .end_slot_on_hover(div().pr_1p5().child({
                                      let (icon, color, tooltip) = if is_favorite {
                                          (IconName::StarFilled, Color::Accent, "Unfavorite")
-@@ -940,6 +970,14 @@ impl PickerDelegate for ConfigOptionPickerDelegate {
+@@ -980,6 +1010,14 @@ impl PickerDelegate for ConfigOptionPickerDelegate {
      fn documentation_aside_index(&self) -> Option<usize> {
          self.selected_description.as_ref().map(|(ix, _)| *ix)
      }
@@ -535,7 +545,7 @@ index 196dc74..a93fea9 100644
  }
  
  fn extract_options(
-@@ -1012,20 +1050,6 @@ fn shows_manual_mode_badge_for_option(option: &acp::SessionConfigOption) -> bool
+@@ -1052,20 +1090,6 @@ fn shows_manual_mode_badge_for_option(option: &acp::SessionConfigOption) -> bool
          }
  }
  
@@ -543,7 +553,7 @@ index 196dc74..a93fea9 100644
 -    value: &acp::SessionConfigOptionValue,
 -) -> Option<AgentConfigOptionValue> {
 -    match value {
--        acp::SessionConfigOptionValue::ValueId { value } => {
+-        acp::SessionConfigOptionValue::Id { value } => {
 -            Some(AgentConfigOptionValue::ValueId(value.0.to_string()))
 -        }
 -        acp::SessionConfigOptionValue::Boolean { value } => {
@@ -556,7 +566,7 @@ index 196dc74..a93fea9 100644
  fn options_to_picker_entries(
      options: &[ConfigOptionValue],
      favorites: &HashSet<acp::SessionConfigValueId>,
-@@ -1148,7 +1172,7 @@ mod tests {
+@@ -1188,7 +1212,7 @@ mod tests {
      use std::{any::Any, cell::RefCell};
  
      #[gpui::test]
@@ -565,7 +575,7 @@ index 196dc74..a93fea9 100644
          let agent_server = Rc::new(TestAgentServer::default());
          let config_options = Rc::new(TestSessionConfigOptions::new(vec![
              acp::SessionConfigOption::select(
-@@ -1182,12 +1206,9 @@ mod tests {
+@@ -1222,12 +1246,9 @@ mod tests {
              }));
          });
  
@@ -581,7 +591,7 @@ index 196dc74..a93fea9 100644
          );
          assert_eq!(
              config_options.set_values.borrow().as_slice(),
-@@ -1199,7 +1220,7 @@ mod tests {
+@@ -1239,7 +1260,7 @@ mod tests {
      }
  
      #[gpui::test]
@@ -590,7 +600,7 @@ index 196dc74..a93fea9 100644
          let agent_server = Rc::new(TestAgentServer::default());
          let config_options = Rc::new(TestSessionConfigOptions::new(vec![
              acp::SessionConfigOption::boolean("web_search", "Web Search", false)
-@@ -1225,12 +1246,9 @@ mod tests {
+@@ -1265,12 +1286,9 @@ mod tests {
              }));
          });
  
@@ -606,7 +616,7 @@ index 196dc74..a93fea9 100644
          );
          assert_eq!(
              config_options.set_values.borrow().as_slice(),
-@@ -1278,12 +1296,9 @@ mod tests {
+@@ -1318,12 +1336,9 @@ mod tests {
              }));
          });
  
@@ -622,8 +632,25 @@ index 196dc74..a93fea9 100644
          );
          assert_eq!(
              config_options.set_values.borrow().as_slice(),
+@@ -1448,13 +1463,9 @@ mod tests {
+                 acp::SessionConfigOptionValue::id("manual")
+             )]
+         );
+-        assert_eq!(
+-            agent_server.saved_defaults.lock().as_slice(),
+-            &[(
+-                "mode".to_string(),
+-                Some(AgentConfigOptionValue::ValueId("manual".to_string()))
+-            )]
+-        );
++        // The choice above was made without Shift, so it applies to this thread
++        // only and is not persisted as the default for new threads.
++        assert!(agent_server.saved_defaults.lock().is_empty());
+     }
+ 
+     // ---- R4.1/R4.2: manual-mode badge next to the Mode-category select trigger ----
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
-index a22256d..dd1d003 100644
+index 774ac91..ec07922 100644
 --- a/crates/agent_ui/src/conversation_view/thread_view.rs
 +++ b/crates/agent_ui/src/conversation_view/thread_view.rs
 @@ -24,6 +24,7 @@ use sandbox::{SandboxFsPolicy, SandboxNetPolicy, SandboxPolicy};
@@ -634,7 +661,7 @@ index a22256d..dd1d003 100644
  use crate::ui::{
      SandboxGroup, SandboxRow, SandboxSection, SandboxStatusTooltip, TerminalSandboxWarning,
      TerminalToolHeader,
-@@ -5431,12 +5432,17 @@ impl ThreadView {
+@@ -5620,12 +5621,17 @@ impl ThreadView {
              .tooltip(move |_, cx| {
                  Tooltip::for_action_in(tooltip_label, &ToggleThinkingMode, &focus_handle, cx)
              })
@@ -653,7 +680,7 @@ index a22256d..dd1d003 100644
                          let favorite_key = thread
                              .model()
                              .map(|model| (model.provider_id.0.to_string(), model.id.0.to_string()));
-@@ -5576,21 +5582,56 @@ impl ThreadView {
+@@ -5765,21 +5771,56 @@ impl ThreadView {
                  tooltip,
              )
              .menu(move |window, cx| {
@@ -716,7 +743,7 @@ index a22256d..dd1d003 100644
                                  weak_self
                                      .update(cx, |this, cx| {
                                          if let Some(thread) = this.as_native_thread(cx) {
-@@ -5600,6 +5641,10 @@ impl ThreadView {
+@@ -5789,6 +5830,10 @@ impl ThreadView {
                                                      cx,
                                                  );
  
@@ -727,7 +754,7 @@ index a22256d..dd1d003 100644
                                                  let favorite_key = thread.model().map(|model| {
                                                      (
                                                          model.provider_id().0.to_string(),
-@@ -5634,10 +5679,10 @@ impl ThreadView {
+@@ -5823,10 +5868,10 @@ impl ThreadView {
                                      })
                                      .ok();
                              }
@@ -740,7 +767,7 @@ index a22256d..dd1d003 100644
                  }))
              })
              .with_handle(self.thinking_effort_menu_handle.clone())
-@@ -12485,7 +12530,9 @@ impl ThreadView {
+@@ -12686,7 +12731,9 @@ impl ThreadView {
          else {
              return;
          };

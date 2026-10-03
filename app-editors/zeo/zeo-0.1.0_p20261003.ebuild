@@ -1715,13 +1715,6 @@ DEPEND="
 # (2026-10-01) rather than by a file collision with zed or zed-bin: zeo owns
 # /usr/bin/zeo, /usr/libexec/zeo-editor and dev.zeo.Zeo.*, which neither
 # installs. zeo-bin installs those same paths, so that one is a real collision.
-# TODO(next bump, not a revbump of its own): add
-# "claude-code-ide? ( dev-util/claude-code )" here, as app-editors/zeo-bin has
-# had since -r2, and replace the "distributed via npm and is not packaged by
-# this overlay" lines in pkg_postinst with "The 'claude' CLI it talks to comes
-# from dev-util/claude-code, which this USE flag pulls in." Deferred on
-# 2026-10-01 because a revbump here forces a zeo-bin rebuild for an optional
-# dependency and a message; delete this note once both are done.
 RDEPEND="
 	${DEPEND}
 	!app-editors/zed
@@ -1729,6 +1722,7 @@ RDEPEND="
 	!app-editors/zeo-bin
 	claude-agent-acp-plus? ( dev-util/claude-agent-acp-plus )
 	claude-agent-acp-tui? ( dev-util/claude-agent-acp-tui )
+	claude-code-ide? ( dev-util/claude-code )
 	neovim? ( app-editors/neovim )
 "
 BDEPEND="
@@ -2168,8 +2162,8 @@ pkg_postinst() {
 		elog "protocol that may break without notice."
 		elog "It activates automatically in Zeo-spawned terminals via environment"
 		elog "variables; no settings.json configuration is needed."
-		elog "The 'claude' CLI is required at runtime; it is distributed via npm"
-		elog "and is not packaged by this overlay."
+		elog "The 'claude' CLI it talks to comes from dev-util/claude-code,"
+		elog "which this USE flag pulls in."
 		elog "Verify the connection by running /ide inside 'claude'."
 	fi
 }

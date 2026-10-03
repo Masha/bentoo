@@ -244,10 +244,10 @@ index c45f1f7..bd97bf0 100644
      async fn test_new_draft_survives_reload_when_real_thread_is_active(cx: &mut TestAppContext) {
          init_test(cx);
 diff --git a/crates/zed/src/main.rs b/crates/zed/src/main.rs
-index ec31980..2a70b77 100644
+index f720fef..9813a42 100644
 --- a/crates/zed/src/main.rs
 +++ b/crates/zed/src/main.rs
-@@ -1039,29 +1039,78 @@ fn handle_open_request(request: OpenRequest, app_state: Arc<AppState>, cx: &mut
+@@ -1037,29 +1037,78 @@ fn handle_open_request(request: OpenRequest, app_state: Arc<AppState>, cx: &mut
              }
              OpenRequestKind::AgentPanel {
                  external_source_prompt,
@@ -340,7 +340,7 @@ index ec31980..2a70b77 100644
                                  });
                              } else {
                                  log::warn!(
-@@ -1370,6 +1419,38 @@ fn handle_open_request(request: OpenRequest, app_state: Arc<AppState>, cx: &mut
+@@ -1368,6 +1417,38 @@ fn handle_open_request(request: OpenRequest, app_state: Arc<AppState>, cx: &mut
      }
  }
  

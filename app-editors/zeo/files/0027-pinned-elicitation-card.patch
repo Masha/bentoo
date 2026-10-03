@@ -104,10 +104,10 @@ Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>
 ---
 
 diff --git a/assets/settings/default.json b/assets/settings/default.json
-index 721ef88..470c00d 100644
+index 5fc420f..f0fd52f 100644
 --- a/assets/settings/default.json
 +++ b/assets/settings/default.json
-@@ -1407,6 +1407,14 @@
+@@ -1414,6 +1414,14 @@
      //
      // Default: false
      "show_turn_stats": false,
@@ -123,10 +123,10 @@ index 721ef88..470c00d 100644
      // that offers to resolve conflicts using the agent.
      //
 diff --git a/crates/acp_thread/src/acp_thread.rs b/crates/acp_thread/src/acp_thread.rs
-index 52dc71e..1c76b1f 100644
+index 7dcc229..8f89356 100644
 --- a/crates/acp_thread/src/acp_thread.rs
 +++ b/crates/acp_thread/src/acp_thread.rs
-@@ -5934,6 +5934,17 @@ impl AcpThread {
+@@ -6304,6 +6304,17 @@ impl AcpThread {
          Some((index, elicitation))
      }
  
@@ -249,10 +249,10 @@ index 05b7718..fe1f17c 100644
                              menu = menu.separator()
                          }
 diff --git a/crates/agent_ui/src/agent_ui.rs b/crates/agent_ui/src/agent_ui.rs
-index 653279d..5781f3f 100644
+index e45281b..79614ae 100644
 --- a/crates/agent_ui/src/agent_ui.rs
 +++ b/crates/agent_ui/src/agent_ui.rs
-@@ -1009,6 +1009,7 @@ mod tests {
+@@ -1024,6 +1024,7 @@ mod tests {
              tool_permissions: Default::default(),
              sandbox_permissions: Default::default(),
              show_turn_stats: false,
@@ -261,10 +261,10 @@ index 653279d..5781f3f 100644
              max_idle_retained_threads: 5,
              threads_sidebar: agent_settings::ThreadsSidebarSettings {
 diff --git a/crates/agent_ui/src/conversation_view.rs b/crates/agent_ui/src/conversation_view.rs
-index 3d91b18..6b14498 100644
+index 05fb4b0..ea61856 100644
 --- a/crates/agent_ui/src/conversation_view.rs
 +++ b/crates/agent_ui/src/conversation_view.rs
-@@ -2648,22 +2648,37 @@ impl ConversationView {
+@@ -2788,22 +2788,37 @@ impl ConversationView {
                      .log_err();
                  }
              },
@@ -319,7 +319,7 @@ index 3d91b18..6b14498 100644
          )
      }
 diff --git a/crates/agent_ui/src/conversation_view/elicitation.rs b/crates/agent_ui/src/conversation_view/elicitation.rs
-index 6b8c2d8..be41aa9 100644
+index 837314d..aa1b217 100644
 --- a/crates/agent_ui/src/conversation_view/elicitation.rs
 +++ b/crates/agent_ui/src/conversation_view/elicitation.rs
 @@ -52,6 +52,13 @@ pub(crate) struct ElicitationFormState {
@@ -925,7 +925,7 @@ index 6b8c2d8..be41aa9 100644
                      let field = state.fields.get(field_name)?;
                      Some(self.render_field(
                          field_name,
-@@ -2752,10 +3197,22 @@ impl<'a> ElicitationCard<'a> {
+@@ -2653,10 +3098,22 @@ impl<'a> ElicitationCard<'a> {
          let is_accepted_url =
              open_url.is_some() && matches!(self.elicitation.status, ElicitationStatus::Accepted);
          let is_submitting = self.form_state.is_some_and(|state| state.is_submitting);
@@ -948,7 +948,7 @@ index 6b8c2d8..be41aa9 100644
          } else {
              ("Submit", IconName::Check, Color::Success)
          };
-@@ -2765,7 +3222,10 @@ impl<'a> ElicitationCard<'a> {
+@@ -2666,7 +3123,10 @@ impl<'a> ElicitationCard<'a> {
          let on_decline = self.handlers.on_decline.clone();
          let on_cancel = self.handlers.on_cancel.clone();
          let on_dismiss_url = self.handlers.on_dismiss_url.clone();
@@ -959,7 +959,7 @@ index 6b8c2d8..be41aa9 100644
          let decline_id = self.elicitation.id.clone();
          let cancel_id = self.elicitation.id.clone();
          let dismiss_id = self.elicitation.id.clone();
-@@ -2777,6 +3237,22 @@ impl<'a> ElicitationCard<'a> {
+@@ -2678,6 +3138,22 @@ impl<'a> ElicitationCard<'a> {
              .justify_end()
              .border_t_1()
              .border_color(border_color)
@@ -982,7 +982,7 @@ index 6b8c2d8..be41aa9 100644
              .child(
                  Button::new(("elicitation-accept", self.entry_ix), accept_label)
                      .tab_index(0_isize)
-@@ -2793,6 +3269,8 @@ impl<'a> ElicitationCard<'a> {
+@@ -2694,6 +3170,8 @@ impl<'a> ElicitationCard<'a> {
                              if !is_accepted_url {
                                  on_submit(submit_id.clone(), window, cx);
                              }
@@ -992,7 +992,7 @@ index 6b8c2d8..be41aa9 100644
                              on_submit(submit_id.clone(), window, cx);
                          }
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
-index 4e885cc..9b20d03 100644
+index 6aa5ea3..161bb8b 100644
 --- a/crates/agent_ui/src/conversation_view/thread_view.rs
 +++ b/crates/agent_ui/src/conversation_view/thread_view.rs
 @@ -42,7 +42,7 @@ use language_model::{
@@ -1014,23 +1014,23 @@ index 4e885cc..9b20d03 100644
  };
  use super::*;
  
-@@ -615,6 +616,7 @@ pub struct ThreadView {
+@@ -614,6 +615,7 @@ pub struct ThreadView {
+     pub new_server_version_available: Option<SharedString>,
      pub resumed_without_history: bool,
-     pub(crate) permission_selections: HashMap<acp_v1::ToolCallId, PermissionSelection>,
      elicitation_form_states: HashMap<ElicitationEntryId, ElicitationFormState>,
 +    question_queue: QuestionQueue,
      pub _cancel_task: Option<Task<()>>,
      _save_task: Option<Task<()>>,
      _draft_resolve_task: Option<Task<()>>,
-@@ -1033,6 +1035,7 @@ impl ThreadView {
+@@ -1032,6 +1034,7 @@ impl ThreadView {
+             is_loading_contents: false,
              new_server_version_available: None,
-             permission_selections: HashMap::default(),
              elicitation_form_states: HashMap::default(),
 +            question_queue: QuestionQueue::default(),
              _cancel_task: None,
              _save_task: None,
              _draft_resolve_task: None,
-@@ -6882,6 +6885,7 @@ impl ThreadView {
+@@ -7071,6 +7074,7 @@ impl ThreadView {
                  let thread = self.thread.read(cx);
                  if let Some((_, elicitation)) = thread.elicitation(elicitation_id)
                      && should_render_elicitation(elicitation)
@@ -1038,7 +1038,7 @@ index 4e885cc..9b20d03 100644
                  {
                      let elicitation = self.render_elicitation(entry_ix, elicitation, window, cx);
  
-@@ -7122,10 +7126,22 @@ impl ThreadView {
+@@ -7311,10 +7315,22 @@ impl ThreadView {
                      .log_err();
                  }
              },
@@ -1063,7 +1063,7 @@ index 4e885cc..9b20d03 100644
                          cx.notify();
                      }
                  })
-@@ -7604,6 +7620,75 @@ impl ThreadView {
+@@ -7793,6 +7809,75 @@ impl ThreadView {
          self.message_editor.read(cx).set_local_commands(commands);
      }
  
@@ -1139,7 +1139,7 @@ index 4e885cc..9b20d03 100644
      fn render_request_elicitations(&self, cx: &Context<Self>) -> Vec<AnyElement> {
          let server_view = self.server_view.clone();
          let handlers_view = server_view.clone();
-@@ -13343,6 +13428,7 @@ impl Render for ThreadView {
+@@ -13544,6 +13629,7 @@ impl Render for ThreadView {
                  |this, version| this.child(self.render_new_version_callout(&version, cx)),
              )
              .children(self.render_token_limit_callout(cx))
@@ -1148,7 +1148,7 @@ index 4e885cc..9b20d03 100644
              .child(self.render_message_editor(window, cx))
      }
 diff --git a/crates/settings_content/src/agent.rs b/crates/settings_content/src/agent.rs
-index 6bafc02..0dc9e64 100644
+index b066bda..502f321 100644
 --- a/crates/settings_content/src/agent.rs
 +++ b/crates/settings_content/src/agent.rs
 @@ -97,6 +97,33 @@ pub enum ThinkingBlockDisplay {

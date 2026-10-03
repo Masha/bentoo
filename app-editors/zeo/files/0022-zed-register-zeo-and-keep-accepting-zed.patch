@@ -55,13 +55,6 @@ whole backend as Zed's, and a share link is a zed.dev address, not a brand.
 
 Decision D10 in zeo/docs/REBRAND.md, widened by measurement.
 ---
- crates/cli/src/main.rs                        |  9 +++-
- crates/client/src/client.rs                   |  7 +++
- crates/install_cli/src/register_zed_scheme.rs |  6 +--
- crates/zed/src/main.rs                        |  1 +
- crates/zed/src/zed.rs                         |  4 +-
- crates/zed/src/zed/open_listener.rs           | 44 +++++++++++++++++++
- 6 files changed, 65 insertions(+), 6 deletions(-)
 
 diff --git a/crates/cli/src/main.rs b/crates/cli/src/main.rs
 index 0f4d674..be97811 100644
@@ -131,10 +124,10 @@ index 048b2dd..ec48354 100644
 +    cx.update(|cx| cx.register_url_scheme(ZEO_URL_SCHEME)).await
  }
 diff --git a/crates/zed/src/main.rs b/crates/zed/src/main.rs
-index 2a70b77..3a5d479 100644
+index 9813a42..e353727 100644
 --- a/crates/zed/src/main.rs
 +++ b/crates/zed/src/main.rs
-@@ -1893,6 +1893,7 @@ fn parse_url_arg(arg: &str, cx: &App) -> String {
+@@ -1891,6 +1891,7 @@ fn parse_url_arg(arg: &str, cx: &App) -> String {
          Ok(path) => format!("file://{}", path.display()),
          Err(_) => {
              if arg.starts_with("file://")
@@ -226,6 +219,3 @@ index 2083b10..4d72540 100644
      #[gpui::test]
      fn test_parse_skill_install_url(cx: &mut TestAppContext) {
          let _app_state = init_test(cx);
--- 
-2.56.0
-

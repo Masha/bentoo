@@ -53,7 +53,7 @@ CLI started in that terminal fail the handshake rather than run without an IDE.
 ---
 
 diff --git a/Cargo.lock b/Cargo.lock
-index 51656b1..bf6c3cc 100644
+index a39082d..15184c1 100644
 --- a/Cargo.lock
 +++ b/Cargo.lock
 @@ -3106,6 +3106,31 @@ version = "0.7.6"
@@ -97,7 +97,7 @@ index 51656b1..bf6c3cc 100644
   "client",
   "clock",
 diff --git a/Cargo.toml b/Cargo.toml
-index 9388515..b65fa74 100644
+index 4d9a614..d623682 100644
 --- a/Cargo.toml
 +++ b/Cargo.toml
 @@ -27,6 +27,7 @@ members = [
@@ -2084,10 +2084,10 @@ index 0f862d9..833c593 100644
  cli.workspace = true
  client.workspace = true
 diff --git a/crates/zed/src/main.rs b/crates/zed/src/main.rs
-index 0aa7633..23d6b9f 100644
+index 738ee18..cfeec5f 100644
 --- a/crates/zed/src/main.rs
 +++ b/crates/zed/src/main.rs
-@@ -701,6 +701,7 @@ fn main() {
+@@ -699,6 +699,7 @@ fn main() {
          acp_tools::init(cx);
          zed::telemetry_log::init(cx);
          zed::remote_debug::init(cx);

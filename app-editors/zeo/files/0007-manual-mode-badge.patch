@@ -17,10 +17,10 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
 ---
 
 diff --git a/crates/agent_ui/src/config_options.rs b/crates/agent_ui/src/config_options.rs
-index cbefa71..196dc74 100644
+index fc6ce2d..fe98bdf 100644
 --- a/crates/agent_ui/src/config_options.rs
 +++ b/crates/agent_ui/src/config_options.rs
-@@ -458,6 +458,8 @@ impl Render for ConfigOptionSelector {
+@@ -471,6 +471,8 @@ impl Render for ConfigOptionSelector {
  
                  let trigger_button = self.render_trigger_button(window, cx);
  
@@ -29,7 +29,7 @@ index cbefa71..196dc74 100644
                  let show_category_keybindings = option
                      .category
                      .as_ref()
-@@ -529,16 +531,40 @@ impl Render for ConfigOptionSelector {
+@@ -542,16 +544,40 @@ impl Render for ConfigOptionSelector {
                      content.into_any()
                  });
  
@@ -79,8 +79,8 @@ index cbefa71..196dc74 100644
 +                    .into_any_element()
              }
              acp::SessionConfigKind::Boolean(boolean) => {
-                 let option_id = option.id.clone();
-@@ -970,6 +996,22 @@ fn get_current_select_value(
+                 let option_id = option.config_id.clone();
+@@ -1010,6 +1036,22 @@ fn get_current_select_value(
          })
  }
  
@@ -103,8 +103,8 @@ index cbefa71..196dc74 100644
  fn setting_value_for_config_option_value(
      value: &acp::SessionConfigOptionValue,
  ) -> Option<AgentConfigOptionValue> {
-@@ -1278,6 +1320,57 @@ mod tests {
-         assert!(!handled);
+@@ -1415,6 +1457,57 @@ mod tests {
+         );
      }
  
 +    // ---- R4.1/R4.2: manual-mode badge next to the Mode-category select trigger ----

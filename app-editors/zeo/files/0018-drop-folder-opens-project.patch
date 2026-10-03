@@ -63,10 +63,10 @@ Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>
 ---
 
 diff --git a/assets/settings/default.json b/assets/settings/default.json
-index 1228f8b..721ef88 100644
+index 40173f5..5fc420f 100644
 --- a/assets/settings/default.json
 +++ b/assets/settings/default.json
-@@ -181,6 +181,17 @@
+@@ -183,6 +183,17 @@
    //  2. Open projects in a new window
    //         "default_open_behavior": "new_window"
    "default_open_behavior": "existing_window",
@@ -85,10 +85,10 @@ index 1228f8b..721ef88 100644
    // The state is stored per pane.
    // When disabled, defaults are applied instead of the state restoration.
 diff --git a/crates/settings/src/vscode_import.rs b/crates/settings/src/vscode_import.rs
-index 7248c1a..4c6fb68 100644
+index 9f4f835..46629ae 100644
 --- a/crates/settings/src/vscode_import.rs
 +++ b/crates/settings/src/vscode_import.rs
-@@ -1067,6 +1067,7 @@ impl VsCodeSettings {
+@@ -1068,6 +1068,7 @@ impl VsCodeSettings {
              centered_layout: None,
              cli_default_open_behavior: None,
              default_open_behavior: None,
