@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@proton.me</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<longdescription lang="en">
+		A minimal Plasma 6 desktop, the counterpart of gnome-base/gnome-light:
+		the session, the compositor, System Settings, power and display
+		management and the authentication agent -- no applications. Merge
+		kde-plasma/plasma-meta instead for the full desktop.
+	</longdescription>
+	<use>
+		<flag name="bluetooth">Pull in <pkg>kde-plasma/bluedevil</pkg>, the Bluetooth applet</flag>
+		<flag name="kwallet">Pull in <pkg>kde-plasma/kwallet-pam</pkg>, which unlocks the wallet at login</flag>
+		<flag name="networkmanager">Pull in <pkg>kde-plasma/plasma-nm</pkg>, the network applet, and <pkg>net-misc/networkmanager</pkg></flag>
+		<flag name="pulseaudio">Pull in <pkg>kde-plasma/plasma-pa</pkg>, the volume applet (it works with PipeWire's PulseAudio server)</flag>
+	</use>
+</pkgmetadata>

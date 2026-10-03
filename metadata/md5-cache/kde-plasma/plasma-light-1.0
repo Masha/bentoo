@@ -1,0 +1,10 @@
+DEFINED_PHASES=-
+DESCRIPTION=Merge this to pull in a minimal Plasma 6 desktop, without applications
+EAPI=8
+HOMEPAGE=https://kde.org/plasma-desktop/
+IUSE=+bluetooth +kwallet +networkmanager +pulseaudio
+KEYWORDS=~amd64
+LICENSE=metapackage
+RDEPEND=kde-plasma/kde-cli-tools:6 kde-plasma/kscreen:6 kde-plasma/plasma-desktop:6 kde-plasma/polkit-kde-agent:6 kde-plasma/powerdevil:6 kde-plasma/systemsettings:6 bluetooth? ( kde-plasma/bluedevil:6 ) kwallet? ( kde-plasma/kwallet-pam:6 ) networkmanager? ( kde-plasma/plasma-nm:6 net-misc/networkmanager ) pulseaudio? ( kde-plasma/plasma-pa:6 )
+SLOT=0
+_md5_=1f9ab52044b82494cb6f6a7a2b27d2f5
