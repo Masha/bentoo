@@ -3100,7 +3100,7 @@ transform = [['T.*', ""], ['-', ""]]
 commit_sha_path = "[0].sha"
 base_from = "none"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.1.0_p20261003-r1"
+version = "0.1.0_p20261003-r2"
 comments = """
 zeo — commit-tracked on Zed's main; the snapshot plus the bentoo patch series and
 the rebrand. 2026-10-01: this entry WAS app-editors/zed, which now builds
@@ -3113,7 +3113,7 @@ version current, and a stale one would name new bytes after an old distfile.
 Every bump is still a manual follow-up the applier cannot do: regenerate CRATES/
 GIT_CRATES (pycargoebuild from crates/zed), re-check the eleven `local *_COMMIT`
 sed anchors, and carry the series with zed-patches/scripts/bump.sh. zeo-bin is
-then rebuilt with zed-patches/scripts/release-zeo-bin.sh and uploaded by hand.
+then rebuilt with zed-patches/scripts/release-portable.sh and uploaded by hand.
 History below is the snapshot line's, from when it was named zed:
 zed — commit-tracked on main; _pre suffix preserved from current ebuild.
 2026-08-06: 2 commits landed same UTC day (d61e80b -> 6b2aa1c), so the date
@@ -3622,15 +3622,18 @@ follow-up as zed@stable applies to every bump.
 
 ["app-editors/zeo-bin"]
 enabled = false
-disabled_by = "released by hand: zed-patches/scripts/release-zeo-bin.sh builds it from app-editors/zeo and the tarball is uploaded to R2 after review"
+disabled_by = "released by hand: zed-patches/scripts/release-portable.sh builds it from app-editors/zeo's series and the tarball is uploaded to the zeo-workspace/zeo GitHub release after review"
 url = "https://api.github.com/repos/zed-industries/zed/commits?sha=main&per_page=1"
 parser = "json"
 path = "[0].commit.committer.date"
-version = "0.1.0_p20261001"
+version = "0.1.0_p20261003-r2"
 comments = """
-zeo-bin — the prebuilt app-editors/zeo at the same PV, x86-64-v3, hosted at
-distfiles.obentoo.org. Never bumped automatically: a new PV needs a ~25 min
-release build and an upload, and its Manifest must describe the uploaded bytes.
+zeo-bin — the prebuilt app-editors/zeo at the same PV, x86-64-v3, an asset of the
+zeo-workspace/zeo GitHub release v${PVR} (distfiles.obentoo.org until 2026-10-03).
+Never bumped automatically: a new PV needs a release build and an upload, and its
+Manifest must describe the uploaded bytes. Since -r2 the build is the portable one
+(Debian 12 container, official Rust toolchain): the Gentoo-host builds up to -r1
+carried AVX-512 from a std built for znver5.
 """
 # END
 
