@@ -10,67 +10,72 @@ CRATES="
 
 declare -A GIT_CRATES=(
 	[android-wakelock]='https://github.com/rustdesk-org/android-wakelock;d0292e5a367e627c4fa6f1ca6bdfad005dca7d90;android-wakelock-%commit%'
-	[arboard]='https://github.com/rustdesk-org/arboard;85be1218668ff218a7b170c9d424fde73e069914;arboard-%commit%'
+	[arboard]='https://github.com/rustdesk-org/arboard;c7d5781f563176df9efd8df6287e823fb1b9bed5;arboard-%commit%'
 	[cacao]='https://github.com/clslaid/cacao;05e1536b0b43aaae308ec72c0eed703e875b7b95;cacao-%commit%'
 	[cidre-macros]='https://github.com/yury/cidre;f05c4288f9870c9fab53272ddafd6ec01c7b2dbf;cidre-%commit%/cidre-macros'
 	[cidre]='https://github.com/yury/cidre;f05c4288f9870c9fab53272ddafd6ec01c7b2dbf;cidre-%commit%/cidre'
-	[clipboard-master]='https://github.com/rustdesk-org/clipboard-master;ddc39f00a6211959489ae683aa6ae6eedf03a809;clipboard-master-%commit%'
+	[clipboard-master]='https://github.com/rustdesk-org/clipboard-master;522fafb65edfe7939cf63fa797f916569ecab595;clipboard-master-%commit%'
 	[confy]='https://github.com/rustdesk-org/confy;83db9ec19a2f97e9718aef69e4fc5611bb382479;confy-%commit%'
 	[core-foundation-sys]='https://github.com/madsmtm/core-foundation-rs;7d593d016175755e492a92ef89edca68ac3bd5cd;core-foundation-rs-%commit%/core-foundation-sys'
 	[core-foundation]='https://github.com/madsmtm/core-foundation-rs;7d593d016175755e492a92ef89edca68ac3bd5cd;core-foundation-rs-%commit%/core-foundation'
 	[core-graphics-types]='https://github.com/madsmtm/core-foundation-rs;7d593d016175755e492a92ef89edca68ac3bd5cd;core-foundation-rs-%commit%/core-graphics-types'
 	[core-graphics]='https://github.com/madsmtm/core-foundation-rs;7d593d016175755e492a92ef89edca68ac3bd5cd;core-foundation-rs-%commit%/core-graphics'
-	[cpal]='https://github.com/rustdesk-org/cpal;6b374bcaed076750ca8fce6da518ab39b882e14a;cpal-%commit%'
+	[cpal]='https://github.com/rustdesk-org/cpal;96d4da121b7d949677ac5b6887413a9185fd7f39;cpal-%commit%'
 	[default_net]='https://github.com/rustdesk-org/default_net;78f8f70cd85151a3a2c4a3230d80d5272703c02e;default_net-%commit%'
 	[evdev]='https://github.com/rustdesk-org/evdev;cec616e37790293d2cd2aa54a96601ed6b1b35a9;evdev-%commit%'
 	[filedescriptor]='https://github.com/rustdesk-org/wezterm;80174f8009f41565f0fa8c66dab90d4f9211ae16;wezterm-%commit%/filedescriptor'
-	[hwcodec]='https://github.com/rustdesk-org/hwcodec;398e5a8938dd8768ade0fcdc27ea80e8b4b38738;hwcodec-%commit%'
+	[fuser]='https://github.com/rustdesk-org/fuser;a3c0babe4a533f8dbcff5bce59ae7f2424b8d877;fuser-%commit%'
+	[hwcodec]='https://github.com/rustdesk-org/hwcodec;778df1f99597722473b29443bac22ae6c23946fe;hwcodec-%commit%'
 	[impersonate_system]='https://github.com/rustdesk-org/impersonate-system;2f429010a5a10b1fe5eceb553c6672fd53d20167;impersonate-system-%commit%'
-	[kcp-sys]='https://github.com/rustdesk-org/kcp-sys;32a6c09fc6223f54aea83981a6aa8995931d29be;kcp-sys-%commit%'
+	[interceptor]='https://github.com/rustdesk-org/webrtc;49c89bd8d30e6e62e4c1a96cee38fdc11f79ef63;webrtc-%commit%/interceptor'
+	[kcp-sys]='https://github.com/rustdesk-org/kcp-sys;938eda3e5e9757a612385503af7a6cb1189b2cdd;kcp-sys-%commit%'
 	[keepawake]='https://github.com/rustdesk-org/keepawake-rs;64d568586dd16551d02120e19668d2b0fec8e3c9;keepawake-rs-%commit%'
 	[machine-uid]='https://github.com/rustdesk-org/machine-uid;381ff579c1dc3a6c54db9dfec47c44bcb0246542;machine-uid-%commit%'
-	[magnum-opus]='https://github.com/rustdesk-org/magnum-opus;5cd2bf989c148662fa3a2d9d539a71d71fd1d256;magnum-opus-%commit%'
+	[magnum-opus]='https://github.com/rustdesk-org/magnum-opus;588c6e1f9ed50c3a01fa64f3bd3e7cdb0378a114;magnum-opus-%commit%'
 	[nokhwa-bindings-linux]='https://github.com/rustdesk-org/nokhwa;c2f74662b6ce117f7f94301693fdfadc0b1ec91a;nokhwa-%commit%/nokhwa-bindings-linux'
 	[nokhwa-bindings-macos]='https://github.com/rustdesk-org/nokhwa;c2f74662b6ce117f7f94301693fdfadc0b1ec91a;nokhwa-%commit%/nokhwa-bindings-macos'
 	[nokhwa-bindings-windows]='https://github.com/rustdesk-org/nokhwa;c2f74662b6ce117f7f94301693fdfadc0b1ec91a;nokhwa-%commit%/nokhwa-bindings-windows'
 	[nokhwa-core]='https://github.com/rustdesk-org/nokhwa;c2f74662b6ce117f7f94301693fdfadc0b1ec91a;nokhwa-%commit%/nokhwa-core'
 	[nokhwa]='https://github.com/rustdesk-org/nokhwa;c2f74662b6ce117f7f94301693fdfadc0b1ec91a;nokhwa-%commit%'
-	[pam-sys]='https://github.com/rustdesk-org/pam-sys;3337c9bb9a9c68d7497ec8c93cad2368c26091b7;pam-sys-%commit%'
-	[pam]='https://github.com/rustdesk-org/pam;7bfd25510202cd269292cbdd7c71f3977a6fd762;pam-%commit%'
 	[parity-tokio-ipc]='https://github.com/rustdesk-org/parity-tokio-ipc;d0ae39bffe5d5a3e8d82a1b6bcb1ca5a9b2f1c01;parity-tokio-ipc-%commit%'
 	[portable-pty]='https://github.com/rustdesk-org/wezterm;80174f8009f41565f0fa8c66dab90d4f9211ae16;wezterm-%commit%/pty'
-	[rdev]='https://github.com/rustdesk-org/rdev;f9b60b1dd0f3300a1b797d7a74c116683cd232c8;rdev-%commit%'
+	[rdev]='https://github.com/rustdesk-org/rdev;a361d86a8b0245f3618a9efb375c149530a6b599;rdev-%commit%'
+	[rtcp]='https://github.com/rustdesk-org/webrtc;49c89bd8d30e6e62e4c1a96cee38fdc11f79ef63;webrtc-%commit%/rtcp'
+	[rtp]='https://github.com/rustdesk-org/webrtc;49c89bd8d30e6e62e4c1a96cee38fdc11f79ef63;webrtc-%commit%/rtp'
 	[rust-pulsectl]='https://github.com/rustdesk-org/pulsectl;aa34dde499aa912a3abc5289cc0b547bd07dd6e2;pulsectl-%commit%'
 	[sciter-rs]='https://github.com/rustdesk-org/rust-sciter;5322f3a755a0e6bf999fbc60d1efc35246c0f821;rust-sciter-%commit%'
+	[sdp]='https://github.com/rustdesk-org/webrtc;49c89bd8d30e6e62e4c1a96cee38fdc11f79ef63;webrtc-%commit%/sdp'
+	[stun]='https://github.com/rustdesk-org/webrtc;49c89bd8d30e6e62e4c1a96cee38fdc11f79ef63;webrtc-%commit%/stun'
 	[sysinfo]='https://github.com/rustdesk-org/sysinfo;90b1705d909a4902dbbbdea37ee64db17841077d;sysinfo-%commit%'
 	[tao-macros]='https://github.com/rustdesk-org/tao;288c219cb0527e509590c2b2d8e7072aa9feb2d3;tao-%commit%/tao-macros'
 	[tao]='https://github.com/rustdesk-org/tao;288c219cb0527e509590c2b2d8e7072aa9feb2d3;tao-%commit%'
 	[tfc]='https://github.com/rustdesk-org/The-Fat-Controller;78bb80a8e596e4c14ae57c8448f5fca75f91f2b0;The-Fat-Controller-%commit%'
 	[tokio-socks]='https://github.com/rustdesk-org/tokio-socks;bdb9aa3de5bac41602d0742b8ef6bbc6bfebd127;tokio-socks-%commit%'
+	[tokio-tungstenite]='https://github.com/rustdesk-org/tokio-tungstenite;c241b11b03de4881faf1ecd2fe6e867c92f3013b;tokio-tungstenite-%commit%'
 	[tray-icon]='https://github.com/tauri-apps/tray-icon;0a5835b0e6828e37a1f781de9c2d671ae7a939e6;tray-icon-%commit%'
+	[tungstenite]='https://github.com/rustdesk-org/tungstenite-rs;efce47e5364f00a63302cf07ab1fb13ded478914;tungstenite-rs-%commit%'
+	[turn]='https://github.com/rustdesk-org/webrtc;49c89bd8d30e6e62e4c1a96cee38fdc11f79ef63;webrtc-%commit%/turn'
 	[wallpaper]='https://github.com/rustdesk-org/wallpaper.rs;ce4a0cd3f58327c7cc44d15a63706fb0c022bacf;wallpaper.rs-%commit%'
 	[webm-sys]='https://github.com/rustdesk-org/rust-webm;d2c4d3ac133c7b0e4c0f656da710b48391981e64;rust-webm-%commit%/src/sys'
 	[webm]='https://github.com/rustdesk-org/rust-webm;d2c4d3ac133c7b0e4c0f656da710b48391981e64;rust-webm-%commit%'
+	[webrtc-data]='https://github.com/rustdesk-org/webrtc;49c89bd8d30e6e62e4c1a96cee38fdc11f79ef63;webrtc-%commit%/data'
+	[webrtc-dtls]='https://github.com/rustdesk-org/webrtc;49c89bd8d30e6e62e4c1a96cee38fdc11f79ef63;webrtc-%commit%/dtls'
+	[webrtc-ice]='https://github.com/rustdesk-org/webrtc;49c89bd8d30e6e62e4c1a96cee38fdc11f79ef63;webrtc-%commit%/ice'
+	[webrtc-mdns]='https://github.com/rustdesk-org/webrtc;49c89bd8d30e6e62e4c1a96cee38fdc11f79ef63;webrtc-%commit%/mdns'
+	[webrtc-media]='https://github.com/rustdesk-org/webrtc;49c89bd8d30e6e62e4c1a96cee38fdc11f79ef63;webrtc-%commit%/media'
+	[webrtc-sctp]='https://github.com/rustdesk-org/webrtc;49c89bd8d30e6e62e4c1a96cee38fdc11f79ef63;webrtc-%commit%/sctp'
+	[webrtc-srtp]='https://github.com/rustdesk-org/webrtc;49c89bd8d30e6e62e4c1a96cee38fdc11f79ef63;webrtc-%commit%/srtp'
+	[webrtc-util]='https://github.com/rustdesk-org/webrtc;49c89bd8d30e6e62e4c1a96cee38fdc11f79ef63;webrtc-%commit%/util'
+	[webrtc]='https://github.com/rustdesk-org/webrtc;49c89bd8d30e6e62e4c1a96cee38fdc11f79ef63;webrtc-%commit%/webrtc'
 	[x11-clipboard]='https://github.com/clslaid/x11-clipboard;5fc2e73bc01ada3681159b34cf3ea8f0d14cd904;x11-clipboard-%commit%'
 	[x11]='https://github.com/bjornsnoen/x11-rs;c2e9bfaa7b196938f8700245564d8ac5d447786a;x11-rs-%commit%/x11'
 )
 
-# LLVM 22+ NEEDS THE scrap BINDGEN PATCH (files/${PN}-1.4.9-scrap-bindgen-0.72.patch).
-# libs/scrap asks for bindgen 0.65 (May 2023), which cannot parse the
-# libvpx/libaom headers through libclang >= 22: it gives up on the types and
-# emits `_address` as their only field, so `scrap` dies with 64 errors like
-#
-#   error[E0609]: no field `g_w` on type `vpx_codec_enc_cfg`
-#       = note: available fields are: `_address`
-#
-# The patch moves scrap to bindgen 0.72.1 and adds the matching Cargo.lock
-# entry. It has to touch Cargo.lock too: with the lock out of date cargo
-# re-resolves, and the GIT_CRATES sources then fail offline ("can't checkout
-# from 'https://github.com/rustdesk-org/confy'"). bindgen 0.72.1 and every one
-# of its dependencies already ship in ${P}-crates.tar.xz, so no distfile is
-# added. The other bindgen 0.65.1 user in the lock is left alone.
-# Fix suggested in https://github.com/obentoo/bentoo/issues/48 (from the AUR
-# rustdesk package). Drop the patch once upstream scrap moves off 0.65.
+# LLVM 22+ needs bindgen >= 0.72 in libs/scrap: bindgen 0.65 cannot parse the
+# libvpx/libaom headers through libclang >= 22 and emits `_address` as their
+# only field ("no field `g_w` on type `vpx_codec_enc_cfg`"). 1.4.9 carried a
+# local patch for it (obentoo/bentoo#48); upstream moved scrap to 0.72.1 in
+# 1.5.0, so the patch is gone.
 #
 # 23 is absent for a different reason: RUST_NEEDS_LLVM=1 needs a Rust built
 # against the same slot, and no dev-lang/rust{,-bin} is yet (1.98.1 carries
@@ -87,10 +92,11 @@ HOMEPAGE="https://rustdesk.com/"
 # 1. rust-webm-*/src/sys/libwebm is a empty directory
 # 2. gcc15 build: https://github.com/microcai/gentoo-zh/issues/7234
 _LIBWEBM_COMMIT="3b630045052e1e4d563207ab9e3be8d137c26067"
-# grep -i vcpkg .github/workflows/flutter-build.yml
-_VCPKG_TAG="2025.08.27"
-# last rustdesk-vcpkg release available for this vcpkg tag
-_VCPKG_PV="1.4.7"
+# VCPKG_COMMIT_ID in .github/workflows/flutter-build.yml -- a vcpkg tag up to
+# 1.4.9 (2025.08.27), a bare commit since 1.5.0
+_VCPKG_TAG="9e593bb18ea69cc5095e012465dcd675a822ed0d"
+# rustdesk-vcpkg release whose asset name carries that _VCPKG_TAG
+_VCPKG_PV="1.5.0"
 # fix: hwcodec-${_HWCODEC_COMMIT}"/externals is a empty directory
 # git clone https://github.com/rustdesk-org/hwcodec
 # git ls-tree HEAD externals
@@ -106,16 +112,23 @@ _HWCODEC_EXTERNALS_COMMIT="8903740a1f47884906a6e347ad3d8d56304d9771"
 # ALWAYS re-derive this against the tag, never carry it over:
 #   git ls-tree ${PV} libs/hbb_common
 #   curl -s "https://api.github.com/repos/rustdesk/rustdesk/contents/libs/hbb_common?ref=${PV}" | jq -r .sha
-_HBB_COMMON_COMMIT="7e1c392c62d39c364127307cd408421dd5f8cfb0"
+_HBB_COMMON_COMMIT="229b904508364c8997aad0fb5af57effac859f60"
 # fix: kcp-sys-*/kcp is a empty directory
 # git clone https://github.com/rustdesk-org/kcp-sys
 # git ls-tree HEAD kcp
-_KCP_COMMIT="7f9805887b0909c52c825925f123e7a84da37167"
+_KCP_COMMIT="32da082e529a26730aea3eb19922f80634ee6dea"
 # THE CRATES BUNDLE, AND HOW TO READ A CHECKSUM MISMATCH ON IT
 #
 # CRATES= is empty: every crates.io dependency -- 1003 of them -- arrives inside
 # ${P}-crates.tar.xz from gentoo-zh-drafts, a third-party aggregation repo.
-# Only the 44 git dependencies go through GIT_CRATES.
+# Only the 60 git dependencies go through GIT_CRATES.
+#
+# GIT_CRATES goes stale on a bump exactly like the submodule pins above: the
+# 1.5.0 autoupdate carried over the 1.4.9 block, missing 15 entries (webrtc,
+# tungstenite, fuser) and pinning 7 old commits, and cargo died offline with
+# "can't checkout from 'https://github.com/rustdesk-org/tungstenite-rs'".
+# Re-derive the block from the tag's Cargo.lock on every bump: one entry per
+# `source = "git+..."` package, commit = the part after '#'.
 #
 # 2026-08-08: that DIST entry was re-pinned from 141240432 to 141218012 bytes.
 # Do NOT read a mismatch here as "upstream silently regenerated the bundle" --
@@ -136,9 +149,7 @@ _KCP_COMMIT="7f9805887b0909c52c825925f123e7a84da37167"
 # every crate carries .cargo-checksum.json whose .package is the sha256 of its
 # original .crate -- the same value Cargo.lock pins in its `checksum` field, and
 # Cargo.lock comes from ${P}.tar.gz, whose Manifest entry was never broken.
-# Result: 1003/1003 match, 0 missing, 0 mismatches, plus one extra
-# (bindgen-0.72.1) that the upstream Cargo.lock never references -- the scrap
-# bindgen patch (see LLVM_COMPAT below) is what puts it to use.
+# Result at 1.4.9: 1003/1003 match, 0 missing, 0 mismatches.
 # Not proven: that the extracted files correspond to the original .crate, since
 # the bundle ships trees rather than .crate archives.
 #
@@ -234,6 +245,25 @@ src_prepare() {
 	local _KCPSYS_COMMIT=`echo "${GIT_CRATES[kcp-sys]}" | awk -F';' '{print $2}'`
 	rm -rf "${WORKDIR}/kcp-sys-${_KCPSYS_COMMIT}"/kcp || die
 	ln -s "${WORKDIR}/kcp-${_KCP_COMMIT}" "${WORKDIR}/kcp-sys-${_KCPSYS_COMMIT}"/kcp || die
+
+	# Since 1.5.0 the root Cargo.toml points these at git through
+	# [patch.crates-io]. cargo never applies a patch to a patch, so the
+	# [patch.'<url>'] that cargo.eclass writes for GIT_CRATES is ignored for
+	# them and the build dies offline ("can't checkout from
+	# 'https://github.com/rustdesk-org/tungstenite-rs'"). Point them at the
+	# unpacked GIT_CRATES trees instead; Cargo.lock only loses their `source`
+	# lines, no version is re-resolved. The grep catches a sed that stops
+	# matching after a bump -- sed itself would exit 0.
+	local crate commit dir
+	for crate in tungstenite webrtc webrtc-util webrtc-sctp; do
+		commit=$(cut -d';' -f2 <<<"${GIT_CRATES[${crate}]}") || die
+		dir=$(cut -d';' -f3 <<<"${GIT_CRATES[${crate}]}") || die
+		dir=${dir//%commit%/${commit}}
+		sed -i -E "s|^${crate} = \{ git = \"[^\"]+\", rev = \"[0-9a-f]+\" \}$|${crate} = { path = \"${WORKDIR}/${dir}\" }|" \
+			"${S}"/Cargo.toml || die
+		grep -qF "${crate} = { path = \"${WORKDIR}/${dir}\" }" "${S}"/Cargo.toml \
+			|| die "[patch.crates-io] entry for ${crate} not rewritten"
+	done
 }
 
 src_configure() {
