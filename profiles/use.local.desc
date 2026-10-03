@@ -316,6 +316,7 @@ net-libs/nodejs:pnpm - Install the sys-apps/pnpm package manager
 net-libs/nodejs:snapshot - Enable snapshot creation for faster startup
 net-libs/nodejs:system-icu - Use system dev-libs/icu instead of the bundled version
 net-libs/nodejs:system-ssl - Use system OpenSSL instead of the bundled one
+net-libs/nodejs:temporal - Enable the Temporal API for handling dates and times
 net-libs/webkit-gtk:examples - Install the MiniBrowser example application
 net-libs/webkit-gtk:gamepad - Enable gamepad input support via dev-libs/libmanette
 net-libs/webkit-gtk:jumbo-build - Combine source files to speed up build process
