@@ -1508,7 +1508,7 @@ declare -A GIT_CRATES=(
 	[async-process]='https://github.com/zed-industries/async-process;0b6d6713570af61806e1e5cb40e0f757cb93fd9d;async-process-%commit%'
 	[async-tar]='https://github.com/zed-industries/async-tar;bd3ad6f89df9a9da7a8535958756d6bf465936a0;async-tar-%commit%'
 	[async-task]='https://github.com/smol-rs/async-task;b4486cd71e4e94fbda54ce6302444de14f4d190e;async-task-%commit%'
-	[calloop]='https://github.com/zed-industries/calloop;eb6b4fd17b9af5ecc226546bdd04185391b3e265;calloop-%commit%'
+	[calloop]='https://github.com/zed-industries/calloop;3759371fee14c40066d64777e2a36b6ffcc22590;calloop-%commit%'
 	[dap-types]='https://github.com/zed-industries/dap-types;1b461b310481d01e02b2603c16d7144b926339f8;dap-types-%commit%/dap-types'
 	[gh-workflow-macros]='https://github.com/zed-industries/gh-workflow;37f3c0575d379c218a9c455ee67585184e40d43f;gh-workflow-%commit%/crates/gh-workflow-macros'
 	[gh-workflow]='https://github.com/zed-industries/gh-workflow;37f3c0575d379c218a9c455ee67585184e40d43f;gh-workflow-%commit%/crates/gh-workflow'
@@ -1989,8 +1989,9 @@ src_prepare() {
 	ASYNC_TASK_GIT+=", rev = \"${ASYNC_TASK_COMMIT}\""
 	local ASYNC_TASK_PATH="async-task = \\{ path = \"${WORKDIR}/async-task-${ASYNC_TASK_COMMIT}\""
 
-	local CALLOOP_COMMIT="eb6b4fd17b9af5ecc226546bdd04185391b3e265"
+	local CALLOOP_COMMIT="3759371fee14c40066d64777e2a36b6ffcc22590"
 	local CALLOOP_GIT="calloop = { git = \"https://github.com/zed-industries/calloop\""
+	CALLOOP_GIT+=", rev = \"${CALLOOP_COMMIT}\""
 	local CALLOOP_PATH="calloop = \\{ path = \"${WORKDIR}/calloop-${CALLOOP_COMMIT}\""
 
 	local LIVEKIT_COMMIT="0a1c519cfce9b365229026b55de9b9dbdb6fed3c"
