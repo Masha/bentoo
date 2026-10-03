@@ -14,8 +14,7 @@
 		pinned, and every run leaves an audit trail.
 	</longdescription>
 	<use>
-		<flag name="iso">Pull in the tools that assemble the live ISO: <pkg>sys-fs/squashfs-tools</pkg> (the root filesystem), <pkg>dev-libs/libisoburn</pkg> (xorriso) and <pkg>sys-boot/grub</pkg> with <pkg>sys-fs/mtools</pkg> (the hybrid BIOS and UEFI medium made by grub-mkrescue)</flag>
-		<flag name="vm">Pull in what 'shidashi vm' needs to boot an ISO and test it: <pkg>app-emulation/qemu</pkg>, the OVMF firmware for UEFI boots, and an SSH client to drive the VM over vsock</flag>
+		<flag name="vm">Pull in what 'shidashi vm' needs to boot an ISO and test it, or to build inside the builder VM: <pkg>app-emulation/qemu</pkg>, the OVMF firmware for UEFI boots, an SSH client to drive the VM over vsock, <pkg>app-emulation/virtiofsd</pkg> for its shared directories and <pkg>dev-libs/libisoburn</pkg> (xorriso) to read an ISO's build.json</flag>
 	</use>
 	<upstream>
 		<remote-id type="github">obentoo/shidashi</remote-id>
