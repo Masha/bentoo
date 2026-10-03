@@ -30,7 +30,9 @@ inherit go-env go-module
 #    never tested.
 #
 # 2. ${PN}-react-ui-node_modules-${NODE_MODULES_PV}.tar.xz -- REGENERATE WHEN
-#    core/http/react-ui/package-lock.json CHANGES, not every bump:
+#    core/http/react-ui/package-lock.json CHANGES, not every bump. Compare
+#    the lockfile against the tag NODE_MODULES_PV names, not against the
+#    previous release: 4.10.0 changed it and still shipped the 4.9.0 tree.
 #
 #      cd core/http/react-ui
 #      npm ci --ignore-scripts        # --ignore-scripts: @playwright/test's
@@ -42,6 +44,10 @@ inherit go-env go-module
 #      cp -a scratch/node_modules/{lightningcss-linux-arm64-*} node_modules/
 #      cp -a scratch/node_modules/@rolldown/binding-linux-arm64-* \
 #            node_modules/@rolldown/
+#      # @napi-rs/canvas (since 4.11.0) is pdfjs-dist's optional Node-only
+#      # renderer; the browser bundle never loads it and vite builds without
+#      # it. Dropping it saves ~20 MB of distfile:
+#      rm -rf node_modules/@napi-rs
 #      tar caf ${PN}-react-ui-node_modules-${PV}.tar.xz node_modules
 #
 #    Upstream's Makefile builds this with `npm install`; `npm ci` is used
@@ -63,7 +69,7 @@ inherit go-env go-module
 # (1958fcbe2ca8bd93af633f11e97d44e567e945af); that SHA is release v1.4.0.
 PGGG_PV="1.4.0"
 # Bump only when core/http/react-ui/package-lock.json actually changes.
-NODE_MODULES_PV="4.9.0"
+NODE_MODULES_PV="4.11.0"
 
 MY_P="LocalAI-v${PV}"
 
