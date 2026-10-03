@@ -12683,6 +12683,62 @@ TEMPORARY MIRROR: remove once ::gentoo ships any qtwebengine-6.140.
 """
 # END
 
+["dev-qt/qt-creator"]
+url = "https://download.qt.io/development_releases/qtcreator/21.0/"
+parser = "regex"
+pattern = 'href="(21\.0\.0-(?:beta|rc)[0-9]+)/"'
+transform = [['-', "_"]]
+select = "max"
+version = "21.0.0_beta1"
+comments = """
+qt-creator -- PRE-RELEASE MIRROR: ::gentoo carries the 20.x finals; bentoo
+ships the 21.0 betas/RCs ahead of it. The URL pins development_releases/21.0
+on purpose: the final lands under official_releases and is ::gentoo's to
+ship -- once ::gentoo carries qt-creator-21.0.0, remove the ebuild and set
+enabled = false here. The ebuild derives the official/development path from
+${PV}, so beta -> rc bumps need no SRC_URI edit. USE=tracing pulls in
+dev-qt/qtcanvaspainter (bentoo-only, see its records) for the Profiler plugin.
+"""
+# END
+
+["dev-qt/qtcanvaspainter@6.11"]
+url = "https://download.qt.io/official_releases/qt/6.11/"
+parser = "regex"
+pattern = 'href="(6\.11\.[0-9]+)/"'
+select = "max"
+series = '^6\.11\.[0-9]+(?:-r[0-9]+)?$'
+version = "6.11.2"
+comments = """
+qtcanvaspainter -- Qt 6.11 series. Not in ::gentoo at all: bentoo carries it
+because Qt Creator 21's Tracing library (the Profiler plugin) needs
+Qt::CanvasPainter. Each ebuild pins ~dev-qt/qtbase-${PV}, so a bump is only
+installable once ::gentoo ships that qtbase -- follow its Qt series, never lead
+it. One record per live series (@6.11/@6.12) so neither ebuild is swept: the
+series regex is what claims each one. Retire this one with the last
+::gentoo qtbase-6.11.x.
+Remove both records' ebuilds (enabled = false) once ::gentoo packages it.
+"""
+# END
+
+["dev-qt/qtcanvaspainter@6.12"]
+url = "https://download.qt.io/official_releases/qt/6.12/"
+parser = "regex"
+pattern = 'href="(6\.12\.[0-9]+)/"'
+select = "max"
+series = '^6\.12\.[0-9]+(?:-r[0-9]+)?$'
+version = "6.12.0"
+comments = """
+qtcanvaspainter -- Qt 6.12 series. Not in ::gentoo at all: bentoo carries it
+because Qt Creator 21's Tracing library (the Profiler plugin) needs
+Qt::CanvasPainter. Each ebuild pins ~dev-qt/qtbase-${PV}, so a bump is only
+installable once ::gentoo ships that qtbase -- follow its Qt series, never lead
+it. One record per live series (@6.11/@6.12) so neither ebuild is swept: the
+series regex is what claims each one. 6.12.0 is masked in
+profiles/package.mask alongside ::gentoo's own 6.12.0 mask.
+Remove both records' ebuilds (enabled = false) once ::gentoo packages it.
+"""
+# END
+
 ["app-accessibility/at-spi2-core"]
 hold = true
 url = "https://download.gnome.org/sources/at-spi2-core/cache.json"
