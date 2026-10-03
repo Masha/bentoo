@@ -40,7 +40,6 @@ CRATES="
 	bitflags@1.3.2
 	bitflags@2.13.2
 	blake3@1.8.7
-	block-buffer@0.10.4
 	block2@0.6.2
 	blocking@1.7.0
 	boxcar@0.2.14
@@ -50,39 +49,37 @@ CRATES="
 	bytes@1.12.1
 	c-gull@0.22.3
 	c-scape@0.22.3
-	cc@1.4.6
-	cfg-if@1.0.4
+	cc@1.5.1
+	cfg-if@1.0.5
 	cfg_aliases@0.2.2
 	chacha20@0.10.2
 	chrono@0.4.45
 	clap@4.6.7
 	clap_builder@4.6.7
-	clap_complete@4.6.10
+	clap_complete@4.6.11
 	clap_complete_nushell@4.6.2
 	clap_derive@4.6.7
 	clap_lex@1.1.1
 	clap_mangen@0.2.33
-	clearscreen@4.0.6
+	clearscreen@5.0.0
 	colorchoice@1.0.5
 	concurrent-queue@2.5.0
 	console-api@0.9.0
 	console-subscriber@0.5.0
 	constant_time_eq@0.4.2
 	core-foundation-sys@0.8.7
-	cpufeatures@0.2.17
 	cpufeatures@0.3.1
 	crc32fast@1.5.2
 	crossbeam-channel@0.5.17
 	crossbeam-deque@0.8.8
 	crossbeam-epoch@0.9.21
 	crossbeam-utils@0.8.23
-	crypto-common@0.1.7
 	dashmap@6.2.1
 	defmt-macros@1.1.1
 	defmt-parser@1.0.0
+	defmt@0.3.100
 	defmt@1.1.1
 	deranged@0.5.8
-	digest@0.10.7
 	dirs-sys@0.5.0
 	dirs@6.0.0
 	dispatch2@0.3.1
@@ -103,9 +100,9 @@ CRATES="
 	event-listener@4.0.3
 	event-listener@5.4.2
 	eyra@0.22.0
-	faster-hex@0.10.0
+	faster-hex@0.10.1
 	fastrand@2.5.0
-	find-msvc-tools@0.1.12
+	find-msvc-tools@0.1.14
 	flate2@1.1.10
 	fnv@1.0.7
 	foldhash@0.1.5
@@ -121,31 +118,29 @@ CRATES="
 	futures-task@0.3.34
 	futures-util@0.3.34
 	futures@0.3.34
-	generic-array@0.14.7
-	getrandom@0.2.17
 	getrandom@0.3.4
 	getrandom@0.4.3
 	gimli@0.32.3
 	gimli@0.34.0
-	gix-actor@0.41.2
-	gix-config-value@0.19.1
-	gix-config@0.59.0
-	gix-date@0.15.6
-	gix-error@0.2.5
-	gix-features@0.49.1
-	gix-fs@0.22.1
-	gix-glob@0.27.1
-	gix-hash@0.26.2
-	gix-hashtable@0.16.0
-	gix-lock@24.0.0
-	gix-object@0.63.0
-	gix-path@0.12.6
-	gix-ref@0.66.0
-	gix-sec@0.14.2
-	gix-tempfile@24.0.0
-	gix-trace@0.1.21
-	gix-utils@0.3.6
-	gix-validate@0.11.4
+	gix-actor@0.43.0
+	gix-config-value@0.20.0
+	gix-config@0.61.0
+	gix-date@0.17.0
+	gix-error@0.4.0
+	gix-features@0.50.0
+	gix-fs@0.23.0
+	gix-glob@0.28.0
+	gix-hash@0.27.0
+	gix-hashtable@0.17.0
+	gix-lock@25.0.0
+	gix-object@0.65.0
+	gix-path@0.13.0
+	gix-ref@0.68.0
+	gix-sec@0.15.0
+	gix-tempfile@25.0.0
+	gix-trace@0.2.0
+	gix-utils@0.4.0
+	gix-validate@0.12.0
 	globset@0.4.20
 	h2@0.4.19
 	hash32@0.3.1
@@ -164,7 +159,7 @@ CRATES="
 	httpdate@1.0.3
 	humantime@2.4.0
 	hyper-timeout@0.5.2
-	hyper-util@0.1.20
+	hyper-util@0.1.21
 	hyper@1.11.1
 	iana-time-zone-haiku@0.1.2
 	iana-time-zone@0.1.65
@@ -191,14 +186,14 @@ CRATES="
 	jiff-tzdb-platform@0.1.3
 	jiff-tzdb@0.1.8
 	jiff@0.2.37
-	js-sys@0.3.105
+	js-sys@0.3.106
 	kqueue-sys@1.1.2
 	kqueue@1.2.1
-	lazy_static@1.5.0
+	lazy_static@1.5.1
 	libc@0.2.189
 	libm@0.2.16
 	libmimalloc-sys@0.1.49
-	libredox@0.1.24
+	libredox@0.1.25
 	linux-raw-sys@0.12.1
 	linux-raw-sys@0.9.4
 	listenfd@1.0.2
@@ -225,7 +220,7 @@ CRATES="
 	nom@8.0.0
 	normalize-line-endings@0.3.0
 	normalize-path@0.2.1
-	notify-rust@4.18.0
+	notify-rust@4.18.1
 	notify-types@2.1.0
 	notify@8.2.0
 	nu-ansi-term@0.50.3
@@ -267,8 +262,8 @@ CRATES="
 	printf-compat@0.3.1
 	proc-macro-crate@3.5.0
 	proc-macro2@1.0.107
-	process-wrap@9.1.0
-	prodash@31.0.0
+	process-wrap@9.1.1
+	prodash@31.0.1
 	prost-derive@0.14.4
 	prost-types@0.14.4
 	prost@0.14.4
@@ -276,7 +271,7 @@ CRATES="
 	r-efi@5.3.0
 	r-efi@6.0.0
 	radix_trie@0.3.0
-	rand@0.10.2
+	rand@0.10.3
 	rand@0.8.8
 	rand@0.9.5
 	rand_chacha@0.9.0
@@ -287,7 +282,7 @@ CRATES="
 	rayon-core@1.13.0
 	realpath-ext@0.1.3
 	redox_syscall@0.5.18
-	redox_users@0.5.2
+	redox_users@0.5.3
 	regex-automata@0.4.18
 	regex-lite@0.1.9
 	regex-syntax@0.8.11
@@ -298,7 +293,7 @@ CRATES="
 	rustix-dlmalloc@0.2.2
 	rustix-futex-sync@0.4.0
 	rustix-openpty@0.2.0
-	rustix@1.1.4
+	rustix@1.1.5
 	rustversion@1.0.23
 	same-file@1.0.6
 	scopeguard@1.2.0
@@ -309,17 +304,16 @@ CRATES="
 	serde_json@1.0.151
 	serde_repr@0.1.21
 	serde_spanned@1.1.1
-	sha1-checked@0.10.0
-	sha1@0.10.7
+	sha1dc@0.1.5
 	sharded-slab@0.1.7
 	shlex@2.0.1
 	signal-hook-registry@1.4.8
 	signal-hook@0.4.4
 	simd-adler32@0.3.10
 	similar@3.2.0
-	siphasher@1.0.3
+	siphasher@1.0.4
 	slab@0.4.12
-	smallvec@1.16.1
+	smallvec@1.16.2
 	snapbox-macros@1.1.0
 	snapbox@1.2.2
 	socket2@0.6.5
@@ -330,17 +324,17 @@ CRATES="
 	supports-unicode@3.0.0
 	symlink@0.1.0
 	syn@2.0.119
-	syn@3.0.5
+	syn@3.0.6
 	sync_wrapper@1.0.2
-	synstructure@0.13.2
-	tauri-winrt-notification@0.7.3
+	synstructure@0.14.0
+	tauri-winrt-notification@0.8.1
 	tempfile@3.27.0
 	termcolor@1.4.1
 	terminal_size@0.4.4
 	terminfo@0.9.0
 	textwrap@0.16.4
-	thiserror-impl@2.0.20
-	thiserror@2.0.20
+	thiserror-impl@2.0.21
+	thiserror@2.0.21
 	thread_local@1.1.10
 	time-core@0.1.9
 	time-macros@0.2.32
@@ -372,11 +366,10 @@ CRATES="
 	tracing@0.1.44
 	try-lock@0.2.5
 	typed-arena@2.0.2
-	typenum@1.20.1
 	tz-rs@0.7.3
 	uds_windows@1.2.1
 	unicode-bom@2.0.3
-	unicode-ident@1.0.24
+	unicode-ident@1.0.26
 	unicode-normalization@0.1.25
 	unicode-width@0.1.14
 	unicode-width@0.2.2
@@ -386,47 +379,37 @@ CRATES="
 	utf8parse@0.2.2
 	uuid@1.26.1
 	valuable@0.1.1
-	version_check@0.9.5
 	vswhom-sys@0.1.3
 	vswhom@0.1.0
 	walkdir@2.5.0
 	want@0.3.1
 	wasi@0.11.1+wasi-snapshot-preview1
 	wasip2@1.0.4+wasi-0.2.12
-	wasm-bindgen-macro-support@0.2.128
-	wasm-bindgen-macro@0.2.128
-	wasm-bindgen-shared@0.2.128
-	wasm-bindgen@0.2.128
+	wasm-bindgen-macro-support@0.2.129
+	wasm-bindgen-macro@0.2.129
+	wasm-bindgen-shared@0.2.129
+	wasm-bindgen@0.2.129
 	which@8.0.6
 	winapi-i686-pc-windows-gnu@0.4.0
 	winapi-util@0.1.11
 	winapi-x86_64-pc-windows-gnu@0.4.0
 	winapi@0.3.9
-	windows-collections@0.2.0
 	windows-collections@0.3.2
-	windows-core@0.61.2
 	windows-core@0.62.2
-	windows-future@0.2.1
 	windows-future@0.3.2
 	windows-implement@0.60.2
 	windows-interface@0.59.3
-	windows-link@0.1.3
 	windows-link@0.2.1
-	windows-numerics@0.2.0
 	windows-numerics@0.3.1
-	windows-result@0.3.4
 	windows-result@0.4.1
-	windows-strings@0.4.2
 	windows-strings@0.5.1
 	windows-sys@0.59.0
 	windows-sys@0.60.2
 	windows-sys@0.61.2
 	windows-targets@0.52.6
 	windows-targets@0.53.5
-	windows-threading@0.1.0
 	windows-threading@0.2.1
 	windows-version@0.1.7
-	windows@0.61.3
 	windows@0.62.2
 	windows_aarch64_gnullvm@0.52.6
 	windows_aarch64_gnullvm@0.53.1
@@ -448,20 +431,20 @@ CRATES="
 	winreg@0.55.0
 	wit-bindgen@0.57.1
 	writeable@0.6.4
-	yoke-derive@0.8.2
+	yoke-derive@0.8.4
 	yoke@0.8.3
 	zbus@5.19.0
 	zbus_macros@5.19.0
 	zbus_names@4.3.4
 	zcheapstr@1.1.0
-	zerocopy-derive@0.8.57
-	zerocopy@0.8.57
-	zerofrom-derive@0.1.7
+	zerocopy-derive@0.8.59
+	zerocopy@0.8.59
+	zerofrom-derive@0.1.8
 	zerofrom@0.1.8
 	zerotrie@0.2.5
 	zerovec-derive@0.11.6
 	zerovec@0.11.8
-	zlib-rs@0.6.7
+	zlib-rs@0.6.8
 	zmij@1.0.23
 	zvariant@5.15.0
 	zvariant_derive@5.15.0

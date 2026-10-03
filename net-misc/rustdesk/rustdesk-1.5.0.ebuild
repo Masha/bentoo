@@ -210,10 +210,6 @@ QA_PRESTRIPPED="
 	/usr/share/${PN}/libsciter-gtk.so
 "
 
-PATCHES=(
-	"${FILESDIR}"/${PN}-1.4.9-scrap-bindgen-0.72.patch
-)
-
 pkg_setup() {
 	llvm-r1_pkg_setup
 	rust_pkg_setup

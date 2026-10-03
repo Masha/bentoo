@@ -185,7 +185,7 @@
 url = "https://registry.npmjs.org/@anthropic-ai/claude-code"
 parser = "json"
 path = "dist-tags.latest"
-version = "2.1.287"
+version = "2.1.288"
 comments = """
 claude-code — npm @anthropic-ai/claude-code; dist-tags.latest is the stable channel.
 
@@ -954,7 +954,7 @@ transform strips the "go" prefix to match PV. Live=1.26.5.
 url = "https://persistent.oaistatic.com/codex-app-prod/linux/deb/dists/stable/main/binary-amd64/Packages"
 parser = "regex"
 pattern = 'Package: chatgpt\nVersion: ([0-9]+\.[0-9]+\.[0-9]+)'
-version = "26.930.21537"
+version = "26.930.31730"
 comments = """
 OpenAI Codex/ChatGPT desktop app — read the APT index of the very repo that
 SRC_URI pulls from. Both openai.com and chatgpt.com sit behind Cloudflare and
@@ -1952,7 +1952,7 @@ commit_sha_path = "[0].id"
 base_from = "file"
 base_url = "https://code.videolan.org/videolan/vlc/-/raw/master/configure.ac"
 base_pattern = 'AC_INIT\(\[vlc\], \[([0-9][0-9.]*)-dev\]\)'
-version = "4.0.0_pre20261002"
+version = "4.0.0_pre20261003"
 comments = """
 vlc — 4.0 development snapshot, commit-tracked on master; _pre suffix
 preserved from the current ebuild. Only the 4.0 line lives here: 3.0.x is
@@ -1994,7 +1994,7 @@ url = "https://api.github.com/repos/rustdesk/rustdesk/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.9-r2"
+version = "1.5.0"
 comments = """
 rustdesk — release tag bare semver.
 """
@@ -2063,7 +2063,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "0.35.0"
+version = "0.35.1"
 comments = """
 ollama-bin — same upstream repo.
 """
@@ -2486,7 +2486,7 @@ url = "https://api.github.com/repos/brave/brave-browser/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.96.60"
+version = "1.96.61"
 comments = """
 brave-browser — releases/latest is the stable channel (tag "vX.Y.Z").
 """
@@ -3064,7 +3064,7 @@ commit_sha_path = "[0].id"
 base_from = "file"
 base_url = "https://gitlab.freedesktop.org/mesa/mesa/-/raw/main/VERSION"
 base_pattern = '^([0-9][0-9.]*)-devel'
-version = "26.3.0_pre20261002"
+version = "26.3.0_pre20261003"
 comments = """
 mesa — commit-tracked on main; _pre suffix preserved from current ebuild.
 
@@ -3082,7 +3082,7 @@ commit_sha_path = "[0].id"
 base_from = "file"
 base_url = "https://gitlab.freedesktop.org/mesa/mesa/-/raw/main/VERSION"
 base_pattern = '^([0-9][0-9.]*)-devel'
-version = "26.3.0_pre20261002"
+version = "26.3.0_pre20261003"
 comments = """
 mesa_clc — part of the mesa tree; same source/rule as media-libs/mesa.
 """
@@ -3097,7 +3097,7 @@ transform = [['T.*', ""], ['-', ""]]
 commit_sha_path = "[0].sha"
 base_from = "none"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.1.0_p20261002"
+version = "0.1.0_p20261003"
 comments = """
 zeo — commit-tracked on Zed's main; the snapshot plus the bentoo patch series and
 the rebrand. 2026-10-01: this entry WAS app-editors/zed, which now builds
@@ -3761,7 +3761,7 @@ base_from = "tag"
 base_url = "https://api.github.com/repos/KhronosGroup/SPIRV-Headers/git/refs/tags"
 base_tag_pattern = '^vulkan-sdk-([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)$'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.363.0_p20260924"
+version = "1.4.363.0_p20261002"
 comments = """
 spirv-headers — commit-tracked on main; scans titles for vulkan-sdk-X.Y.Z.W to detect base bump.
 """
@@ -9947,7 +9947,7 @@ pattern = '"name":\s*"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 series = '^2\.'
-version = "2.37.8"
+version = "2.37.9"
 comments = """
 aws-cli v2 — GitHub tag index, pinned to the 2.x series. Verified 2026-08-19
 against the live endpoint: 100 matches, all of them 2.x, max = 2.36.27 = ebuild.
@@ -10066,7 +10066,7 @@ hand.
 url = "https://storage.googleapis.com/flutter_infra_release/releases/releases_linux.json"
 parser = "regex"
 pattern = '"channel": "stable",\s+"version": "([0-9]+\.[0-9]+\.[0-9]+)"'
-version = "3.47.6"
+version = "3.47.6-r1"
 comments = """
 Flutter — official releases_linux.json (pretty-printed, newest-first). The
 current_release.stable is a hash, not a version, so anchor the regex on the
@@ -10140,7 +10140,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "261"
+version = "262"
 comments = """
 llama-swap — releases/latest; tag_name is "vNNN" (a plain incrementing integer,
 not semver), transform strips the v.  Verified by real download on 2026-08-16:
@@ -11272,7 +11272,7 @@ parser = "regex"
 pattern = '"tag_name":\s*"v([0-9]+\.[0-9]+\.[0-9]+)"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "1.52.0"
+version = "1.53.0"
 comments = """
 goose — Block's AI agent, moved org: block/goose is now aaif-goose/goose. The
 old path still answers, but only through a GitHub 301 that can be withdrawn
@@ -11375,7 +11375,7 @@ parser = "regex"
 pattern = '"tag_name":\s*"desktop-v([0-9]+\.[0-9]+\.[0-9]+)"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "0.0.42"
+version = "0.0.43"
 comments = """
 Cline for Desktop (beta, Tauri) -- the Linux .deb from the desktop-v* GitHub
 releases. Same repository as dev-util/cline-bin, different product.
@@ -11406,7 +11406,7 @@ url = "https://api.github.com/repos/aaif-goose/goose/releases/latest"
 parser = "regex"
 pattern = '"tag_name":\s*"v([0-9]+\.[0-9]+\.[0-9]+)"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.52.0"
+version = "1.53.0"
 comments = """
 goose, built from source. Same probe as dev-util/goose-bin -- both track the
 canonical aaif-goose org, NOT the old block/goose path (see that record).
