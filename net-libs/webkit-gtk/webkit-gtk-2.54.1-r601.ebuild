@@ -164,9 +164,6 @@ PATCHES=(
 	"${FILESDIR}"/2.52.3-disable-nvidia-dmabuf.patch
 	# https://bugs.gentoo.org/730044 -- x86 without SSE2
 	"${FILESDIR}"/2.52.6-no-sse2.patch
-	# FTBFS with USE=-gstreamer
-	"${FILESDIR}"/2.52.6-no-video.patch
-	"${FILESDIR}"/2.54.0-cstringview.patch
 )
 
 pkg_pretend() {
