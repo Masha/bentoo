@@ -3111,7 +3111,7 @@ transform = [['T.*', ""], ['-', ""]]
 commit_sha_path = "[0].sha"
 base_from = "none"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.1.0_p20261003-r4"
+version = "0.1.0_p20261003-r6"
 comments = """
 zeo — commit-tracked on Zed's main; the snapshot plus the bentoo patch series and
 the rebrand. 2026-10-01: this entry WAS app-editors/zed, which now builds
@@ -3733,7 +3733,7 @@ commit_sha_path = "[0].id"
 base_from = "file"
 base_url = "https://gitlab.freedesktop.org/mobile-broadband/ModemManager/-/raw/main/meson.build"
 base_pattern = "(?m)^  version: '([0-9][0-9.]*)'"
-version = "1.25.95_p20260922"
+version = "1.25.95_p20261004"
 comments = """
 modemmanager — commit-tracked on main (GitLab); date YYYYMMDD becomes _pDATE suffix.
 """
