@@ -1096,6 +1096,8 @@ release.gitkraken.com/linux/gitkraken-amd64.tar.gz 302 target).
 # END
 
 ["net-print/hplip"]
+enabled = false
+disabled_by = "removed 2026-10-04: ::gentoo shipped hplip-3.26.6 with its own 3.26.6 patchset, the only reason this copy existed -- see comments"
 hold = true
 url = "https://sourceforge.net/projects/hplip/best_release.json"
 parser = "regex"
@@ -1129,6 +1131,14 @@ Release the hold the day dev.gentoo.org/~billie publishes a patchset matching
 the version being bumped to. At that point PATCHSET_PV in the ebuild should
 track ${PV} again and the three local patches should be DELETED, not rebased --
 see the header of each one in files/ for what it replaced.
+
+Removed 2026-10-04. ::gentoo bumped to 3.26.6 with hplip-3.26.6-patches-1, so
+both conditions above resolved at once and the overlay copy shadowed an
+equivalent ebuild. Its only other difference, USE=policykit, was a leftover
+from the 3.26.4 ebuild: ::gentoo dropped the flag in 3.26.6 because upstream
+removed pkservice.py. net-print/hplip-plugin-3.26.6 stays here and resolves
+~net-print/hplip-3.26.6 from ::gentoo. Re-enable only if the plugin again
+outruns ::gentoo's hplip.
 """
 # END
 
