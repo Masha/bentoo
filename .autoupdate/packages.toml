@@ -1966,7 +1966,7 @@ commit_sha_path = "[0].id"
 base_from = "file"
 base_url = "https://code.videolan.org/videolan/vlc/-/raw/master/configure.ac"
 base_pattern = 'AC_INIT\(\[vlc\], \[([0-9][0-9.]*)-dev\]\)'
-version = "4.0.0_pre20261003"
+version = "4.0.0_pre20261004"
 comments = """
 vlc — 4.0 development snapshot, commit-tracked on master; _pre suffix
 preserved from the current ebuild. Only the 4.0 line lives here: 3.0.x is
@@ -3078,7 +3078,7 @@ commit_sha_path = "[0].id"
 base_from = "file"
 base_url = "https://gitlab.freedesktop.org/mesa/mesa/-/raw/main/VERSION"
 base_pattern = '^([0-9][0-9.]*)-devel'
-version = "26.3.0_pre20261003"
+version = "26.3.0_pre20261004"
 comments = """
 mesa — commit-tracked on main; _pre suffix preserved from current ebuild.
 
@@ -3096,7 +3096,7 @@ commit_sha_path = "[0].id"
 base_from = "file"
 base_url = "https://gitlab.freedesktop.org/mesa/mesa/-/raw/main/VERSION"
 base_pattern = '^([0-9][0-9.]*)-devel'
-version = "26.3.0_pre20261003"
+version = "26.3.0_pre20261004"
 comments = """
 mesa_clc — part of the mesa tree; same source/rule as media-libs/mesa.
 """
@@ -3701,7 +3701,7 @@ base_from = "file"
 base_url = "https://raw.githubusercontent.com/sqlitebrowser/sqlitebrowser/master/CMakeLists.txt"
 base_pattern = '(?m)^\s+VERSION ([0-9][0-9.]*)'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "3.13.99_p20260930"
+version = "3.13.99_p20261004"
 comments = """
 sqlitebrowser — commit-tracked on master (uses COMMIT= without quotes); date YYYYMMDD becomes _pDATE suffix.
 """
@@ -3717,7 +3717,7 @@ commit_sha_path = "[0].id"
 base_from = "file"
 base_url = "https://gitlab.freedesktop.org/mobile-broadband/libqmi/-/raw/main/meson.build"
 base_pattern = "(?m)^  version: '([0-9][0-9.]*)'"
-version = "1.39.1_pre20260929"
+version = "1.39.1_pre20261004"
 comments = """
 libqmi — commit-tracked on main; _pre suffix preserved from current ebuild.
 """
@@ -9221,7 +9221,7 @@ url = "https://api.github.com/repos/zeo-workspace/claude-agent-tui/releases/late
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.14.9"
+version = "0.14.11"
 comments = """
 Renamed from dev-util/claude-agent-tui (commit e8a05fdc: del old ebuild + add
 claude-agent-acp-tui, same upstream repo zeo-workspace/claude-agent-tui, same PV).
