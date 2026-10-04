@@ -12,6 +12,10 @@ CRATES="
 RUST_MIN_VER="1.92.0"
 RUST_MULTILIB=1
 
+# BENTOO-DIVERGENCE: INHERIT - toolchain-funcs, which ::gentoo leaves out while
+# still calling tc-is-cross-compiler in multilib_src_configure; it only works there
+# because another eclass happens to inherit it. Declared here so the call does
+# not depend on that.
 inherit cargo gnome2 meson-multilib python-any-r1 rust-toolchain toolchain-funcs vala
 
 DESCRIPTION="Scalable Vector Graphics (SVG) rendering library"
