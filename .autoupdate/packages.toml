@@ -1985,7 +1985,7 @@ url = "https://api.github.com/repos/netdata/netdata/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "2.12.0"
+version = "2.12.0-r1"
 comments = """
 netdata — tag "vX.Y.Z".
 """
@@ -2238,7 +2238,7 @@ url = "https://api.github.com/repos/tianocore/edk2/releases/latest"
 parser = "regex"
 pattern = '"tag_name":\s*"edk2-stable([0-9]{6})"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "202608-r2"
+version = "202608-r3"
 comments = """
 edk2 — tag "edk2-stableYYYYMM"; regex captures the 6-digit datestamp.
 
@@ -3829,7 +3829,7 @@ base_from = "file"
 base_url = "https://raw.githubusercontent.com/KhronosGroup/Vulkan-Tools/main/CMakeLists.txt"
 base_pattern = '(?m)^project\([A-Za-z_-]+ VERSION ([0-9][0-9.]*)'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.365_p20261002"
+version = "1.4.365_p20261004"
 comments = """
 vulkan-tools — commit-tracked on main; scans titles "Update for Vulkan-Docs X.Y.Z" to detect base bump.
 """
@@ -3846,7 +3846,7 @@ base_from = "tag"
 base_url = "https://api.github.com/repos/KhronosGroup/Vulkan-Utility-Libraries/git/refs/tags"
 base_tag_pattern = '^v([0-9]+\.[0-9]+\.[0-9]+)$'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.365"
+version = "1.4.365_p20261004"
 comments = """
 vulkan-utility-libraries — commit-tracked on main, same shape as vulkan-headers.
 
@@ -9221,7 +9221,7 @@ url = "https://api.github.com/repos/zeo-workspace/claude-agent-tui/releases/late
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.14.7"
+version = "0.14.9"
 comments = """
 Renamed from dev-util/claude-agent-tui (commit e8a05fdc: del old ebuild + add
 claude-agent-acp-tui, same upstream repo zeo-workspace/claude-agent-tui, same PV).
@@ -9867,7 +9867,7 @@ url = "https://api.github.com/repos/zeo-workspace/claude-agent-acp-plus/releases
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.23.5"
+version = "0.23.6"
 comments = """
 claude-agent-acp-plus — GitHub releases/latest tag "vX.Y.Z" (v stripped).
 SRC_URI releases/download/v${PV}/${P}-bundle.tar.gz. Live=v0.2.0.
@@ -10374,7 +10374,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "9.2.1"
+version = "9.2.1-r1"
 comments = """
 simdutf — bentoo carries this package only to build it as C++20
 (-DSIMDUTF_CXX_STANDARD=20). Upstream gates the atomic base64 API behind
