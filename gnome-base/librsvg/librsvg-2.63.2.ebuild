@@ -12,7 +12,7 @@ CRATES="
 RUST_MIN_VER="1.92.0"
 RUST_MULTILIB=1
 
-inherit cargo gnome2 meson-multilib python-any-r1 rust-toolchain vala
+inherit cargo gnome2 meson-multilib python-any-r1 rust-toolchain toolchain-funcs vala
 
 DESCRIPTION="Scalable Vector Graphics (SVG) rendering library"
 HOMEPAGE="https://wiki.gnome.org/Projects/LibRsvg https://gitlab.gnome.org/GNOME/librsvg"

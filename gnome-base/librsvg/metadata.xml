@@ -5,9 +5,6 @@
     <email>gnome@gentoo.org</email>
     <name>Gentoo GNOME Desktop</name>
   </maintainer>
-  <use>
-    <flag name="tools">Build svg viewer tool</flag>
-  </use>
   <upstream>
     <remote-id type="gnome-gitlab">GNOME/librsvg</remote-id>
   </upstream>

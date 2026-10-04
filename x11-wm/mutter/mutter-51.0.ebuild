@@ -18,7 +18,6 @@ LICENSE="GPL-2+"
 if [[ ${PV} == 9999 ]]; then
 	inherit git-r3
 	EGIT_REPO_URI="https://gitlab.gnome.org/GNOME/mutter.git"
-	SRC_URI=""
 	SLOT="0/51" # This can get easily out of date, but better than 9967
 else
 	KEYWORDS="~amd64 ~arm ~arm64 ~riscv ~x86"
