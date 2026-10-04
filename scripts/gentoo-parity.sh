@@ -539,6 +539,27 @@ gentoo_candidates() {
 	printf '%s\n' "${versions[@]}" | sort -V | tr '\n' ' '
 }
 
+CACHE_SLOT=""
+
+# cache_slot <md5-cache file>
+# The SLOT of one md5-cache entry, subslot dropped, into CACHE_SLOT. Empty when
+# the entry is missing: stage 3 is the one that reports a missing entry, so this
+# only declines to narrow anything.
+cache_slot() {
+	local line
+
+	CACHE_SLOT=""
+	[[ -f $1 ]] || return 0
+
+	while IFS= read -r line; do
+		if [[ ${line} == SLOT=* ]]; then
+			CACHE_SLOT=${line#SLOT=}
+			CACHE_SLOT=${CACHE_SLOT%%/*}
+			return 0
+		fi
+	done <"$1"
+}
+
 # Stage 2. For each shared package, pick the ::gentoo version to compare
 # against - the baseline the overlay copy is drifting from.
 #
@@ -559,9 +580,9 @@ gentoo_candidates() {
 # Publishes: PARITY_BASELINES, PARITY_BEHIND.
 select_baseline() {
 	local entry category pf pn key version candidate baseline distance wanted
-	local overlay_top gentoo_top
-	local -A candidates=() overlay_versions=()
-	local -a pool=() in_series=() overlay_pool=()
+	local overlay_top gentoo_top overlay_slot
+	local -A candidates=() overlay_versions=() gentoo_slots=()
+	local -a pool=() in_series=() overlay_pool=() slotted=()
 	local exact=0 same=0 cross=0 unbaselined=0
 
 	for entry in "${PARITY_SCOPE_EBUILDS[@]}"; do
@@ -613,6 +634,33 @@ select_baseline() {
 				break
 			fi
 		done
+
+		# R2.2 and R2.3 only consider ::gentoo versions in the overlay
+		# ebuild's own SLOT, when at least one exists. Without this, the
+		# highest version of a multi-slot package wins regardless of slot:
+		# webkit-gtk-2.54.1-r411 (SLOT 4.1) was paired with ::gentoo's
+		# -r600 (SLOT 6) instead of -r400 (SLOT 4.1), and the slot
+		# difference came out as an ALIGN row nobody could act on. A package
+		# whose slots do not line up at all keeps the whole pool, so the
+		# narrowing can never leave an ebuild without a baseline.
+		if [[ -z ${distance} ]]; then
+			cache_slot "${OVERLAY_ROOT}/metadata/md5-cache/${category}/${pf}"
+			overlay_slot=${CACHE_SLOT}
+			slotted=()
+			for candidate in "${pool[@]}"; do
+				if [[ -z ${gentoo_slots["${key}-${candidate}"]+set} ]]; then
+					cache_slot "${GENTOO_REPO}/metadata/md5-cache/${category}/${pn}-${candidate}"
+					gentoo_slots["${key}-${candidate}"]=${CACHE_SLOT}
+				fi
+				if [[ -n ${overlay_slot} &&
+					${gentoo_slots["${key}-${candidate}"]} == "${overlay_slot}" ]]; then
+					slotted+=( "${candidate}" )
+				fi
+			done
+			if (( ${#slotted[@]} )); then
+				pool=( "${slotted[@]}" )
+			fi
+		fi
 
 		# R2.2 - highest ::gentoo version sharing major.minor.
 		if [[ -z ${distance} ]]; then
