@@ -13004,17 +13004,49 @@ the probe only reports. TEMPORARY MIRROR: remove when ::gentoo reaches it.
 """
 # END
 
-["gnome-base/gnome-desktop"]
+["gnome-base/gnome-desktop:3"]
 hold = true
 url = "https://download.gnome.org/sources/gnome-desktop/cache.json"
 parser = "regex"
 pattern = 'gnome\-desktop-([0-9]+\.[0-9]+(?:\.[0-9]+)*)\.tar\.xz'
 select = "max"
-version = "51.0-r400"
+revision = 300
+version = "51.0-r300"
 comments = """
 gnome-desktop -- GNOME 51 mirror ahead of ::gentoo. download.gnome.org cache.json for
 module "gnome-desktop"; matching tarball names excludes .alpha/.beta/.rc, select = "max".
-Bump together with: two slot ebuilds (-r300 gtk3, -r400 gtk4) bump together.
+
+--- one entry per SLOT, as net-libs/webkit-gtk does ---
+-r300 (SLOT 3, libgnome-desktop-3, GTK3) and -r400 (SLOT 4, libgnome-desktop-4,
+GTK4) share one directory AND one PV, so neither a single entry nor an @label
+with `series` can tell them apart: a single entry claims only the highest
+ebuild and --clean then reports -r300 as an unclaimed "older ebuild", while
+`series` matches the version (the same 51.0 for both, and the upstream's bare
+51.0 for the probe). The ":slot" key filters on each ebuild's SLOT= instead.
+`revision` is the SLOT's base revision, reset on every PV change.
+
+Both slots are needed at once and must stay on the same PV: -r400 blocks
+!<gnome-desktop-${PV}:3 because the two share data files, and gnome-shell 51
+depends on both. Never drop -r300 alone -- slot 3 would then be left with only
+::gentoo's 44.5-r300, which that blocker rejects.
+Bump together with: gnome-base/gnome-desktop:4.
+HELD: a GNOME series bump is never mechanical (patch rebases, floors, SLOTs);
+the probe only reports. TEMPORARY MIRROR: remove when ::gentoo reaches it.
+"""
+# END
+
+["gnome-base/gnome-desktop:4"]
+hold = true
+url = "https://download.gnome.org/sources/gnome-desktop/cache.json"
+parser = "regex"
+pattern = 'gnome\-desktop-([0-9]+\.[0-9]+(?:\.[0-9]+)*)\.tar\.xz'
+select = "max"
+revision = 400
+version = "51.0-r400"
+comments = """
+gnome-desktop SLOT 4 (libgnome-desktop-4, GTK4) -- see gnome-base/gnome-desktop:3
+for why the package needs one entry per SLOT.
+Bump together with: gnome-base/gnome-desktop:3.
 HELD: a GNOME series bump is never mechanical (patch rebases, floors, SLOTs);
 the probe only reports. TEMPORARY MIRROR: remove when ::gentoo reaches it.
 """
