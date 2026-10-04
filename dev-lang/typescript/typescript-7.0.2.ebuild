@@ -15,6 +15,24 @@ EAPI=8
 # the JavaScript compiler API (typescript-language-server, editor plugins,
 # ts-node and friends) must depend on <dev-lang/typescript-7, which keeps the
 # 6.x series from ::gentoo installable in the same slot.
+#
+# Every divergence below follows from that rewrite; ::gentoo's counterpart is
+# the 6.x JavaScript compiler, a different artifact rather than an older copy.
+# BENTOO-DIVERGENCE: EAPI - 8, where ::gentoo's 6.0.3 is 9. Nothing here needs
+# an EAPI 9 feature, and this ebuild was never derived from that one.
+# BENTOO-DIVERGENCE: HOMEPAGE - adds microsoft/typescript-go, where the native
+# compiler is actually developed.
+# BENTOO-DIVERGENCE: DEFINED_PHASES - src_unpack, which places the per-platform
+# compiler package beside the launcher; 6.x is one tarball and needs none.
+# BENTOO-DIVERGENCE: LICENSE - the Go modules linked into the executable and
+# the material in lib.*.d.ts, itemised at LICENSE below; 6.x is Apache-2.0 only.
+# BENTOO-DIVERGENCE: KEYWORDS - "-*" plus exactly the arches npm publishes a
+# compiler for. arm and loong are added; ppc64 is dropped because npm's build
+# is little-endian only (see the SRC_URI comment).
+# BENTOO-DIVERGENCE: BDEPEND - none. 6.x runs npm at install time; 7.x installs
+# prebuilt files with doins, so nodejs is a runtime dependency only.
+# BENTOO-DIVERGENCE: metadata.xml - the longdescription states the 6.x/7.x API
+# split and upstream lists the typescript-go repository; maintainer is ours.
 
 DESCRIPTION="Superset of JavaScript with optional static typing (native Go compiler)"
 HOMEPAGE="

@@ -12,6 +12,12 @@ S="${WORKDIR}"
 
 LICENSE="Apache-2.0 MIT BSD BSD-2 ISC MPL-2.0"
 SLOT="0"
+# BENTOO-DIVERGENCE: KEYWORDS - ~arm64, which ::gentoo lacks. doctl is pure Go
+# and upstream publishes linux-arm64 release binaries, so the arch is supported;
+# this overlay keywords ~arm64 wherever upstream does.
+# BENTOO-DIVERGENCE: metadata.xml - ::gentoo's file names its proxied
+# maintainer; ours names this overlay's, and adds upstream bugs-to, doc and
+# changelog links plus a longer description. Documentation, nothing to align.
 KEYWORDS="~amd64 ~arm64 ~x86"
 IUSE="test"
 RESTRICT="!test? ( test )"
