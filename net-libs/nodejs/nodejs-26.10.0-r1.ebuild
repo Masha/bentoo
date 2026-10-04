@@ -107,19 +107,18 @@ RESTRICT="!test? ( test )"
 # they stand. They were NOT re-measured against this tarball's deps/; do that on
 # the next bump. brotli and simdutf keep the bentoo floors, which are higher.
 #
-# simdutf is the exception to "match what node bundles": the floor is
-# >=9.0.0-r1 and the -r1 is bentoo's, not ::gentoo's. V8's
-# builtins-typed-array.cc is compiled with -std=gnu++20 and calls
-# simdutf::atomic_binary_to_base64 / simdutf::atomic_base64_to_binary_safe,
-# which libsimdutf.so only exports when it was itself built as C++20.
-# ::gentoo's simdutf builds as C++17, so --shared-simdutf against it fails to
-# link mksnapshot. dev-cpp/simdutf-9.0.0-r1::bentoo carries -DSIMDUTF_CXX_STANDARD=20;
-# the reasoning lives there. A future ::gentoo simdutf newer than 9.0.0-r1 would
-# satisfy this floor and reintroduce the failure -- keep the bentoo copy ahead.
+# simdutf is the exception to "match what node bundles": what matters is not
+# the version but how the library was compiled. V8's builtins-typed-array.cc is
+# compiled with -std=gnu++20 and calls simdutf::atomic_binary_to_base64 /
+# simdutf::atomic_base64_to_binary_safe, which libsimdutf.so only exports when
+# it was itself built as C++20 -- i.e. with USE=atomic-base64. Without it,
+# --shared-simdutf fails to link mksnapshot. ::gentoo grew that flag in its
+# simdutf-9.2.1 (default off; bentoo's copy turns it on), so the USE dependency
+# below holds against either repository's ebuild.
 COMMON_DEPEND=">=app-arch/brotli-1.2.0:=
 	dev-db/sqlite:3
 	>=dev-cpp/ada-4.0.0:=
-	>=dev-cpp/simdutf-9.0.0-r1:=
+	>=dev-cpp/simdutf-9.2.1:=[atomic-base64]
 	>=dev-libs/libuv-1.52.1:=
 	>=dev-libs/simdjson-4.6.11:=
 	>=net-dns/c-ares-1.34.8:=
