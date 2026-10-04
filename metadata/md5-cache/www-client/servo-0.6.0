@@ -13,4 +13,4 @@ RDEPEND=dev-libs/glib:2 media-libs/fontconfig media-libs/freetype:2 media-libs/h
 SLOT=0
 SRC_URI=https://github.com/servo/servo/releases/download/v0.6.0/servo-v0.6.0-src-vendored.tar.gz
 _eclasses_=toolchain-funcs	58a918e3a42d0156f010dcfd43725be5	flag-o-matic	fd3558f73f6503093adee69adf41020d	multiprocessing	45d0620f25c2f063ad6276ecd9ed9399	rust	71b6825bd86e342e1540c76cc6fe864b	rust-toolchain	76468983281b0a7fc167ca224f84ecfd	cargo	bff30f59ca59b09857b787ac644b2e4c	desktop	e447b5f77146d69797e9f03ff177f3f1	xdg-utils	42869b3c8d86a70ef3cf75165a395e09	xdg	3ef49a87c52c8b77c476351195dfe575
-_md5_=f5bea8ac4bdee114fc5110b344d8feed
+_md5_=a37e0a8ba84e81511de8d67fc7ef8ea9

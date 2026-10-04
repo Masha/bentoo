@@ -104,6 +104,31 @@ src_prepare() {
 	# resolves when cargo's CWD is ${S}; making the path absolute is safer.
 	sed -i "s|directory = \"vendor/\"|directory = \"${S}/vendor\"|" \
 		"${S}/.cargo/config.toml" || die
+
+	# vendor/ sits under the workspace root. Build scripts that call
+	# cbindgen::generate(".") (mozjs_properties_glue, mozjs_unicode_bidi_ffi
+	# since mozjs 153) run `cargo metadata` from inside vendor/<crate>, and
+	# cargo then rejects the crate as a non-member of that workspace.
+	sed -i '/^exclude = \[/s|\[|[ "vendor",|' "${S}/Cargo.toml" || die
+	grep -qF 'exclude = [ "vendor",' "${S}/Cargo.toml" ||
+		die "failed to exclude vendor/ from the workspace"
+
+	# Once standalone, those crates resolve against their own shipped
+	# Cargo.lock, which pins versions absent from vendor/ (e.g. icu_properties
+	# 2.3.0 vs 2.1.2), and --offline cannot fetch them. Drop the lock and its
+	# checksum entry so cargo re-resolves against what vendor/ holds.
+	local buildrs crate n=0
+	for buildrs in "${S}"/vendor/*/build.rs; do
+		grep -qF 'cbindgen::generate' "${buildrs}" || continue
+		crate=${buildrs%/build.rs}
+		rm -f "${crate}/Cargo.lock" || die
+		sed -i 's/"Cargo\.lock":"[0-9a-f]*",\?//' \
+			"${crate}/.cargo-checksum.json" || die
+		n=$((n + 1))
+	done
+	[[ ${n} -gt 0 ]] ||
+		die "no vendored cbindgen crate found; drop this workaround"
+	einfo "Unpinned ${n} vendored cbindgen crate(s)"
 }
 
 src_compile() {
@@ -116,7 +141,9 @@ src_compile() {
 	# mozjs_sys compiles SpiderMonkey from source via clang/llvm. RUSTC_BOOTSTRAP
 	# is required because servo uses nightly-only -Z/feature flags gated behind it
 	# (see .cargo/config.toml: RUSTC_BOOTSTRAP=crown,script,...).
-	export RUSTC_BOOTSTRAP="crown,script,script_bindings,style_tests,mozjs,mozjs_sys"
+	# Keep in sync with [env] in the shipped .cargo/config.toml: an exported
+	# value overrides it there.
+	export RUSTC_BOOTSTRAP="crown,script,script_webgpu,script_bindings,style_tests,mozjs,mozjs_sys"
 	export CARGO_HOME="${ECARGO_HOME}"
 
 	# Force mozjs_sys to build SpiderMonkey from source. Without this, its
