@@ -6,7 +6,7 @@ EAPI=8
 PYTHON_REQ_USE="sqlite"
 PYTHON_COMPAT=( python3_{12..15} )
 
-inherit edo multiprocessing prefix python-any-r1 readme.gentoo-r1 secureboot toolchain-funcs
+inherit edo flag-o-matic multiprocessing prefix python-any-r1 readme.gentoo-r1 secureboot toolchain-funcs
 
 DESCRIPTION="TianoCore EDK II UEFI firmware for virtual machines"
 HOMEPAGE="https://github.com/tianocore/edk2"
@@ -259,6 +259,12 @@ src_compile() {
 	BUILD_TARGET="RELEASE"
 	BUILD_DIR="${BUILD_TARGET}_${TOOLCHAIN}"
 	BUILD_ARGS=()
+
+	# ODR violations and type mismatches. Taken from ::gentoo's edk2-202608,
+	# which added it in place; the r2 copy predated it and built BaseTools with
+	# whatever LTO and strict-aliasing the user's CFLAGS asked for.
+	filter-lto
+	append-flags -fno-strict-aliasing
 
 	tc-export_build_env
 	emake -C BaseTools \
