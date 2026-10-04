@@ -185,7 +185,7 @@
 url = "https://registry.npmjs.org/@anthropic-ai/claude-code"
 parser = "json"
 path = "dist-tags.latest"
-version = "2.1.288"
+version = "2.1.289"
 comments = """
 claude-code — npm @anthropic-ai/claude-code; dist-tags.latest is the stable channel.
 
@@ -268,7 +268,7 @@ unconditional git-r3 form, which ::gentoo's tarball/9999 branch is not.
 url = "https://registry.npmjs.org/pnpm"
 parser = "json"
 path = "dist-tags.latest"
-version = "12.8.1"
+version = "12.9.1"
 comments = """
 pnpm — npm package, stable channel. dist-tags.latest is the RIGHT endpoint and
 must stay: pnpm promotes through next-<major> first, and that channel carries
@@ -811,7 +811,7 @@ url = "https://nodejs.org/dist/latest-v26.x/SHASUMS256.txt"
 parser = "regex"
 pattern = 'node-v(26\.[0-9]+\.[0-9]+)\.tar\.xz'
 select = "max"
-version = "26.10.0"
+version = "26.10.0-r1"
 comments = """
 Node.js SLOT 26 — the current line.
 Identical in shape to net-libs/nodejs:24 above, which carries the shared
@@ -954,7 +954,7 @@ transform strips the "go" prefix to match PV. Live=1.26.5.
 url = "https://persistent.oaistatic.com/codex-app-prod/linux/deb/dists/stable/main/binary-amd64/Packages"
 parser = "regex"
 pattern = 'Package: chatgpt\nVersion: ([0-9]+\.[0-9]+\.[0-9]+)'
-version = "26.930.31730"
+version = "26.930.41038"
 comments = """
 OpenAI Codex/ChatGPT desktop app — read the APT index of the very repo that
 SRC_URI pulls from. Both openai.com and chatgpt.com sit behind Cloudflare and
@@ -1668,7 +1668,7 @@ url = "https://api.github.com/repos/tsyrogit/zxcvbn-c/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "2.6-r1"
+version = "2.7"
 comments = """
 zxcvbn-c — tag "vX.Y".
 """
@@ -3861,7 +3861,7 @@ base_from = "file"
 base_url = "https://raw.githubusercontent.com/KhronosGroup/Vulkan-ValidationLayers/main/CMakeLists.txt"
 base_pattern = '(?m)^project\([A-Za-z_-]+ VERSION ([0-9][0-9.]*)'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.365_p20261002"
+version = "1.4.365_p20261003"
 comments = """
 vulkan-layers — commit-tracked on main (Vulkan-ValidationLayers); scans for "Update for Vulkan-Docs X.Y.Z".
 """
@@ -9609,7 +9609,7 @@ parser = "regex"
 pattern = 'webkitgtk-(2\.54\.[0-9]+)\.tar\.xz'
 select = "max"
 revision = 410
-version = "2.54.1-r410"
+version = "2.54.1-r411"
 comments = """
 revision is the SLOT's BASE revision, not whatever the current ebuild carries.
 -r411 is a revbump WITHIN a PV; a PV change resets it to the base, exactly as
@@ -9634,7 +9634,7 @@ parser = "regex"
 pattern = 'webkitgtk-(2\.54\.[0-9]+)\.tar\.xz'
 select = "max"
 revision = 600
-version = "2.54.1-r600"
+version = "2.54.1-r601"
 comments = """
 600 is the base for this SLOT (::gentoo ships -r600 for every PV and -r601 as
 the revbump), and the overlay now follows it: the ebuild is
@@ -9849,7 +9849,7 @@ url = "https://api.github.com/repos/zeo-workspace/claude-agent-acp-plus/releases
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.23.3"
+version = "0.23.5"
 comments = """
 claude-agent-acp-plus — GitHub releases/latest tag "vX.Y.Z" (v stripped).
 SRC_URI releases/download/v${PV}/${P}-bundle.tar.gz. Live=v0.2.0.
@@ -11068,7 +11068,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "2.6.2"
+version = "2.6.3"
 comments = """
 ai-jail — releases/latest on akitaonrails/ai-jail; tag_name is "vX.Y.Z" and the
 transform strips the v.  Verified by real download on 2026-09-07: tag_name
@@ -11102,7 +11102,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "2.6.2"
+version = "2.6.3"
 comments = """
 ai-jail-bin — same endpoint and same release as sys-apps/ai-jail; this record
 exists separately only because the two are separate packages.  Bump them
