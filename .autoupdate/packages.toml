@@ -1194,10 +1194,11 @@ That is exactly what happened on 2026-09-23, and it exposed the half this record
 did not cover. HP published the 3.26.6 blob, the probe answered 3.26.6, the bump
 fetched cleanly -- and the result was uninstallable, because the ebuild depends
 on ~net-print/hplip-${PV} and ::gentoo ships only 3.26.4. A plugin bump is
-therefore NEVER self-contained: it is a bump of a PAIR. net-print/hplip is now
-packaged here (held, see its record) to close that, and the byte-identical
-3.26.4 copy was dropped again -- ::gentoo still covers that version, so keeping
-it here bought nothing and left the Manifest missing its DIST entry.
+therefore NEVER self-contained: it is a bump of a PAIR. net-print/hplip was
+packaged here from 2026-09-23 to close that, and removed on 2026-10-04 once
+::gentoo shipped 3.26.6 itself (its record is now enabled = false). The
+byte-identical 3.26.4 plugin was dropped earlier for the same reason --
+::gentoo covered it, and the copy left the Manifest missing its DIST entry.
 
 Before bumping this package, check that net-print/hplip carries the same PV. If
 it does not, bump that one first; a plugin ahead of its hplip is dead weight.
@@ -5793,6 +5794,8 @@ for 6.7.90 siblings that ::gentoo does not have, and nothing satisfies them.
 # END
 
 ["kde-plasma/powerdevil"]
+enabled = false
+disabled_by = "removed 2026-10-04: ::gentoo's 6.7.5-r3 carries the same brightness-slider fix -- see comments"
 hold = true
 url = "https://invent.kde.org/api/v4/projects/plasma%2Fpowerdevil/repository/tags?search=^v6&per_page=100"
 parser = "regex"
@@ -5817,6 +5820,11 @@ to code that no longer needs it, and the fix is already complete upstream from
 6.7.6 on. So this record does not bump -- it reports, and the report IS the
 exit condition. The moment it calls 6.7.6, delete this package and this record
 goes enabled = false; there is nothing bentoo-specific left to keep.
+
+Removed 2026-10-04, before 6.7.6: ::gentoo's own 6.7.5-r3 added
+powerdevil-6.7.5-fix-brightness-slider.patch, whose hunks are identical to the
+overlay's brightness-applet-scope.patch (bug #983371). The 6.7.91 beta stays
+under the @beta record.
 
 Probed on invent.kde.org rather than api.github.com/repos/KDE: the GitHub
 token-less cap is 60 req/h and kde-plasma already overspends it (see
