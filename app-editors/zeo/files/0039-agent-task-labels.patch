@@ -66,42 +66,12 @@ crate records the aria labels it renders in a #[cfg(test)] thread-local.
 Live proof on a built Zeo p20261004: a 10 s heredoc listed on one line under
 its description, a 79-character rename stored as 60, kept across a restart.
 ---
- Cargo.lock                                    |   2 +
- crates/agent_tasks_panel/Cargo.toml           |   2 +
- crates/agent_tasks_panel/src/history_db.rs    |  53 +-
- .../src/history_db/label_tests.rs             | 306 ++++++++++
- crates/agent_tasks_panel/src/panel.rs         | 478 ++++++++++++++--
- .../src/panel/actions_rename_tests.rs         | 538 ++++++++++++++++++
- .../src/panel/dock_default_tests.rs           | 154 +++++
- .../src/panel/label_contract_tests.rs         | 294 ++++++++++
- .../src/panel/list_label_tests.rs             | 389 +++++++++++++
- .../agent_tasks_panel/src/panel/list_tests.rs |   8 +-
- .../src/panel/persistence_tests.rs            |   6 +-
- .../src/panel/rename_vanish_tests.rs          | 353 ++++++++++++
- crates/agent_tasks_panel/src/store.rs         |  64 ++-
- .../src/store/rename_tests.rs                 | 272 +++++++++
- crates/agent_ui/src/agent_ui.rs               |   9 +-
- crates/agent_ui/src/task_label.rs             |  83 +++
- .../src/task_label/task_label_tests.rs        | 239 ++++++++
- crates/agent_ui/src/tasks_card.rs             |  68 ++-
- crates/agent_ui/src/tasks_card/label_tests.rs | 355 ++++++++++++
- 19 files changed, 3585 insertions(+), 88 deletions(-)
- create mode 100644 crates/agent_tasks_panel/src/history_db/label_tests.rs
- create mode 100644 crates/agent_tasks_panel/src/panel/actions_rename_tests.rs
- create mode 100644 crates/agent_tasks_panel/src/panel/dock_default_tests.rs
- create mode 100644 crates/agent_tasks_panel/src/panel/label_contract_tests.rs
- create mode 100644 crates/agent_tasks_panel/src/panel/list_label_tests.rs
- create mode 100644 crates/agent_tasks_panel/src/panel/rename_vanish_tests.rs
- create mode 100644 crates/agent_tasks_panel/src/store/rename_tests.rs
- create mode 100644 crates/agent_ui/src/task_label.rs
- create mode 100644 crates/agent_ui/src/task_label/task_label_tests.rs
- create mode 100644 crates/agent_ui/src/tasks_card/label_tests.rs
 
 diff --git a/Cargo.lock b/Cargo.lock
-index 01ee382..1751b46 100644
+index 394b5ae..62c58a0 100644
 --- a/Cargo.lock
 +++ b/Cargo.lock
-@@ -471,11 +471,13 @@ dependencies = [
+@@ -470,11 +470,13 @@ dependencies = [
   "anyhow",
   "collections",
   "db",
@@ -3439,7 +3409,7 @@ index 0000000..498f40f
 +    }
 +}
 diff --git a/crates/agent_ui/src/agent_ui.rs b/crates/agent_ui/src/agent_ui.rs
-index fca2b81..305f403 100644
+index 294cbb9..4208d36 100644
 --- a/crates/agent_ui/src/agent_ui.rs
 +++ b/crates/agent_ui/src/agent_ui.rs
 @@ -25,6 +25,7 @@ mod model_selector;
@@ -4330,6 +4300,3 @@ index 0000000..33a3f21
 +        shown.chars().count()
 +    );
 +}
--- 
-2.56.0
-

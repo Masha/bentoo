@@ -8,13 +8,13 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
 ---
 
 diff --git a/crates/agent_ui/src/message_editor.rs b/crates/agent_ui/src/message_editor.rs
-index abf2168..1560756 100644
+index 9746b4f..1f8f269 100644
 --- a/crates/agent_ui/src/message_editor.rs
 +++ b/crates/agent_ui/src/message_editor.rs
-@@ -1802,7 +1802,25 @@ impl MessageEditor {
+@@ -1779,7 +1779,25 @@ impl MessageEditor {
          for chunk in message {
              match chunk {
-                 acp_v1::ContentBlock::Text(text_content) => {
+                 acp_v2::ContentBlock::Text(text_content) => {
 +                    let segment_start = text.len();
                      append_normalized(&mut text, text_content.text);
 +                    // Replayed messages carry file mentions as literal
@@ -35,9 +35,9 @@ index abf2168..1560756 100644
 +                        ));
 +                    }
                  }
-                 acp_v1::ContentBlock::Resource(acp_v1::EmbeddedResource {
-                     resource: acp_v1::EmbeddedResourceResource::TextResourceContents(resource),
-@@ -5755,6 +5773,68 @@ mod tests {
+                 acp_v2::ContentBlock::Resource(acp_v2::EmbeddedResource {
+                     resource: acp_v2::EmbeddedResourceResource::TextResourceContents(resource),
+@@ -5726,6 +5744,68 @@ mod tests {
          assert_eq!(mention_uris.len(), 1);
      }
  

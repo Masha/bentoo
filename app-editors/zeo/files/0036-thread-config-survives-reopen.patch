@@ -65,7 +65,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 ---
 
 diff --git a/Cargo.lock b/Cargo.lock
-index a39082d..49160fc 100644
+index 3f03b2f..18d0bc9 100644
 --- a/Cargo.lock
 +++ b/Cargo.lock
 @@ -388,6 +388,7 @@ dependencies = [
@@ -77,10 +77,10 @@ index a39082d..49160fc 100644
   "feature_flags",
   "fs",
 diff --git a/crates/agent_servers/Cargo.toml b/crates/agent_servers/Cargo.toml
-index 9ce7a7e..dc2d50d 100644
+index cc850c2..c09ad6b 100644
 --- a/crates/agent_servers/Cargo.toml
 +++ b/crates/agent_servers/Cargo.toml
-@@ -34,6 +34,7 @@ base64.workspace = true
+@@ -36,6 +36,7 @@ base64.workspace = true
  chrono.workspace = true
  client.workspace = true
  collections.workspace = true
@@ -88,7 +88,7 @@ index 9ce7a7e..dc2d50d 100644
  env_logger = { workspace = true, optional = true }
  fs.workspace = true
  futures.workspace = true
-@@ -64,6 +65,7 @@ zed_credentials_provider.workspace = true
+@@ -65,6 +66,7 @@ zed_credentials_provider.workspace = true
  
  [dev-dependencies]
  client = { workspace = true, features = ["test-support"] }
@@ -97,7 +97,7 @@ index 9ce7a7e..dc2d50d 100644
  fs.workspace = true
  
 diff --git a/crates/agent_servers/src/acp.rs b/crates/agent_servers/src/acp.rs
-index 51e7a2c..21c90e5 100644
+index 0c30e17..3574ff2 100644
 --- a/crates/agent_servers/src/acp.rs
 +++ b/crates/agent_servers/src/acp.rs
 @@ -45,12 +45,16 @@ use util::path_list::PathList;
@@ -840,7 +840,7 @@ index 51e7a2c..21c90e5 100644
              });
  
              Ok(thread)
-@@ -1983,6 +2379,7 @@ impl AgentConnection for AcpConnection {
+@@ -1991,6 +2387,7 @@ impl AgentConnection for AcpConnection {
                  connection: self.connection.clone(),
                  session_id: session_id.clone(),
                  state: modes.clone(),
@@ -848,7 +848,7 @@ index 51e7a2c..21c90e5 100644
              }) as _)
          } else {
              None
-@@ -4109,9 +4506,10 @@ mod tests {
+@@ -4121,9 +4518,10 @@ mod tests {
          ])));
  
          let mut async_cx = cx.to_async();
@@ -860,7 +860,7 @@ index 51e7a2c..21c90e5 100644
              &mut async_cx,
          );
          drop(async_cx);
-@@ -5872,6 +6270,8 @@ struct AcpSessionModes {
+@@ -5884,6 +6282,8 @@ struct AcpSessionModes {
      session_id: acp::SessionId,
      connection: ConnectionTo<Agent>,
      state: Rc<RefCell<acp::SessionModeState>>,
@@ -869,7 +869,7 @@ index 51e7a2c..21c90e5 100644
  }
  
  impl acp_thread::AgentSessionModes for AcpSessionModes {
-@@ -5893,6 +6293,7 @@ impl acp_thread::AgentSessionModes for AcpSessionModes {
+@@ -5905,6 +6305,7 @@ impl acp_thread::AgentSessionModes for AcpSessionModes {
              state.current_mode_id = mode_id.clone();
          };
          let state = self.state.clone();
@@ -877,7 +877,7 @@ index 51e7a2c..21c90e5 100644
          cx.foreground_executor().spawn(async move {
              let result = connection
                  .send_request(acp::SetSessionModeRequest::new(session_id, mode_id))
-@@ -5902,6 +6303,12 @@ impl acp_thread::AgentSessionModes for AcpSessionModes {
+@@ -5914,6 +6315,12 @@ impl acp_thread::AgentSessionModes for AcpSessionModes {
              if result.is_err() {
                  state.borrow_mut().current_mode_id = old_mode_id;
              }
@@ -890,7 +890,7 @@ index 51e7a2c..21c90e5 100644
  
              result?;
  
-@@ -6236,7 +6643,7 @@ fn handle_session_notification(
+@@ -6248,7 +6655,7 @@ fn handle_session_notification(
      ctx: &ClientContext,
  ) {
      // Extract everything we need from the session while briefly borrowing.
@@ -899,7 +899,7 @@ index 51e7a2c..21c90e5 100644
          let sessions = ctx.sessions.borrow();
          let Some(session) = sessions.get(&notification.session_id) else {
              log::warn!(
-@@ -6248,6 +6655,7 @@ fn handle_session_notification(
+@@ -6260,6 +6667,7 @@ fn handle_session_notification(
          (
              session.thread.clone(),
              session.session_modes.clone(),
@@ -907,7 +907,7 @@ index 51e7a2c..21c90e5 100644
              session
                  .config_options
                  .as_ref()
-@@ -6263,6 +6671,7 @@ fn handle_session_notification(
+@@ -6275,6 +6683,7 @@ fn handle_session_notification(
      {
          if let Some(session_modes) = &session_modes {
              session_modes.borrow_mut().current_mode_id = current_mode_id.clone();

@@ -163,10 +163,10 @@ index 890248d..2287857 100644
                  let on_left = self.side(cx) == SidebarSide::Left;
                  match window.window_decorations() {
 diff --git a/crates/sidebar/src/sidebar_tests.rs b/crates/sidebar/src/sidebar_tests.rs
-index d6ae15c..a235b37 100644
+index 307ff52..9736b06 100644
 --- a/crates/sidebar/src/sidebar_tests.rs
 +++ b/crates/sidebar/src/sidebar_tests.rs
-@@ -15878,3 +15878,93 @@ fn sidebar_painted_background_at(position: Point<Pixels>, cx: &mut VisualTestCon
+@@ -15879,3 +15879,93 @@ fn sidebar_painted_background_at(position: Point<Pixels>, cx: &mut VisualTestCon
          u32::from(Rgba::from(color))
      })
  }

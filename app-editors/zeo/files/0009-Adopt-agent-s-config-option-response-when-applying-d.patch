@@ -30,7 +30,7 @@ Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 ---
 
 diff --git a/crates/agent_servers/src/acp.rs b/crates/agent_servers/src/acp.rs
-index 1b912eb..51e7a2c 100644
+index ed3870b..0c30e17 100644
 --- a/crates/agent_servers/src/acp.rs
 +++ b/crates/agent_servers/src/acp.rs
 @@ -1239,6 +1239,7 @@ impl AcpConnection {
@@ -112,7 +112,7 @@ index 1b912eb..51e7a2c 100644
                      cx,
                  )
              });
-@@ -4085,11 +4104,9 @@ mod tests {
+@@ -4097,11 +4116,9 @@ mod tests {
                  AgentConfigOptionValue::Boolean(true),
              )]),
          );
@@ -127,7 +127,7 @@ index 1b912eb..51e7a2c 100644
  
          let mut async_cx = cx.to_async();
          connection.apply_default_config_options(
-@@ -4111,10 +4128,19 @@ mod tests {
+@@ -4123,10 +4140,19 @@ mod tests {
              })]
          );
  
@@ -148,7 +148,7 @@ index 1b912eb..51e7a2c 100644
      }
  
      #[gpui::test]
-@@ -4208,8 +4234,21 @@ mod tests {
+@@ -4220,8 +4246,21 @@ mod tests {
                  .builder()
                  .name("config-defaults-test-agent")
                  .on_receive_request(

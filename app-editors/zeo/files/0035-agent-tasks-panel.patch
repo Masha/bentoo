@@ -118,10 +118,10 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 ---
 
 diff --git a/Cargo.lock b/Cargo.lock
-index 49160fc..e71e6e4 100644
+index 18d0bc9..394b5ae 100644
 --- a/Cargo.lock
 +++ b/Cargo.lock
-@@ -459,6 +459,33 @@ dependencies = [
+@@ -458,6 +458,33 @@ dependencies = [
   "util",
  ]
  
@@ -155,7 +155,7 @@ index 49160fc..e71e6e4 100644
  [[package]]
  name = "agent_ui"
  version = "0.1.0"
-@@ -22809,6 +22836,7 @@ dependencies = [
+@@ -22407,6 +22434,7 @@ dependencies = [
   "agent_servers",
   "agent_settings",
   "agent_skills",
@@ -164,7 +164,7 @@ index 49160fc..e71e6e4 100644
   "anyhow",
   "ashpd",
 diff --git a/Cargo.toml b/Cargo.toml
-index 4d9a614..b6b3455 100644
+index 6ce47cc..aeb9578 100644
 --- a/Cargo.toml
 +++ b/Cargo.toml
 @@ -9,6 +9,7 @@ members = [
@@ -5406,10 +5406,10 @@ index 0000000..f08c933
 +        .collect()
 +}
 diff --git a/crates/agent_ui/src/agent_panel.rs b/crates/agent_ui/src/agent_panel.rs
-index 62977c7..37f2127 100644
+index c94a44a..a7e27da 100644
 --- a/crates/agent_ui/src/agent_panel.rs
 +++ b/crates/agent_ui/src/agent_panel.rs
-@@ -4537,8 +4537,8 @@ impl AgentPanel {
+@@ -4553,8 +4553,8 @@ impl AgentPanel {
              .is_some_and(|thread| thread.read(cx).session_id() == session_id)
      }
  
@@ -5421,7 +5421,7 @@ index 62977c7..37f2127 100644
      }
  
 diff --git a/crates/agent_ui/src/agent_ui.rs b/crates/agent_ui/src/agent_ui.rs
-index 42b7a51..fca2b81 100644
+index 8591207..294cbb9 100644
 --- a/crates/agent_ui/src/agent_ui.rs
 +++ b/crates/agent_ui/src/agent_ui.rs
 @@ -78,6 +78,7 @@ pub use crate::agent_panel::{
@@ -6864,10 +6864,10 @@ index 0000000..d1d7dd8
 +    assert_eq!(endings[0].thread_title.as_deref(), Some(GENERATED));
 +}
 diff --git a/crates/zed/Cargo.toml b/crates/zed/Cargo.toml
-index 0f862d9..e8c5b90 100644
+index aab3e9c..8b423db 100644
 --- a/crates/zed/Cargo.toml
 +++ b/crates/zed/Cargo.toml
-@@ -73,6 +73,7 @@ agent_servers = { workspace = true, optional = true }
+@@ -74,6 +74,7 @@ agent_servers = { workspace = true, optional = true }
  agent_settings.workspace = true
  agent_skills.workspace = true
  agent_ui = { workspace = true, features = ["audio"] }

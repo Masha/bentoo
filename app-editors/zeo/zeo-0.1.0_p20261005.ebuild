@@ -20,7 +20,6 @@ CRATES="
 	agent-client-protocol-derive@2.2.0
 	agent-client-protocol-schema@1.9.1
 	agent-client-protocol@2.2.0
-	ahash@0.7.8
 	ahash@0.8.12
 	aho-corasick@1.1.3
 	aliasable@0.1.3
@@ -134,7 +133,6 @@ CRATES="
 	bitflags@1.3.2
 	bitflags@2.13.1
 	bitstream-io@4.9.0
-	bitvec@1.0.1
 	block-buffer@0.10.4
 	block-padding@0.3.3
 	block2@0.5.1
@@ -145,16 +143,12 @@ CRATES="
 	bon-macros@3.8.2
 	bon@3.8.2
 	borrow-or-share@0.2.4
-	borsh-derive@1.5.7
-	borsh@1.5.7
 	brush-parser@0.3.0
 	bs58@0.5.1
 	bstr@1.12.1
 	built@0.8.0
 	bumpalo@3.20.3
 	by_address@1.2.1
-	bytecheck@0.6.12
-	bytecheck_derive@0.6.12
 	bytecount@0.6.9
 	bytemuck@1.24.0
 	bytemuck_derive@1.10.2
@@ -175,9 +169,7 @@ CRATES="
 	cap-fs-ext@4.0.3
 	cap-primitives@4.0.3
 	cap-std@4.0.3
-	cargo-platform@0.1.9
 	cargo-platform@0.3.2
-	cargo_metadata@0.19.2
 	cargo_metadata@0.23.1
 	cargo_toml@0.21.0
 	cast@0.3.0
@@ -198,7 +190,6 @@ CRATES="
 	ciborium-ll@0.2.2
 	ciborium@0.2.2
 	cipher@0.4.4
-	circular-buffer@1.2.0
 	clang-sys@1.8.1
 	clap@4.5.49
 	clap_builder@4.5.49
@@ -417,9 +408,7 @@ CRATES="
 	fs-set-times@0.20.3
 	fs2@0.4.3
 	fs_extra@1.3.0
-	fsevent-sys@4.1.0
 	fuchsia-cprng@0.1.1
-	funty@2.0.0
 	futures-channel@0.3.34
 	futures-concurrency@7.7.1
 	futures-core@0.3.34
@@ -544,7 +533,6 @@ CRATES="
 	inherent@1.0.13
 	inotify-sys@0.1.5
 	inotify@0.11.0
-	inotify@0.9.6
 	inout@0.1.4
 	instant@0.1.13
 	interpolate_name@0.2.4
@@ -672,7 +660,6 @@ CRATES="
 	minidumper@0.11.0
 	minimal-lexical@0.2.1
 	miniz_oxide@0.8.9
-	mio@0.8.11
 	mio@1.2.0
 	miow@0.6.1
 	moka@0.12.11
@@ -694,13 +681,10 @@ CRATES="
 	nom@8.0.0
 	noop_proc_macro@0.3.0
 	normpath@1.5.0
-	notify-debouncer-mini@0.4.1
 	notify-rust@4.18.0
-	notify@6.1.1
 	ntapi@0.4.1
 	nu-ansi-term@0.50.3
 	nucleo-matcher@0.3.1
-	nucleo@0.5.0
 	num-bigint-dig@0.8.6
 	num-bigint-dig@0.9.1
 	num-bigint@0.4.8
@@ -708,7 +692,6 @@ CRATES="
 	num-complex@0.4.6
 	num-conv@0.2.0
 	num-derive@0.4.2
-	num-format@0.4.4
 	num-integer@0.1.46
 	num-iter@0.1.45
 	num-rational@0.4.2
@@ -730,7 +713,6 @@ CRATES="
 	objc2-core-foundation@0.3.2
 	objc2-core-graphics@0.3.2
 	objc2-core-image@0.2.2
-	objc2-core-location@0.3.2
 	objc2-core-media@0.3.2
 	objc2-core-services@0.3.2
 	objc2-core-video@0.3.2
@@ -741,7 +723,6 @@ CRATES="
 	objc2-io-surface@0.3.2
 	objc2-metal@0.2.2
 	objc2-metal@0.3.2
-	objc2-open-directory@0.3.2
 	objc2-quartz-core@0.2.2
 	objc2-quartz-core@0.3.2
 	objc2-screen-capture-kit@0.3.2
@@ -875,8 +856,6 @@ CRATES="
 	protox@0.9.1
 	proxyvars@0.2.0
 	psm@0.1.30
-	ptr_meta@0.1.4
-	ptr_meta_derive@0.1.4
 	pulldown-cmark-escape@0.10.1
 	pulldown-cmark@0.10.3
 	pulldown-cmark@0.13.4
@@ -895,7 +874,6 @@ CRATES="
 	quinn@0.11.9
 	quote@1.0.47
 	r-efi@5.3.0
-	radium@0.7.0
 	rand@0.10.2
 	rand@0.3.23
 	rand@0.4.6
@@ -908,7 +886,6 @@ CRATES="
 	rand_core@0.4.2
 	rand_core@0.6.4
 	rand_core@0.9.3
-	rand_distr@0.5.1
 	rand_pcg@0.10.2
 	rand_pcg@0.3.1
 	rand_xorshift@0.4.0
@@ -936,7 +913,6 @@ CRATES="
 	regex-lite@0.1.8
 	regex-syntax@0.8.11
 	regex@1.12.3
-	rend@0.4.2
 	renderdoc-sys@1.1.0
 	reqwest@0.11.27
 	reqwest@0.12.24
@@ -944,8 +920,6 @@ CRATES="
 	rfc6979@0.3.1
 	rgb@0.8.52
 	ring@0.17.14
-	rkyv@0.7.45
-	rkyv_derive@0.7.45
 	rle-decode-fast@1.0.3
 	rmp@0.8.14
 	rmpv@1.3.0
@@ -1128,7 +1102,6 @@ CRATES="
 	taffy@0.13.0
 	tagptr@0.2.0
 	tao-core-video-sys@0.2.0
-	tap@1.0.1
 	target-lexicon@0.13.5
 	target-spec@3.7.0
 	tauri-winrt-notification@0.7.3
@@ -1160,7 +1133,6 @@ CRATES="
 	tokio-socks@0.5.2
 	tokio-stream@0.1.17
 	tokio-tungstenite@0.20.1
-	tokio-tungstenite@0.21.0
 	tokio-tungstenite@0.28.0
 	tokio-util@0.7.18
 	tokio@1.52.1
@@ -1208,7 +1180,6 @@ CRATES="
 	try-lock@0.2.5
 	ttf-parser@0.25.1
 	tungstenite@0.20.1
-	tungstenite@0.21.0
 	tungstenite@0.28.0
 	typeid@1.0.3
 	typenum@1.19.0
@@ -1263,7 +1234,6 @@ CRATES="
 	waker-fn@1.2.0
 	walkdir@2.5.0
 	want@0.3.1
-	warp@0.3.7
 	wasi@0.11.1+wasi-snapshot-preview1
 	wasip2@1.0.1+wasi-0.2.4
 	wasip3@0.4.0+wasi-0.3.0-rc-2026-01-06
@@ -1446,7 +1416,6 @@ CRATES="
 	wit-parser@0.254.0
 	write16@1.0.0
 	writeable@0.6.4
-	wyz@0.5.1
 	x11@2.21.0
 	x11rb-protocol@0.13.2
 	x11rb@0.13.2

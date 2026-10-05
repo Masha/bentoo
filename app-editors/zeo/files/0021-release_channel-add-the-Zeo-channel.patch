@@ -212,7 +212,7 @@ index c79ca14..f84a970 100644
          })
      }
 diff --git a/crates/remote_server/src/server.rs b/crates/remote_server/src/server.rs
-index 6a4bf3d..14fa1fc 100644
+index 2263293..5d3a282 100644
 --- a/crates/remote_server/src/server.rs
 +++ b/crates/remote_server/src/server.rs
 @@ -107,7 +107,7 @@ pub fn run(command: Commands) -> anyhow::Result<()> {

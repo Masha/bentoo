@@ -229,10 +229,10 @@ index 9c17f49..c2c3411 100644
              .tooltip(version)
              .disabled(true)
 diff --git a/crates/workspace/src/notifications.rs b/crates/workspace/src/notifications.rs
-index 697f4f3..1531d38 100644
+index 9a07a77..4a37184 100644
 --- a/crates/workspace/src/notifications.rs
 +++ b/crates/workspace/src/notifications.rs
-@@ -1210,7 +1210,7 @@ pub mod simple_message_notification {
+@@ -1269,7 +1269,7 @@ pub mod simple_message_notification {
              });
  
              let with_primary_action = cx.new(|cx| {
@@ -241,7 +241,7 @@ index 697f4f3..1531d38 100644
                      .with_title("Update Available")
                      .primary_message("Restart Now")
                      .primary_icon(IconName::ArrowCircle)
-@@ -1313,7 +1313,7 @@ pub mod simple_message_notification {
+@@ -1372,7 +1372,7 @@ pub mod simple_message_notification {
                      "Linux desktop portal initialization failed.".into()
                  }
                  fn secondary_message(&self) -> Option<SharedString> {

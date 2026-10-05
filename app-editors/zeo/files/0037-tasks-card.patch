@@ -111,7 +111,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 ---
 
 diff --git a/assets/settings/default.json b/assets/settings/default.json
-index 5843217..c541492 100644
+index 5af3bca..c75e399 100644
 --- a/assets/settings/default.json
 +++ b/assets/settings/default.json
 @@ -1422,6 +1422,15 @@
@@ -282,7 +282,7 @@ index 0000000..54bdc62
 +    }
 +}
 diff --git a/crates/agent_ui/src/agent_panel.rs b/crates/agent_ui/src/agent_panel.rs
-index f49d3b0..351473b 100644
+index 4fa0bc0..50de592 100644
 --- a/crates/agent_ui/src/agent_panel.rs
 +++ b/crates/agent_ui/src/agent_panel.rs
 @@ -39,6 +39,7 @@ use crate::ExpandMessageEditor;
@@ -568,7 +568,7 @@ index f49d3b0..351473b 100644
              self.serialize(cx);
              cx.emit(AgentPanelEvent::ActiveViewChanged);
              cx.notify();
-@@ -4277,6 +4437,7 @@ impl AgentPanel {
+@@ -4293,6 +4453,7 @@ impl AgentPanel {
          self.retained_threads
              .insert(thread_id, conversation_view.clone());
          self.observe_retained_thread(thread_id, conversation_view, cx);
@@ -576,7 +576,7 @@ index f49d3b0..351473b 100644
      }
  
      fn observe_retained_thread(
-@@ -4313,12 +4474,115 @@ impl AgentPanel {
+@@ -4329,12 +4490,115 @@ impl AgentPanel {
              .insert(thread_id, subscription);
      }
  
@@ -694,7 +694,7 @@ index f49d3b0..351473b 100644
          let mut potential_removals = self
              .retained_threads
              .iter()
-@@ -4345,7 +4609,7 @@ impl AgentPanel {
+@@ -4361,7 +4625,7 @@ impl AgentPanel {
              .take(n)
              .collect::<Vec<_>>();
          for id in to_remove {
@@ -703,7 +703,7 @@ index f49d3b0..351473b 100644
          }
      }
  
-@@ -4434,6 +4698,7 @@ impl AgentPanel {
+@@ -4450,6 +4714,7 @@ impl AgentPanel {
              }
          };
          self.serialize(cx);
@@ -711,7 +711,7 @@ index f49d3b0..351473b 100644
      }
  
      fn visible_surface(&self) -> VisibleSurface<'_> {
-@@ -4480,7 +4745,7 @@ impl AgentPanel {
+@@ -4496,7 +4761,7 @@ impl AgentPanel {
                              this.draft_thread = None;
                              this._draft_editor_observation = None;
                          }
@@ -720,7 +720,7 @@ index f49d3b0..351473b 100644
                          cx.emit(AgentPanelEvent::ThreadInteracted { thread_id });
                      }
                  },
-@@ -4556,7 +4821,7 @@ impl AgentPanel {
+@@ -4572,7 +4837,7 @@ impl AgentPanel {
              );
              return;
          }
@@ -729,7 +729,7 @@ index f49d3b0..351473b 100644
              self.try_make_empty_draft_ephemeral(conversation_view.clone(), cx);
              self.set_base_view(
                  BaseView::AgentThread { conversation_view },
-@@ -6598,6 +6863,7 @@ impl Render for AgentPanel {
+@@ -6683,6 +6948,7 @@ impl Render for AgentPanel {
          // - Scrolling in all views works as expected
          // - Files can be dropped into the panel
          let content = v_flex()
@@ -737,7 +737,7 @@ index f49d3b0..351473b 100644
              .key_context(self.key_context())
              .relative()
              .size_full()
-@@ -6681,7 +6947,8 @@ impl Render for AgentPanel {
+@@ -6766,7 +7032,8 @@ impl Render for AgentPanel {
                          .child(self.render_drag_target(cx))
                  }
              })
@@ -747,7 +747,7 @@ index f49d3b0..351473b 100644
  
          match self.visible_font_size() {
              WhichFontSize::AgentFont => {
-@@ -6719,7 +6986,7 @@ impl AgentPanel {
+@@ -6804,7 +7071,7 @@ impl AgentPanel {
      /// Drops a thread's `ConversationView` from `retained_threads` without
      /// deleting its metadata or kvp state. Simulates the post-restart
      pub fn test_unload_retained_thread(&mut self, id: ThreadId) -> bool {
@@ -756,7 +756,7 @@ index f49d3b0..351473b 100644
      }
  
      /// Opens an external thread using an arbitrary AgentServer.
-@@ -14284,8 +14551,8 @@ mod tests {
+@@ -14463,8 +14730,8 @@ mod tests {
          // directly remove from retained_threads and drop the handle
          // so on_release → close_all_sessions fires only on A.
          drop(retained_conversation_a);
@@ -768,7 +768,7 @@ index f49d3b0..351473b 100644
          cx.run_until_parked();
  
 diff --git a/crates/agent_ui/src/agent_ui.rs b/crates/agent_ui/src/agent_ui.rs
-index 79614ae..42b7a51 100644
+index ec696c8..8591207 100644
 --- a/crates/agent_ui/src/agent_ui.rs
 +++ b/crates/agent_ui/src/agent_ui.rs
 @@ -25,6 +25,7 @@ mod model_selector;
@@ -791,7 +791,7 @@ index 79614ae..42b7a51 100644
              max_idle_retained_threads: 5,
              threads_sidebar: agent_settings::ThreadsSidebarSettings {
 diff --git a/crates/agent_ui/src/conversation_view.rs b/crates/agent_ui/src/conversation_view.rs
-index 36d1dda..050082d 100644
+index 1939dc8..16e444f 100644
 --- a/crates/agent_ui/src/conversation_view.rs
 +++ b/crates/agent_ui/src/conversation_view.rs
 @@ -1858,21 +1858,30 @@ impl ConversationView {
