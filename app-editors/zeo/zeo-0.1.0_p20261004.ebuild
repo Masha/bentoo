@@ -1582,7 +1582,7 @@ declare -A GIT_CRATES=(
 # rewrites the date and EGIT_COMMIT; a second version variable it could not
 # keep current would leave a new tarball under an old, already-manifested name).
 
-EGIT_COMMIT="a84689073d296dfd39987bc7dd478e43ef76d83a"
+EGIT_COMMIT="279fe070bb389b79652e52065b2f001edcc0b11b"
 LLVM_COMPAT=( 22 )
 RUST_MIN_VER="1.98.1"
 RUST_NEEDS_LLVM=1
@@ -1974,6 +1974,12 @@ src_prepare() {
 			# zeo-systray (>= 0.3.0, optional at runtime) as one non-blocking
 			# datagram on $XDG_RUNTIME_DIR/zeo-systray.sock; no daemon, no-op.
 			"${FILESDIR}/0038-tasks-card-tray.patch"
+			# 0035: the Agent Tasks panel -- a dock panel listing every task the
+			# agent ran, kept across restarts in its own sqlez domain
+			# (AgentTaskHistoryDb), with filters, Stop and archive; toggled by
+			# ctrl-alt-shift-a, no settings of its own. Rides this flag BY
+			# DEPENDENCY, after 0038: fed only by 0037's card.
+			"${FILESDIR}/0035-agent-tasks-panel.patch"
 		)
 	fi
 
