@@ -3111,14 +3111,16 @@ transform = [['T.*', ""], ['-', ""]]
 commit_sha_path = "[0].sha"
 base_from = "none"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.1.0_p20261005"
+version = "0.1.1_p20261005"
 comments = """
 zeo — commit-tracked on Zed's main; the snapshot plus the bentoo patch series and
 the rebrand. 2026-10-01: this entry WAS app-editors/zed, which now builds
 upstream's releases unpatched (see the zed@stable/zed@preview entries); the
 snapshot line and its history moved here with the package.
-base_from = "none": Zeo versions itself (0.1.0), so a bump only moves the _p date
-and EGIT_COMMIT. That is also why the distfile is zed-${EGIT_COMMIT}.tar.gz and
+base_from = "none": Zeo versions itself -- <X.Y.Z>_p<date>[-rN], X.Y.Z being Zeo's own
+SemVer since 2026-10-05 (zeo/docs/RELEASING.md, every version in zeo/CHANGELOG.md) --
+so a bump only moves the _p date and EGIT_COMMIT, keeping X.Y.Z and needing no
+changelog entry. That is also why the distfile is zed-${EGIT_COMMIT}.tar.gz and
 the ebuild carries no Zed version variable -- nothing here could keep a second
 version current, and a stale one would name new bytes after an old distfile.
 Every bump is still a manual follow-up the applier cannot do: regenerate CRATES/
