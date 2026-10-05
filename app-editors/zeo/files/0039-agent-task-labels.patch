@@ -1,6 +1,6 @@
-From 9ea03bbd3eb0791362831a0087a5f7b1907c4595 Mon Sep 17 00:00:00 2001
+From dd8236716669bf8a7adcff89fd288a7ef2edacb2 Mon Sep 17 00:00:00 2001
 From: zed-patches <zed-patches@localhost>
-Date: Mon, 5 Oct 2026 09:37:45 -0300
+Date: Mon, 5 Oct 2026 10:16:06 -0300
 Subject: [PATCH] agent_tasks: one-line task labels, and a Rename the panel
  keeps
 
@@ -33,6 +33,11 @@ default keymap dispatches the former, so the latter alone leaves Escape
 dead. The editor is rendered outside the row's ButtonLike, so a click in
 it never opens the thread, and rows are full width so its slot is not laid
 out at 0px by uniform_list.
+An editor that vanishes without an answer -- its row scrolled out of
+uniform_list's range, hidden by a filter, or gone -- discards the edit
+instead of saving half a label. Asking what holds focus cannot tell that
+apart from a real blur: the Workspace refocuses the panel before Blurred
+arrives. The panel's own on_focus_lost fires first, and that is the flag.
 
 Where the label lives. The panel's history gains migration step 2,
 `ALTER TABLE agent_task_history ADD COLUMN label TEXT` -- appended, step 1
@@ -45,14 +50,18 @@ agent_tasks_panel depends on agent_ui, never the reverse. Loading the
 history refills it, so a label survives a restart; later updates of the
 task never clear it.
 
+Dock. The panel now docks at the bottom by default (320px tall) instead of
+the left: the agent panel, which holds 0037's card, defaults to the left
+dock, so the two hid each other. A dock position the user saved is kept.
+
 Paired with claude-agent-acp-plus 0.25.0, which holds a foreground shell
 task back for 5 s and labels shell tasks with the tool call's own
 description; with an older adapter everything above still holds, the
 lists are only fuller.
 
-Tests: agent_ui task_label 16, tasks_card 96; agent_tasks_panel 90 (new:
+Tests: agent_ui task_label 16, tasks_card 96; agent_tasks_panel 97 (new:
 history_db/label, store/rename, panel/list_label, actions_rename,
-label_contract). GPUI test windows build no accessibility tree, so each
+label_contract, rename_vanish, dock_default). GPUI test windows build no accessibility tree, so each
 crate records the aria labels it renders in a #[cfg(test)] thread-local.
 Live proof on a built Zeo p20261004: a 10 s heredoc listed on one line under
 its description, a 79-character rename stored as 60, kept across a restart.
@@ -61,10 +70,14 @@ its description, a 79-character rename stored as 60, kept across a restart.
  crates/agent_tasks_panel/Cargo.toml           |   2 +
  crates/agent_tasks_panel/src/history_db.rs    |  53 +-
  .../src/history_db/label_tests.rs             | 306 ++++++++++
- crates/agent_tasks_panel/src/panel.rs         | 393 +++++++++++--
+ crates/agent_tasks_panel/src/panel.rs         | 478 ++++++++++++++--
  .../src/panel/actions_rename_tests.rs         | 538 ++++++++++++++++++
+ .../src/panel/dock_default_tests.rs           | 154 +++++
  .../src/panel/label_contract_tests.rs         | 294 ++++++++++
  .../src/panel/list_label_tests.rs             | 389 +++++++++++++
+ .../agent_tasks_panel/src/panel/list_tests.rs |   8 +-
+ .../src/panel/persistence_tests.rs            |   6 +-
+ .../src/panel/rename_vanish_tests.rs          | 353 ++++++++++++
  crates/agent_tasks_panel/src/store.rs         |  64 ++-
  .../src/store/rename_tests.rs                 | 272 +++++++++
  crates/agent_ui/src/agent_ui.rs               |   9 +-
@@ -72,11 +85,13 @@ its description, a 79-character rename stored as 60, kept across a restart.
  .../src/task_label/task_label_tests.rs        | 239 ++++++++
  crates/agent_ui/src/tasks_card.rs             |  68 ++-
  crates/agent_ui/src/tasks_card/label_tests.rs | 355 ++++++++++++
- 15 files changed, 2993 insertions(+), 74 deletions(-)
+ 19 files changed, 3585 insertions(+), 88 deletions(-)
  create mode 100644 crates/agent_tasks_panel/src/history_db/label_tests.rs
  create mode 100644 crates/agent_tasks_panel/src/panel/actions_rename_tests.rs
+ create mode 100644 crates/agent_tasks_panel/src/panel/dock_default_tests.rs
  create mode 100644 crates/agent_tasks_panel/src/panel/label_contract_tests.rs
  create mode 100644 crates/agent_tasks_panel/src/panel/list_label_tests.rs
+ create mode 100644 crates/agent_tasks_panel/src/panel/rename_vanish_tests.rs
  create mode 100644 crates/agent_tasks_panel/src/store/rename_tests.rs
  create mode 100644 crates/agent_ui/src/task_label.rs
  create mode 100644 crates/agent_ui/src/task_label/task_label_tests.rs
@@ -553,7 +568,7 @@ index 0000000..daa2fb2
 +    );
 +}
 diff --git a/crates/agent_tasks_panel/src/panel.rs b/crates/agent_tasks_panel/src/panel.rs
-index 256b143..cd1bf1d 100644
+index 256b143..cd8d4dd 100644
 --- a/crates/agent_tasks_panel/src/panel.rs
 +++ b/crates/agent_tasks_panel/src/panel.rs
 @@ -14,16 +14,17 @@ use std::{cmp::Reverse, ops::Range, sync::Arc};
@@ -601,7 +616,7 @@ index 256b143..cd1bf1d 100644
      stop: FocusHandle,
      /// Archive, or Unarchive on an archived row: the two share the row's last slot.
      archive: FocusHandle,
-@@ -211,12 +222,20 @@ impl RowFocus {
+@@ -211,12 +222,30 @@ impl RowFocus {
      fn new(cx: &mut App) -> Self {
          Self {
              open: control_focus_handle(cx),
@@ -616,13 +631,23 @@ index 256b143..cd1bf1d 100644
 +struct Renaming {
 +    key: TaskKey,
 +    editor: Entity<Editor>,
++    /// Whether the window's focus went nowhere since the editor last took it. A vanished
++    /// editor and a bare blur both leave the focus path empty, so its `Blurred` then discards
++    /// the edit (R3.13) rather than confirming it (R3.6).
++    focus_lost: bool,
 +    _subscription: Subscription,
++}
++
++impl Renaming {
++    fn is_for(&self, record: &TaskRecord) -> bool {
++        self.key.0 == record.session_id && self.key.1 == record.task_id
++    }
 +}
 +
  /// What the panel reads from the cards in one pass: each held thread's current title and each
  /// row's error.
  #[derive(Default)]
-@@ -258,6 +277,8 @@ pub struct AgentTasksPanel {
+@@ -258,6 +287,8 @@ pub struct AgentTasksPanel {
      group_focus_handles: HashMap<acp::SessionId, FocusHandle>,
      /// A row's message after a click that opened nothing, until a later click opens it.
      notices: HashMap<TaskKey, SharedString>,
@@ -631,7 +656,23 @@ index 256b143..cd1bf1d 100644
      scroll_handle: UniformListScrollHandle,
      /// The lines of the last render, read by the `uniform_list` callback.
      entries: Vec<ListEntry>,
-@@ -328,6 +349,7 @@ impl AgentTasksPanel {
+@@ -304,6 +335,15 @@ impl AgentTasksPanel {
+     ) -> Self {
+         let subscriptions = vec![
+             cx.observe(&store, |_, _, cx| cx.notify()),
++            // GPUI runs focus-lost listeners before the blur listeners of the same frame, and
++            // the workspace's own listener has already moved focus back to the panel, so
++            // `window.focused` alone cannot tell a vanished editor from focus taken by another
++            // element.
++            cx.on_focus_lost(window, |panel, _window, _cx| {
++                if let Some(renaming) = panel.renaming.as_mut() {
++                    renaming.focus_lost = true;
++                }
++            }),
+             // The agent panel loads alongside this one, and is torn down and rebuilt when AI
+             // is turned off and on again; each one brings a new card.
+             cx.subscribe_in(
+@@ -328,6 +368,7 @@ impl AgentTasksPanel {
              row_focus_handles: HashMap::default(),
              group_focus_handles: HashMap::default(),
              notices: HashMap::default(),
@@ -639,7 +680,7 @@ index 256b143..cd1bf1d 100644
              scroll_handle: UniformListScrollHandle::new(),
              entries: Vec::new(),
              _save_position: Task::ready(()),
-@@ -480,6 +502,138 @@ impl AgentTasksPanel {
+@@ -480,6 +521,177 @@ impl AgentTasksPanel {
              .update(cx, |store, cx| store.archive_group(session_id, cx));
      }
  
@@ -682,16 +723,30 @@ index 256b143..cd1bf1d 100644
 +        let subscription = cx.subscribe_in(
 +            &editor,
 +            window,
-+            |panel, editor, event: &EditorEvent, _window, cx| {
++            |panel, editor, event: &EditorEvent, window, cx| {
 +                // A cancelled rename has already let go of its editor, so the blur its removal
 +                // raises confirms nothing (R3.5).
-+                if matches!(event, EditorEvent::Blurred)
-+                    && panel
-+                        .renaming
-+                        .as_ref()
-+                        .is_some_and(|renaming| renaming.editor == *editor)
-+                {
-+                    panel.finish_rename(cx);
++                let Some(renaming) = panel
++                    .renaming
++                    .as_mut()
++                    .filter(|renaming| renaming.editor == *editor)
++                else {
++                    return;
++                };
++                match event {
++                    EditorEvent::Focused => renaming.focus_lost = false,
++                    EditorEvent::Blurred => {
++                        // Focus taken by another element confirms (R3.6). Focus gone nowhere
++                        // means the editor left the drawn tree — scrolled out of the list's
++                        // range, filtered out, its record gone — or was blurred outright, and
++                        // the edit is discarded as Escape would (R3.13).
++                        if renaming.focus_lost || window.focused(cx).is_none() {
++                            panel.cancel_rename(window, cx);
++                        } else {
++                            panel.finish_rename(cx);
++                        }
++                    }
++                    _ => {}
 +                }
 +            },
 +        );
@@ -699,6 +754,7 @@ index 256b143..cd1bf1d 100644
 +        self.renaming = Some(Renaming {
 +            key,
 +            editor,
++            focus_lost: false,
 +            _subscription: subscription,
 +        });
 +        cx.notify();
@@ -731,15 +787,39 @@ index 256b143..cd1bf1d 100644
 +        self.focus_rename_control(&key, window, cx);
 +    }
 +
-+    /// Escape in the rename editor: closes it and keeps the previous label (R3.5).
++    /// Escape in the rename editor, or an editor that vanished: closes it and keeps the
++    /// previous label (R3.5, R3.13).
 +    fn cancel_rename(&mut self, window: &mut Window, cx: &mut Context<Self>) {
++        if self.discard_rename(window, cx) {
++            cx.notify();
++        }
++    }
++
++    /// Closes the open rename without touching the label; false when none is open.
++    fn discard_rename(&mut self, window: &mut Window, cx: &mut App) -> bool {
 +        // Taken before the editor goes, so the blur it raises finds no rename to confirm.
 +        let Some(renaming) = self.renaming.take() else {
-+            return;
++            return false;
 +        };
 +        self.focus_rename_control(&renaming.key, window, cx);
 +        drop(renaming);
-+        cx.notify();
++        true
++    }
++
++    /// Discards a rename whose row the list no longer holds — hidden by a filter or gone from
++    /// the history — so the edit is not confirmed by the blur its vanished editor raises
++    /// (R3.13). Runs after `list_entries`, so focus falls back to the panel.
++    fn discard_unlisted_rename(&mut self, window: &mut Window, cx: &mut App) {
++        let Some(renaming) = &self.renaming else {
++            return;
++        };
++        let listed = self.entries.iter().any(|entry| match entry {
++            ListEntry::Row(row, _) => renaming.is_for(&row.entry.record),
++            ListEntry::Header { .. } => false,
++        });
++        if !listed {
++            self.discard_rename(window, cx);
++        }
 +    }
 +
 +    /// Focus back on `key`'s Rename control once its editor closes, else on the panel, so
@@ -778,7 +858,7 @@ index 256b143..cd1bf1d 100644
      fn set_notice(&mut self, key: &TaskKey, notice: &'static str, cx: &mut Context<Self>) {
          self.notices
              .insert(key.clone(), SharedString::new_static(notice));
-@@ -544,7 +698,17 @@ impl AgentTasksPanel {
+@@ -544,7 +756,15 @@ impl AgentTasksPanel {
                      archive_focus,
                      cx,
                  ),
@@ -788,16 +868,14 @@ index 256b143..cd1bf1d 100644
 +                    let rename_editor = self
 +                        .renaming
 +                        .as_ref()
-+                        .filter(|renaming| {
-+                            renaming.key.0 == record.session_id && renaming.key.1 == record.task_id
-+                        })
++                        .filter(|renaming| renaming.is_for(record))
 +                        .map(|renaming| renaming.editor.clone());
 +                    render_row(row, focus, rename_editor, cx)
 +                }
              })
              .collect()
      }
-@@ -642,11 +806,17 @@ fn render_header(
+@@ -642,11 +862,17 @@ fn render_header(
          .into_any_element()
  }
  
@@ -820,7 +898,7 @@ index 256b143..cd1bf1d 100644
      let record = &row.entry.record;
      let key: TaskKey = (record.session_id.clone(), record.task_id.clone());
      let row_id = row_element_id(&key.0, &key.1);
-@@ -656,50 +826,85 @@ fn render_row(row: &PanelRow, focus: &RowFocus, cx: &mut Context<AgentTasksPanel
+@@ -656,50 +882,85 @@ fn render_row(row: &PanelRow, focus: &RowFocus, cx: &mut Context<AgentTasksPanel
          Some(message) => (message.clone(), Color::Error),
          None => (row_detail(record).into(), status_color(record.status)),
      };
@@ -882,7 +960,7 @@ index 256b143..cd1bf1d 100644
 +            .color(detail_color)
 +            .truncate(),
 +    );
-+
+ 
 +    let open_or_rename = match rename_editor {
 +        Some(editor) => render_rename_editor(label_slot.child(editor), detail_label, cx),
 +        None => ButtonLike::new(control_id("open"))
@@ -912,7 +990,7 @@ index 256b143..cd1bf1d 100644
 +            }))
 +            .into_any_element(),
 +    };
- 
++
 +    let rename_button = div()
 +        .debug_selector({
 +            let task_id = record.task_id.clone();
@@ -944,7 +1022,7 @@ index 256b143..cd1bf1d 100644
              "Stop This Task",
              &focus.stop,
          )
-@@ -713,7 +918,7 @@ fn render_row(row: &PanelRow, focus: &RowFocus, cx: &mut Context<AgentTasksPanel
+@@ -713,7 +974,7 @@ fn render_row(row: &PanelRow, focus: &RowFocus, cx: &mut Context<AgentTasksPanel
              action_button(
                  control_id("unarchive"),
                  IconName::Undo,
@@ -953,7 +1031,7 @@ index 256b143..cd1bf1d 100644
                  "Unarchive This Task",
                  &focus.archive,
              )
-@@ -724,7 +929,7 @@ fn render_row(row: &PanelRow, focus: &RowFocus, cx: &mut Context<AgentTasksPanel
+@@ -724,7 +985,7 @@ fn render_row(row: &PanelRow, focus: &RowFocus, cx: &mut Context<AgentTasksPanel
              action_button(
                  control_id("archive"),
                  IconName::Archive,
@@ -962,7 +1040,7 @@ index 256b143..cd1bf1d 100644
                  "Archive This Task",
                  &focus.archive,
              )
-@@ -735,18 +940,55 @@ fn render_row(row: &PanelRow, focus: &RowFocus, cx: &mut Context<AgentTasksPanel
+@@ -735,18 +996,55 @@ fn render_row(row: &PanelRow, focus: &RowFocus, cx: &mut Context<AgentTasksPanel
          })
      };
  
@@ -1019,7 +1097,7 @@ index 256b143..cd1bf1d 100644
  /// A row or header action: a small muted icon with its tooltip, its screen-reader label and
  /// its keyboard focus.
  fn action_button(
-@@ -759,11 +1001,44 @@ fn action_button(
+@@ -759,11 +1057,44 @@ fn action_button(
      IconButton::new(id, icon)
          .icon_size(IconSize::Small)
          .icon_color(Color::Muted)
@@ -1065,18 +1143,55 @@ index 256b143..cd1bf1d 100644
  /// A row's element id, keyed by its task rather than its place in the list, so a row's hover
  /// and click state stay with it when rows above it come and go. Nested children keep the pair
  /// unambiguous where a joined string would not be (`a-b` + `c` against `a` + `b-c`).
-@@ -936,6 +1211,10 @@ impl Focusable for AgentTasksPanel {
+@@ -775,20 +1106,24 @@ fn row_element_id(session_id: &acp::SessionId, task_id: &AgentTaskId) -> Element
+     ElementId::NamedChild(Arc::new(session), task_id.clone())
+ }
+ 
+-/// The dock a saved value names; Left — the default — when nothing usable was saved.
++/// The dock a saved value names; Bottom — the default — when nothing usable was saved. The
++/// agent panel, which holds the tasks card, defaults to the left dock, so a left default would
++/// make the panel and the card hide each other.
+ fn saved_position(saved: Result<Option<String>>) -> DockPosition {
+     match saved {
+-        Ok(None) => DockPosition::Left,
++        Ok(None) => DockPosition::Bottom,
+         Ok(Some(text)) => parse_dock_position(&text).unwrap_or_else(|| {
+-            log::warn!("agent tasks panel: unknown saved dock position {text:?}; docking left");
+-            DockPosition::Left
++            log::warn!(
++                "agent tasks panel: unknown saved dock position {text:?}; docking at the bottom"
++            );
++            DockPosition::Bottom
+         }),
+         Err(error) => {
+             log::error!(
+-                "agent tasks panel: reading the saved dock position failed; docking left: \
+-                 {error:#}"
++                "agent tasks panel: reading the saved dock position failed; docking at the \
++                 bottom: {error:#}"
+             );
+-            DockPosition::Left
++            DockPosition::Bottom
+         }
+     }
+ }
+@@ -935,9 +1270,14 @@ impl Focusable for AgentTasksPanel {
+ }
  
  impl Render for AgentTasksPanel {
-     fn render(&mut self, _window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
+-    fn render(&mut self, _window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
++    fn render(&mut self, window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
 +        // The list renders its rows after this, during layout; it renders its first entry — a
 +        // group header, never a row — more than once to measure it.
 +        #[cfg(test)]
 +        RENDERED_ARIA_LABELS.with_borrow_mut(Vec::clear);
          let groups = self.groups(cx);
          self.entries = self.list_entries(groups, cx);
++        self.discard_unlisted_rename(window, cx);
          let entry_count = self.entries.len();
-@@ -1067,3 +1346,15 @@ mod persistence;
+ 
+         v_flex()
+@@ -1067,3 +1407,23 @@ mod persistence;
  #[cfg(test)]
  #[path = "panel/actions_tests.rs"]
  mod actions;
@@ -1092,6 +1207,14 @@ index 256b143..cd1bf1d 100644
 +#[cfg(test)]
 +#[path = "panel/label_contract_tests.rs"]
 +mod label_contract;
++
++#[cfg(test)]
++#[path = "panel/rename_vanish_tests.rs"]
++mod rename_vanish;
++
++#[cfg(test)]
++#[path = "panel/dock_default_tests.rs"]
++mod dock_default;
 diff --git a/crates/agent_tasks_panel/src/panel/actions_rename_tests.rs b/crates/agent_tasks_panel/src/panel/actions_rename_tests.rs
 new file mode 100644
 index 0000000..23682f6
@@ -1635,6 +1758,166 @@ index 0000000..23682f6
 +    );
 +    assert_eq!(editor_text(&mut panels).as_deref(), Some("Task ta"));
 +    assert!(editor_focused(&mut panels), "the editor takes focus");
++}
+diff --git a/crates/agent_tasks_panel/src/panel/dock_default_tests.rs b/crates/agent_tasks_panel/src/panel/dock_default_tests.rs
+new file mode 100644
+index 0000000..6a93607
+--- /dev/null
++++ b/crates/agent_tasks_panel/src/panel/dock_default_tests.rs
+@@ -0,0 +1,154 @@
++// Story 022, task 7.2 — the Agent Tasks panel docks at the bottom unless a known dock was saved
++// (R6.1, R6.2, R5.7). Module path: `panel::dock_default`. Hostile fixtures come before benign
++// ones: a saved dock must never be folded into the new default.
++//
++// Declared in `src/panel.rs` as
++//
++//     #[cfg(test)]
++//     #[path = "panel/dock_default_tests.rs"]
++//     mod dock_default;
++//
++// Contract assumed beyond design.md (adjust HERE when the implementation drifts):
++//   - `saved_position(Result<Option<String>>) -> DockPosition` is the panel module's pure
++//     reading of the stored value (private, reachable from this child module);
++//   - the stored texts are `left`, `right`, `bottom` under `Panel::panel_key()`;
++//   - a read error is logged at error level and carries its cause.
++//
++// Not covered: the log line for an unknown saved value — it is a warning, and the crate's log
++// capture exposes only error lines.
++
++use anyhow::anyhow;
++use gpui::{Entity, TestAppContext, VisualTestContext, px};
++use workspace::dock::{DockPosition, Panel};
++
++use super::saved_position;
++use crate::AgentTasksPanel;
++use crate::test_helpers::*;
++
++async fn reload(panels: &mut Panels) -> Entity<AgentTasksPanel> {
++    let weak = panels.workspace.downgrade();
++    let loading = panels
++        .cx
++        .update(|window, cx| AgentTasksPanel::load(weak, window.to_async(cx)));
++    panels.cx.run_until_parked();
++    loading.await.expect("the Agent Tasks panel loads again")
++}
++
++fn position_of(panel: &Entity<AgentTasksPanel>, cx: &mut VisualTestContext) -> DockPosition {
++    panel.update_in(cx, |panel, window, cx| panel.position(window, cx))
++}
++
++async fn save(panels: &mut Panels, value: &str) {
++    let kvp = panels.cx.update(|_, cx| db::kvp::KeyValueStore::global(cx));
++    kvp.write_kvp(
++        <AgentTasksPanel as Panel>::panel_key().to_string(),
++        value.to_string(),
++    )
++    .await
++    .unwrap();
++}
++
++// R5.7 first (hostile: a saved dock must not collapse into the default), then R6.1 / R6.2.
++#[test]
++fn panel_dock_default_saved_position_honours_a_saved_dock_and_falls_back_to_the_bottom() {
++    assert_eq!(saved_position(Ok(Some("left".into()))), DockPosition::Left);
++    assert_eq!(
++        saved_position(Ok(Some("right".into()))),
++        DockPosition::Right
++    );
++    assert_eq!(
++        saved_position(Ok(Some("bottom".into()))),
++        DockPosition::Bottom
++    );
++
++    assert_eq!(
++        saved_position(Ok(None)),
++        DockPosition::Bottom,
++        "no saved value docks at the bottom"
++    );
++    for unknown in ["upside-down", "", "top"] {
++        assert_eq!(
++            saved_position(Ok(Some(unknown.into()))),
++            DockPosition::Bottom,
++            "a saved value naming no known dock ({unknown:?}) docks at the bottom"
++        );
++    }
++
++    capture_logs();
++    assert_eq!(
++        saved_position(Err(anyhow!("kvp table is locked"))),
++        DockPosition::Bottom,
++        "a read error docks at the bottom"
++    );
++    let errors = error_lines();
++    assert!(
++        errors
++            .iter()
++            .any(|line| line.contains("kvp table is locked")),
++        "the read error is logged with its cause: {errors:?}"
++    );
++}
++
++// R6.1 — a fresh profile: the panel sits in the BOTTOM dock, 320 px, and not in the left one.
++#[gpui::test]
++async fn panel_dock_default_fresh_profile_docks_the_panel_at_the_bottom_at_320px(
++    cx: &mut TestAppContext,
++) {
++    init_base(cx);
++    let mut panels = open_panels(cx).await;
++
++    panels
++        .tasks_panel
++        .update_in(&mut panels.cx, |panel, window, cx| {
++            assert_eq!(panel.position(window, cx), DockPosition::Bottom);
++            assert_eq!(panel.default_size(window, cx), px(320.));
++        });
++    let (in_bottom, in_left) = panels.workspace.read_with(&panels.cx, |workspace, cx| {
++        (
++            workspace
++                .bottom_dock()
++                .read(cx)
++                .panel::<AgentTasksPanel>()
++                .is_some(),
++            workspace
++                .left_dock()
++                .read(cx)
++                .panel::<AgentTasksPanel>()
++                .is_some(),
++        )
++    });
++    assert!(in_bottom, "the bottom dock holds the panel");
++    assert!(!in_left, "the left dock does not");
++}
++
++// R5.7 first (hostile: each saved dock survives a reload), then R6.2 (an unknown saved value
++// docks at the bottom on reload).
++#[gpui::test]
++async fn panel_dock_default_reload_honours_a_saved_dock_and_falls_back_to_the_bottom(
++    cx: &mut TestAppContext,
++) {
++    init_base(cx);
++    let mut panels = open_panels(cx).await;
++
++    for (value, expected) in [
++        ("left", DockPosition::Left),
++        ("right", DockPosition::Right),
++        ("bottom", DockPosition::Bottom),
++    ] {
++        save(&mut panels, value).await;
++        let reloaded = reload(&mut panels).await;
++        assert_eq!(
++            position_of(&reloaded, &mut panels.cx),
++            expected,
++            "a saved {value:?} is honoured"
++        );
++    }
++
++    save(&mut panels, "upside-down").await;
++    let reloaded = reload(&mut panels).await;
++    assert_eq!(
++        position_of(&reloaded, &mut panels.cx),
++        DockPosition::Bottom,
++        "an unknown saved value docks at the bottom"
++    );
 +}
 diff --git a/crates/agent_tasks_panel/src/panel/label_contract_tests.rs b/crates/agent_tasks_panel/src/panel/label_contract_tests.rs
 new file mode 100644
@@ -2330,6 +2613,427 @@ index 0000000..82c396e
 +        !strings.iter().any(|text| text.contains('\n')),
 +        "no screen-reader label carries a line break: {strings:?}"
 +    );
++}
+diff --git a/crates/agent_tasks_panel/src/panel/list_tests.rs b/crates/agent_tasks_panel/src/panel/list_tests.rs
+index f5cbc99..6ccd8e8 100644
+--- a/crates/agent_tasks_panel/src/panel/list_tests.rs
++++ b/crates/agent_tasks_panel/src/panel/list_tests.rs
+@@ -46,7 +46,9 @@ fn pair(session: &str, task: &str) -> (String, String) {
+ 
+ // R2.1, Q14 — dock, size, icon, tooltip and toggle action; `init` created the store.
+ #[gpui::test]
+-async fn panel_list_docks_left_by_default_at_320px_and_accepts_every_dock(cx: &mut TestAppContext) {
++async fn panel_list_docks_at_the_bottom_by_default_at_320px_and_accepts_every_dock(
++    cx: &mut TestAppContext,
++) {
+     init_base(cx);
+     let mut panels = open_panels(cx).await;
+ 
+@@ -60,7 +62,7 @@ async fn panel_list_docks_left_by_default_at_320px_and_accepts_every_dock(cx: &m
+     panels
+         .tasks_panel
+         .update_in(&mut panels.cx, |panel, window, cx| {
+-            assert!(matches!(panel.position(window, cx), DockPosition::Left));
++            assert!(matches!(panel.position(window, cx), DockPosition::Bottom));
+             assert_eq!(panel.default_size(window, cx), px(320.));
+             for position in [
+                 DockPosition::Left,
+@@ -89,7 +91,7 @@ async fn panel_list_toggle_focus_action_opens_the_panel_in_its_dock(cx: &mut Tes
+     let tasks_panel_id = panels.tasks_panel.entity_id();
+     let shown = |panels: &Panels| {
+         panels.workspace.read_with(&panels.cx, |workspace, cx| {
+-            let dock = workspace.left_dock().read(cx);
++            let dock = workspace.bottom_dock().read(cx);
+             dock.is_open()
+                 && dock.visible_panel().map(|panel| panel.panel_id()) == Some(tasks_panel_id)
+         })
+diff --git a/crates/agent_tasks_panel/src/panel/persistence_tests.rs b/crates/agent_tasks_panel/src/panel/persistence_tests.rs
+index 9e2149a..764fb21 100644
+--- a/crates/agent_tasks_panel/src/panel/persistence_tests.rs
++++ b/crates/agent_tasks_panel/src/panel/persistence_tests.rs
+@@ -35,7 +35,7 @@ async fn panel_dock_position_moves_the_panel_and_survives_a_reload(cx: &mut gpui
+     let mut panels = open_panels(cx).await;
+     assert_eq!(
+         position_of(&panels.tasks_panel, &mut panels.cx),
+-        DockPosition::Left
++        DockPosition::Bottom
+     );
+ 
+     move_to(&mut panels, DockPosition::Right);
+@@ -64,7 +64,7 @@ async fn panel_dock_position_moves_the_panel_and_survives_a_reload(cx: &mut gpui
+ }
+ 
+ #[gpui::test]
+-async fn panel_dock_position_falls_back_to_left_on_an_unknown_saved_value(
++async fn panel_dock_position_falls_back_to_the_bottom_on_an_unknown_saved_value(
+     cx: &mut gpui::TestAppContext,
+ ) {
+     init_base(cx);
+@@ -78,5 +78,5 @@ async fn panel_dock_position_falls_back_to_left_on_an_unknown_saved_value(
+     .unwrap();
+ 
+     let reloaded = reload(&mut panels).await;
+-    assert_eq!(position_of(&reloaded, &mut panels.cx), DockPosition::Left);
++    assert_eq!(position_of(&reloaded, &mut panels.cx), DockPosition::Bottom);
+ }
+diff --git a/crates/agent_tasks_panel/src/panel/rename_vanish_tests.rs b/crates/agent_tasks_panel/src/panel/rename_vanish_tests.rs
+new file mode 100644
+index 0000000..649e96a
+--- /dev/null
++++ b/crates/agent_tasks_panel/src/panel/rename_vanish_tests.rs
+@@ -0,0 +1,353 @@
++// Story 022, task 7.1 — a rename editor that stops being shown discards the edit (R3.13), while
++// a blur to another element still confirms it (R3.6, narrowed). Module path:
++// `panel::rename_vanish`. Hostile fixtures come before benign ones.
++//
++// Declared in `src/panel.rs` as
++//
++//     #[cfg(test)]
++//     #[path = "panel/rename_vanish_tests.rs"]
++//     mod rename_vanish;
++//
++// Contract assumed beyond design.md (adjust HERE when the implementation drifts):
++//   - `AgentTasksPanel::start_rename(&mut self, key, window, cx)` opens the editor and
++//     `rename_editor(&self) -> Option<Entity<Editor>>` exposes it while open;
++//   - the editor confirms on `menu::Confirm`;
++//   - `set_filter(filter, enabled, cx)` toggles a list filter;
++//   - the list scrolls through the panel's `scroll_handle` (`UniformListScrollHandle`), and the
++//     filter toggles keep their focus handles in `filter_focus_handles` (`TaskFilter::ALL`
++//     order) — both private fields, reachable from this child module.
++//
++// Not covered: a task record removed from the history — the store offers no removal, so the
++// "removed" route of R3.13 is exercised through its effect (the row leaves the list) by a status
++// change and by a filter change.
++
++use agent_ui::TaskLabels;
++use gpui::{Entity, Focusable as _, ScrollStrategy, TestAppContext, VisualTestContext};
++use workspace::Workspace;
++
++use crate::test_helpers::*;
++use crate::{AgentTasksPanel, TaskFilter, TaskHistoryStore};
++
++fn ensure_labels(cx: &mut VisualTestContext) {
++    cx.update(|_, cx| {
++        if !cx.has_global::<TaskLabels>() {
++            cx.set_global(TaskLabels::default());
++        }
++    });
++}
++
++fn draw(cx: &mut VisualTestContext) {
++    cx.update(|window, _| window.refresh());
++    cx.run_until_parked();
++}
++
++/// Draws twice: the frame that drops the editor, then the one that settles focus after it.
++fn settle(cx: &mut VisualTestContext) {
++    draw(cx);
++    draw(cx);
++}
++
++fn show_panel(workspace: &Entity<Workspace>, cx: &mut VisualTestContext) {
++    workspace.update_in(cx, |workspace, window, cx| {
++        workspace.focus_panel::<AgentTasksPanel>(window, cx);
++    });
++    draw(cx);
++}
++
++fn store_label(session: &str, task: &str, cx: &mut VisualTestContext) -> Option<String> {
++    cx.update(|_, cx| {
++        let store = TaskHistoryStore::global(cx);
++        let records = store.read(cx).records().to_vec();
++        find(&records, session, task).and_then(|entry| entry.label.as_ref().map(|l| l.to_string()))
++    })
++}
++
++fn start(panels: &mut Panels, session: &str, task: &str) {
++    let target = key(session, task);
++    panels
++        .tasks_panel
++        .update_in(&mut panels.cx, |panel, window, cx| {
++            panel.start_rename(target, window, cx)
++        });
++    panels.cx.run_until_parked();
++}
++
++fn editor_text(panels: &mut Panels) -> Option<String> {
++    panels.tasks_panel.update(&mut panels.cx, |panel, cx| {
++        panel.rename_editor().map(|editor| editor.read(cx).text(cx))
++    })
++}
++
++fn editor_focused(panels: &mut Panels) -> bool {
++    panels
++        .tasks_panel
++        .update_in(&mut panels.cx, |panel, window, cx| {
++            panel
++                .rename_editor()
++                .is_some_and(|editor| editor.focus_handle(cx).is_focused(window))
++        })
++}
++
++fn type_text(panels: &mut Panels, text: &str) {
++    panels.cx.simulate_input(text);
++    panels.cx.run_until_parked();
++}
++
++fn confirm(panels: &mut Panels) {
++    panels.cx.dispatch_action(menu::Confirm);
++    panels.cx.run_until_parked();
++}
++
++fn rename_to(panels: &mut Panels, session: &str, task: &str, text: &str) {
++    start(panels, session, task);
++    type_text(panels, text);
++    confirm(panels);
++}
++
++fn set_filter(panels: &mut Panels, filter: TaskFilter, enabled: bool) {
++    panels.tasks_panel.update(&mut panels.cx, |panel, cx| {
++        panel.set_filter(filter, enabled, cx)
++    });
++    panels.cx.run_until_parked();
++}
++
++/// Thread A holds a RUNNING task `t`, thread B an ENDED task with the same id `t` — the same
++/// task id in two threads, so only the (session, task) pair tells the two rows apart.
++async fn same_id_in_two_threads(cx: &mut TestAppContext) -> (Panels, String, String) {
++    init_base(cx);
++    let mut panels = open_panels(cx).await;
++    ensure_labels(&mut panels.cx);
++    let a = open_live_thread(&mut panels, "A");
++    send_tasks(
++        &a,
++        vec![wire_task("t", "running", 1_000, None)],
++        &mut panels.cx,
++    );
++    let b = open_live_thread(&mut panels, "B");
++    send_tasks(
++        &b,
++        vec![wire_task("t", "completed", 2_000, None)],
++        &mut panels.cx,
++    );
++    let (sa, sb) = (
++        session_of(&a, &panels.cx).to_string(),
++        session_of(&b, &panels.cx).to_string(),
++    );
++    show_panel(&panels.workspace, &mut panels.cx);
++    (panels, sa, sb)
++}
++
++// R3.13 via a filter change. Hostile, stay-apart half first: hiding thread B's row must not close
++// the editor open on thread A's row of the SAME task id — the editor stays, focused, with its
++// text, and Enter still labels A only. Then the vanishing half: hiding the renamed row itself
++// closes the editor and keeps the previous label, and turning the filter back on brings back
++// neither the editor nor the half-typed text.
++#[gpui::test]
++async fn panel_actions_rename_vanish_filter_hiding_the_row_keeps_the_previous_label(
++    cx: &mut TestAppContext,
++) {
++    let (mut panels, sa, sb) = same_id_in_two_threads(cx).await;
++
++    start(&mut panels, &sa, "t");
++    type_text(&mut panels, "Still typing");
++    set_filter(&mut panels, TaskFilter::Finished, false);
++    settle(&mut panels.cx);
++    assert_eq!(
++        editor_text(&mut panels).as_deref(),
++        Some("Still typing"),
++        "hiding another thread's row with the same task id leaves this rename open"
++    );
++    assert!(editor_focused(&mut panels), "the editor keeps focus");
++    confirm(&mut panels);
++    assert_eq!(
++        store_label(&sa, "t", &mut panels.cx).as_deref(),
++        Some("Still typing")
++    );
++    assert_eq!(
++        store_label(&sb, "t", &mut panels.cx),
++        None,
++        "B's row was not renamed"
++    );
++    set_filter(&mut panels, TaskFilter::Finished, true);
++    settle(&mut panels.cx);
++
++    rename_to(&mut panels, &sb, "t", "Old");
++    assert_eq!(
++        store_label(&sb, "t", &mut panels.cx).as_deref(),
++        Some("Old")
++    );
++    start(&mut panels, &sb, "t");
++    type_text(&mut panels, "Half typed");
++    set_filter(&mut panels, TaskFilter::Finished, false);
++    settle(&mut panels.cx);
++
++    assert_eq!(
++        store_label(&sb, "t", &mut panels.cx).as_deref(),
++        Some("Old"),
++        "a rename whose row a filter hid keeps the previous label"
++    );
++    assert_eq!(
++        editor_text(&mut panels),
++        None,
++        "the hidden row's editor is closed"
++    );
++    assert_eq!(
++        store_label(&sa, "t", &mut panels.cx).as_deref(),
++        Some("Still typing"),
++        "the other thread's label is untouched"
++    );
++
++    set_filter(&mut panels, TaskFilter::Finished, true);
++    settle(&mut panels.cx);
++    assert_eq!(
++        editor_text(&mut panels),
++        None,
++        "showing the row again reopens nothing"
++    );
++    assert_eq!(
++        store_label(&sb, "t", &mut panels.cx).as_deref(),
++        Some("Old")
++    );
++}
++
++// R3.13 via the record: a running row that fails while being renamed leaves the list (Failed is
++// off by default) — the edit is discarded and the previous label kept.
++#[gpui::test]
++async fn panel_actions_rename_vanish_row_leaving_the_list_keeps_the_previous_label(
++    cx: &mut TestAppContext,
++) {
++    init_base(cx);
++    let mut panels = open_panels(cx).await;
++    ensure_labels(&mut panels.cx);
++    let thread = open_live_thread(&mut panels, "Live");
++    send_tasks(
++        &thread,
++        vec![wire_task("t", "running", 1_000, None)],
++        &mut panels.cx,
++    );
++    let session = session_of(&thread, &panels.cx).to_string();
++    show_panel(&panels.workspace, &mut panels.cx);
++
++    rename_to(&mut panels, &session, "t", "Old");
++    start(&mut panels, &session, "t");
++    type_text(&mut panels, "Half typed");
++    send_tasks(
++        &thread,
++        vec![wire_task("t", "failed", 1_000, None)],
++        &mut panels.cx,
++    );
++    settle(&mut panels.cx);
++    assert!(
++        find_row(&mut panels, &session, "t").is_none(),
++        "the failed row is no longer listed"
++    );
++
++    assert_eq!(
++        store_label(&session, "t", &mut panels.cx).as_deref(),
++        Some("Old"),
++        "a rename whose row left the list keeps the previous label"
++    );
++    assert_eq!(editor_text(&mut panels), None, "its editor is closed");
++}
++
++// R3.13 via scrolling: a rename on the top row, then the list scrolled to its last line so the
++// renamed row is drawn no more — the edit is discarded and the previous label kept.
++#[gpui::test]
++async fn panel_actions_rename_vanish_row_scrolled_out_of_view_keeps_the_previous_label(
++    cx: &mut TestAppContext,
++) {
++    init_base(cx);
++    let mut panels = open_panels(cx).await;
++    ensure_labels(&mut panels.cx);
++    let thread = open_live_thread(&mut panels, "Long");
++    // 120 running rows — far more than any dock shows. `t119` is the newest, so it is listed
++    // first.
++    let tasks = (0..120)
++        .map(|n| wire_task(&format!("t{n}"), "running", 1_000 + n * 10, None))
++        .collect();
++    send_tasks(&thread, tasks, &mut panels.cx);
++    let session = session_of(&thread, &panels.cx).to_string();
++    show_panel(&panels.workspace, &mut panels.cx);
++
++    rename_to(&mut panels, &session, "t119", "Old");
++    start(&mut panels, &session, "t119");
++    type_text(&mut panels, "Half typed");
++    assert!(
++        editor_focused(&mut panels),
++        "the editor is shown and focused"
++    );
++
++    let last = panels.tasks_panel.update(&mut panels.cx, |panel, _| {
++        panel.entries.len().saturating_sub(1)
++    });
++    assert!(last > 100, "every row is a line of the list");
++    panels.tasks_panel.update(&mut panels.cx, |panel, _| {
++        panel
++            .scroll_handle
++            .scroll_to_item(last, ScrollStrategy::Top)
++    });
++    settle(&mut panels.cx);
++    let at_end = panels.tasks_panel.update(&mut panels.cx, |panel, _| {
++        panel.scroll_handle.is_scrolled_to_end()
++    });
++    assert_eq!(
++        at_end,
++        Some(true),
++        "the list is scrollable and scrolled to its last line, away from the renamed row"
++    );
++
++    assert_eq!(
++        store_label(&session, "t119", &mut panels.cx).as_deref(),
++        Some("Old"),
++        "a rename scrolled out of view keeps the previous label"
++    );
++    assert_eq!(editor_text(&mut panels), None, "its editor is closed");
++}
++
++// R3.6 narrowed and R3.13 side by side. Hostile half first: focus moving from the editor to
++// another element — a filter toggle — confirms, as Enter would. Then a blur that leaves NOTHING
++// focused — what a vanished editor raises — discards the edit and keeps that label.
++#[gpui::test]
++async fn panel_actions_rename_vanish_blur_with_nothing_focused_discards_but_a_blur_to_another_element_confirms(
++    cx: &mut TestAppContext,
++) {
++    init_base(cx);
++    let mut panels = open_panels(cx).await;
++    ensure_labels(&mut panels.cx);
++    let thread = open_live_thread(&mut panels, "Live");
++    send_tasks(
++        &thread,
++        vec![wire_task("t", "running", 1_000, None)],
++        &mut panels.cx,
++    );
++    let session = session_of(&thread, &panels.cx).to_string();
++    show_panel(&panels.workspace, &mut panels.cx);
++
++    start(&mut panels, &session, "t");
++    type_text(&mut panels, "Kept");
++    panels
++        .tasks_panel
++        .update_in(&mut panels.cx, |panel, window, cx| {
++            let toggle = panel.filter_focus_handles[0].clone();
++            window.focus(&toggle, cx);
++        });
++    settle(&mut panels.cx);
++    assert_eq!(editor_text(&mut panels), None);
++    assert_eq!(
++        store_label(&session, "t", &mut panels.cx).as_deref(),
++        Some("Kept"),
++        "focus moved to a filter toggle confirms the label"
++    );
++
++    start(&mut panels, &session, "t");
++    type_text(&mut panels, "Half typed");
++    panels.cx.update(|window, cx| window.blur(cx));
++    settle(&mut panels.cx);
++
++    assert_eq!(
++        store_label(&session, "t", &mut panels.cx).as_deref(),
++        Some("Kept"),
++        "a blur with nothing focused discards the edit"
++    );
++    assert_eq!(editor_text(&mut panels), None, "the editor is closed");
 +}
 diff --git a/crates/agent_tasks_panel/src/store.rs b/crates/agent_tasks_panel/src/store.rs
 index 6719acf..fc31082 100644
