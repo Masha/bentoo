@@ -1582,7 +1582,7 @@ declare -A GIT_CRATES=(
 # rewrites the date and EGIT_COMMIT; a second version variable it could not
 # keep current would leave a new tarball under an old, already-manifested name).
 
-EGIT_COMMIT="279fe070bb389b79652e52065b2f001edcc0b11b"
+EGIT_COMMIT="cac9d17a6c1283759805fa968d5b111a6ba5f988"
 LLVM_COMPAT=( 22 )
 RUST_MIN_VER="1.98.1"
 RUST_NEEDS_LLVM=1
@@ -1980,6 +1980,10 @@ src_prepare() {
 			# ctrl-alt-shift-a, no settings of its own. Rides this flag BY
 			# DEPENDENCY, after 0038: fed only by 0037's card.
 			"${FILESDIR}/0035-agent-tasks-panel.patch"
+			# 0039: task labels on one line, at most 60 characters, in 0037's card
+			# and 0035's panel, plus the panel's Rename (kept in 0035's history,
+			# migration 2). Rides this flag BY DEPENDENCY, after 0035.
+			"${FILESDIR}/0039-agent-task-labels.patch"
 		)
 	fi
 
