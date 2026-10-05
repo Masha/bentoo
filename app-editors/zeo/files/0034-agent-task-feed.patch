@@ -2068,7 +2068,7 @@ index 9727fae..03e22b1 100644
              | AcpThreadEvent::SubagentSpawned(_)
              | AcpThreadEvent::EntriesRemoved(_)
 diff --git a/crates/agent_ui/src/agent_panel.rs b/crates/agent_ui/src/agent_panel.rs
-index fe1f17c..3e32c75 100644
+index 4e2db35..f49d3b0 100644
 --- a/crates/agent_ui/src/agent_panel.rs
 +++ b/crates/agent_ui/src/agent_panel.rs
 @@ -4293,6 +4293,9 @@ impl AgentPanel {

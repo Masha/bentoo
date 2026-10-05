@@ -327,7 +327,7 @@ index 0000000..9bd3ea6
 +    }
 +}
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
-index 161bb8b..0ed6227 100644
+index 6c35421..1b9e65b 100644
 --- a/crates/agent_ui/src/conversation_view/thread_view.rs
 +++ b/crates/agent_ui/src/conversation_view/thread_view.rs
 @@ -674,6 +674,9 @@ pub struct TurnFields {
@@ -469,7 +469,7 @@ index 161bb8b..0ed6227 100644
                      )
                  },
              )
-@@ -8211,14 +8265,22 @@ impl ThreadView {
+@@ -8215,14 +8269,22 @@ impl ThreadView {
  
      fn render_generating(&self, confirmation: bool, cx: &App) -> impl IntoElement {
          let show_stats = AgentSettings::get_global(cx).show_turn_stats;
@@ -497,7 +497,7 @@ index 161bb8b..0ed6227 100644
  
          let is_blocked_on_terminal_command =
              !confirmation && self.is_blocked_on_terminal_command(cx);
-@@ -8279,6 +8341,13 @@ impl ThreadView {
+@@ -8283,6 +8345,13 @@ impl ThreadView {
                          .color(Color::Muted),
                  )
              })

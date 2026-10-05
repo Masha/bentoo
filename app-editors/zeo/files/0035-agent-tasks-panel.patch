@@ -118,7 +118,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 ---
 
 diff --git a/Cargo.lock b/Cargo.lock
-index 16a1057..01ee382 100644
+index 49160fc..e71e6e4 100644
 --- a/Cargo.lock
 +++ b/Cargo.lock
 @@ -459,6 +459,33 @@ dependencies = [
@@ -155,7 +155,7 @@ index 16a1057..01ee382 100644
  [[package]]
  name = "agent_ui"
  version = "0.1.0"
-@@ -22834,6 +22861,7 @@ dependencies = [
+@@ -22809,6 +22836,7 @@ dependencies = [
   "agent_servers",
   "agent_settings",
   "agent_skills",
@@ -164,7 +164,7 @@ index 16a1057..01ee382 100644
   "anyhow",
   "ashpd",
 diff --git a/Cargo.toml b/Cargo.toml
-index d623682..3fc86c8 100644
+index 4d9a614..b6b3455 100644
 --- a/Cargo.toml
 +++ b/Cargo.toml
 @@ -9,6 +9,7 @@ members = [
@@ -175,7 +175,7 @@ index d623682..3fc86c8 100644
      "crates/agent_ui",
      "crates/ai_onboarding",
      "crates/anthropic",
-@@ -289,6 +290,7 @@ agent = { path = "crates/agent" }
+@@ -288,6 +289,7 @@ agent = { path = "crates/agent" }
  agent_servers = { path = "crates/agent_servers" }
  agent_settings = { path = "crates/agent_settings" }
  agent_skills = { path = "crates/agent_skills" }
@@ -5406,7 +5406,7 @@ index 0000000..f08c933
 +        .collect()
 +}
 diff --git a/crates/agent_ui/src/agent_panel.rs b/crates/agent_ui/src/agent_panel.rs
-index f09f016..4477b13 100644
+index 62977c7..37f2127 100644
 --- a/crates/agent_ui/src/agent_panel.rs
 +++ b/crates/agent_ui/src/agent_panel.rs
 @@ -4537,8 +4537,8 @@ impl AgentPanel {
@@ -6864,7 +6864,7 @@ index 0000000..d1d7dd8
 +    assert_eq!(endings[0].thread_title.as_deref(), Some(GENERATED));
 +}
 diff --git a/crates/zed/Cargo.toml b/crates/zed/Cargo.toml
-index 833c593..6e1701e 100644
+index 0f862d9..e8c5b90 100644
 --- a/crates/zed/Cargo.toml
 +++ b/crates/zed/Cargo.toml
 @@ -73,6 +73,7 @@ agent_servers = { workspace = true, optional = true }
@@ -6876,10 +6876,10 @@ index 833c593..6e1701e 100644
  askpass.workspace = true
  assets.workspace = true
 diff --git a/crates/zed/src/main.rs b/crates/zed/src/main.rs
-index cfeec5f..210082f 100644
+index 738ee18..ca6aee8 100644
 --- a/crates/zed/src/main.rs
 +++ b/crates/zed/src/main.rs
-@@ -719,6 +719,7 @@ fn main() {
+@@ -718,6 +718,7 @@ fn main() {
              false,
              cx,
          );
