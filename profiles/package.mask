@@ -1,3 +1,21 @@
+# Lucas C.S. <lucascs@protonmail.com> (2026-10-05)
+# Upstream abandoned. Kagi ended Orion for Linux on 2026-10-02 and ships no
+# further updates, security fixes included; its own advice is not to use the
+# Linux beta as a main browser:
+#   https://blog.kagi.com/update-orion-linux-windows
+# The bundled WebKit is therefore frozen at the April 0.3.0 bundle, in a
+# program whose whole job is to render untrusted content.
+#
+# icu-compat and libjxl-compat exist only to satisfy orion-bin's Flatpak ABI;
+# nothing else in the tree depends on them, so they go with it.
+#
+# Kagi promised to open-source the code within 30 days. If that yields a free
+# license and a maintained fork, the way back is a from-source package, not
+# this -bin. Removal on 2026-11-04.
+www-client/orion-bin
+dev-libs/icu-compat
+media-libs/libjxl-compat
+
 # Lucas C.S. <lucascs@protonmail.com> (2026-10-02)
 # Linux 7.3 release candidates as a dist-kernel, opt-in only. ::gentoo never
 # ships an -rc dist-kernel (its -rc kernels are git-sources, sources only), so
