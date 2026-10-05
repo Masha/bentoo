@@ -9,7 +9,12 @@ EAPI=8
 
 CRATES="
 	glycin@4.0.0
+	glycin-builtin@4.0.0
 	glycin-common@2.0.0
+	glycin-core@4.0.0
+	glycin-external@4.0.0
+	glycin-image-rs@2.2.0
+	glycin-test@2.2.0
 	glycin-utils@5.0.1
 "
 # These should be in the gentoo crate dist
