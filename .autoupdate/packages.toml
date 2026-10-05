@@ -10672,14 +10672,12 @@ which is what the 9999 ebuild is for; 9999 is not version-checked.
 # END
 
 ["sys-devel/mold"]
-enabled = false
-disabled_by = "auto"
 url = "https://api.github.com/repos/rui314/mold/releases/latest"
 parser = "json"
 path = "tag_name"
 transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "2.42.0"
+version = "3.0.0"
 comments = """
 mold — GitHub releases/latest -> tag_name "vX.Y.Z" ("v" stripped). Prefer
 latestRelease over ranking refs/tags: rui314/mold has no parallel prerelease
@@ -10687,6 +10685,13 @@ channel today, but tag ranking has already produced false "outdated" results
 elsewhere in this overlay (see brave-browser stable/beta), so latestRelease is
 the default posture regardless. This overlay ships only the released ebuild;
 the 9999 live one stays in ::gentoo and is not mirrored here.
+
+Re-added on 2026-10-05 for 3.0.0, the Rust rewrite (CMake -> Cargo), ahead of
+::gentoo (2.42.1, the last C++ release). A bump is no longer PV-only: CRATES and
+GIT_CRATES must be regenerated from the new Cargo.lock (pycargoebuild), and
+MIMALLOC_COMMIT must follow the v3 submodule pinned by the mimalloc_rust fork at
+the GIT_CRATES commit -- the GitHub archive of that fork ships it empty.
+Once ::gentoo carries a 3.x that matches, drop the package again.
 """
 # END
 

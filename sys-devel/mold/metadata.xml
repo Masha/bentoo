@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<!-- maintainer-needed -->
+	<use>
+		<flag name="mimalloc">Use the bundled, statically linked mimalloc as the memory allocator instead of the system malloc</flag>
+	</use>
+	<upstream>
+		<remote-id type="github">rui314/mold</remote-id>
+	</upstream>
+</pkgmetadata>
