@@ -243,18 +243,30 @@ version_series() {
 	fi
 }
 
-# highest_version <version>...
-# The greatest of the versions given, by sort -V.
+# sort_versions
+# Sorts the versions on stdin, one per line, in Gentoo order.
 #
-# KNOWN GAP, stated where it is used rather than discovered later: sort -V is
-# GNU version sort, not Gentoo's ver_test. They disagree on suffixed versions -
-# Gentoo orders 1.0_rc1 BELOW 1.0, sort -V puts it above. Measured 2026-08-06:
-# three shared packages carry a suffixed ::gentoo version and in none of them
-# does the disagreement change the version picked, so the sweep is unaffected
-# today. design.md specifies sort -V; a package where it starts to matter shows
-# up as a baseline that looks wrong for a reason this comment explains.
+# Plain sort -V is GNU version sort, not Gentoo's ver_test, and the two disagree
+# on suffixed versions: Gentoo orders 1.0_rc1 BELOW 1.0, sort -V puts it above.
+# That was a known gap until 2026-10-06, when it first changed a pick:
+# sys-apps/systemd-262-r1 got ::gentoo's 262_rc2 as its baseline instead of
+# 262, and the rc's empty KEYWORDS surfaced as an UNDOCUMENTED row.
+#
+# The fix keeps sort -V and rewrites only the sort KEY: the four pre-release
+# suffixes become "~" plus a letter in their Gentoo order (alpha < beta < pre
+# < rc), and sort -V places "~" before the end of the string, so 1.0~r1 sorts
+# below 1.0. _p and -rN are left alone - sort -V already puts both above the
+# bare version, as Gentoo does.
+sort_versions() {
+	awk '{ k = $0; gsub(/_alpha/, "~a", k); gsub(/_beta/, "~b", k)
+		gsub(/_pre/, "~p", k); gsub(/_rc/, "~r", k); print k "\t" $0 }' |
+		sort -t $'\t' -k1,1V | cut -f2
+}
+
+# highest_version <version>...
+# The greatest of the versions given, in Gentoo order (see sort_versions).
 highest_version() {
-	printf '%s\n' "$@" | sort -V | tail -n1
+	printf '%s\n' "$@" | sort_versions | tail -n1
 }
 
 ### pipeline #########################################################
@@ -536,7 +548,7 @@ gentoo_candidates() {
 		return 0
 	fi
 
-	printf '%s\n' "${versions[@]}" | sort -V | tr '\n' ' '
+	printf '%s\n' "${versions[@]}" | sort_versions | tr '\n' ' '
 }
 
 CACHE_SLOT=""

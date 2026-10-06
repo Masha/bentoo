@@ -1,0 +1,431 @@
+From 847a40e16c2ceda279a6c7c83cb00e70fb3effa3 Mon Sep 17 00:00:00 2001
+From: Chris Coulson <chris.coulson@amutable.com>
+Date: Tue, 29 Sep 2026 15:36:00 +0200
+Subject: [PATCH] tpm2: Don't fail NvPCR initialization if there is no initial
+ write policy available
+
+Currently systemd-tpm2-setup will fail if NvPCR initialization doesn't
+succeed, either because the currently booted UKI carries no PCR public
+key, or it carries no appropriate signed policy (one with the "initrd"
+policy reference). In addition to this, systemd-pcrextend will
+subsequently fail because it also fails to initialize the NvPCR it is
+requested to extend.
+
+This makes systemd-tpm2-setup return EX_CONFIG in these scenarios, with
+this marked as a successful exit status in the service unit file. In
+addition to this, systemd-pcrextend is updated to only attempt NvPCR
+initialization from the initrd (the only place it will succceed), and
+when called with --graceful, to not exit with an error code if the
+target NvPCR is uninitialized, and can't be initialized because of a
+missing PCR public key or appropriate signed policy. When called via
+Varlink, it will return the existing "NoSuchNvPCR" error.
+
+Note that I also removed some NvPCR initialization specific exit status
+codes from systemd-tpm2-setup.service.in, as these can only be returned
+via systemd-tpm2-setup-early.service.
+
+This should address the issues in
+https://github.com/systemd/systemd/issues/43848.
+---
+ src/pcrextend/pcrextend.c                 | 36 +++++----
+ src/shared/tpm2-util.c                    | 70 +++++++++++++----
+ src/systemd/sd-messages.h                 |  3 +
+ src/tpm2-setup/tpm2-setup.c               | 24 ++++++
+ test/units/TEST-70-TPM2.nvpcr.sh          | 93 ++++++++++++++++++++++-
+ units/systemd-tpm2-setup-early.service.in |  2 +
+ units/systemd-tpm2-setup.service.in       |  2 -
+ 7 files changed, 198 insertions(+), 32 deletions(-)
+
+diff --git a/src/pcrextend/pcrextend.c b/src/pcrextend/pcrextend.c
+index f0cc7500f9d0..9d772abe696a 100644
+--- a/src/pcrextend/pcrextend.c
++++ b/src/pcrextend/pcrextend.c
+@@ -365,8 +365,8 @@ static int extend_nvpcr_now(
+                         secret,
+                         event,
+                         safe);
+-        if (r == -ENOBUFS)
+-                return r; /* NV space exhausted; let caller handle gracefully */
++        if (IN_SET(r, -ENOBUFS, -ENETDOWN))
++                return r; /* NV space exhausted or NvPCR not initialized; let caller handle gracefully */
+         if (r < 0)
+                 return log_error_errno(r, "Could not extend NvPCR: %m");
+ 
+@@ -451,7 +451,7 @@ static int vl_method_extend(sd_varlink *link, sd_json_variant *parameters, sd_va
+ 
+         if (p.nvpcr) {
+                 r = extend_nvpcr_now(p.nvpcr, extend_iovec, &p.secret, p.event_type);
+-                if (IN_SET(r, -ENOENT, -ENODEV))
++                if (IN_SET(r, -ENOENT, -ENODEV, -ENETDOWN))
+                         return sd_varlink_error(link, "io.systemd.PCRExtend.NoSuchNvPCR", NULL);
+                 if (r == -ENOBUFS)
+                         return sd_varlink_error(link, "io.systemd.PCRExtend.NvPCRSpaceExhausted", NULL);
+@@ -590,17 +590,25 @@ static int run(int argc, char *argv[]) {
+                 r = extend_nvpcr_now(arg_nvpcr_name, &IOVEC_MAKE(word, strlen(word)), NULL, event);
+         else
+                 r = extend_pcr_now(arg_pcr_mask, &IOVEC_MAKE(word, strlen(word)), NULL, event);
+-        /* Both extend paths report "TPM cannot be used for this measurement" (no PCR bank, missing crypto,
+-         * no TPM device — see tpm2_context_new_for_measurement()) as -EOPNOTSUPP. Under --graceful we skip
+-         * those rather than fail and block boot. Genuine faults keep their own errno and are never
+-         * suppressed. */
+-        if (arg_graceful && r == -EOPNOTSUPP) {
+-                log_notice_errno(r, "TPM2 cannot be used for measurement (no usable PCR bank, missing device, or missing crypto support), skipping gracefully.");
+-                return EXIT_SUCCESS;
+-        }
+-        if (arg_graceful && r == -ENOBUFS) {
+-                log_notice_errno(r, "TPM NV index space is exhausted, NvPCR '%s' could not be initialized, skipping gracefully.", arg_nvpcr_name);
+-                return EXIT_SUCCESS;
++        if (arg_graceful) {
++                /* Both extend paths report "TPM cannot be used for this measurement" (no PCR bank, missing crypto,
++                 * no TPM device — see tpm2_context_new_for_measurement()) as -EOPNOTSUPP. Under --graceful we skip
++                 * those rather than fail and block boot. Genuine faults keep their own errno and are never
++                 * suppressed. */
++                if (r == -EOPNOTSUPP) {
++                        log_notice_errno(r, "TPM2 cannot be used for measurement (no usable PCR bank, missing device, or missing crypto support), skipping gracefully.");
++                        return EXIT_SUCCESS;
++                }
++                if (r == -ENETDOWN) {
++                        /* The NvPCR couldn't be initialized in this boot (e.g. because the booted kernel image
++                         * carries no suitable PCR signature), hence there's nothing to extend. */
++                        log_notice_errno(r, "NvPCR '%s' is not initialized, skipping gracefully.", arg_nvpcr_name);
++                        return EXIT_SUCCESS;
++                }
++                if (r == -ENOBUFS) {
++                        log_notice_errno(r, "TPM NV index space is exhausted, NvPCR '%s' could not be initialized, skipping gracefully.", arg_nvpcr_name);
++                        return EXIT_SUCCESS;
++                }
+         }
+         if (r < 0)
+                 return r;
+diff --git a/src/shared/tpm2-util.c b/src/shared/tpm2-util.c
+index a4a2a27258c0..c9c940833779 100644
+--- a/src/shared/tpm2-util.c
++++ b/src/shared/tpm2-util.c
+@@ -4650,8 +4650,13 @@ static int find_signature(
+         const char *k;
+         int r;
+ 
++        assert(pcr_selection);
++        assert(policy || !ret_signature);
++        assert(!ret_signature || ret_signature_size);
++
+         /* Searches for a signature blob in the specified JSON object. Search keys are PCR bank, PCR mask,
+-         * public key, and policy digest. */
++         * public key, policy reference and policy digest. If 'policy' is NULL, matches any policy digest.
++         * If 'ret_signature' is NULL, only checks whether a matching entry exists. */
+ 
+         if (!sd_json_variant_is_object(v))
+                 return log_debug_errno(SYNTHETIC_ERRNO(EINVAL), "Signature is not a JSON object.");
+@@ -4721,18 +4726,23 @@ static int find_signature(
+                 if (!polj)
+                         continue;
+ 
+-                r = sd_json_variant_unhex(polj, &polj_data, &polj_size);
+-                if (r < 0)
+-                        return log_debug_errno(r, "Failed to decode policy hash JSON data: %m");
++                if (policy) {
++                        r = sd_json_variant_unhex(polj, &polj_data, &polj_size);
++                        if (r < 0)
++                                return log_debug_errno(r, "Failed to decode policy hash JSON data: %m");
+ 
+-                if (memcmp_nn(policy, policy_size, polj_data, polj_size) != 0)
+-                        continue;
++                        if (memcmp_nn(policy, policy_size, polj_data, polj_size) != 0)
++                                continue;
++                }
+ 
+                 /* This entry matches all our expectations, now return the signature included in it */
+                 sigj = sd_json_variant_by_key(i, "sig");
+                 if (!sigj)
+                         continue;
+ 
++                if (!ret_signature)
++                        return 0;
++
+                 return sd_json_variant_unbase64(sigj, ret_signature, ret_signature_size);
+         }
+ 
+@@ -9135,8 +9145,13 @@ int tpm2_nvpcr_extend_bytes(
+                 return r;
+ 
+         /* The NvPCR isn't initialized yet, i.e. systemd-tpm2-setup hasn't run.
+-         * Initialize it now and extend again. */
++         * Initialize it now and extend again. This can only run in the initrd. */
++        if (!in_initrd())
++                return log_debug_errno(r, "NvPCR is not initialized and lazy initialization is only available in the initrd, refusing.");
++
+         r = tpm2_nvpcr_initialize(c, session, name);
++        if (r == -ENOKEY) /* Can't be initialized in this boot, report it as not initialized. */
++                return -ENETDOWN;
+         if (r < 0)
+                 return log_debug_errno(r, "Failed to initialize NvPCR '%s': %m", name);
+ 
+@@ -9261,6 +9276,41 @@ int tpm2_nvpcr_initialize(
+         TPM2B_PUBLIC public;
+         _cleanup_(iovec_done) struct iovec fingerprint = {};
+         r = tpm2_nvpcr_load_pcr_public_key(/* path= */ NULL, &public, &fingerprint);
++        if (r == -ENOENT)
++                /* Avoid failing systemd-tpm2-setup if there is no PCR public key attached to the UKI. */
++                return log_debug_errno(SYNTHETIC_ERRNO(ENOKEY),
++                                       "No PCR public key available, cannot initialize NvPCR '%s'.", name);
++        if (r < 0)
++                return r;
++
++        /* Load the signed PCR policy, which authorizes the initializing write. */
++        _cleanup_(sd_json_variant_unrefp) sd_json_variant *signature_json = NULL;
++        r = tpm2_load_pcr_signature(/* path= */ NULL, &signature_json);
++        if (r == -ENOENT)
++                /* Avoid failing systemd-tpm2-setup if there are no PCR signatures attached to the UKI. */
++                return log_debug_errno(SYNTHETIC_ERRNO(ENOKEY),
++                                       "No signed PCR policy available, cannot initialize NvPCR '%s'.", name);
++        if (r < 0)
++                return log_debug_errno(r, "Failed to load PCR signature for NvPCR initialization: %m");
++
++        /* Check that there's a signed policy for the initializing write at all before we allocate anything
++         * on the TPM. This avoids failing systemd-tpm2-setup if there are no policies signed for the "initrd"
++         * policy reference. We don't check the policy digest here: if there is a matching policy but it doesn't
++         * match the current PCR state, or its signature is invalid, then that's a real error which we
++         * want to report below. */
++        TPML_PCR_SELECTION pcr_selection;
++        tpm2_tpml_pcr_selection_from_mask(NVPCR_PUBKEY_PCRMASK, TPM2_ALG_SHA256, &pcr_selection);
++        r = find_signature(
++                        signature_json,
++                        &pcr_selection,
++                        fingerprint.iov_base, fingerprint.iov_len,
++                        NVPCR_INIT_POLICY_REF,
++                        /* policy= */ NULL, /* policy_size= */ 0,
++                        /* ret_signature= */ NULL, /* ret_signature_size= */ NULL);
++        if (r == -ENOSTR)
++                return log_debug_errno(SYNTHETIC_ERRNO(ENOKEY),
++                                       "No signed PCR policy with reference '%s' available, cannot initialize NvPCR '%s'.",
++                                       NVPCR_INIT_POLICY_REF, name);
+         if (r < 0)
+                 return r;
+ 
+@@ -9281,12 +9331,6 @@ int tpm2_nvpcr_initialize(
+ 
+         log_debug("Successfully acquired handle to NV index 0x%" PRIx32 ".", p.nv_index);
+ 
+-        /* Load the signed PCR policy, which authorizes the initializing write. */
+-        _cleanup_(sd_json_variant_unrefp) sd_json_variant *signature_json = NULL;
+-        r = tpm2_load_pcr_signature(/* path= */ NULL, &signature_json);
+-        if (r < 0)
+-                return log_debug_errno(r, "Failed to load PCR signature for NvPCR initialization: %m");
+-
+         bool reset_marker;
+         for (unsigned i = RETRY_NVPCR_INIT_MAX;; i--) {
+                 /* Open a policy session to perform the initializing write. */
+diff --git a/src/systemd/sd-messages.h b/src/systemd/sd-messages.h
+index 25cf03e18ed1..c59291abfa5f 100644
+--- a/src/systemd/sd-messages.h
++++ b/src/systemd/sd-messages.h
+@@ -314,6 +314,9 @@ _SD_BEGIN_DECLARATIONS;
+ #define SD_MESSAGE_TPM_NVPCR_UNSUPPORTED              SD_ID128_MAKE(8f,07,a5,b8,14,ca,47,62,b8,9f,cc,30,82,e4,8a,ed)
+ #define SD_MESSAGE_TPM_NVPCR_UNSUPPORTED_STR          SD_ID128_MAKE_STR(8f,07,a5,b8,14,ca,47,62,b8,9f,cc,30,82,e4,8a,ed)
+ 
++#define SD_MESSAGE_TPM_NVPCR_UNAUTHORIZED             SD_ID128_MAKE(7a,42,76,13,a5,69,46,b6,bf,a9,ae,e1,df,c5,53,cd)
++#define SD_MESSAGE_TPM_NVPCR_UNAUTHORIZED_STR         SD_ID128_MAKE_STR(7a,42,76,13,a5,69,46,b6,bf,a9,ae,e1,df,c5,53,cd)
++
+ #define SD_MESSAGE_MISSING_DEPENDENCY                 SD_ID128_MAKE(ea,c6,d3,94,c9,25,49,3d,ea,c2,ba,99,f3,c2,bb,11)
+ #define SD_MESSAGE_MISSING_DEPENDENCY_STR             SD_ID128_MAKE_STR(ea,c6,d3,94,c9,25,49,3d,ea,c2,ba,99,f3,c2,bb,11)
+ 
+diff --git a/src/tpm2-setup/tpm2-setup.c b/src/tpm2-setup/tpm2-setup.c
+index d9f6ebe46f39..041aa0b4639c 100644
+--- a/src/tpm2-setup/tpm2-setup.c
++++ b/src/tpm2-setup/tpm2-setup.c
+@@ -417,6 +417,9 @@ typedef struct SetupNvPCRContext {
+         Tpm2Context *tpm2_context;
+         size_t n_already, n_initialized, n_failed, n_skipped;
+         bool nv_space_exhausted; /* Set once the TPM ran out of NV index space, so we skip the rest. */
++        /* Set if the booted UKI carries no PCR public key or no signed PCR policy for NvPCR initialization,
++         * so we skip the rest. */
++        bool nvpcr_unauthorized;
+         Set *done;
+ } SetupNvPCRContext;
+ 
+@@ -448,6 +451,12 @@ static int setup_nvpcr_one(
+                 return 0;
+         }
+ 
++        if (c->nvpcr_unauthorized) {
++                log_debug("Booted UKI carries no PCR public key or no signed PCR policy for NvPCR initialization, skipping allocation of NvPCR '%s'.", name);
++                c->n_skipped++;
++                return 0;
++        }
++
+         r = tpm2_nvpcr_initialize(c->tpm2_context, /* session= */ NULL, name);
+         if (r == -EOPNOTSUPP) {
+                 c->n_failed++;
+@@ -465,6 +474,16 @@ static int setup_nvpcr_one(
+                                         LOG_MESSAGE("The TPM's NV index space is exhausted, skipping allocation of NvPCR '%s' and any less important ones: %m", name),
+                                         LOG_MESSAGE_ID(SD_MESSAGE_TPM_NVINDEX_EXHAUSTED_STR));
+         }
++        if (r == -ENOKEY) {
++                /* The booted UKI carries no PCR public key or no signed PCR policy for NvPCR
++                 * initialization. This is not an error, the NvPCR simply won't be available in this
++                 * boot. */
++                c->nvpcr_unauthorized = true;
++                c->n_skipped++;
++                return log_struct_errno(LOG_NOTICE, r,
++                                        LOG_MESSAGE("Booted UKI carries no PCR public key or no signed PCR policy for NvPCR initialization, unable to allocate NvPCR '%s': %m", name),
++                                        LOG_MESSAGE_ID(SD_MESSAGE_TPM_NVPCR_UNAUTHORIZED_STR));
++        }
+         if (r < 0) {
+                 c->n_failed++;
+                 return log_error_errno(r, "Failed to initialize NvPCR index: %m");
+@@ -564,6 +583,9 @@ static int setup_nvpcr(void) {
+         if (c.nv_space_exhausted)
+                 log_notice("Skipped %zu lowest-priority NvPCR(s) because the TPM's NV index space is exhausted, proceeding anyway.", c.n_skipped);
+ 
++        if (c.nvpcr_unauthorized)
++                log_notice("Skipped %zu NvPCR(s) because the booted kernel image carries no PCR public key or no signed PCR policy for NvPCR initialization, proceeding anyway.", c.n_skipped);
++
+         if (c.n_failed > 0)
+                 log_warning("%zu NvPCRs failed to initialize, proceeding anyway.", c.n_failed);
+ 
+@@ -583,6 +605,8 @@ static int setup_nvpcr(void) {
+                 return EX_UNAVAILABLE;   /* e.g. no NvPCR support in TPM */
+         if (ret == -ENOBUFS)
+                 return EX_CANTCREAT;     /* NV index space on TPM exhausted */
++        if (ret == -ENOKEY)
++                return EX_CONFIG;        /* booted UKI carries no PCR public key or no signed PCR policy for NvPCR initialization */
+ 
+         return ret;
+ }
+diff --git a/test/units/TEST-70-TPM2.nvpcr.sh b/test/units/TEST-70-TPM2.nvpcr.sh
+index 60dac06c483f..bda142a38ef2 100755
+--- a/test/units/TEST-70-TPM2.nvpcr.sh
++++ b/test/units/TEST-70-TPM2.nvpcr.sh
+@@ -24,10 +24,10 @@ at_exit() {
+ 
+     mv -f /run/systemd/tpm2-pcr-public-key.pem.bak /run/systemd/tpm2-pcr-public-key.pem
+     mv -f /run/systemd/tpm2-pcr-signature.json.bak /run/systemd/tpm2-pcr-signature.json
+-    rm -f /tmp/tpm2-pcr-private-key.pem
++    rm -f /tmp/tpm2-pcr-private-key.pem /tmp/tpm2-pcr-public-key.pem /tmp/tpm2-pcr-signature.json.valid
+     rm -rf /run/nvpcr /tmp/nvpcr
+     rm -f /var/tmp/nvpcr.raw /run/verity.d/test-70-nvpcr.crt
+-    rm -f /run/systemd/nvpcr/test.auth /run/systemd/nvpcr/test2.auth /run/systemd/nvpcr/aaa.auth /run/systemd/nvpcr/zzz.auth
++    rm -f /run/systemd/nvpcr/test.auth /run/systemd/nvpcr/test2.auth /run/systemd/nvpcr/aaa.auth /run/systemd/nvpcr/zzz.auth /run/systemd/nvpcr/unauth.auth /run/systemd/nvpcr/unauth2.auth
+     rm -f /tmp/test.policy
+ }
+ 
+@@ -156,11 +156,98 @@ AAA_LINE="$(echo "$SETUP_LOG" | grep -n "Setting up NvPCR 'aaa'" | cut -d: -f1)"
+ ZZZ_LINE="$(echo "$SETUP_LOG" | grep -n "Setting up NvPCR 'zzz'" | cut -d: -f1)"
+ test "$ZZZ_LINE" -lt "$AAA_LINE"
+ 
++# Verify that systemd-tpm2-setup skips (rather than fails) NvPCR initialization if the booted kernel
++# image carries no PCR public key or no signed PCR policy with the "initrd" reference, and that it
++# doesn't allocate the NV index in that case. systemd-pcrextend must then treat the NvPCR as not
++# initialized. 'unauth2' sorts after 'unauth', so once 'unauth' couldn't be initialized it must be
++# skipped without another initialization attempt.
++cat >/run/nvpcr/unauth.nvpcr <<EOF
++{"name":"unauth","algorithm":"sha256","nvIndex":30474774}
++EOF
++cat >/run/nvpcr/unauth2.nvpcr <<EOF
++{"name":"unauth2","algorithm":"sha256","nvIndex":30474775,"priority":1001}
++EOF
++cp /run/systemd/tpm2-pcr-signature.json /tmp/tpm2-pcr-signature.json.valid
++
++# Takes the expected reason for skipping the initialization, as logged by tpm2_nvpcr_initialize().
++check_nvpcr_unauth_skipped() {
++    local reason="${1:?}"
++    local expected="$reason, cannot initialize NvPCR 'unauth'."
++    local log rc=0
++
++    # systemd-tpm2-setup returns EX_CONFIG if the NvPCR initialization was skipped for this reason
++    log="$("$SD_TPM2SETUP" --early=yes 2>&1)" || rc=$?
++    [[ "$rc" -eq 78 ]]
++    grep -F "$expected" <<<"$log" >/dev/null
++    grep -F "Skipped 2 NvPCR(s) because the booted kernel image carries no PCR public key or no signed PCR policy" <<<"$log" >/dev/null
++    grep -F "skipping allocation of NvPCR 'unauth2'." <<<"$log" >/dev/null
++    (! grep -F "cannot initialize NvPCR 'unauth2'" <<<"$log" >/dev/null)
++    test ! -f /run/systemd/nvpcr/unauth.auth
++    test ! -f /run/systemd/nvpcr/unauth2.auth
++    (! tpm2_nvreadpublic 0x01d10216)
++    (! tpm2_nvreadpublic 0x01d10217)
++
++    (! "$SD_PCREXTEND" --nvpcr=unauth foo)
++    "$SD_PCREXTEND" --graceful --nvpcr=unauth foo
++    log="$(varlinkctl call /usr/lib/systemd/systemd-pcrextend io.systemd.PCRExtend.Extend '{"nvpcr":"unauth","text":"foo"}' 2>&1 || :)"
++    grep -F "io.systemd.PCRExtend.NoSuchNvPCR" <<<"$log" >/dev/null
++
++    # In the initrd, systemd-pcrextend attempts to lazily initialize the NvPCR, which must fail in the
++    # same way and be reported as the NvPCR not being initialized.
++    rc=0
++    log="$(SYSTEMD_IN_INITRD=1 "$SD_PCREXTEND" --nvpcr=unauth foo 2>&1)" || rc=$?
++    [[ "$rc" -ne 0 ]]
++    grep -F "$expected" <<<"$log" >/dev/null
++    log="$(SYSTEMD_IN_INITRD=1 "$SD_PCREXTEND" --graceful --nvpcr=unauth foo 2>&1)"
++    grep -F "$expected" <<<"$log" >/dev/null
++    grep -F "NvPCR 'unauth' is not initialized, skipping gracefully." <<<"$log" >/dev/null
++    log="$(SYSTEMD_IN_INITRD=1 varlinkctl call /usr/lib/systemd/systemd-pcrextend io.systemd.PCRExtend.Extend '{"nvpcr":"unauth","text":"foo"}' 2>&1 || :)"
++    grep -F "$expected" <<<"$log" >/dev/null
++    grep -F "io.systemd.PCRExtend.NoSuchNvPCR" <<<"$log" >/dev/null
++    test ! -f /run/systemd/nvpcr/unauth.auth
++    (! tpm2_nvreadpublic 0x01d10216)
++}
++
++# No PCR public key
++mv /run/systemd/tpm2-pcr-public-key.pem /tmp/tpm2-pcr-public-key.pem
++check_nvpcr_unauth_skipped "No PCR public key available"
++mv /tmp/tpm2-pcr-public-key.pem /run/systemd/tpm2-pcr-public-key.pem
++
++# No PCR signature file
++rm -f /run/systemd/tpm2-pcr-signature.json
++check_nvpcr_unauth_skipped "No signed PCR policy available"
++
++# PCR signature without a policy with the "initrd" reference
++"$SD_MEASURE" sign --current --bank sha256 --private-key="/tmp/tpm2-pcr-private-key.pem" --public-key="/run/systemd/tpm2-pcr-public-key.pem" --phase=":" --policyref="foo" >"/run/systemd/tpm2-pcr-signature.json"
++check_nvpcr_unauth_skipped "No signed PCR policy with reference 'initrd' available"
++"$SD_MEASURE" sign --current --bank sha256 --private-key="/tmp/tpm2-pcr-private-key.pem" --public-key="/run/systemd/tpm2-pcr-public-key.pem" --phase=":" >"/run/systemd/tpm2-pcr-signature.json"
++check_nvpcr_unauth_skipped "No signed PCR policy with reference 'initrd' available"
++
++# A policy with the "initrd" reference but an invalid signature must still fail
++jq --arg sig "$(openssl rand -base64 256 | tr -d '\n')" '.sha256[].sig = $sig' </tmp/tpm2-pcr-signature.json.valid >/run/systemd/tpm2-pcr-signature.json
++SETUP_LOG="$(rc=0; $SD_TPM2SETUP --early=yes 2>&1 || rc=$?; [[ "$rc" -ne 0 ]] && [[ "$rc" -ne 69 ]] && [[ "$rc" -ne 78 ]])"
++grep -F "Failed to initialize NvPCR index: State not recoverable" <<<"$SETUP_LOG" >/dev/null
++test ! -f /run/systemd/nvpcr/unauth.auth
++test ! -f /run/systemd/nvpcr/unauth2.auth
++tpm2_nvundefine -C o 0x01d10216
++tpm2_nvundefine -C o 0x01d10217
++
++# And with the valid signature restored, the NvPCRs get initialized
++cp /tmp/tpm2-pcr-signature.json.valid /run/systemd/tpm2-pcr-signature.json
++run_tpm2_setup
++test -f /run/systemd/nvpcr/unauth.auth
++test -f /run/systemd/nvpcr/unauth2.auth
++"$SD_PCREXTEND" --nvpcr=unauth foo
++"$SD_PCREXTEND" --nvpcr=unauth2 foo
++rm -f /run/nvpcr/unauth.nvpcr /run/nvpcr/unauth2.nvpcr /run/systemd/nvpcr/unauth.auth /run/systemd/nvpcr/unauth2.auth
++tpm2_nvundefine -C o 0x01d10216
++tpm2_nvundefine -C o 0x01d10217
++
+ # Verify that we can't redefine an NvPCR once we've exitted early boot by extending PCR11.
+ rm -f /run/systemd/nvpcr/test.auth
+ tpm2_nvundefine -C o 0x01d1020a
+ "$SD_PCREXTEND" --pcr 11 "foo"
+-SETUP_LOG="$(rc=0; $SD_TPM2SETUP --early=yes 2>&1 || rc=$?; [[ "$rc" -ne 0 ]] && [[ "$rc" -ne 69 ]])"
++SETUP_LOG="$(rc=0; $SD_TPM2SETUP --early=yes 2>&1 || rc=$?; [[ "$rc" -ne 0 ]] && [[ "$rc" -ne 69 ]] && [[ "$rc" -ne 78 ]])"
+ grep -F "Failed to initialize NvPCR index: Device not a stream" <<<"$SETUP_LOG" >/dev/null
+ 
+ # Test the --login= mode and the 'login' NvPCR, used in production by systemd-pcrlogin@.service.
+diff --git a/units/systemd-tpm2-setup-early.service.in b/units/systemd-tpm2-setup-early.service.in
+index bafb67519685..4754c171ecc5 100644
+--- a/units/systemd-tpm2-setup-early.service.in
++++ b/units/systemd-tpm2-setup-early.service.in
+@@ -28,3 +28,5 @@ SuccessExitStatus=PROTOCOL
+ SuccessExitStatus=UNAVAILABLE
+ # The tool returns EX_CANTCREAT if the NV index space is exhausted.
+ SuccessExitStatus=CANTCREAT
++# The tool returns EX_CONFIG if the booted UKI carries no PCR public key or no signed policy for NvPCR initialization.
++SuccessExitStatus=CONFIG
+diff --git a/units/systemd-tpm2-setup.service.in b/units/systemd-tpm2-setup.service.in
+index 4593211c1ef8..f0489777b367 100644
+--- a/units/systemd-tpm2-setup.service.in
++++ b/units/systemd-tpm2-setup.service.in
+@@ -27,5 +27,3 @@ ExecStart={{LIBEXECDIR}}/systemd-tpm2-setup --graceful
+ SuccessExitStatus=PROTOCOL
+ # The tool returns EX_UNAVAILABLE if some key functionality (e.g. NvPCR) support is not available in the TPM device.
+ SuccessExitStatus=UNAVAILABLE
+-# The tool returns EX_CANTCREAT if the NV index space is exhausted.
+-SuccessExitStatus=CANTCREAT
