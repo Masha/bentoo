@@ -12,12 +12,10 @@ SRC_URI="https://github.com/obentoo/${PN}/archive/refs/tags/v${PV}.tar.gz -> ${P
 LICENSE="MIT"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
-IUSE="+secure kde playwright +browser +system-snapshot systemd"
+IUSE="+secure kde +browser +system-snapshot systemd"
 RESTRICT="network-sandbox"
-
-# playwright and browser are two alternative backends for the same headless
-# "script" version parser, so at most one may be enabled.
-REQUIRED_USE="?? ( playwright browser )"
+# go.mod declares go 1.26.0; an older toolchain refuses the module.
+BDEPEND=">=dev-lang/go-1.26.0"
 
 # browser? enables the chromedp backend, which drives an already-installed
 # Chrome/Chromium over the DevTools Protocol (it does not download a browser).
@@ -63,11 +61,9 @@ src_compile() {
 
 	# The "script" version parser (headless-browser backend used by some
 	# autoupdate packages) lives behind a build tag; without one the binary
-	# ships only the stub that reports ErrScriptSupportNotBuilt. `playwright`
-	# bundles its own browsers; `browser` (chromedp) drives the system Chrome.
-	# REQUIRED_USE keeps the two mutually exclusive.
+	# ships only the stub that reports ErrScriptSupportNotBuilt. `browser`
+	# (chromedp) drives the system Chrome.
 	local gotags=""
-	use playwright && gotags="-tags playwright"
 	use browser && gotags="-tags chromedp"
 
 	ego build ${gotags} -ldflags "${ldflags}" -o bentoo ./cmd/bentoo
@@ -109,15 +105,6 @@ pkg_postinst() {
 	elog "  git:"
 	elog "    user: your_username"
 	elog "    email: your_email@example.com"
-
-	if use playwright; then
-		elog ""
-		elog "The headless-browser (\"script\") version parser is enabled"
-		elog "(Playwright backend). It needs the Playwright browsers at runtime."
-		elog "If 'bentoo overlay autoupdate' reports 'could not start Playwright',"
-		elog "install them once:"
-		elog "  playwright install chromium"
-	fi
 
 	if use browser; then
 		elog ""

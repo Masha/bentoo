@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@proton.me</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<longdescription lang="en">
+		bentoo-tray is a session daemon that reads the bentoo overlay's notices
+		feed and the unread bentoo news items, keeps those that concern packages
+		installed from the bentoo repository, and shows them as desktop
+		notifications and a StatusNotifierItem tray icon. It ships from the
+		bentoolkit repository as a separate binary.
+	</longdescription>
+	<use>
+		<flag name="systemd">Install the systemd user unit that starts the tray with the graphical session</flag>
+	</use>
+	<upstream>
+		<remote-id type="github">obentoo/bentoolkit</remote-id>
+		<bugs-to>https://github.com/obentoo/bentoolkit/issues</bugs-to>
+	</upstream>
+</pkgmetadata>
