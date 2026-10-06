@@ -13653,3 +13653,25 @@ pytorch/torchvision. PyPI info.version is clean X.Y.Z; the SRC_URI is the
 GitHub tag tarball. Live=2.11.0 == current PV.
 """
 # END
+
+["app-mobilephone/scrcpy"]
+url = "https://api.github.com/repos/Genymobile/scrcpy/releases/latest"
+parser = "json"
+path = "tag_name"
+transform = [['^v', ""]]
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "5.0"
+comments = """
+scrcpy — releases/latest; tag_name is "vX.Y", transform strips the v.
+Verified on 2026-10-06: tag_name "v5.0", published 2026-10-05.
+
+TEMPORARY MIRROR of ::gentoo's app-mobilephone/scrcpy (4.1 there), carried for
+5.0's VA-API hardware decoding and for ~arm64. Remove the ebuild and set
+enabled = false once ::gentoo reaches 5.0 with ~arm64.
+
+A bump needs BOTH distfiles: the source tarball and the prebuilt
+scrcpy-server-vX.Y release asset. Check upstream's SHA256SUMS.txt for the
+server, and diff app/meson.build's dependency() lines and meson_options.txt
+against the previous tag: 5.0 added -Dvaapi and raised FFmpeg to >= 6.
+"""
+# END

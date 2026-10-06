@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@protonmail.com</email>
+		<name>Lucas Couto</name>
+	</maintainer>
+	<use>
+		<flag name="usb">Enable HID/OTG keyboard, mouse and gamepad forwarding over USB (AOA) via <pkg>virtual/libusb</pkg></flag>
+		<flag name="v4l">Enable mirroring the device screen to a V4L2 loopback device (--v4l2-sink)</flag>
+		<flag name="vaapi">Enable VA-API hardware video decoding through <pkg>media-video/ffmpeg</pkg> (--hwdec=vaapi)</flag>
+	</use>
+	<upstream>
+		<bugs-to>https://github.com/Genymobile/scrcpy/issues</bugs-to>
+		<changelog>https://github.com/Genymobile/scrcpy/releases</changelog>
+		<doc>https://github.com/Genymobile/scrcpy/tree/master/doc</doc>
+		<remote-id type="github">Genymobile/scrcpy</remote-id>
+	</upstream>
+</pkgmetadata>
