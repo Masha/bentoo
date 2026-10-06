@@ -3848,7 +3848,7 @@ base_from = "tag"
 base_url = "https://api.github.com/repos/KhronosGroup/Vulkan-Utility-Libraries/git/refs/tags"
 base_tag_pattern = '^v([0-9]+\.[0-9]+\.[0-9]+)$'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.365_p20261005"
+version = "1.4.365_p20261006"
 comments = """
 vulkan-utility-libraries — commit-tracked on main, same shape as vulkan-headers.
 
@@ -9379,7 +9379,7 @@ fails only at import time.
 url = "https://pypi.org/pypi/tavily-python/json"
 parser = "json"
 path = "info.version"
-version = "0.8.4"
+version = "0.8.5"
 comments = """
 tavily-python — web-search client, core install_requires of sci-ml/amd-gaia
 (imported lazily inside gaia/web/tavily.py, so it only matters at call time).
