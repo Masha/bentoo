@@ -94,7 +94,7 @@ still correct, and on X11 it is enough on its own.
 ---
 
 diff --git a/crates/agent_ui/src/agent_panel.rs b/crates/agent_ui/src/agent_panel.rs
-index d706aee..fceee5a 100644
+index 9be2911..7e98c0c 100644
 --- a/crates/agent_ui/src/agent_panel.rs
 +++ b/crates/agent_ui/src/agent_panel.rs
 @@ -1701,6 +1701,39 @@ impl AgentPanel {

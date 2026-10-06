@@ -69,10 +69,10 @@ of this patch said the same sentence, and it was right.
 ---
 
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
-index 9a741e4..3683c66 100644
+index 48660d5..2fd2cd2 100644
 --- a/crates/agent_ui/src/conversation_view/thread_view.rs
 +++ b/crates/agent_ui/src/conversation_view/thread_view.rs
-@@ -5020,6 +5020,10 @@ impl ThreadView {
+@@ -5045,6 +5045,10 @@ impl ThreadView {
                                      .flex_wrap()
                                      .gap_0p5()
                                      .child(self.render_add_context_button(cx))
@@ -84,7 +84,7 @@ index 9a741e4..3683c66 100644
                                      .children(self.render_fast_mode_control(cx))
                                      .children(self.render_thinking_control(cx)),
 diff --git a/crates/agent_ui/src/message_editor.rs b/crates/agent_ui/src/message_editor.rs
-index c6a0993..4782e02 100644
+index 5a5b7ad..4cf71f1 100644
 --- a/crates/agent_ui/src/message_editor.rs
 +++ b/crates/agent_ui/src/message_editor.rs
 @@ -25,10 +25,11 @@ use editor::{
@@ -122,8 +122,8 @@ index c6a0993..4782e02 100644
 +
  #[derive(Default)]
  pub struct SessionCapabilities {
-     prompt_capabilities: acp_v1::PromptCapabilities,
-@@ -210,6 +219,13 @@ pub struct MessageEditor {
+     prompt_capabilities: acp_v2::PromptCapabilities,
+@@ -214,6 +223,13 @@ pub struct MessageEditor {
      local_commands: SharedLocalCommands,
      agent_id: AgentId,
      thread_store: Option<Entity<ThreadStore>>,
@@ -137,7 +137,7 @@ index c6a0993..4782e02 100644
      _subscriptions: Vec<Subscription>,
      _parse_slash_command_task: Task<()>,
  }
-@@ -563,6 +579,7 @@ impl MessageEditor {
+@@ -567,6 +583,7 @@ impl MessageEditor {
                      && !editor.read(cx).read_only(cx)
                  {
                      cx.emit(MessageEditorEvent::Edited);
@@ -145,7 +145,7 @@ index c6a0993..4782e02 100644
                      editor.update(cx, |editor, cx| {
                          let snapshot = editor.snapshot(window, cx);
                          this.mention_set
-@@ -613,6 +630,8 @@ impl MessageEditor {
+@@ -617,6 +634,8 @@ impl MessageEditor {
              local_commands,
              agent_id,
              thread_store,
@@ -154,7 +154,7 @@ index c6a0993..4782e02 100644
              _subscriptions: subscriptions,
              _parse_slash_command_task: Task::ready(()),
          }
-@@ -735,6 +754,37 @@ impl MessageEditor {
+@@ -739,6 +758,37 @@ impl MessageEditor {
          self.editor.read(cx).text(cx).trim().is_empty()
      }
  
@@ -192,7 +192,7 @@ index c6a0993..4782e02 100644
      pub fn is_completions_menu_visible(&self, cx: &App) -> bool {
          self.editor
              .read(cx)
-@@ -2061,9 +2111,86 @@ impl Focusable for MessageEditor {
+@@ -2065,9 +2115,86 @@ impl Focusable for MessageEditor {
      }
  }
  
@@ -281,7 +281,7 @@ index c6a0993..4782e02 100644
              .key_context("MessageEditor")
              .on_action(cx.listener(Self::chat))
              .on_action(cx.listener(Self::send_immediately))
-@@ -2073,8 +2200,12 @@ impl Render for MessageEditor {
+@@ -2077,8 +2204,12 @@ impl Render for MessageEditor {
              .capture_action(cx.listener(Self::cut))
              .on_action(cx.listener(Self::paste_raw))
              .capture_action(cx.listener(Self::paste))
@@ -295,7 +295,7 @@ index c6a0993..4782e02 100644
                  let settings = ThemeSettings::get_global(cx);
  
                  let text_style = TextStyle {
-@@ -2099,7 +2230,7 @@ impl Render for MessageEditor {
+@@ -2103,7 +2234,7 @@ impl Render for MessageEditor {
                          ..Default::default()
                      },
                  )
@@ -304,7 +304,7 @@ index c6a0993..4782e02 100644
      }
  }
  
-@@ -2310,6 +2441,7 @@ mod tests {
+@@ -2314,6 +2445,7 @@ mod tests {
      use std::{ops::Range, path::Path, path::PathBuf, rc::Rc, sync::Arc};
  
      use super::PromptLocalCommand;
@@ -312,7 +312,7 @@ index c6a0993..4782e02 100644
      use acp_thread::MentionUri;
      use agent::{ThreadStore, outline};
      use agent_client_protocol::schema::{v1 as acp_v1, v2 as acp_v2};
-@@ -5975,4 +6107,163 @@ mod tests {
+@@ -5982,4 +6114,163 @@ mod tests {
              "Expected text to start with 'prefix text\\n\\n', got: {text:?}"
          );
      }

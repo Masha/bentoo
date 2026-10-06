@@ -842,7 +842,7 @@ index 0000000..83ba40c
 +    assert_eq!(notice_of(&tasks_panel_b, &session, "t", &mut b.cx), None);
 +}
 diff --git a/crates/agent_tasks_panel/src/test_helpers.rs b/crates/agent_tasks_panel/src/test_helpers.rs
-index 45054b2..436abaf 100644
+index bc713d9..d49ae43 100644
 --- a/crates/agent_tasks_panel/src/test_helpers.rs
 +++ b/crates/agent_tasks_panel/src/test_helpers.rs
 @@ -543,3 +543,203 @@ pub(crate) fn visible_keys(panels: &mut Panels) -> Vec<(String, String)> {
@@ -2411,7 +2411,7 @@ index 4208d36..aa68e19 100644
  pub use crate::message_editor::MessageEditorEvent;
  pub use crate::task_label::{
 diff --git a/crates/agent_ui/src/conversation_view.rs b/crates/agent_ui/src/conversation_view.rs
-index 16e444f..6bf8ff6 100644
+index 29bd66a..540f73a 100644
 --- a/crates/agent_ui/src/conversation_view.rs
 +++ b/crates/agent_ui/src/conversation_view.rs
 @@ -1818,6 +1818,14 @@ impl ConversationView {

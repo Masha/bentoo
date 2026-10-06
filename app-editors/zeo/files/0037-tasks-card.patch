@@ -282,7 +282,7 @@ index 0000000..54bdc62
 +    }
 +}
 diff --git a/crates/agent_ui/src/agent_panel.rs b/crates/agent_ui/src/agent_panel.rs
-index 4fa0bc0..50de592 100644
+index fe84db2..3e500f8 100644
 --- a/crates/agent_ui/src/agent_panel.rs
 +++ b/crates/agent_ui/src/agent_panel.rs
 @@ -39,6 +39,7 @@ use crate::ExpandMessageEditor;
@@ -791,7 +791,7 @@ index ec696c8..8591207 100644
              max_idle_retained_threads: 5,
              threads_sidebar: agent_settings::ThreadsSidebarSettings {
 diff --git a/crates/agent_ui/src/conversation_view.rs b/crates/agent_ui/src/conversation_view.rs
-index 1939dc8..16e444f 100644
+index 8f4b359..29bd66a 100644
 --- a/crates/agent_ui/src/conversation_view.rs
 +++ b/crates/agent_ui/src/conversation_view.rs
 @@ -1858,21 +1858,30 @@ impl ConversationView {
@@ -4265,7 +4265,7 @@ index 0000000..49f0bb1
 +}
 diff --git a/crates/agent_ui/src/tasks_card/row_error_tests.rs b/crates/agent_ui/src/tasks_card/row_error_tests.rs
 new file mode 100644
-index 0000000..8b2c328
+index 0000000..885c3dd
 --- /dev/null
 +++ b/crates/agent_ui/src/tasks_card/row_error_tests.rs
 @@ -0,0 +1,181 @@
@@ -4404,7 +4404,7 @@ index 0000000..8b2c328
 +                project,
 +                action_log,
 +                acp::SessionId::new("tasks-card-not-running-session"),
-+                watch::Receiver::constant(acp::PromptCapabilities::new()),
++                watch::Receiver::constant(agent_client_protocol::schema::v2::PromptCapabilities::new()),
 +                cx,
 +            )
 +        });
@@ -4608,7 +4608,7 @@ index 0000000..54c31cc
 +}
 diff --git a/crates/agent_ui/src/tasks_card/test_helpers.rs b/crates/agent_ui/src/tasks_card/test_helpers.rs
 new file mode 100644
-index 0000000..c618c90
+index 0000000..28d467a
 --- /dev/null
 +++ b/crates/agent_ui/src/tasks_card/test_helpers.rs
 @@ -0,0 +1,418 @@
@@ -4784,7 +4784,7 @@ index 0000000..c618c90
 +                project,
 +                action_log,
 +                session_id,
-+                watch::Receiver::constant(acp::PromptCapabilities::new()),
++                watch::Receiver::constant(agent_client_protocol::schema::v2::PromptCapabilities::new()),
 +                cx,
 +            )
 +        });

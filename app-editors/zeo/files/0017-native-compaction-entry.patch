@@ -86,10 +86,10 @@ both zero.
 ---
 
 diff --git a/crates/acp_thread/src/acp_thread.rs b/crates/acp_thread/src/acp_thread.rs
-index ca35c9c..222bb0e 100644
+index ac21f39..3e35fbb 100644
 --- a/crates/acp_thread/src/acp_thread.rs
 +++ b/crates/acp_thread/src/acp_thread.rs
-@@ -939,6 +939,30 @@ pub struct ContextCompactionUpdate {
+@@ -940,6 +940,30 @@ pub struct ContextCompactionUpdate {
      pub status: Option<ContextCompactionStatus>,
  }
  
@@ -120,7 +120,7 @@ index ca35c9c..222bb0e 100644
  impl AgentThreadEntry {
      pub fn is_indented(&self) -> bool {
          match self {
-@@ -4525,10 +4549,24 @@ impl AcpThread {
+@@ -4534,10 +4558,24 @@ impl AcpThread {
                  );
              }
              acp_v1::SessionUpdate::ToolCall(tool_call) => {
@@ -147,8 +147,8 @@ index ca35c9c..222bb0e 100644
              }
              acp_v1::SessionUpdate::CompactionUpdate(compaction_update) => {
                  self.upsert_context_compaction_update(compaction_update, cx)
-@@ -5383,6 +5421,73 @@ impl AcpThread {
-         cx.emit(AcpThreadEvent::EntryUpdated(ix));
+@@ -5400,6 +5438,73 @@ impl AcpThread {
+         }
      }
  
 +    /// Routes an adapter-reported compaction into the native entry, reporting whether
@@ -219,9 +219,9 @@ index ca35c9c..222bb0e 100644
 +    }
 +
      pub fn can_set_title(&mut self, cx: &mut Context<Self>) -> bool {
-         self.connection.set_title(&self.session_id, cx).is_some()
+         self.connection.set_title(self.session_id(), cx).is_some()
      }
-@@ -19128,6 +19233,475 @@ mod tests {
+@@ -19264,6 +19369,475 @@ mod tests {
              assert_eq!(usage.max_tokens, 10000);
          });
      }

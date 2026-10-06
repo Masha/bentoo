@@ -89,8 +89,8 @@ CRATES="
 	avif-serialize@0.8.6
 	aws-config@1.8.14
 	aws-credential-types@1.2.12
-	aws-lc-rs@1.17.1
-	aws-lc-sys@0.42.0
+	aws-lc-rs@1.18.1
+	aws-lc-sys@0.45.0
 	aws-runtime@1.7.0
 	aws-sdk-bedrockruntime@1.125.0
 	aws-sdk-kinesis@1.100.0
@@ -948,8 +948,8 @@ CRATES="
 	rustls-pki-types@1.12.0
 	rustls-platform-verifier-android@0.1.1
 	rustls-platform-verifier@0.7.0
-	rustls-webpki@0.103.13
-	rustls@0.23.40
+	rustls-webpki@0.103.15
+	rustls@0.23.45
 	rustversion@1.0.22
 	rusty-fork@0.3.1
 	rustybuzz@0.20.1
@@ -1551,7 +1551,7 @@ declare -A GIT_CRATES=(
 # rewrites the date and EGIT_COMMIT; a second version variable it could not
 # keep current would leave a new tarball under an old, already-manifested name).
 
-EGIT_COMMIT="a1b71072e5b43faef437b471e988fbb5f972c99c"
+EGIT_COMMIT="ba8159b4d324d137e08993d85fb023b484388ede"
 LLVM_COMPAT=( 22 )
 RUST_MIN_VER="1.98.1"
 RUST_NEEDS_LLVM=1
@@ -1807,11 +1807,10 @@ src_prepare() {
 			"${FILESDIR}/0006-elicitation-option-previews.patch"
 			"${FILESDIR}/0007-manual-mode-badge.patch"
 			"${FILESDIR}/0008-clickable-attachments.patch"
-			# 0009: adopt the agent's config-option response when applying
-			# per-agent defaults, so options that appear as a side effect (Fast
-			# mode once the resolved model supports it) surface without a manual
-			# model switch.
-			"${FILESDIR}/0009-Adopt-agent-s-config-option-response-when-applying-d.patch"
+			# 0009 (adopt the agent's config-option response when applying
+			# per-agent defaults) dropped: upstream 78a0da201 (#65233) routes the
+			# defaults path through ConfigOptions::set_config_option, which
+			# installs the agent's returned option list and wakes the watch.
 			# 0010: a thread menu choice (permission mode, model, thinking effort,
 			# an ACP agent's config options) applies to that thread only; Shift
 			# also makes it the default for new threads. It applies to the packaged
@@ -1922,7 +1921,7 @@ src_prepare() {
 			# reset to the entry's default_config_options on load. The last state
 			# is recorded per (agent, session) in the key-value store upstream
 			# ships, with no migration; a new or forked thread still starts from
-			# the defaults. Generic ACP, so it rides this flag by CHOICE, like 0009.
+			# the defaults. Generic ACP, so it rides this flag by CHOICE, like 0010.
 			"${FILESDIR}/0036-thread-config-survives-reopen.patch"
 			# 0034: the agent's task feed -- AcpThread holds the adapter's
 			# _meta["_claude/tasks"] snapshot (every live task, replaced, never

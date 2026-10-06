@@ -48,7 +48,7 @@ question gets the status. Rides the claude-agent-acp-plus flag BY CHOICE, like
 ---
 
 diff --git a/crates/agent_ui/src/conversation_view.rs b/crates/agent_ui/src/conversation_view.rs
-index f0f3629..23f0c21 100644
+index 4d35438..38074bb 100644
 --- a/crates/agent_ui/src/conversation_view.rs
 +++ b/crates/agent_ui/src/conversation_view.rs
 @@ -299,6 +299,22 @@ impl Conversation {
@@ -101,7 +101,7 @@ index f0f3629..23f0c21 100644
      pub(crate) fn root_thread(&self, cx: &App) -> Option<Entity<AcpThread>> {
          self.root_thread_view()
              .map(|view| view.read(cx).thread.clone())
-@@ -5684,6 +5713,41 @@ pub(crate) mod tests {
+@@ -5681,6 +5710,41 @@ pub(crate) mod tests {
          });
      }
  

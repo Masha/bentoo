@@ -57,10 +57,10 @@ claude-agent-acp-plus flag BY DEPENDENCY, like 0011 and 0013.
 ---
 
 diff --git a/crates/acp_thread/src/acp_thread.rs b/crates/acp_thread/src/acp_thread.rs
-index d7a16e0..223857e 100644
+index 03586e9..c2e313f 100644
 --- a/crates/acp_thread/src/acp_thread.rs
 +++ b/crates/acp_thread/src/acp_thread.rs
-@@ -3563,6 +3563,15 @@ impl AccountUsage {
+@@ -3564,6 +3564,15 @@ impl AccountUsage {
  /// forwards the SDK's `rate_limit_event` here instead of dropping it.
  const CLAUDE_RATE_LIMIT_META_KEY: &str = "_claude/rateLimit";
  
@@ -76,15 +76,15 @@ index d7a16e0..223857e 100644
  pub const TOKEN_USAGE_WARNING_THRESHOLD: f32 = 0.8;
  
  impl TokenUsage {
-@@ -3662,6 +3671,7 @@ pub struct AcpThread {
+@@ -3661,6 +3670,7 @@ pub struct AcpThread {
      activity: SessionActivity,
      token_usage: Option<TokenUsage>,
      account_usage: AccountUsage,
 +    background_task_count: usize,
      cost: Option<SessionCost>,
-     prompt_capabilities: acp_v1::PromptCapabilities,
+     prompt_capabilities: acp_v2::PromptCapabilities,
      available_commands: Vec<acp_v2::AvailableCommand>,
-@@ -3787,6 +3797,7 @@ pub enum AcpThreadEvent {
+@@ -3786,6 +3796,7 @@ pub enum AcpThreadEvent {
      NoticesUpdated,
      TokenUsageUpdated,
      AccountUsageUpdated,
@@ -92,7 +92,7 @@ index d7a16e0..223857e 100644
      EntryUpdated(usize),
      EntriesRemoved(Range<usize>),
      ToolAuthorizationRequested(PermissionRequestId),
-@@ -3938,6 +3949,7 @@ impl AcpThread {
+@@ -3937,6 +3948,7 @@ impl AcpThread {
                  | AcpThreadEvent::NoticesUpdated
                  | AcpThreadEvent::TokenUsageUpdated
                  | AcpThreadEvent::AccountUsageUpdated
@@ -100,15 +100,15 @@ index d7a16e0..223857e 100644
                  | AcpThreadEvent::EntryUpdated(_)
                  | AcpThreadEvent::Retry(_)
                  | AcpThreadEvent::SubagentSpawned(_)
-@@ -3993,6 +4005,7 @@ impl AcpThread {
-             session_id,
+@@ -3997,6 +4009,7 @@ impl AcpThread {
+             connection,
              token_usage: None,
              account_usage: AccountUsage::default(),
 +            background_task_count: 0,
              cost: None,
              prompt_capabilities,
              available_commands: Vec::new(),
-@@ -4422,6 +4435,12 @@ impl AcpThread {
+@@ -4431,6 +4444,12 @@ impl AcpThread {
          (!self.account_usage.is_empty()).then_some(&self.account_usage)
      }
  
@@ -121,10 +121,10 @@ index d7a16e0..223857e 100644
      pub fn cost(&self) -> Option<&SessionCost> {
          self.cost.as_ref()
      }
-@@ -4597,6 +4616,22 @@ impl AcpThread {
-                         cx.emit(AcpThreadEvent::TitleUpdated);
-                     }
-                 }
+@@ -4596,6 +4615,22 @@ impl AcpThread {
+                 cx.notify();
+             }
+             acp_v1::SessionUpdate::SessionInfoUpdate(info_update) => {
 +                // Absent for every agent but the Claude adapter, and absent from its own
 +                // title-only updates too, so a missing key leaves the count alone rather
 +                // than resetting it.
@@ -141,10 +141,10 @@ index d7a16e0..223857e 100644
 +                    self.background_task_count = count;
 +                    cx.emit(AcpThreadEvent::BackgroundTasksUpdated);
 +                }
+                 self.update_session_info(session_info_update_from_v1(info_update), cx);
              }
              acp_v1::SessionUpdate::AvailableCommandsUpdate(acp_v1::AvailableCommandsUpdate {
-                 available_commands,
-@@ -18905,6 +18940,79 @@ mod tests {
+@@ -18924,6 +18959,79 @@ mod tests {
          );
      }
  
@@ -237,7 +237,7 @@ index f943a3c..9727fae 100644
              | AcpThreadEvent::SubagentSpawned(_)
              | AcpThreadEvent::EntriesRemoved(_)
 diff --git a/crates/agent_ui/src/conversation_view.rs b/crates/agent_ui/src/conversation_view.rs
-index 4fae1da..f0f3629 100644
+index 5a1e791..4d35438 100644
 --- a/crates/agent_ui/src/conversation_view.rs
 +++ b/crates/agent_ui/src/conversation_view.rs
 @@ -339,6 +339,7 @@ impl Conversation {
@@ -256,7 +256,7 @@ index 4fae1da..f0f3629 100644
          | AcpThreadEvent::PromptCapabilitiesUpdated
          | AcpThreadEvent::AvailableCommandsUpdated(_)
          | AcpThreadEvent::ModeUpdated(_)
-@@ -2090,6 +2092,10 @@ impl ConversationView {
+@@ -2087,6 +2089,10 @@ impl ConversationView {
                      });
                  }
              }
