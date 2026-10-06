@@ -7,10 +7,13 @@ inherit go-module desktop systemd xdg
 
 DESCRIPTION="Tray icon and desktop notifications for bentoo overlay notices"
 HOMEPAGE="https://github.com/obentoo/bentoolkit"
-# bentoo-tray is the second binary of the bentoolkit repository, so it shares
+# bentoo-tray is the second binary of the bentoolkit repository and carries a
+# version of its own (internal/tray/version/VERSION); BENTOOLKIT_PV is the
+# bentoolkit release that ships this tray version. It shares
 # app-portage/bentoolkit's distfile rather than fetching the same tag twice.
-SRC_URI="https://github.com/obentoo/bentoolkit/archive/refs/tags/v${PV}.tar.gz -> bentoolkit-${PV}.tar.gz"
-S="${WORKDIR}/bentoolkit-${PV}"
+BENTOOLKIT_PV="0.33.1"
+SRC_URI="https://github.com/obentoo/bentoolkit/archive/refs/tags/v${BENTOOLKIT_PV}.tar.gz -> bentoolkit-${BENTOOLKIT_PV}.tar.gz"
+S="${WORKDIR}/bentoolkit-${BENTOOLKIT_PV}"
 
 LICENSE="MIT"
 SLOT="0"
@@ -38,10 +41,22 @@ src_unpack() {
 	ego mod download
 }
 
+src_prepare() {
+	default
+	# The binary reports the embedded VERSION, not ${PV}: refuse a pairing in
+	# which the package and the tray would claim different versions.
+	local tray_pv
+	tray_pv=$(<internal/tray/version/VERSION) || die
+	[[ ${tray_pv} == "${PV}" ]] ||
+		die "bentoolkit ${BENTOOLKIT_PV} ships bentoo-tray ${tray_pv}, not ${PV}"
+}
+
 src_compile() {
 	local version_pkg="github.com/obentoo/bentoolkit/internal/common/version"
 	local build_date=$(date -u '+%Y-%m-%d_%H:%M:%S')
-	local ldflags="-X ${version_pkg}.Version=${PV}"
+	# The tray's own version is embedded from VERSION; this is the bentoolkit
+	# release that --version prints on its second line.
+	local ldflags="-X ${version_pkg}.Version=${BENTOOLKIT_PV}"
 	ldflags+=" -X ${version_pkg}.Commit=release"
 	ldflags+=" -X ${version_pkg}.BuildDate=${build_date}"
 
