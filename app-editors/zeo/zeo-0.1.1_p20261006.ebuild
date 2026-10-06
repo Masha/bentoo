@@ -1957,6 +1957,11 @@ src_prepare() {
 			# and the Agent Tasks panel alike. Rides this flag BY DEPENDENCY,
 			# after 0035 and 0039, whose open_task it changes.
 			"${FILESDIR}/0040-agent-route-sessions-to-their-project-window.patch"
+			# 0041: every running row of 0037's card shows its last tool and tool
+			# count; 0035's history keeps the tool call that started each task (a
+			# migration step appended after 0039's) and "Open at Task" opens it
+			# through 0040's router scrolled to that call (story 023). After 0040.
+			"${FILESDIR}/0041-agent-tasks-progress-and-open-at-task.patch"
 		)
 	fi
 
