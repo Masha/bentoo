@@ -118,7 +118,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 ---
 
 diff --git a/Cargo.lock b/Cargo.lock
-index 18d0bc9..394b5ae 100644
+index 45cce0f..3de94f4 100644
 --- a/Cargo.lock
 +++ b/Cargo.lock
 @@ -458,6 +458,33 @@ dependencies = [
@@ -6864,7 +6864,7 @@ index 0000000..d1d7dd8
 +    assert_eq!(endings[0].thread_title.as_deref(), Some(GENERATED));
 +}
 diff --git a/crates/zed/Cargo.toml b/crates/zed/Cargo.toml
-index aab3e9c..8b423db 100644
+index 362a0d9..6a76f52 100644
 --- a/crates/zed/Cargo.toml
 +++ b/crates/zed/Cargo.toml
 @@ -74,6 +74,7 @@ agent_servers = { workspace = true, optional = true }

@@ -68,7 +68,7 @@ its description, a 79-character rename stored as 60, kept across a restart.
 ---
 
 diff --git a/Cargo.lock b/Cargo.lock
-index 394b5ae..62c58a0 100644
+index 3de94f4..3ec3274 100644
 --- a/Cargo.lock
 +++ b/Cargo.lock
 @@ -470,11 +470,13 @@ dependencies = [

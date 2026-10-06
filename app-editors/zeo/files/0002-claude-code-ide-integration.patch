@@ -53,7 +53,7 @@ CLI started in that terminal fail the handshake rather than run without an IDE.
 ---
 
 diff --git a/Cargo.lock b/Cargo.lock
-index 62c58a0..f4374fc 100644
+index 3ec3274..be436f6 100644
 --- a/Cargo.lock
 +++ b/Cargo.lock
 @@ -3036,6 +3036,31 @@ version = "0.7.6"
@@ -2072,7 +2072,7 @@ index c940607..3ece6e1 100644
              project.update(cx, move |_, cx| {
                  match remote_client {
 diff --git a/crates/zed/Cargo.toml b/crates/zed/Cargo.toml
-index 8b423db..7baffbd 100644
+index 6a76f52..f7ebd87 100644
 --- a/crates/zed/Cargo.toml
 +++ b/crates/zed/Cargo.toml
 @@ -86,6 +86,7 @@ call.workspace = true
@@ -2084,7 +2084,7 @@ index 8b423db..7baffbd 100644
  cli.workspace = true
  client.workspace = true
 diff --git a/crates/zed/src/main.rs b/crates/zed/src/main.rs
-index ca6aee8..210082f 100644
+index a2a66fe..ef34bcc 100644
 --- a/crates/zed/src/main.rs
 +++ b/crates/zed/src/main.rs
 @@ -699,6 +699,7 @@ fn main() {
