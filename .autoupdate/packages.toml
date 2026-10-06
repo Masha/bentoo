@@ -185,7 +185,7 @@
 url = "https://registry.npmjs.org/@anthropic-ai/claude-code"
 parser = "json"
 path = "dist-tags.latest"
-version = "2.1.289"
+version = "2.1.290"
 comments = """
 claude-code — npm @anthropic-ai/claude-code; dist-tags.latest is the stable channel.
 
@@ -312,7 +312,7 @@ url = "https://api2.cursor.sh/updates/api/download/stable/linux-x64/cursor"
 parser = "json"
 path = "version"
 commit_sha_path = "commitSha"
-version = "3.23.12"
+version = "3.23.23"
 comments = """
 Cursor — official download API; "version" is the full version. commitSha is the
 per-release BUILD_ID embedded in SRC_URI; the applier substitutes it into the
@@ -326,7 +326,7 @@ Vendor JSON API  (per-vendor endpoint)
 url = "https://prod.download.desktop.kiro.dev/stable/metadata-linux-x64-stable.json"
 parser = "json"
 path = "currentRelease"
-version = "1.2.4"
+version = "1.2.37"
 comments = """
 Kiro — kiro.dev SPA metadata endpoint (found via DevTools); "currentRelease" is authoritative.
 """
@@ -337,7 +337,7 @@ url = "https://downloads.claude.ai/claude-desktop/apt/stable/dists/stable/main/b
 parser = "regex"
 pattern = 'Version: ([0-9][0-9.]*)'
 select = "max"
-version = "2.9939.4"
+version = "2.19675.1"
 comments = """
 Claude Desktop — the Debian "Packages" index of Anthropic's own APT repository,
 the one code.claude.com/docs/en/desktop-linux tells users to add. It is a flat
@@ -954,7 +954,7 @@ transform strips the "go" prefix to match PV. Live=1.26.5.
 url = "https://persistent.oaistatic.com/codex-app-prod/linux/deb/dists/stable/main/binary-amd64/Packages"
 parser = "regex"
 pattern = 'Package: chatgpt\nVersion: ([0-9]+\.[0-9]+\.[0-9]+)'
-version = "26.930.51102"
+version = "26.930.61225"
 comments = """
 OpenAI Codex/ChatGPT desktop app — read the APT index of the very repo that
 SRC_URI pulls from. Both openai.com and chatgpt.com sit behind Cloudflare and
@@ -1724,7 +1724,7 @@ url = "https://api.github.com/repos/openai/codex/releases/latest"
 parser = "regex"
 pattern = '"tag_name":\s*"rust-v([0-9]+\.[0-9]+\.[0-9]+)"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.160.0"
+version = "0.160.1"
 comments = """
 codex — tag "rust-vX.Y.Z" ("rust-" not strippable); regex extracts X.Y.Z from tag_name.
 
@@ -1751,7 +1751,7 @@ parser = "regex"
 pattern = '"tag_name":\s*"rust-v([0-9]+\.[0-9]+\.[0-9]+)"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "0.160.0"
+version = "0.160.1"
 comments = """
 codex-bin — same upstream tag "rust-vX.Y.Z"; regex on tag_name.
 """
@@ -1850,7 +1850,7 @@ url = "https://api.github.com/repos/harfbuzz/harfbuzz/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "14.5.1"
+version = "14.6.0"
 comments = """
 harfbuzz — release tag bare semver.
 """
@@ -3078,7 +3078,7 @@ commit_sha_path = "[0].id"
 base_from = "file"
 base_url = "https://gitlab.freedesktop.org/mesa/mesa/-/raw/main/VERSION"
 base_pattern = '^([0-9][0-9.]*)-devel'
-version = "26.3.0_pre20261005"
+version = "26.3.0_pre20261006"
 comments = """
 mesa — commit-tracked on main; _pre suffix preserved from current ebuild.
 
@@ -3096,7 +3096,7 @@ commit_sha_path = "[0].id"
 base_from = "file"
 base_url = "https://gitlab.freedesktop.org/mesa/mesa/-/raw/main/VERSION"
 base_pattern = '^([0-9][0-9.]*)-devel'
-version = "26.3.0_pre20261005"
+version = "26.3.0_pre20261006"
 comments = """
 mesa_clc — part of the mesa tree; same source/rule as media-libs/mesa.
 """
@@ -3763,7 +3763,7 @@ base_from = "tag"
 base_url = "https://api.github.com/repos/KhronosGroup/glslang/git/refs/tags"
 base_tag_pattern = '^vulkan-sdk-([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)$'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.363.0_p20260930"
+version = "1.4.363.0_p20261005"
 comments = """
 glslang — commit-tracked on main; scans titles for vulkan-sdk-X.Y.Z.W to detect base bump.
 """
@@ -9182,7 +9182,7 @@ url = "https://api.github.com/repos/servo/servo/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.6.0"
+version = "0.7.0"
 comments = """
 servo — GitHub release tag "vX.Y.Z" ("v" stripped). SRC_URI pulls the src-vendored tarball
 from the same release. Live=0.3.0. (A bump must re-check the mozjs/xargs build gotchas.)
@@ -10031,7 +10031,7 @@ url = "https://api.github.com/repos/digitalocean/doctl/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.177.0"
+version = "1.178.0"
 comments = """
 doctl (DigitalOcean CLI, historically "doit"/DoCli) — GitHub releases/latest
 tag "vX.Y.Z"; the leading v is normalized away by the autoupdate. Verified
@@ -11370,7 +11370,7 @@ parser = "regex"
 pattern = '"tag_name":\s*"v([0-9]+\.[0-9]+\.[0-9]+)"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "1.0.91"
+version = "1.0.92"
 comments = """
 GitHub Copilot CLI — TWO PARALLEL TRAINS out of one repository, and picking the
 wrong one is the whole trap here:

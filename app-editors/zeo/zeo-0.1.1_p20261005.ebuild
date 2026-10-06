@@ -1953,6 +1953,11 @@ src_prepare() {
 			# and 0035's panel, plus the panel's Rename (kept in 0035's history,
 			# migration 2). Rides this flag BY DEPENDENCY, after 0035.
 			"${FILESDIR}/0039-agent-task-labels.patch"
+			# 0040: one router opens an agent session in the window holding its
+			# project's folders (else a new window), for the tray link (0024)
+			# and the Agent Tasks panel alike. Rides this flag BY DEPENDENCY,
+			# after 0035 and 0039, whose open_task it changes.
+			"${FILESDIR}/0040-agent-route-sessions-to-their-project-window.patch"
 		)
 	fi
 
