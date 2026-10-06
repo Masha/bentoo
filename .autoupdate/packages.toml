@@ -500,7 +500,7 @@ url = "https://api.github.com/repos/trufflesecurity/trufflehog/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "3.97.9"
+version = "3.98.1"
 comments = """
 trufflehog - releases/latest returns "vX.Y.Z". Upstream ships several releases
 a week, so this record moves often.
@@ -8719,7 +8719,7 @@ url = "https://www.softmaker.com/en/support/installation/linux/office-2024"
 parser = "regex"
 pattern = 'softmaker-office-2024-([0-9]+)-amd64\.tgz'
 type = "bin"
-version = "1234"
+version = "1238"
 comments = """
 softmaker-office — the official Linux install page links the current .tgz,
 whose revision NNNN is the ebuild's PV; SSR. The installer's "-latest" link
@@ -12096,7 +12096,7 @@ licenses/intelephense must be refreshed with it.
 url = "https://registry.npmjs.org/basedpyright/latest"
 parser = "regex"
 pattern = '"version":"([0-9]+\.[0-9]+\.[0-9]+)"'
-version = "1.40.1"
+version = "1.40.2"
 comments = """
 basedpyright -- probed on npm, where every release lands; the ebuild takes
 the source from the matching GitHub tag and only the typeshed-fallback stub
