@@ -25,7 +25,7 @@ CRATES="
 	async-lock@3.4.2
 	async-priority-channel@0.2.0
 	async-process@2.5.0
-	async-recursion@1.1.1
+	async-recursion@1.2.0
 	async-signal@0.2.14
 	async-task@4.7.1
 	async-trait@0.1.92
@@ -49,7 +49,7 @@ CRATES="
 	bytes@1.12.1
 	c-gull@0.22.3
 	c-scape@0.22.3
-	cc@1.5.1
+	cc@1.6.0
 	cfg-if@1.0.5
 	cfg_aliases@0.2.2
 	chacha20@0.10.2
@@ -190,7 +190,7 @@ CRATES="
 	kqueue-sys@1.1.2
 	kqueue@1.2.1
 	lazy_static@1.5.1
-	libc@0.2.189
+	libc@0.2.190
 	libm@0.2.16
 	libmimalloc-sys@0.1.49
 	libredox@0.1.25
@@ -213,13 +213,13 @@ CRATES="
 	minimal-lexical@0.2.1
 	miniz_oxide@0.8.9
 	miniz_oxide@0.9.1
-	mio@1.2.3
+	mio@1.2.4
 	nibble_vec@0.1.0
 	nix@0.31.3
 	nom@7.1.3
 	nom@8.0.0
 	normalize-line-endings@0.3.0
-	normalize-path@0.2.1
+	normalize-path@0.2.2
 	notify-rust@4.18.1
 	notify-types@2.1.0
 	notify@8.2.0
@@ -257,7 +257,7 @@ CRATES="
 	portable-atomic@1.15.0
 	posix-regex@0.1.4
 	potential_utf@0.1.6
-	powerfmt@0.2.0
+	powerfmt@0.2.1
 	ppv-lite86@0.2.21
 	printf-compat@0.3.1
 	proc-macro-crate@3.5.0
@@ -308,7 +308,7 @@ CRATES="
 	sharded-slab@0.1.7
 	shlex@2.0.1
 	signal-hook-registry@1.4.8
-	signal-hook@0.4.4
+	signal-hook@0.4.5
 	simd-adler32@0.3.10
 	similar@3.2.0
 	siphasher@1.0.4
@@ -344,7 +344,7 @@ CRATES="
 	tokio-macros@2.7.2
 	tokio-stream@0.1.19
 	tokio-util@0.7.19
-	tokio@1.53.1
+	tokio@1.53.2
 	toml@1.1.6+spec-1.1.0
 	toml_datetime@1.1.1+spec-1.1.0
 	toml_edit@0.25.15+spec-1.1.0
@@ -377,7 +377,7 @@ CRATES="
 	urlencoding@2.1.3
 	utf8_iter@1.0.4
 	utf8parse@0.2.2
-	uuid@1.26.1
+	uuid@1.27.0
 	valuable@0.1.1
 	vswhom-sys@0.1.3
 	vswhom@0.1.0
