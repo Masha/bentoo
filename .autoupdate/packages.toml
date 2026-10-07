@@ -12880,6 +12880,25 @@ the probe only reports. TEMPORARY MIRROR: remove when ::gentoo reaches it.
 """
 # END
 
+["dev-cpp/glibmm@2"]
+url = "https://download.gnome.org/sources/glibmm/cache.json"
+parser = "regex"
+pattern = 'glibmm-(2\.66\.[0-9]+)\.tar\.xz'
+select = "max"
+series = '^2\.66\.'
+version = "2.66.10"
+comments = """
+glibmm SLOT 2 (the giomm-2.4 / gtkmm-3 ABI), a second line beside the 2.68 slot
+the record above follows. Mirrored because bentoo ships glib >= 2.89.2, where
+GEmblem and GDBusActionGroup became final types: ::gentoo's 2.66.8 forward-declares
+their Class structs and every gtkmm-3 consumer (inkscape first) dies with
+"conflicting declaration GEmblemClass". 2.66.10 is the first 2.66 release with
+the GLIB_CHECK_VERSION guard. series keeps this record on 2.66.x so the sweep
+never treats it as an unclaimed copy of the 2.68 slot.
+TEMPORARY MIRROR: remove when ::gentoo reaches it.
+"""
+# END
+
 ["dev-libs/gjs"]
 hold = true
 url = "https://download.gnome.org/sources/gjs/cache.json"
