@@ -9,6 +9,10 @@ EAPI=8
 # Drop this ebuild, tags included, once ::gentoo ships 6.8.0.
 # BENTOO-DIVERGENCE: DEPEND - upstream 6.8 beta, not in ::gentoo yet.
 # BENTOO-DIVERGENCE: IUSE - upstream 6.8 beta, not in ::gentoo yet.
+# BENTOO-DIVERGENCE: PATCHES - ::gentoo 6.7.5-r1's handle-unknown-host.patch
+# (upstream b99b1a02) is already in 6.7.91: the parser moved to src/prompt.cpp
+# with the generic "(?:.*\n)*" line, and autotests/tst_prompt.cpp covers the
+# "known by the following other names" prompt.
 # BENTOO-DIVERGENCE: RDEPEND - upstream 6.8 beta, not in ::gentoo yet.
 
 ECM_TEST=true

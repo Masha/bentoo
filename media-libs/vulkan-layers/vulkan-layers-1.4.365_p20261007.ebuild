@@ -47,9 +47,12 @@ DEPEND="${RDEPEND}
 QA_SONAME="/usr/lib[^/]*/libVkLayer_khronos_validation.so"
 
 # BENTOO-DIVERGENCE: PATCHES - descriptor-hashing-32bit-align, ours alone.
-# ::gentoo's tests-no-static patches are pinned to 1.4.328/1.4.335 and have
-# no bearing on this snapshot.
+# tests-no-static is ::gentoo's, verbatim, and still needed: this snapshot's
+# tests/framework links SPIRV-Tools-static, a target dev-util/spirv-tools
+# never exports (SPIRV_TOOLS_BUILD_STATIC=OFF), so USE=test fails at
+# configure without it. It applies here with --fuzz=0.
 PATCHES=(
+	"${FILESDIR}"/${PN}-1.4.335.0-tests-no-static.patch
 	"${FILESDIR}"/${PN}-descriptor-hashing-32bit-align.patch
 )
 
@@ -68,6 +71,11 @@ multilib_src_configure() {
 		-DUPDATE_DEPS=OFF
 	)
 	cmake_src_configure
+}
+
+multilib_src_test() {
+	addwrite "/dev/dri/renderD128"
+	cmake_src_test
 }
 
 multilib_src_install_all() {
