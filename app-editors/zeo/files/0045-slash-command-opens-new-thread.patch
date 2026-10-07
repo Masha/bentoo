@@ -52,24 +52,9 @@ user messages, the trimmed command lands in the new composer unsent).
 Pure Zed and generic ACP: it rides `claude-agent-acp-plus` BY CHOICE, like
 0014 and 0026, and needs no adapter feature.
 ---
- crates/agent_ui/src/agent_panel.rs            |  72 ++++
- .../tests/prefilled_prompt_tests.rs           | 305 +++++++++++++++
- .../tests/slash_command_button_tests.rs       | 180 +++++++++
- .../tests/slash_command_contract_tests.rs     |  66 ++++
- crates/agent_ui/src/agent_ui.rs               |  17 +
- .../src/conversation_view/thread_view.rs      |  75 +++-
- .../src/slash_command_in_code_block_tests.rs  | 143 +++++++
- .../markdown/src/code_block_action_tests.rs   | 368 ++++++++++++++++++
- crates/markdown/src/markdown.rs               |  58 +++
- 9 files changed, 1274 insertions(+), 10 deletions(-)
- create mode 100644 crates/agent_ui/src/agent_panel/tests/prefilled_prompt_tests.rs
- create mode 100644 crates/agent_ui/src/agent_panel/tests/slash_command_button_tests.rs
- create mode 100644 crates/agent_ui/src/agent_panel/tests/slash_command_contract_tests.rs
- create mode 100644 crates/agent_ui/src/slash_command_in_code_block_tests.rs
- create mode 100644 crates/markdown/src/code_block_action_tests.rs
 
 diff --git a/crates/agent_ui/src/agent_panel.rs b/crates/agent_ui/src/agent_panel.rs
-index 56c43a0..88a7c22 100644
+index 9573118..04e2afb 100644
 --- a/crates/agent_ui/src/agent_panel.rs
 +++ b/crates/agent_ui/src/agent_panel.rs
 @@ -2119,6 +2119,72 @@ impl AgentPanel {
@@ -728,10 +713,10 @@ index 0000000..a7fa618
 +    );
 +}
 diff --git a/crates/agent_ui/src/agent_ui.rs b/crates/agent_ui/src/agent_ui.rs
-index d5e593b..b416e75 100644
+index dcf9547..3518c1e 100644
 --- a/crates/agent_ui/src/agent_ui.rs
 +++ b/crates/agent_ui/src/agent_ui.rs
-@@ -987,6 +987,23 @@ fn update_active_language_model_from_settings(cx: &mut App) {
+@@ -1068,6 +1068,23 @@ fn update_active_language_model_from_settings(cx: &mut App) {
      });
  }
  
@@ -756,19 +741,19 @@ index d5e593b..b416e75 100644
  mod tests {
      use super::*;
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
-index 1ac7f53..2470810 100644
+index 17d9fb3..bfe3f7c 100644
 --- a/crates/agent_ui/src/conversation_view/thread_view.rs
 +++ b/crates/agent_ui/src/conversation_view/thread_view.rs
 @@ -2,7 +2,7 @@ use crate::{
      DEFAULT_THREAD_TITLE, RecallNewerMessage, RecallOlderMessage, SelectPermissionGranularity,
      conversation_view::sent_history::{Recall, SentMessageHistory},
      conversation_view::thread_search_bar::{ThreadSearchBar, ThreadSearchBarEvent},
--    open_abs_path_at_point,
-+    open_abs_path_at_point, slash_command_in_code_block,
+-    open_abs_path_at_point, project_path_for_file_link,
++    open_abs_path_at_point, project_path_for_file_link, slash_command_in_code_block,
      thread_metadata_store::{ThreadId, ThreadMetadataStore},
  };
  use agent_client_protocol::schema::{v1 as acp_v1, v2 as acp_v2};
-@@ -7398,7 +7398,7 @@ impl ThreadView {
+@@ -7403,7 +7403,7 @@ impl ThreadView {
                                      div()
                                          .id(("assistant-message-chunk", chunk_ix))
                                          .child(self.render_message_content(
@@ -777,7 +762,7 @@ index 1ac7f53..2470810 100644
                                          ))
                                          .into_any_element()
                                  })
-@@ -8829,11 +8829,15 @@ impl ThreadView {
+@@ -8840,11 +8840,15 @@ impl ThreadView {
          cx.notify();
      }
  
@@ -793,7 +778,7 @@ index 1ac7f53..2470810 100644
          window: &Window,
          cx: &Context<Self>,
      ) -> Div {
-@@ -8843,9 +8847,19 @@ impl ThreadView {
+@@ -8854,9 +8858,19 @@ impl ThreadView {
                  .enumerate()
                  .filter(|(_, block)| block.visible_content(cx))
                  .map(|(block_ix, block)| {
@@ -816,7 +801,7 @@ index 1ac7f53..2470810 100644
                      div()
                          .id(("message-content-block", block_ix))
                          .debug_selector(move || {
-@@ -8949,11 +8963,9 @@ impl ThreadView {
+@@ -8960,11 +8974,9 @@ impl ThreadView {
                                      this.track_scroll(&scroll_handle)
                                  })
                                  .overflow_hidden()
@@ -830,8 +815,8 @@ index 1ac7f53..2470810 100644
 +                                )),
                          )
                          .when(is_constrained, |this| {
-                             this.child(
-@@ -13085,6 +13097,49 @@ impl ThreadView {
+                             this.child(div().absolute().inset_0().size_full().bg(linear_gradient(
+@@ -13089,6 +13101,49 @@ impl ThreadView {
          })
      }
  
@@ -1405,7 +1390,7 @@ index 0000000..e38ceed
 +    assert_eq!(second.clicked.borrow().len(), 1);
 +}
 diff --git a/crates/markdown/src/markdown.rs b/crates/markdown/src/markdown.rs
-index 6e6fb4c..b41f461 100644
+index e29d6c2..3734544 100644
 --- a/crates/markdown/src/markdown.rs
 +++ b/crates/markdown/src/markdown.rs
 @@ -1724,6 +1724,16 @@ pub enum AutoscrollBehavior {
@@ -1458,7 +1443,7 @@ index 6e6fb4c..b41f461 100644
      pub fn on_code_span_link(
          mut self,
          callback: impl Fn(&str, &App) -> Option<SharedString> + 'static,
-@@ -3146,6 +3168,13 @@ impl Element for MarkdownElement {
+@@ -3156,6 +3178,13 @@ impl Element for MarkdownElement {
                          {
                              let copy_button_visibility = *copy_button_visibility;
                              let wrap_button_visibility = *wrap_button_visibility;
@@ -1472,7 +1457,7 @@ index 6e6fb4c..b41f461 100644
                              builder.modify_current_div(|el| {
                                  let any_hover = copy_button_visibility
                                      == CopyButtonVisibility::VisibleOnHover
-@@ -3186,6 +3215,14 @@ impl Element for MarkdownElement {
+@@ -3196,6 +3225,14 @@ impl Element for MarkdownElement {
                                              ))
                                          },
                                      )
@@ -1487,7 +1472,7 @@ index 6e6fb4c..b41f461 100644
                                      .when(
                                          copy_button_visibility != CopyButtonVisibility::Hidden,
                                          |this| {
-@@ -3555,6 +3592,24 @@ fn render_wrap_code_block_button(
+@@ -3565,6 +3602,24 @@ fn render_wrap_code_block_button(
          })
  }
  
@@ -1512,7 +1497,7 @@ index 6e6fb4c..b41f461 100644
  fn render_copy_code_block_button(
      id: usize,
      code: String,
-@@ -5185,6 +5240,9 @@ impl InputHandler for MarkdownInputHandler {
+@@ -5195,6 +5250,9 @@ impl InputHandler for MarkdownInputHandler {
      }
  }
  
@@ -1522,6 +1507,3 @@ index 6e6fb4c..b41f461 100644
  #[cfg(test)]
  mod tests {
      use super::*;
--- 
-2.56.0
-

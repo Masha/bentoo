@@ -144,10 +144,10 @@ index 133e3aa..ca684fc 100644
    {
      "context": "SettingsWindow > NavigationMenu && !search",
 diff --git a/crates/agent_ui/src/agent_ui.rs b/crates/agent_ui/src/agent_ui.rs
-index aa68e19..933d075 100644
+index 916644c..0ebed1c 100644
 --- a/crates/agent_ui/src/agent_ui.rs
 +++ b/crates/agent_ui/src/agent_ui.rs
-@@ -243,6 +243,11 @@ actions!(
+@@ -324,6 +324,11 @@ actions!(
          RenameSelectedThread,
          /// Starts a chat conversation with follow-up enabled.
          ChatWithFollow,
@@ -159,7 +159,7 @@ index aa68e19..933d075 100644
          /// Cycles to the next inline assist suggestion.
          CycleNextInlineAssist,
          /// Cycles to the previous inline assist suggestion.
-@@ -896,6 +901,8 @@ fn update_command_palette_filter(cx: &mut App) {
+@@ -977,6 +982,8 @@ fn update_command_palette_filter(cx: &mut App) {
          // Skills are surfaced through the settings UI now, so this command
          // should never appear in the palette.
          filter.hide_action_types(&manage_skills_action);
@@ -169,10 +169,10 @@ index aa68e19..933d075 100644
              filter.show_action_types(skill_creator_actions.iter());
          } else {
 diff --git a/crates/agent_ui/src/conversation_view.rs b/crates/agent_ui/src/conversation_view.rs
-index f14bf54..405ec91 100644
+index 429e4b4..80af4b1 100644
 --- a/crates/agent_ui/src/conversation_view.rs
 +++ b/crates/agent_ui/src/conversation_view.rs
-@@ -5844,6 +5844,196 @@ pub(crate) mod tests {
+@@ -5862,6 +5862,196 @@ pub(crate) mod tests {
          });
      }
  
@@ -370,7 +370,7 @@ index f14bf54..405ec91 100644
      async fn test_resume_without_history_adds_notice(cx: &mut TestAppContext) {
          init_test(cx);
 diff --git a/crates/agent_ui/src/conversation_view/elicitation.rs b/crates/agent_ui/src/conversation_view/elicitation.rs
-index 06d9226..23eb636 100644
+index 225e741..28598b3 100644
 --- a/crates/agent_ui/src/conversation_view/elicitation.rs
 +++ b/crates/agent_ui/src/conversation_view/elicitation.rs
 @@ -62,6 +62,14 @@ pub(crate) struct ElicitationFormState {
@@ -389,10 +389,10 @@ index 06d9226..23eb636 100644
          let required = schema.required.as_deref().unwrap_or_default();
          let mut fields = HashMap::default();
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
-index 03cd62a..fc8a9cb 100644
+index d6ea837..1ce6fbb 100644
 --- a/crates/agent_ui/src/conversation_view/thread_view.rs
 +++ b/crates/agent_ui/src/conversation_view/thread_view.rs
-@@ -3096,6 +3096,17 @@ impl ThreadView {
+@@ -3101,6 +3101,17 @@ impl ThreadView {
          self.elicitation_form_states.contains_key(id)
      }
  
@@ -410,7 +410,7 @@ index 03cd62a..fc8a9cb 100644
      fn submit_elicitation(
          &mut self,
          elicitation_id: ElicitationEntryId,
-@@ -8042,6 +8053,19 @@ impl ThreadView {
+@@ -8047,6 +8058,19 @@ impl ThreadView {
          self.message_editor.read(cx).set_local_commands(commands);
      }
  
@@ -430,7 +430,7 @@ index 03cd62a..fc8a9cb 100644
      /// Whether this elicitation is drawn by the pinned card above the message
      /// editor rather than inline, in the conversation.
      ///
-@@ -13531,6 +13555,7 @@ impl Render for ThreadView {
+@@ -13535,6 +13559,7 @@ impl Render for ThreadView {
          // current availability of feedback/sharing, which can change between
          // renders (settings, connection state, feature flags).
          self.sync_local_commands(cx);
@@ -439,7 +439,7 @@ index 03cd62a..fc8a9cb 100644
          let has_messages = self.list_state.item_count() > 0;
          let list_state = self.list_state.clone();
 diff --git a/crates/agent_ui/src/message_editor.rs b/crates/agent_ui/src/message_editor.rs
-index 4cf71f1..0e598d6 100644
+index 27510de..5b2ffbc 100644
 --- a/crates/agent_ui/src/message_editor.rs
 +++ b/crates/agent_ui/src/message_editor.rs
 @@ -1,7 +1,7 @@
@@ -510,7 +510,7 @@ index 4cf71f1..0e598d6 100644
      pub fn set_session_capabilities(
          &mut self,
          session_capabilities: SharedSessionCapabilities,
-@@ -2199,6 +2212,7 @@ impl Render for MessageEditor {
+@@ -2200,6 +2213,7 @@ impl Render for MessageEditor {
              .on_action(cx.listener(Self::chat))
              .on_action(cx.listener(Self::send_immediately))
              .on_action(cx.listener(Self::chat_with_follow))
@@ -518,7 +518,7 @@ index 4cf71f1..0e598d6 100644
              .on_action(cx.listener(Self::cancel))
              .capture_action(cx.listener(Self::copy))
              .capture_action(cx.listener(Self::cut))
-@@ -2238,11 +2252,13 @@ impl Render for MessageEditor {
+@@ -2239,11 +2253,13 @@ impl Render for MessageEditor {
      }
  }
  
@@ -535,7 +535,7 @@ index 4cf71f1..0e598d6 100644
      }
  }
  
-@@ -2260,6 +2276,9 @@ impl Addon for MessageEditorAddon {
+@@ -2261,6 +2277,9 @@ impl Addon for MessageEditorAddon {
          if settings.use_modifier_to_send {
              key_context.add("use_modifier_to_send");
          }

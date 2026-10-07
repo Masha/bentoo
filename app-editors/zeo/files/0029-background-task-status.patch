@@ -57,10 +57,10 @@ claude-agent-acp-plus flag BY DEPENDENCY, like 0011 and 0013.
 ---
 
 diff --git a/crates/acp_thread/src/acp_thread.rs b/crates/acp_thread/src/acp_thread.rs
-index 03586e9..c2e313f 100644
+index c882de7..722decb 100644
 --- a/crates/acp_thread/src/acp_thread.rs
 +++ b/crates/acp_thread/src/acp_thread.rs
-@@ -3564,6 +3564,15 @@ impl AccountUsage {
+@@ -3567,6 +3567,15 @@ impl AccountUsage {
  /// forwards the SDK's `rate_limit_event` here instead of dropping it.
  const CLAUDE_RATE_LIMIT_META_KEY: &str = "_claude/rateLimit";
  
@@ -76,7 +76,7 @@ index 03586e9..c2e313f 100644
  pub const TOKEN_USAGE_WARNING_THRESHOLD: f32 = 0.8;
  
  impl TokenUsage {
-@@ -3661,6 +3670,7 @@ pub struct AcpThread {
+@@ -3664,6 +3673,7 @@ pub struct AcpThread {
      activity: SessionActivity,
      token_usage: Option<TokenUsage>,
      account_usage: AccountUsage,
@@ -84,7 +84,7 @@ index 03586e9..c2e313f 100644
      cost: Option<SessionCost>,
      prompt_capabilities: acp_v2::PromptCapabilities,
      available_commands: Vec<acp_v2::AvailableCommand>,
-@@ -3786,6 +3796,7 @@ pub enum AcpThreadEvent {
+@@ -3791,6 +3801,7 @@ pub enum AcpThreadEvent {
      NoticesUpdated,
      TokenUsageUpdated,
      AccountUsageUpdated,
@@ -92,7 +92,7 @@ index 03586e9..c2e313f 100644
      EntryUpdated(usize),
      EntriesRemoved(Range<usize>),
      ToolAuthorizationRequested(PermissionRequestId),
-@@ -3937,6 +3948,7 @@ impl AcpThread {
+@@ -3942,6 +3953,7 @@ impl AcpThread {
                  | AcpThreadEvent::NoticesUpdated
                  | AcpThreadEvent::TokenUsageUpdated
                  | AcpThreadEvent::AccountUsageUpdated
@@ -100,7 +100,7 @@ index 03586e9..c2e313f 100644
                  | AcpThreadEvent::EntryUpdated(_)
                  | AcpThreadEvent::Retry(_)
                  | AcpThreadEvent::SubagentSpawned(_)
-@@ -3997,6 +4009,7 @@ impl AcpThread {
+@@ -4002,6 +4014,7 @@ impl AcpThread {
              connection,
              token_usage: None,
              account_usage: AccountUsage::default(),
@@ -108,7 +108,7 @@ index 03586e9..c2e313f 100644
              cost: None,
              prompt_capabilities,
              available_commands: Vec::new(),
-@@ -4431,6 +4444,12 @@ impl AcpThread {
+@@ -4474,6 +4487,12 @@ impl AcpThread {
          (!self.account_usage.is_empty()).then_some(&self.account_usage)
      }
  
@@ -121,8 +121,8 @@ index 03586e9..c2e313f 100644
      pub fn cost(&self) -> Option<&SessionCost> {
          self.cost.as_ref()
      }
-@@ -4596,6 +4615,22 @@ impl AcpThread {
-                 cx.notify();
+@@ -4635,6 +4654,22 @@ impl AcpThread {
+                 self.push_notice(notices::from_v1(notice).map_err(acp_v1::Error::from)?, cx);
              }
              acp_v1::SessionUpdate::SessionInfoUpdate(info_update) => {
 +                // Absent for every agent but the Claude adapter, and absent from its own
@@ -144,7 +144,7 @@ index 03586e9..c2e313f 100644
                  self.update_session_info(session_info_update_from_v1(info_update), cx);
              }
              acp_v1::SessionUpdate::AvailableCommandsUpdate(acp_v1::AvailableCommandsUpdate {
-@@ -18924,6 +18959,79 @@ mod tests {
+@@ -19007,6 +19042,79 @@ mod tests {
          );
      }
  
@@ -237,7 +237,7 @@ index f943a3c..9727fae 100644
              | AcpThreadEvent::SubagentSpawned(_)
              | AcpThreadEvent::EntriesRemoved(_)
 diff --git a/crates/agent_ui/src/conversation_view.rs b/crates/agent_ui/src/conversation_view.rs
-index 5a1e791..4d35438 100644
+index 7ebcf33..9c1228e 100644
 --- a/crates/agent_ui/src/conversation_view.rs
 +++ b/crates/agent_ui/src/conversation_view.rs
 @@ -339,6 +339,7 @@ impl Conversation {
@@ -256,7 +256,7 @@ index 5a1e791..4d35438 100644
          | AcpThreadEvent::PromptCapabilitiesUpdated
          | AcpThreadEvent::AvailableCommandsUpdated(_)
          | AcpThreadEvent::ModeUpdated(_)
-@@ -2087,6 +2089,10 @@ impl ConversationView {
+@@ -2091,6 +2093,10 @@ impl ConversationView {
                      });
                  }
              }
@@ -268,10 +268,10 @@ index 5a1e791..4d35438 100644
                  // A redraw is all this needs: the account section is built from the thread
                  // when the tooltip opens, so there is no per-turn state to recompute.
 diff --git a/crates/sidebar/src/sidebar.rs b/crates/sidebar/src/sidebar.rs
-index 2287857..c7f9671 100644
+index 2e0a755..199849c 100644
 --- a/crates/sidebar/src/sidebar.rs
 +++ b/crates/sidebar/src/sidebar.rs
-@@ -1849,7 +1849,14 @@ impl Sidebar {
+@@ -1857,7 +1857,14 @@ impl Sidebar {
                          && session_id
                              .as_ref()
                              .and_then(|sid| old_statuses.get(sid))
@@ -287,7 +287,7 @@ index 2287857..c7f9671 100644
                      {
                          notified_threads.insert(thread.metadata.thread_id);
                      }
-@@ -1889,7 +1896,10 @@ impl Sidebar {
+@@ -1897,7 +1904,10 @@ impl Sidebar {
                          let old_status = old_statuses.get(&info.session_id).map(|(s, _)| *s);
                          new_live_statuses.insert(info.session_id.clone(), (info.status, thread_id));
                          if info.status == AgentThreadStatus::Completed
@@ -299,7 +299,7 @@ index 2287857..c7f9671 100644
                          {
                              notified_threads.insert(thread_id);
                          }
-@@ -5822,7 +5832,9 @@ impl Sidebar {
+@@ -5830,7 +5840,9 @@ impl Sidebar {
                      AgentThreadStatus::Running | AgentThreadStatus::WaitingForConfirmation => {
                          return;
                      }
@@ -310,7 +310,7 @@ index 2287857..c7f9671 100644
                  }
                  if thread.draft.is_some() {
                      let workspace = thread.workspace.clone();
-@@ -8182,6 +8194,9 @@ fn all_thread_infos_for_workspace(
+@@ -8190,6 +8202,9 @@ fn all_thread_infos_for_workspace(
              } else {
                  match thread.status() {
                      ThreadStatus::Generating => AgentThreadStatus::Running,

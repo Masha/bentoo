@@ -842,7 +842,7 @@ index 0000000..83ba40c
 +    assert_eq!(notice_of(&tasks_panel_b, &session, "t", &mut b.cx), None);
 +}
 diff --git a/crates/agent_tasks_panel/src/test_helpers.rs b/crates/agent_tasks_panel/src/test_helpers.rs
-index bc713d9..d49ae43 100644
+index 2c43abf..559eb6a 100644
 --- a/crates/agent_tasks_panel/src/test_helpers.rs
 +++ b/crates/agent_tasks_panel/src/test_helpers.rs
 @@ -543,3 +543,203 @@ pub(crate) fn visible_keys(panels: &mut Panels) -> Vec<(String, String)> {
@@ -2389,7 +2389,7 @@ index 0000000..65b86f6
 +    );
 +}
 diff --git a/crates/agent_ui/src/agent_ui.rs b/crates/agent_ui/src/agent_ui.rs
-index 4208d36..aa68e19 100644
+index 4239763..916644c 100644
 --- a/crates/agent_ui/src/agent_ui.rs
 +++ b/crates/agent_ui/src/agent_ui.rs
 @@ -4,6 +4,7 @@ mod agent_diff;
@@ -2400,7 +2400,7 @@ index 4208d36..aa68e19 100644
  mod buffer_codegen;
  mod completion_provider;
  mod config_options;
-@@ -77,6 +78,9 @@ pub use crate::agent_panel::{
+@@ -82,6 +83,9 @@ pub use crate::agent_panel::{
      AgentPanel, AgentPanelEvent, AgentPanelTerminalInfo, TerminalId, ThreadTitleRegenerationResult,
  };
  use crate::agent_registry_ui::AgentRegistryPage;
@@ -2411,10 +2411,10 @@ index 4208d36..aa68e19 100644
  pub use crate::message_editor::MessageEditorEvent;
  pub use crate::task_label::{
 diff --git a/crates/agent_ui/src/conversation_view.rs b/crates/agent_ui/src/conversation_view.rs
-index 29bd66a..540f73a 100644
+index 3d1b470..e8555a8 100644
 --- a/crates/agent_ui/src/conversation_view.rs
 +++ b/crates/agent_ui/src/conversation_view.rs
-@@ -1818,6 +1818,14 @@ impl ConversationView {
+@@ -1822,6 +1822,14 @@ impl ConversationView {
          matches!(self.server_state, ServerState::Loading { .. })
      }
  
@@ -2430,7 +2430,7 @@ index 29bd66a..540f73a 100644
          &mut self,
          thread: &Entity<AcpThread>,
 diff --git a/crates/zed/src/main.rs b/crates/zed/src/main.rs
-index ca6aee8..a2a66fe 100644
+index b77de80..7397d97 100644
 --- a/crates/zed/src/main.rs
 +++ b/crates/zed/src/main.rs
 @@ -1037,47 +1037,42 @@ fn handle_open_request(request: OpenRequest, app_state: Arc<AppState>, cx: &mut
@@ -2578,10 +2578,10 @@ index ca6aee8..a2a66fe 100644
      if stdout_is_a_pty() {
          if client::IMPERSONATE_LOGIN.is_some() {
 diff --git a/crates/zed/src/zed.rs b/crates/zed/src/zed.rs
-index de655e7..0f52a94 100644
+index a9c5a4c..14cfa25 100644
 --- a/crates/zed/src/zed.rs
 +++ b/crates/zed/src/zed.rs
-@@ -2868,6 +2868,10 @@ pub(crate) fn eager_load_active_theme_and_icon_theme(fs: Arc<dyn Fs>, cx: &mut A
+@@ -2874,6 +2874,10 @@ pub(crate) fn eager_load_active_theme_and_icon_theme(fs: Arc<dyn Fs>, cx: &mut A
      }
  }
  

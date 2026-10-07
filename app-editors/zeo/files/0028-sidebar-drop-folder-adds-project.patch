@@ -55,7 +55,7 @@ Co-Authored-By: Claude Opus 5.5 (1M context) <noreply@anthropic.com>
 ---
 
 diff --git a/crates/sidebar/src/sidebar.rs b/crates/sidebar/src/sidebar.rs
-index 890248d..2287857 100644
+index 235e329..2e0a755 100644
 --- a/crates/sidebar/src/sidebar.rs
 +++ b/crates/sidebar/src/sidebar.rs
 @@ -29,9 +29,9 @@ use feature_flags::{
@@ -98,7 +98,7 @@ index 890248d..2287857 100644
  fn linked_worktree_path_lists_for_workspaces(
      workspaces: &[Entity<Workspace>],
      cx: &App,
-@@ -1295,6 +1315,44 @@ impl Sidebar {
+@@ -1303,6 +1323,44 @@ impl Sidebar {
          }
      }
  
@@ -143,7 +143,7 @@ index 890248d..2287857 100644
      /// Opens a new workspace for a group that has no open workspaces.
      fn open_workspace_for_group(
          &mut self,
-@@ -7945,6 +8003,9 @@ impl Render for Sidebar {
+@@ -7953,6 +8011,9 @@ impl Render for Sidebar {
  
          let color = cx.theme().colors();
          let bg = color.surface_background;
@@ -153,7 +153,7 @@ index 890248d..2287857 100644
  
          let no_open_projects = !self.contents.has_open_projects;
          let no_search_results = self.contents.entries.is_empty();
-@@ -7981,6 +8042,8 @@ impl Render for Sidebar {
+@@ -7989,6 +8050,8 @@ impl Render for Sidebar {
                  this.recent_projects_popover_handle.toggle(window, cx);
              }))
              .font(ui_font)

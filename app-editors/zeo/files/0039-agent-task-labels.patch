@@ -68,7 +68,7 @@ its description, a 79-character rename stored as 60, kept across a restart.
 ---
 
 diff --git a/Cargo.lock b/Cargo.lock
-index 00e0ce8..8e23258 100644
+index ef219f7..0f56e1c 100644
 --- a/Cargo.lock
 +++ b/Cargo.lock
 @@ -470,11 +470,13 @@ dependencies = [
@@ -3409,7 +3409,7 @@ index 0000000..498f40f
 +    }
 +}
 diff --git a/crates/agent_ui/src/agent_ui.rs b/crates/agent_ui/src/agent_ui.rs
-index 294cbb9..4208d36 100644
+index 75dabf6..4239763 100644
 --- a/crates/agent_ui/src/agent_ui.rs
 +++ b/crates/agent_ui/src/agent_ui.rs
 @@ -25,6 +25,7 @@ mod model_selector;
@@ -3420,7 +3420,7 @@ index 294cbb9..4208d36 100644
  mod tasks_card;
  mod terminal_codegen;
  mod terminal_inline_assistant;
-@@ -78,7 +79,10 @@ pub use crate::agent_panel::{
+@@ -83,7 +84,10 @@ pub use crate::agent_panel::{
  use crate::agent_registry_ui::AgentRegistryPage;
  pub use crate::inline_assistant::InlineAssistant;
  pub use crate::message_editor::MessageEditorEvent;
@@ -3432,7 +3432,7 @@ index 294cbb9..4208d36 100644
  pub use crate::thread_metadata_store::ThreadId;
  pub use agent_diff::{AgentDiffPane, AgentDiffToolbar};
  pub use conversation_view::open_markdown_in_workspace;
-@@ -605,6 +609,9 @@ pub fn init(
+@@ -686,6 +690,9 @@ pub fn init(
  ) {
      agent::ThreadStore::init_global(cx);
      prompt_store::init(cx);

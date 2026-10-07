@@ -212,10 +212,10 @@ index c79ca14..f84a970 100644
          })
      }
 diff --git a/crates/remote_server/src/server.rs b/crates/remote_server/src/server.rs
-index 2263293..5d3a282 100644
+index bcd3a2a..6c702e8 100644
 --- a/crates/remote_server/src/server.rs
 +++ b/crates/remote_server/src/server.rs
-@@ -107,7 +107,7 @@ pub fn run(command: Commands) -> anyhow::Result<()> {
+@@ -121,7 +121,7 @@ pub fn run(command: Commands) -> anyhow::Result<()> {
          Commands::Version => {
              let release_channel = *RELEASE_CHANNEL;
              match release_channel {
@@ -224,7 +224,7 @@ index 2263293..5d3a282 100644
                      println!("{}", env!("ZED_PKG_VERSION"))
                  }
                  ReleaseChannel::Nightly | ReleaseChannel::Dev => {
-@@ -127,7 +127,9 @@ pub fn run(command: Commands) -> anyhow::Result<()> {
+@@ -141,7 +141,9 @@ pub fn run(command: Commands) -> anyhow::Result<()> {
  }
  
  pub static VERSION: LazyLock<String> = LazyLock::new(|| match *RELEASE_CHANNEL {
@@ -248,7 +248,7 @@ index 92407a3..d78ba82 100644
      };
  
 diff --git a/crates/zed/src/zed.rs b/crates/zed/src/zed.rs
-index a5d947b..6ae5bda 100644
+index 3f20c8c..5c8cae3 100644
 --- a/crates/zed/src/zed.rs
 +++ b/crates/zed/src/zed.rs
 @@ -1536,6 +1536,7 @@ fn open_about_window(cx: &mut App) {

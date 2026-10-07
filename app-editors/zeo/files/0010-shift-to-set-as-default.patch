@@ -45,7 +45,7 @@ Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>
 ---
 
 diff --git a/crates/acp_thread/src/connection.rs b/crates/acp_thread/src/connection.rs
-index 2abc8ff..d59579e 100644
+index ec20734..b740676 100644
 --- a/crates/acp_thread/src/connection.rs
 +++ b/crates/acp_thread/src/connection.rs
 @@ -536,11 +536,27 @@ pub trait AgentModelSelector: 'static {
@@ -92,10 +92,10 @@ index 2abc8ff..d59579e 100644
              Task::ready(Ok(()))
          }
 diff --git a/crates/agent/src/agent.rs b/crates/agent/src/agent.rs
-index c26f762..db57c86 100644
+index fa332a4..7451323 100644
 --- a/crates/agent/src/agent.rs
 +++ b/crates/agent/src/agent.rs
-@@ -2565,7 +2565,12 @@ impl acp_thread::AgentModelSelector for NativeAgentModelSelector {
+@@ -2592,7 +2592,12 @@ impl acp_thread::AgentModelSelector for NativeAgentModelSelector {
          })
      }
  
@@ -109,7 +109,7 @@ index c26f762..db57c86 100644
          log::debug!(
              "Setting model for session {}: {}",
              self.session_id,
-@@ -2611,30 +2616,45 @@ impl acp_thread::AgentModelSelector for NativeAgentModelSelector {
+@@ -2638,30 +2643,45 @@ impl acp_thread::AgentModelSelector for NativeAgentModelSelector {
              }
          });
  
@@ -175,7 +175,7 @@ index c26f762..db57c86 100644
      fn selected_model(&self, cx: &mut App) -> Task<Result<acp_thread::AgentModelInfo>> {
          let Some(thread) = self
              .connection
-@@ -6593,6 +6613,86 @@ mod internal_tests {
+@@ -6620,6 +6640,86 @@ mod internal_tests {
          );
      }
  
@@ -262,7 +262,7 @@ index c26f762..db57c86 100644
      #[gpui::test]
      async fn test_model_selection_persists_to_settings(cx: &mut TestAppContext) {
          init_test(cx);
-@@ -6640,7 +6740,7 @@ mod internal_tests {
+@@ -6667,7 +6767,7 @@ mod internal_tests {
          // Select a model
          let selector = connection.model_selector(&session_id).unwrap();
          let model_id = AgentModelId::new("fake/fake");
@@ -271,7 +271,7 @@ index c26f762..db57c86 100644
              .await
              .unwrap();
  
-@@ -6685,9 +6785,11 @@ mod internal_tests {
+@@ -6712,9 +6812,11 @@ mod internal_tests {
          agent.update(cx, |agent, cx| agent.models.refresh_list(cx));
  
          let selector = connection.model_selector(&session_id).unwrap();
@@ -286,7 +286,7 @@ index c26f762..db57c86 100644
          cx.run_until_parked();
  
          // Verify enable_thinking was written to settings as true.
-@@ -6754,9 +6856,11 @@ mod internal_tests {
+@@ -6781,9 +6883,11 @@ mod internal_tests {
  
          // Select the thinking model via select_model.
          let selector = connection.model_selector(&session_id).unwrap();
@@ -301,7 +301,7 @@ index c26f762..db57c86 100644
  
          // select_model should have enabled thinking based on the model's supports_thinking().
          agent.read_with(cx, |agent, _| {
-@@ -6771,7 +6875,7 @@ mod internal_tests {
+@@ -6798,7 +6902,7 @@ mod internal_tests {
  
          // Switch back to the non-thinking model.
          let selector = connection.model_selector(&session_id).unwrap();
@@ -310,7 +310,7 @@ index c26f762..db57c86 100644
              .await
              .unwrap();
  
-@@ -6883,9 +6987,11 @@ mod internal_tests {
+@@ -6910,9 +7014,11 @@ mod internal_tests {
          let session_id = acp_thread.read_with(cx, |thread, _| thread.session_id().clone());
  
          let selector = connection.model_selector(&session_id).unwrap();
@@ -325,7 +325,7 @@ index c26f762..db57c86 100644
  
          // Verify thinking is enabled after selecting the thinking model.
          let thread = agent.read_with(cx, |agent, _| {
-@@ -6978,9 +7084,11 @@ mod internal_tests {
+@@ -7005,9 +7111,11 @@ mod internal_tests {
          let session_id = acp_thread.read_with(cx, |thread, _| thread.session_id().clone());
  
          let selector = connection.model_selector(&session_id).unwrap();
@@ -340,7 +340,7 @@ index c26f762..db57c86 100644
  
          let thread = agent.read_with(cx, |agent, _| {
              agent.sessions.get(&session_id).unwrap().thread.clone()
-@@ -7080,9 +7188,11 @@ mod internal_tests {
+@@ -7107,9 +7215,11 @@ mod internal_tests {
          let session_id = acp_thread.read_with(cx, |thread, _| thread.session_id().clone());
  
          let selector = connection.model_selector(&session_id).unwrap();
@@ -355,7 +355,7 @@ index c26f762..db57c86 100644
  
          let send = acp_thread.update(cx, |thread, cx| thread.send(vec!["Hello".into()], cx));
          let send = cx.foreground_executor().spawn(send);
-@@ -7201,9 +7311,11 @@ mod internal_tests {
+@@ -7228,9 +7338,11 @@ mod internal_tests {
          cx.run_until_parked();
  
          let selector = connection.model_selector(&session_id).unwrap();
@@ -371,7 +371,7 @@ index c26f762..db57c86 100644
          thread.read_with(cx, |thread, _| {
              assert_eq!(thread.model().unwrap().id().0.as_ref(), "other-model-id");
 diff --git a/crates/agent_ui/src/agent_ui.rs b/crates/agent_ui/src/agent_ui.rs
-index b185122..d4c48f8 100644
+index eee943e..0d05b39 100644
 --- a/crates/agent_ui/src/agent_ui.rs
 +++ b/crates/agent_ui/src/agent_ui.rs
 @@ -24,6 +24,7 @@ mod mode_selector;
@@ -650,7 +650,7 @@ index fe98bdf..320ceb9 100644
  
      // ---- R4.1/R4.2: manual-mode badge next to the Mode-category select trigger ----
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
-index 0fe0b90..bd21b85 100644
+index 02cb5cc..4d6ab48 100644
 --- a/crates/agent_ui/src/conversation_view/thread_view.rs
 +++ b/crates/agent_ui/src/conversation_view/thread_view.rs
 @@ -24,6 +24,7 @@ use sandbox::{SandboxFsPolicy, SandboxNetPolicy, SandboxPolicy};
@@ -661,7 +661,7 @@ index 0fe0b90..bd21b85 100644
  use crate::ui::{
      SandboxGroup, SandboxRow, SandboxSection, SandboxStatusTooltip, TerminalSandboxWarning,
      TerminalToolHeader,
-@@ -5795,12 +5796,17 @@ impl ThreadView {
+@@ -5800,12 +5801,17 @@ impl ThreadView {
              .tooltip(move |_, cx| {
                  Tooltip::for_action_in(tooltip_label, &ToggleThinkingMode, &focus_handle, cx)
              })
@@ -680,7 +680,7 @@ index 0fe0b90..bd21b85 100644
                          let favorite_key = thread
                              .model()
                              .map(|model| (model.provider_id.0.to_string(), model.id.0.to_string()));
-@@ -5940,21 +5946,56 @@ impl ThreadView {
+@@ -5945,21 +5951,56 @@ impl ThreadView {
                  tooltip,
              )
              .menu(move |window, cx| {
@@ -743,7 +743,7 @@ index 0fe0b90..bd21b85 100644
                                  weak_self
                                      .update(cx, |this, cx| {
                                          if let Some(thread) = this.as_native_thread(cx) {
-@@ -5964,6 +6005,10 @@ impl ThreadView {
+@@ -5969,6 +6010,10 @@ impl ThreadView {
                                                      cx,
                                                  );
  
@@ -754,7 +754,7 @@ index 0fe0b90..bd21b85 100644
                                                  let favorite_key = thread.model().map(|model| {
                                                      (
                                                          model.provider_id().0.to_string(),
-@@ -5998,10 +6043,10 @@ impl ThreadView {
+@@ -6003,10 +6048,10 @@ impl ThreadView {
                                      })
                                      .ok();
                              }
@@ -767,7 +767,7 @@ index 0fe0b90..bd21b85 100644
                  }))
              })
              .with_handle(self.thinking_effort_menu_handle.clone())
-@@ -12872,7 +12917,9 @@ impl ThreadView {
+@@ -12878,7 +12923,9 @@ impl ThreadView {
          else {
              return;
          };

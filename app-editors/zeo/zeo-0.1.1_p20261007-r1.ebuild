@@ -27,8 +27,8 @@ CRATES="
 	aligned@0.4.3
 	alloca@0.4.0
 	allocator-api2@0.2.21
-	alsa-sys@0.3.1
-	alsa@0.10.0
+	alsa-sys@0.4.0
+	alsa@0.11.0
 	ambient-authority@0.0.2
 	ammonia@4.1.4
 	android_system_properties@0.1.5
@@ -236,10 +236,9 @@ CRATES="
 	core2@0.4.0
 	core_maths@0.1.1
 	coreaudio-rs@0.12.1
-	coreaudio-rs@0.13.0
+	coreaudio-rs@0.14.2
 	coreaudio-sys@0.2.18
 	cosmic-text@0.19.0
-	cpal@0.17.1
 	cpp_demangle@0.5.1
 	cpufeatures@0.2.17
 	cpufeatures@0.3.0
@@ -626,7 +625,6 @@ CRATES="
 	lyon_path@1.0.16
 	lyon_tessellation@1.0.16
 	mac-notification-sys@0.6.15
-	mach2@0.5.0
 	mach2@0.6.0
 	malloc_buf@0.0.6
 	manatee@0.8.0-alpha.5
@@ -1478,6 +1476,7 @@ declare -A GIT_CRATES=(
 	[async-tar]='https://github.com/zed-industries/async-tar;bd3ad6f89df9a9da7a8535958756d6bf465936a0;async-tar-%commit%'
 	[async-task]='https://github.com/smol-rs/async-task;b4486cd71e4e94fbda54ce6302444de14f4d190e;async-task-%commit%'
 	[calloop]='https://github.com/zed-industries/calloop;3759371fee14c40066d64777e2a36b6ffcc22590;calloop-%commit%'
+	[cpal]='https://github.com/RustAudio/cpal;e1612d5d98152f8dc2a62e1b51ef7cbf4f7f26b7;cpal-%commit%'
 	[dap-types]='https://github.com/zed-industries/dap-types;1b461b310481d01e02b2603c16d7144b926339f8;dap-types-%commit%/dap-types'
 	[gh-workflow-macros]='https://github.com/zed-industries/gh-workflow;37f3c0575d379c218a9c455ee67585184e40d43f;gh-workflow-%commit%/crates/gh-workflow-macros'
 	[gh-workflow]='https://github.com/zed-industries/gh-workflow;37f3c0575d379c218a9c455ee67585184e40d43f;gh-workflow-%commit%/crates/gh-workflow'
@@ -1519,7 +1518,7 @@ declare -A GIT_CRATES=(
 	[pet]='https://github.com/zed-industries/python-environment-tools;5aad7164bfc2a58977b103c8ef8fdd7302ed2e9f;python-environment-tools-%commit%/crates/pet'
 	[proptest-macro]='https://github.com/proptest-rs/proptest;3dca198a8fef1b32e3a66f1e1897c955b4dc5b5b;proptest-%commit%/proptest-macro'
 	[proptest]='https://github.com/proptest-rs/proptest;3dca198a8fef1b32e3a66f1e1897c955b4dc5b5b;proptest-%commit%/proptest'
-	[rodio]='https://github.com/RustAudio/rodio;e50e726ddd0292f6ef9de0dda6b90af4ed1fb66a;rodio-%commit%'
+	[rodio]='https://github.com/RustAudio/rodio;3ee9745862279ce1d18db593155016e7ce024aeb;rodio-%commit%'
 	[trash]='https://github.com/zed-industries/trash-rs;41c6c800d884a89351f3b8856d12894cccee261d;trash-rs-%commit%'
 	[tree-sitter-cpp]='https://github.com/tree-sitter/tree-sitter-cpp;5cb9b693cfd7bfacab1d9ff4acac1a4150700609;tree-sitter-cpp-%commit%'
 	[tree-sitter-gitcommit]='https://github.com/zed-industries/tree-sitter-git-commit;88309716a69dd13ab83443721ba6e0b491d37ee9;tree-sitter-git-commit-%commit%'
@@ -1551,7 +1550,7 @@ declare -A GIT_CRATES=(
 # rewrites the date and EGIT_COMMIT; a second version variable it could not
 # keep current would leave a new tarball under an old, already-manifested name).
 
-EGIT_COMMIT="eb466341a6b4306604cffef466cfdf9b1aafcecc"
+EGIT_COMMIT="cb73ee1d45db3babb14f21efe83f229fcb334d99"
 LLVM_COMPAT=( 22 )
 RUST_MIN_VER="1.98.1"
 RUST_NEEDS_LLVM=1
@@ -2053,6 +2052,11 @@ src_prepare() {
 	CALLOOP_GIT+=", rev = \"${CALLOOP_COMMIT}\""
 	local CALLOOP_PATH="calloop = \\{ path = \"${WORKDIR}/calloop-${CALLOOP_COMMIT}\""
 
+	local CPAL_COMMIT="e1612d5d98152f8dc2a62e1b51ef7cbf4f7f26b7"
+	local CPAL_GIT="cpal = { git = \"https://github.com/RustAudio/cpal\""
+	CPAL_GIT+=", rev = \"${CPAL_COMMIT}\""
+	local CPAL_PATH="cpal = \\{ path = \"${WORKDIR}/cpal-${CPAL_COMMIT}\""
+
 	local LIVEKIT_COMMIT="0a1c519cfce9b365229026b55de9b9dbdb6fed3c"
 	local LIVEKIT_GIT="livekit = { git = \"https://github.com/zed-industries/livekit-rust-sdks\""
 	LIVEKIT_GIT+=", rev = \"${LIVEKIT_COMMIT}\""
@@ -2093,6 +2097,7 @@ src_prepare() {
 	sed -e "s#${ASYNC_PROCESS_GIT}#${ASYNC_PROCESS_PATH}#" \
 		-e "s#${ASYNC_TASK_GIT}#${ASYNC_TASK_PATH}#" \
 		-e "s#${CALLOOP_GIT}#${CALLOOP_PATH}#" \
+		-e "s#${CPAL_GIT}#${CPAL_PATH}#" \
 		-e "s#${LIVEKIT_GIT}#${LIVEKIT_PATH}#" \
 		-e "s#${LIBWEBRTC_GIT}#${LIBWEBRTC_PATH}#" \
 		-e "s#${WEBRTC_SYS_GIT}#${WEBRTC_SYS_PATH}#" \

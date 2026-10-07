@@ -118,7 +118,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 ---
 
 diff --git a/Cargo.lock b/Cargo.lock
-index b28755e..00e0ce8 100644
+index 3e5a70b..ef219f7 100644
 --- a/Cargo.lock
 +++ b/Cargo.lock
 @@ -458,6 +458,33 @@ dependencies = [
@@ -155,7 +155,7 @@ index b28755e..00e0ce8 100644
  [[package]]
  name = "agent_ui"
  version = "0.1.0"
-@@ -22408,6 +22435,7 @@ dependencies = [
+@@ -22403,6 +22430,7 @@ dependencies = [
   "agent_servers",
   "agent_settings",
   "agent_skills",
@@ -164,7 +164,7 @@ index b28755e..00e0ce8 100644
   "anyhow",
   "ashpd",
 diff --git a/Cargo.toml b/Cargo.toml
-index 6ce47cc..aeb9578 100644
+index 1239adb..a28c76b 100644
 --- a/Cargo.toml
 +++ b/Cargo.toml
 @@ -9,6 +9,7 @@ members = [
@@ -4856,7 +4856,7 @@ index 0000000..e589a50
 +}
 diff --git a/crates/agent_tasks_panel/src/test_helpers.rs b/crates/agent_tasks_panel/src/test_helpers.rs
 new file mode 100644
-index 0000000..bc713d9
+index 0000000..2c43abf
 --- /dev/null
 +++ b/crates/agent_tasks_panel/src/test_helpers.rs
 @@ -0,0 +1,545 @@
@@ -5152,11 +5152,11 @@ index 0000000..bc713d9
 +        Task::ready(Ok(thread))
 +    }
 +
-+    fn auth_methods(&self) -> &[acp::AuthMethod] {
++    fn auth_methods(&self) -> &[agent_client_protocol::schema::v2::AuthMethod] {
 +        &[]
 +    }
 +
-+    fn authenticate(&self, _method: acp::AuthMethodId, _cx: &mut App) -> Task<Result<()>> {
++    fn authenticate(&self, _method: agent_client_protocol::schema::v2::AuthMethodId, _cx: &mut App) -> Task<Result<()>> {
 +        Task::ready(Ok(()))
 +    }
 +
@@ -5406,7 +5406,7 @@ index 0000000..bc713d9
 +        .collect()
 +}
 diff --git a/crates/agent_ui/src/agent_panel.rs b/crates/agent_ui/src/agent_panel.rs
-index cbc122b..ba98583 100644
+index 7a0ed9f..ed0b003 100644
 --- a/crates/agent_ui/src/agent_panel.rs
 +++ b/crates/agent_ui/src/agent_panel.rs
 @@ -4553,8 +4553,8 @@ impl AgentPanel {
@@ -5421,10 +5421,10 @@ index cbc122b..ba98583 100644
      }
  
 diff --git a/crates/agent_ui/src/agent_ui.rs b/crates/agent_ui/src/agent_ui.rs
-index 8591207..294cbb9 100644
+index 4eef1dc..75dabf6 100644
 --- a/crates/agent_ui/src/agent_ui.rs
 +++ b/crates/agent_ui/src/agent_ui.rs
-@@ -78,6 +78,7 @@ pub use crate::agent_panel::{
+@@ -83,6 +83,7 @@ pub use crate::agent_panel::{
  use crate::agent_registry_ui::AgentRegistryPage;
  pub use crate::inline_assistant::InlineAssistant;
  pub use crate::message_editor::MessageEditorEvent;
@@ -5810,7 +5810,7 @@ index 50f1002..2f699cd 100644
  fn project_name(thread: &AcpThread) -> SharedString {
 diff --git a/crates/agent_ui/src/tasks_card/activity_tests.rs b/crates/agent_ui/src/tasks_card/activity_tests.rs
 new file mode 100644
-index 0000000..1edc462
+index 0000000..01a93f0
 --- /dev/null
 +++ b/crates/agent_ui/src/tasks_card/activity_tests.rs
 @@ -0,0 +1,845 @@
@@ -6428,11 +6428,11 @@ index 0000000..1edc462
 +            Task::ready(held.ok_or_else(|| anyhow!("session {session_id} is not open")))
 +        }
 +
-+        fn auth_methods(&self) -> &[acp::AuthMethod] {
++        fn auth_methods(&self) -> &[agent_client_protocol::schema::v2::AuthMethod] {
 +            &[]
 +        }
 +
-+        fn authenticate(&self, method: acp::AuthMethodId, cx: &mut App) -> Task<Result<()>> {
++        fn authenticate(&self, method: agent_client_protocol::schema::v2::AuthMethodId, cx: &mut App) -> Task<Result<()>> {
 +            self.inner.authenticate(method, cx)
 +        }
 +
@@ -6864,7 +6864,7 @@ index 0000000..d1d7dd8
 +    assert_eq!(endings[0].thread_title.as_deref(), Some(GENERATED));
 +}
 diff --git a/crates/zed/Cargo.toml b/crates/zed/Cargo.toml
-index 362a0d9..6a76f52 100644
+index 7d372c2..0cea2f3 100644
 --- a/crates/zed/Cargo.toml
 +++ b/crates/zed/Cargo.toml
 @@ -74,6 +74,7 @@ agent_servers = { workspace = true, optional = true }
@@ -6876,7 +6876,7 @@ index 362a0d9..6a76f52 100644
  askpass.workspace = true
  assets.workspace = true
 diff --git a/crates/zed/src/main.rs b/crates/zed/src/main.rs
-index 738ee18..ca6aee8 100644
+index dd9198b..b77de80 100644
 --- a/crates/zed/src/main.rs
 +++ b/crates/zed/src/main.rs
 @@ -718,6 +718,7 @@ fn main() {
@@ -6888,7 +6888,7 @@ index 738ee18..ca6aee8 100644
  
          repl::init(app_state.fs.clone(), cx);
 diff --git a/crates/zed/src/zed.rs b/crates/zed/src/zed.rs
-index 6ab5548..de655e7 100644
+index 70c5df3..a9c5a4c 100644
 --- a/crates/zed/src/zed.rs
 +++ b/crates/zed/src/zed.rs
 @@ -782,6 +782,8 @@ fn initialize_panels(window: &mut Window, cx: &mut Context<Workspace>) -> Task<a

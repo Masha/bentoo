@@ -8,10 +8,10 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
 ---
 
 diff --git a/crates/agent_ui/src/conversation_view.rs b/crates/agent_ui/src/conversation_view.rs
-index 4b582ac..db16af8 100644
+index 5ac8971..16ea6ae 100644
 --- a/crates/agent_ui/src/conversation_view.rs
 +++ b/crates/agent_ui/src/conversation_view.rs
-@@ -2759,13 +2759,33 @@ impl ConversationView {
+@@ -2763,13 +2763,33 @@ impl ConversationView {
                      .log_err();
                  }
              },
@@ -52,7 +52,7 @@ index 4b582ac..db16af8 100644
                  .log_err();
              },
 diff --git a/crates/agent_ui/src/conversation_view/elicitation.rs b/crates/agent_ui/src/conversation_view/elicitation.rs
-index 46bfca7..837314d 100644
+index 106647a..999b91a 100644
 --- a/crates/agent_ui/src/conversation_view/elicitation.rs
 +++ b/crates/agent_ui/src/conversation_view/elicitation.rs
 @@ -4,12 +4,18 @@ use collections::{HashMap, HashSet};
@@ -158,7 +158,7 @@ index 46bfca7..837314d 100644
              };
  
              div()
-@@ -1196,6 +1248,224 @@ mod tests {
+@@ -1300,6 +1352,224 @@ mod tests {
              Editor::single_line(window, cx)
          });
      }
@@ -383,7 +383,7 @@ index 46bfca7..837314d 100644
  }
  
  #[derive(RegisterComponent)]
-@@ -1411,6 +1681,54 @@ fn preview_form_schema() -> acp::ElicitationSchema {
+@@ -1515,6 +1785,54 @@ fn preview_form_schema() -> acp::ElicitationSchema {
          )
  }
  
@@ -438,7 +438,7 @@ index 46bfca7..837314d 100644
  fn single_select_options(schema: &acp::StringPropertySchema) -> Vec<ElicitationOption> {
      if let Some(options) = &schema.one_of {
          return options
-@@ -1419,6 +1737,7 @@ fn single_select_options(schema: &acp::StringPropertySchema) -> Vec<ElicitationO
+@@ -1523,6 +1841,7 @@ fn single_select_options(schema: &acp::StringPropertySchema) -> Vec<ElicitationO
                  value: option.value.clone(),
                  label: SharedString::from(option.title.clone()),
                  description: option.description.clone().map(SharedString::from),
@@ -446,7 +446,7 @@ index 46bfca7..837314d 100644
              })
              .collect();
      }
-@@ -1432,6 +1751,7 @@ fn single_select_options(schema: &acp::StringPropertySchema) -> Vec<ElicitationO
+@@ -1536,6 +1855,7 @@ fn single_select_options(schema: &acp::StringPropertySchema) -> Vec<ElicitationO
              value: value.clone(),
              label: SharedString::from(value.clone()),
              description: None,
@@ -454,7 +454,7 @@ index 46bfca7..837314d 100644
          })
          .collect()
  }
-@@ -1460,6 +1780,7 @@ fn multi_select_options(schema: &acp::MultiSelectPropertySchema) -> Vec<Elicitat
+@@ -1564,6 +1884,7 @@ fn multi_select_options(schema: &acp::MultiSelectPropertySchema) -> Vec<Elicitat
                  value: value.clone(),
                  label: SharedString::from(value.clone()),
                  description: None,
@@ -462,7 +462,7 @@ index 46bfca7..837314d 100644
              })
              .collect(),
          acp::MultiSelectItems::Titled(items) => items
-@@ -1469,6 +1790,7 @@ fn multi_select_options(schema: &acp::MultiSelectPropertySchema) -> Vec<Elicitat
+@@ -1573,6 +1894,7 @@ fn multi_select_options(schema: &acp::MultiSelectPropertySchema) -> Vec<Elicitat
                  value: option.value.clone(),
                  label: SharedString::from(option.title.clone()),
                  description: option.description.clone().map(SharedString::from),
@@ -470,7 +470,7 @@ index 46bfca7..837314d 100644
              })
              .collect(),
          _ => Vec::new(),
-@@ -1689,6 +2011,7 @@ type OpenUrlHandler = Rc<dyn Fn(ElicitationEntryId, String, &mut Window, &mut Ap
+@@ -1799,6 +2121,7 @@ type OpenUrlHandler = Rc<dyn Fn(ElicitationEntryId, String, &mut Window, &mut Ap
  type BooleanHandler = Rc<dyn Fn(ElicitationEntryId, String, bool, &mut App)>;
  type SelectHandler = Rc<dyn Fn(ElicitationEntryId, String, String, &mut App)>;
  type MultiSelectHandler = Rc<dyn Fn(ElicitationEntryId, String, String, bool, &mut App)>;
@@ -478,7 +478,7 @@ index 46bfca7..837314d 100644
  
  #[derive(Clone)]
  pub(crate) struct ElicitationCardHandlers {
-@@ -1700,6 +2023,7 @@ pub(crate) struct ElicitationCardHandlers {
+@@ -1810,6 +2133,7 @@ pub(crate) struct ElicitationCardHandlers {
      on_boolean_change: BooleanHandler,
      on_single_select_change: SelectHandler,
      on_multi_select_change: MultiSelectHandler,
@@ -486,7 +486,7 @@ index 46bfca7..837314d 100644
  }
  
  impl ElicitationCardHandlers {
-@@ -1712,6 +2036,7 @@ impl ElicitationCardHandlers {
+@@ -1822,6 +2146,7 @@ impl ElicitationCardHandlers {
          on_boolean_change: impl Fn(ElicitationEntryId, String, bool, &mut App) + 'static,
          on_single_select_change: impl Fn(ElicitationEntryId, String, String, &mut App) + 'static,
          on_multi_select_change: impl Fn(ElicitationEntryId, String, String, bool, &mut App) + 'static,
@@ -494,7 +494,7 @@ index 46bfca7..837314d 100644
      ) -> Self {
          Self {
              on_submit: Rc::new(on_submit),
-@@ -1722,6 +2047,7 @@ impl ElicitationCardHandlers {
+@@ -1832,6 +2157,7 @@ impl ElicitationCardHandlers {
              on_boolean_change: Rc::new(on_boolean_change),
              on_single_select_change: Rc::new(on_single_select_change),
              on_multi_select_change: Rc::new(on_multi_select_change),
@@ -502,7 +502,7 @@ index 46bfca7..837314d 100644
          }
      }
  
-@@ -1735,6 +2061,7 @@ impl ElicitationCardHandlers {
+@@ -1845,6 +2171,7 @@ impl ElicitationCardHandlers {
              |_, _, _, _| {},
              |_, _, _, _| {},
              |_, _, _, _, _| {},
@@ -510,7 +510,7 @@ index 46bfca7..837314d 100644
          )
      }
  }
-@@ -2075,6 +2402,7 @@ impl<'a> ElicitationCard<'a> {
+@@ -2185,6 +2512,7 @@ impl<'a> ElicitationCard<'a> {
                          value.as_ref(),
                          options,
                          error.is_some(),
@@ -518,7 +518,7 @@ index 46bfca7..837314d 100644
                      )
                  }
                  ElicitationFieldState::MultiSelect(selected) => {
-@@ -2095,12 +2423,15 @@ impl<'a> ElicitationCard<'a> {
+@@ -2205,12 +2533,15 @@ impl<'a> ElicitationCard<'a> {
                                  self.handlers.on_multi_select_change.clone();
                              let elicitation_id = self.elicitation.id.clone();
                              let field_name = field_name.to_string();
@@ -535,7 +535,7 @@ index 46bfca7..837314d 100644
                                  .when_some(option.description, |this, description| {
                                      this.description(description)
                                  })
-@@ -2113,6 +2444,17 @@ impl<'a> ElicitationCard<'a> {
+@@ -2223,6 +2554,17 @@ impl<'a> ElicitationCard<'a> {
                                          !is_selected,
                                          cx,
                                      );
@@ -553,7 +553,7 @@ index 46bfca7..837314d 100644
                                  })
                          }))
                          .into_any_element()
-@@ -2131,6 +2473,7 @@ impl<'a> ElicitationCard<'a> {
+@@ -2241,6 +2583,7 @@ impl<'a> ElicitationCard<'a> {
          selected_value: Option<&String>,
          options: Vec<ElicitationOption>,
          has_error: bool,
@@ -561,7 +561,7 @@ index 46bfca7..837314d 100644
      ) -> AnyElement {
          let entry_ix = self.entry_ix;
          let elicitation_id = self.elicitation.id.clone();
-@@ -2149,12 +2492,15 @@ impl<'a> ElicitationCard<'a> {
+@@ -2259,12 +2602,15 @@ impl<'a> ElicitationCard<'a> {
                  );
                  let is_selected =
                      selected_value.is_some_and(|selected_value| selected_value == &option.value);
@@ -578,7 +578,7 @@ index 46bfca7..837314d 100644
                      .when_some(option.description, |this, description| {
                          this.description(description)
                      })
-@@ -2166,11 +2512,71 @@ impl<'a> ElicitationCard<'a> {
+@@ -2276,11 +2622,71 @@ impl<'a> ElicitationCard<'a> {
                              option_value.clone(),
                              cx,
                          );
@@ -651,10 +651,10 @@ index 46bfca7..837314d 100644
          v_flex()
              .gap_2()
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
-index 143e7f3..0fe0b90 100644
+index 8885a35..02cb5cc 100644
 --- a/crates/agent_ui/src/conversation_view/thread_view.rs
 +++ b/crates/agent_ui/src/conversation_view/thread_view.rs
-@@ -7316,10 +7316,22 @@ impl ThreadView {
+@@ -7323,10 +7323,22 @@ impl ThreadView {
                      .log_err();
                  }
              },

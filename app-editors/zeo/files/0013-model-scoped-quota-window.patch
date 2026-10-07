@@ -51,10 +51,10 @@ unnamed model-scoped window are still dropped.
 ---
 
 diff --git a/crates/acp_thread/src/acp_thread.rs b/crates/acp_thread/src/acp_thread.rs
-index a530593..ac21f39 100644
+index 5f5a484..9dcd718 100644
 --- a/crates/acp_thread/src/acp_thread.rs
 +++ b/crates/acp_thread/src/acp_thread.rs
-@@ -3294,7 +3294,15 @@ pub struct SessionCost {
+@@ -3297,7 +3297,15 @@ pub struct SessionCost {
  /// `rate_limit_event`. They are carried to us verbatim by the ACP adapter under
  /// `_meta["_claude/rateLimit"]`; see [`AcpThread::account_usage`] for why we accumulate
  /// them rather than replacing.
@@ -71,7 +71,7 @@ index a530593..ac21f39 100644
  pub enum AccountUsageWindowKind {
      /// The rolling five-hour session window.
      FiveHour,
-@@ -3304,6 +3312,19 @@ pub enum AccountUsageWindowKind {
+@@ -3307,6 +3315,19 @@ pub enum AccountUsageWindowKind {
      SevenDayOpus,
      /// The seven-day window for the Sonnet-class model specifically.
      SevenDaySonnet,
@@ -91,7 +91,7 @@ index a530593..ac21f39 100644
      /// The seven-day window, counting overage the plan includes.
      SevenDayOverageIncluded,
      /// Paid overage beyond the plan's included usage.
-@@ -3311,7 +3332,14 @@ pub enum AccountUsageWindowKind {
+@@ -3314,7 +3335,14 @@ pub enum AccountUsageWindowKind {
  }
  
  impl AccountUsageWindowKind {
@@ -107,7 +107,7 @@ index a530593..ac21f39 100644
          Some(match value {
              "five_hour" => Self::FiveHour,
              "seven_day" => Self::SevenDay,
-@@ -3319,22 +3347,42 @@ impl AccountUsageWindowKind {
+@@ -3322,22 +3350,42 @@ impl AccountUsageWindowKind {
              "seven_day_sonnet" => Self::SevenDaySonnet,
              "seven_day_overage_included" => Self::SevenDayOverageIncluded,
              "overage" => Self::Overage,
@@ -153,7 +153,7 @@ index a530593..ac21f39 100644
      }
  }
  
-@@ -3446,10 +3494,14 @@ impl AccountUsage {
+@@ -3449,10 +3497,14 @@ impl AccountUsage {
          // `rateLimitType` and `status` are both needed to place a bar. Without the kind we
          // do not know which window moved; without the status we cannot colour it. Either
          // one missing means this event carries only the account-wide flags handled above.
@@ -169,7 +169,7 @@ index a530593..ac21f39 100644
          else {
              return changed;
          };
-@@ -3473,8 +3525,8 @@ impl AccountUsage {
+@@ -3476,8 +3528,8 @@ impl AccountUsage {
              resets_at: object.get("resetsAt").and_then(|v| v.as_i64()),
          };
  
@@ -180,7 +180,7 @@ index a530593..ac21f39 100644
              changed = true;
          }
          changed
-@@ -7631,7 +7683,7 @@ mod tests {
+@@ -7670,7 +7722,7 @@ mod tests {
          assert!(usage.ingest(&rate_limit("five_hour", "allowed", 0.25)));
          assert!(usage.ingest(&rate_limit("seven_day", "allowed_warning", 0.9)));
  
@@ -189,7 +189,7 @@ index a530593..ac21f39 100644
          assert_eq!(
              kinds,
              vec![
-@@ -7728,6 +7780,181 @@ mod tests {
+@@ -7767,6 +7819,181 @@ mod tests {
              "a rejected window outranks a merely-full one"
          );
      }

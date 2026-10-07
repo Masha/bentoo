@@ -69,10 +69,10 @@ of this patch said the same sentence, and it was right.
 ---
 
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
-index 48660d5..2fd2cd2 100644
+index 7533a1a..42915ec 100644
 --- a/crates/agent_ui/src/conversation_view/thread_view.rs
 +++ b/crates/agent_ui/src/conversation_view/thread_view.rs
-@@ -5045,6 +5045,10 @@ impl ThreadView {
+@@ -5050,6 +5050,10 @@ impl ThreadView {
                                      .flex_wrap()
                                      .gap_0p5()
                                      .child(self.render_add_context_button(cx))
@@ -84,7 +84,7 @@ index 48660d5..2fd2cd2 100644
                                      .children(self.render_fast_mode_control(cx))
                                      .children(self.render_thinking_control(cx)),
 diff --git a/crates/agent_ui/src/message_editor.rs b/crates/agent_ui/src/message_editor.rs
-index 5a5b7ad..4cf71f1 100644
+index fc1e941..27510de 100644
 --- a/crates/agent_ui/src/message_editor.rs
 +++ b/crates/agent_ui/src/message_editor.rs
 @@ -25,10 +25,11 @@ use editor::{
@@ -154,7 +154,7 @@ index 5a5b7ad..4cf71f1 100644
              _subscriptions: subscriptions,
              _parse_slash_command_task: Task::ready(()),
          }
-@@ -739,6 +758,37 @@ impl MessageEditor {
+@@ -740,6 +759,37 @@ impl MessageEditor {
          self.editor.read(cx).text(cx).trim().is_empty()
      }
  
@@ -192,7 +192,7 @@ index 5a5b7ad..4cf71f1 100644
      pub fn is_completions_menu_visible(&self, cx: &App) -> bool {
          self.editor
              .read(cx)
-@@ -2065,9 +2115,86 @@ impl Focusable for MessageEditor {
+@@ -2066,9 +2116,86 @@ impl Focusable for MessageEditor {
      }
  }
  
@@ -281,7 +281,7 @@ index 5a5b7ad..4cf71f1 100644
              .key_context("MessageEditor")
              .on_action(cx.listener(Self::chat))
              .on_action(cx.listener(Self::send_immediately))
-@@ -2077,8 +2204,12 @@ impl Render for MessageEditor {
+@@ -2078,8 +2205,12 @@ impl Render for MessageEditor {
              .capture_action(cx.listener(Self::cut))
              .on_action(cx.listener(Self::paste_raw))
              .capture_action(cx.listener(Self::paste))
@@ -295,7 +295,7 @@ index 5a5b7ad..4cf71f1 100644
                  let settings = ThemeSettings::get_global(cx);
  
                  let text_style = TextStyle {
-@@ -2103,7 +2234,7 @@ impl Render for MessageEditor {
+@@ -2104,7 +2235,7 @@ impl Render for MessageEditor {
                          ..Default::default()
                      },
                  )
@@ -304,7 +304,7 @@ index 5a5b7ad..4cf71f1 100644
      }
  }
  
-@@ -2314,6 +2445,7 @@ mod tests {
+@@ -2315,6 +2446,7 @@ mod tests {
      use std::{ops::Range, path::Path, path::PathBuf, rc::Rc, sync::Arc};
  
      use super::PromptLocalCommand;
@@ -312,7 +312,7 @@ index 5a5b7ad..4cf71f1 100644
      use acp_thread::MentionUri;
      use agent::{ThreadStore, outline};
      use agent_client_protocol::schema::{v1 as acp_v1, v2 as acp_v2};
-@@ -5982,4 +6114,163 @@ mod tests {
+@@ -5983,4 +6115,163 @@ mod tests {
              "Expected text to start with 'prefix text\\n\\n', got: {text:?}"
          );
      }

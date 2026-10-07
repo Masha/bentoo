@@ -68,7 +68,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 ---
 
 diff --git a/crates/agent_ui/src/agent_panel.rs b/crates/agent_ui/src/agent_panel.rs
-index 3e500f8..cbc122b 100644
+index d115e2f..7a0ed9f 100644
 --- a/crates/agent_ui/src/agent_panel.rs
 +++ b/crates/agent_ui/src/agent_panel.rs
 @@ -1549,7 +1549,10 @@ impl AgentPanel {
@@ -763,7 +763,7 @@ index 0000000..b035a4c
 +}
 diff --git a/crates/agent_ui/src/tasks_card/tray/dedupe_tests.rs b/crates/agent_ui/src/tasks_card/tray/dedupe_tests.rs
 new file mode 100644
-index 0000000..814e89b
+index 0000000..425920a
 --- /dev/null
 +++ b/crates/agent_ui/src/tasks_card/tray/dedupe_tests.rs
 @@ -0,0 +1,276 @@
@@ -898,11 +898,11 @@ index 0000000..814e89b
 +        Task::ready(held.ok_or_else(|| anyhow!("session {session_id} is not open")))
 +    }
 +
-+    fn auth_methods(&self) -> &[acp::AuthMethod] {
++    fn auth_methods(&self) -> &[agent_client_protocol::schema::v2::AuthMethod] {
 +        &[]
 +    }
 +
-+    fn authenticate(&self, method: acp::AuthMethodId, cx: &mut App) -> Task<Result<()>> {
++    fn authenticate(&self, method: agent_client_protocol::schema::v2::AuthMethodId, cx: &mut App) -> Task<Result<()>> {
 +        self.inner.authenticate(method, cx)
 +    }
 +
