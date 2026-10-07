@@ -6,5 +6,5 @@ KEYWORDS=~amd64 ~arm64
 LICENSE=MIT Apache-2.0 BSD
 RDEPEND=>=dev-lang/php-8.2:*[cli,filter,iconv,phar,posix,ssl,tokenizer,unicode,zlib]
 SLOT=0
-SRC_URI=https://github.com/phpactor/phpactor/releases/download/2026.06.23.0/phpactor.phar -> phpactor-2026.06.23.0.phar
+SRC_URI=https://github.com/phpactor/phpactor/releases/download/2026.10.07.0/phpactor.phar -> phpactor-2026.10.07.0.phar
 _md5_=a69f5facb8361266aceed8f01b4674e6

@@ -275,16 +275,18 @@ src_prepare() {
 	fi
 
 	# BENTOO-DIVERGENCE: PATCHES - a different set from ::gentoo's, and built
-	# here in src_prepare rather than in a global array. The reasons are the two
-	# comments below: a bentoo-local rebase of gcc17, and a 26.5.1-specific
-	# paxmarking copy that applies with --fuzz=0 where the shared one drifts.
+	# here in src_prepare rather than in a global array. The reasons are the
+	# comments below: bentoo-local rebases onto 26.11.0 of three patches whose
+	# ::gentoo copies no longer apply with --fuzz=0.
 	# (The reasoning predates this tag; the tag exists so gentoo-parity.sh can
 	# see it.)
 	#
-	# Build fixes carried from ::gentoo's 26.7.0 (it lists these as a global
-	# PATCHES array; this ebuild has none, so they go here). gcc17 is a
-	# bentoo-local rebase -- see the header of the 26.7.0 copy for why the
-	# ::gentoo 26.6.0 one cannot be used verbatim.
+	# Build fixes carried from ::gentoo (it lists these as a global PATCHES
+	# array; this ebuild has none, so they go here). ::gentoo's gcc17 patch is
+	# dropped: 26.11.0 updated the bundled LIEF, which now includes <sstream>
+	# in PE/ResourcesManager.hpp itself. The same LIEF update moved the context
+	# of format-cstdlib (fuzz 2) and add-missing-functional-inc (fails), so both
+	# are 26.11.0 rebases with byte-identical + lines -- see their headers.
 	#
 	# merve-shared-simdutf is bentoo-local and has no ::gentoo counterpart.
 	# deps/merve/merve.gyp hardcodes the include path of V8's bundled simdutf
@@ -299,31 +301,28 @@ src_prepare() {
 	# copies the ebuild but never renames anything under files/, so a versioned
 	# name would dangle on the next bump.
 	#
-	# add-missing-funcational-inc and x86-SSE2-fix are ::gentoo's verbatim
-	# (26.10.0 and 26.10.0-r2): a missing <functional> in LIEF's bundled frozen
-	# headers, and V8's string hasher taking the 64-bit SSE2 path on 32-bit x86.
+	# x86-SSE2-fix is ::gentoo's verbatim (26.10.0-r2): V8's string hasher
+	# taking the 64-bit SSE2 path on 32-bit x86.
 	PATCHES+=(
-		"${FILESDIR}"/${PN}-26.7.0-gcc17.patch
-		"${FILESDIR}"/${PN}-26.6.0-format-cstdlib.patch
+		"${FILESDIR}"/${PN}-26.11.0-format-cstdlib.patch
 		"${FILESDIR}"/${PN}-26.6.0-v8-climits.patch
-		"${FILESDIR}"/${PN}-26.8.2-add-missing-funcational-inc.patch
+		"${FILESDIR}"/${PN}-26.11.0-add-missing-functional-inc.patch
 		"${FILESDIR}"/${PN}-26.10.0-x86-SSE2-fix.patch
 		"${FILESDIR}"/${PN}-merve-shared-simdutf.patch
 	)
 
 	# We need to disable mprotect on two files when it builds Bug 694100.
 	#
-	# A 26.5.1-specific copy, NOT the shared ${PN}-24.1.0-paxmarking.patch:
-	# against this tarball that file applies with "fuzz 1" in both node.gyp
-	# (its context still names src/node_webstorage.h, which 26 replaced with
-	# src/ffi/types.h) and tools/v8_gypfiles/v8.gyp. Fuzz cannot be sat on --
+	# A 26.11.0-specific copy, NOT the shared ${PN}-24.1.0-paxmarking.patch:
+	# against this tarball the shared file and the former 26.5.1 copy drift or
+	# fail in both node.gyp and tools/v8_gypfiles/v8.gyp. Fuzz cannot be sat on --
 	# portage's __eapply_patch greps its own output for "with fuzz", prints it
 	# and still returns SUCCESS, so a hunk that drifts to the wrong site ships
 	# silently and only breaks at compile time, only for USE=pax-kernel users.
 	# The rebased copy applies with --fuzz=0 and produces a byte-identical
 	# result to the original.
 	use pax-kernel &&
-		PATCHES+=( "${FILESDIR}"/${PN}-26.5.1-paxmarking.patch )
+		PATCHES+=( "${FILESDIR}"/${PN}-26.11.0-paxmarking.patch )
 
 	use ppc64 &&
 		PATCHES+=(	"${FILESDIR}/${PN}-24.11.1-restore-ppc64be.patch" )

@@ -1,0 +1,18 @@
+Add a missing #include <functional> to LIEF's bundled frozen/map.h, which
+uses std::less without including it (fails with gcc-16+/libc++).
+
+Same change as ::gentoo's nodejs-26.8.2-add-missing-funcational-inc.patch,
+rebased onto node-v26.11.0: the bundled LIEF update added
+frozen/bits/mpl.h and <iterator> around the old context, so the 26.8.2 copy
+no longer applies at all. The + line is unchanged.
+---
+--- a/deps/LIEF/third-party/frozen/include/frozen/map.h
++++ b/deps/LIEF/third-party/frozen/include/frozen/map.h
+@@ -29,6 +29,7 @@
+ #include "frozen/bits/mpl.h"
+ #include "frozen/bits/version.h"
+ 
++#include <functional>
+ #include <iterator>
+ #include <utility>
+ 

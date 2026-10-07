@@ -9,12 +9,11 @@ Subject: [PATCH] Add express <cstdlib> inclusion to format.h
 This is preventing nodejs to compile with LLVM's libcxx, missing definition to malloc.
 
 Reference: Gentoo bug 977376 at https://bugs.gentoo.org/977376
+Rebased onto node-v26.11.0 for this overlay: 26.11.0 updated the bundled LIEF
+and the old context (`#include <cmath>` under FMT_MODULE) moved, so the
+26.6.0 copy only lands "with fuzz 2". Portage prints that and still returns
+SUCCESS. Only the context lines changed; the + lines are byte-identical.
 ---
- .../LIEF/third-party/spdlog/include/spdlog/fmt/bundled/format.h | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/deps/LIEF/third-party/spdlog/include/spdlog/fmt/bundled/format.h b/deps/LIEF/third-party/spdlog/include/spdlog/fmt/bundled/format.h
-index 50e571442e5393..88f32c5f75744f 100644
 --- a/deps/LIEF/third-party/spdlog/include/spdlog/fmt/bundled/format.h
 +++ b/deps/LIEF/third-party/spdlog/include/spdlog/fmt/bundled/format.h
 @@ -39,6 +39,8 @@
@@ -24,6 +23,5 @@ index 50e571442e5393..88f32c5f75744f 100644
 +#include <cstdlib>	// Needed for malloc support
 +              			// when using clang compiler
  
- #ifndef FMT_MODULE
- #  include <cmath>    // std::signbit
-
+ // libc++ supports string_view in pre-c++17.
+ #if FMT_HAS_INCLUDE(<string_view>) && \

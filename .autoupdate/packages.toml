@@ -197,7 +197,7 @@ npm registry  (parser=json, path=dist-tags.latest)
 url = "https://registry.npmjs.org/playwright/latest"
 parser = "json"
 path = "version"
-version = "1.63.0"
+version = "1.64.0"
 comments = """
 playwright — npm "playwright" (the JS package, replacing the retired
 dev-python/playwright-bin wheel). The full packument (/playwright) now exceeds
@@ -811,7 +811,7 @@ url = "https://nodejs.org/dist/latest-v26.x/SHASUMS256.txt"
 parser = "regex"
 pattern = 'node-v(26\.[0-9]+\.[0-9]+)\.tar\.xz'
 select = "max"
-version = "26.10.0-r1"
+version = "26.11.0"
 comments = """
 Node.js SLOT 26 — the current line.
 Identical in shape to net-libs/nodejs:24 above, which carries the shared
@@ -1964,7 +1964,7 @@ path = "[0].committed_date"
 transform = [['T.*', ""], ['-', ""]]
 commit_sha_path = "[0].id"
 base_from = "file"
-base_url = "https://code.videolan.org/videolan/vlc/-/raw/master/configure.ac"
+base_url = "https://code.videolan.org/api/v4/projects/videolan%2Fvlc/repository/files/configure.ac/raw?ref=master"
 base_pattern = 'AC_INIT\(\[vlc\], \[([0-9][0-9.]*)-dev\]\)'
 version = "4.0.0_pre20261007"
 comments = """
@@ -1975,6 +1975,15 @@ current in ::gentoo and is not mirrored. Re-added 2026-09-30 because the
 
 The base comes from AC_INIT in configure.ac ("4.0.0-dev"); meson.build carries
 the same string. When upstream tags 4.0.0 the track must move to tags.
+
+base_url goes through the GitLab API (repository/files/.../raw), not the web
+route /-/raw/master/configure.ac. Since 2026-10-07 the web route sits behind
+code.videolan.org's Anubis anti-bot, intermittently: the same request returned
+the file and then a "Making sure you're not a bot!" HTML page (200, text/html),
+so the check failed with "base_pattern matched nothing". The API route is not
+challenged -- 9/9 text/plain across three User-Agents, the tool's default
+"Mozilla/5.0 ... bentoo-autoupdate" included -- and the commits probe above
+already relies on it.
 
 Snapshot / git-commit packages  (track upstream stable; Gentoo _pre/_p ordering)
 """
@@ -2114,7 +2123,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "2026.40.0"
+version = "2026.41.1"
 comments = """
 lemonade — GitHub release tag "vX.Y.Z" ("v" stripped). Built from source
 (CMake); the webapp node_modules distfile on distfiles.obentoo.org is NOT
@@ -2129,7 +2138,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "2026.40.0"
+version = "2026.41.1"
 comments = """
 lemonade-bin — same upstream as sci-ml/lemonade, prebuilt "embeddable"
 tarball plus arch-independent data from the .deb.
@@ -2624,7 +2633,7 @@ base_from = "file"
 base_url = "https://raw.githubusercontent.com/Sovereign-Engineering/obscuravpn-client/main/tag.json"
 base_pattern = '"version": "([0-9][0-9.]*)"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.181_p20261007"
+version = "1.182_p20261007"
 comments = """
 Obscura VPN from source — commit-tracked on main because upstream tags only
 the Android releases (v/1.x); Linux versions are "Tag v1.x." commits that bump
@@ -3891,7 +3900,7 @@ base_from = "file"
 base_url = "https://raw.githubusercontent.com/KhronosGroup/Vulkan-Loader/main/CMakeLists.txt"
 base_pattern = '(?m)^project\([A-Za-z_-]+ VERSION ([0-9][0-9.]*)'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.365_p20261002"
+version = "1.4.365_p20261007"
 comments = """
 vulkan-loader — commit-tracked on main; scans for "Update for Vulkan-Docs X.Y.Z" to detect base bump.
 """
@@ -9495,7 +9504,7 @@ url = "https://sources.debian.org/api/src/xorg-server/"
 parser = "regex"
 pattern = '"version":\s*"2:([0-9]+\.[0-9]+\.[0-9]+-[0-9]+)"'
 transform = [['-', "."]]
-version = "21.1.24.1"
+version = "21.1.25.1"
 comments = """
 xvfb-run PV = xorg-server X.Y.Z plus the Debian diff revision W => X.Y.Z.W; SRC_URI fetches
 mirror://debian .../xorg-server_X.Y.Z-W.diff.gz. The Debian sources API JSON lists versions
@@ -9815,7 +9824,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "1.30.1"
+version = "1.30.2"
 comments = """
 Opengrep (LGPL fork of Semgrep CE) — GitHub releases/latest tag "vX.Y.Z"
 (v stripped). SRC_URI pulls the bare per-arch/libc release binaries
@@ -11787,7 +11796,7 @@ url = "https://api.github.com/repos/phpactor/phpactor/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "2026.06.23.0"
+version = "2026.10.07.0"
 comments = """
 phpactor -- releases/latest returns the bare tag ("YYYY.MM.DD.N", no "v"); the
 only asset is phpactor.phar, a Humbug Box build with every Composer dependency
