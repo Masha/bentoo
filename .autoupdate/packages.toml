@@ -9675,13 +9675,11 @@ which is why this entry carried no revision until 2026-07-26.
 # END
 
 ["sci-ml/ollama"]
-enabled = false
-disabled_by = "removed 2026-09-25 (fifth time): ::gentoo ships the same 0.34.4 with the newer llama.cpp pin, ours was behind and named a patch that does not exist -- see comments"
 url = "https://api.github.com/repos/ollama/ollama/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.34.4"
+version = "0.40.0"
 comments = """
 ollama source — same repo as ollama-bin; tag "vX.Y.Z" (leading v stripped).
 
@@ -9790,6 +9788,12 @@ enabled = false has now failed four times against --revive all. It is set again
 because it is the only switch the record model has, not because it holds.
 
 --- ollama source: same upstream repo as sci-ml/ollama-bin ---
+
+2026-10-07, sixth occurrence: --revive seeded 0.35.1 from ::gentoo and bumped
+it to 0.40.0 keeping LLAMA_CPP_tag=b11232, while v0.40.0's LLAMA_CPP_VERSION
+asks b11351 -- 002-clef.patch then failed 2 of 12 hunks in
+tools/server/server-context.cpp. Fixed by hand. b11351 also already includes
+<fstream> in common/common.h, so ollama-0.31.1-gcc17.patch was dropped.
 """
 # END
 
