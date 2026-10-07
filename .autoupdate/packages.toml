@@ -185,7 +185,7 @@
 url = "https://registry.npmjs.org/@anthropic-ai/claude-code"
 parser = "json"
 path = "dist-tags.latest"
-version = "2.1.292"
+version = "2.1.293"
 comments = """
 claude-code — npm @anthropic-ai/claude-code; dist-tags.latest is the stable channel.
 
@@ -337,7 +337,7 @@ url = "https://downloads.claude.ai/claude-desktop/apt/stable/dists/stable/main/b
 parser = "regex"
 pattern = 'Version: ([0-9][0-9.]*)'
 select = "max"
-version = "2.26454.0"
+version = "2.26454.2"
 comments = """
 Claude Desktop — the Debian "Packages" index of Anthropic's own APT repository,
 the one code.claude.com/docs/en/desktop-linux tells users to add. It is a flat
@@ -2595,7 +2595,7 @@ networkmanager-openvpn — default (commit-recency) order; version sort returns 
 url = "https://linux-pkgs.obscura.com/deb/dists/stable/main/binary-amd64/Packages"
 parser = "regex"
 pattern = 'Package: obscura-cli\n(?:[^\n]*\n)*?Version: ([0-9][0-9.]*)'
-version = "1.181"
+version = "1.182"
 comments = """
 Obscura VPN — the Debian "Packages" index of the APT repository SRC_URI pulls
 from (the one obscura-repository.deb configures). Plain text; four stanzas on
@@ -3602,7 +3602,7 @@ transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "source"
 series = '^[0-9.]+(?:-r[0-9]+)?$'
-version = "1.22.0"
+version = "1.23.2"
 comments = """
 zed (stable channel), from source — since 2026-10-01 app-editors/zed builds
 upstream's tagged releases with no patches; the patched snapshot is app-editors/
@@ -3626,7 +3626,7 @@ select = "max"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "source"
 series = '_pre(?:-r[0-9]+)?$'
-version = "1.23.1_pre"
+version = "1.24.1_pre"
 comments = """
 zed (preview channel), from source — mirrors zed-bin@preview; the same manual
 follow-up as zed@stable applies to every bump.
@@ -3657,7 +3657,7 @@ path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
 series = '^[0-9.]+(?:-r[0-9]+)?$'
-version = "1.22.0"
+version = "1.23.2"
 comments = """
 zed-bin (stable channel) — releases/latest is the stable release by definition
 (prerelease=false); upstream tags it "vX.Y.Z" and the preview "vX.Y.Z-pre".
@@ -3682,7 +3682,7 @@ select = "max"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
 series = '_pre(?:-r[0-9]+)?$'
-version = "1.23.1_pre"
+version = "1.24.1_pre"
 comments = """
 zed-bin (preview channel) — releases/latest never returns a prerelease, so the
 preview needs the full list: the pattern takes only "vX.Y.Z-pre" tags and the
