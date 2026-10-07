@@ -11293,6 +11293,7 @@ it must be DROPPED, not forced, once a release carries the fix).
 
 ["www-client/opera"]
 enabled = false
+disabled_by = "removed 2026-10-01: ::gentoo pins the right Chromium (152) for 136.0.6008.80 -- see comments"
 url = "https://deb.opera.com/opera-stable/dists/stable/non-free/binary-amd64/Packages"
 parser = "regex"
 pattern = 'Package: opera-stable\nVersion: ([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)'
