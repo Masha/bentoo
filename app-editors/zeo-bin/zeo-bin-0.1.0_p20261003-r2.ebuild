@@ -104,15 +104,9 @@ pkg_postinst() {
 
 	elog "Zeo (binary) installed. Launch with: zeo"
 
-	if use claude-agent-acp-plus; then
-		elog ""
-		elog "The claude-agent-acp-plus ACP adapter was installed as 'claude-agent-acp-plus'."
-		elog "To enable it in Zeo, add to ~/.config/zeo/settings.json:"
-		elog ""
-		elog "    \"agent_servers\": {"
-		elog "        \"Claude Agent Plus\": { \"command\": \"claude-agent-acp-plus\", \"args\": [] }"
-		elog "    }"
-	fi
+	elog ""
+	elog "Claude Agent (Plus) and Claude Agent TUI are available in Zeo's agent panel"
+	elog "by default, installed from npm on first use. No settings.json entry is needed."
 
 	if use claude-code-ide; then
 		elog ""
