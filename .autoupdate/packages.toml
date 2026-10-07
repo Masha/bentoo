@@ -268,7 +268,7 @@ unconditional git-r3 form, which ::gentoo's tarball/9999 branch is not.
 url = "https://registry.npmjs.org/pnpm"
 parser = "json"
 path = "dist-tags.latest"
-version = "12.9.1"
+version = "12.10.1"
 comments = """
 pnpm — npm package, stable channel. dist-tags.latest is the RIGHT endpoint and
 must stay: pnpm promotes through next-<major> first, and that channel carries
@@ -1084,7 +1084,7 @@ PixiEditor — GitHub releases (tag is 4-part bare version, e.g. 2.1.1.5).
 url = "https://support.gitkraken.com/release-notes/current"
 parser = "regex"
 pattern = 'Version\s+([0-9]+\.[0-9]+\.[0-9]+)'
-version = "12.5.0"
+version = "12.6.0"
 comments = """
 GitKraken — release notes moved to support.gitkraken.com (www.gitkraken.com/release-notes
 301-redirects there); the page is server-rendered WordPress, so no headless browser is
@@ -1724,7 +1724,7 @@ url = "https://api.github.com/repos/openai/codex/releases/latest"
 parser = "regex"
 pattern = '"tag_name":\s*"rust-v([0-9]+\.[0-9]+\.[0-9]+)"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.160.1"
+version = "0.161.0"
 comments = """
 codex — tag "rust-vX.Y.Z" ("rust-" not strippable); regex extracts X.Y.Z from tag_name.
 
@@ -1751,7 +1751,7 @@ parser = "regex"
 pattern = '"tag_name":\s*"rust-v([0-9]+\.[0-9]+\.[0-9]+)"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "0.160.1"
+version = "0.161.0"
 comments = """
 codex-bin — same upstream tag "rust-vX.Y.Z"; regex on tag_name.
 """
@@ -2500,7 +2500,7 @@ url = "https://api.github.com/repos/brave/brave-browser/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.96.61"
+version = "1.97.56"
 comments = """
 brave-browser — releases/latest is the stable channel (tag "vX.Y.Z").
 """
@@ -2700,7 +2700,7 @@ sane-backends — releases endpoint, [0].tag_name plain semver.
 url = "https://proxy.golang.org/gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/v2/@latest"
 parser = "json"
 path = "Version"
-version = "2.14.1"
+version = "2.15.1"
 comments = """
 snowflake — gitlab.torproject.org recusa conexão do checker; o Go module proxy
 espelha as mesmas tags (Version = "vX.Y.Z") e é sempre alcançável.
@@ -10033,7 +10033,7 @@ url = "https://api.github.com/repos/digitalocean/doctl/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.178.0"
+version = "1.179.0"
 comments = """
 doctl (DigitalOcean CLI, historically "doit"/DoCli) — GitHub releases/latest
 tag "vX.Y.Z"; the leading v is normalized away by the autoupdate. Verified
@@ -10192,7 +10192,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.5.0"
+version = "0.6.0"
 comments = """
 moose - GitHub releases/latest; tag_name is "vX.Y.Z", transform strips the v.
 Releases carry no assets: the ebuild builds from the tag tarball. Verified on
@@ -11373,7 +11373,7 @@ parser = "regex"
 pattern = '"tag_name":\s*"v([0-9]+\.[0-9]+\.[0-9]+)"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "1.0.92"
+version = "1.0.93"
 comments = """
 GitHub Copilot CLI — TWO PARALLEL TRAINS out of one repository, and picking the
 wrong one is the whole trap here:
@@ -13632,7 +13632,7 @@ HELD with the GNOME 51 mirror. Switch to tag tracking once upstream tags v51.
 url = "https://pypi.org/pypi/amd-debug-tools/json"
 parser = "json"
 path = "info.version"
-version = "0.2.21"
+version = "0.2.22"
 comments = """
 amd-debug-tools -- AMD's Zen debugging tools (amd-s2idle, amd-bios,
 amd-pstate, amd-ttm), shipped in the AMD Ryzen AI Developer Platform image.
