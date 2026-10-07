@@ -11292,12 +11292,10 @@ it must be DROPPED, not forced, once a release carries the fix).
 # END
 
 ["www-client/opera"]
-enabled = false
-disabled_by = "removed 2026-10-01: ::gentoo pins the right Chromium (152) for 136.0.6008.80 -- see comments"
 url = "https://deb.opera.com/opera-stable/dists/stable/non-free/binary-amd64/Packages"
 parser = "regex"
 pattern = 'Package: opera-stable\nVersion: ([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)'
-version = "136.0.6008.80"
+version = "137.0.6036.39"
 comments = """
 Opera — read the APT index of Opera's own repository. The download CDN
 (downloadN.operacdn.com, which SRC_URI uses) publishes no listing, and
@@ -11330,6 +11328,15 @@ measured on 136.0.6008.52 and the applier carried it to .73 and .80, but the
 the avformat major ffmpeg-chromium:152 brings. ::gentoo pins 152 for that same
 PV, so ours had become the wrong one. The probe stays recorded, verified, so a
 future return needs no re-verification -- re-derive the pin from the binary.
+
+Back on 2026-10-07 at 137.0.6036.39, because the condition reversed: the
+stable channel moved to Chromium 153.0.8010.55 while ::gentoo stops at
+opera-136 / ffmpeg-chromium:152. CHROMIUM_VERSION=153, served by
+media-video/ffmpeg-chromium-153, which this overlay carries for that reason
+only (see .autoupdate/dead-upstreams.md, section C). Cross-checked against
+the binary: opera's libffmpeg.so reports N-127365-gd4e8713cee, the string in
+the ffversion.h of Chromium 153's ffmpeg_revision 53fa34a2 and absent from
+152's; all 48 av* symbols opera imports are exported by the 153 build.
 """
 # END
 
