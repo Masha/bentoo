@@ -107,6 +107,10 @@ RESTRICT="!test? ( test )"
 # they stand. They were NOT re-measured against this tarball's deps/; do that on
 # the next bump. brotli and simdutf keep the bentoo floors, which are higher.
 #
+# 26.11.1-r1: openssl 3.5.9, following ::gentoo's 26.11.1. This one WAS
+# measured: deps/openssl/openssl/VERSION.dat in node-v26.11.1.tar.xz reads
+# 3.5.9, so a system-ssl build is now held to the release node itself ships.
+#
 # simdutf is the exception to "match what node bundles": what matters is not
 # the version but how the library was compiled. V8's builtins-typed-array.cc is
 # compiled with -std=gnu++20 and calls simdutf::atomic_binary_to_base64 /
@@ -128,7 +132,7 @@ COMMON_DEPEND=">=app-arch/brotli-1.2.0:=
 	system-icu? ( >=dev-libs/icu-78:= )
 	system-ssl? (
 		>=net-libs/ngtcp2-1.25.0:=
-		>=dev-libs/openssl-3.5.8:0=
+		>=dev-libs/openssl-3.5.9:0=
 	)
 	!system-ssl? ( >=net-libs/ngtcp2-1.25.0:=[-gnutls] )
 	|| (
@@ -303,12 +307,19 @@ src_prepare() {
 	#
 	# x86-SSE2-fix is ::gentoo's verbatim (26.10.0-r2): V8's string hasher
 	# taking the 64-bit SSE2 path on 32-bit x86.
+	#
+	# test-mkdir-recursive-eacces is ::gentoo's
+	# nodejs-26.11.1-include-EACCES-in-mkdir-test.patch, byte-identical and
+	# renamed version-agnostic for the applier reason above. It touches only
+	# test-fs-mkdir-recursive-enoent.js, which expects ENOENT from
+	# mkdir("/proc/node-test-<pid>") and gets EACCES inside the sandbox.
 	PATCHES+=(
 		"${FILESDIR}"/${PN}-26.11.0-format-cstdlib.patch
 		"${FILESDIR}"/${PN}-26.6.0-v8-climits.patch
 		"${FILESDIR}"/${PN}-26.11.0-add-missing-functional-inc.patch
 		"${FILESDIR}"/${PN}-26.10.0-x86-SSE2-fix.patch
 		"${FILESDIR}"/${PN}-merve-shared-simdutf.patch
+		"${FILESDIR}"/${PN}-test-mkdir-recursive-eacces.patch
 	)
 
 	# We need to disable mprotect on two files when it builds Bug 694100.
@@ -397,6 +408,8 @@ src_configure() {
 
 src_compile() {
 	eninja -C out/Release
+	# There's just a plain make target for the FFI tests, and it doesn't support ninja.
+	use test && emake build-ffi-tests
 }
 
 src_install() {
@@ -633,6 +646,11 @@ src_test() {
 		test/parallel/test-process-setgroups.js
 		test/parallel/test-process-uid-gid.js
 		test/parallel/test-release-npm.js
+		# Unreliable when using system libraries and ASLR.
+		# The variations between snapshot generation passes appear limited to memory
+		# allocation pointers leaking into the serialised V8 blob array; the actual
+		# bytecode and engine structures remain consistently... consistent.
+		test/parallel/test-snapshot-reproducible.js
 		test/parallel/test-socket-write-after-fin-error.js
 		test/parallel/test-strace-openat-openssl.js
 		test/sequential/test-tls-session-timeout.js
