@@ -38,14 +38,7 @@ RUST_SHORT_HASH=${BUNDLED_RUST_VER:0:10}-${BUNDLED_RUST_VER##*-}
 # either floor, so this is a documentation choice, not a resolver one.
 NODE_VER="24.16.0-r1"
 GO_MIN_VER="1.25.0"
-ESBUILD_VER="0.25.1"
-# currently manual. Measured on the 152 tarball: devtools-frontend/src/package.json
-# pins rollup 4.60.4, but deps.gentoo.zip -- which is where the wasm-node repack
-# is hosted -- still only carries 4.57.1, so that is what SRC_URI can name. Left
-# at 4.57.1 deliberately; the devtools rollup config is version-tolerant and
-# nothing has been observed to break. Raise it the moment deps.gentoo.zip catches
-# up, or if a devtools bundling step starts failing.
-ROLLUP_VER="4.57.1"
+ESBUILD_VER="0.28.2"
 VIRTUALX_REQUIRED="pgo"
 
 CHROMIUM_LANGS="af am ar bg bn ca cs da de el en-GB es es-419 et fa fi fil fr gu he
@@ -104,7 +97,6 @@ COPIUM_COMMIT="3c7e56fb4523b43b47595bb3a22f77178fc76293"
 # pkgcore does not derive it from mirror://, so it is spelled out and must be
 # recomputed whenever PPC64_HASH changes.
 SRC_URI="https://github.com/chromium-linux-tarballs/chromium-tarballs/releases/download/${PV}/chromium-${PV}-linux.tar.xz
-	https://deps.gentoo.zip/www-client/chromium/rollup-wasm-node-${ROLLUP_VER}.tgz
 	https://gitlab.com/Matt.Jolly/chromium-patches/-/archive/${PATCH_V}/chromium-patches-${PATCH_V}.tar.bz2
 	!bundled-toolchain? (
 		https://codeberg.org/selfisekai/copium/archive/${COPIUM_COMMIT}.tar.gz
@@ -494,10 +486,6 @@ src_unpack() {
 	if use ppc64; then
 		unpack chromium-openpower-${PPC64_HASH:0:10}.tar.bz2
 	fi
-
-	# This is a dirty hack, but we need rollup to build successfully and it's proving to be challenging
-	# to build locally due to deps
-	unpack rollup-wasm-node-${ROLLUP_VER}.tgz
 }
 
 remove_compiler_builtins() {
@@ -558,52 +546,42 @@ src_prepare() {
 	python_setup
 
 	# We'll fill this in as we go. Patches go in chromium-patches.
-	# BENTOO-DIVERGENCE: PATCHES - nine fixes with no counterpart:
+	# BENTOO-DIVERGENCE: PATCHES - seven fixes with no counterpart:
 	# unbundle-minizip-undo-unicode, cbor-crubit-optional,
-	# revert-font-format-crubit, revert-signed-web-bundles-crubit,
-	# athm-cxx-bridge, devtools-tsc-via-node, devtools-tsc-binary-via-node
-	# and the two
-	# chromium-patches rebases below.
+	# blink-fonts-cxx-not-crubit, revert-signed-web-bundles-crubit,
+	# athm-cxx-bridge, devtools-tsc-binary-via-node and
+	# fix-rust-2-oxidize-harder; plus one chromium-patches member dropped
+	# below.
 	# ::gentoo is on 142 and carries an old-fontconfig patch this series no
 	# longer needs.
 	local PATCHES=()
 
-	# BENTOO-DIVERGENCE: chromium-patches has no 153 tag -- 152 (2026-08-22) is
-	# still the newest -- so PATCH_V lags PV by a series and two of its patches
-	# no longer apply to this tarball. Both are replaced here by a rebase in
-	# FILESDIR rather than skipped: eapply takes whole directories, so the only
-	# way to substitute one member is to delete it from the unpacked patchset
-	# first. Drop each rm together with its FILESDIR twin the moment
-	# chromium-patches tags 153 and PATCH_V follows -- keeping a rm for a file
-	# that no longer exists turns the next bump into a die.
+	# BENTOO-DIVERGENCE: chromium-patches has no tag newer than 152
+	# (2026-08-22), so PATCH_V lags PV by three series. eapply takes whole
+	# directories, so the only way to leave out one member is to delete it from
+	# the unpacked patchset first. Drop the rm the moment PATCH_V moves to a
+	# patchset that no longer ships the file -- a rm for a missing file turns
+	# the next bump into a die.
+	#
+	# cr152-revert-to-rollup-wasm.patch swapped devtools-frontend's native
+	# rollup for @rollup/wasm-node. M155 removed rollup from devtools-frontend
+	# altogether -- every bundling step (Images, web-vitals-injected, recorder
+	# injected, inspector_overlay) now runs through esbuild, which is the
+	# system dev-util/esbuild:${ESBUILD_VER} symlinked in below -- so there is
+	# nothing left to revert and the rollup-wasm-node distfile went with it.
 	rm "${WORKDIR}/chromium-patches-${PATCH_V}/common/cr152-revert-to-rollup-wasm.patch" ||
-		die "chromium-patches no longer ships cr152-revert-to-rollup-wasm.patch; drop this rm and its rebase"
+		die "chromium-patches no longer ships cr152-revert-to-rollup-wasm.patch; drop this rm"
 
 	PATCHES+=(
 		"${WORKDIR}/chromium-patches-${PATCH_V}/common/"
-		# bentoo: rebase of chromium-patches' cr152-revert-to-rollup-wasm.patch.
-		# Only one of its seven files moved: 153 rewrote codemirror.next's
-		# rebuild.sh (added `set -e`, `npm audit`, a package-lock pass and new
-		# tsc flags), so the @@ -1,6 +1,6 @@ hunk lost its context. The
-		# substitution it makes -- node_modules/rollup -> @rollup/wasm-node --
-		# is unchanged; rebuild.sh is a devtools maintainer script and not part
-		# of the build, but a rejected hunk still fails the whole eapply.
-		"${FILESDIR}/chromium-153-revert-to-rollup-wasm.patch"
-		# bentoo: M153 made devtools-frontend's ts_library.py exec the prebuilt
-		# tsgo ELF from third_party/typescript/linux-amd64 unconditionally --
-		# the M152 node fallback is gone. That directory is not in keeplibs
-		# (nothing else needs it), the ELF purge would strip the binary
-		# anyway, and there is no arm64 build of it. Restore the node +
-		# node_modules/typescript path. The matching switch for
-		# //tools/typescript is the gn arg use_typescript_go=false in
-		# src_configure; the two go together.
-		"${FILESDIR}/chromium-153-devtools-tsc-via-node.patch"
-		# bentoo: M154 split most devtools TypeScript targets out of
-		# ts_library.py -- ts_library_split.gni now execs `tsc_binary` from the
-		# new typescript_vars.gni directly, and that still names the tsgo ELF
-		# under third_party/typescript/linux-amd64, which the tree ships empty.
-		# Point it at devtools' own JS tsc. Same trio as above.
-		"${FILESDIR}/chromium-154-devtools-tsc-binary-via-node.patch"
+		# bentoo: every devtools-frontend TypeScript step execs `tsc_binary`
+		# from typescript_vars.gni, which names the prebuilt tsgo ELF under
+		# third_party/typescript/linux-amd64. That directory is not in keeplibs
+		# (nothing else needs it), the ELF purge would strip the binary anyway,
+		# and there is no arm64 build of it. Point it at devtools' own JS tsc.
+		# The matching switch for //tools/typescript is the gn arg
+		# use_typescript_go=false in src_configure; the two go together.
+		"${FILESDIR}/chromium-155-devtools-tsc-binary-via-node.patch"
 	)
 
 	# So many fontconfig magic numbers to cover
@@ -675,42 +653,45 @@ src_prepare() {
 			# turns false precisely when rust_sysroot_absolute is set; cbor is
 			# the one that does not. Only reachable here: with USE=bundled-
 			# toolchain the flag is true and the patch is a no-op.
-			"${FILESDIR}/chromium-152-cbor-crubit-optional.patch"
-			# bentoo: M153 (upstream 493e6c3911e3) moved blink's OpenType
-			# FontFormatCheck from a cxx bridge to a Crubit binding and made
-			# //third_party/blink/renderer/platform depend on //build/rust/crubit
-			# unconditionally -- the same gn death as cbor above, but with no C++
-			# fallback to gate on: font_format_check.cc calls the generated
-			# bindings directly. This reverts the commit, restoring the M152 cxx
-			# path. Same reachability as cbor: no-op with USE=bundled-toolchain.
-			"${FILESDIR}/chromium-153-revert-font-format-crubit.patch"
+			"${FILESDIR}/chromium-155-cbor-crubit-optional.patch"
+			# bentoo: //third_party/blink/renderer/platform depends on
+			# //build/rust/crubit unconditionally and on two Crubit bindings with
+			# no C++ fallback to gate on -- the same gn death as cbor above. The
+			# OpenType FontFormatCheck (moved to Crubit in M153, upstream
+			# 493e6c3911e3) is reverted to its M152 cxx bridge; Incremental Font
+			# Transfer (new in M155, Crubit from the start) gets a cxx bridge of
+			# its own. Same reachability as cbor: no-op with
+			# USE=bundled-toolchain.
+			"${FILESDIR}/chromium-155-blink-fonts-cxx-not-crubit.patch"
 			# bentoo: M154 added two more unconditional Crubit consumers, and
 			# gn gen dies on their missing *_bindings targets. web_package
 			# (upstream e85da0b2f2dc + b2c9d9c61c9f) moved Signed Web Bundle
 			# parsing and signature checks to a Rust crate; reverting both
 			# restores the M153 C++. private_verification_tokens (4ff7d01fb98f)
 			# cannot be reverted -- later M154 commits and chrome/browser build
-			# on it -- so it keeps upstream's Rust crate and reaches it through
-			# a small cxx bridge instead. Same reachability as the two above.
+			# on it, and M155 rewrote its client side again -- so it keeps
+			# upstream's Rust crate and reaches it through a small cxx bridge
+			# instead. Same reachability as the two above.
 			# Every one of these four is a stopgap: building Crubit for the
 			# system toolchain needs a rustc-dev from the same rustc build and
 			# a Rust stdlib compiled by Chromium (assert(!rust_prebuilt_stdlib)
 			# in build/rust/gni_impl/cpp_api_from_rust.gni).
 			"${FILESDIR}/chromium-154-revert-signed-web-bundles-crubit.patch"
-			"${FILESDIR}/chromium-154-athm-cxx-bridge.patch"
+			"${FILESDIR}/chromium-155-athm-cxx-bridge.patch"
 			# bentoo: rebase of chromium-patches' toolchain/
 			# cr152-fix-rust-2-oxidize-harder.patch, which teaches Crubit to take
 			# rs_bindings_from_cc and rustfmt from ${rust_sysroot} instead of the
 			# bundled //third_party/rust-toolchain the tarball does not ship.
 			# Nothing about the fix changed -- the hardcoded RUST_TOOLCHAIN_DIR
 			# constants are still there -- only the context around it: 153
-			# reformatted run_rs_bindings_from_cc.py to 4-space indent, and 154
+			# reformatted run_rs_bindings_from_cc.py to 4-space indent, 154
 			# moved filter_clang_args out of run_bindgen and hoisted the Crubit
 			# support path into a CRUBIT_SUPPORT_PATH constant, which sat exactly
-			# where two of the four hunks anchored. Reachable only on this
+			# where two of the four hunks anchored, and 155 moved
+			# rs_bindings_from_cc.gni's public_headers from sources to inputs. Reachable only on this
 			# branch: the patchset's toolchain/ directory is applied by the loop
 			# below, which is inside this same USE=-bundled-toolchain else.
-			"${FILESDIR}/chromium-154-fix-rust-2-oxidize-harder.patch"
+			"${FILESDIR}/chromium-155-fix-rust-2-oxidize-harder.patch"
 		)
 
 		# See the rm above common/ for why substitution means deleting first.
@@ -812,13 +793,6 @@ src_prepare() {
 
 	fi
 
-	# Do this before we apply patches since (e.g.) ppc64 needs to patch rollup and it's easier in ${S}
-	einfo "Moving rollup wasm-node package into place ..."
-	mkdir -p third_party/devtools-frontend/src/node_modules/@rollup/wasm-node ||
-		die "Failed to create node_modules/@rollup/wasm-node"
-	mv "${WORKDIR}"/package/* third_party/devtools-frontend/src/node_modules/@rollup/wasm-node ||
-		die "Failed to move rollup package"
-
 	default
 
 	# Sanity check esbuild version before we start removing files.
@@ -893,7 +867,6 @@ src_prepare() {
 		third_party/anonymous_tokens
 		third_party/apple_apsl
 		third_party/axe-core
-		third_party/bidimapper
 		third_party/blink
 		third_party/boringssl
 		third_party/boringssl/src/third_party/fiat
@@ -916,6 +889,7 @@ src_prepare() {
 		third_party/catapult/tracing/third_party/oboe
 		third_party/catapult/tracing/third_party/pako
 		third_party/ced
+		third_party/chromium-bidi # M155: built from source, replaces the prebuilt third_party/bidimapper
 		third_party/cld_3
 		third_party/closure_compiler
 		third_party/compiler-rt # Since M137 atomic is required; we could probably unbundle this as a target of opportunity.
@@ -1522,8 +1496,6 @@ chromium_configure() {
 		# See dependency logic in third_party/BUILD.gn
 		"use_system_harfbuzz=$(usex system-harfbuzz true false)"
 		"use_thin_lto=${use_lto}"
-		# Only enabled for clang, but gcc has endian macros too
-		"v8_use_libm_trig_functions=true"
 		# use system go
 		"tint_use_system_go=true"
 		# M153 (crbug.com/423789047) defaults use_typescript_go=true, which
@@ -1537,6 +1509,16 @@ chromium_configure() {
 		# typescript, run through the system node) that ts_library.py still
 		# supports as the non-tsgo branch.
 		"use_typescript_go=false"
+		# M155 generates V8's instance-types.h with metagen, which parses V8's
+		# headers through libclang: the prebuilt third_party/llvm-libclang (the
+		# tarball ships its bindings but not lib/libclang.so) plus the bundled
+		# clang's resource dir, which gn derives as
+		# ${clang_base_path}/lib/clang/${clang_version} -- a path that does not
+		# exist under a system clang, so ninja dies on a missing stddef.h before
+		# compiling anything in V8. Off selects Torque's instance-type output,
+		# which is still generated in every build; upstream documents this as
+		# taking metagen and llvm-libclang out of the graph entirely.
+		"v8_use_metagen_instance_types=false"
 	)
 
 	if use bindist ; then

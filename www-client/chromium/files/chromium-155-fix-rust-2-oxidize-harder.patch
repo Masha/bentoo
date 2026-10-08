@@ -106,11 +106,10 @@ Signed-off-by: Matt Jolly <kangie@gentoo.org>
              rebase_path(_rustc_env_and_flags, root_build_dir),
 --- a/build/rust/rs_bindings_from_cc.gni
 +++ b/build/rust/rs_bindings_from_cc.gni
-@@ -248,7 +248,15 @@
+@@ -248,10 +248,18 @@
      }
  
      script = "//build/rust/gni_impl/run_rs_bindings_from_cc.py"
--    inputs = [ "//third_party/rust-toolchain/bin/rs_bindings_from_cc" ]
 +
 +    if (host_os == "win") {
 +      _rs_bindings_from_cc_exe = "${rust_sysroot}/bin/rs_bindings_from_cc.exe"
@@ -119,8 +118,12 @@ Signed-off-by: Matt Jolly <kangie@gentoo.org>
 +      _rs_bindings_from_cc_exe = "${rust_sysroot}/bin/rs_bindings_from_cc"
 +      _rustfmt_exe = "${rust_sysroot}/bin/rustfmt"
 +    }
-+    inputs = [ _rs_bindings_from_cc_exe ]
-     sources = invoker.public_headers
+     inputs = [
+                # Public headers are inputs to this action rather than sources,
+                # so GN does not consider this target an owner of the headers.
+-               "//third_party/rust-toolchain/bin/rs_bindings_from_cc",
++               _rs_bindings_from_cc_exe,
+              ] + invoker.public_headers
      outputs = [
        _rs_out_path,
 @@ -268,6 +276,10 @@

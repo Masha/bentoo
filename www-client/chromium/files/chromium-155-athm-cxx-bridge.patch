@@ -1,0 +1,397 @@
+From: Lucas C.S. <lucascs@protonmail.com>
+Subject: [PATCH] components/private_verification_tokens: reach ATHM through a cxx bridge, not Crubit
+
+M154 (upstream 4ff7d01fb98f, "[PVT] Migrate athm_ffi to use Crubit instead
+of cxx") moved the ATHM bindings to a Crubit `cpp_api_from_rust` binding.
+`cpp_api_from_rust` only exists when `enable_cpp_api_from_rust` is true,
+and //build/config/rust.gni turns it false whenever `rust_sysroot_absolute`
+is set, so with a system Rust sysroot gn never defines `athm_ffi_bindings`
+and `gn gen` dies:
+
+  ERROR Unresolved dependencies.
+  //components/private_verification_tokens/common:privacy_pass_athm_batch_request(...)
+    needs //components/private_verification_tokens/common/athm_ffi:athm_ffi_bindings(...)
+
+This cannot be a revert: //chrome/browser/private_verification_tokens
+consumes the API, and M155 rewrote the client side on top of the Crubit
+binding (AthmParameters/AthmClientRequest gave way to a single
+PrivacyPassBatchClient that builds the whole request body and finalizes the
+whole batch).  So the Rust crate is kept exactly as upstream ships it, and
+only the binding layer is swapped:
+
+ - athm_ffi/athm_cxx.rs (new) is a `cxx` bridge over PrivacyPassBatchClient,
+   the one type PrivacyPassAthmBatchRequest uses.  `cxx` cannot return a
+   `Result` without C++ exceptions, so a failed constructor yields an object
+   whose `batch_client_ok()` is false, and `finalize` returns a shared enum
+   that keeps upstream's InvalidInput/OperationFailed distinction.  `cxx`
+   has no Vec<Vec<u8>>, so the finalized tokens come back concatenated
+   with their lengths alongside.
+ - privacy_pass_athm_batch_request.{h,cc} hold a `rust::Box` of the bridge
+   type instead of the Crubit one, and pass slices through
+   base::SpanToRustSlice.  Behaviour and error mapping are unchanged.
+ - The test-only targets (common:test_support, the batch request unittest,
+   and chrome/browser's unit_tests and browser_tests) drive the *issuer*
+   half through Crubit -- private_verification_tokens_test_util.h hands out
+   a PrivacyPassAthmIssuer.  They keep their definitions, so every reference
+   to them still resolves, but their `athm_ffi_bindings` dependency is gated
+   on `enable_cpp_api_from_rust`: with a system sysroot they are defined
+   and not buildable, which costs nothing here since the ebuild only builds
+   base_unittests.
+
+Same reachability as chromium-155-blink-fonts-cxx-not-crubit.patch: applied
+only with USE=-bundled-toolchain.  Drop this patch once the overlay builds
+Crubit for the system toolchain, or upstream gates the dependency on
+`enable_cpp_api_from_rust`.
+diff -ruN a/chrome/browser/private_verification_tokens/BUILD.gn b/chrome/browser/private_verification_tokens/BUILD.gn
+--- a/chrome/browser/private_verification_tokens/BUILD.gn
++++ b/chrome/browser/private_verification_tokens/BUILD.gn
+@@ -2,6 +2,8 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//build/config/rust.gni")
++
+ static_library("private_verification_tokens") {
+   visibility = [
+     ":*",
+@@ -52,11 +54,15 @@
+     "//components/private_verification_tokens/common:private_verification_tokens_database",
+     "//components/private_verification_tokens/common:private_verification_tokens_issuer_config",
+     "//components/private_verification_tokens/common:test_support",
+-    "//components/private_verification_tokens/common/athm_ffi:athm_ffi_bindings",
+     "//net:test_support",
+     "//services/network:test_support",
+     "//url",
+   ]
++
++  # bentoo: Crubit bindings only exist when enable_cpp_api_from_rust is true.
++  if (enable_cpp_api_from_rust) {
++    deps += [ "//components/private_verification_tokens/common/athm_ffi:athm_ffi_bindings" ]
++  }
+ }
+ 
+ source_set("unit_tests") {
+@@ -77,7 +83,6 @@
+     "//components/private_verification_tokens/common:private_verification_tokens_issuer_config",
+     "//components/private_verification_tokens/common:private_verification_tokens_parameters",
+     "//components/private_verification_tokens/common:test_support",
+-    "//components/private_verification_tokens/common/athm_ffi:athm_ffi_bindings",
+     "//content/test:test_support",
+     "//net",
+     "//services/network:test_support",
+@@ -86,4 +91,9 @@
+     "//third_party/blink/public/common",
+     "//url",
+   ]
++
++  # bentoo: Crubit bindings only exist when enable_cpp_api_from_rust is true.
++  if (enable_cpp_api_from_rust) {
++    deps += [ "//components/private_verification_tokens/common/athm_ffi:athm_ffi_bindings" ]
++  }
+ }
+diff -ruN a/components/private_verification_tokens/common/athm_ffi/athm_cxx.rs b/components/private_verification_tokens/common/athm_ffi/athm_cxx.rs
+--- a/components/private_verification_tokens/common/athm_ffi/athm_cxx.rs
++++ b/components/private_verification_tokens/common/athm_ffi/athm_cxx.rs
+@@ -0,0 +1,105 @@
++// Copyright 2026 The Chromium Authors
++// Use of this source code is governed by a BSD-style license that can be
++// found in the LICENSE file.
++
++//! `cxx` bridge over the client half of `athm_ffi`, for builds where Crubit's
++//! `cpp_api_from_rust` is unavailable (`enable_cpp_api_from_rust == false`).
++//!
++//! It exposes exactly the operations `PrivacyPassAthmBatchRequest` needs, and
++//! nothing else: the protocol logic stays in `athm_ffi`, this file only adapts
++//! calling conventions. `cxx` cannot return `Result` without C++ exceptions,
++//! which Chromium disables, so a failed constructor yields an object whose
++//! `batch_client_ok()` is false, and `finalize` reports its outcome as a shared
++//! enum. `cxx` has no `Vec<Vec<u8>>` either, so the finalized tokens come back
++//! concatenated, with their individual lengths alongside.
++
++chromium::import! {
++    "//components/private_verification_tokens/common/athm_ffi:athm_ffi";
++}
++
++use athm_ffi::{AthmStatus, PrivacyPassBatchClient};
++
++#[cxx::bridge(namespace = "private_verification_tokens::athm_cxx")]
++mod ffi {
++    enum FinalizeStatus {
++        Success,
++        InvalidInput,
++        OperationFailed,
++    }
++
++    extern "Rust" {
++        type AthmCxxBatchClient;
++
++        fn new_batch_client(
++            public_key: &[u8],
++            public_key_proof: &[u8],
++            num_buckets: u8,
++            deployment_id: &[u8],
++            version: u32,
++            batch_size: usize,
++        ) -> Box<AthmCxxBatchClient>;
++        fn batch_client_ok(self: &AthmCxxBatchClient) -> bool;
++        fn request_body(self: &AthmCxxBatchClient) -> &[u8];
++        fn finalize(
++            self: &mut AthmCxxBatchClient,
++            response_body: &[u8],
++            tokens: &mut Vec<u8>,
++            token_sizes: &mut Vec<usize>,
++        ) -> FinalizeStatus;
++    }
++}
++
++pub struct AthmCxxBatchClient(Option<PrivacyPassBatchClient>);
++
++fn new_batch_client(
++    public_key: &[u8],
++    public_key_proof: &[u8],
++    num_buckets: u8,
++    deployment_id: &[u8],
++    version: u32,
++    batch_size: usize,
++) -> Box<AthmCxxBatchClient> {
++    Box::new(AthmCxxBatchClient(
++        PrivacyPassBatchClient::try_new(
++            public_key,
++            public_key_proof,
++            num_buckets,
++            deployment_id,
++            version,
++            batch_size,
++        )
++        .ok(),
++    ))
++}
++
++impl AthmCxxBatchClient {
++    fn batch_client_ok(&self) -> bool {
++        self.0.is_some()
++    }
++
++    fn request_body(&self) -> &[u8] {
++        self.0.as_ref().map_or(&[][..], PrivacyPassBatchClient::request_body)
++    }
++
++    fn finalize(
++        &mut self,
++        response_body: &[u8],
++        tokens: &mut Vec<u8>,
++        token_sizes: &mut Vec<usize>,
++    ) -> ffi::FinalizeStatus {
++        let Some(client) = self.0.as_mut() else {
++            return ffi::FinalizeStatus::OperationFailed;
++        };
++        match client.finalize(response_body) {
++            Ok(finalized) => {
++                for token in finalized {
++                    token_sizes.push(token.len());
++                    tokens.extend_from_slice(&token);
++                }
++                ffi::FinalizeStatus::Success
++            }
++            Err(AthmStatus::InvalidInput) => ffi::FinalizeStatus::InvalidInput,
++            Err(AthmStatus::OperationFailed) => ffi::FinalizeStatus::OperationFailed,
++        }
++    }
++}
+diff -ruN a/components/private_verification_tokens/common/athm_ffi/BUILD.gn b/components/private_verification_tokens/common/athm_ffi/BUILD.gn
+--- a/components/private_verification_tokens/common/athm_ffi/BUILD.gn
++++ b/components/private_verification_tokens/common/athm_ffi/BUILD.gn
+@@ -26,6 +26,18 @@
+   ]
+ }
+ 
++# bentoo: `cxx` bridge over the client half of athm_ffi, used in place of the
++# Crubit `athm_ffi_bindings` above, which gn only defines when
++# enable_cpp_api_from_rust is true.
++rust_static_library("athm_cxx") {
++  allow_unsafe = true  # Needed for FFI that underpins the `cxx` crate.
++  crate_root = "athm_cxx.rs"
++  sources = [ crate_root ]
++  cxx_bindings = [ crate_root ]
++  deps = [ ":athm_ffi" ]
++  visibility = [ "//components/private_verification_tokens/common:*" ]
++}
++
+ rust_static_library("privacy_pass_unittests") {
+   testonly = true
+   is_gtest_unittests = true
+diff -ruN a/components/private_verification_tokens/common/BUILD.gn b/components/private_verification_tokens/common/BUILD.gn
+--- a/components/private_verification_tokens/common/BUILD.gn
++++ b/components/private_verification_tokens/common/BUILD.gn
+@@ -186,10 +186,12 @@
+ source_set("test_support") {
+   testonly = true
+   sources = [ "private_verification_tokens_test_util.h" ]
+-  public_deps = [
+-    "//base",
+-    "//components/private_verification_tokens/common/athm_ffi:athm_ffi_bindings",
+-  ]
++  public_deps = [ "//base" ]
++
++  # bentoo: Crubit bindings only exist when enable_cpp_api_from_rust is true.
++  if (enable_cpp_api_from_rust) {
++    public_deps += [ "//components/private_verification_tokens/common/athm_ffi:athm_ffi_bindings" ]
++  }
+ }
+ 
+ # ATHM (Anonymous Tokens with Hidden Metadata): Crubit bindings over
+@@ -203,7 +205,9 @@
+     public_deps = [
+       ":private_verification_tokens_issuer_config",
+       "//base",
+-      "//components/private_verification_tokens/common/athm_ffi:athm_ffi_bindings",
++
++      # bentoo: cxx bridge, see athm_ffi/athm_cxx.rs.
++      "//components/private_verification_tokens/common/athm_ffi:athm_cxx",
+     ]
+   }
+ 
+@@ -216,10 +220,14 @@
+       ":private_verification_tokens_parameters",
+       ":private_verification_tokens_public_key",
+       "//base",
+-      "//components/private_verification_tokens/common/athm_ffi:athm_ffi_bindings",
+       "//testing/gmock",
+       "//testing/gtest",
+       "//url",
+     ]
++
++    # bentoo: Crubit bindings only exist when enable_cpp_api_from_rust is true.
++    if (enable_cpp_api_from_rust) {
++      deps += [ "//components/private_verification_tokens/common/athm_ffi:athm_ffi_bindings" ]
++    }
+   }
+ }
+diff -ruN a/components/private_verification_tokens/common/privacy_pass_athm_batch_request.cc b/components/private_verification_tokens/common/privacy_pass_athm_batch_request.cc
+--- a/components/private_verification_tokens/common/privacy_pass_athm_batch_request.cc
++++ b/components/private_verification_tokens/common/privacy_pass_athm_batch_request.cc
+@@ -7,9 +7,10 @@
+ #include <utility>
+ #include <vector>
+ 
++#include "base/compiler_specific.h"
++#include "base/containers/span_rust.h"
+ #include "base/containers/to_vector.h"
+-#include "components/private_verification_tokens/common/athm_ffi/athm_ffi.h"
+-#include "third_party/crubit/support/rs_std/slice_ref.h"
++#include "components/private_verification_tokens/common/athm_ffi/athm_cxx.rs.h"
+ 
+ namespace private_verification_tokens {
+ 
+@@ -26,27 +27,30 @@
+         PrivacyPassAthmBatchRequestError::kInvalidBucketCount);
+   }
+ 
+-  auto client_result = PrivacyPassBatchClient::try_new(
+-      rs_std::SliceRef<const uint8_t>(issuer_config.public_key.public_key()),
+-      rs_std::SliceRef<const uint8_t>(
+-          issuer_config.public_key.public_key_proof()),
++  rust::Box<athm_cxx::AthmCxxBatchClient> client = athm_cxx::new_batch_client(
++      base::SpanToRustSlice(issuer_config.public_key.public_key()),
++      base::SpanToRustSlice(issuer_config.public_key.public_key_proof()),
+       num_buckets,
+-      rs_std::SliceRef<const uint8_t>(
+-          base::as_byte_span(issuer_config.deployment_id)),
++      base::SpanToRustSlice(base::as_byte_span(issuer_config.deployment_id)),
+       issuer_config.public_key.version(),
+       static_cast<size_t>(issuer_config.batch_size));
+-  if (!client_result.has_value()) {
++  if (!client->batch_client_ok()) {
+     return base::unexpected(
+         PrivacyPassAthmBatchRequestError::kClientRequestGenerationFailed);
+   }
+ 
+-  return PrivacyPassAthmBatchRequest(std::move(*client_result));
++  return PrivacyPassAthmBatchRequest(std::move(client));
+ }
+ 
+ PrivacyPassAthmBatchRequest::PrivacyPassAthmBatchRequest(
+-    PrivacyPassBatchClient batch_client)
+-    : batch_client_(std::move(batch_client)),
+-      request_body_(base::ToVector(batch_client_->request_body().to_span())) {}
++    rust::Box<athm_cxx::AthmCxxBatchClient> batch_client)
++    : batch_client_(std::move(batch_client)) {
++  rust::Slice<const uint8_t> body = (*batch_client_)->request_body();
++  // SAFETY: `body` borrows the Rust-owned request body inside
++  // `batch_client_`, and `data()`/`size()` describe exactly that allocation.
++  request_body_ =
++      base::ToVector(UNSAFE_BUFFERS(base::span(body.data(), body.size())));
++}
+ 
+ PrivacyPassAthmBatchRequest::PrivacyPassAthmBatchRequest(
+     PrivacyPassAthmBatchRequest&&) = default;
+@@ -62,22 +66,29 @@
+         PrivacyPassAthmBatchRequestError::kAlreadyFinalized);
+   }
+ 
+-  auto finalize_result =
+-      std::exchange(batch_client_, std::nullopt)
+-          ->finalize(rs_std::SliceRef<const uint8_t>(response_body));
+-  if (!finalize_result.has_value()) {
+-    if (finalize_result.error() == AthmStatus::MakeInvalidInput()) {
+-      return base::unexpected(
+-          PrivacyPassAthmBatchRequestError::kInvalidResponseBodyLength);
+-    }
++  rust::Box<athm_cxx::AthmCxxBatchClient> batch_client =
++      std::move(*std::exchange(batch_client_, std::nullopt));
++  rust::Vec<uint8_t> tokens;
++  rust::Vec<size_t> token_sizes;
++  const athm_cxx::FinalizeStatus status = batch_client->finalize(
++      base::SpanToRustSlice(response_body), tokens, token_sizes);
++  if (status == athm_cxx::FinalizeStatus::InvalidInput) {
++    return base::unexpected(
++        PrivacyPassAthmBatchRequestError::kInvalidResponseBodyLength);
++  }
++  if (status != athm_cxx::FinalizeStatus::Success) {
+     return base::unexpected(
+         PrivacyPassAthmBatchRequestError::kClientFinalizeFailed);
+   }
+ 
++  // SAFETY: `tokens` owns `size()` contiguous bytes at `data()`.
++  base::span<const uint8_t> remaining =
++      UNSAFE_BUFFERS(base::span(tokens.data(), tokens.size()));
+   std::vector<std::vector<uint8_t>> finalized_tokens;
+-  finalized_tokens.reserve(finalize_result->size());
+-  for (const auto& token : *finalize_result) {
+-    finalized_tokens.push_back(base::ToVector(token));
++  finalized_tokens.reserve(token_sizes.size());
++  for (size_t token_size : token_sizes) {
++    finalized_tokens.push_back(
++        base::ToVector(remaining.take_first(token_size)));
+   }
+   return finalized_tokens;
+ }
+diff -ruN a/components/private_verification_tokens/common/privacy_pass_athm_batch_request.h b/components/private_verification_tokens/common/privacy_pass_athm_batch_request.h
+--- a/components/private_verification_tokens/common/privacy_pass_athm_batch_request.h
++++ b/components/private_verification_tokens/common/privacy_pass_athm_batch_request.h
+@@ -11,8 +11,9 @@
+ 
+ #include "base/containers/span.h"
+ #include "base/types/expected.h"
+-#include "components/private_verification_tokens/common/athm_ffi/athm_ffi.h"
++#include "components/private_verification_tokens/common/athm_ffi/athm_cxx.rs.h"
+ #include "components/private_verification_tokens/common/private_verification_tokens_issuer_config.h"
++#include "third_party/rust/cxx/v1/cxx.h"
+ 
+ namespace private_verification_tokens {
+ 
+@@ -78,9 +79,12 @@
+   Finalize(base::span<const uint8_t> response_body);
+ 
+  private:
+-  explicit PrivacyPassAthmBatchRequest(PrivacyPassBatchClient batch_client);
++  // bentoo: held through the `cxx` bridge in athm_ffi/athm_cxx.rs rather than
++  // as a Crubit value type.
++  explicit PrivacyPassAthmBatchRequest(
++      rust::Box<athm_cxx::AthmCxxBatchClient> batch_client);
+ 
+-  std::optional<PrivacyPassBatchClient> batch_client_;
++  std::optional<rust::Box<athm_cxx::AthmCxxBatchClient>> batch_client_;
+   std::vector<uint8_t> request_body_;
+ };
+ 
