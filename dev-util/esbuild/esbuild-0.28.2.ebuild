@@ -3,7 +3,7 @@
 
 EAPI=8
 
-inherit go-module
+inherit go-env go-module
 
 # bentoo: ::gentoo stops at 0.27.3, and chromium 155's devtools-frontend pins
 # 0.28.2 (node_modules/esbuild/lib/main.js refuses any other binary). esbuild's
@@ -27,13 +27,17 @@ KEYWORDS="~amd64 ~arm64"
 
 RESTRICT="test" # tests require more work, but chromium needs esbuild already.
 
-# BENTOO-DIVERGENCE: DEFINED_PHASES - prepare, which moves the reused
+# BENTOO-DIVERGENCE: DEFINED_PHASES - unpack, which moves the reused
 # ${VENDOR_PV} vendor tree (see VENDOR_PV above) under ${S}; ::gentoo's own
 # vendor tarball for each version unpacks there directly and needs none.
-src_prepare() {
+# It has to happen in src_unpack, not src_prepare: go-module_src_unpack runs
+# `go mod verify` whenever ${S}/vendor is missing at the end of unpack, and
+# that fetches from proxy.golang.org, which the network sandbox refuses.
+src_unpack() {
 	default
 	mv "${WORKDIR}/esbuild-${VENDOR_PV}/vendor" "${S}/vendor" ||
 		die "Failed to move the ${VENDOR_PV} vendor tree into place"
+	go-env_set_compile_environment
 }
 
 src_compile() {
