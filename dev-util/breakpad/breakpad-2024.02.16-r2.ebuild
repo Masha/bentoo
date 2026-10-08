@@ -15,11 +15,16 @@ SLOT="0"
 KEYWORDS="~amd64"
 IUSE="test tools"
 
+# BENTOO-DIVERGENCE: RDEPEND - linux-syscall-support is a runtime dependency too:
+# the installed headers include <lss/linux_syscall_support.h> (src_prepare
+# rewrites them to it), so a consumer building against a binpkg of breakpad
+# failed without it (dev-libs/sentry-native[breakpad], 2026-10-08). ::gentoo
+# lists it in DEPEND only.
 RDEPEND="
+	dev-libs/linux-syscall-support
 	net-misc/curl
 "
 DEPEND="${RDEPEND}
-	dev-libs/linux-syscall-support
 	dev-embedded/libdisasm
 "
 BDEPEND="test? ( dev-cpp/gtest )"
