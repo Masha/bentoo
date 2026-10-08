@@ -2101,7 +2101,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "0.40.0"
+version = "0.40.1"
 comments = """
 ollama-bin — same upstream repo.
 """
@@ -9721,7 +9721,7 @@ url = "https://api.github.com/repos/ollama/ollama/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.40.0"
+version = "0.40.1"
 comments = """
 ollama source — same repo as ollama-bin; tag "vX.Y.Z" (leading v stripped).
 

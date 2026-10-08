@@ -9,10 +9,12 @@ DESCRIPTION="Get up and running with Llama 3, Mistral, Gemma, and other language
 HOMEPAGE="https://ollama.com"
 
 LLAMA_CPP_tag=b11351
+# go.mod/go.sum unchanged since 0.40.0; no 0.40.1 deps tarball published
+DEPS_PV=0.40.0
 
 SRC_URI="
 	https://github.com/ollama/${PN}/archive/refs/tags/v${PV}.tar.gz -> ${P}.gh.tar.gz
-	https://github.com/gentoo-golang-dist/${PN}/releases/download/v${PV}/${P}-deps.tar.xz
+	https://github.com/gentoo-golang-dist/${PN}/releases/download/v${DEPS_PV}/${PN}-${DEPS_PV}-deps.tar.xz
 	https://github.com/ggml-org/llama.cpp/archive/refs/tags/${LLAMA_CPP_tag}.tar.gz
 		-> llama.cpp-${LLAMA_CPP_tag}.tar.gz
 "
