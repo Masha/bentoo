@@ -3,6 +3,9 @@
 
 EAPI=8
 
+# BENTOO-DIVERGENCE: INHERIT - go-env, which go-module already pulls in. It is
+# named here because src_unpack below calls go-env_set_compile_environment
+# directly; without the explicit inherit pkgcheck reports IndirectInherits.
 inherit go-env go-module
 
 # bentoo: ::gentoo stops at 0.27.3, and chromium 155's devtools-frontend pins
