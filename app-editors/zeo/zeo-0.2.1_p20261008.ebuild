@@ -1788,6 +1788,10 @@ src_prepare() {
 		# (dev.zed.Zed, zed, zed-editor); without it the dev.zeo.Zeo Flatpak runs
 		# confined. Inert outside a Flatpak.
 		"${FILESDIR}/0032-cli-let-the-Flatpak-escape-recognise-Zeo-s-app-id-an.patch"
+		# 0047 makes the About window name Zeo's version -- RELEASE_VERSION, which
+		# src_compile below exports as ${PV} -- and keeps Zed's AppVersion on a
+		# row of its own, since extensions check compatibility against it.
+		"${FILESDIR}/0047-zed-the-About-window-names-Zeo-s-version.patch"
 		# 0033 ships Claude Agent (Plus) and Claude Agent TUI as default agents:
 		# npx entries in the ACP registry list, enabled in default.json, always
 		# @latest from npm. Needs no adapter at build time, so it is not gated
