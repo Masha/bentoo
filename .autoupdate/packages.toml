@@ -1740,8 +1740,9 @@ codex — tag "rust-vX.Y.Z" ("rust-" not strippable); regex extracts X.Y.Z from 
 
 A bump of this record moves PV and nothing else, and the from-source ebuild
 carries three pins PV does not reach. One is now derived (MY_CRATES_TAG is
-"rust-v${PV}"); the other two are hand-written and must be re-checked against
-codex-rs/Cargo.lock on every bump, or the build breaks at compile time:
+"rust-v${PV}"); the other two must match codex-rs/Cargo.lock on every bump, or
+the build breaks at compile time. RUSTY_V8_TAG is synced by aux_url (below);
+GIT_CRATES is still hand-written and must be re-checked by hand:
 
   GIT_CRATES    every "source = git+" line in the lock needs a matching entry,
                 one per crate even when several share a repository. 0.153.0
@@ -1754,7 +1755,8 @@ Both were stale in 0.153.0 as shipped. See the comments above each in the
 ebuild for the full reasoning.
 
 RUSTY_V8_TAG follows the v8 crate in the release's Cargo.lock via aux_url
-(2026-10-07): a mismatched pair builds against the wrong prebuilt V8.
+(2026-10-07): a mismatched pair builds against the wrong prebuilt V8. Only
+the awk check above is replaced; GIT_CRATES is not.
 """
 # END
 
@@ -11826,12 +11828,13 @@ tsserver is NOT bundled upstream. The ebuild installs a private typescript
 the server's require.resolve('typescript') fallback finds it. It deliberately
 does NOT depend on dev-lang/typescript: 7.x is the native Go port, has no
 tsserver.js, and shares slot 0, so a <7 pin blocked TypeScript 7 for every
-user of this server. TS_PV is not probed by this record; raise it by hand if
-the 6.x series ever gets another release. On a bump, check that engines.node
-has not risen past the >=net-libs/nodejs floor in RDEPEND.
+user of this server. On a bump, check that engines.node has not risen past the
+>=net-libs/nodejs floor in RDEPEND.
 
-TS_PV is the typescript devDependency pin of that release's package.json,
-read through aux_url since 2026-10-07.
+TS_PV follows the typescript devDependency pin ("^" or "~" stripped) of the
+release's package.json, read through aux_url since 2026-10-07; before that it
+was raised by hand. If upstream ever pins a 7.x typescript there, the bump
+must be reviewed by hand: 7.x ships no tsserver.js.
 """
 # END
 
@@ -12095,18 +12098,14 @@ milestones directory listing rather than the GitHub tags: a tag can precede
 the milestone upload by a day, while a listed directory already holds the
 tarball. The listing is in no useful order, so select = "max" is mandatory.
 
-MY_BUILD is NOT covered by this probe: the distfile is
-jdt-language-server-${PV}-${MY_BUILD}.tar.gz and the timestamp only lives in
+MY_BUILD is the build stamp in the distfile name
+(jdt-language-server-${PV}-${MY_BUILD}.tar.gz). It only lives in
 https://download.eclipse.org/jdtls/milestones/${PV}/latest.txt, a URL that
 depends on the new version (milestones/latest.txt and jdtls/latest.txt are
-404), so aux_var cannot reach it. A bump applied by the tool keeps the old
-MY_BUILD and fails loudly at manifest time with a 404 -- refresh MY_BUILD by
-hand from latest.txt. files/jdtls-launcher-config.patch patches bin/jdtls.py;
-if upstream reworks the launcher, the patch fails to apply, which is the
-intended signal.
-
-MY_BUILD (the build stamp in the distfile name) is read from the release's
-latest.txt through aux_url since 2026-10-07; before that every bump 404ed.
+404), so it is read through aux_url since 2026-10-07; before that every bump
+kept the old MY_BUILD and 404ed at manifest time.
+files/jdtls-launcher-config.patch patches bin/jdtls.py; if upstream reworks
+the launcher, the patch fails to apply, which is the intended signal.
 """
 # END
 
