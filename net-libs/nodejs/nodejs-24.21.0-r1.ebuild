@@ -68,40 +68,38 @@ REQUIRED_USE="inspector? ( icu ssl )
 
 RESTRICT="!test? ( test )"
 
-# Version-driven bounds, taken from ::gentoo's own 24 series
-# (nodejs-24.16.0-r1) rather than from the 26 ebuild: a 26-era floor would
-# reject libraries slot 24 builds against perfectly well. This block, SRC_URI
-# and PATCHES are the only places the two slots are expected to differ.
+# Version-driven bounds, taken from ::gentoo's own 24 series rather than from
+# the 26 ebuild: a 26-era floor could reject libraries slot 24 builds against
+# perfectly well. This block, SRC_URI and PATCHES are the only places the two
+# slots are expected to differ.
 #
-# What these numbers are NOT is a mirror of what deps/ vendors. They are the
-# floors ::gentoo's 24 maintainer settled on -- the oldest API each --shared-*
-# link is known to work against. Measured against this tarball, deps/ is ahead
-# of several of them, and that is fine:
+# These are the floors ::gentoo's 24 maintainer settled on -- the oldest API
+# each --shared-* link is known to work against. 24.21.0-r1 takes ::gentoo's
+# nodejs-24.21.0 floors as they stand. They were checked against this tarball
+# rather than copied blind: every raised one equals what deps/ vendors, and
+# every one is satisfiable from ::gentoo today:
 #
-#   dep       floor here  24.18.1 has  26.5.1 has  ::gentoo has
-#   ada       3.3.0       3.4.4        3.4.4       3.4.4
-#   brotli    1.1.0       1.2.0        1.2.0       1.2.0-r1
-#   c-ares    1.34.5      1.34.6       1.34.6      1.34.8
-#   libuv     1.52.1      1.52.1       1.52.1      1.52.1
-#   simdjson  4.6.1       4.6.4        4.6.4       4.6.2
-#   nghttp2   1.69.0      1.69.0       1.69.0      1.69.0
-#   nghttp3   1.14.0      1.14.0       1.17.0      1.18.0
-#   ngtcp2    1.14.0      1.15.1       1.23.0      1.25.0
-#   openssl   3.5.6       3.5.7        3.5.7       3.6.3
+#   dep       floor here  24.21.0 deps/ has
+#   ada       4.0.0       4.0.0
+#   brotli    1.1.0       (unchanged by ::gentoo)
+#   c-ares    1.34.8      1.34.8
+#   libuv     1.52.1      (unchanged by ::gentoo)
+#   simdjson  4.6.7       4.6.7
+#   nghttp2   1.70.0      1.70.0
+#   nghttp3   1.18.0      1.18.0
+#   ngtcp2    1.25.0      1.25.0   (system-ssl only; 1.14.0 otherwise, as
+#                                   ::gentoo has it)
+#   icu       78          78.3
+#   openssl   3.5.8       3.5.8
 #
-# Left alone deliberately, and the simdjson row is why: "raise every floor to
-# whatever deps/ vendors" is the obvious-looking rule and it is wrong. deps/
-# vendors simdjson 4.6.4 while ::gentoo ships at most 4.6.2, so that rule
-# makes the package uninstallable. A floor is a claim about an API, and
-# raising one without a build behind it buys a user-visible restriction with
-# no evidence. Move a line here when a build actually fails below it.
+# Satisfiability is the check that matters, not "matches deps/": "raise every
+# floor to whatever deps/ vendors" made the package uninstallable once before,
+# when deps/ vendored a simdjson newer than any ::gentoo shipped. Re-run both
+# checks on every bump rather than carrying these numbers forward.
 #
-# Two rows are real 24-vs-26 differences rather than staleness -- nghttp3 and
-# ngtcp2. 24.18.1 vendors 1.14.0 and 1.15.1 where 26.5.1 vendors 1.17.0 and
-# 1.23.0, so the 26 ebuild's higher floors would simply be wrong here. ada and
-# brotli, by contrast, have CONVERGED since ::gentoo's 24.16.0-r1 snapshot:
-# both majors now vendor 3.4.4 and 1.2.0. Their floors differ only because
-# ::gentoo's 24 ebuild predates that, not because the series disagree.
+# The nghttp3/ngtcp2 floors used to be a genuine 24-vs-26 difference (24.18.1
+# vendored 1.14.0/1.15.1). 24.21.0 vendors the same versions 26 does, so that
+# difference is gone.
 #
 # BENTOO-DIVERGENCE: DEPEND - no dev-cpp/simdutf, for the reason spelled out
 # immediately below. The prose predates the tag; only the tag is machine
@@ -135,17 +133,17 @@ RESTRICT="!test? ( test )"
 # that v8.gyp in THIS tarball gained the same gate.
 COMMON_DEPEND=">=app-arch/brotli-1.1.0:=
 	dev-db/sqlite:3
-	>=dev-cpp/ada-3.3.0:=
+	>=dev-cpp/ada-4.0.0:=
 	>=dev-libs/libuv-1.52.1:=
-	>=dev-libs/simdjson-4.6.1:=
-	>=net-dns/c-ares-1.34.5:=
-	>=net-libs/nghttp2-1.69.0:=
-	>=net-libs/nghttp3-1.14.0:=
+	>=dev-libs/simdjson-4.6.7:=
+	>=net-dns/c-ares-1.34.8:=
+	>=net-libs/nghttp2-1.70.0:=
+	>=net-libs/nghttp3-1.18.0:=
 	virtual/zlib:=
-	system-icu? ( >=dev-libs/icu-73:= )
+	system-icu? ( >=dev-libs/icu-78:= )
 	system-ssl? (
-		>=net-libs/ngtcp2-1.14.0:=
-		>=dev-libs/openssl-3.5.6:0=
+		>=net-libs/ngtcp2-1.25.0:=
+		>=dev-libs/openssl-3.5.8:0=
 	)
 	!system-ssl? ( >=net-libs/ngtcp2-1.14.0:=[-gnutls] )
 	|| (
