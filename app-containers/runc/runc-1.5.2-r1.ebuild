@@ -7,7 +7,7 @@ inherit go-module linux-info
 
 # update on bump, look for commit ID on release tag.
 # https://github.com/opencontainers/runc
-RUNC_COMMIT=8f2685a471d3347a686ad3909783d8aafc6bb208
+RUNC_COMMIT="29dd3dc2b13b4123162e5fe132504bb4b15569f1"
 
 DESCRIPTION="CLI tool for spawning and running containers"
 HOMEPAGE="https://github.com/opencontainers/runc/"
