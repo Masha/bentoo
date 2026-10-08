@@ -13,7 +13,7 @@ inherit xdg
 # targets znver5 and put AVX-512 into the binary; this build refuses any
 # compiler-generated AVX-512. PROVENANCE.txt inside the tarball names the commit,
 # every patch with its sha256, the toolchains and the flags.
-EGIT_COMMIT="a84689073d296dfd39987bc7dd478e43ef76d83a"
+EGIT_COMMIT="20aff31323605d87cc45883c706f85ec4cb04614"
 
 DESCRIPTION="Zeo - the Zed editor, rebranded, with the bentoo patch series (binary)"
 HOMEPAGE="https://github.com/zeo-workspace/zeo https://zed.dev"
@@ -44,8 +44,8 @@ IUSE="+claude-agent-acp-plus +claude-agent-acp-tui +claude-code-ide"
 # Never bindist: redistributing this binary is the reason the package exists.
 RESTRICT="mirror strip"
 
-# NEEDED is measured on the shipped binary with scanelf; -r2 adds libX11-xcb,
-# which x11-libs/libX11 provides. The dlopen()ed
+# NEEDED is measured on the shipped binary with scanelf (unchanged since -r2,
+# whose libX11-xcb x11-libs/libX11 provides). The dlopen()ed
 # libraries are invisible to scanelf and are listed from what gpui loads at run
 # time: Vulkan, the Wayland client and libX11.
 RDEPEND="
@@ -65,7 +65,7 @@ RDEPEND="
 		media-fonts/noto
 		media-fonts/ubuntu-font-family
 	)
-	claude-agent-acp-plus? ( dev-util/claude-agent-acp-plus )
+	claude-agent-acp-plus? ( >=dev-util/claude-agent-acp-plus-0.24.0 )
 	claude-agent-acp-tui? ( dev-util/claude-agent-acp-tui )
 	claude-code-ide? ( dev-util/claude-code )
 "
@@ -104,9 +104,19 @@ pkg_postinst() {
 
 	elog "Zeo (binary) installed. Launch with: zeo"
 
-	elog ""
-	elog "Claude Agent (Plus) and Claude Agent TUI are available in Zeo's agent panel"
-	elog "by default, installed from npm on first use. No settings.json entry is needed."
+	if use claude-agent-acp-plus; then
+		elog ""
+		elog "Claude Agent (Plus) is available in Zeo's agent panel by default and runs"
+		elog "the adapter installed as /usr/bin/claude-agent-acp-plus. No settings.json"
+		elog "entry is needed."
+	fi
+
+	if use claude-agent-acp-tui; then
+		elog ""
+		elog "Claude Agent TUI is available in Zeo's agent panel by default and runs"
+		elog "the bridge installed as /usr/bin/claude-agent-acp-tui. No settings.json"
+		elog "entry is needed."
+	fi
 
 	if use claude-code-ide; then
 		elog ""
