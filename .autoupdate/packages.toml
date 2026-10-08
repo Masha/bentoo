@@ -368,7 +368,7 @@ url = "https://api.github.com/repos/tmux/tmux/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "3.7c"
+version = "3.8"
 comments = """
 tmux - GitHub release tag, a bare version with no "v" prefix.
 
@@ -500,7 +500,7 @@ url = "https://api.github.com/repos/trufflesecurity/trufflehog/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "3.99.0"
+version = "3.99.2"
 comments = """
 trufflehog - releases/latest returns "vX.Y.Z". Upstream ships several releases
 a week, so this record moves often.
@@ -755,7 +755,7 @@ url = "https://dl.pstmn.io/api/version/latest?platform=linux64&channel=stable"
 parser = "json"
 path = "version"
 type = "bin"
-version = "12.31.3"
+version = "12.31.6"
 comments = """
 Postman — official version API; clean {"version":"..."}.
 """
@@ -930,7 +930,7 @@ url = "https://api.github.com/repos/ProtonMail/proton-bridge/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "3.27.0"
+version = "3.27.1"
 comments = """
 Proton Mail Bridge — GitHub release tag "vX.Y.Z" ("v" stripped).
 """
@@ -1661,7 +1661,7 @@ url = "https://api.github.com/repos/simdjson/simdjson/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "5.0.2"
+version = "5.0.3"
 comments = """
 simdjson - tag "vX.Y.Z". A major bump moves SIMDJSON_LIB_SOVERSION in the top
 CMakeLists.txt (4.x = 33, 5.0 = 34): SLOT's subslot must follow it by hand.
@@ -3607,7 +3607,7 @@ transform = [['T.*', ""], ['-', ""]]
 commit_sha_path = "[0].sha"
 base_from = "none"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0_p20260827"
+version = "0_p20261008"
 comments = """
 asus-ec-sensors — the single upstream tag (v0.1.0) is stale and board support
 lands as plain commits on master, so track master. base_from = "none" says
@@ -9415,7 +9415,7 @@ is a workspace and pycargoebuild refuses it.
 url = "https://pypi.org/pypi/openai/json"
 parser = "json"
 path = "info.version"
-version = "3.26.0"
+version = "3.26.1"
 comments = """
 openai — official Python SDK; core dep of sci-ml/amd-gaia. info.version is
 clean X.Y.Z. Live=3.0.0 == current PV.
@@ -9464,7 +9464,7 @@ pattern = '"name":\s*"Hermes Agent v([0-9]+\.[0-9]+\.[0-9]+)'
 headers = { "User-Agent" = "bentoo-autoupdate" }
 aux_var = "MY_TAG"
 aux_pattern = '"tag_name":\s*"v([0-9]+\.[0-9]+\.[0-9]+)"'
-version = "0.21.5"
+version = "0.21.6"
 comments = """
 hermes-agent -- tags are dated (v2026.9.24) while PV is the pyproject SemVer
 (0.21.5); the release name carries both: "Hermes Agent v0.21.5 (v2026.9.24)".
@@ -10209,7 +10209,7 @@ parser = "json"
 path = "[0].tag_name"
 transform = [['-', "_p"]]
 type = "bin"
-version = "157.0_p1"
+version = "157.0.1_p1"
 comments = """
 LibreWolf (bin) — NÃO usar as tags do repo "source": o upstream tagueia o
 source antes de publicar os binários, e o -bin morre com 404 no pkgdev
@@ -10509,7 +10509,7 @@ transform = [['T.*', ""], ['-', ""]]
 commit_sha_path = "sha"
 base_from = "none"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0_pre20261007"
+version = "0_pre20261008"
 comments = """
 ik_llama-cpp — base_from = "none": upstream publishes no usable release
 series.  Verified 2026-07-19 and again 2026-08-04: the repo has exactly ONE
@@ -11215,7 +11215,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "2.6.0"
+version = "2.6.1"
 comments = """
 ai-memory — releases/latest on akitaonrails/ai-memory; tag_name is "vX.Y.Z" and
 the transform strips the v.  Verified by real request on 2026-09-07: tag_name
@@ -11264,7 +11264,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "2.6.0"
+version = "2.6.1"
 comments = """
 ai-memory-bin — same endpoint and same release as dev-util/ai-memory; this
 record exists separately only because the two are separate packages.  Bump them
@@ -11469,7 +11469,7 @@ url = "https://registry.npmjs.org/@cline/cli-linux-x64/latest"
 parser = "regex"
 pattern = '"version":"([0-9]+\.[0-9]+\.[0-9]+)"'
 type = "bin"
-version = "3.0.69"
+version = "3.0.70"
 comments = """
 Cline CLI — probed on npm, NOT on GitHub, and that is deliberate: the
 cline/cline repository publishes several product lines under one releases
@@ -11497,7 +11497,7 @@ parser = "regex"
 pattern = '"tag_name":\s*"desktop-v([0-9]+\.[0-9]+\.[0-9]+)"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "0.0.44"
+version = "0.0.45"
 comments = """
 Cline for Desktop (beta, Tauri) -- the Linux .deb from the desktop-v* GitHub
 releases. Same repository as dev-util/cline-bin, different product.
@@ -13763,7 +13763,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "5.0"
+version = "5.0.1"
 comments = """
 scrcpy — releases/latest; tag_name is "vX.Y", transform strips the v.
 Verified on 2026-10-06: tag_name "v5.0", published 2026-10-05.
