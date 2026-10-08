@@ -4,11 +4,16 @@
 EAPI=8
 
 # Plasma 6.8 beta 2, masked in profiles/package.mask. Copied from the Gentoo
-# KDE team's overlay (github.com/gentoo/kde) with no change but these tags;
-# each axis differs only because ::gentoo is still on the 6.7.x series.
-# Drop this ebuild, tags included, once ::gentoo ships 6.8.0.
+# KDE team's overlay (github.com/gentoo/kde) with no change but these tags
+# and the DDC/CI patch below; the other axes differ only because ::gentoo is
+# still on the 6.7.x series.
+# The patch makes powerdevil redetect monitors whose DDC/CI was not ready yet
+# when it started (seen at login on an HDMI monitor): libddcutil marks them
+# invalid and never rechecks them, so brightness control is lost for the
+# whole session. Still needed on upstream master as of 2026-10-08, so when
+# ::gentoo ships 6.8.0 this package stays here to carry it.
 # BENTOO-DIVERGENCE: DEPEND - upstream 6.8 beta, not in ::gentoo yet.
-# BENTOO-DIVERGENCE: PATCHES - upstream 6.8 beta, not in ::gentoo yet.
+# BENTOO-DIVERGENCE: PATCHES - redetect monitors whose DDC/CI was not ready at startup.
 # BENTOO-DIVERGENCE: RDEPEND - upstream 6.8 beta, not in ::gentoo yet.
 
 ECM_HANDBOOK="optional"
@@ -76,6 +81,10 @@ BDEPEND="
 	dev-util/wayland-scanner
 	>=kde-frameworks/kcmutils-${KFMIN}:6
 "
+
+PATCHES=(
+	"${FILESDIR}"/${PN}-6.7.91-ddc-redetect-invalid-displays.patch
+)
 
 # -m 0755 to avoid suid with USE="-filecaps"
 FILECAPS=( -m 0755 cap_wake_alarm=ep usr/libexec/org_kde_powerdevil )

@@ -1,0 +1,57 @@
+--- a/daemon/controllers/ddcutildetector.cpp
++++ b/daemon/controllers/ddcutildetector.cpp
+@@ -11,6 +11,7 @@
+ #include <powerdevil_debug.h>
+ 
+ #include <QMutex>
++#include <QTimer>
+ 
+ #include <map>
+ #include <memory> // std::unique_ptr
+@@ -66,6 +67,7 @@
+     QMutex m_openDisplayMutex;
+     bool m_performedDetection = false;
+     bool m_noDdcutil = false;
++    int m_redetectRetries = 0;
+ };
+ 
+ #if DDCUTIL_VERSION >= QT_VERSION_CHECK(2, 1, 0)
+@@ -186,6 +188,26 @@
+         m_pendingDisplays.erase(id);
+         m_displays.emplace(id, std::move(display));
+     }
++
++#if DDCUTIL_VERSION >= QT_VERSION_CHECK(2, 1, 0)
++    // A monitor that is still waking up (e.g. right after login) fails ddcutil's initial
++    // DDC check and is only reported among the invalid displays. ddcutil rechecks hotplugged
++    // displays only, so redetect a few times with backoff to pick it up once it answers.
++    DDCA_Display_Ref *allDisplayRefs = nullptr;
++    ddca_get_display_refs(true, &allDisplayRefs);
++    int allDisplayCount = 0;
++    while (allDisplayRefs[allDisplayCount] != nullptr) {
++        ++allDisplayCount;
++    }
++    if (allDisplayCount == displayCount) {
++        m_redetectRetries = 0;
++    } else if (m_redetectRetries < 4) {
++        const int delayMs = 2000 << m_redetectRetries++;
++        qCWarning(POWERDEVIL) << "[DDCutilDetector]:" << allDisplayCount - displayCount
++                              << "display(s) without working DDC/CI - redetecting in" << delayMs << "ms, attempt" << m_redetectRetries;
++        QTimer::singleShot(delayMs, this, &DDCutilPrivateSingleton::redetect);
++    }
++#endif
+ }
+ 
+ const std::map<QString, std::unique_ptr<DDCutilDisplay>> &DDCutilPrivateSingleton::displays()
+@@ -223,6 +245,11 @@
+     if (event.event_type == DDCA_EVENT_DISPLAY_CONNECTED) {
+         qCDebug(POWERDEVIL) << "[DDCutilDetector]: DDCA_EVENT_DISPLAY_CONNECTED signal arrived";
+         Q_EMIT displayAdded();
++#if DDCUTIL_VERSION >= QT_VERSION_CHECK(2, 2, 0)
++    } else if (event.event_type == DDCA_EVENT_DDC_ENABLED) {
++        qCDebug(POWERDEVIL) << "[DDCutilDetector]: DDCA_EVENT_DDC_ENABLED signal arrived";
++        Q_EMIT displayAdded();
++#endif
+     } else if (event.event_type == DDCA_EVENT_DISPLAY_DISCONNECTED) {
+         qCDebug(POWERDEVIL) << "[DDCutilDetector]: DDCA_EVENT_DISPLAY_DISCONNECTED signal arrived";
+         Q_EMIT displayRemoved(DDCutilDisplay::generatePathId(event.io_path));
