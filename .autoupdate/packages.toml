@@ -13778,3 +13778,19 @@ server, and diff app/meson.build's dependency() lines and meson_options.txt
 against the previous tag: 5.0 added -Dvaapi and raised FFmpeg to >= 6.
 """
 # END
+
+["games-util/vinegar"]
+url = "https://api.github.com/repos/vinegarhq/vinegar/releases/latest"
+parser = "json"
+path = "tag_name"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "1.9.4"
+comments = """
+vinegar - GitHub release tag "vX.Y.Z" ("v" stripped by normalizer). The release
+asset vinegar-vX.Y.Z.tar.xz already carries vendor/, so a bump needs no Go
+dependency tarball. Two things do not follow PV: the vendored LICENSE list
+(re-derive from vendor/*/LICENSE*) and the RDEPEND of libraries puregotk
+dlopen()s at runtime (grep vendor/codeberg.org for '"lib*.so*"' strings) -
+neither fails the build when stale.
+"""
+# END
