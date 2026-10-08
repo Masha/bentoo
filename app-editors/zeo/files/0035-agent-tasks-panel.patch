@@ -118,10 +118,10 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 ---
 
 diff --git a/Cargo.lock b/Cargo.lock
-index 3e5a70b..ef219f7 100644
+index 294c2e4..01a9da2 100644
 --- a/Cargo.lock
 +++ b/Cargo.lock
-@@ -458,6 +458,33 @@ dependencies = [
+@@ -451,6 +451,33 @@ dependencies = [
   "util",
  ]
  
@@ -155,7 +155,7 @@ index 3e5a70b..ef219f7 100644
  [[package]]
  name = "agent_ui"
  version = "0.1.0"
-@@ -22403,6 +22430,7 @@ dependencies = [
+@@ -22395,6 +22422,7 @@ dependencies = [
   "agent_servers",
   "agent_settings",
   "agent_skills",
@@ -164,7 +164,7 @@ index 3e5a70b..ef219f7 100644
   "anyhow",
   "ashpd",
 diff --git a/Cargo.toml b/Cargo.toml
-index 1239adb..a28c76b 100644
+index 062c473..7ebd586 100644
 --- a/Cargo.toml
 +++ b/Cargo.toml
 @@ -9,6 +9,7 @@ members = [
@@ -6888,7 +6888,7 @@ index dd9198b..b77de80 100644
  
          repl::init(app_state.fs.clone(), cx);
 diff --git a/crates/zed/src/zed.rs b/crates/zed/src/zed.rs
-index 70c5df3..a9c5a4c 100644
+index 50959aa..1f0510b 100644
 --- a/crates/zed/src/zed.rs
 +++ b/crates/zed/src/zed.rs
 @@ -782,6 +782,8 @@ fn initialize_panels(window: &mut Window, cx: &mut Context<Workspace>) -> Task<a

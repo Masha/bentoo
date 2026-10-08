@@ -741,7 +741,7 @@ index dcf9547..3518c1e 100644
  mod tests {
      use super::*;
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
-index 17d9fb3..bfe3f7c 100644
+index 310a30c..c7a9d1a 100644
 --- a/crates/agent_ui/src/conversation_view/thread_view.rs
 +++ b/crates/agent_ui/src/conversation_view/thread_view.rs
 @@ -2,7 +2,7 @@ use crate::{
@@ -753,7 +753,7 @@ index 17d9fb3..bfe3f7c 100644
      thread_metadata_store::{ThreadId, ThreadMetadataStore},
  };
  use agent_client_protocol::schema::{v1 as acp_v1, v2 as acp_v2};
-@@ -7403,7 +7403,7 @@ impl ThreadView {
+@@ -7402,7 +7402,7 @@ impl ThreadView {
                                      div()
                                          .id(("assistant-message-chunk", chunk_ix))
                                          .child(self.render_message_content(
@@ -762,7 +762,7 @@ index 17d9fb3..bfe3f7c 100644
                                          ))
                                          .into_any_element()
                                  })
-@@ -8840,11 +8840,15 @@ impl ThreadView {
+@@ -8839,11 +8839,15 @@ impl ThreadView {
          cx.notify();
      }
  
@@ -778,7 +778,7 @@ index 17d9fb3..bfe3f7c 100644
          window: &Window,
          cx: &Context<Self>,
      ) -> Div {
-@@ -8854,9 +8858,19 @@ impl ThreadView {
+@@ -8853,9 +8857,19 @@ impl ThreadView {
                  .enumerate()
                  .filter(|(_, block)| block.visible_content(cx))
                  .map(|(block_ix, block)| {
@@ -801,7 +801,7 @@ index 17d9fb3..bfe3f7c 100644
                      div()
                          .id(("message-content-block", block_ix))
                          .debug_selector(move || {
-@@ -8960,11 +8974,9 @@ impl ThreadView {
+@@ -8959,11 +8973,9 @@ impl ThreadView {
                                      this.track_scroll(&scroll_handle)
                                  })
                                  .overflow_hidden()
@@ -816,7 +816,7 @@ index 17d9fb3..bfe3f7c 100644
                          )
                          .when(is_constrained, |this| {
                              this.child(div().absolute().inset_0().size_full().bg(linear_gradient(
-@@ -13089,6 +13101,49 @@ impl ThreadView {
+@@ -13088,6 +13100,49 @@ impl ThreadView {
          })
      }
  
@@ -1390,7 +1390,7 @@ index 0000000..e38ceed
 +    assert_eq!(second.clicked.borrow().len(), 1);
 +}
 diff --git a/crates/markdown/src/markdown.rs b/crates/markdown/src/markdown.rs
-index e29d6c2..3734544 100644
+index ab9253b..81792d5 100644
 --- a/crates/markdown/src/markdown.rs
 +++ b/crates/markdown/src/markdown.rs
 @@ -1724,6 +1724,16 @@ pub enum AutoscrollBehavior {
@@ -1497,7 +1497,7 @@ index e29d6c2..3734544 100644
  fn render_copy_code_block_button(
      id: usize,
      code: String,
-@@ -5195,6 +5250,9 @@ impl InputHandler for MarkdownInputHandler {
+@@ -5203,6 +5258,9 @@ impl InputHandler for MarkdownInputHandler {
      }
  }
  

@@ -36,10 +36,10 @@ regression and the percent normalisation.
 ---
 
 diff --git a/crates/acp_thread/src/acp_thread.rs b/crates/acp_thread/src/acp_thread.rs
-index 6eea0a2..5f5a484 100644
+index 4b32890..ff00a29 100644
 --- a/crates/acp_thread/src/acp_thread.rs
 +++ b/crates/acp_thread/src/acp_thread.rs
-@@ -42,7 +42,7 @@ use serde::{Deserialize, Serialize};
+@@ -43,7 +43,7 @@ use serde::{Deserialize, Serialize};
  use serde_json::to_string_pretty;
  use settings::{Settings, SettingsStore};
  use std::borrow::Cow;
@@ -48,7 +48,7 @@ index 6eea0a2..5f5a484 100644
  use std::error::Error;
  use std::fmt::{Formatter, Write};
  use std::ops::Range;
-@@ -3291,6 +3291,206 @@ pub struct SessionCost {
+@@ -3314,6 +3314,206 @@ pub struct SessionCost {
      pub currency: SharedString,
  }
  
@@ -255,7 +255,7 @@ index 6eea0a2..5f5a484 100644
  pub const TOKEN_USAGE_WARNING_THRESHOLD: f32 = 0.8;
  
  impl TokenUsage {
-@@ -3387,6 +3587,7 @@ pub struct AcpThread {
+@@ -3410,6 +3610,7 @@ pub struct AcpThread {
      submissions: SessionSubmissions,
      activity: SessionActivity,
      token_usage: Option<TokenUsage>,
@@ -263,7 +263,7 @@ index 6eea0a2..5f5a484 100644
      cost: Option<SessionCost>,
      prompt_capabilities: acp_v2::PromptCapabilities,
      available_commands: Vec<acp_v2::AvailableCommand>,
-@@ -3513,6 +3714,7 @@ pub enum AcpThreadEvent {
+@@ -3536,6 +3737,7 @@ pub enum AcpThreadEvent {
      TitleUpdated,
      NoticesUpdated,
      TokenUsageUpdated,
@@ -271,7 +271,7 @@ index 6eea0a2..5f5a484 100644
      EntryUpdated(usize),
      EntriesRemoved(Range<usize>),
      ToolAuthorizationRequested(PermissionRequestId),
-@@ -3663,6 +3865,7 @@ impl AcpThread {
+@@ -3686,6 +3888,7 @@ impl AcpThread {
                  | AcpThreadEvent::TitleUpdated
                  | AcpThreadEvent::NoticesUpdated
                  | AcpThreadEvent::TokenUsageUpdated
@@ -279,7 +279,7 @@ index 6eea0a2..5f5a484 100644
                  | AcpThreadEvent::EntryUpdated(_)
                  | AcpThreadEvent::Retry(_)
                  | AcpThreadEvent::SubagentSpawned(_)
-@@ -3722,6 +3925,7 @@ impl AcpThread {
+@@ -3745,6 +3948,7 @@ impl AcpThread {
              activity: SessionActivity::default(),
              connection,
              token_usage: None,
@@ -287,7 +287,7 @@ index 6eea0a2..5f5a484 100644
              cost: None,
              prompt_capabilities,
              available_commands: Vec::new(),
-@@ -4185,6 +4389,15 @@ impl AcpThread {
+@@ -4214,6 +4418,15 @@ impl AcpThread {
          Ok(())
      }
  
@@ -303,7 +303,7 @@ index 6eea0a2..5f5a484 100644
      pub fn cost(&self) -> Option<&SessionCost> {
          self.cost.as_ref()
      }
-@@ -4363,7 +4576,18 @@ impl AcpThread {
+@@ -4396,7 +4609,18 @@ impl AcpThread {
                          currency: cost.currency.into(),
                      });
                  }
@@ -322,7 +322,7 @@ index 6eea0a2..5f5a484 100644
              }
              _ => {}
          }
-@@ -7425,6 +7649,124 @@ fn update_markdown_in_place(markdown: &Entity<Markdown>, text: &str, cx: &mut Ap
+@@ -7461,6 +7685,124 @@ fn update_markdown_in_place(markdown: &Entity<Markdown>, text: &str, cx: &mut Ap
  
  #[cfg(test)]
  mod tests {
@@ -460,7 +460,7 @@ index 48f6487..f943a3c 100644
              | AcpThreadEvent::SubagentSpawned(_)
              | AcpThreadEvent::EntriesRemoved(_)
 diff --git a/crates/agent_ui/src/conversation_view.rs b/crates/agent_ui/src/conversation_view.rs
-index 16ea6ae..4b16c32 100644
+index 9e2fa38..a6b8148 100644
 --- a/crates/agent_ui/src/conversation_view.rs
 +++ b/crates/agent_ui/src/conversation_view.rs
 @@ -338,6 +338,7 @@ impl Conversation {
@@ -494,7 +494,7 @@ index 16ea6ae..4b16c32 100644
                  if let Some(thread_view) = self.thread_view(&session_id) {
                      let available_skills = thread
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
-index 4d6ab48..7ffaeb3 100644
+index 50f2cb3..468edbc 100644
 --- a/crates/agent_ui/src/conversation_view/thread_view.rs
 +++ b/crates/agent_ui/src/conversation_view/thread_view.rs
 @@ -8,7 +8,7 @@ use agent_client_protocol::schema::{v1 as acp_v1, v2 as acp_v2};
@@ -506,7 +506,7 @@ index 4d6ab48..7ffaeb3 100644
      SandboxAuthorizationDetails, SandboxFallbackAuthorizationDetails, SandboxNotAppliedReason,
      SubmissionId, SubmissionResponse, SubmissionState, decode_path_escapes,
  };
-@@ -5375,6 +5375,32 @@ impl ThreadView {
+@@ -5373,6 +5373,32 @@ impl ThreadView {
          let input_max_label = crate::humanize_token_count(max_input_tokens);
          let output_max_label = crate::humanize_token_count(max_output_tokens);
  
@@ -539,7 +539,7 @@ index 4d6ab48..7ffaeb3 100644
          let build_tooltip = {
              move |_window: &mut Window, cx: &mut App| {
                  let percentage = percentage.clone();
-@@ -5387,8 +5413,11 @@ impl ThreadView {
+@@ -5385,8 +5411,11 @@ impl ThreadView {
                  let project_entry_ids = project_entry_ids.clone();
                  let workspace = workspace.clone();
                  let cost_label = cost_label.clone();
@@ -551,7 +551,7 @@ index 4d6ab48..7ffaeb3 100644
                      used,
                      max,
                      input_tokens: input_tokens_label,
-@@ -6376,8 +6405,23 @@ impl ThreadView {
+@@ -6374,8 +6403,23 @@ impl ThreadView {
      }
  }
  
@@ -575,7 +575,7 @@ index 4d6ab48..7ffaeb3 100644
      used: String,
      max: String,
      input_tokens: String,
-@@ -6405,6 +6449,8 @@ impl Render for TokenUsageTooltip {
+@@ -6403,6 +6447,8 @@ impl Render for TokenUsageTooltip {
          let output_max = self.output_max.clone();
          let show_split = self.show_split;
          let cost_label = self.cost_label.clone();
@@ -584,7 +584,7 @@ index 4d6ab48..7ffaeb3 100644
          let global_agents_md_loaded = self.global_agents_md_loaded;
          let project_rules_count = self.project_rules_count;
          let project_entry_ids = self.project_entry_ids.clone();
-@@ -6467,6 +6513,68 @@ impl Render for TokenUsageTooltip {
+@@ -6465,6 +6511,68 @@ impl Render for TokenUsageTooltip {
                              .child(Label::new(cost_label)),
                      )
                  })

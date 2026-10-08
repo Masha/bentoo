@@ -48,7 +48,7 @@ question gets the status. Rides the claude-agent-acp-plus flag BY CHOICE, like
 ---
 
 diff --git a/crates/agent_ui/src/conversation_view.rs b/crates/agent_ui/src/conversation_view.rs
-index 9c1228e..513d85b 100644
+index ce47c13..0fe6cb5 100644
 --- a/crates/agent_ui/src/conversation_view.rs
 +++ b/crates/agent_ui/src/conversation_view.rs
 @@ -299,6 +299,22 @@ impl Conversation {

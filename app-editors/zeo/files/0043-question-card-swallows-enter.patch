@@ -169,7 +169,7 @@ index 916644c..0ebed1c 100644
              filter.show_action_types(skill_creator_actions.iter());
          } else {
 diff --git a/crates/agent_ui/src/conversation_view.rs b/crates/agent_ui/src/conversation_view.rs
-index 429e4b4..80af4b1 100644
+index 846f047..5f02a3f 100644
 --- a/crates/agent_ui/src/conversation_view.rs
 +++ b/crates/agent_ui/src/conversation_view.rs
 @@ -5862,6 +5862,196 @@ pub(crate) mod tests {
@@ -389,10 +389,10 @@ index 225e741..28598b3 100644
          let required = schema.required.as_deref().unwrap_or_default();
          let mut fields = HashMap::default();
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
-index d6ea837..1ce6fbb 100644
+index a6abe31..99abcc9 100644
 --- a/crates/agent_ui/src/conversation_view/thread_view.rs
 +++ b/crates/agent_ui/src/conversation_view/thread_view.rs
-@@ -3101,6 +3101,17 @@ impl ThreadView {
+@@ -3099,6 +3099,17 @@ impl ThreadView {
          self.elicitation_form_states.contains_key(id)
      }
  
@@ -410,7 +410,7 @@ index d6ea837..1ce6fbb 100644
      fn submit_elicitation(
          &mut self,
          elicitation_id: ElicitationEntryId,
-@@ -8047,6 +8058,19 @@ impl ThreadView {
+@@ -8046,6 +8057,19 @@ impl ThreadView {
          self.message_editor.read(cx).set_local_commands(commands);
      }
  
@@ -430,7 +430,7 @@ index d6ea837..1ce6fbb 100644
      /// Whether this elicitation is drawn by the pinned card above the message
      /// editor rather than inline, in the conversation.
      ///
-@@ -13535,6 +13559,7 @@ impl Render for ThreadView {
+@@ -13534,6 +13558,7 @@ impl Render for ThreadView {
          // current availability of feedback/sharing, which can change between
          // renders (settings, connection state, feature flags).
          self.sync_local_commands(cx);

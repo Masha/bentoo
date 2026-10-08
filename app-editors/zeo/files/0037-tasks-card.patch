@@ -791,7 +791,7 @@ index b553947..4eef1dc 100644
              max_idle_retained_threads: 5,
              threads_sidebar: agent_settings::ThreadsSidebarSettings {
 diff --git a/crates/agent_ui/src/conversation_view.rs b/crates/agent_ui/src/conversation_view.rs
-index 8de52a7..3d1b470 100644
+index a585eea..2f0dbc5 100644
 --- a/crates/agent_ui/src/conversation_view.rs
 +++ b/crates/agent_ui/src/conversation_view.rs
 @@ -1862,21 +1862,30 @@ impl ConversationView {
@@ -835,7 +835,7 @@ index 8de52a7..3d1b470 100644
                          active.sync_generating_indicator(cx);
                      });
 diff --git a/crates/agent_ui/src/entry_view_state.rs b/crates/agent_ui/src/entry_view_state.rs
-index 1833802..db38a8f 100644
+index 54ea5eb..7f36b58 100644
 --- a/crates/agent_ui/src/entry_view_state.rs
 +++ b/crates/agent_ui/src/entry_view_state.rs
 @@ -229,6 +229,11 @@ impl EntryViewState {
