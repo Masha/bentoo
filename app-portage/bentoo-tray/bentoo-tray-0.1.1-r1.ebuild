@@ -32,8 +32,10 @@ RESTRICT="network-sandbox"
 # (/var/lib/gentoo/news) come from Portage itself. xdg-open is the fallback
 # when the portal is missing or fails (internal/desktop/portal/portal.go).
 RDEPEND="x11-misc/xdg-utils"
-# go.mod declares go 1.26.0; an older toolchain refuses the module.
-BDEPEND=">=dev-lang/go-1.26.0"
+# go.mod declares go 1.26.0, but the Go that builds this package decides
+# the standard library it links: 1.27.1 carries 13 stdlib advisories
+# (GO-2026-6599..6617), all fixed in 1.27.2.
+BDEPEND=">=dev-lang/go-1.27.2"
 
 src_unpack() {
 	default
