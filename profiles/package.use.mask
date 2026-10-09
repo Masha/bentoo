@@ -1,0 +1,12 @@
+# Copyright 2026 Bentoo Authors
+# Distributed under the terms of the GNU General Public License v2
+
+# Repository-level USE masks: Portage applies them to this overlay's own
+# packages (UseManager's per-repository package.use.mask), whatever profile
+# is selected.
+
+# USE=ghcbootstrap builds GHC with an external hadrian, and 9.14.1 needs
+# ~dev-haskell/hadrian-9.14.1, which neither ::gentoo (hadrian-9.8.4 at most)
+# nor this overlay packages. Without the mask the flag only yields an
+# unsatisfiable dependency. Lift it together with a hadrian-9.14.1 ebuild.
+=dev-lang/ghc-9.14.1 ghcbootstrap
