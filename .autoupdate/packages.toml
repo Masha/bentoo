@@ -3921,6 +3921,29 @@ vulkan-loader — commit-tracked on main; scans for "Update for Vulkan-Docs X.Y.
 """
 # END
 
+["kde-apps/kdenlive"]
+url = "https://api.github.com/repos/gentoo/gentoo/contents/kde-apps/kdenlive"
+parser = "regex"
+pattern = '"name":\s*"kdenlive-([0-9]+\.[0-9]+\.[0-9]+)\.ebuild"'
+select = "max"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "26.08.2"
+comments = """
+kdenlive — follows ::gentoo's kde-apps/kdenlive, NOT upstream release tags.
+
+The overlay copy is ::gentoo's ebuild plus one src_configure that passes
+-DBUILD_RUN_QMLLINT=OFF; the ebuild header says why (Qt 6.12 qmllint error,
+upstream fix 2a40ef90 on master only). The copy has the same PV as ::gentoo, so
+the day ::gentoo bumps, its version outranks this one and the fix silently stops
+applying -- this record exists to bump the copy in step. Tracking upstream
+instead would let it run ahead of ::gentoo's dependency floors (KFMIN, QTMIN,
+mlt), which the copy takes verbatim. The regex skips 9999 and -rN.
+
+Disable this record (enabled = false) and remove the package once ::gentoo
+ships a kdenlive containing 2a40ef90 (expected: 26.12.0).
+"""
+# END
+
 ["kde-frameworks/attica"]
 enabled = false
 disabled_by = "auto"
