@@ -1100,6 +1100,21 @@ REF_PRESETS = (
     "default/linux/amd64/23.0/desktop/plasma/systemd",
 )
 TOUCH_ALL = ("profiles/catalog.toml", "metadata/layout.conf", "profiles/profiles.desc")
+# Top-level profile files only humans read: changing one touches no layer.
+DESCRIPTIVE = ("use.desc", "use.local.desc", "categories", "repo_name", "arch.list")
+
+
+def repo_wide(path):
+    """A file directly under profiles/ that Portage reads for every profile of
+    the repository (package.*, use.* but the two descriptions, license_groups,
+    eapi), or anything under profiles/updates/: it changes every composition,
+    so it touches every layer (R6.15)."""
+    if path.startswith("profiles/updates/"):
+        return True
+    rest = path[len("profiles/"):]
+    if not path.startswith("profiles/") or "/" in rest or rest in DESCRIPTIVE:
+        return False
+    return rest.startswith(("package.", "use.")) or rest in ("license_groups", "eapi")
 
 
 def staged_touch(catalog, paths):
@@ -1117,6 +1132,7 @@ def staged_touch(catalog, paths):
     for path in relevant:
         if (
             path in TOUCH_ALL
+            or repo_wide(path)
             or path.startswith("profiles/features/branding/")
             or any(path.startswith(f"profiles/{pid}/") for pid in preset_ids)
         ):

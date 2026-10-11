@@ -142,9 +142,11 @@ break_amd_in_a_commit() {
 
 # --- R6.13: a profiles/ path that touches no layer -> static only, exit 0 ----------
 
-@test "R6.13 staging only profiles/package.mask runs the static checks only and exits 0" {
-  printf '\n# probe: staged comment\n' >>"$R/profiles/package.mask"
-  git -C "$R" add -- profiles/package.mask
+@test "R6.13 staging only a descriptive profile file (use.local.desc) runs the static checks only and exits 0" {
+  # profiles/package.mask touches every layer since refine v2 (R6.15): only
+  # files no profile reads stay static-only.
+  printf '\n# probe: staged comment\n' >>"$R/profiles/use.local.desc"
+  git -C "$R" add -- profiles/use.local.desc
   local t0=$SECONDS
   run_staged
   local took=$((SECONDS - t0))
