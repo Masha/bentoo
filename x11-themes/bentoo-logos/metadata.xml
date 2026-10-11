@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@proton.me</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<longdescription>
+		The bentoo logo as the hicolor icon "bentoo". The bentoo profiles set
+		LOGO=bentoo in /etc/os-release, which is where KDE's "About this
+		System", GNOME's "About" and fastfetch look the logo up.
+	</longdescription>
+	<upstream>
+		<remote-id type="github">obentoo/bentoo</remote-id>
+	</upstream>
+</pkgmetadata>

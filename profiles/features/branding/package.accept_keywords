@@ -1,0 +1,4 @@
+# bentoo-logos is in @system through ./packages; without this a user on stable
+# keywords would get a keyword-masked package in @system and @world would not
+# resolve.
+x11-themes/bentoo-logos ~amd64
