@@ -3737,6 +3737,21 @@ sqlitebrowser — commit-tracked on master (uses COMMIT= without quotes); date Y
 """
 # END
 
+["dev-db/sqlite"]
+url = "https://sqlite.org/download.html"
+parser = "regex"
+pattern = 'PRODUCT,([0-9]+\.[0-9]+\.[0-9]+),[0-9]{4}/sqlite-src-'
+version = "3.54.0"
+comments = """
+Mirror of ::gentoo's dev-db/sqlite, carried AHEAD of it (3.54.0 on 2026-10-10,
+::gentoo still on 3.53.4). The probe reads the machine-readable PRODUCT CSV
+embedded in download.html; anchoring on sqlite-src- picks the tarball the
+ebuild actually fetches. SRC_URI hardcodes the /2026/ directory, as ::gentoo
+does: the first release of a new year needs that path edited by hand.
+Remove the package (enabled = false) once ::gentoo reaches the same version.
+"""
+# END
+
 ["net-libs/libqmi"]
 track = "commit"
 url = "https://gitlab.freedesktop.org/api/v4/projects/mobile-broadband%2Flibqmi/repository/commits?ref_name=main&per_page=50"
