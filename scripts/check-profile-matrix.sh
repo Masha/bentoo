@@ -32,7 +32,7 @@
 #   --static            the catalog against its schema and the tree, and the
 #                       layers/ fragment rules. Seconds; never calls Portage.
 #   --staged            --static, then resolution of every layer the index
-#                       touches over the 4 reference presets (the hook mode).
+#                       touches over the 5 reference presets (the hook mode).
 #   --full              --static, then every layer alone, every pair and the
 #                       largest allowed selection over every preset (manual).
 #   --compose <preset-id> [layer-id...]
@@ -64,7 +64,7 @@
 #
 # Prerequisites are checked PER MODE, and the first missing one is named with
 # exit 2: every mode needs bash >= 5 and python3 with tomllib; --staged and
-# --full also need emerge, portageq and /var/db/repos/gentoo; --self-test also
+# --full also need emerge, portageq, bwrap and /var/db/repos/gentoo; --self-test also
 # needs bats. --static, --compose and --self-test never read
 # /var/db/repos/gentoo, so they run on a host without Portage.
 #
@@ -87,6 +87,8 @@
 #     /var/db/repos/gentoo. Only this repo's lines (`:path`, `bentoo:path`,
 #     relative, absolute) are checked; --staged and --full resolve the rest
 #     through Portage.
+#   * A `parent` line of `.` or a cycle of parents is not caught by --static;
+#     Portage recurses on it, so --staged and --full fail it through emerge.
 #
 # Exit status:
 #   0  everything compared is clean
@@ -201,7 +203,7 @@ Usage: check-profile-matrix.sh MODE
 Modes:
   --static                             catalog schema + fragment rules (seconds)
   --staged                             --static, then resolve the layers the index touches
-  --full                               --static, then resolve every combination (hours)
+  --full                               --static, then resolve every combination (minutes)
   --compose <preset-id> [layer-id...]  print the composed parent lines, or the broken rule
   --self-test                          run the unit fixtures (no tree, no ::gentoo)
   -h, --help                           this text
