@@ -9629,13 +9629,11 @@ risen past the nodejs floor in RDEPEND.
 # END
 
 ["dev-lang/rust"]
-enabled = false
-disabled_by = "parity-audit 2026-09-04: removed, ::gentoo copy is better"
 hold = true
 url = "https://static.rust-lang.org/dist/channel-rust-stable.toml"
 parser = "regex"
 pattern = '\[pkg\.rust\]\s+version = "([0-9]+\.[0-9]+\.[0-9]+)'
-version = "1.98.0"
+version = "1.99.0"
 comments = """
 Stable Rust toolchain, anchored on the sole [pkg.rust] block (the toml also has
 cargo 0.97.x / rustc 0.1.x lines — an unanchored regex would grab the wrong one).
@@ -9655,32 +9653,32 @@ Re-entered the overlay on 2026-08-21 at 1.98.0 (::gentoo is still on 1.97.1), so
 these three are back to hold = true. This bump carries the Gentoo patchset in
 dev-lang/rust/files/ because proj/rust-patches.git has no 1.98.0 tag yet; see the
 NOTE(bentoo) block at the top of the ebuild for the removal condition.
+Removed by the parity audit on 2026-09-04 (::gentoo reached 1.98.1) and back on
+2026-10-10 at 1.99.0, again with a local patchset (no 1.99.0 tag) and this time
+with a fork of rust.eclass in eclass/, because ::gentoo's slot tables do not list
+1.99.0 yet. Retire the fork together with the trio when ::gentoo catches up.
 
 --- rust: source, -bin and -common share ONE stable Rust version (channel toml) ---
 """
 # END
 
 ["dev-lang/rust-bin"]
-enabled = false
-disabled_by = "parity-audit 2026-09-04: removed, ::gentoo copy is better"
 hold = true
 url = "https://static.rust-lang.org/dist/channel-rust-stable.toml"
 parser = "regex"
 pattern = '\[pkg\.rust\]\s+version = "([0-9]+\.[0-9]+\.[0-9]+)'
-version = "1.98.0"
+version = "1.99.0"
 comments = """
 Same stable Rust release as dev-lang/rust (binary toolchains from static.rust-lang.org/dist).
 """
 # END
 
 ["dev-lang/rust-common"]
-enabled = false
-disabled_by = "parity-audit 2026-09-04: removed, ::gentoo copy is better"
 hold = true
 url = "https://static.rust-lang.org/dist/channel-rust-stable.toml"
 parser = "regex"
 pattern = '\[pkg\.rust\]\s+version = "([0-9]+\.[0-9]+\.[0-9]+)'
-version = "1.98.0"
+version = "1.99.0"
 comments = """
 Pure-rename package shadowing the rust source PV; bump in lockstep with dev-lang/rust.
 """
