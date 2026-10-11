@@ -13,16 +13,12 @@ SRC_URI="
 		${QWEN_BASE}/qwen-code-linux-x64.tar.gz
 			-> ${P}-amd64.tar.gz
 	)
-	arm64? (
-		${QWEN_BASE}/qwen-code-linux-arm64.tar.gz
-			-> ${P}-arm64.tar.gz
-	)
 "
 S="${WORKDIR}/qwen-code"
 
 LICENSE="Apache-2.0"
 SLOT="0"
-KEYWORDS="-* ~amd64 ~arm64"
+KEYWORDS="-* ~amd64"
 RESTRICT="bindist mirror strip"
 
 # The bundle is JavaScript executed by Node; the private runtime it ships with

@@ -17,16 +17,12 @@ SRC_URI="
 		${OC_BASE}/OpenChamber-${PV}-linux-x86_64.AppImage
 			-> ${P}-amd64.AppImage
 	)
-	arm64? (
-		${OC_BASE}/OpenChamber-${PV}-linux-arm64.AppImage
-			-> ${P}-arm64.AppImage
-	)
 "
 S="${WORKDIR}/${P}"
 
 LICENSE="MIT"
 SLOT="0"
-KEYWORDS="-* ~amd64 ~arm64"
+KEYWORDS="-* ~amd64"
 IUSE="wayland"
 RESTRICT="bindist mirror strip"
 

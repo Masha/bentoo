@@ -8,7 +8,7 @@ inherit acct-user
 DESCRIPTION="User for the ntpd-rs NTP daemon"
 
 SLOT="0"
-KEYWORDS="~amd64 ~arm64"
+KEYWORDS="~amd64"
 
 ACCT_USER_ID=466
 ACCT_USER_GROUPS=( ntpd-rs )

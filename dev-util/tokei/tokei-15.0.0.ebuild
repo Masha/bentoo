@@ -231,7 +231,7 @@ LICENSE+="
 	|| ( Apache-2.0 Boost-1.0 )
 "
 SLOT="0"
-KEYWORDS="~amd64 ~arm64"
+KEYWORDS="~amd64"
 
 # The .crate files are not mirrored by Gentoo.
 RESTRICT="mirror"

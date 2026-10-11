@@ -39,7 +39,7 @@ else
 		https://github.com/doitsujin/libdisplay-info/archive/${HASH_DISPLAYINFO}.tar.gz
 			-> libdisplay-info-${HASH_DISPLAYINFO}.tar.gz
 	"
-	KEYWORDS="-* ~amd64 ~x86"
+	KEYWORDS="-* ~amd64"
 fi
 
 DESCRIPTION="Vulkan-based implementation of D3D7 and earlier APIs for Linux/Wine, fork of DXVK"

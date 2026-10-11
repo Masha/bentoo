@@ -24,7 +24,7 @@ S="${WORKDIR}/linux-${KV}"
 
 LICENSE="GPL-2"
 SLOT="0"
-KEYWORDS="~amd64 ~arm64"
+KEYWORDS="~amd64"
 # The kernel is never run on the build host; there is nothing to test here.
 RESTRICT="test"
 

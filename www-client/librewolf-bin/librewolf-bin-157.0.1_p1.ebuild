@@ -33,13 +33,12 @@ inherit desktop linux-info optfeature pax-utils xdg
 MOZ_SRC_BASE_URI="https://archive.mozilla.org/pub/${MOZ_PN}/releases/${MOZ_PV}"
 
 SRC_URI="${SRC_URI}
-	amd64? ( https://codeberg.org/api/packages/librewolf/generic/librewolf/${LIBREWOLF_PV}/librewolf-${LIBREWOLF_PV}-linux-x86_64-package.tar.xz )
-	arm64? ( https://codeberg.org/api/packages/librewolf/generic/librewolf/${LIBREWOLF_PV}/librewolf-${LIBREWOLF_PV}-linux-arm64-package.tar.xz )"
+	amd64? ( https://codeberg.org/api/packages/librewolf/generic/librewolf/${LIBREWOLF_PV}/librewolf-${LIBREWOLF_PV}-linux-x86_64-package.tar.xz )"
 
 DESCRIPTION="LibreWolf Web Browser"
 HOMEPAGE="https://librewolf.net/"
 
-KEYWORDS="-* amd64 ~arm64"
+KEYWORDS="-* amd64"
 SLOT="0"
 LICENSE="MPL-2.0 GPL-2 LGPL-2.1"
 IUSE="selinux wayland"

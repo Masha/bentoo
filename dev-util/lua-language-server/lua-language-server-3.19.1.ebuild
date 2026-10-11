@@ -19,7 +19,7 @@ S="${WORKDIR}"
 # Boost-1.0: wildcards (header-only, compiled into the code formatter).
 LICENSE="MIT Boost-1.0"
 SLOT="0"
-KEYWORDS="~amd64 ~arm64"
+KEYWORDS="~amd64"
 
 BDEPEND="
 	app-alternatives/ninja

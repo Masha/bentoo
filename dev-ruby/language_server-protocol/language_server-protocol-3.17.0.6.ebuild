@@ -17,4 +17,4 @@ HOMEPAGE="https://github.com/mtsmfm/language_server-protocol-ruby"
 
 LICENSE="MIT"
 SLOT="0"
-KEYWORDS="~amd64 ~arm64"
+KEYWORDS="~amd64"

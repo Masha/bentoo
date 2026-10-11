@@ -49,13 +49,12 @@ SRC_URI="${LIBREWOLF_SRC_URI} -> librewolf-${LIBREWOLF_PV}.source.tar.gz
 	${PATCH_URIS[@]}
 	wasm-sandbox? (
 		amd64? ( https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-${WASI_SDK_VER/.*/}/wasi-sdk-${WASI_SDK_VER}-x86_64-linux.tar.gz )
-		arm64? ( https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-${WASI_SDK_VER/.*/}/wasi-sdk-${WASI_SDK_VER}-arm64-linux.tar.gz )
 	)"
 
 S="${WORKDIR}/librewolf-${LIBREWOLF_PV}"
 LICENSE="MPL-2.0 GPL-2 LGPL-2.1"
 SLOT="0/$(ver_cut 1)"
-KEYWORDS="~amd64 ~arm64 ~loong ~ppc64 ~riscv ~x86"
+KEYWORDS="~amd64"
 
 RESTRICT="
 	mirror
@@ -94,7 +93,6 @@ BDEPEND="${PYTHON_DEPS}
 	net-libs/nodejs
 	virtual/pkgconfig
 	amd64? ( >=dev-lang/nasm-2.14 )
-	x86? ( >=dev-lang/nasm-2.14 )
 	pgo? (
 		X? (
 			sys-devel/gettext

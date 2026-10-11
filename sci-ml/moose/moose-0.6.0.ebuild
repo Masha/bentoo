@@ -285,7 +285,7 @@ LICENSE+="
 # STIX Two Math font, embedded into the binary by the latex-rust crate
 LICENSE+=" OFL-1.1"
 SLOT="0"
-KEYWORDS="~amd64 ~arm64"
+KEYWORDS="~amd64"
 
 # sys-crates in Cargo.lock: cairo, gdk-pixbuf, gdk4/gsk4/gtk4, gio/glib/gobject,
 # graphene, libadwaita, sqlite (system, FTS5 is always on in ::gentoo), pango,

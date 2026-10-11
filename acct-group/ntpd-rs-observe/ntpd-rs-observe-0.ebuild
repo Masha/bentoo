@@ -8,6 +8,6 @@ inherit acct-group
 DESCRIPTION="Group for the ntpd-rs metrics exporter"
 
 SLOT="0"
-KEYWORDS="~amd64 ~arm64"
+KEYWORDS="~amd64"
 
 ACCT_GROUP_ID=500

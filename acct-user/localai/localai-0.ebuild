@@ -8,7 +8,7 @@ inherit acct-user
 DESCRIPTION="User for the LocalAI inference server"
 
 SLOT="0"
-KEYWORDS="~amd64 ~arm64"
+KEYWORDS="~amd64"
 
 # See acct-group/localai for why 600 and not a hole inside ::gentoo's range.
 ACCT_USER_ID=600

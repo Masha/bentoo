@@ -93,7 +93,7 @@ LICENSE+="
 	Unicode-3.0 ZLIB
 "
 SLOT="0"
-KEYWORDS="~amd64 ~arm64"
+KEYWORDS="~amd64"
 # No USE flag for the LLM crate's `local-embeddings` feature, and that is a
 # measurement rather than an omission.  The feature is default-on in
 # crates/ai-memory-llm (`default = ["local-embeddings"]`), which is what the

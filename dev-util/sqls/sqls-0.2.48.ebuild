@@ -19,7 +19,7 @@ LICENSE="MIT"
 # UPL-1.0 OR Apache-2.0, already covered by Apache-2.0.
 LICENSE+=" Apache-2.0 BSD BSD-2 MPL-2.0"
 SLOT="0"
-KEYWORDS="~amd64 ~arm64"
+KEYWORDS="~amd64"
 
 # go-sqlite3 links the system SQLite (-tags libsqlite3) instead of its bundled
 # amalgamation. The Oracle driver (godror) needs cgo too, but loads the Oracle

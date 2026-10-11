@@ -18,7 +18,7 @@ S="${WORKDIR}"
 LICENSE="MIT BSD MPL-2.0"
 SLOT="0"
 # A phar is PHP code, not architecture-specific.
-KEYWORDS="~amd64 ~arm ~arm64 ~loong ~ppc ~ppc64 ~riscv ~sparc ~x86"
+KEYWORDS="~amd64"
 
 # composer.json requires ext-filter, ext-hash and ext-json (the last two are
 # always built into PHP 8). ssl is required in practice: without ext-openssl

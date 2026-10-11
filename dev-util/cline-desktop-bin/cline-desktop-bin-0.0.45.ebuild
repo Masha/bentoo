@@ -23,13 +23,12 @@ HOMEPAGE="
 CLINE_BASE="https://github.com/cline/cline/releases/download/desktop-v${PV}"
 SRC_URI="
 	amd64? ( ${CLINE_BASE}/Cline_${PV}_amd64.deb -> ${P}-amd64.deb )
-	arm64? ( ${CLINE_BASE}/Cline_${PV}_arm64.deb -> ${P}-arm64.deb )
 "
 S="${WORKDIR}"
 
 LICENSE="Apache-2.0"
 SLOT="0"
-KEYWORDS="-* ~amd64 ~arm64"
+KEYWORDS="-* ~amd64"
 # strip: code-sidecar is a Bun single-file executable whose JavaScript payload
 #        is appended to the ELF; stripping it removes the app.
 # bindist: the app itself is Apache-2.0, but that sidecar bundles a few

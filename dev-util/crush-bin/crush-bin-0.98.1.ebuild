@@ -15,10 +15,6 @@ SRC_URI="
 		${CRUSH_BASE}/${MY_PN}_${PV}_Linux_x86_64.tar.gz
 			-> ${P}-amd64.tar.gz
 	)
-	arm64? (
-		${CRUSH_BASE}/${MY_PN}_${PV}_Linux_arm64.tar.gz
-			-> ${P}-arm64.tar.gz
-	)
 "
 
 # Functional Source License: source-available, converts to MIT two years after
@@ -26,7 +22,7 @@ SRC_URI="
 # licenses/FSL-1.1-MIT -- ::gentoo carries no FSL entry.
 LICENSE="FSL-1.1-MIT"
 SLOT="0"
-KEYWORDS="-* ~amd64 ~arm64"
+KEYWORDS="-* ~amd64"
 RESTRICT="bindist mirror strip"
 
 QA_PREBUILT="*"

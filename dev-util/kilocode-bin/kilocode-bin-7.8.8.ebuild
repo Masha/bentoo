@@ -7,7 +7,6 @@ DESCRIPTION="AI coding agent CLI (prebuilt binary, bundles a static bubblewrap s
 HOMEPAGE="https://github.com/Kilo-Org/kilocode"
 SRC_URI="
 	amd64? ( https://github.com/Kilo-Org/kilocode/releases/download/v${PV}/kilo-linux-x64.tar.gz -> ${P}-amd64.tar.gz )
-	arm64? ( https://github.com/Kilo-Org/kilocode/releases/download/v${PV}/kilo-linux-arm64.tar.gz -> ${P}-arm64.tar.gz )
 "
 S="${WORKDIR}"
 
@@ -18,7 +17,7 @@ S="${WORKDIR}"
 #   licenses/bubblewrap/MUSL-COPYRIGHT -> MIT (musl)
 LICENSE="MIT Apache-2.0 LGPL-2"
 SLOT="0"
-KEYWORDS="-* ~amd64 ~arm64"
+KEYWORDS="-* ~amd64"
 RESTRICT="bindist mirror strip"
 
 QA_PREBUILT="*"

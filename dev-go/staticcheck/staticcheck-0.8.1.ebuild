@@ -16,7 +16,7 @@ LICENSE="MIT"
 # LICENSE-THIRD-PARTY: golang.org/x/*, gogrep and gosmith are all BSD.
 LICENSE+=" BSD"
 SLOT="0"
-KEYWORDS="~amd64 ~arm64"
+KEYWORDS="~amd64"
 
 # Go modules are downloaded in src_unpack (upstream publishes no vendor tarball
 # and bentoo hosts no deps tarball for it), so the network sandbox must be

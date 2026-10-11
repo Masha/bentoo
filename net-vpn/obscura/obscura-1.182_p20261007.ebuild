@@ -643,7 +643,7 @@ LICENSE+="
 # Font Awesome (CC-BY-4.0) and Simple Icons (CC0-1.0) sets from react-icons.
 LICENSE+=" gui? ( 0BSD Apache-2.0 BSD CC-BY-4.0 CC0-1.0 MIT OFL-1.1 )"
 SLOT="0"
-KEYWORDS="~amd64 ~arm64"
+KEYWORDS="~amd64"
 IUSE="gui systemd"
 
 # tss-esapi links tpm2-tss (esys, tctildr, mu); logroller's xz feature links

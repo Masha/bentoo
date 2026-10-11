@@ -12,10 +12,6 @@ SRC_URI="
 		https://storage.googleapis.com/dart-archive/channels/stable/release/${PV}/sdk/dartsdk-linux-x64-release.zip
 			-> ${P}-amd64.zip
 	)
-	arm64? (
-		https://storage.googleapis.com/dart-archive/channels/stable/release/${PV}/sdk/dartsdk-linux-arm64-release.zip
-			-> ${P}-arm64.zip
-	)
 "
 
 # The zip extracts into a top-level dart-sdk/ directory.
@@ -23,7 +19,7 @@ S="${WORKDIR}/dart-sdk"
 
 LICENSE="BSD"
 SLOT="0"
-KEYWORDS="-* ~amd64 ~arm64"
+KEYWORDS="-* ~amd64"
 RESTRICT="strip"
 
 QA_PREBUILT="*"

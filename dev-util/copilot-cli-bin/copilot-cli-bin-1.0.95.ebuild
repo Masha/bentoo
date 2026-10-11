@@ -15,10 +15,6 @@ SRC_URI="
 		${COPILOT_BASE}/copilot-linux-x64.tar.gz
 			-> ${P}-amd64.tar.gz
 	)
-	arm64? (
-		${COPILOT_BASE}/copilot-linux-arm64.tar.gz
-			-> ${P}-arm64.tar.gz
-	)
 "
 S="${WORKDIR}"
 
@@ -28,7 +24,7 @@ S="${WORKDIR}"
 # packaging possible here, not a shortcut taken to avoid a build.
 LICENSE="github-copilot-cli"
 SLOT="0"
-KEYWORDS="-* ~amd64 ~arm64"
+KEYWORDS="-* ~amd64"
 RESTRICT="bindist mirror strip"
 
 QA_PREBUILT="*"

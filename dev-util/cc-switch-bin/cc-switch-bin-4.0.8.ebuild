@@ -17,16 +17,12 @@ SRC_URI="
 		${CCS_BASE}/CC-Switch-v${PV}-Linux-x86_64.deb
 			-> ${P}-amd64.deb
 	)
-	arm64? (
-		${CCS_BASE}/CC-Switch-v${PV}-Linux-arm64.deb
-			-> ${P}-arm64.deb
-	)
 "
 S="${WORKDIR}"
 
 LICENSE="MIT"
 SLOT="0"
-KEYWORDS="-* ~amd64 ~arm64"
+KEYWORDS="-* ~amd64"
 RESTRICT="bindist mirror strip"
 
 # Tauri application: the webview is the system WebKitGTK, not a bundled one.

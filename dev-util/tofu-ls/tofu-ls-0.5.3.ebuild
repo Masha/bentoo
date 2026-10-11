@@ -18,7 +18,7 @@ LICENSE="MPL-2.0"
 # modules `go version -m` lists for the built binary.
 LICENSE+=" Apache-2.0 BSD ISC MIT"
 SLOT="0"
-KEYWORDS="~amd64 ~arm64"
+KEYWORDS="~amd64"
 
 BDEPEND=">=dev-lang/go-1.26.0"
 

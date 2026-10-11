@@ -12,7 +12,7 @@ SRC_URI="https://github.com/OpenShot/libopenshot-audio/archive/refs/tags/v${PV}.
 LICENSE="GPL-3"
 # subslot = SONAME (PROJECT_SO_VERSION in CMakeLists.txt)
 SLOT="0/10"
-KEYWORDS="~amd64 ~arm64"
+KEYWORDS="~amd64"
 IUSE="doc"
 
 # JUCE is vendored in JuceLibraryCode/ upstream; there is no usable system JUCE

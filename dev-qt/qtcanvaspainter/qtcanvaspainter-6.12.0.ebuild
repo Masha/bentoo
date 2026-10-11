@@ -8,7 +8,7 @@ inherit qt6-build
 DESCRIPTION="Accelerated 2D painting API on top of QRhi for the Qt6 framework"
 
 if [[ ${QT6_BUILD_TYPE} == release ]]; then
-	KEYWORDS="~amd64 ~arm ~arm64 ~loong ~ppc64 ~riscv ~x86"
+	KEYWORDS="~amd64"
 fi
 
 # unlike most Qt modules, upstream ships this one GPL-3 only (no LGPL)

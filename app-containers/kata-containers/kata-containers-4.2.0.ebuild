@@ -28,7 +28,7 @@ LICENSE+="
 	Apache-2.0 BSD CDLA-Permissive-2.0 ISC MIT MIT-0 MPL-2.0 Unicode-3.0 ZLIB
 "
 SLOT="0"
-KEYWORDS="~amd64 ~arm64"
+KEYWORDS="~amd64"
 IUSE="+seccomp"
 # The suite needs root, KVM and a running containerd; upstream runs it in CI
 # containers, not from a build sandbox.
@@ -53,7 +53,6 @@ RDEPEND="
 		app-containers/cri-o
 	)
 	amd64? ( app-emulation/qemu[qemu_softmmu_targets_x86_64,vhost-net] )
-	arm64? ( app-emulation/qemu[fdt,qemu_softmmu_targets_aarch64,vhost-net] )
 "
 BDEPEND="
 	app-arch/libarchive

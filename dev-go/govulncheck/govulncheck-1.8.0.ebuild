@@ -19,7 +19,7 @@ LICENSE="BSD"
 # Dependent (bundled, statically linked) Go module licenses
 LICENSE+=" Apache-2.0"
 SLOT="0"
-KEYWORDS="~amd64 ~arm64"
+KEYWORDS="~amd64"
 
 # Upstream publishes GitHub releases only up to v1.1.4 while tagging every
 # version since; v1.8.0 is a tag with no release. Probing releases/latest here

@@ -17,7 +17,7 @@ SRC_URI="
 
 LICENSE="MIT"
 SLOT="0"
-KEYWORDS="~amd64 ~x86"
+KEYWORDS="~amd64"
 IUSE="+secure kde +browser +system-snapshot systemd"
 # go.mod declares go 1.27.0 with toolchain go1.27.2, but the Go that builds
 # this package decides the standard library it links: 1.27.1 carries 13

@@ -18,7 +18,7 @@ S="${WORKDIR}/${MY_PN}-${PV}"
 
 LICENSE="GPL-3+"
 SLOT="0"
-KEYWORDS="~amd64 ~arm64"
+KEYWORDS="~amd64"
 
 # The suite is a full Qt GUI driver: it instantiates MainWindow, needs a
 # libopenshot runtime and a usable QPA platform.  Not validated in a sandbox

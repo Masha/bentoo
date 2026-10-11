@@ -20,7 +20,7 @@ LICENSE="AGPL-3"
 # Dependent (bundled, statically linked) Go module licenses
 LICENSE+=" Apache-2.0 BSD BSD-2 CC0-1.0 ISC LGPL-3 MIT MPL-2.0 public-domain"
 SLOT="0"
-KEYWORDS="~amd64 ~arm64"
+KEYWORDS="~amd64"
 
 BDEPEND=">=dev-lang/go-1.25"
 

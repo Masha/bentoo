@@ -18,7 +18,7 @@ LICENSE="LGPL-3+"
 # Subslot tracks PROJECT_SO_VERSION (libopenshot.so.31), so revdeps rebuild on
 # an ABI bump.
 SLOT="0/31"
-KEYWORDS="~amd64 ~arm64"
+KEYWORDS="~amd64"
 
 IUSE="babl doc +imagemagick opencv +python ruby test wayland"
 REQUIRED_USE="python? ( ${PYTHON_REQUIRED_USE} )"

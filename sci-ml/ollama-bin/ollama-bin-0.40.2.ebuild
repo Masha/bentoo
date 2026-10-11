@@ -16,12 +16,11 @@ SRC_URI="
 		!rocm? ( https://github.com/ollama/ollama/releases/download/v${MY_PV}/ollama-linux-amd64.tar.zst -> ${MY_P}-amd64.tar.zst )
 		rocm? ( https://github.com/ollama/ollama/releases/download/v${MY_PV}/ollama-linux-amd64-rocm.tar.zst -> ${MY_P}-rocm.tar.zst )
 	)
-	arm64? ( https://github.com/ollama/ollama/releases/download/v${MY_PV}/ollama-linux-arm64.tar.zst -> ${MY_P}-arm64.tar.zst )
 "
 
 LICENSE="MIT"
 SLOT="0"
-KEYWORDS="~amd64 ~arm64"
+KEYWORDS="~amd64"
 IUSE="cuda rocm systemd"
 
 REQUIRED_USE="
@@ -107,8 +106,6 @@ src_unpack() {
 		else
 			unpack "${MY_P}-amd64.tar.zst"
 		fi
-	elif use arm64; then
-		unpack "${MY_P}-arm64.tar.zst"
 	fi
 }
 

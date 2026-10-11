@@ -27,19 +27,8 @@ HOMEPAGE="https://github.com/amd/gaia https://pypi.org/project/amd-gaia/"
 
 LICENSE="MIT"
 SLOT="0"
-KEYWORDS="~amd64 ~arm64"
+KEYWORDS="~amd64"
 
-# Pure Python (py3-none-any wheel) and the model backend is reached over HTTP,
-# so nothing here is architecture specific — hence ~arm64 alongside ~amd64.
-#
-# pkgcheck reports NonsolvableDeps on every arm64 profile, and that report is
-# EXPECTED — do not "fix" it by dropping the keyword.  Nothing in GAIA is
-# amd64-only; the gap is one level down, in ::gentoo, where sci-ml/transformers
-# and sci-ml/accelerate are still ~amd64 (sci-ml/pytorch beneath them already
-# carries ~arm64), and dev-python/fastapi likewise.  Keeping ~arm64 here means
-# the package starts working on arm64 the day those three are keyworded,
-# without this ebuild being touched.
-#
 # IUSE maps upstream extras_require, but only the extras whose every dependency
 # already exists in ::gentoo or ::bentoo.  The rest are deliberately absent:
 #

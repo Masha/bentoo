@@ -23,17 +23,13 @@ SRC_URI="
 		${MY_URI}/${MY_PN}_${PV}_amd64.deb
 			-> ${P}-x86_64.deb
 	)
-	arm64? (
-		${MY_URI}/${MY_PN}_${PV}_arm64.deb
-			-> ${P}-aarch64.deb
-	)
 "
 S="${WORKDIR}"
 
 # Anthropic proprietary app; MIT covers the bundled Electron/Chromium runtime.
 LICENSE="all-rights-reserved MIT"
 SLOT="0"
-KEYWORDS="-* ~amd64 ~arm64"
+KEYWORDS="-* ~amd64"
 IUSE="egl wayland"
 RESTRICT="bindist mirror strip"
 

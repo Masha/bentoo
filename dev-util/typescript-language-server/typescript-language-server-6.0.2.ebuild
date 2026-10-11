@@ -29,7 +29,7 @@ S="${WORKDIR}/${PN}"
 LICENSE="Apache-2.0 BlueOak-1.0.0 ISC MIT"
 SLOT="0"
 # Pure JavaScript: nothing here is architecture-specific.
-KEYWORDS="~amd64 ~arm64"
+KEYWORDS="~amd64"
 
 RDEPEND=">=net-libs/nodejs-22.22.2:*"
 

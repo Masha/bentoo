@@ -21,7 +21,7 @@ HOMEPAGE="
 
 LICENSE="MIT"
 SLOT="0"
-KEYWORDS="~amd64 ~arm64"
+KEYWORDS="~amd64"
 
 # ::gentoo marks dev-python/httpx deprecated (encode/httpx no longer accepts
 # bug reports), so pkgcheck reports DeprecatedDep here — expected, not a defect.

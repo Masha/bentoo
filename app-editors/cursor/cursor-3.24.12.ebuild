@@ -18,16 +18,12 @@ SRC_URI="
 		https://downloads.cursor.com/production/${BUILD_ID}/linux/x64/deb/amd64/deb/cursor_${PV}_amd64.deb
 			-> ${P}-amd64.deb
 	)
-	arm64? (
-		https://downloads.cursor.com/production/${BUILD_ID}/linux/arm64/deb/arm64/deb/cursor_${PV}_arm64.deb
-			-> ${P}-arm64.deb
-	)
 "
 S="${WORKDIR}"
 
 LICENSE="all-rights-reserved"
 SLOT="0"
-KEYWORDS="-* ~amd64 ~arm64"
+KEYWORDS="-* ~amd64"
 IUSE="egl kerberos wayland"
 RESTRICT="bindist mirror strip"
 

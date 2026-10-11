@@ -1,4 +1,4 @@
-# Copyright 1999-2021 Gentoo Authors
+# Copyright 1999-2026 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI="7"
@@ -46,7 +46,6 @@ DESCRIPTION="Apache OpenOffice productivity suite"
 HOMEPAGE="https://www.openoffice.org/"
 SRC_URI="
 	amd64? ( "${FILEPATH}"/en-US/Apache_OpenOffice_${PV}_Linux_x86-64_install-rpm_en-US.tar.gz )
-	x86? ( "${FILEPATH}"/en-US/Apache_OpenOffice_${PV}_Linux_x86_install-rpm_en-US.tar.gz )
 "
 
 # TODO: supports ca_XR (Valencian RACV) locale too
@@ -55,13 +54,12 @@ LANGS="ast eu bg ca ca-valencia zh-CN zh-TW cs da nl en-GB fi fr gd gl de el he 
 for X in ${LANGS} ; do
 	IUSE="${IUSE} l10n_${X}"
 	SRC_URI+=" l10n_${X}? (
-		amd64? ( "${FILEPATH}"/${X/ca-valencia/ca-XV}/Apache_OpenOffice_${PV}_Linux_x86-64_langpack-rpm_${X/ca-valencia/ca-XV}.tar.gz )
-		x86? ( "${FILEPATH}"/${X/ca-valencia/ca-XV}/Apache_OpenOffice_${PV}_Linux_x86_langpack-rpm_${X/ca-valencia/ca-XV}.tar.gz ) )"
+		amd64? ( "${FILEPATH}"/${X/ca-valencia/ca-XV}/Apache_OpenOffice_${PV}_Linux_x86-64_langpack-rpm_${X/ca-valencia/ca-XV}.tar.gz ) )"
 done
 
 LICENSE="Apache-2.0"
 SLOT="0"
-KEYWORDS="~amd64 ~x86"
+KEYWORDS="~amd64"
 
 RDEPEND="
 	!app-office/openoffice

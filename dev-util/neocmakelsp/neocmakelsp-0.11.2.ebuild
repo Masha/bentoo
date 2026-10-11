@@ -241,7 +241,7 @@ LICENSE="MIT"
 # Dependent crate licenses
 LICENSE+=" Apache-2.0 CC0-1.0 MIT Unicode-3.0 ZLIB"
 SLOT="0"
-KEYWORDS="~amd64 ~arm64"
+KEYWORDS="~amd64"
 
 src_test() {
 	# document_link and grammar tests both mutate the process-global CMake

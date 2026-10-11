@@ -8,7 +8,7 @@ inherit acct-group
 DESCRIPTION="Group allowed to operate the Obscura VPN service"
 
 SLOT="0"
-KEYWORDS="~amd64 ~arm64"
+KEYWORDS="~amd64"
 
 # 603 continues this overlay's own run (localai 600, lemonade 601, ai-memory
 # 602) above ::gentoo's highest assigned account id, 563 as of 2026-09-24.

@@ -16,7 +16,7 @@ S="${WORKDIR}"
 LICENSE="MIT Apache-2.0 BSD"
 SLOT="0"
 # A phar is PHP code, not architecture-specific.
-KEYWORDS="~amd64 ~arm64"
+KEYWORDS="~amd64"
 
 # The phar runs Box's requirement checker before phpactor itself and aborts
 # unless every extension it lists is loaded:

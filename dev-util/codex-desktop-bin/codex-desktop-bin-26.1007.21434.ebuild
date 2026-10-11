@@ -27,7 +27,6 @@ DESCRIPTION="OpenAI Codex/ChatGPT desktop application (Electron, proprietary)"
 HOMEPAGE="https://developers.openai.com/codex/app"
 SRC_URI="
 	amd64? ( ${OAI_BASE}/${MY_PN}_${PV}_amd64.deb -> ${P}-amd64.deb )
-	arm64? ( ${OAI_BASE}/${MY_PN}_${PV}_arm64.deb -> ${P}-arm64.deb )
 "
 S="${WORKDIR}"
 
@@ -37,7 +36,7 @@ S="${WORKDIR}"
 # is included, so the app itself is all-rights-reserved.
 LICENSE="all-rights-reserved MIT"
 SLOT="0"
-KEYWORDS="-* ~amd64 ~arm64"
+KEYWORDS="-* ~amd64"
 IUSE="apparmor egl wayland"
 RESTRICT="bindist mirror strip"
 

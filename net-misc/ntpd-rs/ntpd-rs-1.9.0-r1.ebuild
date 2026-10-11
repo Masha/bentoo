@@ -283,7 +283,7 @@ LICENSE="|| ( Apache-2.0 MIT )"
 # Dependent crate licenses (generated from Cargo.lock via pycargoebuild)
 LICENSE+=" Apache-2.0 BSD BSD-2 Boost-1.0 CDLA-Permissive-2.0 ISC MIT MPL-2.0 Unicode-3.0 ZLIB"
 SLOT="0"
-KEYWORDS="~amd64 ~arm64"
+KEYWORDS="~amd64"
 # The flag gates the systemd units ONLY. The OpenRC init scripts are installed
 # unconditionally -- see src_install.
 IUSE="systemd"

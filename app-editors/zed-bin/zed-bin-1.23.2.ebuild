@@ -13,15 +13,11 @@ SRC_URI="
 		https://github.com/zed-industries/zed/releases/download/v${PV/_/-}/${MY_PN}-linux-x86_64.tar.gz
 			-> ${P}-linux-x86_64.tar.gz
 	)
-	arm64? (
-		https://github.com/zed-industries/zed/releases/download/v${PV/_/-}/${MY_PN}-linux-aarch64.tar.gz
-			-> ${P}-linux-aarch64.tar.gz
-	)
 "
 
 LICENSE="GPL-3+"
 SLOT="0"
-KEYWORDS="-* ~amd64 ~arm64"
+KEYWORDS="-* ~amd64"
 RESTRICT="mirror strip bindist"
 IUSE="+claude-agent-acp-plus +claude-agent-acp-tui"
 

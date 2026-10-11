@@ -15,7 +15,7 @@ if [[ ${PV} == 9999 ]]; then
 	EGIT_REPO_URI="https://github.com/hakavlad/nohang.git"
 else
 	SRC_URI="https://github.com/hakavlad/nohang/archive/v${PV}.tar.gz -> ${P}.tar.gz"
-	KEYWORDS="~amd64 ~arm64 ~x86"
+	KEYWORDS="~amd64"
 fi
 
 LICENSE="MIT"

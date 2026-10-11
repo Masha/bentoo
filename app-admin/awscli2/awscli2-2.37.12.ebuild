@@ -27,7 +27,7 @@ S=${WORKDIR}/${MY_P}
 
 LICENSE="Apache-2.0"
 SLOT="0"
-KEYWORDS="~amd64 ~arm64"
+KEYWORDS="~amd64"
 
 # awscli/{botocore,s3transfer} are vendored *forks* in v2, not copies of the
 # upstream releases: the v2-only features (SSO, the auto-prompt, the new

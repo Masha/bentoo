@@ -62,7 +62,7 @@ SRC_URI="
 LICENSE="MIT Apache-2.0 BSD BSD-2 ISC 0BSD"
 SLOT="0"
 # Pure JavaScript: no install scripts, no native addons, compiled by tsc.
-KEYWORDS="~amd64 ~arm64"
+KEYWORDS="~amd64"
 # The upstream suite runs through jest and an rspack-built test server.
 RESTRICT="test"
 

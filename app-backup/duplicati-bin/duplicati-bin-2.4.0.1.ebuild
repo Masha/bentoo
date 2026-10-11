@@ -20,15 +20,11 @@ SRC_URI="
 		https://github.com/duplicati/duplicati/releases/download/${MY_TAG}/${MY_ASSET}-linux-x64-gui.zip
 			-> ${P}-linux-x64-gui.zip
 	)
-	arm64? (
-		https://github.com/duplicati/duplicati/releases/download/${MY_TAG}/${MY_ASSET}-linux-arm64-gui.zip
-			-> ${P}-linux-arm64-gui.zip
-	)
 "
 
 LICENSE="MIT"
 SLOT="0"
-KEYWORDS="-* ~amd64 ~arm64"
+KEYWORDS="-* ~amd64"
 RESTRICT="bindist mirror strip"
 
 # Self-contained .NET bundle: the runtime is embedded, but the native

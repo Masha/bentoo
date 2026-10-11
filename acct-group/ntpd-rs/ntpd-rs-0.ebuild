@@ -8,6 +8,6 @@ inherit acct-group
 DESCRIPTION="Group for the ntpd-rs NTP daemon"
 
 SLOT="0"
-KEYWORDS="~amd64 ~arm64"
+KEYWORDS="~amd64"
 
 ACCT_GROUP_ID=466

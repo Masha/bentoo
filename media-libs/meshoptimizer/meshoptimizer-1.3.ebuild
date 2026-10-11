@@ -28,7 +28,7 @@ LICENSE="MIT"
 # should depend on media-libs/meshoptimizer:0/${PV} via ":=".
 SLOT="0/${PV}"
 
-KEYWORDS="~amd64 ~arm64"
+KEYWORDS="~amd64"
 IUSE="gltfpack test"
 RESTRICT="!test? ( test )"
 

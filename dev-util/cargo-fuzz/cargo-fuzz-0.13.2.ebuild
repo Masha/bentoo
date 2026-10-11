@@ -119,7 +119,7 @@ LICENSE="|| ( Apache-2.0 MIT )"
 # Dependent crate licenses
 LICENSE+=" Apache-2.0 MIT Unicode-3.0 ZLIB"
 SLOT="0"
-KEYWORDS="~amd64 ~arm64"
+KEYWORDS="~amd64"
 
 # The .crate files are not mirrored by Gentoo.
 RESTRICT="mirror"

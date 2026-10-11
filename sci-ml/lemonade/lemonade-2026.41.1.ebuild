@@ -31,7 +31,7 @@ SRC_URI="
 # next to the bundle.
 LICENSE="Apache-2.0 webapp? ( BSD MIT )"
 SLOT="0"
-KEYWORDS="~amd64 ~arm64"
+KEYWORDS="~amd64"
 IUSE="+caps +systemd test +webapp"
 RESTRICT="!test? ( test )"
 

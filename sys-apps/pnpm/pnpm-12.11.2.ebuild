@@ -33,16 +33,6 @@ SRC_URI="
 				-> ${PN}-exe.linux-x64-musl-${PV}.tgz
 		)
 	)
-	arm64? (
-		elibc_glibc? (
-			https://registry.npmjs.org/@pnpm/exe.linux-arm64/-/exe.linux-arm64-${PV}.tgz
-				-> ${PN}-exe.linux-arm64-${PV}.tgz
-		)
-		elibc_musl? (
-			https://registry.npmjs.org/@pnpm/exe.linux-arm64-musl/-/exe.linux-arm64-musl-${PV}.tgz
-				-> ${PN}-exe.linux-arm64-musl-${PV}.tgz
-		)
-	)
 "
 S="${WORKDIR}/wrapper/package"
 
@@ -50,7 +40,7 @@ S="${WORKDIR}/wrapper/package"
 # alongside it and is installed with the rest of the wrapper.
 LICENSE="MIT"
 SLOT="0"
-KEYWORDS="~amd64 ~arm64"
+KEYWORDS="~amd64"
 
 # Prebuilt, and upstream ships it stripped already.
 QA_PREBUILT="usr/lib*/node_modules/${PN}/${PN}"
@@ -89,8 +79,6 @@ pnpm_native_distfile() {
 
 	if use amd64; then
 		arch="x64"
-	elif use arm64; then
-		arch="arm64"
 	else
 		die "no prebuilt pnpm binary for ARCH=${ARCH}"
 	fi

@@ -19,7 +19,7 @@ S="${WORKDIR}/package"
 LICENSE="intelephense"
 SLOT="0"
 # Pure JavaScript plus TypeScript .d.ts stubs; nothing arch-specific.
-KEYWORDS="~amd64 ~arm64"
+KEYWORDS="~amd64"
 RESTRICT="bindist mirror"
 
 RDEPEND="net-libs/nodejs:*"

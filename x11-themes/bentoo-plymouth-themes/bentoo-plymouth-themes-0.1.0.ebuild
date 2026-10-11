@@ -11,7 +11,7 @@ SRC_URI="https://distfiles.obentoo.org/${P}.tar.xz"
 
 LICENSE="GPL-3"
 SLOT="0"
-KEYWORDS="~amd64 ~arm64"
+KEYWORDS="~amd64"
 
 RDEPEND="sys-boot/plymouth"
 

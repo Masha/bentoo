@@ -231,7 +231,7 @@ else
 		https://github.com/EmbarkStudios/cargo-deny/archive/refs/tags/${PV}.tar.gz -> ${P}.tar.gz
 		${CARGO_CRATE_URIS}
 	"
-	KEYWORDS="~amd64 ~arm64"
+	KEYWORDS="~amd64"
 fi
 
 # cargo-deny itself is dual-licensed MIT OR Apache-2.0

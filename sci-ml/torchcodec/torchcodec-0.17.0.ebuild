@@ -24,7 +24,7 @@ SRC_URI="
 # that media-libs/giflib security updates never reach.
 LICENSE="BSD gif? ( MIT )"
 SLOT="0"
-KEYWORDS="~amd64 ~arm64"
+KEYWORDS="~amd64"
 # No ROCm flag: upstream has no HIP backend. On a ROCm pytorch the CPU decoders
 # are used and the tensors are moved to the GPU by torch itself.
 IUSE="cuda +gif heif +jpeg +png +webp"

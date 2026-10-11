@@ -37,7 +37,7 @@ LICENSE="MIT"
 SLOT="0"
 # Pure JavaScript, no install scripts and no native addons in the vendored
 # tree, so nothing here is arch-specific.
-KEYWORDS="~amd64 ~arm64"
+KEYWORDS="~amd64"
 
 RDEPEND="net-libs/nodejs:*"
 

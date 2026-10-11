@@ -20,9 +20,7 @@ S="${WORKDIR}/bentoolkit-${BENTOOLKIT_PV}"
 
 LICENSE="MIT"
 SLOT="0"
-# Pure Go built with CGO_ENABLED=0, and upstream's Makefile cross-builds an
-# arm64 binary of it, so ~arm64 is upstream-supported.
-KEYWORDS="~amd64 ~arm64 ~x86"
+KEYWORDS="~amd64"
 IUSE="systemd"
 
 # Everything else it talks to is a D-Bus service of the desktop session (the

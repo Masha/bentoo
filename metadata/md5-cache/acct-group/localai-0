@@ -3,7 +3,7 @@ DESCRIPTION=Group for the LocalAI inference server
 EAPI=8
 IDEPEND=!prefix? ( >=sys-apps/shadow-4.6 )
 INHERIT=acct-group
-KEYWORDS=~amd64 ~arm64
+KEYWORDS=~amd64
 SLOT=0
-_eclasses_=user-info	9bc91a5977c2453c0a861b26f65057ea	edob	357e125b8c5cad0deccb625e537ea831	edo	e472083829a6e7ff43a197cf536728a2	acct-group	81e55491b477037cf9ab70628d57e609
-_md5_=30983bd2dc43090ae5a8230cfe33b3b8
+_eclasses_=acct-group	81e55491b477037cf9ab70628d57e609	edo	e472083829a6e7ff43a197cf536728a2	edob	357e125b8c5cad0deccb625e537ea831	user-info	9bc91a5977c2453c0a861b26f65057ea
+_md5_=78897b64cf3f45a345d27da26b7a3298

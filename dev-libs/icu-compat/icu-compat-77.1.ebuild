@@ -14,7 +14,7 @@ S="${WORKDIR}/icu/source"
 
 LICENSE="BSD"
 SLOT="$(ver_cut 1)"
-KEYWORDS="~amd64 ~arm64"
+KEYWORDS="~amd64"
 
 # Nothing should ever build against this package: it exists so that binaries
 # which were compiled elsewhere against SONAME libicu*.so.77 keep loading.

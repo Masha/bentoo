@@ -43,7 +43,7 @@ SLOT="0"
 # Pure JavaScript plus WebAssembly (vscode-oniguruma) and Perl scripts, no
 # install scripts and no native addons, so nothing here is arch-specific.
 # The upstream GitHub assets are pkg-built x86_64 binaries and are not used.
-KEYWORDS="~amd64 ~arm64"
+KEYWORDS="~amd64"
 
 RDEPEND="
 	dev-lang/perl

@@ -8,7 +8,7 @@ inherit acct-group
 DESCRIPTION="Group for the lemonade local LLM server"
 
 SLOT="0"
-KEYWORDS="~amd64 ~arm64"
+KEYWORDS="~amd64"
 
 # No reserved GID in the Gentoo GID/UID assignment table for lemonade,
 # so let the system pick the next free one.

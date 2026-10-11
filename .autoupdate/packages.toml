@@ -633,7 +633,7 @@ the library version, which is not a version of this package at all.
 releases/latest is titled "CLI vX.Y.Z" and tagged "vX.Y.Z".
 
 Derived from the guru overlay's ebuild (app-misc/watchexec-2.5.0), rebased onto
-2.7.2 with regenerated CRATES and ~arm64 added.
+2.7.2 with regenerated CRATES.
 """
 # END
 
@@ -647,7 +647,7 @@ comments = """
 tokei - releases/latest returns "vX.Y.Z".
 
 Derived from the guru overlay's ebuild (dev-util/tokei-14.0.0), rebased onto
-15.0.0 with regenerated CRATES and ~arm64 added. Note RUST_MIN_VER is 1.71.1,
+15.0.0 with regenerated CRATES. Note RUST_MIN_VER is 1.71.1,
 not the 1.71 upstream declares: cargo.eclass rejects anything below 1.71.1.
 """
 # END
@@ -10688,9 +10688,9 @@ from-source package; unlike it, this one is NOT a mirror — ::gentoo ships no
 binary variant, so it stays after the source package is dropped.
 
 Bump checklist beyond PV: upstream publishes one tarball per target plus a
-shared docs.tar.zst, and the ebuild picks glibc builds on amd64/x86 and musl
-on arm64/riscv.  Re-check the glibc floor of the -gnu tarballs on a bump
-(objdump -T | grep GLIBC_); 0.10.0 was 2.39 on x86_64 and 2.18 on i686.  If a
+shared docs.tar.zst, and the ebuild picks the x86_64 glibc build (musl
+on elibc_musl).  Re-check the glibc floor of the -gnu tarballs on a bump
+(objdump -T | grep GLIBC_); 0.10.0 was 2.39 on x86_64.  If a
 floor ever passes the oldest glibc in ::gentoo, move that arch to its musl
 tarball.
 """
@@ -11327,11 +11327,10 @@ ai-memory-bin — same endpoint and same release as dev-util/ai-memory; this
 record exists separately only because the two are separate packages.  Bump them
 together.
 
-The distfiles are the release assets ai-memory-linux-x86_64.tar.gz and
-ai-memory-linux-aarch64.tar.gz, one per KEYWORDS arch.  Upstream also publishes
-macos and windows assets, which are not packaged.  If a Linux asset ever
-disappears from a release, that is the moment to narrow KEYWORDS — check the
-asset list, not the tag.
+The distfile is the release asset ai-memory-linux-x86_64.tar.gz (bentoo is
+amd64 only; the aarch64, macos and windows assets are not packaged).  If it
+ever disappears from a release, the bump cannot proceed — check the asset
+list, not the tag.
 """
 # END
 
@@ -11740,8 +11739,8 @@ actually follow.
 
 Unlike cline and pnpm, the npm tarball here is NOT a wrapper around a
 platform binary: it is a self-contained JavaScript bundle, which is why the
-ebuild is architecture-independent and keeps ordinary ~amd64 ~arm64 keywords
-instead of the "-*" used by the prebuilt packages.
+ebuild is architecture-independent and keeps an ordinary ~amd64 keyword
+instead of the "-* ~amd64" used by the prebuilt packages.
 
 node-pty and keytar are listed upstream as optional native bindings and are
 deliberately not packaged -- the bundle was verified to run without them, and
@@ -11880,7 +11879,7 @@ release artefact anywhere else; the GitHub tags carry source only, and the
 npm tarball is the one that ships the built lib/cli.mjs bundle.
 
 The tarball is a self-contained rollup bundle (no runtime dependencies), so the
-ebuild is architecture-independent with ordinary ~amd64 ~arm64 keywords.
+ebuild is architecture-independent.
 
 tsserver is NOT bundled upstream. The ebuild installs a private typescript
 (TS_PV, the last JavaScript series) under /usr/share/${PN}/node_modules, where
@@ -11909,7 +11908,7 @@ a third-party wrapper that downloads this same npm tarball at runtime.
 
 The tarball is a self-contained webpack bundle; its only declared dependency,
 fsevents, is an optional macOS binding. The ebuild is therefore
-architecture-independent and keeps ordinary ~amd64 ~arm64 keywords.
+architecture-independent.
 
 On a bump, re-list the bundled modules from dist/*.map (the .pnpm/<name>@<ver>
 paths) and re-check LICENSE: a new bundled module can bring a new license.
@@ -11958,7 +11957,7 @@ least 7 days old>, deterministic tar | xz -T1 -9e) and uploads it with
 wrangler --remote. Upload BEFORE running autoupdate, or Cloudflare caches the
 404. Redo the LICENSE survey from node_modules/.package-lock.json in the same
 step, and re-check that the tree still has no install scripts or .node addons
-(KEYWORDS ~arm64 depends on it).
+(keeping the ebuild architecture-independent depends on it).
 """
 # END
 
@@ -12068,7 +12067,7 @@ version = "0.8.20-r1"
 comments = """
 perlnavigator (npm: perlnavigator-server) -- probed on npm, the channel that
 ships the compiled server. GitHub releases carry only pkg-built x86_64
-binaries, which would drop ~arm64.
+binaries, which would tie the ebuild to one ELF ABI.
 
 A BUMP IS NOT AUTOMATABLE. The ebuild needs a second distfile we generate,
 perlnavigator-node_modules-${PV}.tar.xz on distfiles.obentoo.org; after
@@ -12078,8 +12077,8 @@ least 7 days old>, deterministic tar | xz -T1 -9e) and uploads it with
 wrangler --remote. Upload BEFORE running autoupdate, or Cloudflare caches the
 404. Redo the LICENSE survey from node_modules/.package-lock.json in the same
 step (plus the Perl modules vendored under src/perl/lib_bs22), re-check that
-the tree still has no install scripts or .node addons (KEYWORDS ~arm64 depends
-on it), and that out/assets.js still resolves src/perl next to out/.
+the tree still has no install scripts or .node addons (keeping the ebuild
+architecture-independent depends on it), and that out/assets.js still resolves src/perl next to out/.
 """
 # END
 
@@ -12220,7 +12219,7 @@ comments = """
 Intelephense -- probed on npm, the only channel upstream ships the server
 through (the GitHub repos hold the VS Code extension and docs, not the server).
 The npm tarball is a self-contained webpack bundle whose only require() calls
-are Node built-ins, so the ebuild is architecture-independent (~amd64 ~arm64).
+are Node built-ins, so the ebuild is architecture-independent.
 
 Proprietary licence (licenses/intelephense): redistribution and modification
 are forbidden, hence RESTRICT="bindist mirror" and an install that copies the

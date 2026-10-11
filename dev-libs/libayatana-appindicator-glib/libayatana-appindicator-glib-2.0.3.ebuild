@@ -10,7 +10,7 @@ if [[ ${PV} == *9999* ]]; then
 	inherit git-r3
 else
 	SRC_URI="https://github.com/AyatanaIndicators/${PN}/archive/refs/tags/${PV}.tar.gz -> ${P}.tar.gz"
-	KEYWORDS="~amd64 ~arm64"
+	KEYWORDS="~amd64"
 fi
 
 DESCRIPTION="Ayatana Application Indicators (GLib-2.0-only reimplementation)"

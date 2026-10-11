@@ -15,16 +15,12 @@ SRC_URI="
 		${OPENCODE_BASE}/opencode-linux-x64.tar.gz
 			-> ${P}-amd64.tar.gz
 	)
-	arm64? (
-		${OPENCODE_BASE}/opencode-linux-arm64.tar.gz
-			-> ${P}-arm64.tar.gz
-	)
 "
 S="${WORKDIR}"
 
 LICENSE="MIT"
 SLOT="0"
-KEYWORDS="-* ~amd64 ~arm64"
+KEYWORDS="-* ~amd64"
 RESTRICT="bindist mirror strip"
 
 QA_PREBUILT="*"

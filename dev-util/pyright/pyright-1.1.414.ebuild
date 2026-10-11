@@ -18,7 +18,7 @@ S="${WORKDIR}/package"
 LICENSE="MIT 0BSD Apache-2.0 BSD BSD-2 ISC"
 SLOT="0"
 # Pure JavaScript: nothing here is architecture-specific.
-KEYWORDS="~amd64 ~arm64"
+KEYWORDS="~amd64"
 
 RDEPEND="net-libs/nodejs:*"
 

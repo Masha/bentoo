@@ -8,23 +8,19 @@ EAPI=8
 # 1) Why a -bin at all, when ::gentoo already has sys-apps/uutils-coreutils:
 #    the from-source ebuild pulls ~400 crates and a Rust toolchain.  Upstream
 #    publishes official binaries for every release, so users who only want the
-#    utilities (containers, edge boxes, arm64 SBCs, machines with no Rust)
+#    utilities (containers, edge boxes, machines with no Rust)
 #    should not have to compile them.  This package installs exactly the same
 #    file layout as the from-source one, so the two are interchangeable.
 #
-# 2) Why musl builds on arm64/riscv but a glibc build on amd64/x86:
-#    upstream ships NO aarch64-*-linux-gnu or riscv64-*-linux-gnu tarball --
-#    only *-linux-musl, which is statically linked and therefore runs fine on
-#    a glibc system.  On amd64/x86 the glibc build is preferred because a
-#    statically linked musl binary resolves users and groups through musl's
-#    own minimal NSS: it reads /etc/passwd and /etc/group directly and cannot
-#    consult nsswitch.conf modules (LDAP, SSSD, systemd-userdb).  That would
-#    silently change the output of `uu-ls -l`, `uu-id` and `uu-chown` on hosts
-#    with networked accounts.  Verified glibc floors (objdump -T):
+# 2) Why the glibc build rather than the static musl one: a statically
+#    linked musl binary resolves users and groups through musl's own minimal
+#    NSS -- it reads /etc/passwd and /etc/group directly and cannot consult
+#    nsswitch.conf modules (LDAP, SSSD, systemd-userdb).  That would silently
+#    change the output of `uu-ls -l`, `uu-id` and `uu-chown` on hosts with
+#    networked accounts.  Verified glibc floor (objdump -T):
 #       x86_64-unknown-linux-gnu -> GLIBC_2.39
-#       i686-unknown-linux-gnu   -> GLIBC_2.18
-#    Re-check those on a bump; if the floor ever exceeds the oldest glibc in
-#    ::gentoo, switch that arch over to its musl tarball.
+#    Re-check it on a bump; if the floor ever exceeds the oldest glibc in
+#    ::gentoo, switch over to the musl tarball.
 #
 # 3) Where the applet list, the man pages and the completions come from:
 #    up to 0.11.0 upstream published an architecture independent docs.tar.zst
@@ -64,12 +60,6 @@ SRC_URI="
 		elibc_glibc? ( ${MY_BASE}/coreutils-${PV}-x86_64-unknown-linux-gnu.tar.gz )
 		elibc_musl? ( ${MY_BASE}/coreutils-${PV}-x86_64-unknown-linux-musl.tar.gz )
 	)
-	arm64? ( ${MY_BASE}/coreutils-${PV}-aarch64-unknown-linux-musl.tar.gz )
-	riscv? ( ${MY_BASE}/coreutils-${PV}-riscv64gc-unknown-linux-musl.tar.gz )
-	x86? (
-		elibc_glibc? ( ${MY_BASE}/coreutils-${PV}-i686-unknown-linux-gnu.tar.gz )
-		elibc_musl? ( ${MY_BASE}/coreutils-${PV}-i686-unknown-linux-musl.tar.gz )
-	)
 	l10n_fr? (
 		https://github.com/uutils/coreutils/archive/refs/tags/${PV}.tar.gz
 			-> ${MY_PN}-${PV}.tar.gz
@@ -84,7 +74,7 @@ LICENSE+="
 	Apache-2.0 BSD-2 BSD CC0-1.0 ISC MIT MPL-2.0 Unicode-3.0 ZLIB
 "
 SLOT="0"
-KEYWORDS="-* ~amd64 ~arm64 ~riscv ~x86"
+KEYWORDS="-* ~amd64"
 IUSE="l10n_fr"
 
 RDEPEND="!sys-apps/uutils-coreutils"
@@ -96,12 +86,6 @@ src_install() {
 	local target
 	if use amd64 ; then
 		target=x86_64-unknown-linux-$(usex elibc_musl musl gnu)
-	elif use x86 ; then
-		target=i686-unknown-linux-$(usex elibc_musl musl gnu)
-	elif use arm64 ; then
-		target=aarch64-unknown-linux-musl
-	elif use riscv ; then
-		target=riscv64gc-unknown-linux-musl
 	else
 		die "no upstream binary for this arch; use sys-apps/uutils-coreutils instead"
 	fi
@@ -187,15 +171,6 @@ pkg_postinst() {
 	elog "'stdbuf' is not available here: it needs a helper library that"
 	elog "upstream does not ship in the release tarballs.  Build"
 	elog "sys-apps/uutils-coreutils from source if you need it."
-
-	if use elibc_glibc && ( use arm64 || use riscv ) ; then
-		ewarn "Upstream publishes no glibc binary for this arch, so the"
-		ewarn "statically linked musl build was installed.  It resolves users"
-		ewarn "and groups from /etc/passwd and /etc/group only -- NSS modules"
-		ewarn "such as LDAP, SSSD or systemd-userdb are ignored by uu-ls -l,"
-		ewarn "uu-id and uu-chown.  Build sys-apps/uutils-coreutils from source"
-		ewarn "if your system uses networked accounts."
-	fi
 
 	optfeature "shell completions" app-shells/bash-completion
 }

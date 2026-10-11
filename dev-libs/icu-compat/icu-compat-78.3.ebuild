@@ -12,7 +12,7 @@ S="${WORKDIR}/icu/source"
 
 LICENSE="BSD"
 SLOT="$(ver_cut 1)"
-KEYWORDS="~amd64 ~arm64"
+KEYWORDS="~amd64"
 
 # This slot carries the ABI that dev-libs/icu itself currently ships, so every
 # library it installs is a file dev-libs/icu already owns -- measured: all six

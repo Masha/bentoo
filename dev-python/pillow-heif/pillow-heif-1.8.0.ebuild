@@ -18,7 +18,7 @@ HOMEPAGE="
 
 LICENSE="BSD"
 SLOT="0"
-KEYWORDS="~amd64 ~arm64"
+KEYWORDS="~amd64"
 
 # _pillow_heif.c refuses to compile below LIBHEIF_HAVE_VERSION(1,23,4).
 # setup.py locates the system libheif through pkg-config; the bundled

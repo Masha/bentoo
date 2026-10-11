@@ -15,16 +15,12 @@ SRC_URI="
 		https://cdn.kagi.com/downloads/${MY_PN}.${PV}.flatpak
 			-> ${P}-amd64.flatpak
 	)
-	arm64? (
-		https://cdn.kagi.com/downloads/${MY_PN}.${PV}.arm.flatpak
-			-> ${P}-arm64.flatpak
-	)
 "
 S="${WORKDIR}/${PN}"
 
 LICENSE="all-rights-reserved"
 SLOT="0"
-KEYWORDS="~amd64 ~arm64"
+KEYWORDS="~amd64"
 RESTRICT="bindist mirror splitdebug strip"
 
 QA_PREBUILT="usr/lib*/orion/*"

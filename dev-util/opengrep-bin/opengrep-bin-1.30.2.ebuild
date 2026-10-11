@@ -15,16 +15,12 @@ SRC_URI="
 		elibc_glibc? ( ${URLPREFIX}/opengrep_manylinux_x86 -> ${P}-x86_64-linux-gnu )
 		elibc_musl? ( ${URLPREFIX}/opengrep_musllinux_x86 -> ${P}-x86_64-linux-musl )
 	)
-	arm64? (
-		elibc_glibc? ( ${URLPREFIX}/opengrep_manylinux_aarch64 -> ${P}-aarch64-linux-gnu )
-		elibc_musl? ( ${URLPREFIX}/opengrep_musllinux_aarch64 -> ${P}-aarch64-linux-musl )
-	)
 "
 S="${WORKDIR}"
 
 LICENSE="LGPL-2.1"
 SLOT="0"
-KEYWORDS="-* ~amd64 ~arm64"
+KEYWORDS="-* ~amd64"
 RESTRICT="strip"
 
 QA_PREBUILT="usr/bin/opengrep"
@@ -47,8 +43,6 @@ src_install() {
 
 	if use amd64; then
 		myarch="x86_64"
-	elif use arm64; then
-		myarch="aarch64"
 	else
 		die "Unsupported architecture"
 	fi

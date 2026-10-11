@@ -24,7 +24,7 @@ HOMEPAGE="https://shopify.github.io/ruby-lsp/ https://github.com/Shopify/ruby-ls
 
 LICENSE="MIT"
 SLOT="0"
-KEYWORDS="~amd64 ~arm64"
+KEYWORDS="~amd64"
 
 # Ranges mirror the gemspec: language_server-protocol ~> 3.17.0,
 # prism >= 1.2 < 2.0, rbs >= 3 < 5. bundler is required at runtime: the

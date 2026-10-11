@@ -20,7 +20,7 @@ LICENSE="BSD"
 # Dependent (bundled, statically linked) Go module licenses
 LICENSE+=" Apache-2.0 MIT"
 SLOT="0"
-KEYWORDS="~amd64 ~arm64"
+KEYWORDS="~amd64"
 
 BDEPEND=">=dev-lang/go-1.26"
 

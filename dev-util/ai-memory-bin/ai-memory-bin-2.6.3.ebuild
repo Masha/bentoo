@@ -13,17 +13,12 @@ MY_PN="${PN%-bin}"
 DESCRIPTION="Local-first long-term memory MCP server for AI coding agents (upstream prebuilt)"
 HOMEPAGE="https://github.com/akitaonrails/ai-memory"
 
-# Upstream publishes one Linux asset per architecture at each tag, so both
-# ~amd64 and ~arm64 are real builds rather than an untested keyword.  Neither
-# tarball has a top-level directory -- they extract straight into ${WORKDIR}.
+# The tarball has no top-level directory -- it extracts straight into
+# ${WORKDIR}.
 SRC_URI="
 	amd64? (
 		https://github.com/akitaonrails/ai-memory/releases/download/v${PV}/ai-memory-linux-x86_64.tar.gz
 			-> ${P}-amd64.tar.gz
-	)
-	arm64? (
-		https://github.com/akitaonrails/ai-memory/releases/download/v${PV}/ai-memory-linux-aarch64.tar.gz
-			-> ${P}-arm64.tar.gz
 	)
 "
 S="${WORKDIR}"
@@ -40,7 +35,7 @@ LICENSE+="
 	Unicode-3.0 ZLIB
 "
 SLOT="0"
-KEYWORDS="-* ~amd64 ~arm64"
+KEYWORDS="-* ~amd64"
 
 # The from-source ebuild has no USE flag for the LLM crate's local-embeddings
 # feature and neither can this one: these ARE the release binaries that feature

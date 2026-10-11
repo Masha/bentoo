@@ -161,7 +161,7 @@ LICENSE="MIT"
 # Dependent crate licenses
 LICENSE+=" Apache-2.0 Apache-2.0-with-LLVM-exceptions MIT MPL-2.0 Unicode-3.0"
 SLOT="0"
-KEYWORDS="~amd64 ~arm64"
+KEYWORDS="~amd64"
 
 # Upstream declares no runtime dependencies (requires_dist is empty).
 

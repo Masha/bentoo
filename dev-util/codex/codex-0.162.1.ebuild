@@ -125,12 +125,6 @@ SRC_URI="
 		https://github.com/openai/codex/releases/download/rusty-v8-v${RUSTY_V8_TAG}/src_binding_release_x86_64-unknown-linux-musl.rs
 			-> rusty_v8_${RUSTY_V8_TAG}_src_binding_release_x86_64-unknown-linux-musl.rs
 	)
-	arm64? (
-		https://github.com/openai/codex/releases/download/rusty-v8-v${RUSTY_V8_TAG}/librusty_v8_release_aarch64-unknown-linux-musl.a.gz
-			-> rusty_v8_${RUSTY_V8_TAG}_librusty_v8_release_aarch64-unknown-linux-musl.a.gz
-		https://github.com/openai/codex/releases/download/rusty-v8-v${RUSTY_V8_TAG}/src_binding_release_aarch64-unknown-linux-musl.rs
-			-> rusty_v8_${RUSTY_V8_TAG}_src_binding_release_aarch64-unknown-linux-musl.rs
-	)
 	${CARGO_CRATE_URIS}
 "
 
@@ -143,7 +137,7 @@ LICENSE+="
 	CC0-1.0 CDLA-Permissive-2.0 ISC MIT MPL-2.0 Unicode-3.0 ZLIB
 "
 SLOT="0"
-KEYWORDS="-* ~amd64 ~arm64"
+KEYWORDS="-* ~amd64"
 # Tests fail due to ring crate conflicts with system OpenSSL
 RESTRICT="test"
 
@@ -202,7 +196,6 @@ src_prepare() {
 src_compile() {
 	local rusty_v8_triple
 	use amd64 && rusty_v8_triple=x86_64-unknown-linux-musl
-	use arm64 && rusty_v8_triple=aarch64-unknown-linux-musl
 
 	RUSTY_V8_ARCHIVE="${DISTDIR}/rusty_v8_${RUSTY_V8_TAG}_librusty_v8_release_${rusty_v8_triple}.a.gz" \
 	RUSTY_V8_SRC_BINDING_PATH="${DISTDIR}/rusty_v8_${RUSTY_V8_TAG}_src_binding_release_${rusty_v8_triple}.rs" \

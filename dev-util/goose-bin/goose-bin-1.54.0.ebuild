@@ -14,10 +14,6 @@ SRC_URI="
 		${GOOSE_BASE}/goose-x86_64-unknown-linux-gnu.tar.bz2
 			-> ${P}-amd64.tar.bz2
 	)
-	arm64? (
-		${GOOSE_BASE}/goose-aarch64-unknown-linux-gnu.tar.bz2
-			-> ${P}-arm64.tar.bz2
-	)
 "
 S="${WORKDIR}"
 
@@ -27,7 +23,7 @@ S="${WORKDIR}"
 # (Goose.zip / .rpm / .deb), are out of scope for this ebuild.
 LICENSE="Apache-2.0"
 SLOT="0"
-KEYWORDS="-* ~amd64 ~arm64"
+KEYWORDS="-* ~amd64"
 RESTRICT="bindist mirror strip"
 
 QA_PREBUILT="*"

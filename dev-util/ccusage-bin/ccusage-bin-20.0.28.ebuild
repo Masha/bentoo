@@ -17,16 +17,12 @@ SRC_URI="
 		${CCUSAGE_BASE}/${MY_PN}-linux-x64/-/${MY_PN}-linux-x64-${PV}.tgz
 			-> ${P}-amd64.tgz
 	)
-	arm64? (
-		${CCUSAGE_BASE}/${MY_PN}-linux-arm64/-/${MY_PN}-linux-arm64-${PV}.tgz
-			-> ${P}-arm64.tgz
-	)
 "
 S="${WORKDIR}/package"
 
 LICENSE="MIT"
 SLOT="0"
-KEYWORDS="-* ~amd64 ~arm64"
+KEYWORDS="-* ~amd64"
 RESTRICT="bindist mirror strip"
 
 QA_PREBUILT="*"

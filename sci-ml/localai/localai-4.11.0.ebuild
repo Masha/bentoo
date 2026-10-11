@@ -91,7 +91,7 @@ S="${WORKDIR}"
 # ISC (2), BSD-2 (1).
 LICENSE="MIT Apache-2.0 BSD BSD-2 ISC MPL-2.0"
 SLOT="0"
-KEYWORDS="~amd64 ~arm64"
+KEYWORDS="~amd64"
 
 # No acceleration USE flags, and that is deliberate rather than an omission:
 # LocalAI resolves its inference backends as OCI artifacts at RUNTIME, so no

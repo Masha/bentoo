@@ -17,7 +17,7 @@ S="${WORKDIR}/${MY_PN}-${PV}"
 
 LICENSE="BSD"
 SLOT="$(ver_cut 1-2)"
-KEYWORDS="~amd64 ~arm64"
+KEYWORDS="~amd64"
 
 # media-libs/libjxl carries SLOT="0/$(ver_cut 1-2)", so only one ABI of it can
 # ever be installed. This package supplies the older runtime alongside it,

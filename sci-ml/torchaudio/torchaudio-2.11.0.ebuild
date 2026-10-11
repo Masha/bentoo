@@ -19,7 +19,7 @@ S="${WORKDIR}/audio-${PV}"
 
 LICENSE="BSD-2 cuda? ( BSD Apache-2.0 )"
 SLOT="0"
-KEYWORDS="~amd64 ~arm64"
+KEYWORDS="~amd64"
 # No ROCm flag: tools/setup_helpers/extension.py reads USE_ROCM but only
 # USE_CUDA switches to CUDAExtension, so a ROCm pytorch gets the same C++
 # extension as a CPU one and the GPU work is done by torch itself.

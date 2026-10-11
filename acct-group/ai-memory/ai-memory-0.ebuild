@@ -8,7 +8,7 @@ inherit acct-group
 DESCRIPTION="Group for the ai-memory MCP server"
 
 SLOT="0"
-KEYWORDS="~amd64 ~arm64"
+KEYWORDS="~amd64"
 
 # 602 continues this overlay's own run (localai 600, lemonade 601) above
 # ::gentoo's highest assigned account id, 563 as of 2026-09-07. Picking a hole

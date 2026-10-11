@@ -35,7 +35,7 @@ LICENSE="EPL-2.0 Apache-2.0 BSD BSD-2 EPL-1.0 MIT
 	|| ( EPL-2.0 GPL-2-with-classpath-exception )
 "
 SLOT="0"
-KEYWORDS="~amd64 ~arm64"
+KEYWORDS="~amd64"
 REQUIRED_USE="${PYTHON_REQUIRED_USE}"
 
 RDEPEND="

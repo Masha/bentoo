@@ -15,16 +15,12 @@ SRC_URI="
 		${CLINE_BASE}/cli-linux-x64/-/cli-linux-x64-${PV}.tgz
 			-> ${P}-amd64.tgz
 	)
-	arm64? (
-		${CLINE_BASE}/cli-linux-arm64/-/cli-linux-arm64-${PV}.tgz
-			-> ${P}-arm64.tgz
-	)
 "
 S="${WORKDIR}/package"
 
 LICENSE="Apache-2.0"
 SLOT="0"
-KEYWORDS="-* ~amd64 ~arm64"
+KEYWORDS="-* ~amd64"
 RESTRICT="bindist mirror strip"
 
 QA_PREBUILT="*"

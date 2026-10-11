@@ -15,7 +15,7 @@ LICENSE="Apache-2.0"
 # installs as libdraco.so.9.  Re-read that file on every version bump: the
 # soname moves independently of ${PV}.
 SLOT="0/9"
-KEYWORDS="~amd64 ~arm64"
+KEYWORDS="~amd64"
 
 # The release tarball carries third_party/{googletest,eigen,filesystem,tinygltf}
 # as empty submodule stubs, so DRACO_TESTS cannot be satisfied from it at all.

@@ -215,7 +215,7 @@ LICENSE+="
 	ZLIB
 "
 SLOT="0"
-KEYWORDS="~amd64 ~arm64"
+KEYWORDS="~amd64"
 
 QA_FLAGS_IGNORED="usr/lib.*/py.*/site-packages/anydoc/_anydoc.*\\.so"
 

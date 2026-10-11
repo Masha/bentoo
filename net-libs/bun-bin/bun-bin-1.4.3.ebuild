@@ -17,10 +17,6 @@ SRC_URI="
 				-> ${P}-linux-x64-baseline.zip
 		)
 	)
-	arm64? (
-		https://github.com/oven-sh/bun/releases/download/bun-v${PV}/bun-linux-aarch64.zip
-			-> ${P}-linux-aarch64.zip
-	)
 "
 S="${WORKDIR}"
 
@@ -28,7 +24,7 @@ S="${WORKDIR}"
 # zlib (ZLIB), and many MIT/Apache-2.0 dependencies.
 LICENSE="MIT BSD BSD-2 LGPL-2.1+ ZLIB Apache-2.0"
 SLOT="0"
-KEYWORDS="-* ~amd64 ~arm64"
+KEYWORDS="-* ~amd64"
 IUSE="cpu_flags_x86_avx2"
 
 RESTRICT="bindist mirror strip"
@@ -44,8 +40,6 @@ src_install() {
 		else
 			bun_dir="bun-linux-x64-baseline"
 		fi
-	elif use arm64; then
-		bun_dir="bun-linux-aarch64"
 	else
 		die "Unsupported architecture"
 	fi

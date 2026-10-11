@@ -47,16 +47,7 @@ LICENSE="MIT"
 # anyone checked. The survey is a manual step or it does not happen.
 LICENSE+=" Apache-2.0 BSD BSD-2 ISC"
 SLOT="0"
-# ~arm64 ships here, unlike the ggml family in this overlay, and the difference
-# is real rather than a lapse: this is pure Go with no cgo. There is no
-# `import "C"` anywhere in the tree and the SQLite driver is modernc.org/sqlite,
-# a pure-Go implementation — so no architecture-specific code path exists to go
-# unexercised. Upstream builds GOOS=linux GOARCH=arm64 as a first-class release
-# target in its own Makefile.
-#
-# Contrast sci-ml/{llama-cpp,koboldcpp,sherpa-onnx}, which are ~amd64 only:
-# those compile C++ with SIMD/NEON paths that genuinely differ per arch.
-KEYWORDS="~amd64 ~arm64"
+KEYWORDS="~amd64"
 IUSE="systemd ui"
 
 # nodejs is slotted in this overlay (SLOT 24 and 26); the unslotted atom
@@ -71,9 +62,8 @@ IUSE="systemd ui"
 #
 # An overlay cannot add to a master's profile. The real fix is for bentoo to
 # ship its own profile tree, which is already recorded as a follow-up in story
-# 002 for the same class of problem (the arm64/ROCm solver artifact). Until
-# then this finding is expected here and must not be "fixed" by dropping the
-# USE flag or the dependency.
+# 002. Until then this finding is expected here and must not be "fixed" by
+# dropping the USE flag or the dependency.
 BDEPEND="
 	>=dev-lang/go-1.26.1
 	ui? ( net-libs/nodejs[npm] )

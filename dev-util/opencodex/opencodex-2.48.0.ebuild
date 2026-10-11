@@ -78,7 +78,6 @@ SRC_URI="
 	https://distfiles.obentoo.org/${NODE_MODULES_TARBALL}
 	keyring? (
 		amd64? ( https://distfiles.obentoo.org/${PN}-keyring-${KEYRING_PV}-linux-x64-gnu.tar.xz )
-		arm64? ( https://distfiles.obentoo.org/${PN}-keyring-${KEYRING_PV}-linux-arm64-gnu.tar.xz )
 	)
 "
 S="${WORKDIR}/package"
@@ -96,7 +95,7 @@ S="${WORKDIR}/package"
 # has already been bitten by a vendored-license list going quietly stale.
 LICENSE="MIT ISC BSD BSD-2 Apache-2.0"
 SLOT="0"
-KEYWORDS="~amd64 ~arm64"
+KEYWORDS="~amd64"
 IUSE="+keyring"
 
 # No REQUIRED_USE on purpose.  A `^^ ( ... )` group with no default kills
@@ -168,8 +167,6 @@ src_install() {
 		local triple
 		if use amd64; then
 			triple="x64"
-		elif use arm64; then
-			triple="arm64"
 		else
 			die "USE=keyring on an arch with no prebuilt @napi-rs/keyring"
 		fi

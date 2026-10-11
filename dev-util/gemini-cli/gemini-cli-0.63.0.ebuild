@@ -17,7 +17,7 @@ LICENSE="Apache-2.0"
 SLOT="0"
 # Pure JavaScript: nothing here is architecture-specific, so this is not
 # restricted to the two arches the prebuilt packages in this overlay carry.
-KEYWORDS="~amd64 ~arm64"
+KEYWORDS="~amd64"
 
 RDEPEND="net-libs/nodejs:*"
 

@@ -70,7 +70,6 @@ LEMONADE_URI="https://github.com/lemonade-sdk/lemonade/releases/download/v${PV}"
 
 SRC_URI="
 	amd64? ( ${LEMONADE_URI}/${MY_EMB}-x64.tar.gz -> ${P}-amd64.tar.gz )
-	arm64? ( ${LEMONADE_URI}/${MY_EMB}-arm64.tar.gz -> ${P}-arm64.tar.gz )
 	${LEMONADE_URI}/lemonade-server_${PV}-debian13_amd64.deb -> ${P}-data.deb
 "
 
@@ -81,7 +80,7 @@ S="${WORKDIR}"
 # Apache-2.0 pieces, per the .LICENSE.txt installed next to it.
 LICENSE="Apache-2.0 BSD MIT"
 SLOT="0"
-KEYWORDS="-* ~amd64 ~arm64"
+KEYWORDS="-* ~amd64"
 IUSE="+systemd"
 RESTRICT="bindist mirror strip"
 
@@ -111,8 +110,6 @@ src_install() {
 
 	if use amd64; then
 		emb="${WORKDIR}/${MY_EMB}-x64"
-	elif use arm64; then
-		emb="${WORKDIR}/${MY_EMB}-arm64"
 	else
 		die "unsupported ARCH=${ARCH}: no embeddable tarball for it"
 	fi

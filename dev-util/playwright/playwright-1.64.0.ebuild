@@ -21,7 +21,7 @@ S="${WORKDIR}/package"
 
 LICENSE="Apache-2.0"
 SLOT="0"
-KEYWORDS="~amd64 ~arm64"
+KEYWORDS="~amd64"
 # Pure JavaScript plus a WASM codec and data files, no ELF objects: nothing
 # arch-specific is installed. The browser binaries are downloaded at runtime by
 # "playwright install", exactly as with the upstream npm package.

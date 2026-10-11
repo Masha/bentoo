@@ -13,7 +13,7 @@ if [[ ${PV} == 9999 ]]; then
 	EGIT_REPO_URI="https://github.com/gitleaks/gitleaks.git"
 else
 	SRC_URI="https://github.com/gitleaks/gitleaks/archive/refs/tags/v${PV}.tar.gz -> ${P}.tar.gz"
-	KEYWORDS="~amd64 ~arm64"
+	KEYWORDS="~amd64"
 	S="${WORKDIR}/${PN}-${PV}"
 fi
 

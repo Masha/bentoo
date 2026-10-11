@@ -13,16 +13,12 @@ SRC_URI="
 		${KIMI_BASE}/kimi-${PV}-x86_64-unknown-linux-gnu.tar.gz
 			-> ${P}-amd64.tar.gz
 	)
-	arm64? (
-		${KIMI_BASE}/kimi-${PV}-aarch64-unknown-linux-gnu.tar.gz
-			-> ${P}-arm64.tar.gz
-	)
 "
 S="${WORKDIR}"
 
 LICENSE="Apache-2.0"
 SLOT="0"
-KEYWORDS="-* ~amd64 ~arm64"
+KEYWORDS="-* ~amd64"
 RESTRICT="bindist mirror strip"
 
 QA_PREBUILT="*"

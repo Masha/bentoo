@@ -12,16 +12,12 @@ SRC_URI="
 		https://github.com/rustdesk/rustdesk/releases/download/${PV}/rustdesk-${PV}-x86_64.deb
 			-> ${P}-x86_64.deb
 	)
-	arm64? (
-		https://github.com/rustdesk/rustdesk/releases/download/${PV}/rustdesk-${PV}-aarch64.deb
-			-> ${P}-aarch64.deb
-	)
 "
 S="${WORKDIR}"
 
 LICENSE="AGPL-3"
 SLOT="0"
-KEYWORDS="-* ~amd64 ~arm64"
+KEYWORDS="-* ~amd64"
 # `systemd` gates the unit ONLY. The OpenRC init script is installed
 # unconditionally -- see src_install.
 IUSE="systemd"

@@ -22,19 +22,12 @@ SRC_URI="
 		https://github.com/audacity/audacity/releases/download/${MY_TAG}/${MY_PN}-linux-${PV}-x86_64.AppImage
 			-> ${P}-x86_64.AppImage
 	)
-	arm64? (
-		https://github.com/audacity/audacity/releases/download/${MY_TAG}/${MY_PN}-linux-${PV}-aarch64.AppImage
-			-> ${P}-aarch64.AppImage
-	)
 "
 S="${WORKDIR}"
 
 LICENSE="GPL-3+"
 SLOT="0"
-# 4.0.0 is the first release with an official aarch64 AppImage. Verified to be
-# structurally identical to the x86_64 one (same layout, same set of external
-# NEEDED entries, only the ELF interpreter differs).
-KEYWORDS="-* ~amd64 ~arm64"
+KEYWORDS="-* ~amd64"
 RESTRICT="bindist mirror strip"
 
 QA_PREBUILT="*"
@@ -83,8 +76,6 @@ src_unpack() {
 	local appimage
 	if use amd64; then
 		appimage="${P}-x86_64.AppImage"
-	elif use arm64; then
-		appimage="${P}-aarch64.AppImage"
 	else
 		die "no upstream AppImage for this arch"
 	fi
