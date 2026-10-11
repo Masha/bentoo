@@ -10,6 +10,9 @@
 # member is missing, and printing the missing atoms is how to update it.
 media-libs/mesa abi_x86_32
 media-libs/vulkan-loader abi_x86_32
+# Needed only next to a hardware layer: amd and intel turn on mesa[vaapi], and
+# a 32-bit mesa[vaapi] needs a 32-bit libva (found by --staged, 2026-10-11).
+media-libs/libva abi_x86_32
 app-arch/bzip2 abi_x86_32
 app-arch/xz-utils abi_x86_32
 app-arch/zstd abi_x86_32

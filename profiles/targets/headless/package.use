@@ -1,0 +1,4 @@
+# nvidia-drivers' default +tools builds nvidia-settings, a GTK program that
+# needs gtk+[X]; this flavor turns X off, so the GUI tool would not resolve.
+# Harmless when no NVIDIA layer is selected.
+x11-drivers/nvidia-drivers -tools

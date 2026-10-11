@@ -24,12 +24,14 @@ TREE=${BENTOO_TREE:-$(cd "$BATS_TEST_DIRNAME/../../../.." && pwd -P)}
 SCRIPT=${CHECK_PROFILE_MATRIX:-$TREE/scripts/check-profile-matrix.sh}
 GENTOO_REPO=/var/db/repos/gentoo
 
-# The 4 reference presets of --staged (design.md C6).
+# The 5 reference presets of --staged (design.md C6, plus the desktop axis:
+# without a desktop preset the desktop-only layers are never resolved).
 REF_PRESETS=(
   default/linux/amd64/23.0
   default/linux/amd64/23.0/systemd
   default/linux/amd64/23.0/no-multilib
   default/linux/amd64/23.0/hardened
+  default/linux/amd64/23.0/desktop/plasma/systemd
 )
 
 need_portage() {
@@ -89,7 +91,11 @@ isolated_emerge() {
 # profile error (mask, slot conflict, unsatisfiable USE) prints `!!!` first.
 resolves_ok() {
   [ "$status" -eq 0 ] && return 0
-  if [[ $output == *"circular dependencies"* && $output != *'!!!'* ]]; then
+  # "no ebuilds to satisfy" is a graph error reported as an `emerge:` line
+  # "changes are necessary" is autounmask completing the graph anyway
+  if [[ $output == *"circular dependencies"* && $output != *'!!!'* &&
+    $output != *"changes are necessary"* &&
+    $'\n'$output != *$'\n'"emerge: "* ]]; then
     return 0
   fi
   _dump "the selection does not resolve"

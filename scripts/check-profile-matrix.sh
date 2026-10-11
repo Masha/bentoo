@@ -246,6 +246,7 @@ check_prerequisites() {
 		[ -d "$GENTOO_REPO" ] || missing "$GENTOO_REPO (the ::gentoo tree)"
 		command -v emerge >/dev/null 2>&1 || missing emerge
 		command -v portageq >/dev/null 2>&1 || missing portageq
+		command -v bwrap >/dev/null 2>&1 || missing 'bwrap (sys-apps/bubblewrap, hides the host package database)'
 		;;
 	--self-test)
 		command -v bats >/dev/null 2>&1 || missing bats
@@ -294,12 +295,11 @@ make_workdir() {
 #
 # The program itself arrives on stdin (the heredoc): data for it must come
 # through argv or files in $WORK, never through a pipe into this function.
-catalog_py() {
-	local rc=0
-	# -I: isolated mode -- no PYTHON* variables and no cwd on sys.path, so a
-	# stray tomllib.py next to wherever the hook runs cannot stand in for the
-	# standard library and make the check pass without checking anything.
-	python3 -I - "$TREE" "$@" <<'PY' || rc=$?
+# The program is kept in a variable (not fed on stdin) so the long-running
+# resolution can run under run_child, in its own process group that a signal
+# takes down whole -- emerge children included.
+CATALOG_PROGRAM=$(
+	cat <<'PY'
 import os
 import re
 import sys
@@ -1087,6 +1087,390 @@ def compose(tree, preset_id, layer_args):
     return CLEAN
 
 
+# --- resolution: --staged and --full (design.md C6) ---------------------------
+
+GENTOO_REPO = "/var/db/repos/gentoo"
+# One preset per axis that changes resolution most; the desktop one is what
+# lets desktop-only layers (workstation, games) be resolved by the hook at all.
+REF_PRESETS = (
+    "default/linux/amd64/23.0",
+    "default/linux/amd64/23.0/systemd",
+    "default/linux/amd64/23.0/no-multilib",
+    "default/linux/amd64/23.0/hardened",
+    "default/linux/amd64/23.0/desktop/plasma/systemd",
+)
+TOUCH_ALL = ("profiles/catalog.toml", "metadata/layout.conf", "profiles/profiles.desc")
+
+
+def staged_touch(catalog, paths):
+    """(touched layer ids, compared) from the staged paths. compared is False
+    when nothing under profiles/, layers/ or layout.conf is staged."""
+    layer_ids = [l["id"] for l in catalog.get("layer", [])]
+    preset_ids = [p["id"] for p in catalog.get("preset", [])]
+    relevant = [
+        p for p in paths
+        if p.startswith(("profiles/", "layers/")) or p == "metadata/layout.conf"
+    ]
+    if not relevant:
+        return set(), False
+    touched = set()
+    for path in relevant:
+        if (
+            path in TOUCH_ALL
+            or path.startswith("profiles/features/branding/")
+            or any(path.startswith(f"profiles/{pid}/") for pid in preset_ids)
+        ):
+            return set(layer_ids), True
+        root = "profiles/" if path.startswith("profiles/") else "layers/"
+        parts = path[len(root):].split("/")
+        for n in range(len(parts) - 1, 0, -1):  # directories only, longest first
+            if "/".join(parts[:n]) in layer_ids:
+                touched.add("/".join(parts[:n]))
+                break
+    return touched, True
+
+
+def judge(catalog, preset, selection):
+    """The composition rule, computed straight from the catalog data and
+    written apart from compose() on purpose (R6.7): the two must agree, and
+    a shared bug could not show up as a disagreement."""
+    layers = {l["id"]: l for l in catalog["layer"]}
+    types = catalog["types"]
+    sel = list(dict.fromkeys(selection))
+    seen_exclusive = set()
+    for lid in sel:
+        t = layers[lid]["type"]
+        if types[t]["exclusive"]:
+            if t in seen_exclusive:
+                return False
+            seen_exclusive.add(t)
+    for a in sel:
+        for b in sel:
+            if a != b and b in layers[a].get("conflicts", []):
+                return False
+    for lid in sel:
+        if not set(layers[lid].get("requires", [])) <= set(sel):
+            return False
+        for attr, allowed in layers[lid].get("base", {}).items():
+            if not any(same(preset[attr], v) for v in allowed):
+                return False
+    return True
+
+
+def largest(catalog, preset):
+    """The greedy largest allowed selection: catalog order, one layer per
+    exclusive type, no conflict, base holds; then layers whose requires are
+    unmet are dropped."""
+    types = catalog["types"]
+    sel = []
+    for l in catalog["layer"]:
+        if types[l["type"]]["exclusive"] and any(x["type"] == l["type"] for x in sel):
+            continue
+        if any(l["id"] in x.get("conflicts", []) or x["id"] in l.get("conflicts", []) for x in sel):
+            continue
+        if not all(any(same(preset[a], v) for v in vs) for a, vs in l.get("base", {}).items()):
+            continue
+        sel.append(l)
+    # Dropping a layer can leave another's requirement unmet: repeat until
+    # nothing changes, so the result always satisfies the rule.
+    while True:
+        ids = {x["id"] for x in sel}
+        kept = [x for x in sel if set(x.get("requires", [])) <= ids]
+        if len(kept) == len(sel):
+            return [x["id"] for x in sel]
+        sel = kept
+
+
+def compose_lines(tree, preset_id, selection):
+    """compose() in process: (status, stdout lines)."""
+    import contextlib
+    import io
+    buf = io.StringIO()
+    with contextlib.redirect_stdout(buf):
+        status = compose(tree, preset_id, list(selection))
+    return status, buf.getvalue().splitlines()
+
+
+def make_croot(work, name, tree, parent_lines):
+    croot = Path(work) / name
+    (croot / "etc/portage/repos.conf").mkdir(parents=True)
+    (croot / "etc/portage/make.profile").mkdir(parents=True)
+    (croot / "etc/portage/repos.conf/repos.conf").write_text(
+        f"[DEFAULT]\nmain-repo = gentoo\n\n[gentoo]\nlocation = {GENTOO_REPO}\n\n"
+        f"[bentoo]\nlocation = {tree}\n"
+    )
+    # An empty make.conf is a stage3's: no ACCEPT_LICENSE, no USE of the
+    # user's. What the profiles alone produce is what is judged.
+    (croot / "etc/portage/make.conf").write_text("")
+    (croot / "etc/portage/make.profile/parent").write_text("\n".join(parent_lines) + "\n")
+    (croot / "depcache").mkdir()
+    return croot
+
+
+def isolated(croot, *argv):
+    """argv under croot with this host's package database and world file
+    hidden (task 5.1, measured 2026-10-11): PORTAGE_CONFIGROOT alone still
+    reads the host's /var/db/pkg, and ROOT=<tmp> makes Portage also load the
+    host's own make.profile for build dependencies. bwrap mounts a tmpfs over
+    /var/db (re-binding /var/db/repos read-only) and over /var/lib/portage;
+    Portage's user and group are mapped to the caller's, because the portage
+    group does not exist inside the namespace."""
+    import getpass
+    import grp
+    import subprocess
+    cmd = [
+        "bwrap", "--dev-bind", "/", "/",
+        "--tmpfs", "/var/db", "--ro-bind", "/var/db/repos", "/var/db/repos",
+        "--tmpfs", "/var/lib/portage",
+        "--setenv", "PORTAGE_CONFIGROOT", str(croot),
+        "--setenv", "PORTAGE_DEPCACHEDIR", str(croot / "depcache"),
+        "--setenv", "PORTAGE_USERNAME", getpass.getuser(),
+        "--setenv", "PORTAGE_GRPNAME", grp.getgrgid(os.getgid()).gr_name,
+        *argv,
+    ]
+    return subprocess.run(cmd, stdin=subprocess.DEVNULL, capture_output=True, text=True)
+
+
+def emerge_verdict(proc):
+    """(ok, error excerpt). From an empty root @system always meets bootstrap
+    cycles (xz-utils <-> elt-patches): they concern merge ORDER and are
+    reported only once the dependency graph is COMPLETE, and a real install
+    starts from a stage3. So a cycle report with no other error is a pass.
+    Every graph error stops emerge before that point and is reported as a
+    `!!!` block (mask, slot conflict, unsatisfiable USE) or as an `emerge:`
+    line (no ebuild satisfies an atom)."""
+    out = proc.stdout + proc.stderr
+    if proc.returncode == 0:
+        return True, ""
+    # "changes are necessary" is autounmask: emerge proposes USE, keyword or
+    # licence changes and STILL completes the graph (then reports the cycles),
+    # without any `!!!`. It is run with --autounmask=n; this is the second guard.
+    graph_error = "!!!" in out or "\nemerge: " in "\n" + out or "changes are necessary" in out
+    if "circular dependencies" in out and not graph_error:
+        return True, ""
+    lines = out.splitlines()
+    for n, line in enumerate(lines):
+        if line.startswith(("!!!", "emerge: ")):
+            block = []
+            for follow in lines[n:]:
+                if not follow.strip() and len(block) > 1:
+                    break
+                block.append(follow)
+                if len(block) == 15:
+                    break
+            return False, "\n".join(block)
+    return False, "\n".join(lines[-20:])
+
+
+PROBE = r"""
+import sys, portage
+from portage._sets import load_default_config
+s = portage.settings
+eroot = s["EROOT"]
+pd = portage.db[eroot]["porttree"].dbapi
+q = sys.argv[1]
+if q == "var":
+    print(s.get(sys.argv[2], ""))
+elif q == "set":
+    atoms = load_default_config(s, portage.db[eroot]).getSetAtoms(sys.argv[2])
+    print(" ".join(sorted(str(a.cp) for a in atoms)))
+elif q == "best":
+    print(pd.xmatch("bestmatch-visible", sys.argv[2]))
+elif q == "use":
+    cpv = pd.xmatch("bestmatch-visible", sys.argv[2])
+    if cpv:
+        c = portage.config(clone=s)  # the global settings are locked
+        c.setcpv(cpv, mydb=pd)
+        print(c["PORTAGE_USE"])
+"""
+
+
+def probe(croot, *args):
+    """Read a setting under croot through Portage itself (no package database
+    is involved, so no isolation is needed for these reads)."""
+    import subprocess
+    env = dict(os.environ, PORTAGE_CONFIGROOT=str(croot))
+    proc = subprocess.run(
+        [sys.executable, "-I", "-c", PROBE, *args],
+        stdin=subprocess.DEVNULL, capture_output=True, text=True, env=env,
+    )
+    if proc.returncode != 0:
+        raise RuntimeError(f"portage probe {args} under {croot} failed: {proc.stderr.strip()[-300:]}")
+    return proc.stdout.strip()
+
+
+def content_checks(base, croot, preset_id, selection):
+    """Task 5.4: what each layer promises (R2, R3), read back from Portage.
+    A layer that resolves but no longer does its job is a gap too."""
+    fails = []
+    sel = set(selection)
+    words = lambda text: set(text.split())
+    def fail(layer, what):
+        fails.append(f"content: FAIL {preset_id} {layer}: {what}")
+    if len(sel) == 1:
+        (layer,) = sel
+        if layer == "targets/workstation":
+            have = words(probe(croot, "set", "profile"))
+            for a in ("net-misc/networkmanager", "net-print/cups", "sys-apps/flatpak"):
+                if a not in have:
+                    fail(layer, f"{a} is not in @profile")
+        if layer in ("targets/server", "targets/headless"):
+            use = words(probe(croot, "var", "USE"))
+            for flag in ("X", "wayland"):
+                if flag in use:
+                    fail(layer, f"USE has {flag}")
+        if layer == "targets/headless":
+            added = words(probe(croot, "set", "profile")) - words(probe(base, "set", "profile"))
+            if added:
+                fail(layer, f"adds {' '.join(sorted(added))} to @profile")
+        if layer == "targets/container":
+            if probe(croot, "best", "sys-kernel/gentoo-kernel"):
+                fail(layer, "sys-kernel/gentoo-kernel is not masked")
+        if layer == "features/games":
+            if "games-util/gamemode" not in words(probe(croot, "set", "profile")):
+                fail(layer, "games-util/gamemode is not in @profile")
+            if "abi_x86_32" not in words(probe(croot, "use", "media-libs/mesa")):
+                fail(layer, "media-libs/mesa lacks abi_x86_32")
+        if layer in ("features/hardware/nvidia", "features/hardware/nvidia-legacy"):
+            cards, before = words(probe(croot, "var", "VIDEO_CARDS")), words(probe(base, "var", "VIDEO_CARDS"))
+            if cards != before | {"nvidia"}:
+                fail(layer, f"VIDEO_CARDS is {' '.join(sorted(cards))}, expected the preset's plus nvidia")
+        if layer == "features/hardware/nvidia-legacy":
+            best = probe(croot, "best", "x11-drivers/nvidia-drivers")
+            if not best.startswith("x11-drivers/nvidia-drivers-580."):
+                fail(layer, f"x11-drivers/nvidia-drivers resolves to {best or 'nothing'}, expected 580.x")
+        if layer in ("features/hardware/amd", "features/hardware/intel"):
+            cards, before = words(probe(croot, "var", "VIDEO_CARDS")), words(probe(base, "var", "VIDEO_CARDS"))
+            if cards != before:
+                fail(layer, f"VIDEO_CARDS changed to {' '.join(sorted(cards))}")
+    if sel == {"features/hardware/nvidia", "features/hardware/amd"}:
+        have = words(probe(croot, "set", "profile"))
+        for a in ("x11-drivers/nvidia-drivers", "sys-kernel/linux-firmware"):
+            if a not in have:
+                fail("features/hardware/nvidia+amd", f"{a} is not in @profile")
+    return fails
+
+
+def use_targets(tree, layer_id):
+    """The packages a layer's package.use adjusts. They are often in neither
+    @system nor @profile (games tunes mesa, which a desktop pulls in through
+    @world), so they are resolved by name: a closure the layer misses shows up
+    here instead of on a user's `emerge @world`."""
+    path = tree / "profiles" / layer_id / "package.use"
+    out = set()
+    if path.is_file():
+        for raw in path.read_text(encoding="utf-8", errors="replace").splitlines():
+            fields = raw.split("#", 1)[0].split()
+            if fields:
+                out.add(re.sub(r"^[<>=~]+", "", fields[0]).split(":")[0])
+    return out
+
+
+def resolve(tree, work, mode, staged_file=None):
+    failures = CatalogCheck(tree, load_catalog(tree)).run()
+    if failures:
+        for line in failures:
+            print(line)
+        return GAP  # the static rules fail first: nothing is resolved over them
+    catalog = load_catalog(tree)
+    layer_ids = [l["id"] for l in catalog.get("layer", [])]
+    presets = {p["id"]: p for p in catalog.get("preset", [])}
+    if mode == "staged":
+        raw = Path(staged_file).read_bytes().split(b"\0")
+        paths = [p.decode("utf-8", "replace") for p in raw if p]
+        touched, compared = staged_touch(catalog, paths)
+        if not compared:
+            print("resolve: nothing compared: no staged path under profiles/, layers/ or metadata/layout.conf",
+                  file=sys.stderr)
+            return NOTHING
+        if not touched:
+            print("resolve: staged profile files touch no layer: static checks only, passed")
+            return CLEAN
+        preset_ids = [p for p in REF_PRESETS if p in presets]
+    else:
+        touched = set(layer_ids)
+        preset_ids = list(presets)
+    if not preset_ids or not layer_ids:
+        print("resolve: nothing compared: no preset or no layer in the catalog", file=sys.stderr)
+        return NOTHING
+
+    selections = []  # (preset, tuple of layers)
+    seen = set()
+    def add(pid, sel):
+        key = (pid, frozenset(sel))
+        if key not in seen:
+            seen.add(key)
+            selections.append((pid, tuple(sel)))
+    for pid in preset_ids:
+        for t in sorted(touched, key=layer_ids.index):
+            add(pid, [t])
+            for o in layer_ids:
+                if o != t:
+                    add(pid, [t, o])
+        big = largest(catalog, presets[pid])
+        if len(big) > 2 and set(big) & touched:
+            add(pid, big)
+
+    allowed, forbidden, failed = [], 0, 0
+    for pid, sel in selections:
+        expected = judge(catalog, presets[pid], sel)
+        status, lines = compose_lines(tree, pid, sel)
+        if status not in (CLEAN, GAP):
+            print(f"resolve: --compose broke on {pid} {' '.join(sel)} (status {status})", file=sys.stderr)
+            return NOTHING
+        if (status == CLEAN) != expected:
+            verdict = "accepts" if status == CLEAN else "rejects"
+            print(f"resolve: FAIL {pid} {' '.join(sel)}: --compose {verdict} a selection the catalog data "
+                  f"{'forbids' if status == CLEAN else 'allows'}")
+            failed += 1
+        elif expected:
+            allowed.append((pid, sel, lines))
+        else:
+            forbidden += 1
+
+    # One baseline (the preset alone) per preset, then every allowed selection.
+    from concurrent.futures import ThreadPoolExecutor
+    bases = {pid: make_croot(work, f"base-{n}", tree, [f"bentoo:{pid}"]) for n, pid in enumerate(preset_ids)}
+    jobs = [(make_croot(work, f"sel-{n}", tree, lines), pid, sel) for n, (pid, sel, lines) in enumerate(allowed)]
+
+    # R6.9: Portage must load the composed profile, nothing of the host's.
+    first = jobs[0][0] if jobs else next(iter(bases.values()))
+    seen_profile = isolated(first, sys.executable, "-I", "-c",
+                            "import portage; print(portage.settings.profile_path)")
+    want = str(first / "etc/portage/make.profile")
+    if seen_profile.returncode != 0 or os.path.realpath(seen_profile.stdout.strip()) != os.path.realpath(want):
+        print(f"resolve: Portage loaded {seen_profile.stdout.strip() or seen_profile.stderr.strip()[-200:]!r}, "
+              f"not the composed profile {want}", file=sys.stderr)
+        return NOTHING
+
+    def run(job):
+        croot, pid, sel = job
+        # By name only on desktop presets: there @world installs these
+        # (mesa); on a preset without a desktop nothing pulls them, and naming
+        # them would judge a package the selection never installs.
+        desktop = presets[pid]["desktop"] != "none"
+        extra = sorted({a for lid in sel for a in use_targets(tree, lid)}) if desktop else []
+        ok, excerpt = emerge_verdict(
+            isolated(croot, "emerge", "-pq", "--autounmask=n", "@system", "@profile", *extra)
+        )
+        fails = [] if not ok else content_checks(bases[pid], croot, pid, sel)
+        return job, ok, excerpt, fails
+
+    workers = max(1, min(8, os.cpu_count() or 1))
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        results = list(pool.map(run, jobs))
+    for (croot, pid, sel), ok, excerpt, fails in results:
+        if not ok:
+            failed += 1
+            print(f"resolve: FAIL {pid} {' '.join(sel)}")
+            print(excerpt)
+        for line in fails:
+            failed += 1
+            print(line)
+    print(f"resolve: resolved={len(jobs)} forbidden={forbidden} failed={failed}")
+    return GAP if failed else CLEAN
+
+
 def main(argv):
     # Resolved once, here: every later comparison (commonpath, realpath) needs
     # an absolute, physical root, whatever relative or symlinked path the
@@ -1097,6 +1481,8 @@ def main(argv):
         return static(tree)
     if sub == "compose":
         return compose(tree, argv[3], argv[4:])
+    if sub == "resolve":
+        return resolve(tree, argv[3], argv[4], argv[5] if len(argv) > 5 else None)
     print(f"internal error: unknown subcommand {sub!r}", file=sys.stderr)
     return NOTHING
 
@@ -1115,29 +1501,61 @@ if type(status) is not int or status not in (CLEAN, NOTHING, GAP):
     status = NOTHING
 sys.exit(status)
 PY
-	case $rc in
+)
+
+# py_status RC -- map the Python side's status: 0 -> 0, 3 -> $GAP, 2 -> 2, and
+# ANYTHING else -> 2 with a message: a crash never reads as a gap or a pass.
+py_status() {
+	case $1 in
 	0) return 0 ;;
 	3) return "$GAP" ;;
 	2) return 2 ;;
 	esac
-	printf '%s: internal error: the catalog reader exited %d\n' "$PROG" "$rc" >&2
+	printf '%s: internal error: the catalog reader exited %d\n' "$PROG" "$1" >&2
 	return 2
+}
+
+catalog_py() {
+	local rc=0
+	# -I: isolated mode -- no PYTHON* variables and no cwd on sys.path, so a
+	# stray tomllib.py next to wherever the hook runs cannot stand in for the
+	# standard library and make the check pass without checking anything.
+	python3 -I -c "$CATALOG_PROGRAM" "$TREE" "$@" || rc=$?
+	py_status "$rc"
+}
+
+# resolve_py MODE [ARG...] -- the resolution modes: the same program, run in
+# the background through run_child so INT/TERM also stop every emerge.
+resolve_py() {
+	local rc=0
+	run_child python3 -I -c "$CATALOG_PROGRAM" "$TREE" resolve "$WORK" "$@" || rc=$?
+	py_status "$rc"
 }
 
 ### modes ############################################################
 
 run_static() { catalog_py static; }
 
-# Placeholders: the behaviour arrives with later tasks. Each says so and exits
-# 2 ("nothing compared"), never 0, so an unfinished mode cannot pass a commit.
-not_yet() {
-	printf '%s: %s is not implemented yet (%s)\n' "$PROG" "$MODE" "$1" >&2
-	return 2
+run_compose() { catalog_py compose "$@"; }
+
+# run_staged -- the paths staged in TREE's index pick the layers to resolve.
+run_staged() {
+	local staged=$WORK/staged-paths
+	if ! git -C "$TREE" rev-parse --git-dir >/dev/null 2>&1; then
+		printf '%s: --staged: %s is not a git repository\n' "$PROG" "$TREE" >&2
+		return 2
+	fi
+	# A failing git must never read as an empty "nothing staged" list.
+	# --no-renames: a rename must report its OLD path too, or the layer that
+	# lost the file is never resolved.
+	if ! git -C "$TREE" diff --cached --no-renames --name-only -z >"$staged"; then
+		printf '%s: --staged: git diff --cached failed in %s\n' "$PROG" "$TREE" >&2
+		return 2
+	fi
+	resolve_py staged "$staged"
 }
 
-run_compose() { catalog_py compose "$@"; }
-run_staged() { not_yet 'task 5'; }
-run_full() { not_yet 'task 5'; }
+run_full() { resolve_py full; }
 
 # run_self_test -- the top-level *.bats of the suite next to this script, never
 # integration/ (it reads the real tree and Portage) and never -r. bats gets a

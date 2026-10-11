@@ -1,3 +1,14 @@
 # The catalog lists nvidia-persistenced as this layer's service; the driver
 # installs its init script and unit only with USE=persistenced (off by default).
 x11-drivers/nvidia-drivers persistenced
+# nvidia-drivers defaults to +X and then needs libglvnd[X], whose own default
+# is X off: on a preset that leaves X undecided (no desktop, no flavor) the two
+# defaults contradict each other. On a server this only adds libX11/libXext.
+media-libs/libglvnd X
+# The rest of that contradiction: +tools builds nvidia-settings (GTK), whose
+# stack a desktop preset configures and a bare one leaves on defaults that
+# disagree (pango needs freetype[harfbuzz], gtk+[X] needs cairo[X]). Computed
+# with emerge --autounmask-use on the bare preset, 2026-10-11; these entries
+# change nothing where the GTK stack is not pulled in (server, headless).
+media-libs/freetype harfbuzz
+x11-libs/cairo X
