@@ -1,0 +1,247 @@
+# profiles/catalog.toml -- what a bentoo system can be composed from.
+#
+# Schema 1. Two consumers read this file; Portage ignores it:
+#   * scripts/check-profile-matrix.sh  validates it (--static) and applies the
+#     composition rule (--compose) before every commit that touches profiles/;
+#   * `bentoo profile` (app-portage/bentoolkit) offers these presets and layers
+#     to users and writes /etc/portage/make.profile/parent from them.
+# Both must agree, so any incompatible change bumps `schema` -- the tool
+# refuses a schema it does not know rather than guessing.
+#
+# A composition is one [[preset]] (a ::gentoo profile plus features/branding)
+# followed by at most one layer per exclusive type and any number of the
+# others. A layer is selectable only when its `base` holds for the preset's
+# attributes, it conflicts with no other selected layer (declared on both
+# sides) and everything it `requires` is selected. The parent lines are
+# ordered by type rank, then by the order the layers are declared here, so
+# declaration order is precedence: a later layer overrides an earlier one.
+#
+# Ids are paths relative to profiles/, so an id is also the `bentoo:<id>` line
+# Portage reads. Preset entries mirror profiles/profiles.desc one to one,
+# status included. hardened, selinux and llvm constrain no v1 layer; they are
+# in schema 1 so adding a layer that needs them costs no schema bump.
+
+schema = 1
+
+[attributes]
+init     = ["openrc", "systemd"]
+multilib = [true, false]
+desktop  = ["none", "generic", "plasma", "gnome"]
+hardened = [true, false]
+selinux  = [true, false]
+llvm     = [true, false]
+
+# rank orders the parent lines; exclusive allows at most one layer of the type.
+[types.flavor]
+rank      = 1
+exclusive = true
+
+[types.mix-in]
+rank      = 2
+exclusive = false
+
+[types.hardware]
+rank      = 3
+exclusive = false
+
+# --- presets: one per amd64 line of profiles.desc --------------------------
+
+[[preset]]
+id       = "default/linux/amd64/23.0"
+status   = "stable"
+init     = "openrc"
+multilib = true
+desktop  = "none"
+hardened = false
+selinux  = false
+llvm     = false
+
+[[preset]]
+id       = "default/linux/amd64/23.0/systemd"
+status   = "stable"
+init     = "systemd"
+multilib = true
+desktop  = "none"
+hardened = false
+selinux  = false
+llvm     = false
+
+[[preset]]
+id       = "default/linux/amd64/23.0/desktop"
+status   = "stable"
+init     = "openrc"
+multilib = true
+desktop  = "generic"
+hardened = false
+selinux  = false
+llvm     = false
+
+[[preset]]
+id       = "default/linux/amd64/23.0/desktop/systemd"
+status   = "stable"
+init     = "systemd"
+multilib = true
+desktop  = "generic"
+hardened = false
+selinux  = false
+llvm     = false
+
+[[preset]]
+id       = "default/linux/amd64/23.0/desktop/gnome"
+status   = "stable"
+init     = "openrc"
+multilib = true
+desktop  = "gnome"
+hardened = false
+selinux  = false
+llvm     = false
+
+[[preset]]
+id       = "default/linux/amd64/23.0/desktop/gnome/systemd"
+status   = "stable"
+init     = "systemd"
+multilib = true
+desktop  = "gnome"
+hardened = false
+selinux  = false
+llvm     = false
+
+[[preset]]
+id       = "default/linux/amd64/23.0/desktop/plasma"
+status   = "stable"
+init     = "openrc"
+multilib = true
+desktop  = "plasma"
+hardened = false
+selinux  = false
+llvm     = false
+
+[[preset]]
+id       = "default/linux/amd64/23.0/desktop/plasma/systemd"
+status   = "stable"
+init     = "systemd"
+multilib = true
+desktop  = "plasma"
+hardened = false
+selinux  = false
+llvm     = false
+
+[[preset]]
+id       = "default/linux/amd64/23.0/no-multilib"
+status   = "stable"
+init     = "openrc"
+multilib = false
+desktop  = "none"
+hardened = false
+selinux  = false
+llvm     = false
+
+[[preset]]
+id       = "default/linux/amd64/23.0/no-multilib/systemd"
+status   = "stable"
+init     = "systemd"
+multilib = false
+desktop  = "none"
+hardened = false
+selinux  = false
+llvm     = false
+
+[[preset]]
+id       = "default/linux/amd64/23.0/no-multilib/hardened"
+status   = "stable"
+init     = "openrc"
+multilib = false
+desktop  = "none"
+hardened = true
+selinux  = false
+llvm     = false
+
+[[preset]]
+id       = "default/linux/amd64/23.0/no-multilib/hardened/systemd"
+status   = "stable"
+init     = "systemd"
+multilib = false
+desktop  = "none"
+hardened = true
+selinux  = false
+llvm     = false
+
+[[preset]]
+id       = "default/linux/amd64/23.0/no-multilib/hardened/selinux"
+status   = "stable"
+init     = "openrc"
+multilib = false
+desktop  = "none"
+hardened = true
+selinux  = true
+llvm     = false
+
+[[preset]]
+id       = "default/linux/amd64/23.0/no-multilib/hardened/selinux/systemd"
+status   = "stable"
+init     = "systemd"
+multilib = false
+desktop  = "none"
+hardened = true
+selinux  = true
+llvm     = false
+
+[[preset]]
+id       = "default/linux/amd64/23.0/hardened"
+status   = "stable"
+init     = "openrc"
+multilib = true
+desktop  = "none"
+hardened = true
+selinux  = false
+llvm     = false
+
+[[preset]]
+id       = "default/linux/amd64/23.0/hardened/systemd"
+status   = "stable"
+init     = "systemd"
+multilib = true
+desktop  = "none"
+hardened = true
+selinux  = false
+llvm     = false
+
+[[preset]]
+id       = "default/linux/amd64/23.0/hardened/selinux"
+status   = "stable"
+init     = "openrc"
+multilib = true
+desktop  = "none"
+hardened = true
+selinux  = true
+llvm     = false
+
+[[preset]]
+id       = "default/linux/amd64/23.0/hardened/selinux/systemd"
+status   = "stable"
+init     = "systemd"
+multilib = true
+desktop  = "none"
+hardened = true
+selinux  = true
+llvm     = false
+
+[[preset]]
+id       = "default/linux/amd64/23.0/llvm"
+status   = "exp"
+init     = "openrc"
+multilib = true
+desktop  = "none"
+hardened = false
+selinux  = false
+llvm     = true
+
+[[preset]]
+id       = "default/linux/amd64/23.0/llvm/systemd"
+status   = "exp"
+init     = "systemd"
+multilib = true
+desktop  = "none"
+hardened = false
+selinux  = false
+llvm     = true
