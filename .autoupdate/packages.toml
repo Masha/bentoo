@@ -13888,3 +13888,33 @@ dlopen()s at runtime (grep vendor/codeberg.org for '"lib*.so*"' strings) -
 neither fails the build when stale.
 """
 # END
+
+["sys-kernel/bentoo-kernel"]
+hold = true
+url = "https://api.github.com/repos/CachyOS/linux/releases?per_page=20"
+parser = "regex"
+pattern = '"tag_name":\s*"cachyos-(7\.2\.[0-9]+)-[0-9]+"'
+headers = { "User-Agent" = "bentoo-autoupdate" }
+aux_var = "CACHY_REL"
+aux_pattern = '"tag_name":\s*"cachyos-7\.2\.[0-9]+-([0-9]+)"'
+version = "7.2.9"
+comments = """
+bentoo-kernel — CachyOS's signed source releases (tags cachyos-<kernel>-<N>).
+The pattern pins the 7.2 series and skips -rc tags; the first match is the
+newest release, and CACHY_REL is its respin counter (a respin of the same
+kernel is a revbump, never a PV change: virtual/dist-kernel matches by PV).
+
+hold is on because a bump is never PV-only. Each one needs, by hand:
+  - CACHY_REL from aux_var, and the tarball's .asc still verifying;
+  - PATCHSET, CONFIG_VER and GENTOO_CONFIG_P copied from
+    sys-kernel/gentoo-kernel-${PV} in ::gentoo;
+  - BORE_COMMIT = last commit touching <series>/sched/0001-bore-cachy.patch
+    in CachyOS/kernel-patches;
+  - every INTEL_PATCHES entry re-checked: one that fails forward but applies
+    with -R is in the kernel now and leaves the list;
+  - virtual/dist-kernel-${PV} in this overlay, with bentoo-kernel added at
+    the SAME PVR as ::gentoo's (a revbump changes the subslot and rebuilds
+    every out-of-tree module for every user).
+A new series (7.3) also means editing this pattern.
+"""
+# END

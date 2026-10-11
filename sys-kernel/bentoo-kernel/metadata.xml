@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@protonmail.com</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<longdescription>
+		Distribution kernel built from CachyOS's patched kernel sources, with
+		Gentoo's dist-kernel patchset and configuration, the BORE scheduler
+		and Intel Xe fixes on top. Targets x86-64-v3 and builds with Clang
+		ThinLTO by default.
+	</longdescription>
+	<use>
+		<flag name="bore">
+			Apply the Burst-Oriented Response Enhancer on top of EEVDF: favours
+			tasks that run in short bursts (desktop, games, audio) over tasks
+			that hold the CPU for long stretches.
+		</flag>
+		<flag name="hardened">
+			Use selection of hardening options recommended by Kernel Self
+			Protection Project
+		</flag>
+		<flag name="lto">
+			Build with <pkg>llvm-core/clang</pkg> and link with ThinLTO
+			(CONFIG_LTO_CLANG_THIN). Out-of-tree modules are then built with
+			the same clang automatically.
+		</flag>
+		<flag name="sched-ext">
+			Enable sched_ext (CONFIG_SCHED_CLASS_EXT), so BPF schedulers such as
+			those in <pkg>sys-kernel/scx</pkg> can be loaded at runtime. Turns
+			BTF debug info back on.
+		</flag>
+	</use>
+	<upstream>
+		<remote-id type="github">CachyOS/linux</remote-id>
+	</upstream>
+</pkgmetadata>

@@ -1,0 +1,9 @@
+DEFINED_PHASES=install
+DESCRIPTION=OpenPGP keys used to sign CachyOS kernel source releases
+EAPI=8
+HOMEPAGE=https://github.com/CachyOS/linux
+KEYWORDS=~amd64
+LICENSE=public-domain
+SLOT=0
+SRC_URI=https://keys.openpgp.org/vks/v1/by-fingerprint/E8B9AA39F054E30E8290D492C3C4820857F654FE -> openpgp-keys-cachyos-20261011-ptr1337.asc https://keys.openpgp.org/vks/v1/by-fingerprint/E18447AC260021D31F3FF6C4C8A2A4774B8B63C4 -> openpgp-keys-cachyos-20261011-dnaim.asc
+_md5_=c414edfaeb955c17f1b34903a723c6aa
