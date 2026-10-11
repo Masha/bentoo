@@ -61,7 +61,9 @@ system mistaken for the audience's.
 
 ## Repository layout
 
-`metadata/layout.conf` sets `profile-formats = portage-2 profile-repo-deps`, and
+`metadata/layout.conf` sets `profile-formats = portage-2 profile-repo-deps
+profile-bashrcs profile-set profile-license` (each token's reason is commented
+there), and
 `profiles/eapi` is `5` (slot deps in profile files). This changes how atoms in
 `profiles/package.{mask,unmask}` must be written, in opposite directions:
 
@@ -78,6 +80,43 @@ system mistaken for the audience's.
 Both entries currently in the tree carry that reasoning in their comment. Read
 it before editing either file.
 
+### Composable profiles
+
+A system is **one preset plus optional layers**, all plain profiles of this
+overlay; nothing is generated and no ebuild is touched.
+
+- **Presets** — the 20 `profiles/default/linux/amd64/23.0/*` entries of
+  `profiles.desc` (each `gentoo:<same path>` + `:features/branding`). They carry
+  every Gentoo variant (multilib, hardened, selinux, llvm, init, desktop).
+- **Layers** — `profiles/targets/<flavor>` (workstation, server, headless,
+  container; at most one), `profiles/features/<mix-in>` (games) and
+  `profiles/features/hardware/<hw>` (nvidia, nvidia-legacy, amd, intel; any
+  number). A layer directory is one holding `eapi`; `features/branding` is the
+  exception, inherited by every preset.
+- **`profiles/catalog.toml`** — the contract (`schema = 1`) read by
+  `scripts/check-profile-matrix.sh` and by `bentoo profile`
+  (app-portage/bentoolkit): each preset's attributes, each layer's type, `base`
+  constraints, `conflicts`, `requires`, `has_files` and `services`. The `parent`
+  order is type rank, then declaration order. An incompatible change bumps
+  `schema`.
+- **`layers/<layer-id>/etc/**/<x>.d/<bentoo-...>`** — `/etc` drop-ins a layer
+  installs through `bentoo profile`; regular files only, no symlink, no execute
+  bit, a `bentoo-` name.
+
+Four Portage behaviours shaped the layers, all measured, all easy to undo by
+accident:
+
+- A wildcard (`sys-boot/*`) in a profile `package.mask` is **silently
+  ignored**: `targets/container` spells every atom out, so a new kernel,
+  bootloader or firmware package needs a line there.
+- `ACCEPT_LICENSE` in a profile's `make.defaults` **replaces** the inherited
+  value (it is not incremental): a layer accepts its licence through
+  `package.license` (`profile-license`), for its own packages only.
+- `VIDEO_CARDS` **is** incremental: hardware layers add to it and never reset
+  it with `-*`, or hybrid machines lose their other driver.
+- Bare atoms in a layer's `packages` join `@profile` only with `profile-set`;
+  `*atom` (branding) joins `@system`.
+
 ## Verification scripts
 
 Each one exits `1` on a gap and names what diverged. They exist because the
@@ -93,10 +132,20 @@ surfaces on a user's machine.
 | `check-edk2-dbx-freshness.sh` | `sys-firmware/edk2`'s `SBO_VER` still names the newest Secure Boot revocation list; exits `2`, not `1`, when the network is the problem |
 | `go-vendor.sh [--check] <cat/pkg>` | a Go package's `*-vendor.tar.xz` on distfiles.obentoo.org still matches its `go.mod`; without `--check` it regenerates the tarball into DISTDIR and prints the R2 upload (never uploads). Needs the network; run it after autoupdate bumps one of these |
 | `test-eselect-nodejs.sh` | slot ordering (`node9` vs `node10`) and directory replacement in the eselect module |
+| `check-profile-matrix.sh --static\|--staged\|--full\|--compose <preset> [layer…]\|--self-test` | `profiles/catalog.toml`, the layers and their `layers/` drop-ins agree (`--static`, seconds); every allowed layer combination resolves in an isolated root and every forbidden one is rejected (`--staged`: layers touched by the index, 5 reference presets; `--full`: all 20 presets, ~3 min); `--compose` prints the `parent` lines `bentoo profile` must also produce. Resolution needs `bwrap` and `emerge`, never root |
 
-`check-openrc-coverage.sh`, `gentoo-parity.sh` and
-`check-edk2-dbx-freshness.sh` also take `--self-test`, which
-runs their assertions without touching the tree.
+`check-openrc-coverage.sh`, `gentoo-parity.sh`,
+`check-edk2-dbx-freshness.sh` and `check-profile-matrix.sh` also take
+`--self-test`, which runs their assertions without touching the tree. The
+real-tree half of `check-profile-matrix.sh`'s suite is
+`bats scripts/tests/check-profile-matrix/integration/` (add
+`--filter-tags '!slow'` to skip the every-layer cases).
+
+`check-profile-matrix.sh --staged` runs from `.git/hooks/pre-commit`, but only
+when the commit stages a path under `profiles/`, `layers/` or
+`metadata/layout.conf`; every other commit pays nothing for it.
+Run `--full` by hand after a batch of layer edits, before you push them:
+the hook resolves 5 reference presets, `--full` all 20.
 
 `check-edk2-dbx-freshness.sh` and `go-vendor.sh` are the ones that need the
 network, which is why they are deliberately absent from `.git/hooks/pre-commit`:

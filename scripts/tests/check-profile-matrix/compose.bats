@@ -20,6 +20,15 @@
 # rank order with a rank (10) that sorts before 2 as text, and hardware layers
 # declared in non-alphabetical order (intel before amd).
 
+# Shared with `bentoo profile` (app-portage/bentoolkit): the Go tool must give
+# the same verdict as --compose on every case below, and the same --static
+# verdict on catalog-schema.bats and fragments.bats. Reuse, unchanged:
+#   scripts/tests/check-profile-matrix/compose.bats         composition rule, parent order
+#   scripts/tests/check-profile-matrix/catalog-schema.bats  catalog.toml schema 1
+#   scripts/tests/check-profile-matrix/fragments.bats       layers/ tree rules
+#   scripts/tests/check-profile-matrix/lib/fixture.bash     the fixture builders
+# A schema bump in profiles/catalog.toml invalidates them together.
+
 load lib/fixture
 
 setup() {
