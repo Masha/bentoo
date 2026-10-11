@@ -118,6 +118,46 @@ pkg_setup() {
 	fi
 }
 
+# Portage carries exported variables into every later phase, and the
+# post-merge ones run the system's own tools: dracut builds the UKI with
+# `${OBJDUMP:-objdump} -h`, parses GNU's column layout, and dies on
+# llvm-objdump's ("16#: invalid integer constant"). Give those phases the
+# default toolchain back.
+_bentoo-kernel_drop_llvm_env() {
+	unset CC CXX LD AR NM OBJCOPY OBJDUMP READELF STRIP
+}
+
+pkg_preinst() {
+	_bentoo-kernel_drop_llvm_env
+	kernel-install_pkg_preinst
+}
+
+pkg_postinst() {
+	_bentoo-kernel_drop_llvm_env
+	kernel-build_pkg_postinst
+
+	# Same PV as gentoo-kernel means virtual/dist-kernel's subslot does not
+	# move, so Portage rebuilds no out-of-tree module on its own.
+	elog "Out-of-tree modules (nvidia-drivers, virtualbox-modules, ...) are not"
+	elog "rebuilt automatically for this kernel. Point /usr/src/linux at it and"
+	elog "rebuild them:"
+	elog "  eselect kernel set linux-${PV}-bentoo-dist$(usev hardened -hardened)"
+	elog "  emerge --oneshot @module-rebuild"
+	elog "Those packages hold modules for ONE kernel at a time: the rebuild drops"
+	elog "them from the kernel /usr/src/linux pointed at before. Keep a binary"
+	elog "package of them (quickpkg) to switch back without compiling."
+}
+
+pkg_postrm() {
+	_bentoo-kernel_drop_llvm_env
+	kernel-install_pkg_postrm
+}
+
+pkg_config() {
+	_bentoo-kernel_drop_llvm_env
+	kernel-install_pkg_config
+}
+
 src_unpack() {
 	if use verify-sig; then
 		verify-sig_verify_detached \
