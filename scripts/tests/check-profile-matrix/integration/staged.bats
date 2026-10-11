@@ -272,11 +272,8 @@ for pid in sys.argv[2:]:
   [ "$checked" -ge 1 ] || skip "no reference preset's largest selection includes intel with >= 3 layers"
 }
 
-# R6.7 (forbidden judged from the catalog data, not from --compose) is NOT
-# testable from outside: proving the validator catches a --compose that
-# accepts a forbidden selection needs a broken --compose inside the one
-# self-contained script. Both halves of every rule are covered against
-# --compose in ../compose.bats; the cross-check itself rests on review.
+# R6.7 (forbidden judged from the catalog data, not from --compose) is covered
+# in ../failure-paths.bats, through the script's test-only --compose seam.
 
 # --- autounmask is not a pass (tech review of task 5) ---------------------------
 

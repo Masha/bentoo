@@ -40,7 +40,24 @@
 #                       `parent` lines, or name the broken rule.
 #   --self-test         the unit fixtures (top-level *.bats of
 #                       scripts/tests/check-profile-matrix/, never integration/)
-#                       on scratch trees: no checkout, no ::gentoo.
+#                       on scratch trees: no checkout, no ::gentoo. The
+#                       resolution failure paths (R6.6, R6.7, R6.9, R6.14) run
+#                       --full there over stub bwrap/emerge/portageq.
+#
+# --staged and --full judge every selection twice (R6.7): the verdict comes
+# from the catalog data (judge), and --compose must agree with it both ways -
+# accepting a forbidden selection or rejecting an allowed one is a gap (1).
+# Any other --compose outcome - a crash, a usage error, a rejection naming no
+# rule - is exit 2, never counted as "forbidden".
+#
+# TEST-ONLY SEAM. judge and --compose live in this one file and agree by
+# construction, so a disagreement cannot be built from catalog data. With
+# CHECK_PROFILE_MATRIX_SELF_TEST=1 (which --self-test exports), and only then,
+# CHECK_PROFILE_MATRIX_COMPOSE=<executable> replaces the composition step: it
+# runs once per selection as `<executable> <preset-id> <layer-id>...` with
+# BENTOO_TREE set, under the public --compose contract above. Without the
+# marker the variable is ignored. It is not an interface: never set either
+# variable outside the fixtures.
 #
 # The tree is ${BENTOO_TREE:-the git toplevel of the checkout holding this
 # script}; every tree read and every git call goes through it.
@@ -1207,6 +1224,62 @@ def compose_lines(tree, preset_id, selection):
     return status, buf.getvalue().splitlines()
 
 
+# The rules compose() names in a rejection: `compose: <rule>: ...`.
+COMPOSE_RULES = ("unknown-preset", "unknown-layer", "exclusive", "conflict", "requires", "base")
+RULE_LINE = re.compile(r"compose: ([a-z-]+): ")
+# TEST-ONLY seam (R6.7). judge() and compose() live in this one program and
+# agree by construction, so a --compose that disagrees with the catalog data
+# cannot be produced from a catalog. Under the self-test marker, and only
+# under it, SEAM_VAR names an executable run IN PLACE of compose(), once per
+# selection, as `<exe> <preset-id> <layer-id>...` with BENTOO_TREE set, and
+# judged by the public --compose contract. Without the marker it is ignored:
+# production always composes in process.
+SELF_TEST_VAR = "CHECK_PROFILE_MATRIX_SELF_TEST"
+SEAM_VAR = "CHECK_PROFILE_MATRIX_COMPOSE"
+
+
+def compose_seam():
+    """The seam executable, or None outside the self-test."""
+    if os.environ.get(SELF_TEST_VAR) != "1":
+        return None
+    return os.environ.get(SEAM_VAR) or None
+
+
+def compose_verdict(tree, preset_id, selection, seam):
+    """(accepted, parent lines, None), or (None, [], why) when --compose
+    broke. The public --compose contract: exit 0 with parent lines is an
+    acceptance, exit 1 with a `compose: <rule>: ...` line naming a known rule
+    is a rejection; anything else (a crash, a usage error, a rejection naming
+    no rule) breaks the run with exit 2 and is never counted as forbidden."""
+    if seam is None:
+        status, lines = compose_lines(tree, preset_id, selection)
+        rc = {CLEAN: 0, GAP: 1}.get(status, status)
+        tail = ""
+    else:
+        import subprocess
+        try:
+            proc = subprocess.run(
+                [seam, preset_id, *selection], stdin=subprocess.DEVNULL,
+                capture_output=True, text=True, env=dict(os.environ, BENTOO_TREE=str(tree)),
+            )
+        except OSError as err:
+            return None, [], f"cannot run {seam}: {err}"
+        rc, lines, tail = proc.returncode, proc.stdout.splitlines(), proc.stderr.strip()[-300:]
+    if rc == 0 and lines:
+        return True, lines, None
+    if rc == 1 and any(
+        (m := RULE_LINE.match(line)) and m.group(1) in COMPOSE_RULES for line in lines
+    ):
+        return False, lines, None
+    if rc == 0:
+        why = "exit 0 with no parent line"
+    elif rc == 1:
+        why = "exit 1 naming no rule"
+    else:
+        why = f"exit {rc}"
+    return None, [], f"{why}: {tail}" if tail else why
+
+
 def make_croot(work, name, tree, parent_lines):
     croot = Path(work) / name
     (croot / "etc/portage/repos.conf").mkdir(parents=True)
@@ -1427,17 +1500,20 @@ def resolve(tree, work, mode, staged_file=None):
         if len(big) > 2 and set(big) & touched:
             add(pid, big)
 
+    # R6.7: the verdict comes from the catalog data (judge), and --compose
+    # must agree with it in both directions.
+    seam = compose_seam()
     allowed, forbidden, failed = [], 0, 0
     for pid, sel in selections:
         expected = judge(catalog, presets[pid], sel)
-        status, lines = compose_lines(tree, pid, sel)
-        if status not in (CLEAN, GAP):
-            print(f"resolve: --compose broke on {pid} {' '.join(sel)} (status {status})", file=sys.stderr)
+        accepted, lines, broke = compose_verdict(tree, pid, sel, seam)
+        if broke is not None:
+            print(f"resolve: --compose broke on {pid} {' '.join(sel)}: {broke}", file=sys.stderr)
             return NOTHING
-        if (status == CLEAN) != expected:
-            verdict = "accepts" if status == CLEAN else "rejects"
+        if accepted != expected:
+            verdict = "accepts" if accepted else "rejects"
             print(f"resolve: FAIL {pid} {' '.join(sel)}: --compose {verdict} a selection the catalog data "
-                  f"{'forbids' if status == CLEAN else 'allows'}")
+                  f"{'forbids' if accepted else 'allows'}")
             failed += 1
         elif expected:
             allowed.append((pid, sel, lines))
@@ -1595,6 +1671,9 @@ run_self_test() {
 	}
 	export BENTOO_TREE=$WORK/tree
 	export CHECK_PROFILE_MATRIX=$SCRIPT_PATH
+	# The marker that arms the test-only R6.7 seam (see the header): only a
+	# self-test may replace the composition step.
+	export CHECK_PROFILE_MATRIX_SELF_TEST=1
 
 	if ! count=$(bats --count "${files[@]}"); then
 		printf '%s: bats could not count the tests in %s\n' "$PROG" "$SUITE_DIR" >&2
