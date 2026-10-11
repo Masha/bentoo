@@ -1,0 +1,4 @@
+# amdgpu needs its firmware blobs; VIDEO_CARDS is left alone (arch/amd64
+# already enables amdgpu and radeonsi). ROCm stays an opt-in USE flag.
+sys-kernel/linux-firmware
+media-libs/vulkan-loader

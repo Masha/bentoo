@@ -1,0 +1,3 @@
+# Pascal (GTX 10xx) and older are dropped by the 581+ branches: hold the
+# driver on 580.x, the last branch that still supports them.
+>=x11-drivers/nvidia-drivers-581

@@ -1,0 +1,2 @@
+# amdgpu firmware. Accepted for that package only, not system-wide.
+sys-kernel/linux-firmware linux-fw-redistributable

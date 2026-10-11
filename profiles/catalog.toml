@@ -245,3 +245,84 @@ desktop  = "none"
 hardened = false
 selinux  = false
 llvm     = true
+
+# --- flavors: what the machine is for. At most one. -------------------------
+# Declared in this order on purpose: check-profile-matrix.sh builds the
+# "largest allowed selection" from the first compatible flavor, and container
+# first would exclude every hardware layer from that check.
+
+[[layer]]
+id          = "targets/workstation"
+type        = "flavor"
+description = "Desktop for daily work: NetworkManager, printing, scanning, Flatpak"
+base        = { desktop = ["generic", "plasma", "gnome"] }
+services    = [
+  { openrc = "NetworkManager", systemd = "NetworkManager.service" },
+  { openrc = "cupsd", systemd = "cups.service" },
+]
+
+[[layer]]
+id          = "targets/server"
+type        = "flavor"
+description = "Network services, no graphical stack"
+base        = { desktop = ["none"] }
+has_files   = true
+services    = [{ openrc = "sshd", systemd = "sshd.service" }]
+
+[[layer]]
+id          = "targets/headless"
+type        = "flavor"
+description = "Appliance or edge box: no display, no documentation, no service added"
+base        = { desktop = ["none"] }
+
+[[layer]]
+id          = "targets/container"
+type        = "flavor"
+description = "Container image: no kernel, firmware or bootloader"
+base        = { desktop = ["none"] }
+conflicts   = [
+  "features/hardware/nvidia",
+  "features/hardware/nvidia-legacy",
+  "features/hardware/amd",
+  "features/hardware/intel",
+]
+
+# --- mix-ins: optional traits, any number. ----------------------------------
+
+[[layer]]
+id          = "features/games"
+type        = "mix-in"
+description = "Gaming: 32-bit graphics stack and gamemode"
+# gamemode needs elogind or systemd, which no desktop = none preset enables;
+# gaming without a display has no user either.
+base        = { multilib = [true], desktop = ["generic", "plasma", "gnome"] }
+
+# --- hardware: any number; a hybrid laptop selects two. ---------------------
+
+[[layer]]
+id          = "features/hardware/nvidia"
+type        = "hardware"
+description = "NVIDIA proprietary driver (current branch, Turing and newer)"
+conflicts   = ["features/hardware/nvidia-legacy", "targets/container"]
+has_files   = true
+services    = [{ openrc = "nvidia-persistenced", systemd = "nvidia-persistenced.service" }]
+
+[[layer]]
+id          = "features/hardware/nvidia-legacy"
+type        = "hardware"
+description = "NVIDIA proprietary driver held on the 580.x branch (Pascal)"
+conflicts   = ["features/hardware/nvidia", "targets/container"]
+has_files   = true
+services    = [{ openrc = "nvidia-persistenced", systemd = "nvidia-persistenced.service" }]
+
+[[layer]]
+id          = "features/hardware/amd"
+type        = "hardware"
+description = "AMD GPU: firmware and Vulkan; ROCm via USE"
+conflicts   = ["targets/container"]
+
+[[layer]]
+id          = "features/hardware/intel"
+type        = "hardware"
+description = "Intel GPU: firmware, VA-API media driver and Vulkan; oneAPI via USE"
+conflicts   = ["targets/container"]

@@ -1,0 +1,2 @@
+# Lets a game ask the system for CPU governor and scheduler tweaks while it runs.
+games-util/gamemode

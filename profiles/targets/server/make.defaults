@@ -1,0 +1,4 @@
+# targets/server -- network services, no graphical stack.
+# Turned off globally so packages whose IUSE defaults them on (+X, +wayland)
+# do not pull a display stack, audio or Bluetooth into a server.
+USE="-X -wayland -gtk -qt6 -pulseaudio -bluetooth -cups"

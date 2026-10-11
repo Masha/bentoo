@@ -1,0 +1,4 @@
+# targets/headless -- an appliance or edge box: no display, no services added.
+# Same graphical/audio trimming as targets/server, plus no installed
+# documentation; unlike server it adds no package and no service.
+USE="-X -wayland -gtk -qt6 -pulseaudio -bluetooth -cups -doc -man"

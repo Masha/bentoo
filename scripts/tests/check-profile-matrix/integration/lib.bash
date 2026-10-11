@@ -63,6 +63,39 @@ compose_croot() {
   printf '%s\n' "$parent" >"$cr/etc/portage/make.profile/parent"
 }
 
+# isolated_emerge CROOT ARGS... -- `emerge ARGS` under CROOT with this host's
+# installed packages and world file hidden (task 5.1): bwrap mounts a tmpfs
+# over /var/db (re-binding /var/db/repos read-only) and over /var/lib/portage.
+# Without it, PORTAGE_CONFIGROOT alone still reads the host's package database,
+# and a systemd host makes every openrc preset "fail" with slot conflicts that
+# have nothing to do with the profile. Portage's own user and group are mapped
+# to the caller's, because the portage group does not exist in the namespace.
+isolated_emerge() {
+  local cr=$1 dep
+  shift
+  command -v bwrap >/dev/null || skip "bwrap is not installed"
+  dep=$(mktemp -d -p "$BATS_TEST_TMPDIR")
+  bwrap --dev-bind / / --tmpfs /var/db --ro-bind /var/db/repos /var/db/repos \
+    --tmpfs /var/lib/portage \
+    --setenv PORTAGE_CONFIGROOT "$cr" --setenv PORTAGE_DEPCACHEDIR "$dep" \
+    --setenv PORTAGE_USERNAME "$(id -un)" --setenv PORTAGE_GRPNAME "$(id -gn)" \
+    emerge "$@"
+}
+
+# resolves_ok -- the last `run isolated_emerge -p ...` resolved: exit 0, or the
+# only error is a circular dependency. From an empty root, @system always hits
+# bootstrap cycles (xz-utils <-> elt-patches); they are about merge ORDER, found
+# after the graph is complete, and a real install starts from a stage3. Every
+# profile error (mask, slot conflict, unsatisfiable USE) prints `!!!` first.
+resolves_ok() {
+  [ "$status" -eq 0 ] && return 0
+  if [[ $output == *"circular dependencies"* && $output != *'!!!'* ]]; then
+    return 0
+  fi
+  _dump "the selection does not resolve"
+  return 1
+}
+
 # pq CROOT QUERY [ARG] -- ask Portage, under CROOT, one of:
 #   set NAME      cp of every atom in package set NAME, sorted
 #   var NAME      a global configuration variable (USE, VIDEO_CARDS, ...)

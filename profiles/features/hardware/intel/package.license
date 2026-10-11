@@ -1,0 +1,4 @@
+# i915/Xe firmware and the media driver's redistributable binary kernels.
+# Accepted for those packages only, not system-wide.
+sys-kernel/linux-firmware linux-fw-redistributable
+media-libs/libva-intel-media-driver no-source-code

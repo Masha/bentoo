@@ -1,0 +1,67 @@
+# targets/container -- the kernel, its firmware and the boot chain belong to
+# the host, never to a container image. Masked so nothing pulls them in, and
+# so asking for one fails loudly instead of building it.
+#
+# Every atom is spelled out: a wildcard (sys-boot/*, sys-kernel/*-kernel) in a
+# profile package.mask is silently ignored by Portage (measured 2026-10-11).
+# A NEW kernel, bootloader or firmware package is therefore not covered until
+# it is added here.
+#
+# sys-kernel/linux-headers is deliberately NOT masked: sys-libs/glibc needs it.
+# VM firmware (edk2, seabios, ipxe, ...) is NOT masked: running QEMU inside a
+# container is legitimate and those are plain data files.
+
+# kernels
+virtual/dist-kernel
+sys-kernel/bentoo-kernel
+sys-kernel/gentoo-kernel
+sys-kernel/gentoo-kernel-bin
+sys-kernel/vanilla-kernel
+sys-kernel/kata-guest-kernel
+sys-kernel/gentoo-sources
+sys-kernel/vanilla-sources
+sys-kernel/git-sources
+sys-kernel/pf-sources
+sys-kernel/rt-sources
+sys-kernel/zen-sources
+# hardware firmware and CPU microcode
+sys-kernel/linux-firmware
+sys-firmware/intel-microcode
+sys-firmware/sof-firmware
+sys-firmware/alsa-firmware
+sys-firmware/bluez-firmware
+sys-firmware/broadcom-bt-firmware
+sys-firmware/nvidia-firmware
+sys-firmware/atmel-firmware
+sys-firmware/b43-firmware
+sys-firmware/b43legacy-firmware
+sys-firmware/ipw2100-firmware
+sys-firmware/ipw2200-firmware
+sys-firmware/ivtv-firmware
+sys-firmware/midisport-firmware
+sys-firmware/tt-s2-6400-firmware
+sys-firmware/zd1201-firmware
+sys-firmware/zd1211-firmware
+# boot chain
+sys-boot/grub
+sys-boot/grub-themes-gentoo
+sys-boot/limine
+sys-boot/refind
+sys-boot/shim
+sys-boot/syslinux
+sys-boot/lilo
+sys-boot/elilo
+sys-boot/efibootmgr
+sys-boot/mokutil
+sys-boot/os-prober
+sys-boot/uefi-mkconfig
+sys-boot/plymouth
+sys-boot/plymouth-openrc-plugin
+sys-boot/mbr
+sys-boot/tboot
+# installing a kernel into the image (dracut stays: building an initramfs for
+# a VM from inside a container is a legitimate CI job)
+sys-kernel/installkernel
+sys-kernel/genkernel
+sys-kernel/ugrd
+sys-kernel/dkms

@@ -1,0 +1,8 @@
+# Bare atoms join @profile (profile-set in metadata/layout.conf): dropping the
+# flavor drops them from the set, and `emerge --depclean` can remove them.
+# Network configuration a desktop user can drive from the panel.
+net-misc/networkmanager
+# Printing; the desktop presets already build clients with USE=cups.
+net-print/cups
+# Applications outside the overlay, sandboxed, without root.
+sys-apps/flatpak

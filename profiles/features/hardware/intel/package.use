@@ -1,0 +1,3 @@
+# The Vulkan driver (RADV / ANV) and VA-API come from Mesa; a preset without a
+# desktop leaves both off, and the loader alone would drive nothing.
+media-libs/mesa vulkan vaapi

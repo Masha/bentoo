@@ -1,0 +1,5 @@
+# targets/workstation -- a desktop used for daily work.
+# Only what the ::gentoo desktop presets (targets/desktop) do not already turn
+# on: NetworkManager integration and scanner support. Printing (cups) is on in
+# targets/desktop already.
+USE="networkmanager scanner"

@@ -1,0 +1,6 @@
+# i915/Xe firmware and the VA-API driver for video decode on Intel GPUs.
+# VIDEO_CARDS is left alone (arch/amd64 already enables intel). oneAPI/SYCL
+# stays an opt-in USE flag.
+sys-kernel/linux-firmware
+media-libs/libva-intel-media-driver
+media-libs/vulkan-loader

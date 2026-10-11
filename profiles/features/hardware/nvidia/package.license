@@ -1,0 +1,4 @@
+# Selecting an NVIDIA layer is choosing NVIDIA's driver, whose licence is not
+# in @FREE. Accepted for that package only (profile-license in layout.conf);
+# ACCEPT_LICENSE in make.defaults would REPLACE @FREE system-wide instead.
+x11-drivers/nvidia-drivers NVIDIA-2025

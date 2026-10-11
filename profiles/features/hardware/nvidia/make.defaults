@@ -1,0 +1,4 @@
+# NVIDIA proprietary driver. VIDEO_CARDS is incremental: this ADDS nvidia to
+# the cards ::gentoo's arch/amd64 already enables, so hybrid machines
+# (Intel/AMD iGPU + NVIDIA) keep their other driver. Never reset it with -*.
+VIDEO_CARDS="nvidia"

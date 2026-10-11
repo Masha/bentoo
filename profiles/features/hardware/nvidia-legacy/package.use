@@ -1,0 +1,3 @@
+# The catalog lists nvidia-persistenced as this layer's service; the driver
+# installs its init script and unit only with USE=persistenced (off by default).
+x11-drivers/nvidia-drivers persistenced

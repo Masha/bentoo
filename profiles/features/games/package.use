@@ -1,0 +1,42 @@
+# features/games -- the 32-bit graphics stack that Steam, Wine and most
+# Windows games need. Requires a multilib desktop preset (catalog base).
+#
+# abi_x86_32 must cover the whole dependency closure of the two packages that
+# need it, not just them: emerge refuses mesa[abi_x86_32] over a 64-bit-only
+# libdrm. The list below is that closure, computed by asking Portage itself
+# (emerge --autounmask-use in an isolated root) on the plasma, gnome and
+# generic desktop presets, united, 2026-10-11. It drifts with ::gentoo: the
+# integration case "games: Mesa and the Vulkan loader resolve" fails when a new
+# member is missing, and printing the missing atoms is how to update it.
+media-libs/mesa abi_x86_32
+media-libs/vulkan-loader abi_x86_32
+app-arch/bzip2 abi_x86_32
+app-arch/xz-utils abi_x86_32
+app-arch/zstd abi_x86_32
+dev-libs/elfutils abi_x86_32
+dev-libs/expat abi_x86_32
+dev-libs/icu abi_x86_32
+dev-libs/libffi abi_x86_32
+dev-libs/libxml2 abi_x86_32
+dev-libs/wayland abi_x86_32
+dev-util/spirv-tools abi_x86_32
+dev-util/sysprof-capture abi_x86_32
+llvm-core/llvm abi_x86_32
+media-libs/libdisplay-info abi_x86_32
+media-libs/libglvnd abi_x86_32
+sys-libs/zlib abi_x86_32
+virtual/libelf abi_x86_32
+virtual/zlib abi_x86_32
+x11-libs/libdrm abi_x86_32
+x11-libs/libpciaccess abi_x86_32
+x11-libs/libX11 abi_x86_32
+x11-libs/libXau abi_x86_32
+x11-libs/libxcb abi_x86_32
+x11-libs/libXdmcp abi_x86_32
+x11-libs/libXext abi_x86_32
+x11-libs/libXfixes abi_x86_32
+x11-libs/libXrandr abi_x86_32
+x11-libs/libXrender abi_x86_32
+x11-libs/libxshmfence abi_x86_32
+x11-libs/libXxf86vm abi_x86_32
+x11-libs/xcb-util-keysyms abi_x86_32

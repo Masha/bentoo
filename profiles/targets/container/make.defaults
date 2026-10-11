@@ -1,0 +1,2 @@
+# targets/container -- an image that only ever runs inside a container runtime.
+USE="-X -wayland"
