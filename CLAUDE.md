@@ -13,15 +13,21 @@ Practical consequences, binding on every packaging decision:
 - **Never size a package by the maintainer's hardware.** That hardware is
   irrelevant to the decision to port, to the USE flags exposed, and to the
   defaults chosen.
-- **Cover third-party hardware by default:** NVIDIA (legacy generations
+- **Cover third-party hardware by default, within the platform baseline
+  below:** NVIDIA (every generation still found in that window, Pascal
   included), AMD (ROCm/Vulkan), Intel (SYCL/oneAPI), NPUs (XDNA2 and the like),
-  CPU-only, and ARM64 — not just x86_64 with a discrete GPU.
+  and CPU-only — not just a machine with a discrete GPU.
 - **Cover third-party use cases:** desktop, workstation, server, headless,
   container, edge.
 - Acceleration backends ship as **optional USE flags**, never hardcoded. Nobody
   should be forced to pull in CUDA to use a package on CPU.
-- `KEYWORDS` must include `~arm64` whenever upstream supports it; restricting to
-  `~amd64` is a decision that needs a justification, not a default.
+- **Platform baseline: `amd64` only, x86-64-v3 or newer (hardware from 2017
+  onward).** `KEYWORDS="~amd64"` — no other architecture, because none can be
+  tested here and a keyword is a promise that the package works there.
+  Excluding pre-v3 CPUs is distribution policy, not the maintainer's hardware,
+  so binaries may be built for v3 with no generic x86-64 variant. Exception:
+  `::gentoo` mirrors keep upstream's `KEYWORDS`, so they stay byte-close to the
+  ebuild they mirror.
 - "It is not useful to me" is **not** an exclusion criterion. "Upstream
   abandoned", "does not build", "no clear license" are.
 
