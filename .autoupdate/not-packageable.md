@@ -345,3 +345,54 @@ gh api repos/Euro-Office/DesktopEditors/contents/build --jq '.[].name'
 **Condition that reopens this:** a GitHub release with a Linux binary asset
 (tarball, `.deb`, `.rpm` or AppImage), which would make an `-bin` ebuild like
 `onlyoffice-bin` possible.
+
+---
+
+## `storytold/artcraft` — ArtCraft desktop app (Tauri)
+
+**Assessed:** 2026-10-12 · **Upstream version then:** `artcraft-v0.41.0`
+(2026-09-26, `MIT OR Apache-2.0`) · **Verdict:** rejected — upstream is
+dropping the Linux build of this app.
+
+ArtCraft is a client for hosted image/video/3D generation (its own service,
+Grok, Midjourney, Sora, World Labs); it does no local inference and needs an
+ArtCraft account. Releases ship only macOS and Windows artifacts. A source
+build is possible in principle — the AUR does it — but it is a Tauri app:
+1083 crates plus a React/Vite/Nx frontend with 1772 npm packages, which would
+need a self-hosted `node_modules` tarball (the `lemonade` pattern).
+
+The decision rests on upstream, not on cost. In issue #2035 (2026-10-10) a
+member of the organisation wrote: "Tauri has incredibly weak support on Linux.
+It's so bad that it's honestly not worth supporting. We'd be better off
+rewriting the entire thing in egui, which is what I intend to do." The Linux
+release build also crashes WebKit on Wayland (issue #2055, open).
+
+The rewrite already lives in the same repository as `artcraft-native` (pure
+egui, no webview). On `main` as of 2026-10-10 it builds here offline with
+`cargo build --locked -p artcraft_native` (56 s) and links only glibc and
+`libasound`, but it is `0.1.0`, has no tag or release of its own, and only
+Create Image/Video/Audio are implemented.
+
+**Condition that reopens this:** `artcraft-native` gets its own tag or release
+(package that, from source — crates.io only, no git deps); or upstream starts
+publishing Linux artifacts of the Tauri app.
+
+---
+
+## `storytold/craft-launcher` — ArtCraft Launcher
+
+**Assessed:** 2026-10-12 · **Upstream version then:** `v0.3.2`
+(`MIT OR Apache-2.0`) · **Verdict:** rejected — it is a second package
+manager.
+
+The launcher builds and ships Linux tarballs like the rest of the suite, but
+what it does is install and update the Craft apps itself: it picks the
+AppImage/`.deb`/`.rpm`/tarball for the host, installs it (`~/.local/bin`,
+`~/AppImages`), checks every app's GitHub releases and updates them.
+`crates/native/src/detect.rs` recognises AppImages, `~/.local/bin`, dpkg/rpm,
+pacman and Flatpak installs — not Portage — so on bentoo it would offer to
+install a second, self-updating copy of every app the overlay already ships
+(`media-gfx/photocraft-bin`, ...).
+
+**Condition that reopens this:** a mode (build feature or setting) that only
+lists and opens installed apps, with installing and updating turned off.

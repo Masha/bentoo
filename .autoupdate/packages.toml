@@ -13918,3 +13918,20 @@ hold is on because a bump is never PV-only. Each one needs, by hand:
 A new series (7.3) also means editing this pattern.
 """
 # END
+
+["media-gfx/photocraft-bin"]
+url = "https://api.github.com/repos/storytold/photocraft/releases/latest"
+parser = "json"
+path = "tag_name"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+type = "bin"
+version = "0.7.0"
+comments = """
+PhotoCraft (ArtCraft "Craft App Suite") — GitHub releases, tagged "vX.Y.Z".
+SRC_URI is the upstream linux-x86_64 tarball, so a bump is PV plus one DIST.
+
+Packaged as -bin on purpose: in 2026-10 the suite shipped a release almost
+daily, and a source build would mean regenerating ~730 CRATES by hand on every
+one. A source ebuild becomes worth it once the cadence slows (e.g. a 1.0 line).
+"""
+# END
