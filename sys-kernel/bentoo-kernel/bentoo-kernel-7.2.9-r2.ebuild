@@ -88,6 +88,17 @@ BDEPEND="
 	sched-ext? ( dev-util/pahole )
 	verify-sig? ( sec-keys/openpgp-keys-cachyos )
 "
+# Holds virtual/dist-kernel at this kernel's PV until a newer bentoo-kernel
+# exists. ::gentoo bumps the virtual as soon as gentoo-kernel moves, and
+# without this Portage satisfies the newer virtual by pulling gentoo-kernel
+# onto a bentoo-kernel machine. Once a newer bentoo-kernel is installed this
+# slot no longer pins anything, so old kernels can stay side by side.
+RDEPEND="
+	|| (
+		~virtual/dist-kernel-${PV}
+		>sys-kernel/bentoo-kernel-${PV}-r9999
+	)
+"
 PDEPEND="
 	>=virtual/dist-kernel-${PV}
 "

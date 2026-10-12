@@ -10,6 +10,11 @@ EAPI=8
 # A revbump here would change it and rebuild every out-of-tree module
 # (nvidia-drivers, virtualbox-modules, ...) for every bentoo user. This copy
 # wins over ::gentoo's by repository priority (bentoo 0, gentoo -1000).
+#
+# Never prune the version matching the newest sys-kernel/bentoo-kernel, even
+# when pkgcheck calls it RedundantVersion: bentoo-kernel pins the virtual to
+# its own PV until a newer bentoo-kernel exists, so a bentoo-kernel machine
+# resolves to exactly that version.
 
 DESCRIPTION="Virtual to depend on any Distribution Kernel"
 SLOT="0/${PVR}"
