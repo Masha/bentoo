@@ -164,7 +164,7 @@ index 41dd2ec..ed7a9c2 100644
      // Outranks the binding above while the agent waits on an answer to its
      // question, as the default keymaps' `question_pending` block does.
 diff --git a/crates/agent_ui/src/agent_ui.rs b/crates/agent_ui/src/agent_ui.rs
-index b09dac7..1e26842 100644
+index d4487e3..fff3f14 100644
 --- a/crates/agent_ui/src/agent_ui.rs
 +++ b/crates/agent_ui/src/agent_ui.rs
 @@ -330,6 +330,14 @@ actions!(
@@ -183,7 +183,7 @@ index b09dac7..1e26842 100644
          CycleNextInlineAssist,
          /// Cycles to the previous inline assist suggestion.
 diff --git a/crates/agent_ui/src/conversation_view.rs b/crates/agent_ui/src/conversation_view.rs
-index 3d529fd..c132e27 100644
+index 02ab5e8..3ecff72 100644
 --- a/crates/agent_ui/src/conversation_view.rs
 +++ b/crates/agent_ui/src/conversation_view.rs
 @@ -110,6 +110,7 @@ pub(crate) const DRAFT_PROMPT_PERSIST_DEBOUNCE: Duration = Duration::from_millis
@@ -2137,7 +2137,7 @@ index 0000000..949d577
 +    assert_eq!(composer_text(&view, cx), "my draft");
 +}
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
-index 50c7d42..427e1f7 100644
+index 87e6ebd..4f47960 100644
 --- a/crates/agent_ui/src/conversation_view/thread_view.rs
 +++ b/crates/agent_ui/src/conversation_view/thread_view.rs
 @@ -1,5 +1,6 @@

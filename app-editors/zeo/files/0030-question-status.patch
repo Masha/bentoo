@@ -53,7 +53,7 @@ conversation waiting, and answering it clears that.
 ---
 
 diff --git a/crates/agent_ui/src/conversation_view.rs b/crates/agent_ui/src/conversation_view.rs
-index 5a71c2d..18f3f9f 100644
+index 0e92c2f..4223a93 100644
 --- a/crates/agent_ui/src/conversation_view.rs
 +++ b/crates/agent_ui/src/conversation_view.rs
 @@ -308,6 +308,22 @@ impl Conversation {

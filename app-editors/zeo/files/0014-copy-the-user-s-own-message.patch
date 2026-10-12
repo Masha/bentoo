@@ -60,7 +60,7 @@ is checked in a running Zed, not here.
 ---
 
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
-index 43887db..f3ce55d 100644
+index 8abfee5..d641560 100644
 --- a/crates/agent_ui/src/conversation_view/thread_view.rs
 +++ b/crates/agent_ui/src/conversation_view/thread_view.rs
 @@ -5384,7 +5384,7 @@ impl ThreadView {

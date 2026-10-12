@@ -96,7 +96,7 @@ index c799611..8ba09db 100644
              Task::ready(Ok(()))
          }
 diff --git a/crates/agent/src/agent.rs b/crates/agent/src/agent.rs
-index 42026ed..05a631b 100644
+index b0042fb..b1d5ca8 100644
 --- a/crates/agent/src/agent.rs
 +++ b/crates/agent/src/agent.rs
 @@ -2598,7 +2598,12 @@ impl acp_thread::AgentModelSelector for NativeAgentModelSelector {
@@ -189,7 +189,7 @@ index 42026ed..05a631b 100644
  fn model_id_to_selection(model_id: &AgentModelId, cx: &App) -> LanguageModelSelection {
      let id = model_id.as_ref();
      let (provider, model) = id.split_once('/').unwrap_or(("", id));
-@@ -4421,6 +4444,21 @@ mod internal_tests {
+@@ -4423,6 +4446,21 @@ mod internal_tests {
          });
      }
  
@@ -211,7 +211,7 @@ index 42026ed..05a631b 100644
      #[gpui::test]
      async fn test_compact_prompt_routes_to_manual_compaction(cx: &mut TestAppContext) {
          let fake = init_test(cx);
-@@ -6814,6 +6852,86 @@ mod internal_tests {
+@@ -6816,6 +6854,86 @@ mod internal_tests {
          );
      }
  
@@ -298,7 +298,7 @@ index 42026ed..05a631b 100644
      #[gpui::test]
      async fn test_model_selection_persists_to_settings(cx: &mut TestAppContext) {
          init_test(cx);
-@@ -6861,7 +6979,7 @@ mod internal_tests {
+@@ -6863,7 +6981,7 @@ mod internal_tests {
          // Select a model
          let selector = connection.model_selector(&session_id).unwrap();
          let model_id = AgentModelId::new("fake/fake");
@@ -307,7 +307,7 @@ index 42026ed..05a631b 100644
              .await
              .unwrap();
  
-@@ -6906,9 +7024,11 @@ mod internal_tests {
+@@ -6908,9 +7026,11 @@ mod internal_tests {
          agent.update(cx, |agent, cx| agent.models.refresh_list(cx));
  
          let selector = connection.model_selector(&session_id).unwrap();
@@ -322,7 +322,7 @@ index 42026ed..05a631b 100644
          cx.run_until_parked();
  
          // Verify enable_thinking was written to settings as true.
-@@ -6975,9 +7095,11 @@ mod internal_tests {
+@@ -6977,9 +7097,11 @@ mod internal_tests {
  
          // Select the thinking model via select_model.
          let selector = connection.model_selector(&session_id).unwrap();
@@ -337,7 +337,7 @@ index 42026ed..05a631b 100644
  
          // select_model should have enabled thinking based on the model's supports_thinking().
          agent.read_with(cx, |agent, _| {
-@@ -6992,7 +7114,7 @@ mod internal_tests {
+@@ -6994,7 +7116,7 @@ mod internal_tests {
  
          // Switch back to the non-thinking model.
          let selector = connection.model_selector(&session_id).unwrap();
@@ -346,7 +346,7 @@ index 42026ed..05a631b 100644
              .await
              .unwrap();
  
-@@ -7104,9 +7226,11 @@ mod internal_tests {
+@@ -7106,9 +7228,11 @@ mod internal_tests {
          let session_id = acp_thread.read_with(cx, |thread, _| thread.session_id().clone());
  
          let selector = connection.model_selector(&session_id).unwrap();
@@ -361,7 +361,7 @@ index 42026ed..05a631b 100644
  
          // Verify thinking is enabled after selecting the thinking model.
          let thread = agent.read_with(cx, |agent, _| {
-@@ -7199,9 +7323,11 @@ mod internal_tests {
+@@ -7201,9 +7325,11 @@ mod internal_tests {
          let session_id = acp_thread.read_with(cx, |thread, _| thread.session_id().clone());
  
          let selector = connection.model_selector(&session_id).unwrap();
@@ -376,7 +376,7 @@ index 42026ed..05a631b 100644
  
          let thread = agent.read_with(cx, |agent, _| {
              agent.sessions.get(&session_id).unwrap().thread.clone()
-@@ -7301,9 +7427,11 @@ mod internal_tests {
+@@ -7303,9 +7429,11 @@ mod internal_tests {
          let session_id = acp_thread.read_with(cx, |thread, _| thread.session_id().clone());
  
          let selector = connection.model_selector(&session_id).unwrap();
@@ -391,7 +391,7 @@ index 42026ed..05a631b 100644
  
          let send = acp_thread.update(cx, |thread, cx| thread.send(vec!["Hello".into()], cx));
          let send = cx.foreground_executor().spawn(send);
-@@ -7422,9 +7550,11 @@ mod internal_tests {
+@@ -7424,9 +7552,11 @@ mod internal_tests {
          cx.run_until_parked();
  
          let selector = connection.model_selector(&session_id).unwrap();
@@ -407,7 +407,7 @@ index 42026ed..05a631b 100644
          thread.read_with(cx, |thread, _| {
              assert_eq!(thread.model().unwrap().id().0.as_ref(), "other-model-id");
 diff --git a/crates/agent_ui/src/agent_ui.rs b/crates/agent_ui/src/agent_ui.rs
-index e0cc65b..30cb1e0 100644
+index ab42feb..2d6ff76 100644
 --- a/crates/agent_ui/src/agent_ui.rs
 +++ b/crates/agent_ui/src/agent_ui.rs
 @@ -24,6 +24,7 @@ mod mode_selector;
@@ -686,7 +686,7 @@ index fe98bdf..320ceb9 100644
  
      // ---- R4.1/R4.2: manual-mode badge next to the Mode-category select trigger ----
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
-index 3dc035b..10b9cbe 100644
+index dd6a2d5..1e830a7 100644
 --- a/crates/agent_ui/src/conversation_view/thread_view.rs
 +++ b/crates/agent_ui/src/conversation_view/thread_view.rs
 @@ -24,6 +24,7 @@ use sandbox::{SandboxFsPolicy, SandboxNetPolicy, SandboxPolicy};

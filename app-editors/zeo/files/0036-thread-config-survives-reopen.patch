@@ -71,7 +71,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 ---
 
 diff --git a/Cargo.lock b/Cargo.lock
-index 2d7a5aa..a9e18c2 100644
+index 39b99bf..5781b00 100644
 --- a/Cargo.lock
 +++ b/Cargo.lock
 @@ -381,6 +381,7 @@ dependencies = [

@@ -84,7 +84,7 @@ its own unit, integration and Playwright suites in zeo-devtools.
 ---
 
 diff --git a/Cargo.lock b/Cargo.lock
-index 21f1957..c986a62 100644
+index b7888d4..cf32804 100644
 --- a/Cargo.lock
 +++ b/Cargo.lock
 @@ -5008,6 +5008,32 @@ dependencies = [
@@ -120,7 +120,7 @@ index 21f1957..c986a62 100644
  [[package]]
  name = "diagnostics"
  version = "0.1.0"
-@@ -22475,6 +22501,7 @@ dependencies = [
+@@ -22474,6 +22500,7 @@ dependencies = [
   "debugger_tools",
   "debugger_ui",
   "dev_container",
@@ -164,7 +164,7 @@ index 882a211..d76f265 100644
 +  },
  }
 diff --git a/crates/acp_thread/src/acp_thread.rs b/crates/acp_thread/src/acp_thread.rs
-index 0bc2cbc..bf36919 100644
+index e79121e..f2a232a 100644
 --- a/crates/acp_thread/src/acp_thread.rs
 +++ b/crates/acp_thread/src/acp_thread.rs
 @@ -7,6 +7,8 @@ pub mod content;
@@ -177,7 +177,7 @@ index 0bc2cbc..bf36919 100644
  pub mod prompt_capabilities;
  mod submission;
 diff --git a/crates/acp_thread/src/mention.rs b/crates/acp_thread/src/mention.rs
-index 3fdd66a..3841073 100644
+index b4304a6..8c02576 100644
 --- a/crates/acp_thread/src/mention.rs
 +++ b/crates/acp_thread/src/mention.rs
 @@ -74,6 +74,16 @@ pub enum MentionUri {
@@ -557,10 +557,10 @@ index 9b38311..3cd25c3 100644
  
                      language_model::MessageContent::Text(uri.as_link().to_string())
 diff --git a/crates/agent_ui/src/agent_panel.rs b/crates/agent_ui/src/agent_panel.rs
-index 762e993..773e8a8 100644
+index 2a93f7c..df01160 100644
 --- a/crates/agent_ui/src/agent_panel.rs
 +++ b/crates/agent_ui/src/agent_panel.rs
-@@ -2185,6 +2185,34 @@ impl AgentPanel {
+@@ -2186,6 +2186,34 @@ impl AgentPanel {
          );
      }
  
@@ -595,7 +595,7 @@ index 762e993..773e8a8 100644
      fn set_selected_agent_and_persist(&mut self, agent: Agent, cx: &mut Context<Self>) {
          if self.selected_agent != agent {
              self.selected_agent = agent.clone();
-@@ -7245,6 +7273,19 @@ impl AgentPanel {
+@@ -7246,6 +7274,19 @@ impl AgentPanel {
          self.set_base_view(thread.into(), true, window, cx);
      }
  
@@ -638,7 +638,7 @@ index 5fa6989..1fa5eb3 100644
          Either::Left((output, _)) => Some(output),
          Either::Right(((), _)) => None,
 diff --git a/crates/agent_ui/src/agent_ui.rs b/crates/agent_ui/src/agent_ui.rs
-index c2ca3b1..1b7bf7c 100644
+index 97a285c..e8cb416 100644
 --- a/crates/agent_ui/src/agent_ui.rs
 +++ b/crates/agent_ui/src/agent_ui.rs
 @@ -11,6 +11,7 @@ mod config_options;
@@ -685,7 +685,7 @@ index c2ca3b1..1b7bf7c 100644
  mod tests {
      use super::*;
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
-index 3a65bbf..a7984ce 100644
+index af0bf7a..8b069b2 100644
 --- a/crates/agent_ui/src/conversation_view/thread_view.rs
 +++ b/crates/agent_ui/src/conversation_view/thread_view.rs
 @@ -14427,6 +14427,20 @@ pub(crate) fn open_link(

@@ -51,7 +51,7 @@ turn's time is added to the session once even if stop_turn runs twice.
 ---
 
 diff --git a/crates/agent_ui/src/conversation_view.rs b/crates/agent_ui/src/conversation_view.rs
-index 18f3f9f..a37867b 100644
+index 4223a93..abecfc7 100644
 --- a/crates/agent_ui/src/conversation_view.rs
 +++ b/crates/agent_ui/src/conversation_view.rs
 @@ -104,13 +104,13 @@ use crate::{
@@ -373,7 +373,7 @@ index 0000000..dc93cc2
 +    }
 +}
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
-index d85c787..60de5b7 100644
+index 6af9cf8..6f4c671 100644
 --- a/crates/agent_ui/src/conversation_view/thread_view.rs
 +++ b/crates/agent_ui/src/conversation_view/thread_view.rs
 @@ -677,6 +677,9 @@ pub struct TurnFields {

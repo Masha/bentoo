@@ -41,7 +41,7 @@ window and values above 1 are read as percentages.
 ---
 
 diff --git a/crates/acp_thread/src/acp_thread.rs b/crates/acp_thread/src/acp_thread.rs
-index c1ed81b..1690245 100644
+index 4acdf63..d2d0380 100644
 --- a/crates/acp_thread/src/acp_thread.rs
 +++ b/crates/acp_thread/src/acp_thread.rs
 @@ -43,7 +43,7 @@ use serde::{Deserialize, Serialize};
@@ -53,7 +53,7 @@ index c1ed81b..1690245 100644
  use std::error::Error;
  use std::fmt::{Formatter, Write};
  use std::ops::Range;
-@@ -3342,6 +3342,206 @@ pub struct SessionCost {
+@@ -3336,6 +3336,206 @@ pub struct SessionCost {
      pub currency: SharedString,
  }
  
@@ -260,7 +260,7 @@ index c1ed81b..1690245 100644
  pub const TOKEN_USAGE_WARNING_THRESHOLD: f32 = 0.8;
  
  impl TokenUsage {
-@@ -3438,6 +3638,7 @@ pub struct AcpThread {
+@@ -3432,6 +3632,7 @@ pub struct AcpThread {
      submissions: SessionSubmissions,
      activity: SessionActivity,
      token_usage: Option<TokenUsage>,
@@ -268,7 +268,7 @@ index c1ed81b..1690245 100644
      cost: Option<SessionCost>,
      prompt_capabilities: acp_v2::PromptCapabilities,
      available_commands: Vec<acp_v2::AvailableCommand>,
-@@ -3564,6 +3765,7 @@ pub enum AcpThreadEvent {
+@@ -3558,6 +3759,7 @@ pub enum AcpThreadEvent {
      TitleUpdated,
      NoticesUpdated,
      TokenUsageUpdated,
@@ -276,7 +276,7 @@ index c1ed81b..1690245 100644
      EntryUpdated(usize),
      EntriesRemoved(Range<usize>),
      ToolAuthorizationRequested(PermissionRequestId),
-@@ -3714,6 +3916,7 @@ impl AcpThread {
+@@ -3708,6 +3910,7 @@ impl AcpThread {
                  | AcpThreadEvent::TitleUpdated
                  | AcpThreadEvent::NoticesUpdated
                  | AcpThreadEvent::TokenUsageUpdated
@@ -284,7 +284,7 @@ index c1ed81b..1690245 100644
                  | AcpThreadEvent::EntryUpdated(_)
                  | AcpThreadEvent::Retry(_)
                  | AcpThreadEvent::SubagentSpawned(_)
-@@ -3773,6 +3976,7 @@ impl AcpThread {
+@@ -3767,6 +3970,7 @@ impl AcpThread {
              activity: SessionActivity::default(),
              connection,
              token_usage: None,
@@ -292,7 +292,7 @@ index c1ed81b..1690245 100644
              cost: None,
              prompt_capabilities,
              available_commands: Vec::new(),
-@@ -4246,6 +4450,15 @@ impl AcpThread {
+@@ -4240,6 +4444,15 @@ impl AcpThread {
          Ok(())
      }
  
@@ -308,7 +308,7 @@ index c1ed81b..1690245 100644
      pub fn cost(&self) -> Option<&SessionCost> {
          self.cost.as_ref()
      }
-@@ -4428,7 +4641,18 @@ impl AcpThread {
+@@ -4422,7 +4635,18 @@ impl AcpThread {
                          currency: cost.currency.into(),
                      });
                  }
@@ -327,7 +327,7 @@ index c1ed81b..1690245 100644
              }
              _ => {}
          }
-@@ -7635,6 +7859,198 @@ fn update_markdown_in_place(markdown: &Entity<Markdown>, text: &str, cx: &mut Ap
+@@ -7629,6 +7853,198 @@ fn update_markdown_in_place(markdown: &Entity<Markdown>, text: &str, cx: &mut Ap
  
  #[cfg(test)]
  mod tests {
@@ -539,7 +539,7 @@ index 48f6487..f943a3c 100644
              | AcpThreadEvent::SubagentSpawned(_)
              | AcpThreadEvent::EntriesRemoved(_)
 diff --git a/crates/agent_ui/src/conversation_view.rs b/crates/agent_ui/src/conversation_view.rs
-index 4da4ba7..5b5c4c8 100644
+index e741218..f6e151a 100644
 --- a/crates/agent_ui/src/conversation_view.rs
 +++ b/crates/agent_ui/src/conversation_view.rs
 @@ -347,6 +347,7 @@ impl Conversation {
@@ -573,7 +573,7 @@ index 4da4ba7..5b5c4c8 100644
                  if let Some(thread_view) = self.thread_view(&session_id) {
                      let available_skills = thread
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
-index 10b9cbe..43887db 100644
+index 1e830a7..8abfee5 100644
 --- a/crates/agent_ui/src/conversation_view/thread_view.rs
 +++ b/crates/agent_ui/src/conversation_view/thread_view.rs
 @@ -8,7 +8,7 @@ use agent_client_protocol::schema::v2 as acp_v2;
