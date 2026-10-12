@@ -369,6 +369,10 @@ BDEPEND="
 # NOTE: sys-apps/hwloc is depended upon by dev-cpp/toomanycooks, but needs to
 #       cause SLOT rebuilds here, as dev-cpp/toomanycooks is header-only
 
+# BENTOO-DIVERGENCE: PATCHES - ::gentoo's 7.1.2-r1 applies CVE-2026-107181.patch
+# (upstream commit db3405699f8f); this one does not need it. The fix shipped
+# in 7.2.9 and the commit is an ancestor of the v7.3.0 tag (GitHub compare
+# db3405699f8f...v7.3.0: behind_by 0, checked 2026-10-12).
 PATCHES=(
 	"${FILESDIR}"/tdesktop-5.7.2-cstring.patch
 	"${FILESDIR}"/tdesktop-5.8.3-cstdint.patch

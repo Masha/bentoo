@@ -15,17 +15,14 @@ SRC_URI="
 
 LICENSE="Apache-2.0"
 SLOT="0"
-# BENTOO-DIVERGENCE: KEYWORDS - ~arm64, which ::gentoo lacks. The client is
-# plain C over SDL3/FFmpeg/libusb and the server is an arch-independent dex
-# blob that runs on the device, so nothing ties the package to x86.
-KEYWORDS="~amd64 ~arm64 ~ppc64 ~x86"
-# BENTOO-DIVERGENCE: IUSE - upstream 5.0, not in ::gentoo yet. 5.0 added
+KEYWORDS="~amd64 ~ppc64 ~x86"
+# BENTOO-DIVERGENCE: IUSE - ::gentoo's 5.0.1 exposes none of these. 5.0 added
 # VA-API hardware decoding (meson -Dvaapi); usb and v4l2 were always meson
 # options that ::gentoo builds unconditionally. All three default on, which
 # matches upstream's own defaults.
 IUSE="X +usb +v4l +vaapi wayland"
 
-# BENTOO-DIVERGENCE: DEPEND - upstream 5.0, not in ::gentoo yet. 5.0 requires
+# BENTOO-DIVERGENCE: DEPEND - absent from ::gentoo's 5.0.1. 5.0 requires
 # libavformat >= 60.3 (FFmpeg 6), and its VA-API interop maps frames through
 # FFmpeg's DRM hwcontext, which needs the libdrm headers at build time and an
 # FFmpeg built with drm and vaapi.
@@ -39,7 +36,7 @@ DEPEND="
 	)
 "
 # Manual install for ppc64 until bug #723528 is fixed
-# BENTOO-DIVERGENCE: RDEPEND - upstream 5.0, not in ::gentoo yet; inherits
+# BENTOO-DIVERGENCE: RDEPEND - absent from ::gentoo's 5.0.1; inherits
 # the DEPEND changes above.
 RDEPEND="
 	${DEPEND}
