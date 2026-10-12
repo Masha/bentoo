@@ -92,9 +92,12 @@ LICENSE+="
 	|| ( Apache-2.0 CC0-1.0 MIT-0 )
 "
 SLOT="0"
-# -alpha: alpha support was dropped upstream:
-# https://github.com/rui314/mold/commit/3711ddb95e23c12991f6b8c7bfeba4f1421d19d4
-KEYWORDS="-alpha ~amd64 ~arm ~arm64 ~loong ~ppc ~riscv ~sparc ~x86"
+# BENTOO-DIVERGENCE: KEYWORDS - ~amd64 only. This is not a ::gentoo mirror (the
+# Rust rewrite has no ::gentoo counterpart), so the overlay's amd64-only
+# baseline applies; the list was inherited from ::gentoo's C++ 2.42.x and left
+# BDEPEND on >=rust-1.95 unsolvable on the arm profiles that mask Rust. Other
+# arches keep ::gentoo's 2.42.x.
+KEYWORDS="~amd64"
 IUSE="mimalloc test"
 RESTRICT="!test? ( test )"
 
