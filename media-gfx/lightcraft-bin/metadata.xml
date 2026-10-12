@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@proton.me</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<longdescription>
+		LightCraft is a photo library and raw developer: organise photos and
+		develop raw files non-destructively. This is the upstream prebuilt
+		x86_64 release; it renders through Vulkan, or OpenGL/EGL where Vulkan
+		is missing.
+	</longdescription>
+	<upstream>
+		<bugs-to>https://github.com/storytold/lightcraft/issues</bugs-to>
+		<remote-id type="github">storytold/lightcraft</remote-id>
+	</upstream>
+</pkgmetadata>

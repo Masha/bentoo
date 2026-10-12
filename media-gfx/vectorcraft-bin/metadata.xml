@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@proton.me</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<longdescription>
+		VectorCraft is a vector illustration app. Draw with pen, shape and
+		brush tools, style art with fills, strokes, gradients and live
+		effects, lay out artboards and type, and open and save SVG and PDF.
+		This is the upstream prebuilt x86_64 release; it renders through
+		Vulkan, or OpenGL/EGL where Vulkan is missing.
+	</longdescription>
+	<upstream>
+		<bugs-to>https://github.com/storytold/vectorcraft/issues</bugs-to>
+		<remote-id type="github">storytold/vectorcraft</remote-id>
+	</upstream>
+</pkgmetadata>

@@ -6,11 +6,11 @@
 		<name>Lucas C.S.</name>
 	</maintainer>
 	<longdescription>
-		PhotoCraft is a layered raster image editor written in pure Rust with an
-		egui interface, part of the ArtCraft "Craft App Suite". It opens and saves
-		PSD/PSB, OpenRaster and the common raster formats, and ships a headless
-		photocraft-cli for batch work. This is the upstream prebuilt x86_64
-		release; it renders through Vulkan, or OpenGL/EGL where Vulkan is missing.
+		PhotoCraft is a layered raster image editor. It opens and saves
+		PSD/PSB, OpenRaster and the common raster formats, and ships a
+		headless photocraft-cli for batch work. This is the upstream prebuilt
+		x86_64 release; it renders through Vulkan, or OpenGL/EGL where Vulkan
+		is missing.
 	</longdescription>
 	<upstream>
 		<bugs-to>https://github.com/storytold/photocraft/issues</bugs-to>

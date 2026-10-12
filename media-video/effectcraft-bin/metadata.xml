@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@proton.me</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<longdescription>
+		EffectCraft is a motion graphics and visual effects compositor: layers
+		with keyframes and a graph editor, masks and shapes, text animators,
+		expressions, 3D cameras and lights, and a render queue, with GPU
+		compositing. This is the upstream prebuilt x86_64 release; it renders
+		through Vulkan, or OpenGL/EGL where Vulkan is missing.
+	</longdescription>
+	<upstream>
+		<bugs-to>https://github.com/storytold/effectcraft/issues</bugs-to>
+		<remote-id type="github">storytold/effectcraft</remote-id>
+	</upstream>
+</pkgmetadata>

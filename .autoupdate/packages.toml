@@ -13928,10 +13928,188 @@ type = "bin"
 version = "0.7.0"
 comments = """
 PhotoCraft (ArtCraft "Craft App Suite") — GitHub releases, tagged "vX.Y.Z".
-SRC_URI is the upstream linux-x86_64 tarball, so a bump is PV plus one DIST.
+SRC_URI is the upstream linux-x86_64 tarball, so a bump is PV plus one DIST --
+but LICENSE carries a crate-license survey pinned to the version (see the
+ebuild comment), and that has to be redone by hand on every bump.
 
 Packaged as -bin on purpose: in 2026-10 the suite shipped a release almost
 daily, and a source build would mean regenerating ~730 CRATES by hand on every
 one. A source ebuild becomes worth it once the cadence slows (e.g. a 1.0 line).
+"""
+# END
+
+["app-text/pdfcraft-bin"]
+url = "https://api.github.com/repos/storytold/pdfcraft/releases/latest"
+parser = "json"
+path = "tag_name"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+type = "bin"
+version = "0.6.0"
+comments = """
+PdfCraft (ArtCraft "Craft App Suite") — GitHub releases, tagged "vX.Y.Z"; same
+shape as media-gfx/photocraft-bin, whose record explains the -bin choice.
+
+A bump is PV plus one DIST, but LICENSE carries a crate-license survey pinned to
+the version (see the ebuild comment): redo it on every bump.
+"""
+# END
+
+["media-video/filmcraft-bin"]
+url = "https://api.github.com/repos/storytold/filmcraft/releases/latest"
+parser = "json"
+path = "tag_name"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+type = "bin"
+version = "0.6.0"
+comments = """
+FilmCraft (ArtCraft "Craft App Suite") — GitHub releases, tagged "vX.Y.Z"; same
+shape as media-gfx/photocraft-bin, whose record explains the -bin choice.
+
+A bump is PV plus one DIST, but LICENSE carries a crate-license survey pinned to
+the version (see the ebuild comment): redo it on every bump.
+"""
+# END
+
+["media-gfx/vectorcraft-bin"]
+url = "https://api.github.com/repos/storytold/vectorcraft/releases/latest"
+parser = "json"
+path = "tag_name"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+type = "bin"
+version = "0.9.0"
+comments = """
+VectorCraft (ArtCraft "Craft App Suite") — GitHub releases, tagged "vX.Y.Z"; same
+shape as media-gfx/photocraft-bin, whose record explains the -bin choice.
+
+A bump is PV plus one DIST, but LICENSE carries a crate-license survey pinned to
+the version (see the ebuild comment): redo it on every bump.
+"""
+# END
+
+["media-gfx/lightcraft-bin"]
+url = "https://api.github.com/repos/storytold/lightcraft/releases/latest"
+parser = "json"
+path = "tag_name"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+type = "bin"
+version = "0.6.0"
+comments = """
+LightCraft (ArtCraft "Craft App Suite") — GitHub releases, tagged "vX.Y.Z"; same
+shape as media-gfx/photocraft-bin, whose record explains the -bin choice.
+
+A bump is PV plus one DIST, but LICENSE carries a crate-license survey pinned to
+the version (see the ebuild comment): redo it on every bump.
+"""
+# END
+
+["app-office/designcraft-bin"]
+url = "https://api.github.com/repos/storytold/designcraft/releases/latest"
+parser = "json"
+path = "tag_name"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+type = "bin"
+version = "0.6.0"
+comments = """
+DesignCraft (ArtCraft "Craft App Suite") — GitHub releases, tagged "vX.Y.Z"; same
+shape as media-gfx/photocraft-bin, whose record explains the -bin choice.
+
+A bump is PV plus one DIST, but LICENSE carries a crate-license survey pinned to
+the version (see the ebuild comment): redo it on every bump.
+"""
+# END
+
+["media-video/effectcraft-bin"]
+url = "https://api.github.com/repos/storytold/effectcraft/releases/latest"
+parser = "json"
+path = "tag_name"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+type = "bin"
+version = "0.8.0"
+comments = """
+EffectCraft (ArtCraft "Craft App Suite") — GitHub releases, tagged "vX.Y.Z"; same
+shape as media-gfx/photocraft-bin, whose record explains the -bin choice.
+
+A bump is PV plus one DIST, but LICENSE carries a crate-license survey pinned to
+the version (see the ebuild comment): redo it on every bump.
+"""
+# END
+
+["app-office/gridcraft-bin"]
+url = "https://api.github.com/repos/storytold/gridcraft/releases/latest"
+parser = "json"
+path = "tag_name"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+type = "bin"
+version = "0.5.0"
+comments = """
+GridCraft (ArtCraft "Craft App Suite") — GitHub releases, tagged "vX.Y.Z"; same
+shape as media-gfx/photocraft-bin, whose record explains the -bin choice.
+
+A bump is PV plus one DIST, but LICENSE carries a crate-license survey pinned to
+the version (see the ebuild comment): redo it on every bump.
+"""
+# END
+
+["media-gfx/cadcraft-bin"]
+url = "https://api.github.com/repos/storytold/cadcraft/releases/latest"
+parser = "json"
+path = "tag_name"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+type = "bin"
+version = "0.5.0"
+comments = """
+CADCraft (ArtCraft "Craft App Suite") — GitHub releases, tagged "vX.Y.Z"; same
+shape as media-gfx/photocraft-bin, whose record explains the -bin choice.
+
+A bump is PV plus one DIST, but LICENSE carries a crate-license survey pinned to
+the version (see the ebuild comment): redo it on every bump.
+"""
+# END
+
+["app-office/deckcraft-bin"]
+url = "https://api.github.com/repos/storytold/deckcraft/releases/latest"
+parser = "json"
+path = "tag_name"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+type = "bin"
+version = "0.5.0"
+comments = """
+DeckCraft (ArtCraft "Craft App Suite") — GitHub releases, tagged "vX.Y.Z"; same
+shape as media-gfx/photocraft-bin, whose record explains the -bin choice.
+
+A bump is PV plus one DIST, but LICENSE carries a crate-license survey pinned to
+the version (see the ebuild comment): redo it on every bump.
+"""
+# END
+
+["media-sound/soundcraft-bin"]
+url = "https://api.github.com/repos/storytold/soundcraft/releases/latest"
+parser = "json"
+path = "tag_name"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+type = "bin"
+version = "0.5.0"
+comments = """
+SoundCraft (ArtCraft "Craft App Suite") — GitHub releases, tagged "vX.Y.Z"; same
+shape as media-gfx/photocraft-bin, whose record explains the -bin choice.
+
+A bump is PV plus one DIST, but LICENSE carries a crate-license survey pinned to
+the version (see the ebuild comment): redo it on every bump.
+"""
+# END
+
+["app-office/wordcraft-bin"]
+url = "https://api.github.com/repos/storytold/wordcraft/releases/latest"
+parser = "json"
+path = "tag_name"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+type = "bin"
+version = "0.5.0"
+comments = """
+WordCraft (ArtCraft "Craft App Suite") — GitHub releases, tagged "vX.Y.Z"; same
+shape as media-gfx/photocraft-bin, whose record explains the -bin choice.
+
+A bump is PV plus one DIST, but LICENSE carries a crate-license survey pinned to
+the version (see the ebuild comment): redo it on every bump.
 """
 # END

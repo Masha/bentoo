@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@proton.me</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<longdescription>
+		DesignCraft is a page layout application for magazines, books and
+		print documents. This is the upstream prebuilt x86_64 release; it
+		renders through Vulkan, or OpenGL/EGL where Vulkan is missing.
+	</longdescription>
+	<upstream>
+		<bugs-to>https://github.com/storytold/designcraft/issues</bugs-to>
+		<remote-id type="github">storytold/designcraft</remote-id>
+	</upstream>
+</pkgmetadata>

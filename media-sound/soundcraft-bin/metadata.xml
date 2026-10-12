@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@proton.me</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<longdescription>
+		SoundCraft is a native digital audio workstation. Record, edit and mix
+		multitrack audio and MIDI in Edit and Mix windows. This is the
+		upstream prebuilt x86_64 release; it renders through Vulkan, or
+		OpenGL/EGL where Vulkan is missing.
+	</longdescription>
+	<upstream>
+		<bugs-to>https://github.com/storytold/soundcraft/issues</bugs-to>
+		<remote-id type="github">storytold/soundcraft</remote-id>
+	</upstream>
+</pkgmetadata>

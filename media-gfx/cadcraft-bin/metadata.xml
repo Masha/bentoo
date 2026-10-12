@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@proton.me</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<longdescription>
+		CADCraft is a computer-aided design and drafting application with a
+		command line, object snaps, layers, dimensions, hatches and blocks. It
+		opens and saves DXF and DWG drawings and exports SVG and PNG. This is
+		the upstream prebuilt x86_64 release; it renders through Vulkan, or
+		OpenGL/EGL where Vulkan is missing.
+	</longdescription>
+	<upstream>
+		<bugs-to>https://github.com/storytold/cadcraft/issues</bugs-to>
+		<remote-id type="github">storytold/cadcraft</remote-id>
+	</upstream>
+</pkgmetadata>

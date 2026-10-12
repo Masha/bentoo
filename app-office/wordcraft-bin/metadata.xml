@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@proton.me</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<longdescription>
+		WordCraft is a word processor with styles, tables, track changes,
+		references and mail merge. It opens and saves .docx, PDF, ODT, RTF,
+		HTML and Markdown files. This is the upstream prebuilt x86_64 release;
+		it renders through Vulkan, or OpenGL/EGL where Vulkan is missing.
+	</longdescription>
+	<upstream>
+		<bugs-to>https://github.com/storytold/wordcraft/issues</bugs-to>
+		<remote-id type="github">storytold/wordcraft</remote-id>
+	</upstream>
+</pkgmetadata>
