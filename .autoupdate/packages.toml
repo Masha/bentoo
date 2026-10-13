@@ -14116,3 +14116,33 @@ A bump is PV plus one DIST, but LICENSE carries a crate-license survey pinned to
 the version (see the ebuild comment): redo it on every bump.
 """
 # END
+
+["media-libs/freetype"]
+url = "https://download.savannah.gnu.org/releases/freetype/"
+parser = "regex"
+pattern = 'freetype-([0-9]+\.[0-9]+\.[0-9]+)\.tar\.xz"'
+select = "max"
+version = "2.15.0"
+comments = """
+FreeType — mirror of the ::gentoo ebuild, carried ahead of ::gentoo (2.14.3 when
+added, 2026-10-13). The savannah directory listing is alphabetical, hence
+select = "max". Not the gitlab.freedesktop.org tags API: that host sits behind
+an intermittent Anubis anti-bot wall. Remove the package (enabled = false) once
+::gentoo ships the same version.
+"""
+# END
+
+["app-office/onlyoffice-bin"]
+url = "https://api.github.com/repos/ONLYOFFICE/DesktopEditors/releases/latest"
+parser = "json"
+path = "tag_name"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+type = "bin"
+version = "10.0.0"
+comments = """
+ONLYOFFICE Desktop Editors — mirror of the ::gentoo ebuild, carried ahead of
+::gentoo (9.4.0 when added, 2026-10-13). GitHub releases, tagged "vX.Y.Z"; the
+.deb asset name is not versioned, so SRC_URI renames it with ->. Remove the
+package (enabled = false) once ::gentoo ships the same version.
+"""
+# END
