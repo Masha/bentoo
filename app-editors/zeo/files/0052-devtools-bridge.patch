@@ -84,7 +84,7 @@ its own unit, integration and Playwright suites in zeo-devtools.
 ---
 
 diff --git a/Cargo.lock b/Cargo.lock
-index b7888d4..cf32804 100644
+index fffe176..6214fce 100644
 --- a/Cargo.lock
 +++ b/Cargo.lock
 @@ -5008,6 +5008,32 @@ dependencies = [
@@ -120,7 +120,7 @@ index b7888d4..cf32804 100644
  [[package]]
  name = "diagnostics"
  version = "0.1.0"
-@@ -22474,6 +22500,7 @@ dependencies = [
+@@ -22476,6 +22502,7 @@ dependencies = [
   "debugger_tools",
   "debugger_ui",
   "dev_container",
@@ -149,10 +149,10 @@ index 5d1d0bb..8f4a491 100644
  edit_prediction = { path = "crates/edit_prediction" }
  edit_prediction_context = { path = "crates/edit_prediction_context" }
 diff --git a/assets/settings/default.json b/assets/settings/default.json
-index 882a211..d76f265 100644
+index c03170a..9d0b00e 100644
 --- a/assets/settings/default.json
 +++ b/assets/settings/default.json
-@@ -3068,4 +3068,10 @@
+@@ -3075,4 +3075,10 @@
        "enabled": false,
      },
    },
@@ -164,7 +164,7 @@ index 882a211..d76f265 100644
 +  },
  }
 diff --git a/crates/acp_thread/src/acp_thread.rs b/crates/acp_thread/src/acp_thread.rs
-index af465f1..d00936c 100644
+index 1f0a667..0c7a410 100644
 --- a/crates/acp_thread/src/acp_thread.rs
 +++ b/crates/acp_thread/src/acp_thread.rs
 @@ -7,6 +7,8 @@ pub mod content;
@@ -685,10 +685,10 @@ index 97a285c..e8cb416 100644
  mod tests {
      use super::*;
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
-index a3e6dcd..ce72410 100644
+index c4f84c4..3ed2d24 100644
 --- a/crates/agent_ui/src/conversation_view/thread_view.rs
 +++ b/crates/agent_ui/src/conversation_view/thread_view.rs
-@@ -14443,6 +14443,20 @@ pub(crate) fn open_link(
+@@ -14445,6 +14445,20 @@ pub(crate) fn open_link(
                  );
              }
              MentionUri::Selection { abs_path: None, .. } => {}
@@ -8036,10 +8036,10 @@ index 0000000..9661076
 +    );
 +}
 diff --git a/crates/settings/src/vscode_import.rs b/crates/settings/src/vscode_import.rs
-index 53e31bd..bec14b4 100644
+index 95876b8..388898c 100644
 --- a/crates/settings/src/vscode_import.rs
 +++ b/crates/settings/src/vscode_import.rs
-@@ -245,6 +245,7 @@ impl VsCodeSettings {
+@@ -246,6 +246,7 @@ impl VsCodeSettings {
              modeline_lines: None,
              feature_flags: None,
              instrumentation: None,
@@ -8048,10 +8048,10 @@ index 53e31bd..bec14b4 100644
      }
  
 diff --git a/crates/settings_content/src/settings_content.rs b/crates/settings_content/src/settings_content.rs
-index 88083da..6cd8ded 100644
+index c97679d..7975d2b 100644
 --- a/crates/settings_content/src/settings_content.rs
 +++ b/crates/settings_content/src/settings_content.rs
-@@ -334,6 +334,23 @@ pub struct SettingsContent {
+@@ -335,6 +335,23 @@ pub struct SettingsContent {
      /// Settings for developer-oriented instrumentation tools (profilers,
      /// tracers, etc.) that can be toggled at runtime.
      pub instrumentation: Option<InstrumentationSettingsContent>,
@@ -8075,7 +8075,7 @@ index 88083da..6cd8ded 100644
  }
  
  /// Configuration for developer-oriented instrumentation tools that collect
-@@ -411,7 +428,7 @@ fallible_options::flattened_deserialize!(SettingsContent {
+@@ -412,7 +429,7 @@ fallible_options::flattened_deserialize!(SettingsContent {
          journal, log, line_indicator_format, language_models, copilot, outline_panel, project_panel,
          node, proxy, reduce_motion, server_url, credentials_url, session, telemetry, terminal,
          title_bar, vim_mode, calls, which_key, vim, modeline_lines, feature_flags,

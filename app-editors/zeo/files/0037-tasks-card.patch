@@ -120,7 +120,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 ---
 
 diff --git a/assets/settings/default.json b/assets/settings/default.json
-index 173a801..882a211 100644
+index 6353d56..c03170a 100644
 --- a/assets/settings/default.json
 +++ b/assets/settings/default.json
 @@ -1425,6 +1425,15 @@
@@ -862,10 +862,10 @@ index 0da7203..7eb947e 100644
              max_idle_retained_threads: 5,
              threads_sidebar: agent_settings::ThreadsSidebarSettings {
 diff --git a/crates/agent_ui/src/conversation_view.rs b/crates/agent_ui/src/conversation_view.rs
-index 0c3519c..c096530 100644
+index dbf152f..8cdaebd 100644
 --- a/crates/agent_ui/src/conversation_view.rs
 +++ b/crates/agent_ui/src/conversation_view.rs
-@@ -1877,21 +1877,30 @@ impl ConversationView {
+@@ -1872,21 +1872,30 @@ impl ConversationView {
              }
              AcpThreadEvent::NewEntry => {
                  let len = thread.read(cx).entries().len();
@@ -905,7 +905,7 @@ index 0c3519c..c096530 100644
                          active.sync_editor_mode(cx);
                          active.sync_generating_indicator(cx);
                      });
-@@ -12959,6 +12968,47 @@ pub(crate) mod tests {
+@@ -13122,6 +13131,47 @@ pub(crate) mod tests {
          }
      }
  
@@ -954,10 +954,10 @@ index 0c3519c..c096530 100644
          unsupported: agent_client_protocol::schema::v2::ContentBlock,
          cx: &mut TestAppContext,
 diff --git a/crates/agent_ui/src/entry_view_state.rs b/crates/agent_ui/src/entry_view_state.rs
-index 92158c9..3cd98fc 100644
+index 28c3cc2..839fcb5 100644
 --- a/crates/agent_ui/src/entry_view_state.rs
 +++ b/crates/agent_ui/src/entry_view_state.rs
-@@ -229,6 +229,11 @@ impl EntryViewState {
+@@ -233,6 +233,11 @@ impl EntryViewState {
          self.entries.get(index)
      }
  
@@ -5153,7 +5153,7 @@ index 0000000..218492b
 +    cx.run_until_parked();
 +}
 diff --git a/crates/settings_content/src/agent.rs b/crates/settings_content/src/agent.rs
-index 502f321..8993e8b 100644
+index 3b0c77c..47940a8 100644
 --- a/crates/settings_content/src/agent.rs
 +++ b/crates/settings_content/src/agent.rs
 @@ -124,6 +124,49 @@ pub enum ElicitationPlacement {
@@ -5206,7 +5206,7 @@ index 502f321..8993e8b 100644
  /// Threshold at which agent auto-compaction runs. See
  /// [`AutoCompactSettingsContent::threshold`] for the accepted formats.
  ///
-@@ -419,6 +462,9 @@ pub struct AgentSettingsContent {
+@@ -421,6 +464,9 @@ pub struct AgentSettingsContent {
      ///
      /// Default: card
      pub elicitation_placement: Option<ElicitationPlacement>,

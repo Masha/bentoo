@@ -72,7 +72,7 @@ touch that file.)
 ---
 
 diff --git a/Cargo.lock b/Cargo.lock
-index 1d8165b..e149938 100644
+index 5eb0602..33b095c 100644
 --- a/Cargo.lock
 +++ b/Cargo.lock
 @@ -462,11 +462,13 @@ dependencies = [
