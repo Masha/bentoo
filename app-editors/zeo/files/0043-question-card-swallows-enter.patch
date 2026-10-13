@@ -185,10 +185,10 @@ index ca8cdbe..d4487e3 100644
              filter.show_action_types(skill_creator_actions.iter());
          } else {
 diff --git a/crates/agent_ui/src/conversation_view.rs b/crates/agent_ui/src/conversation_view.rs
-index fd5d252..02ab5e8 100644
+index 59a1e3b..70210d6 100644
 --- a/crates/agent_ui/src/conversation_view.rs
 +++ b/crates/agent_ui/src/conversation_view.rs
-@@ -5946,9 +5946,6 @@ pub(crate) mod tests {
+@@ -6106,9 +6106,6 @@ pub(crate) mod tests {
      #[gpui::test]
      async fn test_preloaded_question_counts_as_pending(cx: &mut TestAppContext) {
          init_test(cx);
@@ -198,7 +198,7 @@ index fd5d252..02ab5e8 100644
  
          // The question is asked before the conversation registers the thread, so it never
          // sees `ElicitationRequested` -- the case `register_thread` seeds for.
-@@ -5978,6 +5975,333 @@ pub(crate) mod tests {
+@@ -6138,6 +6135,333 @@ pub(crate) mod tests {
          });
      }
  
@@ -532,7 +532,7 @@ index fd5d252..02ab5e8 100644
      #[gpui::test]
      async fn test_resume_without_history_adds_notice(cx: &mut TestAppContext) {
          init_test(cx);
-@@ -12892,6 +13216,27 @@ pub(crate) mod tests {
+@@ -13052,6 +13376,27 @@ pub(crate) mod tests {
          }
      }
  
@@ -580,10 +580,10 @@ index 225e741..28598b3 100644
          let required = schema.required.as_deref().unwrap_or_default();
          let mut fields = HashMap::default();
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
-index 6f4c671..87e6ebd 100644
+index c3bba94..0253ee0 100644
 --- a/crates/agent_ui/src/conversation_view/thread_view.rs
 +++ b/crates/agent_ui/src/conversation_view/thread_view.rs
-@@ -3100,6 +3100,17 @@ impl ThreadView {
+@@ -3113,6 +3113,17 @@ impl ThreadView {
          self.elicitation_form_states.contains_key(id)
      }
  
@@ -601,7 +601,7 @@ index 6f4c671..87e6ebd 100644
      fn submit_elicitation(
          &mut self,
          elicitation_id: ElicitationEntryId,
-@@ -8058,6 +8069,19 @@ impl ThreadView {
+@@ -8074,6 +8085,19 @@ impl ThreadView {
          self.message_editor.read(cx).set_local_commands(commands);
      }
  
@@ -621,13 +621,13 @@ index 6f4c671..87e6ebd 100644
      /// Whether this elicitation is drawn by the pinned card above the message
      /// editor rather than inline, in the conversation.
      ///
-@@ -13549,6 +13573,7 @@ impl Render for ThreadView {
+@@ -13565,6 +13589,7 @@ impl Render for ThreadView {
          // current availability of feedback/sharing, which can change between
          // renders (settings, connection state, feature flags).
          self.sync_local_commands(cx);
 +        self.sync_question_pending(cx);
  
-         let has_messages = self.list_state.item_count() > 0;
+         let has_messages = self.has_visible_conversation(cx);
          let list_state = self.list_state.clone();
 diff --git a/crates/agent_ui/src/message_editor.rs b/crates/agent_ui/src/message_editor.rs
 index 459ae88..186d746 100644

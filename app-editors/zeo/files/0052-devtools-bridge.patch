@@ -164,7 +164,7 @@ index 882a211..d76f265 100644
 +  },
  }
 diff --git a/crates/acp_thread/src/acp_thread.rs b/crates/acp_thread/src/acp_thread.rs
-index e79121e..f2a232a 100644
+index af465f1..d00936c 100644
 --- a/crates/acp_thread/src/acp_thread.rs
 +++ b/crates/acp_thread/src/acp_thread.rs
 @@ -7,6 +7,8 @@ pub mod content;
@@ -528,10 +528,10 @@ index 0000000..68fb3f2
 +    assert_eq!(restored.name(), uri.name(), "the same chip label");
 +}
 diff --git a/crates/agent/src/thread.rs b/crates/agent/src/thread.rs
-index 9b38311..3cd25c3 100644
+index 777933d..e5754ae 100644
 --- a/crates/agent/src/thread.rs
 +++ b/crates/agent/src/thread.rs
-@@ -485,6 +485,24 @@ impl UserMessage {
+@@ -484,6 +484,24 @@ impl UserMessage {
                              let label = format!("{} ({})", name, source);
                              write!(&mut skills_context, "\nSkill: {}\n{}\n", label, content).ok();
                          }
@@ -685,10 +685,10 @@ index 97a285c..e8cb416 100644
  mod tests {
      use super::*;
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
-index af0bf7a..8b069b2 100644
+index a3e6dcd..ce72410 100644
 --- a/crates/agent_ui/src/conversation_view/thread_view.rs
 +++ b/crates/agent_ui/src/conversation_view/thread_view.rs
-@@ -14427,6 +14427,20 @@ pub(crate) fn open_link(
+@@ -14443,6 +14443,20 @@ pub(crate) fn open_link(
                  );
              }
              MentionUri::Selection { abs_path: None, .. } => {}

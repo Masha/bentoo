@@ -862,10 +862,10 @@ index 0da7203..7eb947e 100644
              max_idle_retained_threads: 5,
              threads_sidebar: agent_settings::ThreadsSidebarSettings {
 diff --git a/crates/agent_ui/src/conversation_view.rs b/crates/agent_ui/src/conversation_view.rs
-index 7a346cf..6d26208 100644
+index 0c3519c..c096530 100644
 --- a/crates/agent_ui/src/conversation_view.rs
 +++ b/crates/agent_ui/src/conversation_view.rs
-@@ -1871,21 +1871,30 @@ impl ConversationView {
+@@ -1877,21 +1877,30 @@ impl ConversationView {
              }
              AcpThreadEvent::NewEntry => {
                  let len = thread.read(cx).entries().len();
@@ -905,7 +905,7 @@ index 7a346cf..6d26208 100644
                          active.sync_editor_mode(cx);
                          active.sync_generating_indicator(cx);
                      });
-@@ -12799,6 +12808,47 @@ pub(crate) mod tests {
+@@ -12959,6 +12968,47 @@ pub(crate) mod tests {
          }
      }
  
