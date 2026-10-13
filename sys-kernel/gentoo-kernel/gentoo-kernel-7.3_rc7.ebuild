@@ -8,7 +8,7 @@ KERNEL_IUSE_GENERIC_UKI=1
 inherit kernel-build toolchain-funcs
 
 # A release candidate of the NEXT series, ahead of ::gentoo, which never ships
-# -rc dist-kernels.  It is package.mask'ed: 7.3_rc6 sorts above 7.2.x, so without
+# -rc dist-kernels.  It is package.mask'ed: 7.3_rc7 sorts above 7.2.x, so without
 # the mask every ~arch user would be moved onto a release candidate.
 #
 # The source is the previous release plus Linus's cumulative -rc diff from
@@ -21,12 +21,12 @@ inherit kernel-build toolchain-funcs
 # BENTOO-DIVERGENCE: BDEPEND - no kernel.org OpenPGP keys, for the same reason.
 # BENTOO-DIVERGENCE: DEFINED_PHASES - no src_unpack: it only ran verify-sig.
 #
-# PATCH_PV is the series (7.3), so the EXTRAVERSION computed below is -rc6 and
-# the release string becomes 7.3.0-rc6, which kernel-build checks against PV in
+# PATCH_PV is the series (7.3), so the EXTRAVERSION computed below is -rc7 and
+# the release string becomes 7.3.0-rc7, which kernel-build checks against PV in
 # src_configure.
 #
 # PATCHSET and CONFIG_VER are the ones the 7.2 dist-kernel ships.  All 9
-# patches apply to the 7.3-rc6 tree with zero rejects.  The Fedora 7.2 config
+# patches apply to the 7.3-rc7 tree with zero rejects.  The Fedora 7.2 config
 # leaves 84 symbols undecided on this tree; most are new drivers that olddefconfig
 # turns off, which is the price of running ahead of Fedora's 7.3 config.
 BASE_P=linux-$(ver_cut 1).$(( $(ver_cut 2) - 1 ))
