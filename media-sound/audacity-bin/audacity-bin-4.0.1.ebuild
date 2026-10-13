@@ -32,7 +32,7 @@ RESTRICT="bindist mirror strip"
 
 QA_PREBUILT="*"
 
-# Measured on the 4.0.0 payload, by walking every bundled ELF and keeping the
+# Measured on the 4.0.1 payload, by walking every bundled ELF and keeping the
 # NEEDED entries that resolve outside lib/ and fallback/. Qt6, wxWidgets, the
 # codec stack, krb5, harfbuzz and freetype are all bundled and must NOT be
 # listed here -- an earlier revision of this ebuild depended on expat, freetype
@@ -47,8 +47,10 @@ QA_PREBUILT="*"
 #   libasound ............ main binary
 #   libcom_err ........... bundled libkrb5, reached from libQt6Network via the
 #                          bundled libgssapi_krb5 -- a hard load-time edge
-#   libdbus-1 ............ libQt6DBus, see the removal in src_install below
+#   libdbus-1 ............ libQt6DBus, no longer bundled since 4.0.1
 #
+# libgpg-error also shows up unresolved, but only from the orphaned bundled
+# libgcrypt that nothing loads -- not a real edge, see src_prepare.
 # Deliberately absent: x11-libs/gtk+:3, needed only by the optional
 # plugins/platformthemes/libqgtk3.so, which Qt loads under GNOME and otherwise
 # never touches; and dev-libs/nss plus dev-db/sqlite, reachable only through
@@ -90,25 +92,20 @@ src_unpack() {
 src_prepare() {
 	default
 
-	# The bundled libdbus-1.so.3 is dbus 1.12.20 built on a systemd CI runner,
-	# so it carries NEEDED libsystemd.so.0. Nothing in ::gentoo provides that
-	# soname outside sys-apps/systemd -- sys-apps/systemd-utils does not -- so
-	# on an OpenRC or musl host the loader fails on it and Audacity does not
-	# start at all. It is not a soft failure: libQt6DBus.so.6 is a NEEDED of
-	# the main binary, so the whole process dies.
+	# Up to 4.0.0 the payload bundled libdbus-1.so.3 built on a systemd CI
+	# runner, carrying NEEDED libsystemd.so.0. Nothing in ::gentoo provides
+	# that soname outside sys-apps/systemd, so on an OpenRC or musl host the
+	# loader failed on it and Audacity did not start at all (libQt6DBus.so.6
+	# is a NEEDED of the main binary). The 4.0.0 ebuild deleted the bundled
+	# copy; since 4.0.1 upstream no longer ships it, and libQt6DBus resolves
+	# the system sys-apps/dbus on its own. Its leftover deps (libgcrypt, lz4,
+	# libcap, lzma) are still in lib/ but nothing loads them.
 	#
-	# Dropping it makes libQt6DBus.so.6 fall through its RUNPATH ($ORIGIN) to
-	# the system sys-apps/dbus, which follows the host's own init choice.
-	# Verified compatible: libQt6DBus references 89 dbus_* symbols, all at
-	# version node LIBDBUS_1_3, which ::gentoo's dbus-1.16.2 defines. The only
-	# other node either library defines is LIBDBUS_PRIVATE_<ver>, used solely
-	# by dbus's own tools and referenced by nothing in this payload.
-	#
-	# Guarded rather than best-effort: if a future payload stops bundling it,
-	# this must be noticed, not silently skipped.
-	[[ -f squashfs-root/lib/libdbus-1.so.3 ]] ||
-		die "bundled libdbus-1.so.3 is gone -- recheck whether the libsystemd workaround is still needed"
-	rm squashfs-root/lib/libdbus-1.so.3 || die
+	# Guard the property, not the file: if any bundled object asks for
+	# libsystemd.so.0 again, a non-systemd host cannot start the program.
+	local offenders
+	offenders=$(grep -rlF libsystemd.so.0 squashfs-root) && \
+		die "payload links libsystemd.so.0 again, breaking non-systemd hosts:"$'\n'"${offenders}"
 
 	# Upstream ships the CMake install manifest inside the AppImage. Every line
 	# is an absolute path from the GitHub runner that produced it
