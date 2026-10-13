@@ -4,7 +4,7 @@
  		return
  	}
  
-+	cfg.ScannerVersion = "v1.8.0"
++	cfg.ScannerVersion = "@GENTOO_PV@"
 +	return
 +
  	// TODO(https://go.dev/issue/29228): we need to manually construct the
