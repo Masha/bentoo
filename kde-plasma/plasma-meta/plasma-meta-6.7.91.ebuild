@@ -69,7 +69,7 @@ RDEPEND="
 	sys-apps/dbus[elogind?,systemd?]
 	sys-auth/polkit[elogind?,systemd?]
 	sys-fs/udisks:2[elogind?,systemd?]
-	backup? ( >=app-backup/kup-${PV} )
+	backup? ( >=kde-plasma/kup-${PV}:6 )
 	bluetooth? ( >=kde-plasma/bluedevil-${PV}:${SLOT} )
 	browser-integration? ( >=kde-plasma/plasma-browser-integration-${PV}:${SLOT} )
 	crash-handler? (

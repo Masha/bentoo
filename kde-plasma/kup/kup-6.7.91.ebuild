@@ -22,7 +22,7 @@ DESCRIPTION="Backup scheduler for the Plasma desktop"
 HOMEPAGE="https://apps.kde.org/kup/"
 
 LICENSE="GPL-2+"
-SLOT="0"
+SLOT="6"
 KEYWORDS="~amd64 ~arm64"
 IUSE=""
 
