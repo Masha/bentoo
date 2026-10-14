@@ -197,7 +197,7 @@ npm registry  (parser=json, path=dist-tags.latest)
 url = "https://registry.npmjs.org/playwright/latest"
 parser = "json"
 path = "version"
-version = "1.64.0"
+version = "1.64.1"
 comments = """
 playwright — npm "playwright" (the JS package, replacing the retired
 dev-python/playwright-bin wheel). The full packument (/playwright) now exceeds
@@ -1876,7 +1876,7 @@ url = "https://api.github.com/repos/v-novaltd/LCEVCdec/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "4.2.2"
+version = "4.3.0"
 comments = """
 lcevc_dec — release tag bare semver.
 """
@@ -2138,7 +2138,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "2026.41.1"
+version = "2026.42.1"
 comments = """
 lemonade — GitHub release tag "vX.Y.Z" ("v" stripped). Built from source
 (CMake); the webapp node_modules distfile on distfiles.obentoo.org is NOT
@@ -2153,7 +2153,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "2026.41.1"
+version = "2026.42.1"
 comments = """
 lemonade-bin — same upstream as sci-ml/lemonade, prebuilt "embeddable"
 tarball plus arch-independent data from the .deb.
@@ -3135,7 +3135,7 @@ transform = [['T.*', ""], ['-', ""]]
 commit_sha_path = "[0].sha"
 base_from = "none"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.4.0_p20261013"
+version = "0.4.0_p20261014"
 comments = """
 zeo — commit-tracked on Zed's main; the snapshot plus the bentoo patch series and
 the rebrand. 2026-10-01: this entry WAS app-editors/zed, which now builds
@@ -3626,7 +3626,7 @@ transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "source"
 series = '^[0-9.]+(?:-r[0-9]+)?$'
-version = "1.23.2"
+version = "1.23.3"
 comments = """
 zed (stable channel), from source — since 2026-10-01 app-editors/zed builds
 upstream's tagged releases with no patches; the patched snapshot is app-editors/
@@ -3836,7 +3836,7 @@ base_from = "tag"
 base_url = "https://api.github.com/repos/KhronosGroup/SPIRV-Tools/git/refs/tags"
 base_tag_pattern = '^vulkan-sdk-([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)$'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.363.0_p20261012"
+version = "1.4.363.0_p20261014"
 comments = """
 spirv-tools — commit-tracked on main; scans titles for vulkan-sdk-X.Y.Z.W to detect base bump.
 """
@@ -3913,7 +3913,7 @@ base_from = "file"
 base_url = "https://raw.githubusercontent.com/KhronosGroup/Vulkan-ValidationLayers/main/CMakeLists.txt"
 base_pattern = '(?m)^project\([A-Za-z_-]+ VERSION ([0-9][0-9.]*)'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.365_p20261013"
+version = "1.4.365_p20261014"
 comments = """
 vulkan-layers — commit-tracked on main (Vulkan-ValidationLayers); scans for "Update for Vulkan-Docs X.Y.Z".
 """
@@ -9898,7 +9898,7 @@ url = "https://api.github.com/repos/aquasecurity/trivy/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.75.0"
+version = "0.76.0"
 comments = """
 Trivy — GitHub releases/latest tag "vX.Y.Z" (leading v stripped). Live=v0.72.0.
 
@@ -9980,7 +9980,7 @@ url = "https://api.github.com/repos/zeo-workspace/claude-agent-acp-plus/releases
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.26.0"
+version = "0.27.0"
 comments = """
 claude-agent-acp-plus — GitHub releases/latest tag "vX.Y.Z" (v stripped).
 SRC_URI releases/download/v${PV}/${P}-bundle.tar.gz. Live=v0.2.0.
@@ -10166,7 +10166,7 @@ url = "https://api.github.com/repos/digitalocean/doctl/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.185.0"
+version = "1.186.0"
 comments = """
 doctl (DigitalOcean CLI, historically "doit"/DoCli) — GitHub releases/latest
 tag "vX.Y.Z"; the leading v is normalized away by the autoupdate. Verified
@@ -10307,7 +10307,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "264"
+version = "265"
 comments = """
 llama-swap — releases/latest; tag_name is "vNNN" (a plain incrementing integer,
 not semver), transform strips the v.  Verified by real download on 2026-08-16:
@@ -10587,7 +10587,7 @@ transform = [['T.*', ""], ['-', ""]]
 commit_sha_path = "sha"
 base_from = "none"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0_pre20261013"
+version = "0_pre20261014"
 comments = """
 ik_llama-cpp — base_from = "none": upstream publishes no usable release
 series.  Verified 2026-07-19 and again 2026-08-04: the repo has exactly ONE
@@ -11736,7 +11736,7 @@ parser = "regex"
 pattern = '"tag_name":\s*"v([0-9]+\.[0-9]+\.[0-9]+)"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "4.0.11"
+version = "4.0.12"
 comments = """
 CC Switch — a Tauri GUI for switching between Claude Code, Codex and Gemini
 CLI accounts. Tracks CC-Switch-v<PV>-Linux-{x86_64,arm64}.deb; note the asset
@@ -11781,7 +11781,7 @@ url = "https://registry.npmjs.org/@ccusage/ccusage-linux-x64/latest"
 parser = "regex"
 pattern = '"version":"([0-9]+\.[0-9]+\.[0-9]+)"'
 type = "bin"
-version = "20.0.31"
+version = "20.0.32"
 comments = """
 ccusage — probed on the PER-PLATFORM npm package, not on the main "ccusage"
 one and not on GitHub, and the distinction is load-bearing.
@@ -14023,7 +14023,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "0.7.1"
+version = "0.8.0"
 comments = """
 DesignCraft (ArtCraft "Craft App Suite") — GitHub releases, tagged "vX.Y.Z"; same
 shape as media-gfx/photocraft-bin, whose record explains the -bin choice.
@@ -14119,7 +14119,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "0.6.1"
+version = "0.7.0"
 comments = """
 WordCraft (ArtCraft "Craft App Suite") — GitHub releases, tagged "vX.Y.Z"; same
 shape as media-gfx/photocraft-bin, whose record explains the -bin choice.
