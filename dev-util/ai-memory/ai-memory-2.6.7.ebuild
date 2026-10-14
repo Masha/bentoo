@@ -66,10 +66,16 @@ CRATES="
 # (492 -> 494), and the build died with "no matching package named `zopfli`
 # found ... required by package `zip v8.6.0`".
 #
+# 2.6.7, a fourth time, and this one was an autoupdate bump that moved PV
+# alone: the YAML layer swapped serde_yaml + unsafe-libyaml for serde-saphyr
+# (+ granit-parser and friends) and quinn-proto went 0.11.15 -> 0.11.19
+# (494 -> 503), and the build died with "no matching package named
+# `serde-saphyr` found".
+#
 # BUMP THIS to ${PV} (and run the recipe above) the moment the lock's external
 # packages change -- a stale tarball still FETCHES, so the failure would land
 # in src_compile as a missing crate rather than here.
-CRATES_PV="2.5.0"
+CRATES_PV="2.6.7"
 
 # Upstream pins channel 1.95 in rust-toolchain.toml; the workspace is
 # edition 2024 and declares rust-version = "1.95".
