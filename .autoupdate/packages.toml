@@ -9890,6 +9890,12 @@ no newer ggml release exists. With LLAMA_USE_SYSTEM_GGML=ON (the bug 983804
 design) compile dies there. Measured: prepare applies every patch, configure
 passes against a staged ggml-0.26.0, compile fails. Retry once a ggml release
 ships that symbol; ollama-bin covers 0.40.4 meanwhile.
+Timeline: ggml v0.26.0 was tagged 2026-10-05; llama.cpp added the call one
+day later (#29943, "refactor selective expert copying to user code"), and as of
+2026-10-14 ggml master has not synced it yet. Repackaging ggml from the
+llama.cpp subtree was rejected: it would fork ::gentoo's ggml for every
+consumer (llama-cpp, whisper-cpp, ...) with an API that differs under the same
+0.26.0 version, for a feature-only ollama release.
 """
 # END
 
@@ -11417,12 +11423,10 @@ it must be DROPPED, not forced, once a release carries the fix).
 # END
 
 ["www-client/opera"]
-enabled = false
-disabled_by = "removed 2026-10-10: ::gentoo's 137.0.6036.39 pins CHROMIUM_VERSION=153 (the drop condition) and adds arm64 + stable keywords ours lacked"
-url ="https://deb.opera.com/opera-stable/dists/stable/non-free/binary-amd64/Packages"
+url = "https://deb.opera.com/opera-stable/dists/stable/non-free/binary-amd64/Packages"
 parser = "regex"
 pattern = 'Package: opera-stable\nVersion: ([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)'
-version = "137.0.6036.39"
+version = "137.0.6036.63"
 comments = """
 Opera — read the APT index of Opera's own repository. The download CDN
 (downloadN.operacdn.com, which SRC_URI uses) publishes no listing, and
@@ -11465,12 +11469,13 @@ the binary: opera's libffmpeg.so reports N-127365-gd4e8713cee, the string in
 the ffversion.h of Chromium 153's ffmpeg_revision 53fa34a2 and absent from
 152's; all 48 av* symbols opera imports are exported by the 153 build.
 
-2026-10-14: listed as revivable at 137.0.6036.57 and NOT revived. The APT
-index and its pool (deb.opera.com) serve .57, but the four operacdn.com
-mirrors the ebuild fetches amd64 from answer 404 and list .39 as newest, so
-the revive could not produce a fetchable bump. Pointing SRC_URI at the APT
-pool would be fragile (it prunes old versions). Retry once operacdn lists the
-version -- or drop the idea if ::gentoo gets there first.
+2026-10-14: revived at 137.0.6036.63, after skipping .57. The APT index
+announced .57 first, but the four operacdn.com mirrors the ebuild fetches amd64
+from never carried it (404) and went straight from .39 to .63 -- so a 404 on
+the CDN can mean "skipped", not "not yet". .63 is a verbatim copy of ::gentoo's
+.39 ebuild: the .deb sha256 matches its .sha256sum, the binary still embeds
+Chrome/153.0.8010.55 and libffmpeg.so still reports N-127365-gd4e8713cee, so
+CHROMIUM_VERSION=153 holds, and ::gentoo ships ffmpeg-chromium-153 itself.
 """
 # END
 
