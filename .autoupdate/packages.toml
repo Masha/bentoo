@@ -185,7 +185,7 @@
 url = "https://registry.npmjs.org/@anthropic-ai/claude-code"
 parser = "json"
 path = "dist-tags.latest"
-version = "2.1.296"
+version = "2.1.299"
 comments = """
 claude-code — npm @anthropic-ai/claude-code; dist-tags.latest is the stable channel.
 
@@ -312,7 +312,7 @@ url = "https://api2.cursor.sh/updates/api/download/stable/linux-x64/cursor"
 parser = "json"
 path = "version"
 commit_sha_path = "commitSha"
-version = "3.24.12"
+version = "3.24.18"
 comments = """
 Cursor — official download API; "version" is the full version. commitSha is the
 per-release BUILD_ID embedded in SRC_URI; the applier substitutes it into the
@@ -755,7 +755,7 @@ url = "https://dl.pstmn.io/api/version/latest?platform=linux64&channel=stable"
 parser = "json"
 path = "version"
 type = "bin"
-version = "12.32.1"
+version = "12.32.2"
 comments = """
 Postman — official version API; clean {"version":"..."}.
 """
@@ -828,12 +828,10 @@ be fixed there before any entry could ever track it.
 # END
 
 ["mail-client/thunderbird"]
-enabled = false
-disabled_by = "removed 2026-09-18: the fork existed for exactly one reason, stated in the ebuild itself -- the firefox-156 patchset had no Thunderbird 't' variant on dev.gentoo.org, so bentoo used firefox-156-patches-01.tar.xz plus a local bindgen/libc++ patch (bgo#981812). firefox-156-patches-01t.tar.xz has since landed (HTTP 200 on 2026-09-18) and ::gentoo-156.0 now uses it with no extra eapply, so the whole 4-hunk divergence is obsolete. thunderbird-l10n was already byte-identical to ::gentoo. Reopen only if ::gentoo again ships a Thunderbird release whose 't' patchset is missing."
 url = "https://product-details.mozilla.org/1.0/thunderbird_versions.json"
 parser = "json"
 path = "LATEST_THUNDERBIRD_VERSION"
-version = "156.0"
+version = "158.0"
 comments = """
 Thunderbird — Mozilla's authoritative product-details endpoint. Use the
 LATEST_THUNDERBIRD_VERSION key (rapid/release channel, matching SLOT=0/stable):
@@ -889,12 +887,10 @@ version being restored, there is nothing here to maintain.
 # END
 
 ["mail-client/thunderbird-l10n"]
-enabled = false
-disabled_by = "removed 2026-09-18: the fork existed for exactly one reason, stated in the ebuild itself -- the firefox-156 patchset had no Thunderbird 't' variant on dev.gentoo.org, so bentoo used firefox-156-patches-01.tar.xz plus a local bindgen/libc++ patch (bgo#981812). firefox-156-patches-01t.tar.xz has since landed (HTTP 200 on 2026-09-18) and ::gentoo-156.0 now uses it with no extra eapply, so the whole 4-hunk divergence is obsolete. thunderbird-l10n was already byte-identical to ::gentoo. Reopen only if ::gentoo again ships a Thunderbird release whose 't' patchset is missing."
 url = "https://product-details.mozilla.org/1.0/thunderbird_versions.json"
 parser = "json"
 path = "LATEST_THUNDERBIRD_VERSION"
-version = "156.0"
+version = "158.0"
 comments = """
 Thunderbird translation files — same upstream endpoint and key as
 mail-client/thunderbird above, because they are the same release: the .xpi are
@@ -954,7 +950,7 @@ transform strips the "go" prefix to match PV. Live=1.26.5.
 url = "https://persistent.oaistatic.com/codex-app-prod/linux/deb/dists/stable/main/binary-amd64/Packages"
 parser = "regex"
 pattern = 'Package: chatgpt\nVersion: ([0-9]+\.[0-9]+\.[0-9]+)'
-version = "26.1007.21434"
+version = "26.1007.71326"
 comments = """
 OpenAI Codex/ChatGPT desktop app — read the APT index of the very repo that
 SRC_URI pulls from. Both openai.com and chatgpt.com sit behind Cloudflare and
@@ -1713,7 +1709,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "0.13.0"
+version = "0.13.1"
 comments = """
 uv (uv-bin) — tag bare "X.Y.Z".
 """
@@ -1985,7 +1981,7 @@ commit_sha_path = "[0].id"
 base_from = "file"
 base_url = "https://code.videolan.org/api/v4/projects/videolan%2Fvlc/repository/files/configure.ac/raw?ref=master"
 base_pattern = 'AC_INIT\(\[vlc\], \[([0-9][0-9.]*)-dev\]\)'
-version = "4.0.0_pre20261013"
+version = "4.0.0_pre20261014"
 comments = """
 vlc — 4.0 development snapshot, commit-tracked on master; _pre suffix
 preserved from the current ebuild. Only the 4.0 line lives here: 3.0.x is
@@ -2105,7 +2101,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "0.40.3"
+version = "0.40.4"
 comments = """
 ollama-bin — same upstream repo.
 """
@@ -3106,7 +3102,7 @@ commit_sha_path = "[0].id"
 base_from = "file"
 base_url = "https://gitlab.freedesktop.org/mesa/mesa/-/raw/main/VERSION"
 base_pattern = '^([0-9][0-9.]*)-devel'
-version = "26.3.0_pre20261013"
+version = "26.3.0_pre20261014"
 comments = """
 mesa — commit-tracked on main; _pre suffix preserved from current ebuild.
 
@@ -3124,7 +3120,7 @@ commit_sha_path = "[0].id"
 base_from = "file"
 base_url = "https://gitlab.freedesktop.org/mesa/mesa/-/raw/main/VERSION"
 base_pattern = '^([0-9][0-9.]*)-devel'
-version = "26.3.0_pre20261013"
+version = "26.3.0_pre20261014"
 comments = """
 mesa_clc — part of the mesa tree; same source/rule as media-libs/mesa.
 """
@@ -3934,7 +3930,7 @@ base_from = "file"
 base_url = "https://raw.githubusercontent.com/KhronosGroup/Vulkan-Loader/main/CMakeLists.txt"
 base_pattern = '(?m)^project\([A-Za-z_-]+ VERSION ([0-9][0-9.]*)'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.365_p20261013"
+version = "1.4.365_p20261014"
 comments = """
 vulkan-loader — commit-tracked on main; scans for "Update for Vulkan-Docs X.Y.Z" to detect base bump.
 """
@@ -9204,7 +9200,7 @@ url = "https://antigravity.google/download"
 parser = "regex"
 pattern = '/antigravity-hub/([0-9]+\.[0-9]+\.[0-9]+-[0-9]+)/'
 transform = [['-', "."]]
-version = "2.23.0.5238607586394112"
+version = "2.23.1.6348059836284928"
 comments = """
 Antigravity 2.0 — the standalone desktop hub (agent orchestration), a separate
 product from the IDE above. /download now ships the links in the raw HTML, so the
@@ -9461,7 +9457,7 @@ is a workspace and pycargoebuild refuses it.
 url = "https://pypi.org/pypi/openai/json"
 parser = "json"
 path = "info.version"
-version = "3.29.0"
+version = "3.31.0"
 comments = """
 openai — official Python SDK; core dep of sci-ml/amd-gaia. info.version is
 clean X.Y.Z. Live=3.0.0 == current PV.
@@ -9510,7 +9506,7 @@ pattern = '"name":\s*"Hermes Agent v([0-9]+\.[0-9]+\.[0-9]+)'
 headers = { "User-Agent" = "bentoo-autoupdate" }
 aux_var = "MY_TAG"
 aux_pattern = '"tag_name":\s*"v([0-9]+\.[0-9]+\.[0-9]+)"'
-version = "0.21.7"
+version = "0.22.0"
 comments = """
 hermes-agent -- tags are dated (v2026.9.24) while PV is the pyproject SemVer
 (0.21.5); the release name carries both: "Hermes Agent v0.21.5 (v2026.9.24)".
@@ -9885,6 +9881,15 @@ it to 0.40.0 keeping LLAMA_CPP_tag=b11232, while v0.40.0's LLAMA_CPP_VERSION
 asks b11351 -- 002-clef.patch then failed 2 of 12 hunks in
 tools/server/server-context.cpp. Fixed by hand. b11351 also already includes
 <fstream> in common/common.h, so ollama-0.31.1-gcc17.patch was dropped.
+
+2026-10-14: listed as revivable at 0.40.4 and NOT revived -- it cannot build.
+v0.40.4 pins llama.cpp b11521 (LLAMA_CPP_VERSION), whose src/llama-context.cpp
+calls ggml_backend_sched_set_copy_callback. The ggml bundled in b11521 declares
+it while still calling itself 0.26.0; the released ggml v0.26.0 does not, and
+no newer ggml release exists. With LLAMA_USE_SYSTEM_GGML=ON (the bug 983804
+design) compile dies there. Measured: prepare applies every patch, configure
+passes against a staged ggml-0.26.0, compile fails. Retry once a ggml release
+ships that symbol; ollama-bin covers 0.40.4 meanwhile.
 """
 # END
 
@@ -10389,7 +10394,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.122.1"
+version = "1.123"
 comments = """
 koboldcpp — releases/latest; tag_name is "vX.Y[.Z]", so the transform strips the
 leading v to match PV.  Verified by real download on 2026-08-16: tag_name
@@ -10512,7 +10517,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "9.2.1-r1"
+version = "9.3.0"
 comments = """
 simdutf — bentoo carries this package only to build it as C++20
 (-DSIMDUTF_CXX_STANDARD=20). Upstream gates the atomic base64 API behind
@@ -11230,7 +11235,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "2.8.1"
+version = "2.9.0"
 comments = """
 ai-jail — releases/latest on akitaonrails/ai-jail; tag_name is "vX.Y.Z" and the
 transform strips the v.  Verified by real download on 2026-09-07: tag_name
@@ -11264,7 +11269,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "2.8.1"
+version = "2.9.0"
 comments = """
 ai-jail-bin — same endpoint and same release as sys-apps/ai-jail; this record
 exists separately only because the two are separate packages.  Bump them
@@ -11288,7 +11293,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "2.6.7"
+version = "3.0.0"
 comments = """
 ai-memory — releases/latest on akitaonrails/ai-memory; tag_name is "vX.Y.Z" and
 the transform strips the v.  Verified by real request on 2026-09-07: tag_name
@@ -11337,7 +11342,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "2.6.7"
+version = "3.0.0"
 comments = """
 ai-memory-bin — same endpoint and same release as dev-util/ai-memory; this
 record exists separately only because the two are separate packages.  Bump them
@@ -11414,7 +11419,7 @@ it must be DROPPED, not forced, once a release carries the fix).
 ["www-client/opera"]
 enabled = false
 disabled_by = "removed 2026-10-10: ::gentoo's 137.0.6036.39 pins CHROMIUM_VERSION=153 (the drop condition) and adds arm64 + stable keywords ours lacked"
-url = "https://deb.opera.com/opera-stable/dists/stable/non-free/binary-amd64/Packages"
+url ="https://deb.opera.com/opera-stable/dists/stable/non-free/binary-amd64/Packages"
 parser = "regex"
 pattern = 'Package: opera-stable\nVersion: ([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)'
 version = "137.0.6036.39"
@@ -11459,6 +11464,13 @@ only (see .autoupdate/dead-upstreams.md, section C). Cross-checked against
 the binary: opera's libffmpeg.so reports N-127365-gd4e8713cee, the string in
 the ffversion.h of Chromium 153's ffmpeg_revision 53fa34a2 and absent from
 152's; all 48 av* symbols opera imports are exported by the 153 build.
+
+2026-10-14: listed as revivable at 137.0.6036.57 and NOT revived. The APT
+index and its pool (deb.opera.com) serve .57, but the four operacdn.com
+mirrors the ebuild fetches amd64 from answer 404 and list .39 as newest, so
+the revive could not produce a fetchable bump. Pointing SRC_URI at the APT
+pool would be fragile (it prunes old versions). Retry once operacdn lists the
+version -- or drop the idea if ::gentoo gets there first.
 """
 # END
 
@@ -11792,7 +11804,7 @@ parser = "regex"
 pattern = '"tag_name":\s*"v([0-9]+\.[0-9]+\.[0-9]+)"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "2.3.1"
+version = "2.3.2"
 comments = """
 OpenChamber — a desktop cockpit for parallel opencode sessions. Tracks
 OpenChamber-<PV>-linux-{x86_64,arm64}.AppImage; the same release also carries

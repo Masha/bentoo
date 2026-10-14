@@ -9,6 +9,7 @@ EAPI=8
 # Drop this ebuild, tags included, once ::gentoo ships 6.8.0.
 # BENTOO-DIVERGENCE: DEFINED_PHASES - upstream 6.8 beta, not in ::gentoo yet.
 # BENTOO-DIVERGENCE: DEPEND - upstream 6.8 beta, not in ::gentoo yet.
+# BENTOO-DIVERGENCE: HOMEPAGE - upstream 6.8 beta, not in ::gentoo yet.
 # BENTOO-DIVERGENCE: INHERIT - upstream 6.8 beta, not in ::gentoo yet.
 # BENTOO-DIVERGENCE: RDEPEND - upstream 6.8 beta, not in ::gentoo yet.
 

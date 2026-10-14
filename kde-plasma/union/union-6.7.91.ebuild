@@ -9,6 +9,7 @@ EAPI=8
 # Drop this ebuild, tags included, once ::gentoo ships 6.8.0.
 # BENTOO-DIVERGENCE: DEPEND - upstream 6.8 beta, not in ::gentoo yet.
 # BENTOO-DIVERGENCE: IUSE_DEFAULTS - upstream 6.8 beta, not in ::gentoo yet.
+# BENTOO-DIVERGENCE: KEYWORDS - upstream 6.8 beta, not in ::gentoo yet.
 # BENTOO-DIVERGENCE: RDEPEND - upstream 6.8 beta, not in ::gentoo yet.
 
 ECM_EXAMPLES="true"
