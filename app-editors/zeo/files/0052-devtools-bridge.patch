@@ -84,7 +84,7 @@ its own unit, integration and Playwright suites in zeo-devtools.
 ---
 
 diff --git a/Cargo.lock b/Cargo.lock
-index fffe176..6214fce 100644
+index 9dc4d35..c630b3b 100644
 --- a/Cargo.lock
 +++ b/Cargo.lock
 @@ -5008,6 +5008,32 @@ dependencies = [
@@ -120,7 +120,7 @@ index fffe176..6214fce 100644
  [[package]]
  name = "diagnostics"
  version = "0.1.0"
-@@ -22476,6 +22502,7 @@ dependencies = [
+@@ -22473,6 +22499,7 @@ dependencies = [
   "debugger_tools",
   "debugger_ui",
   "dev_container",
