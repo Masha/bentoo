@@ -483,12 +483,15 @@ src_prepare() {
 		rm -v "${WORKDIR}"/firefox-patches/*bgo-748849-RUST_TARGET_override.patch || die
 	fi
 
-	# firefox-158-patches-01t ships bmo#2071536 twice: 0027 patches
-	# third_party/rust/audio_thread_priority, and its Thunderbird variant t0002
-	# patches that same tree plus comm/third_party/. Thunderbird 158's comm/
-	# copy already carries the fix and 0027 covers third_party/, so t0002 can
-	# only fail to apply.
-	rm -v "${WORKDIR}"/firefox-patches/t0002-bmo-2071536-audio_thread_priority-musl-fix-tb.patch || die
+	# firefox-158-patches-01t ships bmo#2071536 twice. 0027 is the Firefox
+	# variant: it bumps the vendored audio_thread_priority to 0.38 and moves
+	# audioipc to rev ef46a7bd, but only in the top-level Cargo.lock,
+	# .cargo/config.toml.in and third_party/. comm/ keeps audioipc at d3c9825,
+	# so the offline cargo build fails with "can't checkout ... audioipc".
+	# t0002 is the Thunderbird variant: it patches the 0.37 sources in both
+	# third_party/ and comm/third_party/ without touching any lock, and the two
+	# patches cannot both apply. Keep t0002, drop 0027.
+	rm -v "${WORKDIR}"/firefox-patches/0027-bmo-2071536-audio_thread_priority-musl-fix.patch || die
 
 	eapply "${WORKDIR}/firefox-patches"
 
