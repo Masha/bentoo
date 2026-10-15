@@ -5,12 +5,6 @@ EAPI=8
 
 FIREFOX_PATCHSET="firefox-158-patches-01t.tar.xz"
 
-# BENTOO-DIVERGENCE: IUSE - llvm_slot_23, because LLVM_COMPAT gained 23.
-# BENTOO-DIVERGENCE: REQUIRED_USE - the matching ^^ ( llvm_slot_22 llvm_slot_23 ).
-#
-# Both follow ::gentoo's own firefox-158.0, which shares this codebase and the
-# firefox-158 patchset; ::gentoo's newest thunderbird is still 157.0.1 with
-# LLVM_COMPAT=( 22 ). They stop being a divergence once ::gentoo ships 158.
 LLVM_COMPAT=( 22 23 )
 
 PYTHON_COMPAT=( python3_{12..14} )
@@ -104,7 +98,7 @@ BDEPEND="${PYTHON_DEPS}
 	app-arch/unzip
 	app-arch/zip
 	>=dev-util/cbindgen-0.29.4
-	net-libs/nodejs
+	net-libs/nodejs[ssl]
 	virtual/pkgconfig
 	amd64? ( >=dev-lang/nasm-2.14 )
 	x86? ( >=dev-lang/nasm-2.14 )

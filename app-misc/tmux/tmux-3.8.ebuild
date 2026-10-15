@@ -44,11 +44,12 @@ QA_CONFIG_IMPL_DECL_SKIP=(
 
 DOCS=( CHANGES README )
 
-# BENTOO-DIVERGENCE: PATCHES - ::gentoo's 3.6a carries four patches; this
-# carries one.  The flags patch is the same fix rebased onto 3.7's reworked
-# Makefile.am (the old hunk no longer applies, the reason for it still holds --
-# see the patch header).  The other three are upstream as of 3.7 and are
-# deliberately dropped.  Verified against this tarball, not against the
+# BENTOO-DIVERGENCE: PATCHES - ::gentoo's 3.8 carries no patch at all (it
+# dropped the four of its 3.6a, flags included, and its replace-flags too);
+# this carries one.  The flags patch is ::gentoo's tmux-2.4-flags.patch rebased
+# onto 3.7's reworked Makefile.am (the old hunk no longer applies, the reason
+# for it still holds -- see the patch header).  The other three 3.6a patches
+# are upstream as of 3.7.  Verified against this tarball, not against the
 # changelog:
 #
 #   tmux-3.6a-race-fork.patch  spawn.c already declares path[PATH_MAX], home

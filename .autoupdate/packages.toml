@@ -811,7 +811,7 @@ url = "https://nodejs.org/dist/latest-v26.x/SHASUMS256.txt"
 parser = "regex"
 pattern = 'node-v(26\.[0-9]+\.[0-9]+)\.tar\.xz'
 select = "max"
-version = "26.11.1-r1"
+version = "26.12.0"
 comments = """
 Node.js SLOT 26 — the current line.
 Identical in shape to net-libs/nodejs:24 above, which carries the shared
@@ -14151,6 +14151,8 @@ the version (see the ebuild comment): redo it on every bump.
 # END
 
 ["media-libs/freetype"]
+enabled = false
+disabled_by = "removed 2026-10-14: ::gentoo now ships the same 2.15.0, with brotli:= and ~arch KEYWORDS where the mirror had neither; the mirror carried no divergence of its own. Reopen only if ::gentoo falls behind upstream again."
 url = "https://download.savannah.gnu.org/releases/freetype/"
 parser = "regex"
 pattern = 'freetype-([0-9]+\.[0-9]+\.[0-9]+)\.tar\.xz"'
