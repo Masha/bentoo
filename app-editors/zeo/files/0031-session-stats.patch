@@ -51,7 +51,7 @@ turn's time is added to the session once even if stop_turn runs twice.
 ---
 
 diff --git a/crates/agent_ui/src/conversation_view.rs b/crates/agent_ui/src/conversation_view.rs
-index 77b35fb..8c7a181 100644
+index e8289ec..e4bbd06 100644
 --- a/crates/agent_ui/src/conversation_view.rs
 +++ b/crates/agent_ui/src/conversation_view.rs
 @@ -105,13 +105,13 @@ use crate::{

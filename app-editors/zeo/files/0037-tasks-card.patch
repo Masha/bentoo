@@ -862,7 +862,7 @@ index 0da7203..7eb947e 100644
              max_idle_retained_threads: 5,
              threads_sidebar: agent_settings::ThreadsSidebarSettings {
 diff --git a/crates/agent_ui/src/conversation_view.rs b/crates/agent_ui/src/conversation_view.rs
-index dbf152f..8cdaebd 100644
+index bde8c99..3181ceb 100644
 --- a/crates/agent_ui/src/conversation_view.rs
 +++ b/crates/agent_ui/src/conversation_view.rs
 @@ -1872,21 +1872,30 @@ impl ConversationView {
@@ -905,7 +905,7 @@ index dbf152f..8cdaebd 100644
                          active.sync_editor_mode(cx);
                          active.sync_generating_indicator(cx);
                      });
-@@ -13122,6 +13131,47 @@ pub(crate) mod tests {
+@@ -13174,6 +13183,47 @@ pub(crate) mod tests {
          }
      }
  
@@ -954,7 +954,7 @@ index dbf152f..8cdaebd 100644
          unsupported: agent_client_protocol::schema::v2::ContentBlock,
          cx: &mut TestAppContext,
 diff --git a/crates/agent_ui/src/entry_view_state.rs b/crates/agent_ui/src/entry_view_state.rs
-index 28c3cc2..839fcb5 100644
+index 1ffc8b6..1d9ea45 100644
 --- a/crates/agent_ui/src/entry_view_state.rs
 +++ b/crates/agent_ui/src/entry_view_state.rs
 @@ -233,6 +233,11 @@ impl EntryViewState {

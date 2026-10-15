@@ -33,10 +33,10 @@ every test the series carries.
 ---
 
 diff --git a/crates/project/tests/integration/project_tests.rs b/crates/project/tests/integration/project_tests.rs
-index f4642a3..7b84b06 100644
+index 62e3053..2b646a4 100644
 --- a/crates/project/tests/integration/project_tests.rs
 +++ b/crates/project/tests/integration/project_tests.rs
-@@ -17712,7 +17712,6 @@ async fn test_git_events_after_project_excludes_dot_git(cx: &mut gpui::TestAppCo
+@@ -17839,7 +17839,6 @@ async fn test_git_events_after_project_excludes_dot_git(cx: &mut gpui::TestAppCo
  }
  
  #[gpui::test]
@@ -44,7 +44,7 @@ index f4642a3..7b84b06 100644
  async fn test_git_status_postprocessing(cx: &mut gpui::TestAppContext) {
      init_test(cx);
      cx.executor().allow_parking();
-@@ -17765,7 +17764,12 @@ async fn test_git_status_postprocessing(cx: &mut gpui::TestAppContext) {
+@@ -17892,7 +17891,12 @@ async fn test_git_status_postprocessing(cx: &mut gpui::TestAppContext) {
                      worktree_status: StatusCode::Added
                  }
                  .into(),
@@ -58,7 +58,7 @@ index f4642a3..7b84b06 100644
                  staged_diff_stat: Some(DiffStat {
                      added: 0,
                      deleted: 0,
-@@ -19108,7 +19112,6 @@ async fn test_bare_dot_git_changed_event_refreshes_git_state(cx: &mut gpui::Test
+@@ -19235,7 +19239,6 @@ async fn test_bare_dot_git_changed_event_refreshes_git_state(cx: &mut gpui::Test
  }
  
  #[gpui::test]
@@ -66,7 +66,7 @@ index f4642a3..7b84b06 100644
  async fn test_ignored_dirs_events(cx: &mut gpui::TestAppContext) {
      init_test(cx);
      cx.executor().allow_parking();
-@@ -19188,10 +19191,13 @@ async fn test_ignored_dirs_events(cx: &mut gpui::TestAppContext) {
+@@ -19315,10 +19318,13 @@ async fn test_ignored_dirs_events(cx: &mut gpui::TestAppContext) {
          );
      });
  
@@ -84,7 +84,7 @@ index f4642a3..7b84b06 100644
      );
      assert_eq!(
          project_events.lock().drain(..).collect::<Vec<_>>(),
-@@ -19265,9 +19271,6 @@ async fn test_ignored_dirs_events(cx: &mut gpui::TestAppContext) {
+@@ -19392,9 +19398,6 @@ async fn test_ignored_dirs_events(cx: &mut gpui::TestAppContext) {
      );
  }
  
@@ -94,7 +94,7 @@ index f4642a3..7b84b06 100644
  #[gpui::test]
  async fn test_odd_events_for_ignored_dirs(
      executor: BackgroundExecutor,
-@@ -19354,14 +19357,12 @@ async fn test_odd_events_for_ignored_dirs(
+@@ -19481,14 +19484,12 @@ async fn test_odd_events_for_ignored_dirs(
          );
      });
  

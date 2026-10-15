@@ -131,7 +131,7 @@ index 5711c45..d67b682 100644
                          cx,
                      );
 diff --git a/crates/agent/src/tests/mod.rs b/crates/agent/src/tests/mod.rs
-index e1e97e1..6d2487d 100644
+index c600d02..c35f8f4 100644
 --- a/crates/agent/src/tests/mod.rs
 +++ b/crates/agent/src/tests/mod.rs
 @@ -2557,20 +2557,26 @@ async fn test_mcp_tool_truncation(cx: &mut TestAppContext) {
@@ -189,7 +189,7 @@ index e1e97e1..6d2487d 100644
      );
  
      // Ensure we can still send a new message after cancellation.
-@@ -5143,7 +5154,8 @@ enum TestModel {
+@@ -5141,7 +5152,8 @@ enum TestModel {
  impl TestModel {
      fn id(&self) -> LanguageModelId {
          match self {
@@ -199,7 +199,7 @@ index e1e97e1..6d2487d 100644
              TestModel::Fake => unreachable!(),
          }
      }
-@@ -5219,19 +5231,31 @@ async fn setup(cx: &mut TestAppContext, model: TestModel) -> ThreadTest {
+@@ -5217,19 +5229,31 @@ async fn setup(cx: &mut TestAppContext, model: TestModel) -> ThreadTest {
              if let TestModel::Fake = model {
                  Task::ready(fake.model("fake"))
              } else {
@@ -242,7 +242,7 @@ index e1e97e1..6d2487d 100644
              }
          })
 diff --git a/crates/agent_servers/src/agent_servers.rs b/crates/agent_servers/src/agent_servers.rs
-index 77503d4..f0dbf36 100644
+index 6eaef26..5d94d98 100644
 --- a/crates/agent_servers/src/agent_servers.rs
 +++ b/crates/agent_servers/src/agent_servers.rs
 @@ -10,6 +10,8 @@ pub mod thread_config_store;
@@ -255,10 +255,10 @@ index 77503d4..f0dbf36 100644
  use client::ProxySettings;
  use collections::{HashMap, HashSet};
 diff --git a/crates/agent_servers/src/e2e_tests.rs b/crates/agent_servers/src/e2e_tests.rs
-index f3e5ed3..783b17f 100644
+index a03524a..b36df84 100644
 --- a/crates/agent_servers/src/e2e_tests.rs
 +++ b/crates/agent_servers/src/e2e_tests.rs
-@@ -14,7 +14,6 @@ use std::{
+@@ -18,7 +18,6 @@ use std::{
      sync::Arc,
      time::Duration,
  };
@@ -266,7 +266,7 @@ index f3e5ed3..783b17f 100644
  use util::path_list::PathList;
  
  pub async fn test_basic<T, F>(server: F, cx: &mut TestAppContext)
-@@ -24,7 +23,10 @@ where
+@@ -28,7 +27,10 @@ where
  {
      let fs = init_test(cx).await as Arc<dyn fs::Fs>;
      let project = Project::test(fs.clone(), [], cx).await;
@@ -276,9 +276,9 @@ index f3e5ed3..783b17f 100644
 +    let workdir = tempfile::tempdir().unwrap();
 +    let thread = new_test_thread(server(&fs, cx).await, project.clone(), workdir.path(), cx).await;
  
-     thread
-         .update(cx, |thread, cx| thread.send_raw("Hello from Zed!", cx))
-@@ -120,7 +122,10 @@ where
+     send_and_wait_for_turn(&thread, vec!["Hello from Zed!".into()], cx)
+         .await
+@@ -119,7 +121,10 @@ where
      std::fs::write(&foo_path, "Lorem ipsum dolor").expect("failed to write file");
  
      let project = Project::example([tempdir.path()], &mut cx.to_async()).await;
@@ -288,9 +288,9 @@ index f3e5ed3..783b17f 100644
 +    // for permission, which this scenario -- unlike the next one -- never answers.
 +    let thread = new_test_thread(server(&fs, cx).await, project.clone(), tempdir.path(), cx).await;
  
-     thread
-         .update(cx, |thread, cx| {
-@@ -160,8 +165,14 @@ pub async fn test_tool_call_with_permission<T, F>(
+     send_and_wait_for_turn(
+         &thread,
+@@ -157,8 +162,14 @@ pub async fn test_tool_call_with_permission<T, F>(
      F: AsyncFn(&Arc<dyn fs::Fs>, &mut TestAppContext) -> T,
  {
      let fs = init_test(cx).await as Arc<dyn fs::Fs>;
@@ -304,10 +304,10 @@ index f3e5ed3..783b17f 100644
 +    fs.as_fake().insert_tree(workdir.path(), serde_json::json!({})).await;
 +    let project = Project::test(fs.clone(), [workdir.path()], cx).await;
 +    let thread = new_test_thread(server(&fs, cx).await, project.clone(), workdir.path(), cx).await;
-     let full_turn = thread.update(cx, |thread, cx| {
-         thread.send_raw(
-             r#"Run exactly `touch hello.txt && echo "Hello, world!" | tee hello.txt` in the terminal."#,
-@@ -249,8 +260,14 @@ where
+     let full_turn = send_and_wait_for_turn(
+         &thread,
+         vec![r#"Run exactly `touch hello.txt && echo "Hello, world!" | tee hello.txt` in the terminal."#.into()],
+@@ -245,8 +256,14 @@ where
  {
      let fs = init_test(cx).await as Arc<dyn fs::Fs>;
  
@@ -321,10 +321,10 @@ index f3e5ed3..783b17f 100644
 +    fs.as_fake().insert_tree(workdir.path(), serde_json::json!({})).await;
 +    let project = Project::test(fs.clone(), [workdir.path()], cx).await;
 +    let thread = new_test_thread(server(&fs, cx).await, project.clone(), workdir.path(), cx).await;
-     let _ = thread.update(cx, |thread, cx| {
-         thread.send_raw(
-             r#"Run exactly `touch hello.txt && echo "Hello, world!" | tee hello.txt` in the terminal."#,
-@@ -311,7 +328,10 @@ where
+     let full_turn = send_and_wait_for_turn(
+         &thread,
+         vec![r#"Run exactly `touch hello.txt && echo "Hello, world!" | tee hello.txt` in the terminal."#.into()],
+@@ -308,7 +325,10 @@ where
  {
      let fs = init_test(cx).await as Arc<dyn fs::Fs>;
      let project = Project::test(fs.clone(), [], cx).await;
@@ -334,9 +334,9 @@ index f3e5ed3..783b17f 100644
 +    let workdir = tempfile::tempdir().unwrap();
 +    let thread = new_test_thread(server(&fs, cx).await, project.clone(), workdir.path(), cx).await;
  
-     thread
-         .update(cx, |thread, cx| thread.send_raw("Hello from test!", cx))
-@@ -440,7 +460,11 @@ pub async fn run_until_first_tool_call(
+     send_and_wait_for_turn(&thread, vec!["Hello from test!".into()], cx)
+         .await
+@@ -489,7 +509,11 @@ pub async fn run_until_first_tool_call(
          cx.subscribe(thread, move |thread, _, cx| {
              for (ix, entry) in thread.read(cx).entries().iter().enumerate() {
                  if wait_until(entry) {

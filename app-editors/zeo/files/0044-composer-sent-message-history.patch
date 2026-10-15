@@ -183,7 +183,7 @@ index ffa4d41..f1135a3 100644
          CycleNextInlineAssist,
          /// Cycles to the previous inline assist suggestion.
 diff --git a/crates/agent_ui/src/conversation_view.rs b/crates/agent_ui/src/conversation_view.rs
-index 786b31c..50ea12c 100644
+index 26e11c8..ede7c1c 100644
 --- a/crates/agent_ui/src/conversation_view.rs
 +++ b/crates/agent_ui/src/conversation_view.rs
 @@ -111,6 +111,7 @@ pub(crate) const DRAFT_PROMPT_PERSIST_DEBOUNCE: Duration = Duration::from_millis
@@ -202,7 +202,7 @@ index 786b31c..50ea12c 100644
                          }
                          active.sync_editor_mode(cx);
                          active.sync_generating_indicator(cx);
-@@ -4171,6 +4173,14 @@ pub(crate) mod tests {
+@@ -4173,6 +4175,14 @@ pub(crate) mod tests {
  
      use super::*;
  

@@ -41,11 +41,11 @@ entry default on reopen. agent_servers 150 passed; config_options 6 passed.
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 ---
 
-diff --git a/crates/agent_servers/src/acp.rs b/crates/agent_servers/src/acp.rs
-index 53a82ed..d4990ec 100644
---- a/crates/agent_servers/src/acp.rs
-+++ b/crates/agent_servers/src/acp.rs
-@@ -1780,9 +1780,13 @@ impl AcpConnection {
+diff --git a/crates/agent_servers/src/acp/v1.rs b/crates/agent_servers/src/acp/v1.rs
+index 15263ae..32bdf05 100644
+--- a/crates/agent_servers/src/acp/v1.rs
++++ b/crates/agent_servers/src/acp/v1.rs
+@@ -1190,9 +1190,13 @@ impl AcpConnection {
                          return None;
                      }
                      let config_id = option.config_id.0.as_ref();
@@ -60,10 +60,10 @@ index 53a82ed..d4990ec 100644
                      if let Some(recorded_value) = recorded_value
                          && !recorded_is_offered(option, recorded_value)
                          && !dropped_warned.contains(&option.config_id)
-diff --git a/crates/agent_servers/src/acp/recorder_tests.rs b/crates/agent_servers/src/acp/recorder_tests.rs
+diff --git a/crates/agent_servers/src/acp/v1/recorder_tests.rs b/crates/agent_servers/src/acp/v1/recorder_tests.rs
 index dc02398..46bc562 100644
---- a/crates/agent_servers/src/acp/recorder_tests.rs
-+++ b/crates/agent_servers/src/acp/recorder_tests.rs
+--- a/crates/agent_servers/src/acp/v1/recorder_tests.rs
++++ b/crates/agent_servers/src/acp/v1/recorder_tests.rs
 @@ -20,7 +20,11 @@ fn script() -> AgentScript {
              boolean("web_search", false),
          ]),
@@ -131,10 +131,10 @@ index dc02398..46bc562 100644
      assert_eq!(
          recorded_id(&config, "model").as_deref(),
          Some("sonnet"),
-diff --git a/crates/agent_servers/src/acp/restore_options_tests.rs b/crates/agent_servers/src/acp/restore_options_tests.rs
+diff --git a/crates/agent_servers/src/acp/v1/restore_options_tests.rs b/crates/agent_servers/src/acp/v1/restore_options_tests.rs
 index 4950ff0..472954c 100644
---- a/crates/agent_servers/src/acp/restore_options_tests.rs
-+++ b/crates/agent_servers/src/acp/restore_options_tests.rs
+--- a/crates/agent_servers/src/acp/v1/restore_options_tests.rs
++++ b/crates/agent_servers/src/acp/v1/restore_options_tests.rs
 @@ -375,3 +375,33 @@ async fn thread_config_store_corrupt_record_is_logged_and_load_applies_defaults(
          "the read failure must be logged with the agent and the session id"
      );
@@ -169,10 +169,10 @@ index 4950ff0..472954c 100644
 +        "the recorded toggle is not sent; the agent's own value stands"
 +    );
 +}
-diff --git a/crates/agent_servers/src/acp/round_trip_tests.rs b/crates/agent_servers/src/acp/round_trip_tests.rs
+diff --git a/crates/agent_servers/src/acp/v1/round_trip_tests.rs b/crates/agent_servers/src/acp/v1/round_trip_tests.rs
 index df1cda0..22591fe 100644
---- a/crates/agent_servers/src/acp/round_trip_tests.rs
-+++ b/crates/agent_servers/src/acp/round_trip_tests.rs
+--- a/crates/agent_servers/src/acp/v1/round_trip_tests.rs
++++ b/crates/agent_servers/src/acp/v1/round_trip_tests.rs
 @@ -76,9 +76,10 @@ async fn round_trip_two_agents_sharing_a_session_id_restore_their_own_state(
  async fn round_trip_restores_picked_and_agent_reported_values_after_a_restart(
      cx: &mut gpui::TestAppContext,

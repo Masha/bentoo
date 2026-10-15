@@ -78,7 +78,7 @@ name are invalid. The terminal environment is one helper,
 ---
 
 diff --git a/Cargo.lock b/Cargo.lock
-index 461b821..9dc4d35 100644
+index 2f14e94..dddc3d5 100644
 --- a/Cargo.lock
 +++ b/Cargo.lock
 @@ -3046,6 +3046,32 @@ version = "0.7.6"
@@ -114,7 +114,7 @@ index 461b821..9dc4d35 100644
  [[package]]
  name = "cli"
  version = "0.1.0"
-@@ -22428,6 +22454,7 @@ dependencies = [
+@@ -22473,6 +22499,7 @@ dependencies = [
   "channel",
   "chrono",
   "clap",
@@ -123,7 +123,7 @@ index 461b821..9dc4d35 100644
   "client",
   "clock",
 diff --git a/Cargo.toml b/Cargo.toml
-index a808d29..5d1d0bb 100644
+index 49b3f21..60ffedc 100644
 --- a/Cargo.toml
 +++ b/Cargo.toml
 @@ -28,6 +28,7 @@ members = [
@@ -134,7 +134,7 @@ index a808d29..5d1d0bb 100644
      "crates/cli",
      "crates/client",
      "crates/clock",
-@@ -306,6 +307,7 @@ buffer_diff = { path = "crates/buffer_diff" }
+@@ -308,6 +309,7 @@ buffer_diff = { path = "crates/buffer_diff" }
  call = { path = "crates/call" }
  call_hierarchy = { path = "crates/call_hierarchy" }
  channel = { path = "crates/channel" }
@@ -2271,7 +2271,7 @@ index 0000000..25f28f3
 +    }
 +}
 diff --git a/crates/project/src/project.rs b/crates/project/src/project.rs
-index fcbe245..d7c2187 100644
+index c3a979e..23d90a3 100644
 --- a/crates/project/src/project.rs
 +++ b/crates/project/src/project.rs
 @@ -255,6 +255,10 @@ pub struct Project {
@@ -2405,7 +2405,7 @@ index c940607..e9aae69 100644
 +    }
 +}
 diff --git a/crates/zed/Cargo.toml b/crates/zed/Cargo.toml
-index 0cea2f3..1f29160 100644
+index 34cd9fe..0c89d5f 100644
 --- a/crates/zed/Cargo.toml
 +++ b/crates/zed/Cargo.toml
 @@ -86,6 +86,7 @@ call.workspace = true

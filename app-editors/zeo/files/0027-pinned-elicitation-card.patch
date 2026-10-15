@@ -128,10 +128,10 @@ index 03137d9..6353d56 100644
      // that offers to resolve conflicts using the agent.
      //
 diff --git a/crates/acp_thread/src/acp_thread.rs b/crates/acp_thread/src/acp_thread.rs
-index cf58e8d..b02174b 100644
+index 002ed80..7454281 100644
 --- a/crates/acp_thread/src/acp_thread.rs
 +++ b/crates/acp_thread/src/acp_thread.rs
-@@ -6621,6 +6621,17 @@ impl AcpThread {
+@@ -6635,6 +6635,17 @@ impl AcpThread {
          Some((index, elicitation))
      }
  
@@ -268,10 +268,10 @@ index 2d6ff76..0da7203 100644
              max_idle_retained_threads: 5,
              threads_sidebar: agent_settings::ThreadsSidebarSettings {
 diff --git a/crates/agent_ui/src/conversation_view.rs b/crates/agent_ui/src/conversation_view.rs
-index 4d011b4..03a1704 100644
+index c6c6478..102533c 100644
 --- a/crates/agent_ui/src/conversation_view.rs
 +++ b/crates/agent_ui/src/conversation_view.rs
-@@ -2835,22 +2835,37 @@ impl ConversationView {
+@@ -2836,22 +2836,37 @@ impl ConversationView {
                      .log_err();
                  }
              },

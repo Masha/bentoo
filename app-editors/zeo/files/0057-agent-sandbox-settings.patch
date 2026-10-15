@@ -111,7 +111,7 @@ spawns a real agent script and reads back its environment (story 050).
 ---
 
 diff --git a/Cargo.lock b/Cargo.lock
-index c630b3b..2f60e45 100644
+index bae4b68..f8edf6d 100644
 --- a/Cargo.lock
 +++ b/Cargo.lock
 @@ -368,6 +368,39 @@ dependencies = [
@@ -191,7 +191,7 @@ index c630b3b..2f60e45 100644
   "agent_servers",
   "agent_settings",
   "agent_skills",
-@@ -16503,6 +16541,7 @@ name = "settings_ui"
+@@ -16548,6 +16586,7 @@ name = "settings_ui"
  version = "0.1.0"
  dependencies = [
   "agent",
@@ -199,7 +199,7 @@ index c630b3b..2f60e45 100644
   "agent_settings",
   "agent_skills",
   "anyhow",
-@@ -16535,6 +16574,7 @@ dependencies = [
+@@ -16580,6 +16619,7 @@ dependencies = [
   "language_models",
   "log",
   "menu",
@@ -207,7 +207,7 @@ index c630b3b..2f60e45 100644
   "paths",
   "picker",
   "platform_title_bar",
-@@ -16545,13 +16585,16 @@ dependencies = [
+@@ -16590,13 +16630,16 @@ dependencies = [
   "rodio",
   "schemars 1.0.4",
   "search",
@@ -224,7 +224,7 @@ index c630b3b..2f60e45 100644
   "theme",
   "theme_settings",
   "ui",
-@@ -22462,6 +22505,7 @@ dependencies = [
+@@ -22507,6 +22550,7 @@ dependencies = [
   "activity_indicator",
   "agent",
   "agent-client-protocol",
@@ -233,7 +233,7 @@ index c630b3b..2f60e45 100644
   "agent_settings",
   "agent_skills",
 diff --git a/Cargo.toml b/Cargo.toml
-index 8f4a491..0d66c5b 100644
+index 9a7ced0..2c8dceb 100644
 --- a/Cargo.toml
 +++ b/Cargo.toml
 @@ -6,6 +6,7 @@ members = [
@@ -244,7 +244,7 @@ index 8f4a491..0d66c5b 100644
      "crates/agent_servers",
      "crates/agent_settings",
      "crates/agent_skills",
-@@ -288,6 +289,7 @@ acp_tools = { path = "crates/acp_tools" }
+@@ -290,6 +291,7 @@ acp_tools = { path = "crates/acp_tools" }
  action_log = { path = "crates/action_log" }
  activity_indicator = { path = "crates/activity_indicator" }
  agent = { path = "crates/agent" }
@@ -10702,109 +10702,21 @@ index a7e6306..6b8fc54 100644
  tempfile.workspace = true
 +workspace = { workspace = true, features = ["test-support"] }
 diff --git a/crates/agent_servers/src/acp.rs b/crates/agent_servers/src/acp.rs
-index 29ccf5d..8c35c55 100644
+index 67c896c..e57651b 100644
 --- a/crates/agent_servers/src/acp.rs
 +++ b/crates/agent_servers/src/acp.rs
-@@ -774,22 +774,35 @@ impl AgentSessionList for AcpSessionList {
-     }
- }
+@@ -12,7 +12,8 @@ use session_updates::{InboundSessionNotification, InboundSessionUpdate};
+ pub use terminal_updates::{DecodedTerminalNotification, DecodedTerminalUpdate};
+ #[cfg(any(test, feature = "test-support"))]
+ pub use v1::test_support;
+-pub use v1::{AcpConnection, AcpSessionList, GEMINI_TERMINAL_AUTH_METHOD_ID, connect};
++pub use v1::{AcpConnection, AcpSessionList, GEMINI_TERMINAL_AUTH_METHOD_ID};
++pub(crate) use v1::{StdioLaunch, connect};
+ pub use v2::AcpV2Connection;
  
--pub async fn connect(
-+/// How [`connect`] starts the agent process, beyond its command.
-+#[derive(Default)]
-+pub(crate) struct StdioLaunch {
-+    /// The working directory, instead of the project's first folder: a jailed start runs in the
-+    /// root its launch decision checked (story 043).
-+    pub cwd: Option<PathBuf>,
-+    /// Held by the connection's IO task and dropped when it ends — the agent exited or the
-+    /// connection was dropped — so the receiver learns that the launch is over.
-+    pub io_ended: Option<futures::channel::oneshot::Sender<()>>,
-+}
-+
-+pub(crate) async fn connect(
-     agent_id: AgentId,
-     project: Entity<Project>,
-     command: AgentServerCommand,
-     agent_server_store: WeakEntity<AgentServerStore>,
-     default_mode: Option<acp_v2::SessionConfigValueId>,
-     default_config_options: HashMap<String, AgentConfigOptionValue>,
-+    launch: StdioLaunch,
-     cx: &mut AsyncApp,
- ) -> Result<Rc<dyn AgentConnection>> {
--    let conn = AcpConnection::stdio(
-+    let conn = AcpConnection::stdio_with(
-         agent_id,
-         project,
--        command.clone(),
-+        command,
-         agent_server_store,
-         default_mode,
-         default_config_options,
-+        launch,
-         cx,
-     )
-     .await?;
-@@ -1097,6 +1110,9 @@ impl AcpConnection {
-         self.debug_log.subscribe()
-     }
- 
-+    /// Starts `command` in the project's first folder. Agents started by the app go through
-+    /// `CustomAgentServer::connect`, which decides the sandbox first.
-+    #[cfg(any(test, feature = "test-support"))]
-     pub async fn stdio(
-         agent_id: AgentId,
-         project: Entity<Project>,
-@@ -1106,6 +1122,30 @@ impl AcpConnection {
-         default_config_options: HashMap<String, AgentConfigOptionValue>,
-         cx: &mut AsyncApp,
-     ) -> Result<Self> {
-+        Self::stdio_with(
-+            agent_id,
-+            project,
-+            command,
-+            agent_server_store,
-+            default_mode,
-+            default_config_options,
-+            StdioLaunch::default(),
-+            cx,
-+        )
-+        .await
-+    }
-+
-+    pub(crate) async fn stdio_with(
-+        agent_id: AgentId,
-+        project: Entity<Project>,
-+        command: AgentServerCommand,
-+        agent_server_store: WeakEntity<AgentServerStore>,
-+        default_mode: Option<acp_v2::SessionConfigValueId>,
-+        default_config_options: HashMap<String, AgentConfigOptionValue>,
-+        launch: StdioLaunch,
-+        cx: &mut AsyncApp,
-+    ) -> Result<Self> {
-+        let StdioLaunch { cwd, io_ended } = launch;
-         let original_command = command.clone();
-         let transport::StdioProcess {
-             mut child,
-@@ -1113,7 +1153,7 @@ impl AcpConnection {
-             outgoing,
-             stderr,
-             debug_log,
--        } = transport::spawn_stdio(&project, command, cx)?;
-+        } = transport::spawn_stdio(&project, command, cwd.as_deref(), cx)?;
-         let sessions = Rc::new(RefCell::new(HashMap::default()));
- 
-         let (release_channel, version): (Option<&str>, String) = cx.update(|cx| {
-@@ -1143,6 +1183,8 @@ impl AcpConnection {
-         let connection_future =
-             connect_client_future("zed", transport, dispatch_tx.clone(), connection_tx);
-         let io_task = cx.background_spawn(async move {
-+            // Dropped with this future, whether it completes or the task is cancelled.
-+            let _io_ended = io_ended;
-             if let Err(err) = connection_future.await {
-                 log::error!("ACP connection error: {err}");
-             }
+ use acp_thread::{AcpThread, AuthRequired, ElicitationStore, LoadError};
 diff --git a/crates/agent_servers/src/acp/transport.rs b/crates/agent_servers/src/acp/transport.rs
-index e2499bd..fc3e793 100644
+index 86f3d0c..0dc9ca6 100644
 --- a/crates/agent_servers/src/acp/transport.rs
 +++ b/crates/agent_servers/src/acp/transport.rs
 @@ -7,7 +7,7 @@ use futures::{
@@ -10814,9 +10726,9 @@ index e2499bd..fc3e793 100644
 -use std::{io, pin::Pin, process::Stdio};
 +use std::{io, path::Path, pin::Pin, process::Stdio};
  use task::{Shell, ShellBuilder};
- use util::process::Child;
+ use util::{ResultExt as _, process::Child};
  
-@@ -20,11 +20,34 @@ pub(super) struct StdioProcess {
+@@ -28,11 +28,34 @@ pub(super) struct StdioProcess {
      pub debug_log: AcpDebugLog,
  }
  
@@ -10851,7 +10763,7 @@ index e2499bd..fc3e793 100644
      let root_dir = project.read_with(cx, |project, cx| {
          project
              .default_path_list(cx)
-@@ -69,8 +92,16 @@ pub(super) fn spawn_stdio(
+@@ -77,8 +100,16 @@ pub(super) fn spawn_stdio(
      }) {
          child.current_dir(cwd);
      }
@@ -10869,7 +10781,7 @@ index e2499bd..fc3e793 100644
      let stdout = child.stdout.take().context("Failed to take stdout")?;
      let stdin = child.stdin.take().context("Failed to take stdin")?;
      let stderr = child.stderr.take().context("Failed to take stderr")?;
-@@ -176,7 +207,7 @@ mod tests {
+@@ -184,7 +215,7 @@ mod tests {
                  mut outgoing,
                  stderr,
                  debug_log,
@@ -10878,7 +10790,7 @@ index e2499bd..fc3e793 100644
                  .expect("spawn fresh transport");
              let stderr_task = cx.background_executor.spawn(stderr);
              let params = serde_json::json!({ "attempt": attempt });
-@@ -241,4 +272,137 @@ mod tests {
+@@ -249,4 +280,137 @@ mod tests {
              }));
          }
      }
@@ -11016,8 +10928,130 @@ index e2499bd..fc3e793 100644
 +        assert_eq!(output, ["ONLY_THIS=1".to_string()]);
 +    }
  }
+diff --git a/crates/agent_servers/src/acp/v1.rs b/crates/agent_servers/src/acp/v1.rs
+index b402efa..73f99f7 100644
+--- a/crates/agent_servers/src/acp/v1.rs
++++ b/crates/agent_servers/src/acp/v1.rs
+@@ -377,22 +377,35 @@ impl AgentSessionList for AcpSessionList {
+     }
+ }
+ 
+-pub async fn connect(
++/// How [`connect`] starts the agent process, beyond its command.
++#[derive(Default)]
++pub(crate) struct StdioLaunch {
++    /// The working directory, instead of the project's first folder: a jailed start runs in the
++    /// root its launch decision checked (story 043).
++    pub cwd: Option<PathBuf>,
++    /// Held by the connection's IO task and dropped when it ends — the agent exited or the
++    /// connection was dropped — so the receiver learns that the launch is over.
++    pub io_ended: Option<futures::channel::oneshot::Sender<()>>,
++}
++
++pub(crate) async fn connect(
+     agent_id: AgentId,
+     project: Entity<Project>,
+     command: AgentServerCommand,
+     agent_server_store: WeakEntity<AgentServerStore>,
+     default_mode: Option<acp_v2::SessionConfigValueId>,
+     default_config_options: HashMap<String, AgentConfigOptionValue>,
++    launch: StdioLaunch,
+     cx: &mut AsyncApp,
+ ) -> Result<Rc<dyn AgentConnection>> {
+-    let conn = AcpConnection::stdio(
++    let conn = AcpConnection::stdio_with(
+         agent_id,
+         project,
+-        command.clone(),
++        command,
+         agent_server_store,
+         default_mode,
+         default_config_options,
++        launch,
+         cx,
+     )
+     .await?;
+@@ -554,6 +567,9 @@ impl AcpConnection {
+         self.debug_log.subscribe()
+     }
+ 
++    /// Starts `command` in the project's first folder. Agents started by the app go through
++    /// `CustomAgentServer::connect`, which decides the sandbox first.
++    #[cfg(any(test, feature = "test-support"))]
+     pub async fn stdio(
+         agent_id: AgentId,
+         project: Entity<Project>,
+@@ -563,6 +579,30 @@ impl AcpConnection {
+         default_config_options: HashMap<String, AgentConfigOptionValue>,
+         cx: &mut AsyncApp,
+     ) -> Result<Self> {
++        Self::stdio_with(
++            agent_id,
++            project,
++            command,
++            agent_server_store,
++            default_mode,
++            default_config_options,
++            StdioLaunch::default(),
++            cx,
++        )
++        .await
++    }
++
++    pub(crate) async fn stdio_with(
++        agent_id: AgentId,
++        project: Entity<Project>,
++        command: AgentServerCommand,
++        agent_server_store: WeakEntity<AgentServerStore>,
++        default_mode: Option<acp_v2::SessionConfigValueId>,
++        default_config_options: HashMap<String, AgentConfigOptionValue>,
++        launch: StdioLaunch,
++        cx: &mut AsyncApp,
++    ) -> Result<Self> {
++        let StdioLaunch { cwd, io_ended } = launch;
+         let original_command = command.clone();
+         let transport::StdioProcess {
+             child,
+@@ -570,7 +610,7 @@ impl AcpConnection {
+             outgoing,
+             stderr,
+             debug_log,
+-        } = transport::spawn_stdio(&project, command, cx)?;
++        } = transport::spawn_stdio(&project, command, cwd.as_deref(), cx)?;
+         let mut child = transport::OwnedChild(child);
+         let sessions = Rc::new(RefCell::new(HashMap::default()));
+ 
+@@ -610,7 +650,14 @@ impl AcpConnection {
+             connection_tx,
+             runtime::shutdown_requested(shutdown),
+         );
+-        runtime.start_io(connection_future, cx);
++        runtime.start_io(
++            async move {
++                // Dropped with this future, whether it completes or the task is cancelled.
++                let _io_ended = io_ended;
++                connection_future.await
++            },
++            cx,
++        );
+ 
+         let connection_rx = async move {
+             connection_rx
+diff --git a/crates/agent_servers/src/acp/v2.rs b/crates/agent_servers/src/acp/v2.rs
+index e943bfd..a1171c2 100644
+--- a/crates/agent_servers/src/acp/v2.rs
++++ b/crates/agent_servers/src/acp/v2.rs
+@@ -75,7 +75,7 @@ impl AcpV2Connection {
+             outgoing,
+             stderr,
+             debug_log,
+-        } = transport::spawn_stdio(&project, command, cx)?;
++        } = transport::spawn_stdio(&project, command, None, cx)?;
+         let mut child = transport::OwnedChild(child);
+         let stderr_task = cx
+             .background_spawn(async move {
 diff --git a/crates/agent_servers/src/agent_servers.rs b/crates/agent_servers/src/agent_servers.rs
-index 68fc849..77503d4 100644
+index ad59390..6eaef26 100644
 --- a/crates/agent_servers/src/agent_servers.rs
 +++ b/crates/agent_servers/src/agent_servers.rs
 @@ -1,6 +1,10 @@
@@ -16194,7 +16228,7 @@ index 0000000..8fac6d8
 +    }
 +}
 diff --git a/crates/zed/Cargo.toml b/crates/zed/Cargo.toml
-index c38d075..3efef93 100644
+index d76bc86..f441800 100644
 --- a/crates/zed/Cargo.toml
 +++ b/crates/zed/Cargo.toml
 @@ -70,6 +70,7 @@ action_log = { workspace = true, optional = true }

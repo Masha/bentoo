@@ -721,6 +721,7 @@ CRATES="
 	objc2-quartz-core@0.3.2
 	objc2-screen-capture-kit@0.3.2
 	objc2-security@0.3.2
+	objc2-ui-kit@0.3.2
 	objc2-user-notifications@0.3.2
 	objc2@0.5.2
 	objc2@0.6.3
@@ -1548,7 +1549,7 @@ declare -A GIT_CRATES=(
 # rewrites the date and EGIT_COMMIT; a second version variable it could not
 # keep current would leave a new tarball under an old, already-manifested name).
 
-EGIT_COMMIT="c403bc6af644cd0ab60c90045ac6dc3436218809"
+EGIT_COMMIT="3e145061d861ed32bb6a08dad7b03f2b5e455ad8"
 LLVM_COMPAT=( 22 )
 RUST_MIN_VER="1.98.1"
 RUST_NEEDS_LLVM=1

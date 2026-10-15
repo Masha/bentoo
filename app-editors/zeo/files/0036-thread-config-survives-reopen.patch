@@ -71,7 +71,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 ---
 
 diff --git a/Cargo.lock b/Cargo.lock
-index e2add4d..6e7c7ca 100644
+index b6c76d5..d7c774f 100644
 --- a/Cargo.lock
 +++ b/Cargo.lock
 @@ -381,6 +381,7 @@ dependencies = [
@@ -103,28 +103,28 @@ index 50b6e1c..a7e6306 100644
  fs.workspace = true
  
 diff --git a/crates/agent_servers/src/acp.rs b/crates/agent_servers/src/acp.rs
-index 1b9905a..c256b55 100644
+index 4e40a71..67c896c 100644
 --- a/crates/agent_servers/src/acp.rs
 +++ b/crates/agent_servers/src/acp.rs
-@@ -46,12 +46,16 @@ use util::path_list::PathList;
- use util::process::Child;
+@@ -27,7 +27,7 @@ use agent_client_protocol::{
+ use anyhow::{Context as _, Result, anyhow};
+ use collections::{HashMap, HashSet};
+ use futures::{Future, channel::mpsc};
+-use gpui::{App, AsyncApp, Entity, SharedString, Subscription, Task, WeakEntity};
++use gpui::{App, AsyncApp, Entity, SharedString, Subscription, Task, TaskExt as _, WeakEntity};
+ use project::AgentId;
+ use project::agent_server_store::{AgentServerCommand, AgentServerStore};
+ use std::{cell::RefCell, process::ExitStatus, rc::Rc};
+@@ -35,6 +35,8 @@ use task::SpawnInTerminal;
+ use thiserror::Error;
+ use util::ResultExt as _;
  
- use anyhow::{Context as _, Result};
--use gpui::{App, AppContext as _, AsyncApp, Entity, SharedString, Subscription, Task, WeakEntity};
-+use gpui::{
-+    App, AppContext as _, AsyncApp, Entity, SharedString, Subscription, Task, TaskExt as _,
-+    WeakEntity,
-+};
++use crate::thread_config_store;
++
+ const EXIT_DRAIN_TIMEOUT: std::time::Duration = std::time::Duration::from_millis(250);
  
- use acp_thread::{AcpThread, AuthRequired, LoadError, TerminalProviderEvent};
- use terminal::TerminalBuilder;
- use terminal::terminal_settings::{AlternateScroll, CursorShape};
- 
-+use crate::thread_config_store::{self, RecordedConfig, RecordedValue};
- use crate::{CURSOR_ID, GEMINI_ID};
- 
- pub const GEMINI_TERMINAL_AUTH_METHOD_ID: &str = "spawn-gemini-cli";
-@@ -465,12 +469,137 @@ impl ConfigOptions {
+ async fn exited_load_error_after_drain(
+@@ -300,12 +302,137 @@ impl ConfigOptions {
      }
  }
  
@@ -262,7 +262,27 @@ index 1b9905a..c256b55 100644
      _release_subscription: Subscription,
  }
  
-@@ -1221,6 +1350,7 @@ impl AcpConnection {
+diff --git a/crates/agent_servers/src/acp/v1.rs b/crates/agent_servers/src/acp/v1.rs
+index 16a24e9..0877d0a 100644
+--- a/crates/agent_servers/src/acp/v1.rs
++++ b/crates/agent_servers/src/acp/v1.rs
+@@ -1,5 +1,6 @@
+ use super::{
+-    AcpDebugLog, AcpDebugMessage, AcpSession, ClientContext, ConfigOptions, FlattenAcpResult as _,
++    AcpDebugLog, AcpDebugMessage, AcpSession, ClientContext, ConfigOptions, ConfigRecorder,
++    FlattenAcpResult as _, ModeTrigger,
+     ForegroundWork, UnsupportedVersion, drain_foreground_queue, enqueue_notification,
+     enqueue_request, first_class_terminal_auth_task, handle_v2_complete_elicitation,
+     handle_v2_create_elicitation, map_acp_error, respond_err, respond_result, runtime,
+@@ -45,6 +46,7 @@ use acp_thread::{AcpThread, LoadError, TerminalProviderEvent};
+ use terminal::TerminalBuilder;
+ use terminal::terminal_settings::{AlternateScroll, CursorShape};
+ 
++use crate::thread_config_store::{self, RecordedConfig, RecordedValue};
+ use crate::{CURSOR_ID, GEMINI_ID};
+ 
+ pub const GEMINI_TERMINAL_AUTH_METHOD_ID: &str = "spawn-gemini-cli";
+@@ -757,6 +759,7 @@ impl AcpConnection {
          session_modes: Option<Rc<RefCell<acp::SessionModeState>>>,
          config_options: Option<ConfigOptions>,
          default_config_task: Option<Task<()>>,
@@ -270,7 +290,7 @@ index 1b9905a..c256b55 100644
          cx: &mut App,
      ) {
          let release_subscription = cx.observe_release(thread, {
-@@ -1241,11 +1371,33 @@ impl AcpConnection {
+@@ -777,11 +780,33 @@ impl AcpConnection {
                  session_modes,
                  config_options,
                  default_config_task,
@@ -304,7 +324,7 @@ index 1b9905a..c256b55 100644
      fn remove_session(&self, session_id: &acp_v2::SessionId, thread_id: gpui::EntityId) {
          let mut sessions = self.sessions.borrow_mut();
          if sessions
-@@ -1391,7 +1543,15 @@ impl AcpConnection {
+@@ -927,7 +952,15 @@ impl AcpConnection {
                  cx,
              )
          });
@@ -321,7 +341,7 @@ index 1b9905a..c256b55 100644
  
          // The connection owns this task, so retaining the thread (which owns the
          // connection) here would keep both alive after all callers abandon the load.
-@@ -1403,6 +1563,7 @@ impl AcpConnection {
+@@ -939,6 +972,7 @@ impl AcpConnection {
                  let connection = self.connection.clone();
                  let dispatch_tx = self.dispatch_tx.clone();
                  let supports_close = self.agent_supports_session_close();
@@ -329,7 +349,7 @@ index 1b9905a..c256b55 100644
                  async move |cx| {
                      if thread.upgrade().is_none() {
                          if let Some(this) = this.upgrade() {
-@@ -1412,6 +1573,10 @@ impl AcpConnection {
+@@ -948,6 +982,10 @@ impl AcpConnection {
                          return Ok(());
                      }
  
@@ -340,7 +360,7 @@ index 1b9905a..c256b55 100644
                      let response =
                          rpc_call(connection.clone(), session_id.clone(), directories).await;
                      if response.is_err() {
-@@ -1434,7 +1599,7 @@ impl AcpConnection {
+@@ -970,7 +1008,7 @@ impl AcpConnection {
                      };
  
                      if let Some(_thread) = thread.upgrade() {
@@ -349,7 +369,7 @@ index 1b9905a..c256b55 100644
                              let mut sessions = connection_state.sessions.borrow_mut();
                              let Some(session) = sessions
                                  .get_mut(&session_id)
-@@ -1446,16 +1611,32 @@ impl AcpConnection {
+@@ -982,16 +1020,32 @@ impl AcpConnection {
                                      "session was closed or replaced before load completed"
                                  )));
                              };
@@ -384,7 +404,7 @@ index 1b9905a..c256b55 100644
                          connection_state.remove_pending_session(&session_id, thread.entity_id());
                          return Ok(());
                      }
-@@ -1491,22 +1672,31 @@ impl AcpConnection {
+@@ -1027,22 +1081,31 @@ impl AcpConnection {
          })
      }
  
@@ -418,7 +438,7 @@ index 1b9905a..c256b55 100644
                      // Retry deferred or reset defaults after dependent changes, but
                      // do not repeat an attempt in the same state if defaults conflict.
                      if attempted_defaults.iter().any(|(config_id, options)| {
-@@ -1514,60 +1704,50 @@ impl AcpConnection {
+@@ -1050,60 +1113,50 @@ impl AcpConnection {
                      }) {
                          return None;
                      }
@@ -517,7 +537,7 @@ index 1b9905a..c256b55 100644
                  };
                  config_options
                      .set_config_option(
-@@ -1581,8 +1761,223 @@ impl AcpConnection {
+@@ -1117,8 +1170,223 @@ impl AcpConnection {
              }
          })
      }
@@ -741,7 +761,7 @@ index 1b9905a..c256b55 100644
  #[derive(Clone, Debug, PartialEq, Eq)]
  struct SessionDirectories {
      cwd: PathBuf,
-@@ -1811,6 +2206,9 @@ impl AgentConnection for AcpConnection {
+@@ -1321,6 +1589,9 @@ impl AgentConnection for AcpConnection {
                  .map_err(map_acp_error)?;
  
              let (modes, config_options) = config_state(response.modes, response.config_options)?;
@@ -751,7 +771,7 @@ index 1b9905a..c256b55 100644
  
              let default_mode = self.defaults.mode();
              if let Some(default_mode) = default_mode {
-@@ -1829,6 +2227,7 @@ impl AgentConnection for AcpConnection {
+@@ -1339,6 +1610,7 @@ impl AgentConnection for AcpConnection {
                              let default_mode = default_mode.clone();
                              let session_id = response.session_id.clone();
                              let modes = modes.clone();
@@ -759,7 +779,7 @@ index 1b9905a..c256b55 100644
                              let conn = self.connection.clone();
                              async move |_| {
                                  let result = conn
-@@ -1843,6 +2242,9 @@ impl AgentConnection for AcpConnection {
+@@ -1353,6 +1625,9 @@ impl AgentConnection for AcpConnection {
                                  if result.is_none() {
                                      modes.borrow_mut().current_mode_id = initial_mode_id;
                                  }
@@ -769,7 +789,7 @@ index 1b9905a..c256b55 100644
                              }
                          })
                          .detach();
-@@ -1865,7 +2267,7 @@ impl AgentConnection for AcpConnection {
+@@ -1375,7 +1650,7 @@ impl AgentConnection for AcpConnection {
  
              let session_id = acp_v2::SessionId::new(response.session_id.0);
              let default_config_task = config_options.as_ref().map(|options| {
@@ -778,7 +798,7 @@ index 1b9905a..c256b55 100644
              });
  
              let action_log = cx.new(|_| ActionLog::new(project.clone()));
-@@ -1886,13 +2288,15 @@ impl AgentConnection for AcpConnection {
+@@ -1396,13 +1671,15 @@ impl AgentConnection for AcpConnection {
  
              cx.update(|cx| {
                  self.register_session(
@@ -796,7 +816,7 @@ index 1b9905a..c256b55 100644
              });
  
              registered
-@@ -2181,6 +2585,7 @@ impl AgentConnection for AcpConnection {
+@@ -1671,6 +1948,7 @@ impl AgentConnection for AcpConnection {
                  connection: self.connection.clone(),
                  session_id: session_id.clone(),
                  state: modes.clone(),
@@ -804,7 +824,7 @@ index 1b9905a..c256b55 100644
              }) as _)
          } else {
              None
-@@ -6482,6 +6887,7 @@ mod tests {
+@@ -5970,6 +6248,7 @@ mod tests {
                      acp::SessionMode::new("opaque/手動", "Manual"),
                  ],
              ))),
@@ -812,7 +832,7 @@ index 1b9905a..c256b55 100644
          };
          let selected = acp_v2::SessionConfigValueId::new("opaque/手動");
          let change = cx.update(|cx| modes.set_mode(selected.clone(), cx));
-@@ -6588,9 +6994,10 @@ mod tests {
+@@ -6076,9 +6355,10 @@ mod tests {
          ])));
  
          let mut async_cx = cx.to_async();
@@ -824,7 +844,7 @@ index 1b9905a..c256b55 100644
              &mut async_cx,
          );
          drop(async_cx);
-@@ -6706,9 +7113,10 @@ mod tests {
+@@ -6194,9 +6474,10 @@ mod tests {
                  config_state(None, Some(initial_options)).expect("initial config");
              let config_options = config_options.expect("config options");
              let mut receiver = config_options.rx.clone();
@@ -836,7 +856,7 @@ index 1b9905a..c256b55 100644
                  &mut cx.to_async(),
              );
              cx.run_until_parked();
-@@ -6784,9 +7192,10 @@ mod tests {
+@@ -6272,9 +6553,10 @@ mod tests {
          )];
          let config_options = ConfigOptions::new(Rc::new(RefCell::new(original_options.clone())));
          let mut receiver = config_options.rx.clone();
@@ -848,7 +868,7 @@ index 1b9905a..c256b55 100644
              &mut cx.to_async(),
          );
          cx.run_until_parked();
-@@ -6827,9 +7236,10 @@ mod tests {
+@@ -6315,9 +6597,10 @@ mod tests {
              acp_v2::SessionConfigOption::boolean("first", "First", false),
              acp_v2::SessionConfigOption::boolean("second", "Second", false),
          ])));
@@ -860,7 +880,7 @@ index 1b9905a..c256b55 100644
              &mut cx.to_async(),
          );
          cx.run_until_parked();
-@@ -9454,6 +9864,8 @@ struct AcpSessionModes {
+@@ -8947,6 +9230,8 @@ struct AcpSessionModes {
      session_id: acp_v2::SessionId,
      connection: ConnectionTo<Agent>,
      state: Rc<RefCell<acp::SessionModeState>>,
@@ -869,7 +889,7 @@ index 1b9905a..c256b55 100644
  }
  
  fn mode_from_v1(mode: &acp::SessionMode) -> acp_v2::SessionConfigSelectOption {
-@@ -9490,6 +9902,7 @@ impl acp_thread::AgentSessionModes for AcpSessionModes {
+@@ -8983,6 +9268,7 @@ impl acp_thread::AgentSessionModes for AcpSessionModes {
              state.current_mode_id = mode_id.clone();
          };
          let state = self.state.clone();
@@ -877,7 +897,7 @@ index 1b9905a..c256b55 100644
          cx.foreground_executor().spawn(async move {
              let result = connection
                  .send_request(acp::SetSessionModeRequest::new(session_id, mode_id))
-@@ -9499,6 +9912,12 @@ impl acp_thread::AgentSessionModes for AcpSessionModes {
+@@ -8992,6 +9278,12 @@ impl acp_thread::AgentSessionModes for AcpSessionModes {
              if result.is_err() {
                  state.borrow_mut().current_mode_id = old_mode_id;
              }
@@ -890,7 +910,7 @@ index 1b9905a..c256b55 100644
  
              result?;
  
-@@ -9991,7 +10410,7 @@ fn handle_session_notification(
+@@ -9241,7 +9533,7 @@ fn handle_session_notification(
  ) {
      let session_id = acp_v2::SessionId::new(notification.session_id.0);
      // Extract everything we need from the session while briefly borrowing.
@@ -899,7 +919,7 @@ index 1b9905a..c256b55 100644
          let sessions = ctx.sessions.borrow();
          let Some(session) = sessions.get(&session_id) else {
              log::warn!(
-@@ -10003,6 +10422,7 @@ fn handle_session_notification(
+@@ -9253,6 +9545,7 @@ fn handle_session_notification(
          (
              session.thread.clone(),
              session.session_modes.clone(),
@@ -907,7 +927,7 @@ index 1b9905a..c256b55 100644
              session
                  .config_options
                  .as_ref()
-@@ -10018,6 +10438,7 @@ fn handle_session_notification(
+@@ -9268,6 +9561,7 @@ fn handle_session_notification(
      {
          if let Some(session_modes) = &session_modes {
              session_modes.borrow_mut().current_mode_id = current_mode_id.clone();
@@ -915,11 +935,11 @@ index 1b9905a..c256b55 100644
          }
      }
  
-diff --git a/crates/agent_servers/src/acp/choose_value_tests.rs b/crates/agent_servers/src/acp/choose_value_tests.rs
+diff --git a/crates/agent_servers/src/acp/v1/choose_value_tests.rs b/crates/agent_servers/src/acp/v1/choose_value_tests.rs
 new file mode 100644
 index 0000000..2415630
 --- /dev/null
-+++ b/crates/agent_servers/src/acp/choose_value_tests.rs
++++ b/crates/agent_servers/src/acp/v1/choose_value_tests.rs
 @@ -0,0 +1,266 @@
 +//! Task 2.1 — `choose_value`, the pure per-option decision (story 015, patch `0036`).
 +//!
@@ -1187,11 +1207,11 @@ index 0000000..2415630
 +    assert!(recorded_is_offered(&toggle, &RecordedValue::Bool(true)));
 +    assert!(recorded_is_offered(&toggle, &RecordedValue::Bool(false)));
 +}
-diff --git a/crates/agent_servers/src/acp/recorder_mode_tests.rs b/crates/agent_servers/src/acp/recorder_mode_tests.rs
+diff --git a/crates/agent_servers/src/acp/v1/recorder_mode_tests.rs b/crates/agent_servers/src/acp/v1/recorder_mode_tests.rs
 new file mode 100644
 index 0000000..f4d548b
 --- /dev/null
-+++ b/crates/agent_servers/src/acp/recorder_mode_tests.rs
++++ b/crates/agent_servers/src/acp/v1/recorder_mode_tests.rs
 @@ -0,0 +1,197 @@
 +//! Task 3.2 — mode changes reach the recorder (story 015, patch `0036`).
 +//!
@@ -1390,11 +1410,11 @@ index 0000000..f4d548b
 +        "the later pick wins"
 +    );
 +}
-diff --git a/crates/agent_servers/src/acp/recorder_tests.rs b/crates/agent_servers/src/acp/recorder_tests.rs
+diff --git a/crates/agent_servers/src/acp/v1/recorder_tests.rs b/crates/agent_servers/src/acp/v1/recorder_tests.rs
 new file mode 100644
 index 0000000..dc02398
 --- /dev/null
-+++ b/crates/agent_servers/src/acp/recorder_tests.rs
++++ b/crates/agent_servers/src/acp/v1/recorder_tests.rs
 @@ -0,0 +1,191 @@
 +//! Task 3.1 — `ConfigRecorder`: every accepted config change is recorded
 +//! (story 015, patch `0036`).
@@ -1587,11 +1607,11 @@ index 0000000..dc02398
 +        "the rejected restored value must not survive in the record"
 +    );
 +}
-diff --git a/crates/agent_servers/src/acp/restore_mode_tests.rs b/crates/agent_servers/src/acp/restore_mode_tests.rs
+diff --git a/crates/agent_servers/src/acp/v1/restore_mode_tests.rs b/crates/agent_servers/src/acp/v1/restore_mode_tests.rs
 new file mode 100644
 index 0000000..8bce60f
 --- /dev/null
-+++ b/crates/agent_servers/src/acp/restore_mode_tests.rs
++++ b/crates/agent_servers/src/acp/v1/restore_mode_tests.rs
 @@ -0,0 +1,194 @@
 +//! Task 2.3 — restoring the recorded session mode on load (story 015, patch `0036`).
 +//!
@@ -1787,11 +1807,11 @@ index 0000000..8bce60f
 +    let _other = agent.load("m-other-thread", cx).await;
 +    assert_eq!(agent.mode_requests(), vec!["acceptEdits".to_string()]);
 +}
-diff --git a/crates/agent_servers/src/acp/restore_options_tests.rs b/crates/agent_servers/src/acp/restore_options_tests.rs
+diff --git a/crates/agent_servers/src/acp/v1/restore_options_tests.rs b/crates/agent_servers/src/acp/v1/restore_options_tests.rs
 new file mode 100644
 index 0000000..4950ff0
 --- /dev/null
-+++ b/crates/agent_servers/src/acp/restore_options_tests.rs
++++ b/crates/agent_servers/src/acp/v1/restore_options_tests.rs
 @@ -0,0 +1,377 @@
 +//! Task 2.2 — restoring recorded config options on load (story 015, patch `0036`).
 +//!
@@ -2170,11 +2190,11 @@ index 0000000..4950ff0
 +        "the read failure must be logged with the agent and the session id"
 +    );
 +}
-diff --git a/crates/agent_servers/src/acp/round_trip_tests.rs b/crates/agent_servers/src/acp/round_trip_tests.rs
+diff --git a/crates/agent_servers/src/acp/v1/round_trip_tests.rs b/crates/agent_servers/src/acp/v1/round_trip_tests.rs
 new file mode 100644
 index 0000000..df1cda0
 --- /dev/null
-+++ b/crates/agent_servers/src/acp/round_trip_tests.rs
++++ b/crates/agent_servers/src/acp/v1/round_trip_tests.rs
 @@ -0,0 +1,152 @@
 +//! Task 5.1 — what is recorded is what is restored, across a restart
 +//! (story 015, patch `0036`): the producer (`snapshot` through the recorder)
@@ -2328,12 +2348,12 @@ index 0000000..df1cda0
 +    assert_eq!(agent.mode_requests(), vec!["plan".to_string()]);
 +    assert_eq!(agent.current_mode("s-mode-trip").as_deref(), Some("plan"));
 +}
-diff --git a/crates/agent_servers/src/acp/thread_config_test_support.rs b/crates/agent_servers/src/acp/thread_config_test_support.rs
+diff --git a/crates/agent_servers/src/acp/v1/thread_config_test_support.rs b/crates/agent_servers/src/acp/v1/thread_config_test_support.rs
 new file mode 100644
-index 0000000..41f76e6
+index 0000000..bfd4d3a
 --- /dev/null
-+++ b/crates/agent_servers/src/acp/thread_config_test_support.rs
-@@ -0,0 +1,658 @@
++++ b/crates/agent_servers/src/acp/v1/thread_config_test_support.rs
+@@ -0,0 +1,661 @@
 +//! Shared harness for the thread-config tests of patch `0036` (story 015):
 +//! a scripted ACP agent over the real wire and the production client handler
 +//! set, so picks, agent updates and loads travel exactly as in Zeo.
@@ -2345,6 +2365,7 @@ index 0000000..41f76e6
 +use std::sync::Mutex;
 +
 +use super::*;
++use futures::StreamExt as _;
 +use crate::thread_config_store::{self, RecordedConfig, RecordedValue};
 +
 +pub(super) const WORK_DIR: &str = "/a";
@@ -2601,6 +2622,7 @@ index 0000000..41f76e6
 +            client_transport,
 +            dispatch_tx.clone(),
 +            connection_tx,
++            futures::future::pending(),
 +        );
 +        let client_io_task = cx.background_spawn(async move {
 +            client_future.await.ok();
@@ -2620,6 +2642,7 @@ index 0000000..41f76e6
 +            sessions: sessions.clone(),
 +            session_list: client_session_list.clone(),
 +            request_elicitations: request_elicitations.clone(),
++            active_request_scopes: None,
 +        };
 +        let dispatch_task = cx.spawn({
 +            let mut dispatch_rx = dispatch_rx;
@@ -2993,7 +3016,7 @@ index 0000000..41f76e6
 +    }
 +}
 diff --git a/crates/agent_servers/src/agent_servers.rs b/crates/agent_servers/src/agent_servers.rs
-index 0bc7394..68fc849 100644
+index 180bfeb..ad59390 100644
 --- a/crates/agent_servers/src/agent_servers.rs
 +++ b/crates/agent_servers/src/agent_servers.rs
 @@ -1,5 +1,8 @@

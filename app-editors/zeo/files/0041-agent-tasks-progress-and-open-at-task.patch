@@ -2226,7 +2226,7 @@ index 0000000..2a991c1
 +    assert_eq!(scroll_top(&a.panel, &mut a.cx), start);
 +}
 diff --git a/crates/agent_ui/src/conversation_view.rs b/crates/agent_ui/src/conversation_view.rs
-index 0531042..260cdd7 100644
+index 60031c9..895b609 100644
 --- a/crates/agent_ui/src/conversation_view.rs
 +++ b/crates/agent_ui/src/conversation_view.rs
 @@ -950,6 +950,23 @@ impl ConversationView {
@@ -2253,8 +2253,8 @@ index 0531042..260cdd7 100644
      pub fn set_work_dirs(&mut self, work_dirs: PathList, cx: &mut Context<Self>) {
          if let Some(connected) = self.as_connected() {
              connected.conversation.update(cx, |conversation, cx| {
-@@ -5902,6 +5919,65 @@ pub(crate) mod tests {
-         });
+@@ -5954,6 +5971,65 @@ pub(crate) mod tests {
+         );
      }
  
 +    // Story 023: a subagent shown full screen hides the root list, so jumping to a root tool
