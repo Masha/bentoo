@@ -609,7 +609,7 @@ url = "https://api.github.com/repos/ast-grep/ast-grep/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.50.0"
+version = "0.51.0"
 comments = """
 ast-grep - releases/latest returns a BARE version with no "v".
 
@@ -1846,7 +1846,7 @@ url = "https://api.github.com/repos/google/draco/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.5.7"
+version = "1.5.8"
 comments = """
 draco — releases/latest tag_name. The tag is a BARE semver with no "v" prefix
 ("1.5.7"), so it needs no rewriting and SRC_URI uses archive/refs/tags/${PV}.
@@ -3818,7 +3818,7 @@ base_from = "tag"
 base_url = "https://api.github.com/repos/KhronosGroup/glslang/git/refs/tags"
 base_tag_pattern = '^vulkan-sdk-([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)$'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.363.0_p20261014"
+version = "1.4.363.0_p20261015"
 comments = """
 glslang — commit-tracked on main; scans titles for vulkan-sdk-X.Y.Z.W to detect base bump.
 """
@@ -3852,7 +3852,7 @@ base_from = "tag"
 base_url = "https://api.github.com/repos/KhronosGroup/SPIRV-Tools/git/refs/tags"
 base_tag_pattern = '^vulkan-sdk-([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)$'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.363.0_p20261014"
+version = "1.4.363.0_p20261015"
 comments = """
 spirv-tools — commit-tracked on main; scans titles for vulkan-sdk-X.Y.Z.W to detect base bump.
 """
@@ -9944,7 +9944,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "1.30.2"
+version = "1.31.0"
 comments = """
 Opengrep (LGPL fork of Semgrep CE) — GitHub releases/latest tag "vX.Y.Z"
 (v stripped). SRC_URI pulls the bare per-arch/libc release binaries
@@ -10619,7 +10619,7 @@ transform = [['T.*', ""], ['-', ""]]
 commit_sha_path = "sha"
 base_from = "none"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0_pre20261014"
+version = "0_pre20261015"
 comments = """
 ik_llama-cpp — base_from = "none": upstream publishes no usable release
 series.  Verified 2026-07-19 and again 2026-08-04: the repo has exactly ONE
@@ -11530,7 +11530,7 @@ parser = "regex"
 pattern = '"tag_name":"v([0-9]+\.[0-9]+\.[0-9]+)","target_commitish":"[^"]*","name":"[^"]*","draft":false,"immutable":[a-z]+,"prerelease":false'
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "7.8.8"
+version = "7.8.12"
 comments = """
 Kilo Code — releases land several times a day (v7.6.1 and v7.6.2 shipped within
 hours of each other), so expect this record to move often.
@@ -11733,7 +11733,7 @@ tree rather than a single binary; those are not used.
 url = "https://registry.npmjs.org/@qwen-code%2fqwen-code"
 parser = "json"
 path = "dist-tags.latest"
-version = "0.25.1"
+version = "0.25.2"
 comments = """
 Qwen Code — probed through npm's dist-tags.latest, NOT through GitHub, although
 the distfiles come from GitHub release assets (releases/download/v${PV}).
@@ -11767,7 +11767,7 @@ parser = "regex"
 pattern = '"tag_name":\s*"v([0-9]+\.[0-9]+\.[0-9]+)"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "4.0.12"
+version = "4.0.13"
 comments = """
 CC Switch — a Tauri GUI for switching between Claude Code, Codex and Gemini
 CLI accounts. Tracks CC-Switch-v<PV>-Linux-{x86_64,arm64}.deb; note the asset
@@ -11812,7 +11812,7 @@ url = "https://registry.npmjs.org/@ccusage/ccusage-linux-x64/latest"
 parser = "regex"
 pattern = '"version":"([0-9]+\.[0-9]+\.[0-9]+)"'
 type = "bin"
-version = "20.0.33"
+version = "20.0.34"
 comments = """
 ccusage — probed on the PER-PLATFORM npm package, not on the main "ccusage"
 one and not on GitHub, and the distinction is load-bearing.
