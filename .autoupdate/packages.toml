@@ -3716,6 +3716,22 @@ strictly ordered, and series keeps this entry off the stable ebuild.
 """
 # END
 
+["app-editors/delta-bin"]
+url = "https://delta.dev/api/releases/stable/latest/asset?asset=delta&os=linux&arch=x86_64"
+parser = "json"
+path = "version"
+type = "bin"
+version = "0.20.0"
+comments = """
+Delta (Zed Industries) — the endpoint delta.dev/download calls when the Linux x64
+button is pressed (found in /_astro/query-client.*.js). Answers anonymously with
+{"version", "url"}; the url is releases.delta.dev/releases/stable/<version>/
+delta-linux-x86_64.tar.gz, which SRC_URI rebuilds from PV. Cross-check for a bump:
+releases.json in github.com/zed-industries/delta-nix pins the same tarball by
+sha256 (0.20.0 matched).
+"""
+# END
+
 ["dev-db/sqlitebrowser"]
 track = "commit"
 url = "https://api.github.com/repos/sqlitebrowser/sqlitebrowser/commits?sha=master&per_page=50"

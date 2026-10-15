@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@proton.me</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<longdescription lang="en">
+		Delta is a proprietary, AI-native code editor from Zed Industries,
+		the creators of Zed. This is the official pre-built Linux binary.
+		The CLI is installed as delta-bin to avoid clashing with
+		dev-util/git-delta.
+	</longdescription>
+	<upstream>
+		<doc lang="en">https://delta.dev/docs</doc>
+	</upstream>
+</pkgmetadata>
