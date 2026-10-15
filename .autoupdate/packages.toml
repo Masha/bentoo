@@ -9776,13 +9776,11 @@ which is why this entry carried no revision until 2026-07-26.
 # END
 
 ["sci-ml/ollama"]
-enabled = false
-disabled_by = "removed 2026-10-10 (sixth time): ::gentoo's 0.40.2 is strictly better -- it carries the bug 983804 libggml symlinks ours lacked, and its 0.40.2 deps tarball exists now"
 url = "https://api.github.com/repos/ollama/ollama/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.40.2"
+version = "0.40.4"
 comments = """
 ollama source — same repo as ollama-bin; tag "vX.Y.Z" (leading v stripped).
 
