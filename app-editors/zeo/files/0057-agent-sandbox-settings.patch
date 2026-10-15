@@ -111,7 +111,7 @@ spawns a real agent script and reads back its environment (story 050).
 ---
 
 diff --git a/Cargo.lock b/Cargo.lock
-index bae4b68..f8edf6d 100644
+index 898fa08..98eb21b 100644
 --- a/Cargo.lock
 +++ b/Cargo.lock
 @@ -368,6 +368,39 @@ dependencies = [
@@ -191,7 +191,7 @@ index bae4b68..f8edf6d 100644
   "agent_servers",
   "agent_settings",
   "agent_skills",
-@@ -16548,6 +16586,7 @@ name = "settings_ui"
+@@ -16546,6 +16584,7 @@ name = "settings_ui"
  version = "0.1.0"
  dependencies = [
   "agent",
@@ -199,7 +199,7 @@ index bae4b68..f8edf6d 100644
   "agent_settings",
   "agent_skills",
   "anyhow",
-@@ -16580,6 +16619,7 @@ dependencies = [
+@@ -16578,6 +16617,7 @@ dependencies = [
   "language_models",
   "log",
   "menu",
@@ -207,7 +207,7 @@ index bae4b68..f8edf6d 100644
   "paths",
   "picker",
   "platform_title_bar",
-@@ -16590,13 +16630,16 @@ dependencies = [
+@@ -16588,13 +16628,16 @@ dependencies = [
   "rodio",
   "schemars 1.0.4",
   "search",
@@ -224,7 +224,7 @@ index bae4b68..f8edf6d 100644
   "theme",
   "theme_settings",
   "ui",
-@@ -22507,6 +22550,7 @@ dependencies = [
+@@ -22521,6 +22564,7 @@ dependencies = [
   "activity_indicator",
   "agent",
   "agent-client-protocol",
@@ -233,7 +233,7 @@ index bae4b68..f8edf6d 100644
   "agent_settings",
   "agent_skills",
 diff --git a/Cargo.toml b/Cargo.toml
-index 9a7ced0..2c8dceb 100644
+index ba6ff8b..e7306db 100644
 --- a/Cargo.toml
 +++ b/Cargo.toml
 @@ -6,6 +6,7 @@ members = [
@@ -244,7 +244,7 @@ index 9a7ced0..2c8dceb 100644
      "crates/agent_servers",
      "crates/agent_settings",
      "crates/agent_skills",
-@@ -290,6 +291,7 @@ acp_tools = { path = "crates/acp_tools" }
+@@ -289,6 +290,7 @@ acp_tools = { path = "crates/acp_tools" }
  action_log = { path = "crates/action_log" }
  activity_indicator = { path = "crates/activity_indicator" }
  agent = { path = "crates/agent" }
@@ -10702,7 +10702,7 @@ index a7e6306..6b8fc54 100644
  tempfile.workspace = true
 +workspace = { workspace = true, features = ["test-support"] }
 diff --git a/crates/agent_servers/src/acp.rs b/crates/agent_servers/src/acp.rs
-index 67c896c..e57651b 100644
+index 13056d6..32a78a7 100644
 --- a/crates/agent_servers/src/acp.rs
 +++ b/crates/agent_servers/src/acp.rs
 @@ -12,7 +12,8 @@ use session_updates::{InboundSessionNotification, InboundSessionUpdate};
@@ -10929,7 +10929,7 @@ index 86f3d0c..0dc9ca6 100644
 +    }
  }
 diff --git a/crates/agent_servers/src/acp/v1.rs b/crates/agent_servers/src/acp/v1.rs
-index b402efa..73f99f7 100644
+index a1fa795..cc7b13b 100644
 --- a/crates/agent_servers/src/acp/v1.rs
 +++ b/crates/agent_servers/src/acp/v1.rs
 @@ -377,22 +377,35 @@ impl AgentSessionList for AcpSessionList {
@@ -11038,10 +11038,10 @@ index b402efa..73f99f7 100644
          let connection_rx = async move {
              connection_rx
 diff --git a/crates/agent_servers/src/acp/v2.rs b/crates/agent_servers/src/acp/v2.rs
-index e943bfd..a1171c2 100644
+index ca3643c..d727cdb 100644
 --- a/crates/agent_servers/src/acp/v2.rs
 +++ b/crates/agent_servers/src/acp/v2.rs
-@@ -75,7 +75,7 @@ impl AcpV2Connection {
+@@ -79,7 +79,7 @@ impl AcpV2Connection {
              outgoing,
              stderr,
              debug_log,
@@ -13040,10 +13040,10 @@ index 6fc9ad2..8a55068 100644
  mod devtools_delivery_tests;
  
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
-index ce96357..48969a3 100644
+index 2054981..4b752de 100644
 --- a/crates/agent_ui/src/conversation_view/thread_view.rs
 +++ b/crates/agent_ui/src/conversation_view/thread_view.rs
-@@ -6029,6 +6029,22 @@ impl ThreadView {
+@@ -6042,6 +6042,22 @@ impl ThreadView {
          )
      }
  

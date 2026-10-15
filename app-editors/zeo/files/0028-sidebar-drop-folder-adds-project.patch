@@ -55,7 +55,7 @@ Co-Authored-By: Claude Opus 5.5 (1M context) <noreply@anthropic.com>
 ---
 
 diff --git a/crates/sidebar/src/sidebar.rs b/crates/sidebar/src/sidebar.rs
-index e89cdc7..de74c09 100644
+index 1dcef2a..04c40cb 100644
 --- a/crates/sidebar/src/sidebar.rs
 +++ b/crates/sidebar/src/sidebar.rs
 @@ -31,9 +31,9 @@ use feature_flags::{
@@ -143,7 +143,7 @@ index e89cdc7..de74c09 100644
      /// Opens a new workspace for a group that has no open workspaces.
      fn open_workspace_for_group(
          &mut self,
-@@ -8388,6 +8446,9 @@ impl Render for Sidebar {
+@@ -8392,6 +8450,9 @@ impl Render for Sidebar {
  
          let color = cx.theme().colors();
          let bg = color.background.blend(color.panel_background);
@@ -153,7 +153,7 @@ index e89cdc7..de74c09 100644
  
          let no_open_projects = !self.contents.has_open_projects;
          let no_search_results = self.contents.entries.is_empty();
-@@ -8425,6 +8486,8 @@ impl Render for Sidebar {
+@@ -8429,6 +8490,8 @@ impl Render for Sidebar {
                  this.recent_projects_popover_handle.toggle(window, cx);
              }))
              .font(ui_font)

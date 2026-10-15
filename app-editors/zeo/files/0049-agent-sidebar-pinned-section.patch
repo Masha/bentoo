@@ -314,7 +314,7 @@ index 0000000..eb9f1ff
 +    }
 +}
 diff --git a/crates/sidebar/src/sidebar.rs b/crates/sidebar/src/sidebar.rs
-index 55b6c93..e89cdc7 100644
+index 0cfd728..1dcef2a 100644
 --- a/crates/sidebar/src/sidebar.rs
 +++ b/crates/sidebar/src/sidebar.rs
 @@ -1,3 +1,4 @@
@@ -1456,7 +1456,7 @@ index 55b6c93..e89cdc7 100644
          }
      }
  
-@@ -8006,6 +8410,7 @@ impl Render for Sidebar {
+@@ -8010,6 +8414,7 @@ impl Render for Sidebar {
              .on_action(cx.listener(Self::unfold_all))
              .on_action(cx.listener(Self::cancel))
              .on_action(cx.listener(Self::archive_selected_thread))

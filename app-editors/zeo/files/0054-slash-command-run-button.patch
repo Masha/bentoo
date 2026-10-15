@@ -1133,7 +1133,7 @@ index e3b8c34..d8babd2 100644
  }
  
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
-index c4f84c4..03d8ad3 100644
+index bb0e7c1..2fe0fe6 100644
 --- a/crates/agent_ui/src/conversation_view/thread_view.rs
 +++ b/crates/agent_ui/src/conversation_view/thread_view.rs
 @@ -830,6 +830,7 @@ impl ThreadView {
@@ -1171,7 +1171,7 @@ index c4f84c4..03d8ad3 100644
          }
          this
      }
-@@ -8869,8 +8882,9 @@ impl ThreadView {
+@@ -8882,8 +8895,9 @@ impl ThreadView {
      }
  
      /// `offers_slash_commands` is set only for an agent's message: a code block
@@ -1183,7 +1183,7 @@ index c4f84c4..03d8ad3 100644
      fn render_message_content(
          &self,
          entry_ix: usize,
-@@ -13136,43 +13150,40 @@ impl ThreadView {
+@@ -13149,43 +13163,40 @@ impl ThreadView {
      fn slash_command_action(
          &self,
          cx: &App,
@@ -1257,7 +1257,7 @@ index c4f84c4..03d8ad3 100644
          }
      }
  
-@@ -13866,6 +13877,71 @@ impl ThreadView {
+@@ -13879,6 +13890,71 @@ impl ThreadView {
      }
  }
  
@@ -1915,10 +1915,10 @@ index e38ceed..5ab92e1 100644
 +    );
  }
 diff --git a/crates/markdown/src/markdown.rs b/crates/markdown/src/markdown.rs
-index 5017161..52fd855 100644
+index 6b77137..559d37f 100644
 --- a/crates/markdown/src/markdown.rs
 +++ b/crates/markdown/src/markdown.rs
-@@ -1736,7 +1736,7 @@ pub struct CodeBlockAction {
+@@ -1739,7 +1739,7 @@ pub struct CodeBlockAction {
      pub on_click: Rc<dyn Fn(&str, &mut Window, &mut App)>,
  }
  
@@ -1927,7 +1927,7 @@ index 5017161..52fd855 100644
  
  pub struct MarkdownElement {
      markdown: Entity<Markdown>,
-@@ -1841,11 +1841,12 @@ impl MarkdownElement {
+@@ -1844,11 +1844,12 @@ impl MarkdownElement {
          self
      }
  
@@ -1943,7 +1943,7 @@ index 5017161..52fd855 100644
      ) -> Self {
          self.code_block_action = Some(Rc::new(action));
          self
-@@ -3182,13 +3183,15 @@ impl Element for MarkdownElement {
+@@ -3185,13 +3186,15 @@ impl Element for MarkdownElement {
                          {
                              let copy_button_visibility = *copy_button_visibility;
                              let wrap_button_visibility = *wrap_button_visibility;
@@ -1966,7 +1966,7 @@ index 5017161..52fd855 100644
                              builder.modify_current_div(|el| {
                                  let any_hover = copy_button_visibility
                                      == CopyButtonVisibility::VisibleOnHover
-@@ -3229,14 +3232,17 @@ impl Element for MarkdownElement {
+@@ -3232,14 +3235,17 @@ impl Element for MarkdownElement {
                                              ))
                                          },
                                      )
@@ -1992,7 +1992,7 @@ index 5017161..52fd855 100644
                                      .when(
                                          copy_button_visibility != CopyButtonVisibility::Hidden,
                                          |this| {
-@@ -3616,13 +3622,16 @@ fn render_wrap_code_block_button(
+@@ -3619,13 +3625,16 @@ fn render_wrap_code_block_button(
  
  fn render_code_block_action_button(
      id: usize,

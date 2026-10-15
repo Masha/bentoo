@@ -419,7 +419,7 @@ index 0000000..5f74176
 +    );
 +}
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
-index 03d8ad3..4844a24 100644
+index 2fe0fe6..19b6027 100644
 --- a/crates/agent_ui/src/conversation_view/thread_view.rs
 +++ b/crates/agent_ui/src/conversation_view/thread_view.rs
 @@ -35,6 +35,7 @@ use crate::unicode_confusables;
@@ -457,7 +457,7 @@ index 03d8ad3..4844a24 100644
              question_queue: QuestionQueue::default(),
              _cancel_task: None,
              _save_task: None,
-@@ -3444,12 +3449,113 @@ impl ThreadView {
+@@ -3457,12 +3462,113 @@ impl ThreadView {
          }
      }
  
@@ -572,7 +572,7 @@ index 03d8ad3..4844a24 100644
          self.respond_to_elicitation(
              elicitation_id,
              acp_v2::CreateElicitationResponse::new(acp_v2::ElicitationAction::Decline),
-@@ -7526,6 +7632,10 @@ impl ThreadView {
+@@ -7539,6 +7645,10 @@ impl ThreadView {
              AgentThreadEntry::Elicitation(elicitation_id) => {
                  let thread = self.thread.read(cx);
                  if let Some((_, elicitation)) = thread.elicitation(elicitation_id)
@@ -583,7 +583,7 @@ index 03d8ad3..4844a24 100644
                      && should_render_elicitation(elicitation)
                      && !Self::renders_elicitation_as_card(elicitation, cx)
                  {
-@@ -7691,6 +7801,43 @@ impl ThreadView {
+@@ -7704,6 +7814,43 @@ impl ThreadView {
          .render(cx)
      }
  
@@ -627,7 +627,7 @@ index 03d8ad3..4844a24 100644
      fn elicitation_card_handlers(&self, cx: &Context<Self>) -> ElicitationCardHandlers {
          let view = cx.entity().downgrade();
  
-@@ -14669,6 +14816,14 @@ fn strip_leading_command(text: &str, command_name: &str) -> String {
+@@ -14682,6 +14829,14 @@ fn strip_leading_command(text: &str, command_name: &str) -> String {
  
  #[cfg(test)]
  mod tests {

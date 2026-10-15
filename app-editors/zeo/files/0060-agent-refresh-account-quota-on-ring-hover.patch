@@ -50,7 +50,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 ---
 
 diff --git a/crates/acp_thread/src/acp_thread.rs b/crates/acp_thread/src/acp_thread.rs
-index 77743b9..648d10c 100644
+index 3e70ef7..ef1b146 100644
 --- a/crates/acp_thread/src/acp_thread.rs
 +++ b/crates/acp_thread/src/acp_thread.rs
 @@ -3507,6 +3507,11 @@ pub struct AccountUsageWindow {
@@ -85,7 +85,7 @@ index 77743b9..648d10c 100644
              background_task_count: 0,
              tasks: Vec::new(),
              announced_task_endings: HashSet::default(),
-@@ -4764,6 +4775,43 @@ impl AcpThread {
+@@ -4802,6 +4813,43 @@ impl AcpThread {
          (!self.account_usage.is_empty()).then_some(&self.account_usage)
      }
  
@@ -129,7 +129,7 @@ index 77743b9..648d10c 100644
      /// How many tasks the agent reports running in the background — work that outlives
      /// the turn that launched it, so [`Self::status`] reads `Idle` while it runs.
      pub fn background_task_count(&self) -> usize {
-@@ -8542,6 +8590,66 @@ mod tests {
+@@ -8580,6 +8628,66 @@ mod tests {
          assert_eq!(utilization(150.0), Some(1.0), "clamped to the track");
      }
  
@@ -196,7 +196,7 @@ index 77743b9..648d10c 100644
      /// 0011 end to end on the thread: the payload rides `_meta["_claude/rateLimit"]` of a
      /// UsageUpdate, lands in `account_usage()`, and fires AccountUsageUpdated once -- and
      /// not again for the same payload.
-@@ -20451,6 +20559,11 @@ mod tests {
+@@ -20676,6 +20784,11 @@ mod tests {
          supports_truncate: bool,
          sessions: Arc<parking_lot::Mutex<HashMap<acp_v2::SessionId, WeakEntity<AcpThread>>>>,
          set_title_calls: Rc<RefCell<Vec<SharedString>>>,
@@ -208,7 +208,7 @@ index 77743b9..648d10c 100644
          on_user_message: Option<
              Rc<
                  dyn Fn(
-@@ -20472,6 +20585,9 @@ mod tests {
+@@ -20697,6 +20810,9 @@ mod tests {
                  on_user_message: None,
                  sessions: Arc::default(),
                  set_title_calls: Default::default(),
@@ -218,7 +218,7 @@ index 77743b9..648d10c 100644
              }
          }
  
-@@ -20505,6 +20621,23 @@ mod tests {
+@@ -20730,6 +20846,23 @@ mod tests {
              AgentId::new("fake")
          }
  
@@ -243,7 +243,7 @@ index 77743b9..648d10c 100644
              "fake".into()
          }
 diff --git a/crates/acp_thread/src/connection.rs b/crates/acp_thread/src/connection.rs
-index b3c72f4..4dde810 100644
+index 0533750..c3eae78 100644
 --- a/crates/acp_thread/src/connection.rs
 +++ b/crates/acp_thread/src/connection.rs
 @@ -152,6 +152,20 @@ pub trait AgentConnection {
@@ -268,7 +268,7 @@ index b3c72f4..4dde810 100644
      fn stop_task(
          self: Rc<Self>,
 diff --git a/crates/agent_servers/src/acp/v1.rs b/crates/agent_servers/src/acp/v1.rs
-index 32bdf05..b402efa 100644
+index 153504b..a1fa795 100644
 --- a/crates/agent_servers/src/acp/v1.rs
 +++ b/crates/agent_servers/src/acp/v1.rs
 @@ -55,6 +55,10 @@ const PARAMETERIZED_MODEL_PICKER_META_KEY: &str = "parameterizedModelPicker";
@@ -503,10 +503,10 @@ index 0000000..ce3a950
 +    }
 +}
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
-index 4844a24..324cbce 100644
+index 19b6027..3de1b89 100644
 --- a/crates/agent_ui/src/conversation_view/thread_view.rs
 +++ b/crates/agent_ui/src/conversation_view/thread_view.rs
-@@ -5757,34 +5757,12 @@ impl ThreadView {
+@@ -5770,34 +5770,12 @@ impl ThreadView {
          let input_max_label = crate::humanize_token_count(max_input_tokens);
          let output_max_label = crate::humanize_token_count(max_output_tokens);
  
@@ -544,7 +544,7 @@ index 4844a24..324cbce 100644
                  let percentage = percentage.clone();
                  let used = used.clone();
                  let max = max.clone();
-@@ -5796,7 +5774,19 @@ impl ThreadView {
+@@ -5809,7 +5787,19 @@ impl ThreadView {
                  let workspace = workspace.clone();
                  let cost_label = cost_label.clone();
                  let account_rows = account_rows.clone();
@@ -565,7 +565,7 @@ index 4844a24..324cbce 100644
                      percentage,
                      account_rows,
                      account_credits_required,
-@@ -5836,6 +5826,7 @@ impl ThreadView {
+@@ -5849,6 +5839,7 @@ impl ThreadView {
              Some(
                  h_flex()
                      .id("split_token_usage")
@@ -573,7 +573,7 @@ index 4844a24..324cbce 100644
                      .flex_shrink_0()
                      .gap_1p5()
                      .mr_1()
-@@ -5884,6 +5875,7 @@ impl ThreadView {
+@@ -5897,6 +5888,7 @@ impl ThreadView {
              Some(
                  h_flex()
                      .id("circular_progress_tokens")
@@ -581,7 +581,7 @@ index 4844a24..324cbce 100644
                      .mt_px()
                      .mr_1()
                      .child(
-@@ -5902,6 +5894,21 @@ impl ThreadView {
+@@ -5915,6 +5907,21 @@ impl ThreadView {
          }
      }
  
@@ -603,7 +603,7 @@ index 4844a24..324cbce 100644
      fn fast_mode_available(&self, cx: &Context<Self>) -> bool {
          self.as_native_thread(cx)
              .and_then(|thread| thread.read(cx).model())
-@@ -6787,11 +6794,35 @@ impl ThreadView {
+@@ -6800,11 +6807,35 @@ impl ThreadView {
      }
  }
  
@@ -641,7 +641,7 @@ index 4844a24..324cbce 100644
  #[derive(Clone)]
  struct AccountUsageRow {
      label: SharedString,
-@@ -6801,6 +6832,7 @@ struct AccountUsageRow {
+@@ -6814,6 +6845,7 @@ struct AccountUsageRow {
  }
  
  struct TokenUsageTooltip {

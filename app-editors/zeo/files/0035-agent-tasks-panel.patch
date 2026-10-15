@@ -122,7 +122,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 ---
 
 diff --git a/Cargo.lock b/Cargo.lock
-index d7c774f..dc24cdc 100644
+index c0ded26..6dd7259 100644
 --- a/Cargo.lock
 +++ b/Cargo.lock
 @@ -450,6 +450,33 @@ dependencies = [
@@ -159,7 +159,7 @@ index d7c774f..dc24cdc 100644
  [[package]]
  name = "agent_ui"
  version = "0.1.0"
-@@ -22429,6 +22456,7 @@ dependencies = [
+@@ -22443,6 +22470,7 @@ dependencies = [
   "agent_servers",
   "agent_settings",
   "agent_skills",
@@ -168,7 +168,7 @@ index d7c774f..dc24cdc 100644
   "anyhow",
   "ashpd",
 diff --git a/Cargo.toml b/Cargo.toml
-index 4ec681e..49b3f21 100644
+index a2972f0..760105d 100644
 --- a/Cargo.toml
 +++ b/Cargo.toml
 @@ -9,6 +9,7 @@ members = [
@@ -179,7 +179,7 @@ index 4ec681e..49b3f21 100644
      "crates/agent_ui",
      "crates/ai_onboarding",
      "crates/anthropic",
-@@ -290,6 +291,7 @@ agent = { path = "crates/agent" }
+@@ -289,6 +290,7 @@ agent = { path = "crates/agent" }
  agent_servers = { path = "crates/agent_servers" }
  agent_settings = { path = "crates/agent_settings" }
  agent_skills = { path = "crates/agent_skills" }

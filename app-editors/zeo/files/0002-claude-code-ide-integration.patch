@@ -78,7 +78,7 @@ name are invalid. The terminal environment is one helper,
 ---
 
 diff --git a/Cargo.lock b/Cargo.lock
-index 2f14e94..dddc3d5 100644
+index d4c890e..abe760b 100644
 --- a/Cargo.lock
 +++ b/Cargo.lock
 @@ -3046,6 +3046,32 @@ version = "0.7.6"
@@ -114,7 +114,7 @@ index 2f14e94..dddc3d5 100644
  [[package]]
  name = "cli"
  version = "0.1.0"
-@@ -22473,6 +22499,7 @@ dependencies = [
+@@ -22487,6 +22513,7 @@ dependencies = [
   "channel",
   "chrono",
   "clap",
@@ -123,7 +123,7 @@ index 2f14e94..dddc3d5 100644
   "client",
   "clock",
 diff --git a/Cargo.toml b/Cargo.toml
-index 49b3f21..60ffedc 100644
+index 760105d..df252c0 100644
 --- a/Cargo.toml
 +++ b/Cargo.toml
 @@ -28,6 +28,7 @@ members = [
@@ -134,7 +134,7 @@ index 49b3f21..60ffedc 100644
      "crates/cli",
      "crates/client",
      "crates/clock",
-@@ -308,6 +309,7 @@ buffer_diff = { path = "crates/buffer_diff" }
+@@ -307,6 +308,7 @@ buffer_diff = { path = "crates/buffer_diff" }
  call = { path = "crates/call" }
  call_hierarchy = { path = "crates/call_hierarchy" }
  channel = { path = "crates/channel" }

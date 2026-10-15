@@ -41,7 +41,7 @@ window and values above 1 are read as percentages.
 ---
 
 diff --git a/crates/acp_thread/src/acp_thread.rs b/crates/acp_thread/src/acp_thread.rs
-index 848d438..8428367 100644
+index ea7abde..0ba861b 100644
 --- a/crates/acp_thread/src/acp_thread.rs
 +++ b/crates/acp_thread/src/acp_thread.rs
 @@ -43,7 +43,7 @@ use serde::{Deserialize, Serialize};
@@ -292,7 +292,7 @@ index 848d438..8428367 100644
              cost: None,
              prompt_capabilities,
              available_commands: Vec::new(),
-@@ -4294,6 +4498,15 @@ impl AcpThread {
+@@ -4332,6 +4536,15 @@ impl AcpThread {
          Ok(())
      }
  
@@ -308,7 +308,7 @@ index 848d438..8428367 100644
      pub fn cost(&self) -> Option<&SessionCost> {
          self.cost.as_ref()
      }
-@@ -5330,7 +5543,18 @@ impl AcpThread {
+@@ -5368,7 +5581,18 @@ impl AcpThread {
                  meta: cost.meta,
              });
          }
@@ -327,7 +327,7 @@ index 848d438..8428367 100644
      }
  
      pub fn update_retry_status(&mut self, status: RetryStatus, cx: &mut Context<Self>) {
-@@ -7801,6 +8025,198 @@ fn update_markdown_in_place(markdown: &Entity<Markdown>, text: &str, cx: &mut Ap
+@@ -7839,6 +8063,198 @@ fn update_markdown_in_place(markdown: &Entity<Markdown>, text: &str, cx: &mut Ap
  
  #[cfg(test)]
  mod tests {
@@ -539,7 +539,7 @@ index 48f6487..f943a3c 100644
              | AcpThreadEvent::SubagentSpawned(_)
              | AcpThreadEvent::EntriesRemoved(_)
 diff --git a/crates/agent_ui/src/conversation_view.rs b/crates/agent_ui/src/conversation_view.rs
-index 28e1454..c6c6478 100644
+index a155df0..e5a9527 100644
 --- a/crates/agent_ui/src/conversation_view.rs
 +++ b/crates/agent_ui/src/conversation_view.rs
 @@ -348,6 +348,7 @@ impl Conversation {
@@ -573,7 +573,7 @@ index 28e1454..c6c6478 100644
                  if let Some(thread_view) = self.thread_view(&session_id) {
                      let available_skills = thread
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
-index 63b830c..0e429a6 100644
+index 7e263fe..e083225 100644
 --- a/crates/agent_ui/src/conversation_view/thread_view.rs
 +++ b/crates/agent_ui/src/conversation_view/thread_view.rs
 @@ -9,7 +9,7 @@ use agent_client_protocol::schema::v2 as acp_v2;
@@ -585,7 +585,7 @@ index 63b830c..0e429a6 100644
      SandboxAuthorizationDetails, SandboxFallbackAuthorizationDetails, SandboxNotAppliedReason,
      SubmissionId, SubmissionResponse, SubmissionState, ToolCallLocation, decode_path_escapes,
  };
-@@ -5388,6 +5388,32 @@ impl ThreadView {
+@@ -5401,6 +5401,32 @@ impl ThreadView {
          let input_max_label = crate::humanize_token_count(max_input_tokens);
          let output_max_label = crate::humanize_token_count(max_output_tokens);
  
@@ -618,7 +618,7 @@ index 63b830c..0e429a6 100644
          let build_tooltip = {
              move |_window: &mut Window, cx: &mut App| {
                  let percentage = percentage.clone();
-@@ -5400,8 +5426,11 @@ impl ThreadView {
+@@ -5413,8 +5439,11 @@ impl ThreadView {
                  let project_entry_ids = project_entry_ids.clone();
                  let workspace = workspace.clone();
                  let cost_label = cost_label.clone();
@@ -630,7 +630,7 @@ index 63b830c..0e429a6 100644
                      used,
                      max,
                      input_tokens: input_tokens_label,
-@@ -6389,8 +6418,23 @@ impl ThreadView {
+@@ -6402,8 +6431,23 @@ impl ThreadView {
      }
  }
  
@@ -654,7 +654,7 @@ index 63b830c..0e429a6 100644
      used: String,
      max: String,
      input_tokens: String,
-@@ -6418,6 +6462,8 @@ impl Render for TokenUsageTooltip {
+@@ -6431,6 +6475,8 @@ impl Render for TokenUsageTooltip {
          let output_max = self.output_max.clone();
          let show_split = self.show_split;
          let cost_label = self.cost_label.clone();
@@ -663,7 +663,7 @@ index 63b830c..0e429a6 100644
          let global_agents_md_loaded = self.global_agents_md_loaded;
          let project_rules_count = self.project_rules_count;
          let project_entry_ids = self.project_entry_ids.clone();
-@@ -6480,6 +6526,68 @@ impl Render for TokenUsageTooltip {
+@@ -6493,6 +6539,68 @@ impl Render for TokenUsageTooltip {
                              .child(Label::new(cost_label)),
                      )
                  })

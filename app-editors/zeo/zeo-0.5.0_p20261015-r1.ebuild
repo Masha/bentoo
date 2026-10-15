@@ -127,10 +127,10 @@ CRATES="
 	bigdecimal@0.4.8
 	bincode@1.3.3
 	bindgen@0.72.1
+	bit-set@0.11.1
 	bit-set@0.8.0
-	bit-set@0.9.1
+	bit-vec@0.10.1
 	bit-vec@0.8.0
-	bit-vec@0.9.1
 	bit_field@0.10.3
 	bitflags@1.3.2
 	bitflags@2.13.1
@@ -182,7 +182,7 @@ CRATES="
 	cexpr@0.6.0
 	cfg-expr@0.20.9
 	cfg-if@1.0.4
-	cfg_aliases@0.2.1
+	cfg_aliases@0.2.2
 	chacha20@0.10.1
 	chardetng@0.1.17
 	chrono@0.4.42
@@ -439,13 +439,11 @@ CRATES="
 	glob@0.3.3
 	globset@0.4.17
 	gloo-timers@0.3.0
-	glow@0.17.0
+	glow@0.18.0
 	glutin_wgl_sys@0.6.1
 	gobject-sys@0.21.5
 	goblin@0.9.3
 	gpu-allocator@0.28.0
-	gpu-descriptor-types@0.2.0
-	gpu-descriptor@0.3.2
 	granit-parser@1.0.0
 	group@0.12.1
 	guppy-workspace-hack@0.1.0
@@ -475,7 +473,6 @@ CRATES="
 	heed@0.21.0
 	hermit-abi@0.5.2
 	hex@0.4.3
-	hexf-parse@0.2.1
 	hkdf@0.12.4
 	hmac@0.12.1
 	home@0.5.11
@@ -562,7 +559,7 @@ CRATES="
 	jni@0.21.1
 	jni@0.22.4
 	jobserver@0.1.34
-	js-sys@0.3.97
+	js-sys@0.3.106
 	json5@1.3.1
 	jsonschema-regex@0.51.0
 	jsonschema-value@0.51.0
@@ -621,6 +618,8 @@ CRATES="
 	lyon_tessellation@1.0.16
 	mac-notification-sys@0.6.15
 	mach2@0.6.0
+	macro_rules_attribute-proc_macro@0.2.3
+	macro_rules_attribute@0.2.3
 	malloc_buf@0.0.6
 	manatee@0.8.0-alpha.5
 	maplit@1.0.2
@@ -659,7 +658,6 @@ CRATES="
 	moxcms@0.8.1
 	msvc_spectre_libs@0.1.3
 	multimap@0.8.3
-	naga@29.0.4
 	nanoid@0.4.0
 	native-tls@0.2.18
 	nbformat@1.2.0
@@ -761,6 +759,7 @@ CRATES="
 	password-hash@0.4.2
 	paste@1.0.15
 	pastey@0.1.1
+	pastey@0.2.3
 	pathdiff@0.2.3
 	pathfinder_geometry@0.5.1
 	pathfinder_simd@0.5.6
@@ -1234,11 +1233,11 @@ CRATES="
 	wasip2@1.0.1+wasi-0.2.4
 	wasip3@0.4.0+wasi-0.3.0-rc-2026-01-06
 	wasite@0.1.0
-	wasm-bindgen-futures@0.4.70
-	wasm-bindgen-macro-support@0.2.120
-	wasm-bindgen-macro@0.2.120
-	wasm-bindgen-shared@0.2.120
-	wasm-bindgen@0.2.120
+	wasm-bindgen-futures@0.4.79
+	wasm-bindgen-macro-support@0.2.129
+	wasm-bindgen-macro@0.2.129
+	wasm-bindgen-shared@0.2.129
+	wasm-bindgen@0.2.129
 	wasm-encoder@0.201.0
 	wasm-encoder@0.227.1
 	wasm-encoder@0.244.0
@@ -1278,22 +1277,13 @@ CRATES="
 	wayland-protocols@0.32.9
 	wayland-scanner@0.31.7
 	wayland-sys@0.31.11
-	web-sys@0.3.97
+	web-sys@0.3.106
 	web-time@1.1.0
 	web_atoms@0.2.6
 	webpki-root-certs@1.0.9
 	webpki-roots@0.26.8
 	webpki-roots@1.0.8
 	weezl@0.1.10
-	wgpu-core-deps-apple@29.0.4
-	wgpu-core-deps-emscripten@29.0.4
-	wgpu-core-deps-wasm@29.0.4
-	wgpu-core-deps-windows-linux-android@29.0.4
-	wgpu-core@29.0.4
-	wgpu-hal@29.0.4
-	wgpu-naga-bridge@29.0.4
-	wgpu-types@29.0.4
-	wgpu@29.0.4
 	which@8.0.5
 	whoami@1.6.1
 	winapi-i686-pc-windows-gnu@0.4.0
@@ -1485,6 +1475,8 @@ declare -A GIT_CRATES=(
 	[livekit-runtime]='https://github.com/zed-industries/livekit-rust-sdks;0a1c519cfce9b365229026b55de9b9dbdb6fed3c;livekit-rust-sdks-%commit%/livekit-runtime'
 	[livekit]='https://github.com/zed-industries/livekit-rust-sdks;0a1c519cfce9b365229026b55de9b9dbdb6fed3c;livekit-rust-sdks-%commit%/livekit'
 	[lsp-types]='https://github.com/zed-industries/lsp-types;f1783e63a7f4eb4397bf51d4148b4895a1f7ab16;lsp-types-%commit%'
+	[naga-types]='https://github.com/gfx-rs/wgpu;3b3506ea31154edc04de64debda0e780cba2639c;wgpu-%commit%/naga-types'
+	[naga]='https://github.com/gfx-rs/wgpu;3b3506ea31154edc04de64debda0e780cba2639c;wgpu-%commit%/naga'
 	[notify-types]='https://github.com/zed-industries/notify;d842f16b2716bd60f09caf3ae3a894237ab38f54;notify-%commit%/notify-types'
 	[notify]='https://github.com/zed-industries/notify;d842f16b2716bd60f09caf3ae3a894237ab38f54;notify-%commit%/notify'
 	[nvim-rs]='https://github.com/KillTheMule/nvim-rs;764dd270c642f77f10f3e19d05cc178a6cbe69f3;nvim-rs-%commit%'
@@ -1532,6 +1524,17 @@ declare -A GIT_CRATES=(
 	[wasm_thread]='https://github.com/zed-industries/wasm_thread;0cf96c7708dfb97ccf3da50347e25edcf75d6937;wasm_thread-%commit%'
 	[webrtc-sys-build]='https://github.com/zed-industries/livekit-rust-sdks;0a1c519cfce9b365229026b55de9b9dbdb6fed3c;livekit-rust-sdks-%commit%/webrtc-sys/build'
 	[webrtc-sys]='https://github.com/zed-industries/livekit-rust-sdks;0a1c519cfce9b365229026b55de9b9dbdb6fed3c;livekit-rust-sdks-%commit%/webrtc-sys'
+	[wgpu-core-deps-apple]='https://github.com/gfx-rs/wgpu;3b3506ea31154edc04de64debda0e780cba2639c;wgpu-%commit%/wgpu-core/platform-deps/apple'
+	[wgpu-core-deps-emscripten]='https://github.com/gfx-rs/wgpu;3b3506ea31154edc04de64debda0e780cba2639c;wgpu-%commit%/wgpu-core/platform-deps/emscripten'
+	[wgpu-core-deps-linux-android-bsd]='https://github.com/gfx-rs/wgpu;3b3506ea31154edc04de64debda0e780cba2639c;wgpu-%commit%/wgpu-core/platform-deps/linux-android-bsd'
+	[wgpu-core-deps-wasm]='https://github.com/gfx-rs/wgpu;3b3506ea31154edc04de64debda0e780cba2639c;wgpu-%commit%/wgpu-core/platform-deps/wasm'
+	[wgpu-core-deps-windows]='https://github.com/gfx-rs/wgpu;3b3506ea31154edc04de64debda0e780cba2639c;wgpu-%commit%/wgpu-core/platform-deps/windows'
+	[wgpu-core]='https://github.com/gfx-rs/wgpu;3b3506ea31154edc04de64debda0e780cba2639c;wgpu-%commit%/wgpu-core'
+	[wgpu-hal]='https://github.com/gfx-rs/wgpu;3b3506ea31154edc04de64debda0e780cba2639c;wgpu-%commit%/wgpu-hal'
+	[wgpu-naga-bridge]='https://github.com/gfx-rs/wgpu;3b3506ea31154edc04de64debda0e780cba2639c;wgpu-%commit%/wgpu-naga-bridge'
+	[wgpu-sync]='https://github.com/gfx-rs/wgpu;3b3506ea31154edc04de64debda0e780cba2639c;wgpu-%commit%/wgpu-sync'
+	[wgpu-types]='https://github.com/gfx-rs/wgpu;3b3506ea31154edc04de64debda0e780cba2639c;wgpu-%commit%/wgpu-types'
+	[wgpu]='https://github.com/gfx-rs/wgpu;3b3506ea31154edc04de64debda0e780cba2639c;wgpu-%commit%/wgpu'
 	[windows-capture]='https://github.com/zed-industries/windows-capture;f0d6c1b6691db75461b732f6d5ff56eed002eeb9;windows-capture-%commit%'
 	[wprcontrol]='https://github.com/zed-industries/wprcontrol;cd811f7d744f65291e13131b1d907fda63ed91a1;wprcontrol-%commit%'
 	[xim-ctext]='https://github.com/zed-industries/xim-rs;16f35a2c881b815a2b6cdfd6687988e84f8447d8;xim-rs-%commit%/xim-ctext'
@@ -1549,8 +1552,8 @@ declare -A GIT_CRATES=(
 # rewrites the date and EGIT_COMMIT; a second version variable it could not
 # keep current would leave a new tarball under an old, already-manifested name).
 
-EGIT_COMMIT="e462f873c622f6265736bf8468e7a017f4ba99de"
-LLVM_COMPAT=( 22 )
+EGIT_COMMIT="7fa2adbe088c8feb3173aec4fc5f8ac0fc153f31"
+LLVM_COMPAT=( 22 23 )
 RUST_MIN_VER="1.98.1"
 RUST_NEEDS_LLVM=1
 WEBRTC_COMMIT="0001d84-4"

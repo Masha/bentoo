@@ -60,7 +60,7 @@ Tests added 2026-10-10 (story 032 v4): Background -> Completed marks a pinned ro
 ---
 
 diff --git a/crates/acp_thread/src/acp_thread.rs b/crates/acp_thread/src/acp_thread.rs
-index 7454281..8575dfc 100644
+index 90c7665..3a31cda 100644
 --- a/crates/acp_thread/src/acp_thread.rs
 +++ b/crates/acp_thread/src/acp_thread.rs
 @@ -3627,6 +3627,15 @@ impl AccountUsage {
@@ -111,7 +111,7 @@ index 7454281..8575dfc 100644
              cost: None,
              prompt_capabilities,
              available_commands: Vec::new(),
-@@ -4583,6 +4596,12 @@ impl AcpThread {
+@@ -4621,6 +4634,12 @@ impl AcpThread {
          (!self.account_usage.is_empty()).then_some(&self.account_usage)
      }
  
@@ -124,7 +124,7 @@ index 7454281..8575dfc 100644
      pub fn cost(&self) -> Option<&SessionCost> {
          self.cost.as_ref()
      }
-@@ -4748,6 +4767,22 @@ impl AcpThread {
+@@ -4786,6 +4805,22 @@ impl AcpThread {
                  self.push_notice(notices::from_v1(notice).map_err(acp_v1::Error::from)?, cx);
              }
              acp_v1::SessionUpdate::SessionInfoUpdate(info_update) => {
@@ -147,7 +147,7 @@ index 7454281..8575dfc 100644
                  self.update_session_info(session_info_update_from_v1(info_update), cx);
              }
              acp_v1::SessionUpdate::AvailableCommandsUpdate(acp_v1::AvailableCommandsUpdate {
-@@ -21280,6 +21315,136 @@ mod tests {
+@@ -21505,6 +21540,136 @@ mod tests {
          );
      }
  
@@ -297,7 +297,7 @@ index f943a3c..9727fae 100644
              | AcpThreadEvent::SubagentSpawned(_)
              | AcpThreadEvent::EntriesRemoved(_)
 diff --git a/crates/agent_ui/src/conversation_view.rs b/crates/agent_ui/src/conversation_view.rs
-index 102533c..4f84c03 100644
+index 50f8a8d..fb980e5 100644
 --- a/crates/agent_ui/src/conversation_view.rs
 +++ b/crates/agent_ui/src/conversation_view.rs
 @@ -349,6 +349,7 @@ impl Conversation {
@@ -328,7 +328,7 @@ index 102533c..4f84c03 100644
                  // A redraw is all this needs: the account section is built from the thread
                  // when the tooltip opens, so there is no per-turn state to recompute.
 diff --git a/crates/sidebar/src/sidebar.rs b/crates/sidebar/src/sidebar.rs
-index de74c09..12eb9ba 100644
+index 04c40cb..a4b9dfd 100644
 --- a/crates/sidebar/src/sidebar.rs
 +++ b/crates/sidebar/src/sidebar.rs
 @@ -443,7 +443,14 @@ fn apply_live_row_state(
@@ -370,7 +370,7 @@ index de74c09..12eb9ba 100644
                  }
                  if thread.draft.is_some() {
                      let workspace = thread.workspace.clone();
-@@ -8626,6 +8638,9 @@ fn all_thread_infos_for_workspace(
+@@ -8630,6 +8642,9 @@ fn all_thread_infos_for_workspace(
              } else {
                  match thread.status() {
                      ThreadStatus::Generating => AgentThreadStatus::Running,

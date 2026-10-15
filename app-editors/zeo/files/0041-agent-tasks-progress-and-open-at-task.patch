@@ -2226,7 +2226,7 @@ index 0000000..2a991c1
 +    assert_eq!(scroll_top(&a.panel, &mut a.cx), start);
 +}
 diff --git a/crates/agent_ui/src/conversation_view.rs b/crates/agent_ui/src/conversation_view.rs
-index 60031c9..895b609 100644
+index 831cf57..432726d 100644
 --- a/crates/agent_ui/src/conversation_view.rs
 +++ b/crates/agent_ui/src/conversation_view.rs
 @@ -950,6 +950,23 @@ impl ConversationView {
@@ -2253,7 +2253,7 @@ index 60031c9..895b609 100644
      pub fn set_work_dirs(&mut self, work_dirs: PathList, cx: &mut Context<Self>) {
          if let Some(connected) = self.as_connected() {
              connected.conversation.update(cx, |conversation, cx| {
-@@ -5954,6 +5971,65 @@ pub(crate) mod tests {
+@@ -5994,6 +6011,65 @@ pub(crate) mod tests {
          );
      }
  

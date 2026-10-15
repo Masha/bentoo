@@ -2442,7 +2442,7 @@ index a340b53..ca8cdbe 100644
  pub use crate::message_editor::MessageEditorEvent;
  pub use crate::task_label::{
 diff --git a/crates/agent_ui/src/conversation_view.rs b/crates/agent_ui/src/conversation_view.rs
-index 3181ceb..60031c9 100644
+index 36c4aec..831cf57 100644
 --- a/crates/agent_ui/src/conversation_view.rs
 +++ b/crates/agent_ui/src/conversation_view.rs
 @@ -1832,6 +1832,14 @@ impl ConversationView {
