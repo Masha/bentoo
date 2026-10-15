@@ -755,7 +755,7 @@ url = "https://dl.pstmn.io/api/version/latest?platform=linux64&channel=stable"
 parser = "json"
 path = "version"
 type = "bin"
-version = "12.32.2"
+version = "12.32.3"
 comments = """
 Postman — official version API; clean {"version":"..."}.
 """
@@ -968,7 +968,7 @@ moving alias and unusable as a distfile.
 url = "https://windsurf-stable.codeiumdata.com/wVxQEIWkwPUEAGf3/apt/dists/stable/main/binary-amd64/Packages"
 parser = "regex"
 pattern = 'Package: devin-desktop\nVersion: ([0-9]+\.[0-9]+\.[0-9]+)'
-version = "3.10.48"
+version = "3.10.67"
 comments = """
 Windsurf — rebranded to "Devin Desktop". The docs.devin.ai changelog is a
 client-rendered SPA that stalls headless rendering; read the APT index of the
@@ -1981,7 +1981,7 @@ commit_sha_path = "[0].id"
 base_from = "file"
 base_url = "https://code.videolan.org/api/v4/projects/videolan%2Fvlc/repository/files/configure.ac/raw?ref=master"
 base_pattern = 'AC_INIT\(\[vlc\], \[([0-9][0-9.]*)-dev\]\)'
-version = "4.0.0_pre20261014"
+version = "4.0.0_pre20261015"
 comments = """
 vlc — 4.0 development snapshot, commit-tracked on master; _pre suffix
 preserved from the current ebuild. Only the 4.0 line lives here: 3.0.x is
@@ -2089,7 +2089,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "2.1.13"
+version = "2.1.14"
 comments = """
 bisq2 (bisq2-bin) — tag "vX.Y.Z".
 """
@@ -3102,7 +3102,7 @@ commit_sha_path = "[0].id"
 base_from = "file"
 base_url = "https://gitlab.freedesktop.org/mesa/mesa/-/raw/main/VERSION"
 base_pattern = '^([0-9][0-9.]*)-devel'
-version = "26.3.0_pre20261014"
+version = "26.3.0_pre20261015"
 comments = """
 mesa — commit-tracked on main; _pre suffix preserved from current ebuild.
 
@@ -3120,7 +3120,7 @@ commit_sha_path = "[0].id"
 base_from = "file"
 base_url = "https://gitlab.freedesktop.org/mesa/mesa/-/raw/main/VERSION"
 base_pattern = '^([0-9][0-9.]*)-devel'
-version = "26.3.0_pre20261014"
+version = "26.3.0_pre20261015"
 comments = """
 mesa_clc — part of the mesa tree; same source/rule as media-libs/mesa.
 """
@@ -3135,7 +3135,7 @@ transform = [['T.*', ""], ['-', ""]]
 commit_sha_path = "[0].sha"
 base_from = "none"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.5.0_p20261014"
+version = "0.5.0_p20261015"
 comments = """
 zeo — commit-tracked on Zed's main; the snapshot plus the bentoo patch series and
 the rebrand. 2026-10-01: this entry WAS app-editors/zed, which now builds
@@ -3721,7 +3721,7 @@ url = "https://delta.dev/api/releases/stable/latest/asset?asset=delta&os=linux&a
 parser = "json"
 path = "version"
 type = "bin"
-version = "0.20.0"
+version = "0.20.1"
 comments = """
 Delta (Zed Industries) — the endpoint delta.dev/download calls when the Linux x64
 button is pressed (found in /_astro/query-client.*.js). Answers anonymously with
@@ -3818,7 +3818,7 @@ base_from = "tag"
 base_url = "https://api.github.com/repos/KhronosGroup/glslang/git/refs/tags"
 base_tag_pattern = '^vulkan-sdk-([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)$'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.363.0_p20261013"
+version = "1.4.363.0_p20261014"
 comments = """
 glslang — commit-tracked on main; scans titles for vulkan-sdk-X.Y.Z.W to detect base bump.
 """
@@ -3929,7 +3929,7 @@ base_from = "file"
 base_url = "https://raw.githubusercontent.com/KhronosGroup/Vulkan-ValidationLayers/main/CMakeLists.txt"
 base_pattern = '(?m)^project\([A-Za-z_-]+ VERSION ([0-9][0-9.]*)'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.365_p20261014"
+version = "1.4.365_p20261015"
 comments = """
 vulkan-layers — commit-tracked on main (Vulkan-ValidationLayers); scans for "Update for Vulkan-Docs X.Y.Z".
 """
@@ -9522,7 +9522,7 @@ pattern = '"name":\s*"Hermes Agent v([0-9]+\.[0-9]+\.[0-9]+)'
 headers = { "User-Agent" = "bentoo-autoupdate" }
 aux_var = "MY_TAG"
 aux_pattern = '"tag_name":\s*"v([0-9]+\.[0-9]+\.[0-9]+)"'
-version = "0.22.0"
+version = "0.22.2"
 comments = """
 hermes-agent -- tags are dated (v2026.9.24) while PV is the pyproject SemVer
 (0.21.5); the release name carries both: "Hermes Agent v0.21.5 (v2026.9.24)".
@@ -9604,7 +9604,7 @@ url = "https://sources.debian.org/api/src/xorg-server/"
 parser = "regex"
 pattern = '"version":\s*"2:([0-9]+\.[0-9]+\.[0-9]+-[0-9]+)"'
 transform = [['-', "."]]
-version = "21.1.25.1"
+version = "21.1.25.2"
 comments = """
 xvfb-run PV = xorg-server X.Y.Z plus the Debian diff revision W => X.Y.Z.W; SRC_URI fetches
 mirror://debian .../xorg-server_X.Y.Z-W.diff.gz. The Debian sources API JSON lists versions
@@ -11837,7 +11837,7 @@ parser = "regex"
 pattern = '"tag_name":\s*"v([0-9]+\.[0-9]+\.[0-9]+)"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "2.3.2"
+version = "2.3.3"
 comments = """
 OpenChamber — a desktop cockpit for parallel opencode sessions. Tracks
 OpenChamber-<PV>-linux-{x86_64,arm64}.AppImage; the same release also carries
@@ -12956,7 +12956,7 @@ parser = "regex"
 pattern = 'href="(21\.0\.0-(?:beta|rc)[0-9]+)/"'
 transform = [['-', "_"]]
 select = "max"
-version = "21.0.0_beta1"
+version = "21.0.0_beta2"
 comments = """
 qt-creator -- PRE-RELEASE MIRROR: ::gentoo carries the 20.x finals; bentoo
 ships the 21.0 betas/RCs ahead of it. The URL pins development_releases/21.0
