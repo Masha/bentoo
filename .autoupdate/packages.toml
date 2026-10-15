@@ -185,7 +185,7 @@
 url = "https://registry.npmjs.org/@anthropic-ai/claude-code"
 parser = "json"
 path = "dist-tags.latest"
-version = "2.1.299"
+version = "2.1.300"
 comments = """
 claude-code — npm @anthropic-ai/claude-code; dist-tags.latest is the stable channel.
 
@@ -766,7 +766,7 @@ url = "https://nodejs.org/dist/latest-v24.x/SHASUMS256.txt"
 parser = "regex"
 pattern = 'node-v(24\.[0-9]+\.[0-9]+)\.tar\.xz'
 select = "max"
-version = "24.21.0-r1"
+version = "24.22.0"
 comments = """
 Node.js SLOT 24 — the previous LTS line.
 
@@ -1697,7 +1697,7 @@ url = "https://api.github.com/repos/conda/conda/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "26.9.2"
+version = "26.9.3"
 comments = """
 conda — tag bare "X.Y.Z".
 """
@@ -2524,7 +2524,7 @@ url = "https://api.github.com/repos/brave/brave-browser/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.97.56"
+version = "1.97.57"
 comments = """
 brave-browser — releases/latest is the stable channel (tag "vX.Y.Z").
 """
@@ -3626,7 +3626,7 @@ transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "source"
 series = '^[0-9.]+(?:-r[0-9]+)?$'
-version = "1.23.3"
+version = "1.24.2"
 comments = """
 zed (stable channel), from source — since 2026-10-01 app-editors/zed builds
 upstream's tagged releases with no patches; the patched snapshot is app-editors/
@@ -3650,7 +3650,7 @@ select = "max"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "source"
 series = '_pre(?:-r[0-9]+)?$'
-version = "1.24.2_pre"
+version = "1.25.0_pre"
 comments = """
 zed (preview channel), from source — mirrors zed-bin@preview; the same manual
 follow-up as zed@stable applies to every bump.
@@ -3681,7 +3681,7 @@ path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
 series = '^[0-9.]+(?:-r[0-9]+)?$'
-version = "1.23.3"
+version = "1.24.2"
 comments = """
 zed-bin (stable channel) — releases/latest is the stable release by definition
 (prerelease=false); upstream tags it "vX.Y.Z" and the preview "vX.Y.Z-pre".
@@ -3706,7 +3706,7 @@ select = "max"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
 series = '_pre(?:-r[0-9]+)?$'
-version = "1.24.2_pre"
+version = "1.25.0_pre"
 comments = """
 zed-bin (preview channel) — releases/latest never returns a prerelease, so the
 preview needs the full list: the pattern takes only "vX.Y.Z-pre" tags and the
@@ -9334,7 +9334,7 @@ url = "https://api.github.com/repos/zeo-workspace/claude-agent-tui/releases/late
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.14.13"
+version = "0.16.0"
 comments = """
 Renamed from dev-util/claude-agent-tui (commit e8a05fdc: del old ebuild + add
 claude-agent-acp-tui, same upstream repo zeo-workspace/claude-agent-tui, same PV).
@@ -10002,7 +10002,7 @@ url = "https://api.github.com/repos/zeo-workspace/claude-agent-acp-plus/releases
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.27.0"
+version = "0.30.0"
 comments = """
 claude-agent-acp-plus — GitHub releases/latest tag "vX.Y.Z" (v stripped).
 SRC_URI releases/download/v${PV}/${P}-bundle.tar.gz. Live=v0.2.0.
@@ -10130,7 +10130,7 @@ pattern = '"name":\s*"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 series = '^2\.'
-version = "2.38.0"
+version = "2.38.1"
 comments = """
 aws-cli v2 — GitHub tag index, pinned to the 2.x series. Verified 2026-08-19
 against the live endpoint: 100 matches, all of them 2.x, max = 2.36.27 = ebuild.
@@ -10188,7 +10188,7 @@ url = "https://api.github.com/repos/digitalocean/doctl/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.186.0"
+version = "2.0.0"
 comments = """
 doctl (DigitalOcean CLI, historically "doit"/DoCli) — GitHub releases/latest
 tag "vX.Y.Z"; the leading v is normalized away by the autoupdate. Verified
@@ -11549,7 +11549,7 @@ parser = "regex"
 pattern = '"tag_name":\s*"v([0-9]+\.[0-9]+\.[0-9]+)"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "1.0.97"
+version = "1.0.98"
 comments = """
 GitHub Copilot CLI — TWO PARALLEL TRAINS out of one repository, and picking the
 wrong one is the whole trap here:
@@ -11802,7 +11802,7 @@ url = "https://registry.npmjs.org/@ccusage/ccusage-linux-x64/latest"
 parser = "regex"
 pattern = '"version":"([0-9]+\.[0-9]+\.[0-9]+)"'
 type = "bin"
-version = "20.0.32"
+version = "20.0.33"
 comments = """
 ccusage — probed on the PER-PLATFORM npm package, not on the main "ccusage"
 one and not on GitHub, and the distinction is load-bearing.
@@ -13961,7 +13961,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "0.8.2"
+version = "0.9.0"
 comments = """
 PhotoCraft (ArtCraft "Craft App Suite") — GitHub releases, tagged "vX.Y.Z".
 SRC_URI is the upstream linux-x86_64 tarball, so a bump is PV plus one DIST --
@@ -13980,7 +13980,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "0.7.1"
+version = "0.8.0"
 comments = """
 PdfCraft (ArtCraft "Craft App Suite") — GitHub releases, tagged "vX.Y.Z"; same
 shape as media-gfx/photocraft-bin, whose record explains the -bin choice.
@@ -13996,7 +13996,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "0.7.2"
+version = "0.8.0"
 comments = """
 FilmCraft (ArtCraft "Craft App Suite") — GitHub releases, tagged "vX.Y.Z"; same
 shape as media-gfx/photocraft-bin, whose record explains the -bin choice.
@@ -14012,7 +14012,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "0.10.0"
+version = "0.11.0"
 comments = """
 VectorCraft (ArtCraft "Craft App Suite") — GitHub releases, tagged "vX.Y.Z"; same
 shape as media-gfx/photocraft-bin, whose record explains the -bin choice.
@@ -14028,7 +14028,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "0.7.1"
+version = "0.8.0"
 comments = """
 LightCraft (ArtCraft "Craft App Suite") — GitHub releases, tagged "vX.Y.Z"; same
 shape as media-gfx/photocraft-bin, whose record explains the -bin choice.
@@ -14060,7 +14060,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "0.9.2"
+version = "0.10.0"
 comments = """
 EffectCraft (ArtCraft "Craft App Suite") — GitHub releases, tagged "vX.Y.Z"; same
 shape as media-gfx/photocraft-bin, whose record explains the -bin choice.
@@ -14076,7 +14076,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "0.6.1"
+version = "0.7.0"
 comments = """
 GridCraft (ArtCraft "Craft App Suite") — GitHub releases, tagged "vX.Y.Z"; same
 shape as media-gfx/photocraft-bin, whose record explains the -bin choice.
@@ -14092,7 +14092,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "0.6.2"
+version = "0.7.0"
 comments = """
 CADCraft (ArtCraft "Craft App Suite") — GitHub releases, tagged "vX.Y.Z"; same
 shape as media-gfx/photocraft-bin, whose record explains the -bin choice.
@@ -14108,7 +14108,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "0.6.1"
+version = "0.7.0"
 comments = """
 DeckCraft (ArtCraft "Craft App Suite") — GitHub releases, tagged "vX.Y.Z"; same
 shape as media-gfx/photocraft-bin, whose record explains the -bin choice.
@@ -14124,7 +14124,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "0.6.1"
+version = "0.7.0"
 comments = """
 SoundCraft (ArtCraft "Craft App Suite") — GitHub releases, tagged "vX.Y.Z"; same
 shape as media-gfx/photocraft-bin, whose record explains the -bin choice.
