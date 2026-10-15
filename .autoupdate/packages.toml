@@ -828,7 +828,9 @@ be fixed there before any entry could ever track it.
 # END
 
 ["mail-client/thunderbird"]
-url = "https://product-details.mozilla.org/1.0/thunderbird_versions.json"
+enabled = false
+disabled_by = "parity-audit 2026-10-15: removed, ::gentoo 158.0 re-rolled firefox-158-patches-01t without 0027, the only divergence"
+url ="https://product-details.mozilla.org/1.0/thunderbird_versions.json"
 parser = "json"
 path = "LATEST_THUNDERBIRD_VERSION"
 version = "158.0"
@@ -883,11 +885,22 @@ net-print/hplip-plugin -- swept back in by the same non-selective
 not, being the very copies the parity audit had removed, and were deleted
 again. Re-check that before the next revival: if ::gentoo catches up to the
 version being restored, there is nothing here to maintain.
+Left a third time on 2026-10-15 at 158.0, through a path the parity diff
+cannot see: the sole divergence was an `rm` of
+0027-bmo-2071536-audio_thread_priority-musl-fix.patch in src_prepare, and
+Gentoo then republished firefox-158-patches-01t.tar.xz UNDER THE SAME NAME
+(22916 -> 17252 bytes, 2026-10-14 08:11 GMT) without that patch. The overlay
+Manifest still pinned the old hash, so a clean fetch failed the digest check,
+and the `rm ... || die` would have died on the new tarball anyway. Before a
+revival, compare the patchset DIST size/hash on both sides, not only the
+ebuild text.
 """
 # END
 
 ["mail-client/thunderbird-l10n"]
-url = "https://product-details.mozilla.org/1.0/thunderbird_versions.json"
+enabled = false
+disabled_by = "parity-audit 2026-10-15: removed with mail-client/thunderbird, byte-identical to ::gentoo 158.0"
+url ="https://product-details.mozilla.org/1.0/thunderbird_versions.json"
 parser = "json"
 path = "LATEST_THUNDERBIRD_VERSION"
 version = "158.0"
