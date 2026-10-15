@@ -3135,7 +3135,7 @@ transform = [['T.*', ""], ['-', ""]]
 commit_sha_path = "[0].sha"
 base_from = "none"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.4.0_p20261014"
+version = "0.5.0_p20261014"
 comments = """
 zeo — commit-tracked on Zed's main; the snapshot plus the bentoo patch series and
 the rebrand. 2026-10-01: this entry WAS app-editors/zed, which now builds
@@ -3663,7 +3663,7 @@ disabled_by = "released by hand: zed-patches/scripts/release-portable.sh builds 
 url = "https://api.github.com/repos/zed-industries/zed/commits?sha=main&per_page=1"
 parser = "json"
 path = "[0].commit.committer.date"
-version = "0.2.3_p20261009"
+version = "0.5.0_p20261014"
 comments = """
 zeo-bin — the prebuilt app-editors/zeo at the same PV, x86-64-v3, an asset of the
 zeo-workspace/zeo GitHub release v${PVR} (distfiles.obentoo.org until 2026-10-03).

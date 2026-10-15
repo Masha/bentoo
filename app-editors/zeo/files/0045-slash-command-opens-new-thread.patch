@@ -54,10 +54,10 @@ Pure Zed and generic ACP: it rides `claude-agent-acp-plus` BY CHOICE, like
 ---
 
 diff --git a/crates/agent_ui/src/agent_panel.rs b/crates/agent_ui/src/agent_panel.rs
-index e2ca78f..2a93f7c 100644
+index acbf155..5d1c090 100644
 --- a/crates/agent_ui/src/agent_panel.rs
 +++ b/crates/agent_ui/src/agent_panel.rs
-@@ -2120,6 +2120,72 @@ impl AgentPanel {
+@@ -2332,6 +2332,72 @@ impl AgentPanel {
          self.activate_new_thread(true, AgentThreadSource::AgentPanel, window, cx);
      }
  
@@ -130,7 +130,7 @@ index e2ca78f..2a93f7c 100644
      fn set_selected_agent_and_persist(&mut self, agent: Agent, cx: &mut Context<Self>) {
          if self.selected_agent != agent {
              self.selected_agent = agent.clone();
-@@ -7403,6 +7469,12 @@ pub(crate) fn scroll_to_root_tool_call(
+@@ -7620,6 +7686,12 @@ pub(crate) fn scroll_to_root_tool_call(
  #[cfg(test)]
  mod tests {
      use super::*;
@@ -713,10 +713,10 @@ index 0000000..a7fa618
 +    );
 +}
 diff --git a/crates/agent_ui/src/agent_ui.rs b/crates/agent_ui/src/agent_ui.rs
-index fff3f14..97a285c 100644
+index f1135a3..e3b8c34 100644
 --- a/crates/agent_ui/src/agent_ui.rs
 +++ b/crates/agent_ui/src/agent_ui.rs
-@@ -1070,6 +1070,23 @@ fn update_active_language_model_from_settings(cx: &mut App) {
+@@ -1081,6 +1081,23 @@ fn update_active_language_model_from_settings(cx: &mut App) {
      });
  }
  

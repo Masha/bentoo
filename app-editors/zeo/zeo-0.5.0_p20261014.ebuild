@@ -1573,6 +1573,14 @@ inherit cargo check-reqs desktop flag-o-matic llvm-r1 toolchain-funcs xdg
 # when those two gain an arm64 build; nothing else here is amd64-bound.
 DESCRIPTION="Zeo - the Zed editor, rebranded, with the bentoo patch series"
 HOMEPAGE="https://github.com/zeo-workspace/zeo https://zed.dev"
+# The Firefox build of zeo-browser (story 045), installed system-wide so Firefox
+# loads it without a manual step. Built reproducibly from zed/zeo-browser
+# (`npm run build` -> dist/zeo-browser-firefox.zip, renamed .xpi); the release
+# story publishes it as a zeo-workspace/zeo release asset under this name.
+# cargo_src_unpack hands it to unpack, which skips an .xpi and leaves it in
+# DISTDIR for src_install.
+ZEO_BROWSER_PV="0.1.0"
+
 SRC_URI="
 	https://github.com/zed-industries/zed/archive/${EGIT_COMMIT}.tar.gz -> zed-${EGIT_COMMIT}.tar.gz
 	amd64? (
@@ -1583,7 +1591,10 @@ SRC_URI="
 		https://github.com/zed-industries/livekit-rust-sdks/releases/download/webrtc-${WEBRTC_COMMIT}/webrtc-linux-arm64-release.zip ->
 			webrtc-${WEBRTC_COMMIT}-linux-arm64-release.zip
 	)
-	${CARGO_CRATE_URIS}"
+	${CARGO_CRATE_URIS}
+	browser-extension? (
+		https://github.com/zeo-workspace/zeo/releases/download/zeo-browser-${ZEO_BROWSER_PV}/zeo-browser-firefox-${ZEO_BROWSER_PV}.xpi
+	)"
 
 # The upstream tarball unpacks to zed-<commit>; ${PN} is "zeo" here, so the
 # directory must be named explicitly rather than derived from it.
@@ -1623,9 +1634,12 @@ KEYWORDS="~amd64"
 #
 # ai-jail was added on 2026-10-03, carried over from app-editors/zed when that
 # package stopped being part of this chain: it pulls in sys-apps/ai-jail, a
-# sandbox for AI coding agents, and tells how to run claude-agent-acp-plus
-# inside it. It changes nothing in this binary -- Zeo only spawns the agent
-# command a user's settings name -- so it is off by default.
+# sandbox for AI coding agents. Since story 043 it also applies patch 0057, the
+# Agent Sandbox: a per-project switch in Settings -> AI -> Agent Sandbox
+# (ai-jail) that starts the Claude adapters through ai-jail with a generated
+# command, a jail icon in the agent panel and an ai-memory section. It stays
+# off by default: the jail needs a one-time login in its own config directory,
+# and the portable build leaves the group out (series `# @default: off`).
 #
 # inspector is the GPUI UI inspector.
 #
@@ -1636,17 +1650,22 @@ KEYWORDS="~amd64"
 # Each installs a binary under a name app-editors/zed uses -- collab,
 # zed-extension, zed-remote-server -- and renaming Zed's server infrastructure is
 # not what a rebrand of the editor is for.
-IUSE="+X ai-jail +claude-agent-acp-plus +claude-agent-acp-tui +claude-code-ide
-	+devtools-bridge inspector +mimalloc neovim screen-capture test tracy +wayland"
+IUSE="+X ai-jail +browser-extension +claude-agent-acp-plus +claude-agent-acp-tui
+	+claude-code-ide +devtools-bridge inspector +mimalloc neovim screen-capture test
+	tracy +wayland"
 # BENTOO-DIVERGENCE: REQUIRED_USE - the || ( X wayland ) clause, which follows
 # from the X and wayland flags this overlay adds (see the IUSE tag). ::gentoo
 # exposes neither, so it has nothing to constrain. ai-jail? requires the agent
-# it wraps. devtools-bridge? requires the group 0052 is generated on top of.
+# it wraps, and the group 0057 is generated on top of (devtools-bridge's 0052).
+# devtools-bridge? requires the group 0052 is generated on top of.
+# browser-extension? requires devtools-bridge: the browser reaches Zeo through
+# 0052's bridge socket, and 0058 is generated on top of it.
 # test? requires the adapter flags the test-only patches (0050, 0051) are
 # generated on top of.
 REQUIRED_USE="
 	|| ( X wayland )
-	ai-jail? ( claude-agent-acp-plus )
+	ai-jail? ( claude-agent-acp-plus devtools-bridge )
+	browser-extension? ( devtools-bridge )
 	devtools-bridge? ( claude-agent-acp-plus )
 	test? ( claude-agent-acp-plus claude-code-ide )
 "
@@ -1700,6 +1719,8 @@ DEPEND="
 # claude-agent-acp-plus >= 0.24.0: the first release that sends the
 # _claude/tasks snapshot 0034, 0037 and 0038 read; 0.23.6 sends only a count,
 # which leaves the tasks card empty.
+# claude-agent-acp-plus >= 0.26.0: the first release with _claude/tasks
+# version 2 (tail, hasOutput, _claude/tasks/output), which 0056 reads.
 # Exactly one editor of the family is installed at a time, by decision
 # (2026-10-01) rather than by a file collision with zed or zed-bin: zeo owns
 # /usr/bin/zeo, /usr/libexec/zeo-editor and dev.zeo.Zeo.*, which neither
@@ -1710,7 +1731,7 @@ RDEPEND="
 	!app-editors/zed-bin
 	!app-editors/zeo-bin
 	ai-jail? ( || ( sys-apps/ai-jail sys-apps/ai-jail-bin ) )
-	claude-agent-acp-plus? ( >=dev-util/claude-agent-acp-plus-0.24.0 )
+	claude-agent-acp-plus? ( >=dev-util/claude-agent-acp-plus-0.26.0 )
 	claude-agent-acp-tui? ( dev-util/claude-agent-acp-tui )
 	claude-code-ide? ( dev-util/claude-code )
 	neovim? ( app-editors/neovim )
@@ -1811,6 +1832,10 @@ src_prepare() {
 		"${FILESDIR}/0046-agent-default-agents-prefer-the-system-adapter.patch"
 		"${FILESDIR}/0048-agent-thread-organization-storage.patch"
 		"${FILESDIR}/0049-agent-sidebar-pinned-section.patch"
+		# 0061 starts every agent with ZEO_THREAD=1, so zeo-systray's hook can
+		# tell Zeo's sessions from any other Claude Code process and offer the
+		# tray link (0024) only for those. Ungrouped like 0024.
+		"${FILESDIR}/0061-agent-mark-agent-servers-with-zeo-thread.patch"
 	)
 
 	if use claude-agent-acp-plus; then
@@ -1983,6 +2008,19 @@ src_prepare() {
 			# all of them, after a confirmation; the thread is never touched and
 			# no migration is added (story 025). After 0041.
 			"${FILESDIR}/0042-agent-tasks-panel-delete-archived.patch"
+			# 0053: the panel polished -- left-aligned rows, an X that closes it,
+			# a scrollbar, a text filter and multi-select with Archive Selected and
+			# Delete Selected. After 0042, whose panel and delete path it changes,
+			# so BY DEPENDENCY (story 034).
+			"${FILESDIR}/0053-agent-tasks-panel-polish.patch"
+			# 0056: _claude/tasks version 2 -- a card row expands to show what the
+			# task runs and its last output lines; Open Log saves a shell task's
+			# output (Zeo's data dir, 0700/0600, 1 MiB cap) and opens it read-only,
+			# from the card and from 0035's panel; the log is deleted with its
+			# record (migration step 4). Needs claude-agent-acp-plus >= 0.26.0;
+			# older adapters advertise version 1 and the additions stay hidden.
+			# After 0053, BY DEPENDENCY (story 041).
+			"${FILESDIR}/0056-agent-task-output-and-logs.patch"
 			# 0043: while the agent waits on an answer to its question, Enter and
 			# the send chords do nothing in the composer; the Send button still
 			# sends (story 017). Reads 0027's card and 0030's pending state.
@@ -1995,6 +2033,28 @@ src_prepare() {
 			# gets a button that opens a new thread with that command in its
 			# composer, unsent (story 020). Pure Zed, BY CHOICE.
 			"${FILESDIR}/0045-slash-command-opens-new-thread.patch"
+			# 0054: a Run button beside 0045's opens a new thread and sends the
+			# clicked block's command; only that first message skips the
+			# slash-command check (story 035). Pure Zed, BY CHOICE.
+			"${FILESDIR}/0054-slash-command-run-button.patch"
+			# 0055: Decline on a question card asks first only when something was
+			# typed or picked, and leaves a "Skipped" line (story 035). Pure Zed,
+			# BY CHOICE.
+			"${FILESDIR}/0055-question-decline-asks-first.patch"
+			# 0059: boolean config options (Fast mode, Ultracode) are
+			# session-scoped: no Shift-click default, and a reopened thread does
+			# not restore them from 0036's record. Pure Zed, BY CHOICE.
+			"${FILESDIR}/0059-agent-boolean-config-options-are-session-scoped.patch"
+			# 0060: hovering the context ring asks the adapter for the account
+			# quota now (_claude/usage/refresh) and the tooltip follows the
+			# answer live. Gated on the adapter advertising _claude/usage; an
+			# older adapter is never sent the request. Pure Zed, BY CHOICE.
+			"${FILESDIR}/0060-agent-refresh-account-quota-on-ring-hover.patch"
+			# 0062: git worktree add is refused when the repository's own config
+			# names a program the checkout would run (includeIf, a filter driver,
+			# a Git LFS agent or extension) or cannot be read; the error names the
+			# key and nothing is created. Pure Zed, BY CHOICE (PARITY item 105).
+			"${FILESDIR}/0062-git-refuse-worktree-when-repo-config-can-run-programs.patch"
 		)
 	fi
 
@@ -2008,6 +2068,22 @@ src_prepare() {
 	# every adapter group and before test; 0050/0051 apply on top of it unchanged.
 	if use devtools-bridge; then
 		PATCHES+=( "${FILESDIR}/0052-devtools-bridge.patch" )
+	fi
+
+	# 0057 (story 043): the Agent Sandbox -- Claude adapters of a project whose
+	# switch is on start through ai-jail with a command Zeo generates, or not at
+	# all. Its own group, after devtools-bridge and before test; 0050/0051 apply on
+	# top of it unchanged.
+	if use ai-jail; then
+		PATCHES+=( "${FILESDIR}/0057-agent-sandbox-settings.patch" )
+	fi
+
+	# 0058 (story 045): the browser sidebar -- zeo-browser reads and drives the
+	# same agent thread through zeo-browser-host and a v2 session protocol on
+	# 0052's bridge socket, after an Allow in Zeo. Its own group, after ai-jail and
+	# before test; it applies with or without 0057, and 0050/0051 on top of it.
+	if use browser-extension; then
+		PATCHES+=( "${FILESDIR}/0058-browser-extension.patch" )
 	fi
 
 	# 0050 and 0051 change tests only -- nothing in them reaches the binary -- so
@@ -2210,6 +2286,9 @@ src_compile() {
 		--package zed
 		--package cli
 	)
+	# The native-messaging host the browser starts (0058): a workspace member of
+	# its own, so it is only built when the browser channel is.
+	use browser-extension && packages+=( --package zeo_browser_host )
 	# "${features[*]}" alone would be an empty --features argument when no flag
 	# is on; the count is what decides whether the option appears at all.
 	local feature_args=()
@@ -2232,6 +2311,25 @@ src_install() {
 	newicon -s 512 crates/zed/resources/app-icon-zeo.png "${APP_ID}.png"
 	newicon -s 1024 crates/zed/resources/app-icon-zeo@2x.png "${APP_ID}.png"
 	domenu "${S}/${APP_ID}.desktop"
+
+	if use browser-extension; then
+		# The host is started by the browser, never by a user: libexec, next to
+		# zeo-editor. Its manifests name this path and only the committed
+		# extension IDs (0058, crates/zeo_browser_host/manifests).
+		exeinto "/usr/libexec"
+		doexe "$(cargo_target_dir)"/zeo-browser-host
+		local manifests="${S}/crates/zeo_browser_host/manifests"
+		insinto /etc/opt/chrome/native-messaging-hosts
+		newins "${manifests}"/dev.zeo.browser_host.chrome.json dev.zeo.browser_host.json
+		insinto /etc/chromium/native-messaging-hosts
+		newins "${manifests}"/dev.zeo.browser_host.chrome.json dev.zeo.browser_host.json
+		insinto "/usr/$(get_libdir)/mozilla/native-messaging-hosts"
+		newins "${manifests}"/dev.zeo.browser_host.firefox.json dev.zeo.browser_host.json
+
+		# System scope, keyed by Firefox's application ID: every profile loads it.
+		insinto "/usr/$(get_libdir)/mozilla/extensions/{ec8030f7-c20a-464f-9b0e-13a3a9e97384}"
+		newins "${DISTDIR}/zeo-browser-firefox-${ZEO_BROWSER_PV}.xpi" zeo-browser@zeo.dev.xpi
+	fi
 }
 
 src_test () {
@@ -2263,32 +2361,33 @@ pkg_postinst() {
 
 	if use ai-jail; then
 		elog ""
-		elog "ai-jail can run claude-agent-acp-plus in a sandbox: writable project,"
-		elog "network limited to anthropic.com, and none of your ~/.claude visible."
-		elog "It keeps its own Claude state in a separate directory, so log in once,"
-		elog "outside the sandbox:"
+		elog "Zeo can start the Claude adapters inside ai-jail: writable project,"
+		elog "read-only .git and .zed, network limited to the allowed hosts, and none"
+		elog "of your ~/.claude visible. The jail keeps its own Claude state in a"
+		elog "separate directory, so log in once, outside the sandbox:"
 		elog ""
 		elog "    install -d -m 700 ~/.claude-jailed"
 		elog "    CLAUDE_CONFIG_DIR=~/.claude-jailed claude    # then: /login"
 		elog ""
-		elog "Then add a second agent to ~/.config/zeo/settings.json:"
+		elog "Then turn it on per project in Settings -> AI -> Agent Sandbox (ai-jail),"
+		elog "or with the palette command 'agent sandbox: toggle'. The lock icon in the"
+		elog "agent panel shows whether the thread you are looking at is jailed."
+		elog "A hand-written \"ai-jail\" entry in agent_servers keeps working, shown as"
+		elog "jailed by its own command."
+	fi
+
+	if use browser-extension; then
 		elog ""
-		elog "    \"agent_servers\": {"
-		elog "        \"Claude Agent (Plus, jailed)\": {"
-		elog "            \"type\": \"custom\","
-		elog "            \"command\": \"ai-jail\","
-		elog "            \"args\": [\"--exec\", \"--no-save-config\", \"--no-status-bar\","
-		elog "                     \"--no-toolchains\","
-		elog "                     \"--claude-dir\", \"~/.claude-jailed\", \"--map\", \".git\","
-		elog "                     \"--allow-host\", \"anthropic.com\","
-		elog "                     \"--allow-host\", \"platform.claude.com\","
-		elog "                     \"claude-agent-acp-plus\"]"
+		elog "The browser sidebar (zeo-browser) talks to this Zeo through"
+		elog "/usr/libexec/zeo-browser-host, installed with its Chrome, Chromium and"
+		elog "Firefox host manifests. Firefox loads the add-on from the system scope;"
+		elog "on Chrome or Chromium build and load it yourself:"
 		elog ""
-		elog "--no-toolchains keeps ai-jail from also opening its default package"
-		elog "registries (github.com, npm, crates.io, ...); platform.claude.com is where"
-		elog "the login renews its token, so without it the sandboxed agent stops after hours."
-		elog "        }"
-		elog "    }"
+		elog "    cd zeo-browser && npm ci && npm run build"
+		elog "    chrome://extensions -> Developer mode -> Load unpacked -> dist/chrome"
+		elog ""
+		elog "The first connection asks in Zeo: Allow or Deny. Palette command"
+		elog "'devtools bridge: revoke browser access' forgets every browser allowed."
 	fi
 
 	if use claude-code-ide; then
