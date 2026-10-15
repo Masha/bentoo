@@ -3,8 +3,8 @@
 
 EAPI=9
 
-# BENTOO-DIVERGENCE: RDEPEND - adds sys-kernel/bentoo-kernel, which installs
-# the same module-build tree as sys-kernel/gentoo-kernel. Without it,
+# BENTOO-DIVERGENCE: RDEPEND - adds sys-kernel/bentoo-kernel{,-bin}, which install
+# the same module-build tree as sys-kernel/gentoo-kernel{,-bin}. Without it,
 # linux-mod-r1's DEPEND on this virtual pulls sys-kernel/gentoo-sources onto
 # machines that already run bentoo-kernel. Same PVR as ::gentoo on purpose;
 # this copy wins by repository priority (bentoo 0, gentoo -1000).
@@ -32,4 +32,5 @@ RDEPEND="
 		sys-kernel/asahi-sources
 		sys-kernel/gentoo-kernel-modprep
 		sys-kernel/bentoo-kernel
+		sys-kernel/bentoo-kernel-bin
 	)"

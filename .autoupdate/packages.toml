@@ -13956,7 +13956,7 @@ pattern = '"tag_name":\s*"cachyos-(7\.2\.[0-9]+)-[0-9]+"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
 aux_var = "CACHY_REL"
 aux_pattern = '"tag_name":\s*"cachyos-7\.2\.[0-9]+-([0-9]+)"'
-version = "7.2.10"
+version = "7.2.11"
 comments = """
 bentoo-kernel — CachyOS's signed source releases (tags cachyos-<kernel>-<N>).
 The pattern pins the 7.2 series and skips -rc tags; the first match is the
@@ -13974,7 +13974,11 @@ hold is on because a bump is never PV-only. Each one needs, by hand:
   - virtual/dist-kernel-${PV} in this overlay, with bentoo-kernel added at
     the SAME PVR as ::gentoo's (a revbump changes the subslot and rebuilds
     every out-of-tree module for every user).
-A new series (7.3) also means editing this pattern.
+  - sys-kernel/bentoo-kernel-bin rebuilt from the new ebuild (see its record).
+A new series (7.3) also means: this pattern and the -bin one; PATCHSET,
+CONFIG_VER and GENTOO_CONFIG_P from the new gentoo-kernel; the BORE path
+<series>/sched/ in kernel-patches (may lag CachyOS's first release of the
+series); every INTEL_PATCHES entry; and a virtual/dist-kernel copy per PV.
 """
 # END
 

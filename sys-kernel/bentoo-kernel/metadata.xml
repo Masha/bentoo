@@ -19,7 +19,8 @@
 		</flag>
 		<flag name="hardened">
 			Use selection of hardening options recommended by Kernel Self
-			Protection Project
+			Protection Project. With USE=lto (clang) the GCC-only hardening
+			plugins are unavailable, and kCFI (CONFIG_CFI) is enabled instead.
 		</flag>
 		<flag name="lto">
 			Build with <pkg>llvm-core/clang</pkg> and link with ThinLTO
