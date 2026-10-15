@@ -10009,6 +10009,18 @@ SRC_URI releases/download/v${PV}/${P}-bundle.tar.gz. Live=v0.2.0.
 """
 # END
 
+["www-plugins/zeo-browser"]
+url = "https://api.github.com/repos/zeo-workspace/zeo-browser/releases/latest"
+parser = "json"
+path = "tag_name"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "0.1.0"
+comments = """
+zeo-browser — GitHub releases/latest tag "vX.Y.Z" (v stripped). SRC_URI
+releases/download/v${PV}/zeo-browser-firefox-${PV}.xpi. Live=v0.1.0 (2026-10-15).
+"""
+# END
+
 ["net-im/telegram-desktop"]
 hold = true
 url = "https://api.github.com/repos/telegramdesktop/tdesktop/releases/latest"
