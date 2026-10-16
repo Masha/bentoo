@@ -42,8 +42,26 @@ EAPI=8
 # 494 external crates the workspace resolves -- generated list and the previous
 # inline CRATES list were compared entry by entry, with no difference in either
 # direction.
+#
+# 3.1.0 lists four crates inline ON TOP of the reused 3.0.1 tarball: they are
+# the only registry entries its lock added (503 -> 507), so a top-up avoids
+# re-uploading 39 MiB for four Windows-only crates. Cargo still needs them:
+# it resolves the whole lock before it filters by target. Drop them the next
+# time the tarball is regenerated -- the recipe above already includes them.
 CRATES="
+	windows-link@0.100.0
+	windows-registry@0.100.0
+	windows-result@0.100.0
+	windows-strings@0.100.0
 "
+
+# 3.1.0 replaced crates.io's zip with a [patch.crates-io] git pin on the
+# v8.6.0 release commit: crates.io yanked every zip 8.x compatible with
+# candle 0.11. The tarball's registry zip-8.6.0 is now unused. Remove this
+# entry once upstream drops the patch.
+declare -A GIT_CRATES=(
+	[zip]='https://github.com/zip-rs/zip2;771dfc534d2614158af5497ea3dff4d4208d7db1;zip2-%commit%'
+)
 
 # Version of the crates tarball to fetch, which is NOT always ${PV}: when a
 # bump leaves the external crate set untouched, the previous artifact is
@@ -171,6 +189,17 @@ src_prepare() {
 		|| die "Cargo.toml no longer sets strip = \"symbols\"; drop this sed"
 	sed -i '/^strip = "symbols"$/d' Cargo.toml || die
 
+	# zip comes from upstream's own [patch.crates-io] as a git dependency,
+	# and cargo never applies a patch to a patch: the [patch."<url>"] that
+	# cargo.eclass writes for GIT_CRATES is ignored and the offline build
+	# dies with "can't checkout from 'https://github.com/zip-rs/zip2'".
+	# Point the upstream patch at the unpacked GIT_CRATES tarball instead.
+	local zip_git='zip = { git = "https://github.com/zip-rs/zip2", rev = "771dfc534d2614158af5497ea3dff4d4208d7db1" }'
+	grep -qxF "${zip_git}" Cargo.toml \
+		|| die "Cargo.toml no longer pins zip to zip2@771dfc53; update GIT_CRATES and this sed"
+	sed -i "s|^zip = { git = .*|zip = { path = \"${WORKDIR}/zip2-771dfc534d2614158af5497ea3dff4d4208d7db1\" }|" \
+		Cargo.toml || die
+
 	# crates/ai-memory-web/build.rs copies the VENDORED stylesheet into
 	# OUT_DIR and only reaches the network when TAILWIND_BUILD=1, which this
 	# ebuild never sets. If upstream ever stops vendoring the file, the build
@@ -213,6 +242,20 @@ src_test() {
 	# token: \". That is an upstream defect in a doc comment, not a fault in
 	# this package, and it fails identically on a plain `cargo test` outside
 	# Portage. Revisit when upstream tags the block `text` or `ignore`.
+	#
+	# Single-threaded since 3.1.0: the upgrade_e2e tests in tests/suite
+	# write a fixture executable and exec it; another test thread forking
+	# meanwhile inherits the still-open write fd, and the exec fails with
+	# ETXTBSY ("Text file busy"). 2 of 287 failed in parallel; serially all
+	# pass, as do the two alone. Serial costs ~80 s for the whole phase.
+	# Splitting off the library to keep it parallel does not pay: --tests
+	# includes the lib target, so it would run twice (~88 s).
+	#
+	# Through RUST_TEST_THREADS, not `-- --test-threads=1`: cargo_src_test
+	# already appends its own `--`, so a second one turns the flag into a
+	# test-name filter that matches nothing -- the phase then "passes" with
+	# 0 tests run and all 287 filtered out.
+	local -x RUST_TEST_THREADS=1
 	cargo_src_test --lib --tests
 }
 
