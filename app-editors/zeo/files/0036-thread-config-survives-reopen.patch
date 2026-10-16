@@ -3060,7 +3060,7 @@ index 0000000..31ad6bf
 +    }
 +}
 diff --git a/crates/agent_servers/src/acp/v2.rs b/crates/agent_servers/src/acp/v2.rs
-index 1298101..ca3643c 100644
+index e95d3aa..0eddd80 100644
 --- a/crates/agent_servers/src/acp/v2.rs
 +++ b/crates/agent_servers/src/acp/v2.rs
 @@ -1,7 +1,7 @@
@@ -3072,8 +3072,8 @@ index 1298101..ca3643c 100644
 +    drain_foreground_queue, enqueue_notification, first_class_terminal_auth_task, map_acp_error,
      mcp_configurations_for_project, runtime, transport, with_v2_client_ingress,
  };
- use acp_thread::{AcpThread, AgentConnection, AgentSessionConfigOptions, ElicitationStore};
-@@ -600,6 +600,8 @@ impl AgentConnection for AcpV2Connection {
+ use acp_thread::{
+@@ -672,6 +672,8 @@ impl AgentConnection for AcpV2Connection {
                              config_options: Some(options),
                              default_config_task: None,
                              _release_subscription: release_subscription,

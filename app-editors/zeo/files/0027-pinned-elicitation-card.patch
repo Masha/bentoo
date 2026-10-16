@@ -128,10 +128,10 @@ index 03137d9..6353d56 100644
      // that offers to resolve conflicts using the agent.
      //
 diff --git a/crates/acp_thread/src/acp_thread.rs b/crates/acp_thread/src/acp_thread.rs
-index 0d236ca..90c7665 100644
+index f72682f..8549971 100644
 --- a/crates/acp_thread/src/acp_thread.rs
 +++ b/crates/acp_thread/src/acp_thread.rs
-@@ -6673,6 +6673,17 @@ impl AcpThread {
+@@ -6679,6 +6679,17 @@ impl AcpThread {
          Some((index, elicitation))
      }
  

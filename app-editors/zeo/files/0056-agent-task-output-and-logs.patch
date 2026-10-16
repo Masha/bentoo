@@ -68,7 +68,7 @@ BY DEPENDENCY after 0053, the last task patch: it extends 0037's card,
 ---
 
 diff --git a/crates/acp_thread/src/acp_thread.rs b/crates/acp_thread/src/acp_thread.rs
-index 6d73327..3e70ef7 100644
+index a1496f8..07114fb 100644
 --- a/crates/acp_thread/src/acp_thread.rs
 +++ b/crates/acp_thread/src/acp_thread.rs
 @@ -3684,6 +3684,20 @@ pub struct AgentTask {
@@ -116,7 +116,7 @@ index 6d73327..3e70ef7 100644
          }
      }
  }
-@@ -4796,6 +4820,17 @@ impl AcpThread {
+@@ -4802,6 +4826,17 @@ impl AcpThread {
              .stop_task(self.session_id(), task_id, cx)
      }
  
@@ -134,7 +134,7 @@ index 6d73327..3e70ef7 100644
      /// Resolves to `false` when the agent had nothing to move to the background.
      pub fn background_task(&self, tool_call_id: &str, cx: &mut App) -> Task<Result<bool>> {
          self.connection
-@@ -5057,10 +5092,14 @@ impl AcpThread {
+@@ -5063,10 +5098,14 @@ impl AcpThread {
                  {
                      match serde_json::from_value::<WireTasksSnapshot>(payload.clone()) {
                          Ok(snapshot) => self.apply_tasks_snapshot(snapshot, cx),
@@ -151,7 +151,7 @@ index 6d73327..3e70ef7 100644
                          ),
                      }
                  }
-@@ -8843,12 +8882,15 @@ mod tests {
+@@ -8858,12 +8897,15 @@ mod tests {
              "utilization": 0.40,
          })));
          for blank in ["", "   ", "\t\n"] {
@@ -173,7 +173,7 @@ index 6d73327..3e70ef7 100644
          }
          assert!(
              usage.is_empty(),
-@@ -22534,7 +22576,12 @@ mod tests {
+@@ -22549,7 +22591,12 @@ mod tests {
          });
  
          thread.read_with(cx, |thread, _| {
@@ -187,7 +187,7 @@ index 6d73327..3e70ef7 100644
              let compaction = compaction_entries(thread)
                  .pop()
                  .expect("the compaction entry survives the enrichment frame");
-@@ -26009,4 +26056,6 @@ mod tests {
+@@ -26024,4 +26071,6 @@ mod tests {
  
      include!("acp_thread_tasks_tests.rs");
      include!("acp_thread_tasks_review_tests.rs");
@@ -601,12 +601,12 @@ index 0000000..bc94905
 +    );
 +}
 diff --git a/crates/acp_thread/src/connection.rs b/crates/acp_thread/src/connection.rs
-index 7c6d47b..0533750 100644
+index fbb32b6..15bb12f 100644
 --- a/crates/acp_thread/src/connection.rs
 +++ b/crates/acp_thread/src/connection.rs
 @@ -1,4 +1,4 @@
--use crate::{AcpThread, ElicitationStore};
-+use crate::{AcpThread, ElicitationStore, TaskOutput};
+-use crate::{AcpThread, ElicitationStore, ReceiptSubmission};
++use crate::{AcpThread, ElicitationStore, ReceiptSubmission, TaskOutput};
  use agent_client_protocol::schema::{MaybeUndefined, v1 as acp_v1, v2 as acp_v2};
  use anyhow::Result;
  use chrono::{DateTime, Utc};

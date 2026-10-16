@@ -41,7 +41,7 @@ window and values above 1 are read as percentages.
 ---
 
 diff --git a/crates/acp_thread/src/acp_thread.rs b/crates/acp_thread/src/acp_thread.rs
-index ea7abde..0ba861b 100644
+index dda463a..372d46b 100644
 --- a/crates/acp_thread/src/acp_thread.rs
 +++ b/crates/acp_thread/src/acp_thread.rs
 @@ -43,7 +43,7 @@ use serde::{Deserialize, Serialize};
@@ -292,7 +292,7 @@ index ea7abde..0ba861b 100644
              cost: None,
              prompt_capabilities,
              available_commands: Vec::new(),
-@@ -4332,6 +4536,15 @@ impl AcpThread {
+@@ -4338,6 +4542,15 @@ impl AcpThread {
          Ok(())
      }
  
@@ -308,7 +308,7 @@ index ea7abde..0ba861b 100644
      pub fn cost(&self) -> Option<&SessionCost> {
          self.cost.as_ref()
      }
-@@ -5368,7 +5581,18 @@ impl AcpThread {
+@@ -5374,7 +5587,18 @@ impl AcpThread {
                  meta: cost.meta,
              });
          }
@@ -327,7 +327,7 @@ index ea7abde..0ba861b 100644
      }
  
      pub fn update_retry_status(&mut self, status: RetryStatus, cx: &mut Context<Self>) {
-@@ -7839,6 +8063,198 @@ fn update_markdown_in_place(markdown: &Entity<Markdown>, text: &str, cx: &mut Ap
+@@ -7854,6 +8078,198 @@ fn update_markdown_in_place(markdown: &Entity<Markdown>, text: &str, cx: &mut Ap
  
  #[cfg(test)]
  mod tests {

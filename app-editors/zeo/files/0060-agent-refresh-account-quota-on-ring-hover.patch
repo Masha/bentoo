@@ -50,7 +50,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 ---
 
 diff --git a/crates/acp_thread/src/acp_thread.rs b/crates/acp_thread/src/acp_thread.rs
-index 3e70ef7..ef1b146 100644
+index 07114fb..9895b3f 100644
 --- a/crates/acp_thread/src/acp_thread.rs
 +++ b/crates/acp_thread/src/acp_thread.rs
 @@ -3507,6 +3507,11 @@ pub struct AccountUsageWindow {
@@ -85,7 +85,7 @@ index 3e70ef7..ef1b146 100644
              background_task_count: 0,
              tasks: Vec::new(),
              announced_task_endings: HashSet::default(),
-@@ -4802,6 +4813,43 @@ impl AcpThread {
+@@ -4808,6 +4819,43 @@ impl AcpThread {
          (!self.account_usage.is_empty()).then_some(&self.account_usage)
      }
  
@@ -129,7 +129,7 @@ index 3e70ef7..ef1b146 100644
      /// How many tasks the agent reports running in the background — work that outlives
      /// the turn that launched it, so [`Self::status`] reads `Idle` while it runs.
      pub fn background_task_count(&self) -> usize {
-@@ -8580,6 +8628,66 @@ mod tests {
+@@ -8595,6 +8643,66 @@ mod tests {
          assert_eq!(utilization(150.0), Some(1.0), "clamped to the track");
      }
  
@@ -196,7 +196,7 @@ index 3e70ef7..ef1b146 100644
      /// 0011 end to end on the thread: the payload rides `_meta["_claude/rateLimit"]` of a
      /// UsageUpdate, lands in `account_usage()`, and fires AccountUsageUpdated once -- and
      /// not again for the same payload.
-@@ -20676,6 +20784,11 @@ mod tests {
+@@ -20691,6 +20799,11 @@ mod tests {
          supports_truncate: bool,
          sessions: Arc<parking_lot::Mutex<HashMap<acp_v2::SessionId, WeakEntity<AcpThread>>>>,
          set_title_calls: Rc<RefCell<Vec<SharedString>>>,
@@ -208,7 +208,7 @@ index 3e70ef7..ef1b146 100644
          on_user_message: Option<
              Rc<
                  dyn Fn(
-@@ -20697,6 +20810,9 @@ mod tests {
+@@ -20712,6 +20825,9 @@ mod tests {
                  on_user_message: None,
                  sessions: Arc::default(),
                  set_title_calls: Default::default(),
@@ -218,7 +218,7 @@ index 3e70ef7..ef1b146 100644
              }
          }
  
-@@ -20730,6 +20846,23 @@ mod tests {
+@@ -20745,6 +20861,23 @@ mod tests {
              AgentId::new("fake")
          }
  
@@ -243,7 +243,7 @@ index 3e70ef7..ef1b146 100644
              "fake".into()
          }
 diff --git a/crates/acp_thread/src/connection.rs b/crates/acp_thread/src/connection.rs
-index 0533750..c3eae78 100644
+index 15bb12f..c52cfba 100644
 --- a/crates/acp_thread/src/connection.rs
 +++ b/crates/acp_thread/src/connection.rs
 @@ -152,6 +152,20 @@ pub trait AgentConnection {

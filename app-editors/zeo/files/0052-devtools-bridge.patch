@@ -164,7 +164,7 @@ index c03170a..9d0b00e 100644
 +  },
  }
 diff --git a/crates/acp_thread/src/acp_thread.rs b/crates/acp_thread/src/acp_thread.rs
-index ef1b146..a754eb4 100644
+index 9895b3f..e79ab17 100644
 --- a/crates/acp_thread/src/acp_thread.rs
 +++ b/crates/acp_thread/src/acp_thread.rs
 @@ -7,6 +7,8 @@ pub mod content;

@@ -91,7 +91,7 @@ status-less frame is read as in progress.
 ---
 
 diff --git a/crates/acp_thread/src/acp_thread.rs b/crates/acp_thread/src/acp_thread.rs
-index 49f0608..0d236ca 100644
+index 9579b3c..f72682f 100644
 --- a/crates/acp_thread/src/acp_thread.rs
 +++ b/crates/acp_thread/src/acp_thread.rs
 @@ -944,6 +944,30 @@ pub struct ContextCompactionUpdate {
@@ -125,7 +125,7 @@ index 49f0608..0d236ca 100644
  impl AgentThreadEntry {
      pub fn is_indented(&self) -> bool {
          match self {
-@@ -4724,10 +4748,24 @@ impl AcpThread {
+@@ -4730,10 +4754,24 @@ impl AcpThread {
                  );
              }
              acp_v1::SessionUpdate::ToolCall(tool_call) => {
@@ -152,7 +152,7 @@ index 49f0608..0d236ca 100644
              }
              acp_v1::SessionUpdate::CompactionUpdate(compaction_update) => {
                  self.upsert_context_compaction_update(
-@@ -5581,6 +5619,74 @@ impl AcpThread {
+@@ -5587,6 +5625,74 @@ impl AcpThread {
          }
      }
  
@@ -227,7 +227,7 @@ index 49f0608..0d236ca 100644
      pub fn can_set_title(&mut self, cx: &mut Context<Self>) -> bool {
          self.connection.set_title(self.session_id(), cx).is_some()
      }
-@@ -21846,6 +21952,582 @@ mod tests {
+@@ -21861,6 +21967,582 @@ mod tests {
              assert_eq!(usage.max_tokens, 10000);
          });
      }

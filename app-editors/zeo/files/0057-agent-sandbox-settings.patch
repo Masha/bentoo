@@ -11038,10 +11038,10 @@ index a1fa795..cc7b13b 100644
          let connection_rx = async move {
              connection_rx
 diff --git a/crates/agent_servers/src/acp/v2.rs b/crates/agent_servers/src/acp/v2.rs
-index ca3643c..d727cdb 100644
+index 0eddd80..e687344 100644
 --- a/crates/agent_servers/src/acp/v2.rs
 +++ b/crates/agent_servers/src/acp/v2.rs
-@@ -79,7 +79,7 @@ impl AcpV2Connection {
+@@ -107,7 +107,7 @@ impl AcpV2Connection {
              outgoing,
              stderr,
              debug_log,

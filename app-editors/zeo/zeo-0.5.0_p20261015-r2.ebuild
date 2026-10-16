@@ -1552,9 +1552,13 @@ declare -A GIT_CRATES=(
 # rewrites the date and EGIT_COMMIT; a second version variable it could not
 # keep current would leave a new tarball under an old, already-manifested name).
 
-EGIT_COMMIT="7fa2adbe088c8feb3173aec4fc5f8ac0fc153f31"
-LLVM_COMPAT=( 22 23 )
-RUST_MIN_VER="1.98.1"
+EGIT_COMMIT="28d0a3547f16b9609b301b48ab363bfca649c864"
+# LLVM 23 only, so it is the default slot: llvm-r1 would always prefer slot 22
+# (its newest stable) whenever 22 is listed. RUST_NEEDS_LLVM ties the Rust slot
+# to it, so this builds with Rust 1.99, one release past upstream's 1.98.1 pin
+# in rust-toolchain.toml -- the series' suites pass there (zed-patches test.sh).
+LLVM_COMPAT=( 23 )
+RUST_MIN_VER="1.99.0"
 RUST_NEEDS_LLVM=1
 WEBRTC_COMMIT="0001d84-4"
 
