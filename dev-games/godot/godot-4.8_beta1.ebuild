@@ -8,6 +8,7 @@ inherit branding desktop python-any-r1 flag-o-matic scons-utils
 inherit shell-completion toolchain-funcs xdg
 
 MY_PV=${PV/_alpha/-dev}
+MY_PV=${MY_PV/_beta/-beta}
 MY_PV=${MY_PV/_rc/-rc}
 MY_P=${PN}-${MY_PV}
 
