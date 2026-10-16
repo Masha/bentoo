@@ -268,7 +268,7 @@ unconditional git-r3 form, which ::gentoo's tarball/9999 branch is not.
 url = "https://registry.npmjs.org/pnpm"
 parser = "json"
 path = "dist-tags.latest"
-version = "12.11.2"
+version = "12.14.0"
 comments = """
 pnpm — npm package, stable channel. dist-tags.latest is the RIGHT endpoint and
 must stay: pnpm promotes through next-<major> first, and that channel carries
@@ -312,7 +312,7 @@ url = "https://api2.cursor.sh/updates/api/download/stable/linux-x64/cursor"
 parser = "json"
 path = "version"
 commit_sha_path = "commitSha"
-version = "3.24.18"
+version = "3.25.6"
 comments = """
 Cursor — official download API; "version" is the full version. commitSha is the
 per-release BUILD_ID embedded in SRC_URI; the applier substitutes it into the
@@ -755,7 +755,7 @@ url = "https://dl.pstmn.io/api/version/latest?platform=linux64&channel=stable"
 parser = "json"
 path = "version"
 type = "bin"
-version = "12.32.3"
+version = "12.32.4"
 comments = """
 Postman — official version API; clean {"version":"..."}.
 """
@@ -1688,7 +1688,7 @@ url = "https://api.github.com/repos/getsentry/sentry-native/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.17.3"
+version = "0.17.4"
 comments = """
 sentry-native — tag bare "X.Y.Z".
 """
@@ -1994,7 +1994,7 @@ commit_sha_path = "[0].id"
 base_from = "file"
 base_url = "https://code.videolan.org/api/v4/projects/videolan%2Fvlc/repository/files/configure.ac/raw?ref=master"
 base_pattern = 'AC_INIT\(\[vlc\], \[([0-9][0-9.]*)-dev\]\)'
-version = "4.0.0_pre20261015"
+version = "4.0.0_pre20261016"
 comments = """
 vlc — 4.0 development snapshot, commit-tracked on master; _pre suffix
 preserved from the current ebuild. Only the 4.0 line lives here: 3.0.x is
@@ -3115,7 +3115,7 @@ commit_sha_path = "[0].id"
 base_from = "file"
 base_url = "https://gitlab.freedesktop.org/mesa/mesa/-/raw/main/VERSION"
 base_pattern = '^([0-9][0-9.]*)-devel'
-version = "26.3.0_pre20261015"
+version = "27.0.0_pre20261016"
 comments = """
 mesa — commit-tracked on main; _pre suffix preserved from current ebuild.
 
@@ -3133,7 +3133,7 @@ commit_sha_path = "[0].id"
 base_from = "file"
 base_url = "https://gitlab.freedesktop.org/mesa/mesa/-/raw/main/VERSION"
 base_pattern = '^([0-9][0-9.]*)-devel'
-version = "26.3.0_pre20261015"
+version = "27.0.0_pre20261016"
 comments = """
 mesa_clc — part of the mesa tree; same source/rule as media-libs/mesa.
 """
@@ -3148,7 +3148,7 @@ transform = [['T.*', ""], ['-', ""]]
 commit_sha_path = "[0].sha"
 base_from = "none"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.5.0_p20261015"
+version = "0.5.0_p20261016"
 comments = """
 zeo — commit-tracked on Zed's main; the snapshot plus the bentoo patch series and
 the rebrand. 2026-10-01: this entry WAS app-editors/zed, which now builds
@@ -3803,7 +3803,7 @@ commit_sha_path = "[0].id"
 base_from = "file"
 base_url = "https://gitlab.freedesktop.org/mobile-broadband/ModemManager/-/raw/main/meson.build"
 base_pattern = "(?m)^  version: '([0-9][0-9.]*)'"
-version = "1.25.95_p20261004"
+version = "1.25.95_p20261016"
 comments = """
 modemmanager — commit-tracked on main (GitLab); date YYYYMMDD becomes _pDATE suffix.
 """
@@ -3942,7 +3942,7 @@ base_from = "file"
 base_url = "https://raw.githubusercontent.com/KhronosGroup/Vulkan-ValidationLayers/main/CMakeLists.txt"
 base_pattern = '(?m)^project\([A-Za-z_-]+ VERSION ([0-9][0-9.]*)'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.365_p20261015"
+version = "1.4.365_p20261016"
 comments = """
 vulkan-layers — commit-tracked on main (Vulkan-ValidationLayers); scans for "Update for Vulkan-Docs X.Y.Z".
 """
@@ -3959,7 +3959,7 @@ base_from = "file"
 base_url = "https://raw.githubusercontent.com/KhronosGroup/Vulkan-Loader/main/CMakeLists.txt"
 base_pattern = '(?m)^project\([A-Za-z_-]+ VERSION ([0-9][0-9.]*)'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.365_p20261014"
+version = "1.4.365_p20261016"
 comments = """
 vulkan-loader — commit-tracked on main; scans for "Update for Vulkan-Docs X.Y.Z" to detect base bump.
 """
@@ -5895,13 +5895,13 @@ parser = "regex"
 pattern = '"name":"v([0-9]+\.[0-9]+\.[0-9]+(?:\.[0-9]+)?)"'
 select = "max"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-series = '^[0-9]+\.[0-9]+\.(?:[0-9]|[1-8][0-9])(?:\.[0-9]+)?(?:-r[0-9]+)?$'
 patched = """
 Applies files/powerdevil-ddc-redetect-invalid-displays.patch, which ::gentoo \
 does not ship: powerdevil marks a monitor whose DDC/CI is not ready at startup \
 as invalid and never rechecks it, so brightness control is lost for the whole \
 session. Drop this once upstream (and then ::gentoo) carries the fix.\
 """
+series = '^[0-9]+\.[0-9]+\.(?:[0-9]|[1-8][0-9])(?:\.[0-9]+)?(?:-r[0-9]+)?$'
 version = "6.8.0"
 comments = """
 powerdevil -> plasma/powerdevil. ::gentoo's ebuild plus the DDC/CI patch in
@@ -8898,7 +8898,7 @@ url = "https://godotengine.org/download/archive/"
 parser = "regex"
 pattern = '(\d+\.\d+(?:\.\d+)?-(?:stable|beta\d*|rc\d*|dev\d*))'
 transform = [['-stable', ""], ['-beta', "_beta"], ['-rc', "_rc"], ['-dev', "_alpha"]]
-version = "4.8_alpha7"
+version = "4.8_beta1"
 comments = """
 godot — download archive lists newest first; transform the upstream suffix to
 Gentoo form (-stable→bare, -beta→_beta, -rc→_rc, -dev→_alpha).
@@ -10443,7 +10443,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.123"
+version = "1.123.1"
 comments = """
 koboldcpp — releases/latest; tag_name is "vX.Y[.Z]", so the transform strips the
 leading v to match PV.  Verified by real download on 2026-08-16: tag_name
@@ -10636,7 +10636,7 @@ transform = [['T.*', ""], ['-', ""]]
 commit_sha_path = "sha"
 base_from = "none"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0_pre20261015"
+version = "0_pre20261016"
 comments = """
 ik_llama-cpp — base_from = "none": upstream publishes no usable release
 series.  Verified 2026-07-19 and again 2026-08-04: the repo has exactly ONE
@@ -11300,7 +11300,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "2.9.0"
+version = "2.10.0"
 comments = """
 ai-jail — releases/latest on akitaonrails/ai-jail; tag_name is "vX.Y.Z" and the
 transform strips the v.  Verified by real download on 2026-09-07: tag_name
@@ -11334,7 +11334,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "2.9.0"
+version = "2.10.0"
 comments = """
 ai-jail-bin — same endpoint and same release as sys-apps/ai-jail; this record
 exists separately only because the two are separate packages.  Bump them
@@ -11358,7 +11358,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "3.0.1"
+version = "3.1.0"
 comments = """
 ai-memory — releases/latest on akitaonrails/ai-memory; tag_name is "vX.Y.Z" and
 the transform strips the v.  Verified by real request on 2026-09-07: tag_name
@@ -11407,7 +11407,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "3.0.1"
+version = "3.1.0"
 comments = """
 ai-memory-bin — same endpoint and same release as dev-util/ai-memory; this
 record exists separately only because the two are separate packages.  Bump them
@@ -11619,7 +11619,7 @@ url = "https://registry.npmjs.org/@cline/cli-linux-x64/latest"
 parser = "regex"
 pattern = '"version":"([0-9]+\.[0-9]+\.[0-9]+)"'
 type = "bin"
-version = "3.0.71"
+version = "3.0.72"
 comments = """
 Cline CLI — probed on npm, NOT on GitHub, and that is deliberate: the
 cline/cline repository publishes several product lines under one releases
@@ -11647,7 +11647,7 @@ parser = "regex"
 pattern = '"tag_name":\s*"desktop-v([0-9]+\.[0-9]+\.[0-9]+)"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "0.0.46"
+version = "0.0.47"
 comments = """
 Cline for Desktop (beta, Tauri) -- the Linux .deb from the desktop-v* GitHub
 releases. Same repository as dev-util/cline-bin, different product.
@@ -11708,7 +11708,7 @@ parser = "regex"
 pattern = '"tag_name":\s*"v([0-9]+\.[0-9]+\.[0-9]+)"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "1.19.1"
+version = "1.19.3"
 comments = """
 opencode — the most-starred open-source coding agent. Repo lives at
 anomalyco/opencode (it was sst/opencode before; both answer today).
@@ -11800,7 +11800,7 @@ parser = "regex"
 pattern = '"tag_name":\s*"v([0-9]+\.[0-9]+\.[0-9]+)"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "4.0.13"
+version = "4.0.14"
 comments = """
 CC Switch — a Tauri GUI for switching between Claude Code, Codex and Gemini
 CLI accounts. Tracks CC-Switch-v<PV>-Linux-{x86_64,arm64}.deb; note the asset
@@ -14083,7 +14083,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "0.11.0"
+version = "0.12.0"
 comments = """
 VectorCraft (ArtCraft "Craft App Suite") — GitHub releases, tagged "vX.Y.Z"; same
 shape as media-gfx/photocraft-bin, whose record explains the -bin choice.
