@@ -185,7 +185,7 @@
 url = "https://registry.npmjs.org/@anthropic-ai/claude-code"
 parser = "json"
 path = "dist-tags.latest"
-version = "2.1.301"
+version = "2.1.302"
 comments = """
 claude-code — npm @anthropic-ai/claude-code; dist-tags.latest is the stable channel.
 
@@ -1867,7 +1867,7 @@ url = "https://api.github.com/repos/google/draco/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.5.8"
+version = "1.5.9"
 comments = """
 draco — releases/latest tag_name. The tag is a BARE semver with no "v" prefix
 ("1.5.7"), so it needs no rewriting and SRC_URI uses archive/refs/tags/${PV}.
@@ -3764,7 +3764,7 @@ base_from = "file"
 base_url = "https://raw.githubusercontent.com/sqlitebrowser/sqlitebrowser/master/CMakeLists.txt"
 base_pattern = '(?m)^\s+VERSION ([0-9][0-9.]*)'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "3.13.99_p20261011"
+version = "3.13.99_p20261016"
 comments = """
 sqlitebrowser — commit-tracked on master (uses COMMIT= without quotes); date YYYYMMDD becomes _pDATE suffix.
 """
@@ -3774,7 +3774,7 @@ sqlitebrowser — commit-tracked on master (uses COMMIT= without quotes); date Y
 url = "https://sqlite.org/download.html"
 parser = "regex"
 pattern = 'PRODUCT,([0-9]+\.[0-9]+\.[0-9]+),[0-9]{4}/sqlite-src-'
-version = "3.54.0"
+version = "3.54.1"
 comments = """
 Mirror of ::gentoo's dev-db/sqlite, carried AHEAD of it (3.54.0 on 2026-10-10,
 ::gentoo still on 3.53.4). The probe reads the machine-readable PRODUCT CSV
@@ -3839,7 +3839,7 @@ base_from = "tag"
 base_url = "https://api.github.com/repos/KhronosGroup/glslang/git/refs/tags"
 base_tag_pattern = '^vulkan-sdk-([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)$'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.363.0_p20261015"
+version = "1.4.363.0_p20261016"
 comments = """
 glslang — commit-tracked on main; scans titles for vulkan-sdk-X.Y.Z.W to detect base bump.
 """
@@ -3873,7 +3873,7 @@ base_from = "tag"
 base_url = "https://api.github.com/repos/KhronosGroup/SPIRV-Tools/git/refs/tags"
 base_tag_pattern = '^vulkan-sdk-([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)$'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.363.0_p20261015"
+version = "1.4.363.0_p20261016"
 comments = """
 spirv-tools — commit-tracked on main; scans titles for vulkan-sdk-X.Y.Z.W to detect base bump.
 """
@@ -9498,7 +9498,7 @@ is a workspace and pycargoebuild refuses it.
 url = "https://pypi.org/pypi/openai/json"
 parser = "json"
 path = "info.version"
-version = "3.31.0"
+version = "3.32.0"
 comments = """
 openai — official Python SDK; core dep of sci-ml/amd-gaia. info.version is
 clean X.Y.Z. Live=3.0.0 == current PV.
@@ -11552,7 +11552,7 @@ parser = "regex"
 pattern = '"tag_name":\s*"v([0-9]+\.[0-9]+\.[0-9]+)"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "1.54.0"
+version = "1.55.0"
 comments = """
 goose — Block's AI agent, moved org: block/goose is now aaif-goose/goose. The
 old path still answers, but only through a GitHub 301 that can be withdrawn
@@ -11686,7 +11686,7 @@ url = "https://api.github.com/repos/aaif-goose/goose/releases/latest"
 parser = "regex"
 pattern = '"tag_name":\s*"v([0-9]+\.[0-9]+\.[0-9]+)"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.54.0"
+version = "1.55.0"
 comments = """
 goose, built from source. Same probe as dev-util/goose-bin -- both track the
 canonical aaif-goose org, NOT the old block/goose path (see that record).
