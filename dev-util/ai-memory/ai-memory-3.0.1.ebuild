@@ -72,10 +72,15 @@ CRATES="
 # (494 -> 503), and the build died with "no matching package named
 # `serde-saphyr` found".
 #
+# 3.0.1, a fifth time, again an autoupdate bump that moved PV alone: the lock
+# moved rustls 0.23.45 -> 0.23.46, and the build died with "failed to select a
+# version for the requirement `rustls = "^0.23"` (locked to 0.23.46)" -- the
+# same message 2.2.2 hit. 503 crates, set unchanged in size.
+#
 # BUMP THIS to ${PV} (and run the recipe above) the moment the lock's external
 # packages change -- a stale tarball still FETCHES, so the failure would land
 # in src_compile as a missing crate rather than here.
-CRATES_PV="2.6.7"
+CRATES_PV="3.0.1"
 
 # Upstream pins channel 1.95 in rust-toolchain.toml; the workspace is
 # edition 2024 and declares rust-version = "1.95".
