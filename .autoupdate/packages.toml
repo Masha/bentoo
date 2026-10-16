@@ -2537,7 +2537,7 @@ url = "https://api.github.com/repos/brave/brave-browser/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.97.57"
+version = "1.97.59"
 comments = """
 brave-browser — releases/latest is the stable channel (tag "vX.Y.Z").
 """
@@ -2549,7 +2549,7 @@ parser = "regex"
 pattern = '"name":\s*"vim-core-([0-9]+\.[0-9]+\.[0-9]+)\.ebuild"'
 select = "max"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "9.2.1172"
+version = "9.2.1202"
 comments = """
 vim — follows ::gentoo's app-editors/vim-core, NOT upstream vim tags.
 
