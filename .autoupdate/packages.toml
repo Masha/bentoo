@@ -13986,6 +13986,30 @@ series); every INTEL_PATCHES entry; and a virtual/dist-kernel copy per PV.
 """
 # END
 
+["sys-kernel/bentoo-kernel-bin"]
+hold = true
+url = "https://api.github.com/repos/CachyOS/linux/releases?per_page=20"
+parser = "regex"
+pattern = '"tag_name":\s*"cachyos-(7\.2\.[0-9]+)-[0-9]+"'
+headers = { "User-Agent" = "bentoo-autoupdate" }
+aux_var = "CACHY_REL"
+aux_pattern = '"tag_name":\s*"cachyos-7\.2\.[0-9]+-([0-9]+)"'
+version = "7.2.11"
+comments = """
+bentoo-kernel-bin -- the binary of sys-kernel/bentoo-kernel, same upstream
+probe. Its gpkg is OURS, built by scripts/build-bentoo-kernel-bin.sh and
+hosted on distfiles.obentoo.org, so the applier's bump would 404 on it: hold.
+
+Bump only after sys-kernel/bentoo-kernel-${PV} is final, then:
+  - copy CACHY_REL, PATCHSET, BORE_COMMIT, BIGK_COMMIT and INTEL_PATCHES
+    from it (modules_prepare needs the exact tree the binary came from);
+  - JOBS=$(nproc) scripts/build-bentoo-kernel-bin.sh <PVR>; set BINPKG and
+    BINPKG_ID to what it prints,
+    pkgdev manifest, upload the gpkg (the script prints the command);
+  - prune the R2 object of the version that leaves the tree (~180 MB each).
+"""
+# END
+
 ["media-gfx/photocraft-bin"]
 url = "https://api.github.com/repos/storytold/photocraft/releases/latest"
 parser = "json"

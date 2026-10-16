@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@protonmail.com</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<longdescription>
+		Pre-built sys-kernel/bentoo-kernel: CachyOS kernel sources with
+		Gentoo's dist-kernel patchset and configuration, the BORE scheduler,
+		sched_ext and Intel Xe fixes. Built with GCC for x86-64-v3; modules
+		are signed with a key discarded after the build.
+	</longdescription>
+	<upstream>
+		<remote-id type="github">CachyOS/linux</remote-id>
+	</upstream>
+</pkgmetadata>
