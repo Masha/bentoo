@@ -1409,6 +1409,93 @@ qBittorrent — tag "release-X.Y.Z" ("release-" stripped).
 """
 # END
 
+["app-containers/containerd"]
+url = "https://api.github.com/repos/containerd/containerd/releases/latest"
+parser = "json"
+path = "tag_name"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+aux_var = "GIT_REVISION"
+aux_pattern = '"sha":\s*"([0-9a-f]{40})"'
+aux_url = "https://api.github.com/repos/containerd/containerd/commits/v{version}"
+version = "2.4.2"
+comments = """
+containerd — releases/latest tag "vX.Y.Z" ("v" stripped).
+TEMPORARY MIRROR of ::gentoo (2026-10-16: ::gentoo at 2.4.1, upstream 2.4.2).
+Copied verbatim from the ::gentoo ebuild, files/ and metadata.xml included;
+the only edit is GIT_REVISION, which `containerd --version` prints and which
+aux_url keeps in sync. Upstream vendors its Go deps, so there is no
+deps tarball. Check go.mod's `go` line against the ebuild's go BDEPEND on
+every bump.
+RETIRE when ::gentoo reaches the mirrored version: delete the overlay copy
+and set enabled = false here (never delete the record).
+"""
+# END
+
+["app-containers/docker"]
+url = "https://api.github.com/repos/moby/moby/releases/latest"
+parser = "json"
+path = "tag_name"
+transform = [['^docker-v', ""]]
+headers = { "User-Agent" = "bentoo-autoupdate" }
+aux_var = "GIT_COMMIT"
+aux_pattern = '"sha":\s*"([0-9a-f]{40})"'
+aux_url = "https://api.github.com/repos/moby/moby/commits/docker-v{version}"
+version = "29.9.1"
+comments = """
+docker — moby/moby releases/latest, tag "docker-vX.Y.Z". The repo also cuts
+"client/vX.Y.Z" and "api/vX.Y.Z" Go-module releases; if one of those ever
+becomes "latest" the transform leaves a non-version and the probe fails loudly
+instead of bumping to a wrong version.
+TEMPORARY MIRROR of ::gentoo (2026-10-16: ::gentoo at 29.9.0, upstream 29.9.1).
+Copied verbatim from the ::gentoo ebuild; the only edit is GIT_COMMIT, which
+`docker version` prints and which aux_url keeps in sync. Bump together with
+app-containers/docker-cli: they share the version number.
+RETIRE when ::gentoo reaches the mirrored version: delete the overlay copy
+and set enabled = false here (never delete the record).
+"""
+# END
+
+["app-containers/docker-buildx"]
+url = "https://api.github.com/repos/docker/buildx/releases/latest"
+parser = "json"
+path = "tag_name"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "0.38.0"
+comments = """
+docker-buildx — releases/latest tag "vX.Y.Z" ("v" stripped). No commit var:
+the ebuild stamps a build date as Revision.
+TEMPORARY MIRROR of ::gentoo (2026-10-16: ::gentoo at 0.37.1, upstream 0.38.0).
+DIVERGENCE from the ::gentoo base: exactly one — BDEPEND ">=dev-lang/go-1.26.8"
+(was 1.26.3), because go.mod moved to 1.26.8 in 0.38.0. Re-check go.mod's
+`go` line on every bump.
+RETIRE when ::gentoo reaches the mirrored version: delete the overlay copy
+and set enabled = false here (never delete the record).
+"""
+# END
+
+["app-containers/docker-cli"]
+url = "https://api.github.com/repos/moby/moby/releases/latest"
+parser = "json"
+path = "tag_name"
+transform = [['^docker-v', ""]]
+headers = { "User-Agent" = "bentoo-autoupdate" }
+aux_var = "GIT_COMMIT"
+aux_pattern = '"sha":\s*"([0-9a-f]{40})"'
+aux_url = "https://api.github.com/repos/docker/cli/commits/v{version}"
+version = "29.9.1"
+comments = """
+docker-cli — probes moby/moby, not docker/cli: docker/cli publishes tags but
+no GitHub releases (releases/latest is 404), and ranking its tags lexically
+would put v29.9.x above v29.10.0. Engine and CLI are released in lockstep
+under the same version, so the moby "docker-vX.Y.Z" tag is the signal; the
+commit still comes from docker/cli's own "vX.Y.Z" tag through aux_url.
+TEMPORARY MIRROR of ::gentoo (2026-10-16: ::gentoo at 29.9.0, upstream 29.9.1).
+Copied verbatim from the ::gentoo ebuild; the only edit is GIT_COMMIT.
+RETIRE when ::gentoo reaches the mirrored version: delete the overlay copy
+and set enabled = false here (never delete the record).
+"""
+# END
+
 ["app-containers/kata-containers"]
 url = "https://api.github.com/repos/kata-containers/kata-containers/releases/latest"
 parser = "json"
