@@ -5889,8 +5889,6 @@ for 6.7.90 siblings that ::gentoo does not have, and nothing satisfies them.
 # END
 
 ["kde-plasma/powerdevil"]
-enabled = false
-disabled_by = "removed 2026-10-04: ::gentoo's 6.7.5-r3 carries the same brightness-slider fix -- see comments"
 hold = true
 url = "https://invent.kde.org/api/v4/projects/plasma%2Fpowerdevil/repository/tags?search=^v6&per_page=100"
 parser = "regex"
@@ -5898,39 +5896,43 @@ pattern = '"name":"v([0-9]+\.[0-9]+\.[0-9]+(?:\.[0-9]+)?)"'
 select = "max"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 series = '^[0-9]+\.[0-9]+\.(?:[0-9]|[1-8][0-9])(?:\.[0-9]+)?(?:-r[0-9]+)?$'
-version = "6.7.5-r3"
+patched = """
+Applies files/powerdevil-ddc-redetect-invalid-displays.patch, which ::gentoo \
+does not ship: powerdevil marks a monitor whose DDC/CI is not ready at startup \
+as invalid and never rechecks it, so brightness control is lost for the whole \
+session. Drop this once upstream (and then ::gentoo) carries the fix.\
+"""
+version = "6.8.0"
 comments = """
-powerdevil -> plasma/powerdevil. Temporary mirror of ::gentoo's 6.7.5-r2 plus
-one patch, NOT a package bentoo intends to carry.
+powerdevil -> plasma/powerdevil. ::gentoo's ebuild plus the DDC/CI patch in
+`patched`; nothing else differs. Carried since the 6.8 beta (6.7.91-r1) and
+kept past 2026-10-15, when the rest of the 6.7.91 family left because ::gentoo
+shipped Plasma 6.8.0: the patch was still needed on upstream master.
 
-::gentoo's -r2 added powerdevil-6.7.5-patchset-1, whose cherry-pick of upstream
-57f190459 (KDE-bug #523281) is half a change: it prefixes the brightness
-applet's controls with "dialog." but omits the companion commit declaring them
-as properties on PopupDialog. The prefix resolves to undefined, so every drag
-of the brightness slider dies on a TypeError and the display never dims. The
-overlay ebuild drops the prefix; files/ carries the reasoning.
+hold = true because a bump must follow ::gentoo, not KDE's tag. The ebuild asks
+for its Plasma siblings at >=${KDE_CATV}, and bentoo no longer carries those
+siblings -- they come from ::gentoo. A powerdevil-6.8.1 published before
+::gentoo has the 6.8.1 family is uninstallable (the spectacle break of
+2026-09-10). So the report is the signal: once ::gentoo has the new version,
+bump from ::gentoo's ebuild and re-apply the patch (its name carries no
+version, so it travels as is). If it no longer applies, check whether upstream
+merged it -- then delete the package and set this record enabled = false.
 
-hold = true because the patch is pinned to 6.7.5: on any later tag it applies
-to code that no longer needs it, and the fix is already complete upstream from
-6.7.6 on. So this record does not bump -- it reports, and the report IS the
-exit condition. The moment it calls 6.7.6, delete this package and this record
-goes enabled = false; there is nothing bentoo-specific left to keep.
-
-Removed 2026-10-04, before 6.7.6: ::gentoo's own 6.7.5-r3 added
-powerdevil-6.7.5-fix-brightness-slider.patch, whose hunks are identical to the
-overlay's brightness-applet-scope.patch (bug #983371). The 6.7.91 beta stays
-under the @beta record.
+The 6.7.5-r3 mirror this record used to track (half-applied brightness-slider
+fix, KDE-bug #523281) was removed on 2026-10-04, when ::gentoo's 6.7.5-r3 took
+the identical patch.
 
 Probed on invent.kde.org rather than api.github.com/repos/KDE: the GitHub
 token-less cap is 60 req/h and kde-plasma already overspends it (see
 kde-frameworks/attica). select = "max" + series, never [0].name, because
-Plasma numbers the next series' beta x.y.90 -- v6.7.90 IS the 6.8 beta and
-sorts first; kde-plasma/plasma-firewall carries the full account of what a
-revival onto such a beta breaks.
+Plasma numbers the next series' beta x.y.90 -- v6.8.90 IS the 6.9 beta and
+sorts first.
 """
 # END
 
 ["kde-plasma/powerdevil@beta"]
+enabled = false
+disabled_by = "removed 2026-10-15: ::gentoo shipped Plasma 6.8.0, the exit condition below; the 6.7.91 beta ebuilds and their package.mask block are gone"
 hold = true
 url = "https://invent.kde.org/api/v4/projects/plasma%2Fpowerdevil/repository/tags?search=^v6&per_page=100"
 parser = "regex"
@@ -6000,6 +6002,8 @@ regex in this file that anchors on `$` needs the same allowance.
 # END
 
 ["kde-plasma/spectacle@beta"]
+enabled = false
+disabled_by = "removed 2026-10-15: ::gentoo shipped Plasma 6.8.0, the exit condition below; the 6.7.91 beta ebuilds and their package.mask block are gone"
 hold = true
 url = "https://invent.kde.org/api/v4/projects/plasma%2Fspectacle/repository/tags?search=^v6&per_page=100"
 parser = "regex"

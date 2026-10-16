@@ -3,18 +3,13 @@
 
 EAPI=8
 
-# Plasma 6.8 beta 2, masked in profiles/package.mask. Copied from the Gentoo
-# KDE team's overlay (github.com/gentoo/kde) with no change but these tags
-# and the DDC/CI patch below; the other axes differ only because ::gentoo is
-# still on the 6.7.x series.
-# The patch makes powerdevil redetect monitors whose DDC/CI was not ready yet
-# when it started (seen at login on an HDMI monitor): libddcutil marks them
-# invalid and never rechecks them, so brightness control is lost for the
-# whole session. Still needed on upstream master as of 2026-10-08, so when
-# ::gentoo ships 6.8.0 this package stays here to carry it.
-# BENTOO-DIVERGENCE: DEPEND - upstream 6.8 beta, not in ::gentoo yet.
+# ::gentoo's 6.8.0 plus one patch, which makes powerdevil redetect monitors
+# whose DDC/CI was not ready yet when it started (seen at login on an HDMI
+# monitor): libddcutil marks them invalid and never rechecks them, so
+# brightness control is lost for the whole session. Still needed on upstream
+# master as of 2026-10-08. The patch name carries no version on purpose: the
+# autoupdate applier never renames files/, so a versioned name breaks a bump.
 # BENTOO-DIVERGENCE: PATCHES - redetect monitors whose DDC/CI was not ready at startup.
-# BENTOO-DIVERGENCE: RDEPEND - upstream 6.8 beta, not in ::gentoo yet.
 
 ECM_HANDBOOK="optional"
 ECM_TEST="true"
@@ -27,7 +22,7 @@ HOMEPAGE="https://invent.kde.org/plasma/powerdevil"
 
 LICENSE="GPL-2" # TODO: CHECK
 SLOT="6"
-KEYWORDS="~amd64 ~arm64 ~ppc64 ~riscv ~x86"
+KEYWORDS="~amd64 ~arm64"
 IUSE="brightness-control"
 
 RESTRICT="test" # bug 926513
@@ -83,7 +78,7 @@ BDEPEND="
 "
 
 PATCHES=(
-	"${FILESDIR}"/${PN}-6.7.91-ddc-redetect-invalid-displays.patch
+	"${FILESDIR}"/${PN}-ddc-redetect-invalid-displays.patch
 )
 
 # -m 0755 to avoid suid with USE="-filecaps"
