@@ -281,7 +281,12 @@ check_prerequisites() {
 resolve_tree() {
 	if [ -n "${BENTOO_TREE:-}" ]; then
 		TREE=$BENTOO_TREE
-	elif ! TREE=$(git -C "$SCRIPT_DIR" rev-parse --show-toplevel 2>/dev/null); then
+	# A hook runs with GIT_DIR exported; in a linked worktree it is absolute,
+	# and with no GIT_WORK_TREE git then takes the -C directory itself as the
+	# top level, i.e. scripts/. Only this lookup drops them: the --staged
+	# reads below must keep the hook's GIT_DIR/GIT_INDEX_FILE.
+	elif ! TREE=$(env -u GIT_DIR -u GIT_WORK_TREE \
+		git -C "$SCRIPT_DIR" rev-parse --show-toplevel 2>/dev/null); then
 		printf '%s: no tree: BENTOO_TREE is unset and %s is not in a git checkout\n' \
 			"$PROG" "$SCRIPT_DIR" >&2
 		exit 2
