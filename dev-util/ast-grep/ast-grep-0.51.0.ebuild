@@ -8,6 +8,7 @@ EAPI=8
 CRATES="
 	Inflector@0.11.4
 	aho-corasick@1.1.5
+	annotate-snippets@0.12.16
 	ansi_term@0.12.1
 	anstream@1.0.0
 	anstyle-parse@1.0.0
@@ -15,9 +16,11 @@ CRATES="
 	anstyle-wincon@3.0.11
 	anstyle@1.0.14
 	anyhow@1.0.104
+	arraydeque@0.5.1
 	assert_cmd@2.2.2
 	async-trait@0.1.92
 	autocfg@1.5.1
+	base64@0.23.1
 	bit-set@0.11.1
 	bit-vec@0.10.1
 	bitflags@2.13.1
@@ -41,6 +44,7 @@ CRATES="
 	convert_case@0.10.0
 	convert_case@0.12.0
 	coolor@1.1.0
+	core_detect@1.0.0
 	crokey-proc_macros@1.5.0
 	crokey@1.5.0
 	crossbeam-channel@0.5.16
@@ -60,6 +64,8 @@ CRATES="
 	dirs-sys@0.5.0
 	document-features@0.2.12
 	dyn-clone@1.0.20
+	encoding_rs@0.8.42
+	encoding_rs_io@0.1.8
 	equivalent@1.0.2
 	errno@0.3.14
 	fastrand@2.5.0
@@ -80,6 +86,7 @@ CRATES="
 	fuzzy-matcher@0.3.7
 	getrandom@0.4.3
 	globset@0.4.20
+	granit-parser@2.0.0
 	hashbrown@0.14.5
 	hashbrown@0.17.1
 	heck@0.5.0
@@ -107,6 +114,7 @@ CRATES="
 	minicov@0.3.9
 	minimad@0.16.0
 	mio@1.2.2
+	multiversion_no_op@1.0.0
 	napi-build@2.5.0
 	napi-derive-backend@6.1.4
 	napi-derive@3.6.10
@@ -121,6 +129,7 @@ CRATES="
 	once_cell_polyfill@1.70.2
 	oorandom@11.1.5
 	option-ext@0.2.0
+	ordered-float@2.10.1
 	parking_lot@0.12.5
 	parking_lot_core@0.9.12
 	percent-encoding@2.3.2
@@ -151,7 +160,6 @@ CRATES="
 	rustc_version@0.4.1
 	rustix@1.1.4
 	rustversion@1.0.23
-	ryu@1.0.23
 	same-file@1.0.6
 	schemafy_core@0.6.0
 	schemafy_lib@0.6.0
@@ -159,7 +167,9 @@ CRATES="
 	schemars_derive@1.2.2
 	scopeguard@1.2.0
 	semver@1.0.28
+	serde-saphyr@2.0.0
 	serde-sarif@0.8.0
+	serde-value@0.7.0
 	serde-wasm-bindgen@0.6.5
 	serde@1.0.229
 	serde_core@1.0.229
@@ -167,12 +177,12 @@ CRATES="
 	serde_derive_internals@0.30.0
 	serde_json@1.0.151
 	serde_regex@1.2.0
-	serde_yaml@0.9.34+deprecated
 	sharded-slab@0.1.7
 	shlex@2.0.1
 	signal-hook-mio@0.2.5
 	signal-hook-registry@1.4.8
 	signal-hook@0.3.18
+	simdutf8@0.1.5
 	similar@3.2.0
 	slab@0.4.12
 	smallvec@1.16.2
@@ -222,7 +232,7 @@ CRATES="
 	tree-sitter-dart@0.2.0
 	tree-sitter-elixir@0.3.5
 	tree-sitter-go@0.25.0
-	tree-sitter-haskell@0.23.1
+	tree-sitter-haskell@0.24.1
 	tree-sitter-hcl@1.1.0
 	tree-sitter-html@0.23.2
 	tree-sitter-java@0.23.5
@@ -250,7 +260,6 @@ CRATES="
 	unicode-segmentation@1.13.3
 	unicode-width@0.1.14
 	unicode-width@0.2.2
-	unsafe-libyaml@0.2.11
 	uriparse@0.6.4
 	utf8parse@0.2.2
 	valuable@0.1.1
@@ -286,7 +295,7 @@ CRATES="
 	zmij@1.0.23
 "
 
-RUST_MIN_VER="1.88.0"
+RUST_MIN_VER="1.90.0"
 
 inherit cargo
 
@@ -298,7 +307,7 @@ SRC_URI+=" ${CARGO_CRATE_URIS}"
 LICENSE="MIT"
 # Dependent crate licenses
 LICENSE+="
-	Apache-2.0 Apache-2.0-with-LLVM-exceptions BSD-2 ISC MIT MIT-0
+	Apache-2.0 Apache-2.0-with-LLVM-exceptions BSD-2 BSD ISC MIT MIT-0
 	MPL-2.0 Unicode-3.0
 "
 SLOT="0"
