@@ -7,15 +7,15 @@ EAPI=8
 # are resolved by npm at install time, which the Portage sandbox forbids, so
 # they ship as a second distfile generated offline from this exact release.
 # Upstream publishes no npm-shrinkwrap.json; --before is what pins the
-# transitive tree (>= 7 days in the past; 1.25.0 itself was published
-# 2026-10-09, but the root package comes from the local tgz so --before does
+# transitive tree (>= 7 days in the past; 2.0.0 itself was published
+# 2026-10-16, but the root package comes from the local tgz so --before does
 # not touch it), and the resolved tree
 # is recorded in node_modules/.package-lock.json inside the tarball:
 #   tar xzf ${P}.tgz && cd package
 #   npm pkg delete devDependencies scripts
 #   npm install --omit=dev --ignore-scripts --no-audit --no-fund \
-#       --before=2026-10-02
-#   tar --sort=name --mtime='2026-10-02 00:00:00Z' --owner=0 --group=0 \
+#       --before=2026-10-09
+#   tar --sort=name --mtime='2026-10-09 00:00:00Z' --owner=0 --group=0 \
 #       --numeric-owner --format=gnu -cf - node_modules \
 #       | xz -T1 -9e > ${PN}-node_modules-${PVR}.tar.xz
 # Every bump must regenerate and upload this tarball, and redo the LICENSE
@@ -39,15 +39,15 @@ SLOT="0"
 # tree, so nothing here is arch-specific.
 KEYWORDS="~amd64"
 
-RDEPEND="net-libs/nodejs:*"
+# engines.node in package.json; 2.0.0 is ESM and its launcher imports
+# package.json with an import attribute.
+RDEPEND=">=net-libs/nodejs-22.13.0:*"
 
 src_install() {
 	insinto /usr/share/${PN}
-	# out/server/test is upstream's test suite; lib/ holds the UMD/ESM
-	# library builds for embedders, which the server does not load.
-	doins -r bin l10n package.json
-	insinto /usr/share/${PN}/out/server
-	doins -r out/server/src
+	# 2.0.0 ships ESM only: the server is out/src (it was out/server/src,
+	# beside a test suite and lib/ builds, up to 1.x).
+	doins -r bin l10n out package.json
 
 	# npm's .bin shims are symlinks to helper CLIs nothing here runs.
 	rm -r "${WORKDIR}"/node_modules/.bin || die

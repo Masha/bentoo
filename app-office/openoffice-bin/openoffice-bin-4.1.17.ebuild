@@ -8,7 +8,8 @@ EAPI="7"
 # carry NO PayloadIs tag at all - checked 2026-09-07 by pulling the first 40 MB
 # of the SourceForge tarball and running strings over every .rpm in it. That is
 # exactly the case rpm.eclass calls "none": supported by app-arch/rpm, payload
-# uncompressed or on builtin zlib.
+# uncompressed or on builtin zlib. Re-checked on the 4.1.17 tarball
+# 2026-10-16: still RPM v3, payload cpio+gzip, no xz/zstd/bzip2 anywhere.
 #
 # Without the variable the eclass takes its unset branch and BDEPEND loses
 # app-arch/rpm entirely. @PRE_INHERIT, so it goes above the inherit.
@@ -18,7 +19,7 @@ inherit desktop multilib gnome2-utils pax-utils prefix rpm xdg
 
 IUSE="gnome java"
 
-BUILDID="9816"
+BUILDID="9818"
 BVER="${PV/_rc*/}-${BUILDID}"
 BVER2=${PV}-${BUILDID}
 BASIS="ooobasis4.1"

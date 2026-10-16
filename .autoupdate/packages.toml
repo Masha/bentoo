@@ -1071,9 +1071,17 @@ url = "https://www.openoffice.org/"
 parser = "regex"
 pattern = 'Apache OpenOffice ([0-9]+\.[0-9]+\.[0-9]+)'
 type = "bin"
-version = "4.1.16"
+version = "4.1.17"
 comments = """
 Apache OpenOffice — homepage states "Apache OpenOffice X.Y.Z" as current.
+
+A BUMP IS NOT A PV CHANGE ALONE. Every RPM inside the tarballs is named
+<pkg>-${PV}-${BUILDID}, and BUILDID moves with each release (9816 for 4.1.16,
+9818 for 4.1.17); a stale BUILDID makes every rpm_unpack fail. Read it from
+`tar tzf Apache_OpenOffice_${PV}_Linux_x86-64_install-rpm_en-US.tar.gz`.
+The Manifest also fetches 39 langpacks from SourceForge (0.8 GB in all); on
+2026-10-16 that outran the applier's timeout (exit 143), so pre-seed them in
+DISTDIR before applying.
 """
 # END
 
@@ -12078,7 +12086,7 @@ step, and re-check that the tree still has no install scripts or .node addons.
 url = "https://registry.npmjs.org/yaml-language-server/latest"
 parser = "regex"
 pattern = '"version":"([0-9]+\.[0-9]+\.[0-9]+)"'
-version = "1.25.0"
+version = "2.0.0"
 comments = """
 yaml-language-server (Red Hat) -- probed on npm, the channel that ships the
 compiled server.

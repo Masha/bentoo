@@ -1,0 +1,10 @@
+DEFINED_PHASES=install
+DESCRIPTION=Language server for YAML with JSON Schema support
+EAPI=8
+HOMEPAGE=https://github.com/redhat-developer/yaml-language-server
+KEYWORDS=~amd64
+LICENSE=MIT Apache-2.0 BSD BSD-2 BlueOak-1.0.0 ISC
+RDEPEND=>=net-libs/nodejs-22.13.0:*
+SLOT=0
+SRC_URI=https://registry.npmjs.org/yaml-language-server/-/yaml-language-server-2.0.0.tgz https://distfiles.obentoo.org/yaml-language-server-node_modules-2.0.0.tar.xz
+_md5_=22144c2f24f3253a4dd14c3980f1c64d
