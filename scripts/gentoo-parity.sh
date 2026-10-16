@@ -1978,7 +1978,24 @@ split_by_reference() {
 			# DIRECTIVE, and an unparseable one turns the whole
 			# function into SC1009/SC1072/SC1073 parse errors while
 			# bash -n still reports the file as fine.
-			regex=${pattern//./\\.}
+			#
+			# Every ERE metacharacter but the glob's own `*` is escaped,
+			# not just the dot: a file name is a literal, and `+` is a
+			# legal one. sys-apps/memtest86+ ships 39_memtest86+-r3,
+			# which unescaped reads as "one or more 6" and never matched
+			# its own name -- reported as an orphan while the ebuild
+			# installed it.
+			regex=${pattern//\\/\\\\}
+			regex=${regex//./\\.}
+			regex=${regex//+/\\+}
+			regex=${regex//\?/\\?}
+			regex=${regex//(/\\(}
+			regex=${regex//)/\\)}
+			regex=${regex//|/\\|}
+			regex=${regex//^/\\^}
+			regex=${regex//\$/\\$}
+			regex=${regex//\[/\\[}
+			regex=${regex//\{/\\\{}
 			regex=${regex//\*/.*}
 			if [[ ${name} =~ ^${regex}$ ]]; then
 				hit=yes
@@ -5345,6 +5362,18 @@ self_test_assertions() {
 		'a package inheriting readme.gentoo-r1 without the file is not a missing reference' \
 		'missing=0 names=(none)' \
 		"$(fixture_pass "${SELF_TEST_ECLASS_FILTER}" report_missing_filesdir_refs)"
+
+	# A file name carrying an ERE metacharacter is matched as the literal it
+	# is, while `*` still globs. A pure function, so no fixture: the literal
+	# names are the subject. The decoy pins the escape itself -- unescaped,
+	# `86+` would accept `866`, and a fix that merely made `+` optional
+	# would still let it through.
+	assert_eq A31 \
+		'files/ names holding + ( $ are matched literally; * still globs' \
+		'ref=39_memtest86+-r3 a(1).sh x$y.conf foo-1.2.patch orphan=39_memtest866-r3' \
+		"$(split_by_reference '39_memtest86+-r3 39_memtest866-r3 a(1).sh x$y.conf foo-1.2.patch' \
+			'39_memtest86+-r3 a(1).sh x$y.conf foo-*.patch'
+			printf 'ref=%s orphan=%s' "${SPLIT_REFERENCED}" "${SPLIT_ORPHAN}")"
 
 	rm -rf -- "${scratch}"
 }
