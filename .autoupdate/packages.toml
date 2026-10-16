@@ -10720,6 +10720,22 @@ because ::gentoo is stuck on 1.33 (2025).  Drop both once ::gentoo ships 2.x.
 """
 # END
 
+["sys-apps/memtest86+"]
+url = "https://api.github.com/repos/memtest86plus/memtest86plus/releases/latest"
+parser = "json"
+path = "tag_name"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "9.00"
+comments = """
+memtest86+ — tag "vX.YY" on GitHub; releases/latest, never ranked tags.
+
+This record is temporary, like the package: bentoo mirrors ::gentoo's
+8.10-r1 ebuild forward to 9.00 (released 2026-10-15) and nothing else
+differs.  An 8.10 mirror existed for the same reason and was removed on
+2026-05-19 when ::gentoo caught up.  Drop both once ::gentoo ships 9.00.
+"""
+# END
+
 ["sys-apps/uutils-coreutils"]
 enabled = false
 disabled_by = "auto"
