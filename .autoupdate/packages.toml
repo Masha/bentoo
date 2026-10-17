@@ -9591,7 +9591,7 @@ is a workspace and pycargoebuild refuses it.
 url = "https://pypi.org/pypi/openai/json"
 parser = "json"
 path = "info.version"
-version = "3.33.0"
+version = "3.34.0"
 comments = """
 openai — official Python SDK; core dep of sci-ml/amd-gaia. info.version is
 clean X.Y.Z. Live=3.0.0 == current PV.
@@ -9894,13 +9894,11 @@ which is why this entry carried no revision until 2026-07-26.
 # END
 
 ["sci-ml/ollama"]
-enabled = false
-disabled_by = "parity-audit 2026-10-17: removed, ::gentoo 0.40.5 is better (LLAMA_CPP_tag b11669 as upstream asks, ours b11351) -- seventh resurrection, see comments"
 url = "https://api.github.com/repos/ollama/ollama/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.40.5"
+version = "0.40.6"
 comments = """
 ollama source — same repo as ollama-bin; tag "vX.Y.Z" (leading v stripped).
 
