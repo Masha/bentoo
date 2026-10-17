@@ -168,9 +168,7 @@ CRATES="
 	cached_proc_macro_types@0.1.1
 	calloop-wayland-source@0.4.1
 	camino@1.2.6
-	cap-fs-ext@4.0.3
 	cap-primitives@4.0.3
-	cap-std@4.0.3
 	cargo-platform@0.3.2
 	cargo_metadata@0.23.1
 	cargo_toml@0.21.0
@@ -241,19 +239,19 @@ CRATES="
 	cpp_demangle@0.5.1
 	cpufeatures@0.2.17
 	cpufeatures@0.3.0
-	cranelift-assembler-x64-meta@0.135.1
-	cranelift-assembler-x64@0.135.1
-	cranelift-bforest@0.135.1
-	cranelift-bitset@0.135.1
-	cranelift-codegen-meta@0.135.1
-	cranelift-codegen-shared@0.135.1
-	cranelift-codegen@0.135.1
-	cranelift-control@0.135.1
-	cranelift-entity@0.135.1
-	cranelift-frontend@0.135.1
-	cranelift-isle@0.135.1
-	cranelift-native@0.135.1
-	cranelift-srcgen@0.135.1
+	cranelift-assembler-x64-meta@0.135.6
+	cranelift-assembler-x64@0.135.6
+	cranelift-bforest@0.135.6
+	cranelift-bitset@0.135.6
+	cranelift-codegen-meta@0.135.6
+	cranelift-codegen-shared@0.135.6
+	cranelift-codegen@0.135.6
+	cranelift-control@0.135.6
+	cranelift-entity@0.135.6
+	cranelift-frontend@0.135.6
+	cranelift-isle@0.135.6
+	cranelift-native@0.135.6
+	cranelift-srcgen@0.135.6
 	crash-context@0.8.0
 	crash-handler@0.8.0
 	crc-catalog@2.4.0
@@ -854,8 +852,8 @@ CRATES="
 	pulldown-cmark-escape@0.10.1
 	pulldown-cmark@0.10.3
 	pulldown-cmark@0.13.4
-	pulley-interpreter@48.0.1
-	pulley-macros@48.0.1
+	pulley-interpreter@48.0.6
+	pulley-macros@48.0.6
 	pxfm@0.1.25
 	qoi@0.4.1
 	quick-error@1.2.3
@@ -944,7 +942,7 @@ CRATES="
 	rustls-platform-verifier-android@0.1.1
 	rustls-platform-verifier@0.7.0
 	rustls-webpki@0.103.15
-	rustls@0.23.45
+	rustls@0.23.46
 	rustversion@1.0.22
 	rusty-fork@0.3.1
 	rustybuzz@0.20.1
@@ -1241,33 +1239,33 @@ CRATES="
 	wasm-encoder@0.201.0
 	wasm-encoder@0.227.1
 	wasm-encoder@0.244.0
-	wasm-encoder@0.254.0
+	wasm-encoder@0.254.2
 	wasm-metadata@0.201.0
 	wasm-metadata@0.227.1
 	wasm-metadata@0.244.0
-	wasm-metadata@0.254.0
+	wasm-metadata@0.254.2
 	wasm-streams@0.4.2
 	wasmparser@0.201.0
 	wasmparser@0.227.1
 	wasmparser@0.244.0
-	wasmparser@0.254.0
-	wasmprinter@0.254.0
-	wasmtime-c-api-impl@48.0.1
-	wasmtime-environ@48.0.1
-	wasmtime-internal-c-api-macros@48.0.1
-	wasmtime-internal-component-macro@48.0.1
-	wasmtime-internal-component-util@48.0.1
-	wasmtime-internal-core@48.0.1
-	wasmtime-internal-cranelift@48.0.1
-	wasmtime-internal-fiber@48.0.1
-	wasmtime-internal-jit-debug@48.0.1
-	wasmtime-internal-jit-icache-coherence@48.0.1
-	wasmtime-internal-unwinder@48.0.1
-	wasmtime-internal-versioned-export-macros@48.0.1
-	wasmtime-internal-wit-bindgen@48.0.1
-	wasmtime-wasi-io@48.0.1
-	wasmtime-wasi@48.0.1
-	wasmtime@48.0.1
+	wasmparser@0.254.2
+	wasmprinter@0.254.2
+	wasmtime-c-api-impl@48.0.6
+	wasmtime-environ@48.0.6
+	wasmtime-internal-c-api-macros@48.0.6
+	wasmtime-internal-component-macro@48.0.6
+	wasmtime-internal-component-util@48.0.6
+	wasmtime-internal-core@48.0.6
+	wasmtime-internal-cranelift@48.0.6
+	wasmtime-internal-fiber@48.0.6
+	wasmtime-internal-jit-debug@48.0.6
+	wasmtime-internal-jit-icache-coherence@48.0.6
+	wasmtime-internal-unwinder@48.0.6
+	wasmtime-internal-versioned-export-macros@48.0.6
+	wasmtime-internal-wit-bindgen@48.0.6
+	wasmtime-wasi-io@48.0.6
+	wasmtime-wasi@48.0.6
+	wasmtime@48.0.6
 	wax@0.7.0
 	wayland-backend@0.3.15
 	wayland-client@0.31.11
@@ -1395,11 +1393,11 @@ CRATES="
 	wit-component@0.201.0
 	wit-component@0.227.1
 	wit-component@0.244.0
-	wit-component@0.254.0
+	wit-component@0.254.2
 	wit-parser@0.201.0
 	wit-parser@0.227.1
 	wit-parser@0.244.0
-	wit-parser@0.254.0
+	wit-parser@0.254.2
 	write16@1.0.0
 	writeable@0.6.4
 	x11@2.21.0
@@ -1834,6 +1832,13 @@ src_prepare() {
 		# tell Zeo's sessions from any other Claude Code process and offer the
 		# tray link (0024) only for those. Ungrouped like 0024.
 		"${FILESDIR}/0061-agent-mark-agent-servers-with-zeo-thread.patch"
+		# 0064 moves wasmtime/wasmtime-wasi 48.0.1 -> 48.0.6 and rustls
+		# 0.23.45 -> 0.23.46 for 26 RustSec advisories, six of them reachable
+		# from an installed extension or any HTTPS connection. Cargo.toml and
+		# Cargo.lock only, so CRATES above lists the moved versions. A security
+		# fix for every build, so ungrouped; 0002, 0035, 0052, 0057 and 0058,
+		# which also edit Cargo.lock, are regenerated on top of it.
+		"${FILESDIR}/0064-wasmtime-48-0-6-rustls-0-23-46.patch"
 	)
 
 	if use claude-agent-acp-plus; then
