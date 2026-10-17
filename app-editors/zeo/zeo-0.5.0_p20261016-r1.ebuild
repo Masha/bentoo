@@ -1552,7 +1552,7 @@ declare -A GIT_CRATES=(
 # rewrites the date and EGIT_COMMIT; a second version variable it could not
 # keep current would leave a new tarball under an old, already-manifested name).
 
-EGIT_COMMIT="56934ec0560bce8929025497411de7f5322fb6ca"
+EGIT_COMMIT="2d4c4831943153f63ad0aeddf49c8f5a3d008e75"
 # LLVM 23 only, so it is the default slot: llvm-r1 would always prefer slot 22
 # (its newest stable) whenever 22 is listed. RUST_NEEDS_LLVM ties the Rust slot
 # to it, so this builds with Rust 1.99, one release past upstream's 1.98.1 pin

@@ -3235,6 +3235,7 @@ mesa_clc — part of the mesa tree; same source/rule as media-libs/mesa.
 # END
 
 ["app-editors/zeo"]
+hold = true
 track = "commit"
 url = "https://api.github.com/repos/zed-industries/zed/commits?sha=main&per_page=50"
 parser = "json"
@@ -3243,8 +3244,13 @@ transform = [['T.*', ""], ['-', ""]]
 commit_sha_path = "[0].sha"
 base_from = "none"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.5.0_p20261017"
+version = "0.5.0_p20261016-r1"
 comments = """
+HOLD since 2026-10-17: an applied bump only moves EGIT_COMMIT, and twice in two
+days that shipped an unbuildable ebuild (p20261016: CRATES lacked ACP 3.4.0, three
+patches rejected; p20261017 at 56934ec: 0029 rejected on acp_thread.rs, CRATES
+lacked the gpui hot-reload crates) while deleting the verified revision. Bump by
+hand with zed-patches/scripts/bump.sh; keep hold on.
 zeo — commit-tracked on Zed's main; the snapshot plus the bentoo patch series and
 the rebrand. 2026-10-01: this entry WAS app-editors/zed, which now builds
 upstream's releases unpatched (see the zed@stable/zed@preview entries); the
