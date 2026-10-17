@@ -3,7 +3,7 @@
 
 EAPI=8
 
-inherit go-module desktop systemd xdg
+inherit go-module desktop optfeature systemd xdg
 
 DESCRIPTION="Tray icon and desktop notifications for bentoo overlay notices"
 HOMEPAGE="https://github.com/obentoo/bentoolkit"
@@ -11,7 +11,7 @@ HOMEPAGE="https://github.com/obentoo/bentoolkit"
 # version of its own (internal/tray/version/VERSION); BENTOOLKIT_PV is the
 # bentoolkit release that ships this tray version. It shares
 # app-portage/bentoolkit's distfile rather than fetching the same tag twice.
-BENTOOLKIT_PV="0.34.0"
+BENTOOLKIT_PV="0.37.0"
 SRC_URI="https://github.com/obentoo/bentoolkit/archive/refs/tags/v${BENTOOLKIT_PV}.tar.gz -> bentoolkit-${BENTOOLKIT_PV}.tar.gz"
 # The release's vendor tarball (the tag's `go mod vendor`) unpacks into the
 # same ${S}, so the build needs no network access.
@@ -98,4 +98,8 @@ pkg_postinst() {
 	elog "GNOME has no tray of its own: install and enable"
 	elog "gnome-shell-extension-appindicator to see the icon. Notifications work"
 	elog "without it. KDE Plasma shows the icon natively."
+
+	optfeature "applicable GLSA alerts" app-portage/gentoolkit
+	optfeature "failing-drive (SMART) alerts" "sys-fs/udisks[smart] sys-libs/libblockdev[smart]"
+	optfeature "network down/back alerts" net-misc/networkmanager
 }
