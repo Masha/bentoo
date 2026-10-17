@@ -78,7 +78,7 @@ name are invalid. The terminal environment is one helper,
 ---
 
 diff --git a/Cargo.lock b/Cargo.lock
-index d4c890e..abe760b 100644
+index ff9802f..616e6eb 100644
 --- a/Cargo.lock
 +++ b/Cargo.lock
 @@ -3046,6 +3046,32 @@ version = "0.7.6"
@@ -123,7 +123,7 @@ index d4c890e..abe760b 100644
   "client",
   "clock",
 diff --git a/Cargo.toml b/Cargo.toml
-index 760105d..df252c0 100644
+index d94aae0..1e0380e 100644
 --- a/Cargo.toml
 +++ b/Cargo.toml
 @@ -28,6 +28,7 @@ members = [

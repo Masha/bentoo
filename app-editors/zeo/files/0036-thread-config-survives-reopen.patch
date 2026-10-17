@@ -71,7 +71,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 ---
 
 diff --git a/Cargo.lock b/Cargo.lock
-index b3940cd..c0ded26 100644
+index 00bb83e..23f4e9a 100644
 --- a/Cargo.lock
 +++ b/Cargo.lock
 @@ -381,6 +381,7 @@ dependencies = [
@@ -103,7 +103,7 @@ index 50b6e1c..a7e6306 100644
  fs.workspace = true
  
 diff --git a/crates/agent_servers/src/acp.rs b/crates/agent_servers/src/acp.rs
-index 7a27ba8..13056d6 100644
+index e915a2e..be1b72f 100644
 --- a/crates/agent_servers/src/acp.rs
 +++ b/crates/agent_servers/src/acp.rs
 @@ -27,7 +27,7 @@ use agent_client_protocol::{
@@ -115,16 +115,16 @@ index 7a27ba8..13056d6 100644
  use project::agent_server_store::{AgentServerCommand, AgentServerStore};
  use project::context_server_store::ContextServerConfiguration;
  use project::{AgentId, Project};
-@@ -36,6 +36,8 @@ use task::SpawnInTerminal;
- use thiserror::Error;
+@@ -37,6 +37,8 @@ use thiserror::Error;
  use util::ResultExt as _;
+ use util::path_list::PathList;
  
 +use crate::thread_config_store;
 +
  const EXIT_DRAIN_TIMEOUT: std::time::Duration = std::time::Duration::from_millis(250);
  
  fn mcp_configurations_for_project(
-@@ -326,12 +328,137 @@ impl ConfigOptions {
+@@ -343,12 +345,137 @@ impl ConfigOptions {
      }
  }
  
@@ -263,7 +263,7 @@ index 7a27ba8..13056d6 100644
  }
  
 diff --git a/crates/agent_servers/src/acp/v1.rs b/crates/agent_servers/src/acp/v1.rs
-index 3d492f0..2ae3228 100644
+index 5db122b..c78bf01 100644
 --- a/crates/agent_servers/src/acp/v1.rs
 +++ b/crates/agent_servers/src/acp/v1.rs
 @@ -1,10 +1,10 @@
@@ -273,13 +273,13 @@ index 3d492f0..2ae3228 100644
 -    enqueue_request, first_class_terminal_auth_task, handle_v2_complete_elicitation,
 -    handle_v2_create_elicitation, map_acp_error, mcp_configurations_for_project, respond_err,
 -    respond_result, runtime, session_thread, terminal_auth_task_id, transport,
--    with_v2_client_ingress,
+-    with_v2_client_ingress, work_dirs_from_session_info,
 +    AcpDebugLog, AcpDebugMessage, AcpSession, ClientContext, ConfigOptions, ConfigRecorder,
 +    FlattenAcpResult as _, ForegroundWork, ModeTrigger, UnsupportedVersion, drain_foreground_queue,
 +    enqueue_notification, enqueue_request, first_class_terminal_auth_task,
 +    handle_v2_complete_elicitation, handle_v2_create_elicitation, map_acp_error,
 +    mcp_configurations_for_project, respond_err, respond_result, runtime, session_thread,
-+    terminal_auth_task_id, transport, with_v2_client_ingress,
++    terminal_auth_task_id, transport, with_v2_client_ingress, work_dirs_from_session_info,
  };
  use acp_thread::{
      AgentConnection, AgentSessionInfo, AgentSessionList, AgentSessionListRequest,
@@ -770,7 +770,7 @@ index 3d492f0..2ae3228 100644
  #[derive(Clone, Debug, PartialEq, Eq)]
  struct SessionDirectories {
      cwd: PathBuf,
-@@ -1322,6 +1589,9 @@ impl AgentConnection for AcpConnection {
+@@ -1306,6 +1573,9 @@ impl AgentConnection for AcpConnection {
                  .map_err(map_acp_error)?;
  
              let (modes, config_options) = config_state(response.modes, response.config_options)?;
@@ -780,7 +780,7 @@ index 3d492f0..2ae3228 100644
  
              let default_mode = self.defaults.mode();
              if let Some(default_mode) = default_mode {
-@@ -1340,6 +1610,7 @@ impl AgentConnection for AcpConnection {
+@@ -1324,6 +1594,7 @@ impl AgentConnection for AcpConnection {
                              let default_mode = default_mode.clone();
                              let session_id = response.session_id.clone();
                              let modes = modes.clone();
@@ -788,7 +788,7 @@ index 3d492f0..2ae3228 100644
                              let conn = self.connection.clone();
                              async move |_| {
                                  let result = conn
-@@ -1354,6 +1625,9 @@ impl AgentConnection for AcpConnection {
+@@ -1338,6 +1609,9 @@ impl AgentConnection for AcpConnection {
                                  if result.is_none() {
                                      modes.borrow_mut().current_mode_id = initial_mode_id;
                                  }
@@ -798,7 +798,7 @@ index 3d492f0..2ae3228 100644
                              }
                          })
                          .detach();
-@@ -1376,7 +1650,7 @@ impl AgentConnection for AcpConnection {
+@@ -1360,7 +1634,7 @@ impl AgentConnection for AcpConnection {
  
              let session_id = acp_v2::SessionId::new(response.session_id.0);
              let default_config_task = config_options.as_ref().map(|options| {
@@ -807,7 +807,7 @@ index 3d492f0..2ae3228 100644
              });
  
              let action_log = cx.new(|_| ActionLog::new(project.clone()));
-@@ -1397,13 +1671,15 @@ impl AgentConnection for AcpConnection {
+@@ -1381,13 +1655,15 @@ impl AgentConnection for AcpConnection {
  
              cx.update(|cx| {
                  self.register_session(
@@ -825,7 +825,7 @@ index 3d492f0..2ae3228 100644
              });
  
              registered
-@@ -1672,6 +1948,7 @@ impl AgentConnection for AcpConnection {
+@@ -1659,6 +1935,7 @@ impl AgentConnection for AcpConnection {
                  connection: self.connection.clone(),
                  session_id: session_id.clone(),
                  state: modes.clone(),
@@ -833,7 +833,7 @@ index 3d492f0..2ae3228 100644
              }) as _)
          } else {
              None
-@@ -2865,8 +3142,15 @@ mod tests {
+@@ -2853,8 +3130,15 @@ mod tests {
                  .await
                  .expect("receipt-capable model session");
              cx.update(|cx| {
@@ -851,7 +851,7 @@ index 3d492f0..2ae3228 100644
              });
              thread
          }
-@@ -6191,6 +6475,7 @@ mod tests {
+@@ -6179,6 +6463,7 @@ mod tests {
                      acp::SessionMode::new("opaque/手動", "Manual"),
                  ],
              ))),
@@ -859,7 +859,7 @@ index 3d492f0..2ae3228 100644
          };
          let selected = acp_v2::SessionConfigValueId::new("opaque/手動");
          let change = cx.update(|cx| modes.set_mode(selected.clone(), cx));
-@@ -6297,9 +6582,10 @@ mod tests {
+@@ -6285,9 +6570,10 @@ mod tests {
          ])));
  
          let mut async_cx = cx.to_async();
@@ -871,7 +871,7 @@ index 3d492f0..2ae3228 100644
              &mut async_cx,
          );
          drop(async_cx);
-@@ -6415,9 +6701,10 @@ mod tests {
+@@ -6403,9 +6689,10 @@ mod tests {
                  config_state(None, Some(initial_options)).expect("initial config");
              let config_options = config_options.expect("config options");
              let mut receiver = config_options.rx.clone();
@@ -883,7 +883,7 @@ index 3d492f0..2ae3228 100644
                  &mut cx.to_async(),
              );
              cx.run_until_parked();
-@@ -6493,9 +6780,10 @@ mod tests {
+@@ -6481,9 +6768,10 @@ mod tests {
          )];
          let config_options = ConfigOptions::new(Rc::new(RefCell::new(original_options.clone())));
          let mut receiver = config_options.rx.clone();
@@ -895,7 +895,7 @@ index 3d492f0..2ae3228 100644
              &mut cx.to_async(),
          );
          cx.run_until_parked();
-@@ -6536,9 +6824,10 @@ mod tests {
+@@ -6524,9 +6812,10 @@ mod tests {
              acp_v2::SessionConfigOption::boolean("first", "First", false),
              acp_v2::SessionConfigOption::boolean("second", "Second", false),
          ])));
@@ -907,7 +907,7 @@ index 3d492f0..2ae3228 100644
              &mut cx.to_async(),
          );
          cx.run_until_parked();
-@@ -7834,7 +8123,15 @@ exit 7
+@@ -7822,7 +8111,15 @@ exit 7
              .expect("receipt model owner");
          cx.update(|cx| {
              let session_id = thread.read(cx).session_id().clone();
@@ -924,7 +924,7 @@ index 3d492f0..2ae3228 100644
          });
          let _pending_sender = connection.defer_next_receipt_response();
          let pending = thread.update(cx, |thread, cx| thread.send(vec!["pending".into()], cx));
-@@ -9202,6 +9499,8 @@ struct AcpSessionModes {
+@@ -9190,6 +9487,8 @@ struct AcpSessionModes {
      session_id: acp_v2::SessionId,
      connection: ConnectionTo<Agent>,
      state: Rc<RefCell<acp::SessionModeState>>,
@@ -933,7 +933,7 @@ index 3d492f0..2ae3228 100644
  }
  
  fn mode_from_v1(mode: &acp::SessionMode) -> acp_v2::SessionConfigSelectOption {
-@@ -9238,6 +9537,7 @@ impl acp_thread::AgentSessionModes for AcpSessionModes {
+@@ -9226,6 +9525,7 @@ impl acp_thread::AgentSessionModes for AcpSessionModes {
              state.current_mode_id = mode_id.clone();
          };
          let state = self.state.clone();
@@ -941,7 +941,7 @@ index 3d492f0..2ae3228 100644
          cx.foreground_executor().spawn(async move {
              let result = connection
                  .send_request(acp::SetSessionModeRequest::new(session_id, mode_id))
-@@ -9247,6 +9547,12 @@ impl acp_thread::AgentSessionModes for AcpSessionModes {
+@@ -9235,6 +9535,12 @@ impl acp_thread::AgentSessionModes for AcpSessionModes {
              if result.is_err() {
                  state.borrow_mut().current_mode_id = old_mode_id;
              }
@@ -954,7 +954,7 @@ index 3d492f0..2ae3228 100644
  
              result?;
  
-@@ -9496,7 +9802,7 @@ fn handle_session_notification(
+@@ -9484,7 +9790,7 @@ fn handle_session_notification(
  ) {
      let session_id = acp_v2::SessionId::new(notification.session_id.0);
      // Extract everything we need from the session while briefly borrowing.
@@ -963,7 +963,7 @@ index 3d492f0..2ae3228 100644
          let sessions = ctx.sessions.borrow();
          let Some(session) = sessions.get(&session_id) else {
              log::warn!(
-@@ -9508,6 +9814,7 @@ fn handle_session_notification(
+@@ -9496,6 +9802,7 @@ fn handle_session_notification(
          (
              session.thread.clone(),
              session.session_modes.clone(),
@@ -971,7 +971,7 @@ index 3d492f0..2ae3228 100644
              session
                  .config_options
                  .as_ref()
-@@ -9523,6 +9830,7 @@ fn handle_session_notification(
+@@ -9511,6 +9818,7 @@ fn handle_session_notification(
      {
          if let Some(session_modes) = &session_modes {
              session_modes.borrow_mut().current_mode_id = current_mode_id.clone();
@@ -3060,7 +3060,7 @@ index 0000000..31ad6bf
 +    }
 +}
 diff --git a/crates/agent_servers/src/acp/v2.rs b/crates/agent_servers/src/acp/v2.rs
-index e95d3aa..0eddd80 100644
+index 7641fb2..6560a56 100644
 --- a/crates/agent_servers/src/acp/v2.rs
 +++ b/crates/agent_servers/src/acp/v2.rs
 @@ -1,7 +1,7 @@
@@ -3071,17 +3071,17 @@ index e95d3aa..0eddd80 100644
 +    ContextServerConfiguration, ForegroundWork, ModeTrigger, UnsupportedVersion,
 +    drain_foreground_queue, enqueue_notification, first_class_terminal_auth_task, map_acp_error,
      mcp_configurations_for_project, runtime, transport, with_v2_client_ingress,
+     work_dirs_from_session_info,
  };
- use acp_thread::{
-@@ -672,6 +672,8 @@ impl AgentConnection for AcpV2Connection {
-                             config_options: Some(options),
-                             default_config_task: None,
-                             _release_subscription: release_subscription,
-+                            mode_trigger: ModeTrigger::new(),
-+                            _config_recorder: None,
-                         },
-                     );
-                     thread.update(cx, |thread, cx| {
+@@ -608,6 +608,8 @@ impl AcpV2Connection {
+                 config_options: Some(ConfigOptions::new(Rc::new(RefCell::new(Vec::new())))),
+                 default_config_task: None,
+                 _release_subscription: release_subscription,
++                mode_trigger: ModeTrigger::new(),
++                _config_recorder: None,
+             },
+         );
+         self.session_owners.borrow_mut().insert(
 diff --git a/crates/agent_servers/src/agent_servers.rs b/crates/agent_servers/src/agent_servers.rs
 index 180bfeb..ad59390 100644
 --- a/crates/agent_servers/src/agent_servers.rs

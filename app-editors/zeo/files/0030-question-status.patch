@@ -53,7 +53,7 @@ conversation waiting, and answering it clears that.
 ---
 
 diff --git a/crates/agent_ui/src/conversation_view.rs b/crates/agent_ui/src/conversation_view.rs
-index fb980e5..981bdac 100644
+index 44d373c..734eddc 100644
 --- a/crates/agent_ui/src/conversation_view.rs
 +++ b/crates/agent_ui/src/conversation_view.rs
 @@ -309,6 +309,22 @@ impl Conversation {
@@ -106,7 +106,7 @@ index fb980e5..981bdac 100644
      pub(crate) fn root_thread(&self, cx: &App) -> Option<Entity<AcpThread>> {
          self.root_thread_view()
              .map(|view| view.read(cx).thread.clone())
-@@ -6182,6 +6211,41 @@ pub(crate) mod tests {
+@@ -6291,6 +6320,41 @@ pub(crate) mod tests {
          });
      }
  
@@ -148,7 +148,7 @@ index fb980e5..981bdac 100644
      #[gpui::test]
      async fn test_resume_without_history_adds_notice(cx: &mut TestAppContext) {
          init_test(cx);
-@@ -16674,6 +16738,76 @@ pub(crate) mod tests {
+@@ -16795,6 +16859,76 @@ pub(crate) mod tests {
          });
      }
  

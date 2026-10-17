@@ -111,7 +111,7 @@ spawns a real agent script and reads back its environment (story 050).
 ---
 
 diff --git a/Cargo.lock b/Cargo.lock
-index 898fa08..98eb21b 100644
+index 84cc648..dd3cde3 100644
 --- a/Cargo.lock
 +++ b/Cargo.lock
 @@ -368,6 +368,39 @@ dependencies = [
@@ -233,7 +233,7 @@ index 898fa08..98eb21b 100644
   "agent_settings",
   "agent_skills",
 diff --git a/Cargo.toml b/Cargo.toml
-index ba6ff8b..e7306db 100644
+index 11016d0..79913fb 100644
 --- a/Cargo.toml
 +++ b/Cargo.toml
 @@ -6,6 +6,7 @@ members = [
@@ -253,10 +253,10 @@ index ba6ff8b..e7306db 100644
  agent_settings = { path = "crates/agent_settings" }
  agent_skills = { path = "crates/agent_skills" }
 diff --git a/assets/settings/default.json b/assets/settings/default.json
-index 9d0b00e..b4d5e49 100644
+index ff0a42e..e9c089e 100644
 --- a/assets/settings/default.json
 +++ b/assets/settings/default.json
-@@ -3081,4 +3081,26 @@
+@@ -3083,4 +3083,26 @@
    "devtools_bridge": {
      "enabled": true,
    },
@@ -10702,7 +10702,7 @@ index a7e6306..6b8fc54 100644
  tempfile.workspace = true
 +workspace = { workspace = true, features = ["test-support"] }
 diff --git a/crates/agent_servers/src/acp.rs b/crates/agent_servers/src/acp.rs
-index 13056d6..32a78a7 100644
+index be1b72f..bc19a1d 100644
 --- a/crates/agent_servers/src/acp.rs
 +++ b/crates/agent_servers/src/acp.rs
 @@ -12,7 +12,8 @@ use session_updates::{InboundSessionNotification, InboundSessionUpdate};
@@ -10929,7 +10929,7 @@ index 86f3d0c..0dc9ca6 100644
 +    }
  }
 diff --git a/crates/agent_servers/src/acp/v1.rs b/crates/agent_servers/src/acp/v1.rs
-index a1fa795..cc7b13b 100644
+index 1c5cbc3..a210cf1 100644
 --- a/crates/agent_servers/src/acp/v1.rs
 +++ b/crates/agent_servers/src/acp/v1.rs
 @@ -377,22 +377,35 @@ impl AgentSessionList for AcpSessionList {
@@ -11038,10 +11038,10 @@ index a1fa795..cc7b13b 100644
          let connection_rx = async move {
              connection_rx
 diff --git a/crates/agent_servers/src/acp/v2.rs b/crates/agent_servers/src/acp/v2.rs
-index 0eddd80..e687344 100644
+index 6560a56..3d71b2b 100644
 --- a/crates/agent_servers/src/acp/v2.rs
 +++ b/crates/agent_servers/src/acp/v2.rs
-@@ -107,7 +107,7 @@ impl AcpV2Connection {
+@@ -147,7 +147,7 @@ impl AcpV2Connection {
              outgoing,
              stderr,
              debug_log,
@@ -12743,7 +12743,7 @@ index 0000000..1a9c116
 +    }
 +}
 diff --git a/crates/agent_ui/src/agent_panel.rs b/crates/agent_ui/src/agent_panel.rs
-index a0447c0..b12c528 100644
+index f900b0e..5b63220 100644
 --- a/crates/agent_ui/src/agent_panel.rs
 +++ b/crates/agent_ui/src/agent_panel.rs
 @@ -723,6 +723,7 @@ pub fn init(cx: &mut App) {
@@ -13040,10 +13040,10 @@ index 6fc9ad2..8a55068 100644
  mod devtools_delivery_tests;
  
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
-index 2054981..4b752de 100644
+index 5b5763b..39c75dd 100644
 --- a/crates/agent_ui/src/conversation_view/thread_view.rs
 +++ b/crates/agent_ui/src/conversation_view/thread_view.rs
-@@ -6042,6 +6042,22 @@ impl ThreadView {
+@@ -6065,6 +6065,22 @@ impl ThreadView {
          )
      }
  
@@ -13262,7 +13262,7 @@ index c18909b..2fb46ea 100644
  clock = { workspace = true, features = ["test-support"] }
  editor = { workspace = true, features = ["test-support"] }
 diff --git a/crates/settings/src/vscode_import.rs b/crates/settings/src/vscode_import.rs
-index 388898c..f03a939 100644
+index 1fe6595..65be438 100644
 --- a/crates/settings/src/vscode_import.rs
 +++ b/crates/settings/src/vscode_import.rs
 @@ -247,6 +247,8 @@ impl VsCodeSettings {
@@ -13409,7 +13409,7 @@ index 861b71e..dc896e6 100644
  
  [package.metadata.cargo-shear]
 diff --git a/crates/settings_ui/src/page_data.rs b/crates/settings_ui/src/page_data.rs
-index 24b82e5..77e5327 100644
+index 138acac..9a9b77f 100644
 --- a/crates/settings_ui/src/page_data.rs
 +++ b/crates/settings_ui/src/page_data.rs
 @@ -13,9 +13,10 @@ use crate::{
@@ -13426,7 +13426,7 @@ index 24b82e5..77e5327 100644
      },
  };
  
-@@ -8934,6 +8935,40 @@ fn ai_page(cx: &App) -> SettingsPage {
+@@ -8948,6 +8949,40 @@ fn ai_page(cx: &App) -> SettingsPage {
                  files: USER,
                  render: render_sandbox_settings_page,
              }),
@@ -16252,10 +16252,10 @@ index b1a7977..4132e69 100644
          edit_prediction_registry::init(app_state.client.clone(), app_state.user_store.clone(), cx);
          let prompt_builder = PromptBuilder::load(app_state.fs.clone(), stdout_is_a_pty(), cx);
 diff --git a/crates/zed/src/zed.rs b/crates/zed/src/zed.rs
-index 7930d72..ef55b79 100644
+index d500ffc..291378b 100644
 --- a/crates/zed/src/zed.rs
 +++ b/crates/zed/src/zed.rs
-@@ -5983,6 +5983,8 @@ mod tests {
+@@ -5984,6 +5984,8 @@ mod tests {
                  "action",
                  "activity_indicator",
                  "agent",

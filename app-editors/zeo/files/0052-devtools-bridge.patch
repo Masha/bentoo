@@ -84,7 +84,7 @@ its own unit, integration and Playwright suites in zeo-devtools.
 ---
 
 diff --git a/Cargo.lock b/Cargo.lock
-index abe760b..898fa08 100644
+index 616e6eb..84cc648 100644
 --- a/Cargo.lock
 +++ b/Cargo.lock
 @@ -5008,6 +5008,32 @@ dependencies = [
@@ -129,7 +129,7 @@ index abe760b..898fa08 100644
   "edit_prediction",
   "edit_prediction_ui",
 diff --git a/Cargo.toml b/Cargo.toml
-index df252c0..ba6ff8b 100644
+index 1e0380e..11016d0 100644
 --- a/Cargo.toml
 +++ b/Cargo.toml
 @@ -56,6 +56,7 @@ members = [
@@ -149,10 +149,10 @@ index df252c0..ba6ff8b 100644
  edit_prediction = { path = "crates/edit_prediction" }
  edit_prediction_context = { path = "crates/edit_prediction_context" }
 diff --git a/assets/settings/default.json b/assets/settings/default.json
-index c03170a..9d0b00e 100644
+index 9a5d375..ff0a42e 100644
 --- a/assets/settings/default.json
 +++ b/assets/settings/default.json
-@@ -3075,4 +3075,10 @@
+@@ -3077,4 +3077,10 @@
        "enabled": false,
      },
    },
@@ -164,7 +164,7 @@ index c03170a..9d0b00e 100644
 +  },
  }
 diff --git a/crates/acp_thread/src/acp_thread.rs b/crates/acp_thread/src/acp_thread.rs
-index 9895b3f..e79ab17 100644
+index 8f6f657..80324ad 100644
 --- a/crates/acp_thread/src/acp_thread.rs
 +++ b/crates/acp_thread/src/acp_thread.rs
 @@ -7,6 +7,8 @@ pub mod content;
@@ -177,10 +177,10 @@ index 9895b3f..e79ab17 100644
  pub mod prompt_capabilities;
  mod submission;
 diff --git a/crates/acp_thread/src/mention.rs b/crates/acp_thread/src/mention.rs
-index b4304a6..8c02576 100644
+index 226e649..d598497 100644
 --- a/crates/acp_thread/src/mention.rs
 +++ b/crates/acp_thread/src/mention.rs
-@@ -74,6 +74,16 @@ pub enum MentionUri {
+@@ -75,6 +75,16 @@ pub enum MentionUri {
          source: String,
          skill_file_path: PathBuf,
      },
@@ -197,7 +197,7 @@ index b4304a6..8c02576 100644
  }
  
  impl MentionUri {
-@@ -239,6 +249,8 @@ impl MentionUri {
+@@ -240,6 +250,8 @@ impl MentionUri {
                  } else if path.starts_with("/agent/merge-conflict") {
                      let file_path = single_query_param(&url, "path")?.unwrap_or_default();
                      Ok(Self::MergeConflict { file_path })
@@ -206,7 +206,7 @@ index b4304a6..8c02576 100644
                  } else if path.starts_with("/agent/skill") {
                      let mut name = None;
                      let mut source = None;
-@@ -316,7 +328,8 @@ impl MentionUri {
+@@ -317,7 +329,8 @@ impl MentionUri {
          match self {
              MentionUri::File { abs_path }
              | MentionUri::Directory { abs_path }
@@ -216,7 +216,7 @@ index b4304a6..8c02576 100644
              MentionUri::Selection { abs_path, .. } => abs_path.as_deref(),
              MentionUri::Skill {
                  skill_file_path, ..
-@@ -366,6 +379,13 @@ impl MentionUri {
+@@ -367,6 +380,13 @@ impl MentionUri {
              } => selection_name(path.as_deref(), line_range),
              MentionUri::Fetch { url } => url.to_string(),
              MentionUri::Skill { name, .. } => name.clone(),
@@ -230,7 +230,7 @@ index b4304a6..8c02576 100644
          }
      }
  
-@@ -429,6 +449,20 @@ impl MentionUri {
+@@ -430,6 +450,20 @@ impl MentionUri {
              MentionUri::Skill {
                  skill_file_path, ..
              } => Some(skill_file_path.to_string_lossy().into_owned().into()),
@@ -251,7 +251,7 @@ index b4304a6..8c02576 100644
              _ => None,
          }
      }
-@@ -451,6 +485,7 @@ impl MentionUri {
+@@ -452,6 +486,7 @@ impl MentionUri {
              MentionUri::GitDiff { .. } => IconName::GitBranch.path().into(),
              MentionUri::MergeConflict { .. } => IconName::GitMergeConflict.path().into(),
              MentionUri::Skill { .. } => IconName::Sparkle.path().into(),
@@ -259,7 +259,7 @@ index b4304a6..8c02576 100644
          }
      }
  
-@@ -582,6 +617,31 @@ impl MentionUri {
+@@ -583,6 +618,31 @@ impl MentionUri {
                      .append_pair("path", &skill_file_path.to_string_lossy());
                  url
              }
@@ -291,7 +291,7 @@ index b4304a6..8c02576 100644
          }
      }
  }
-@@ -835,6 +895,75 @@ fn single_query_param(url: &Url, name: &'static str) -> Result<Option<String>> {
+@@ -839,6 +899,75 @@ fn single_query_param(url: &Url, name: &'static str) -> Result<Option<String>> {
      }
  }
  
@@ -528,7 +528,7 @@ index 0000000..68fb3f2
 +    assert_eq!(restored.name(), uri.name(), "the same chip label");
 +}
 diff --git a/crates/agent/src/thread.rs b/crates/agent/src/thread.rs
-index 83f64a8..3cb37e6 100644
+index a2583e3..1b2ab9c 100644
 --- a/crates/agent/src/thread.rs
 +++ b/crates/agent/src/thread.rs
 @@ -484,6 +484,24 @@ impl UserMessage {
@@ -557,7 +557,7 @@ index 83f64a8..3cb37e6 100644
  
                      language_model::MessageContent::Text(uri.as_link().to_string())
 diff --git a/crates/agent_ui/src/agent_panel.rs b/crates/agent_ui/src/agent_panel.rs
-index b5871e1..a0447c0 100644
+index e509fc2..f900b0e 100644
 --- a/crates/agent_ui/src/agent_panel.rs
 +++ b/crates/agent_ui/src/agent_panel.rs
 @@ -2450,6 +2450,34 @@ impl AgentPanel {
@@ -685,10 +685,10 @@ index d8babd2..6fc9ad2 100644
  mod tests {
      use super::*;
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
-index 3de1b89..2054981 100644
+index 04cab2e..5b5763b 100644
 --- a/crates/agent_ui/src/conversation_view/thread_view.rs
 +++ b/crates/agent_ui/src/conversation_view/thread_view.rs
-@@ -14713,6 +14713,20 @@ pub(crate) fn open_link(
+@@ -14757,6 +14757,20 @@ pub(crate) fn open_link(
                  );
              }
              MentionUri::Selection { abs_path: None, .. } => {}
@@ -3067,7 +3067,7 @@ index 0000000..3293e88
 +    assert!(format!("{error:#}").contains("Gone.tsx"), "{error:#}");
 +}
 diff --git a/crates/agent_ui/src/mention_set.rs b/crates/agent_ui/src/mention_set.rs
-index 13fd750..2ab7abf 100644
+index d6f0cd6..5feef1e 100644
 --- a/crates/agent_ui/src/mention_set.rs
 +++ b/crates/agent_ui/src/mention_set.rs
 @@ -23,8 +23,10 @@ use multi_buffer::MultiBufferRow;
@@ -3419,7 +3419,7 @@ index 13fd750..2ab7abf 100644
  mod tests {
      use super::*;
 diff --git a/crates/agent_ui/src/message_editor.rs b/crates/agent_ui/src/message_editor.rs
-index e822d08..ab9c8b7 100644
+index 06f86ca..4f0ee77 100644
 --- a/crates/agent_ui/src/message_editor.rs
 +++ b/crates/agent_ui/src/message_editor.rs
 @@ -7,12 +7,12 @@ use crate::{
@@ -3437,7 +3437,7 @@ index e822d08..ab9c8b7 100644
  use base64::Engine as _;
  use editor::{
      Addon, AnchorRangeExt, ContextMenuOptions, Editor, EditorElement, EditorEvent, EditorMode,
-@@ -1731,6 +1731,94 @@ impl MessageEditor {
+@@ -1736,6 +1736,94 @@ impl MessageEditor {
          }
      }
  
@@ -3533,10 +3533,10 @@ index e822d08..ab9c8b7 100644
          if !self.session_capabilities.read().supports_images() {
              return;
 diff --git a/crates/agent_ui/src/ui/mention_crease.rs b/crates/agent_ui/src/ui/mention_crease.rs
-index 17890ef..66f784b 100644
+index 1bbb531..16dfd90 100644
 --- a/crates/agent_ui/src/ui/mention_crease.rs
 +++ b/crates/agent_ui/src/ui/mention_crease.rs
-@@ -188,6 +188,20 @@ fn open_mention_uri(
+@@ -192,6 +192,20 @@ fn open_mention_uri(
                  cx,
              );
          }
@@ -8036,7 +8036,7 @@ index 0000000..9661076
 +    );
 +}
 diff --git a/crates/settings/src/vscode_import.rs b/crates/settings/src/vscode_import.rs
-index 95876b8..388898c 100644
+index 0c55dae..1fe6595 100644
 --- a/crates/settings/src/vscode_import.rs
 +++ b/crates/settings/src/vscode_import.rs
 @@ -246,6 +246,7 @@ impl VsCodeSettings {

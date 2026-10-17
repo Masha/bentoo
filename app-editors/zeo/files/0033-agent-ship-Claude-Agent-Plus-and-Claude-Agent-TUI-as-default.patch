@@ -53,10 +53,10 @@ and remote_server's `test_remote_external_agent_server` ("foo" plus both ids).
 ---
 
 diff --git a/assets/settings/default.json b/assets/settings/default.json
-index 928a375..bfeffb8 100644
+index e6b6579..27c4ab2 100644
 --- a/assets/settings/default.json
 +++ b/assets/settings/default.json
-@@ -2990,7 +2990,15 @@
+@@ -2992,7 +2992,15 @@
    // Configures context servers for use by the agent.
    "context_servers": {},
    // Configures agent servers available in the agent panel.

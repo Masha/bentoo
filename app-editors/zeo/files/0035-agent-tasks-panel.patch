@@ -122,7 +122,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 ---
 
 diff --git a/Cargo.lock b/Cargo.lock
-index c0ded26..6dd7259 100644
+index 23f4e9a..3c451c8 100644
 --- a/Cargo.lock
 +++ b/Cargo.lock
 @@ -450,6 +450,33 @@ dependencies = [
@@ -168,7 +168,7 @@ index c0ded26..6dd7259 100644
   "anyhow",
   "ashpd",
 diff --git a/Cargo.toml b/Cargo.toml
-index a2972f0..760105d 100644
+index 770f7d0..d94aae0 100644
 --- a/Cargo.toml
 +++ b/Cargo.toml
 @@ -9,6 +9,7 @@ members = [
@@ -4860,10 +4860,10 @@ index 0000000..e589a50
 +}
 diff --git a/crates/agent_tasks_panel/src/test_helpers.rs b/crates/agent_tasks_panel/src/test_helpers.rs
 new file mode 100644
-index 0000000..173ab4b
+index 0000000..6ffbbfc
 --- /dev/null
 +++ b/crates/agent_tasks_panel/src/test_helpers.rs
-@@ -0,0 +1,546 @@
+@@ -0,0 +1,548 @@
 +// Story 014 — shared fixtures for the agent_tasks_panel tests (patch 0035).
 +//
 +// Declared in the crate's lib (`src/agent_tasks_panel.rs`) as
@@ -5173,7 +5173,9 @@ index 0000000..173ab4b
 +        Task::ready(Ok(acp::PromptResponse::new(acp::StopReason::EndTurn)))
 +    }
 +
-+    fn cancel(&self, _session_id: &acp_v2::SessionId, _cx: &mut App) {}
++    fn cancel(&self, _session_id: &acp_v2::SessionId, _cx: &mut App) -> Result<()> {
++        Ok(())
++    }
 +
 +    fn stop_task(
 +        self: Rc<Self>,
@@ -5411,7 +5413,7 @@ index 0000000..173ab4b
 +        .collect()
 +}
 diff --git a/crates/agent_ui/src/agent_panel.rs b/crates/agent_ui/src/agent_panel.rs
-index dfb1aea..f162034 100644
+index 39595f9..e677841 100644
 --- a/crates/agent_ui/src/agent_panel.rs
 +++ b/crates/agent_ui/src/agent_panel.rs
 @@ -4554,8 +4554,8 @@ impl AgentPanel {
@@ -5815,7 +5817,7 @@ index 4e41c41..ab8fd99 100644
  fn project_name(thread: &AcpThread) -> SharedString {
 diff --git a/crates/agent_ui/src/tasks_card/activity_tests.rs b/crates/agent_ui/src/tasks_card/activity_tests.rs
 new file mode 100644
-index 0000000..d47fe6a
+index 0000000..c2edbf8
 --- /dev/null
 +++ b/crates/agent_ui/src/tasks_card/activity_tests.rs
 @@ -0,0 +1,846 @@
@@ -6450,7 +6452,7 @@ index 0000000..d47fe6a
 +            self.inner.prompt(params, cx)
 +        }
 +
-+        fn cancel(&self, session_id: &acp_v2::SessionId, cx: &mut App) {
++        fn cancel(&self, session_id: &acp_v2::SessionId, cx: &mut App) -> Result<()> {
 +            self.inner.cancel(session_id, cx)
 +        }
 +
@@ -6894,10 +6896,10 @@ index 3718383..7716724 100644
  
          repl::init(app_state.fs.clone(), cx);
 diff --git a/crates/zed/src/zed.rs b/crates/zed/src/zed.rs
-index 5895d64..a66df52 100644
+index 3289996..2d0d6f5 100644
 --- a/crates/zed/src/zed.rs
 +++ b/crates/zed/src/zed.rs
-@@ -782,6 +782,8 @@ fn initialize_panels(window: &mut Window, cx: &mut Context<Workspace>) -> Task<a
+@@ -783,6 +783,8 @@ fn initialize_panels(window: &mut Window, cx: &mut Context<Workspace>) -> Task<a
          let git_panel = GitPanel::load(workspace_handle.clone(), cx.clone());
          let channels_panel =
              collab_ui::collab_panel::CollabPanel::load(workspace_handle.clone(), cx.clone());
@@ -6906,7 +6908,7 @@ index 5895d64..a66df52 100644
          let debug_panel = DebugPanel::load(workspace_handle.clone(), cx);
  
          async fn add_panel_when_ready(
-@@ -806,6 +808,7 @@ fn initialize_panels(window: &mut Window, cx: &mut Context<Workspace>) -> Task<a
+@@ -807,6 +809,7 @@ fn initialize_panels(window: &mut Window, cx: &mut Context<Workspace>) -> Task<a
              add_panel_when_ready(git_panel, workspace_handle.clone(), cx.clone()),
              add_panel_when_ready(channels_panel, workspace_handle.clone(), cx.clone()),
              add_panel_when_ready(debug_panel, workspace_handle.clone(), cx.clone()),
@@ -6914,7 +6916,7 @@ index 5895d64..a66df52 100644
              initialize_agent_panel(workspace_handle.clone(), cx.clone()).map(|r| r.log_err()),
          );
  
-@@ -5976,6 +5979,7 @@ mod tests {
+@@ -5977,6 +5980,7 @@ mod tests {
                  "action",
                  "activity_indicator",
                  "agent",

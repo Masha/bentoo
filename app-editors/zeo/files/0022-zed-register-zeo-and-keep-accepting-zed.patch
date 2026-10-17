@@ -139,10 +139,10 @@ index 598cd35..2ae5f82 100644
                  || arg.starts_with("zed-cli://")
                  || arg.starts_with("ssh://")
 diff --git a/crates/zed/src/zed.rs b/crates/zed/src/zed.rs
-index 5c8cae3..70c5df3 100644
+index 69bede9..b2c47d9 100644
 --- a/crates/zed/src/zed.rs
 +++ b/crates/zed/src/zed.rs
-@@ -1279,7 +1279,7 @@ fn register_actions(
+@@ -1280,7 +1280,7 @@ fn register_actions(
                          Toast::new(
                              NotificationId::unique::<RegisterZedScheme>(),
                              format!(
@@ -151,7 +151,7 @@ index 5c8cae3..70c5df3 100644
                                  ReleaseChannel::global(cx).display_name()
                              ),
                          ),
-@@ -1289,7 +1289,7 @@ fn register_actions(
+@@ -1290,7 +1290,7 @@ fn register_actions(
                  Ok(())
              })
              .detach_and_prompt_err(

@@ -4183,7 +4183,7 @@ index 0000000..c39ad2e
 +    );
 +}
 diff --git a/crates/agent_tasks_panel/src/test_helpers.rs b/crates/agent_tasks_panel/src/test_helpers.rs
-index 5ff18a2..5c94969 100644
+index 815ef52..0e975a2 100644
 --- a/crates/agent_tasks_panel/src/test_helpers.rs
 +++ b/crates/agent_tasks_panel/src/test_helpers.rs
 @@ -299,7 +299,11 @@ impl AgentConnection for StopConnection {

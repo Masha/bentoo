@@ -120,10 +120,10 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 ---
 
 diff --git a/assets/settings/default.json b/assets/settings/default.json
-index 6353d56..c03170a 100644
+index e5ffea4..9a5d375 100644
 --- a/assets/settings/default.json
 +++ b/assets/settings/default.json
-@@ -1425,6 +1425,15 @@
+@@ -1427,6 +1427,15 @@
      //
      // Default: card
      "elicitation_placement": "card",
@@ -291,7 +291,7 @@ index 0000000..54bdc62
 +    }
 +}
 diff --git a/crates/agent_ui/src/agent_panel.rs b/crates/agent_ui/src/agent_panel.rs
-index f31a8fe..b48fc70 100644
+index adb5469..de64522 100644
 --- a/crates/agent_ui/src/agent_panel.rs
 +++ b/crates/agent_ui/src/agent_panel.rs
 @@ -39,6 +39,7 @@ use crate::ExpandMessageEditor;
@@ -765,7 +765,7 @@ index f31a8fe..b48fc70 100644
      }
  
      /// Opens an external thread using an arbitrary AgentServer.
-@@ -9180,6 +9447,61 @@ mod tests {
+@@ -9182,6 +9449,61 @@ mod tests {
          assert_eq!(folders, Some(vec![PathBuf::from("/project")]));
      }
  
@@ -827,7 +827,7 @@ index f31a8fe..b48fc70 100644
      #[gpui::test]
      async fn test_new_draft_survives_reload_when_real_thread_is_active(cx: &mut TestAppContext) {
          init_test(cx);
-@@ -14539,8 +14861,8 @@ mod tests {
+@@ -14543,8 +14865,8 @@ mod tests {
          // directly remove from retained_threads and drop the handle
          // so on_release → close_all_sessions fires only on A.
          drop(retained_conversation_a);
@@ -862,10 +862,10 @@ index 0da7203..7eb947e 100644
              max_idle_retained_threads: 5,
              threads_sidebar: agent_settings::ThreadsSidebarSettings {
 diff --git a/crates/agent_ui/src/conversation_view.rs b/crates/agent_ui/src/conversation_view.rs
-index bc58f90..36c4aec 100644
+index 66ea39f..512fd31 100644
 --- a/crates/agent_ui/src/conversation_view.rs
 +++ b/crates/agent_ui/src/conversation_view.rs
-@@ -1872,21 +1872,30 @@ impl ConversationView {
+@@ -1910,21 +1910,30 @@ impl ConversationView {
              }
              AcpThreadEvent::NewEntry => {
                  let len = thread.read(cx).entries().len();
@@ -905,7 +905,7 @@ index bc58f90..36c4aec 100644
                          active.sync_editor_mode(cx);
                          active.sync_generating_indicator(cx);
                      });
-@@ -13214,6 +13223,47 @@ pub(crate) mod tests {
+@@ -13335,6 +13344,47 @@ pub(crate) mod tests {
          }
      }
  
@@ -4385,7 +4385,7 @@ index 0000000..49f0bb1
 +}
 diff --git a/crates/agent_ui/src/tasks_card/row_error_tests.rs b/crates/agent_ui/src/tasks_card/row_error_tests.rs
 new file mode 100644
-index 0000000..7371783
+index 0000000..e7d807a
 --- /dev/null
 +++ b/crates/agent_ui/src/tasks_card/row_error_tests.rs
 @@ -0,0 +1,182 @@
@@ -4548,7 +4548,7 @@ index 0000000..7371783
 +        self.inner.prompt(params, cx)
 +    }
 +
-+    fn cancel(&self, session_id: &acp_v2::SessionId, cx: &mut App) {
++    fn cancel(&self, session_id: &acp_v2::SessionId, cx: &mut App) -> Result<()> {
 +        self.inner.cancel(session_id, cx)
 +    }
 +
@@ -4729,10 +4729,10 @@ index 0000000..54c31cc
 +}
 diff --git a/crates/agent_ui/src/tasks_card/test_helpers.rs b/crates/agent_ui/src/tasks_card/test_helpers.rs
 new file mode 100644
-index 0000000..218492b
+index 0000000..6b2f789
 --- /dev/null
 +++ b/crates/agent_ui/src/tasks_card/test_helpers.rs
-@@ -0,0 +1,419 @@
+@@ -0,0 +1,421 @@
 +// Story 013 — shared fixtures for the tasks card tests (patch 0033/0034).
 +//
 +// Declared in `src/tasks_card.rs` as:
@@ -4929,7 +4929,9 @@ index 0000000..218492b
 +        Task::ready(Ok(acp::PromptResponse::new(acp::StopReason::EndTurn)))
 +    }
 +
-+    fn cancel(&self, _session_id: &acp_v2::SessionId, _cx: &mut App) {}
++    fn cancel(&self, _session_id: &acp_v2::SessionId, _cx: &mut App) -> Result<()> {
++        Ok(())
++    }
 +
 +    // Story 012's task actions (AgentConnection, design.md of 012).
 +    fn stop_task(

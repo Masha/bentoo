@@ -44,7 +44,7 @@ behind showed through for as long as the drag lasted.
 "Another instance" means another window of this process. Zed is
 single-instance per release channel -- a second launch hands its paths to the
 first over a socket -- so every window a user sees is reachable from
-cx.windows(). A Zeo process or a ZED_STATELESS one is a separate process with
+cx.windows(). A Zed process (another release channel) or a ZED_STATELESS one is a separate process with
 its own database, and is not consulted.
 
 The drop test covers the cross-window case on purpose: removing the

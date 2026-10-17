@@ -17,9 +17,9 @@ CRATES="
 	adler2@2.0.1
 	adler32@1.2.0
 	aes@0.8.4
-	agent-client-protocol-derive@3.3.0
-	agent-client-protocol-schema@1.11.0
-	agent-client-protocol@3.3.0
+	agent-client-protocol-derive@3.4.0
+	agent-client-protocol-schema@1.12.0
+	agent-client-protocol@3.4.0
 	ahash@0.8.12
 	aho-corasick@1.1.3
 	aliasable@0.1.3
@@ -1552,7 +1552,7 @@ declare -A GIT_CRATES=(
 # rewrites the date and EGIT_COMMIT; a second version variable it could not
 # keep current would leave a new tarball under an old, already-manifested name).
 
-EGIT_COMMIT="9f63850f7affbd57772a4f99554d4fd333b50a6f"
+EGIT_COMMIT="2d4c4831943153f63ad0aeddf49c8f5a3d008e75"
 # LLVM 23 only, so it is the default slot: llvm-r1 would always prefer slot 22
 # (its newest stable) whenever 22 is listed. RUST_NEEDS_LLVM ties the Rust slot
 # to it, so this builds with Rust 1.99, one release past upstream's 1.98.1 pin

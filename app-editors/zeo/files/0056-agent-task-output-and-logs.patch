@@ -68,7 +68,7 @@ BY DEPENDENCY after 0053, the last task patch: it extends 0037's card,
 ---
 
 diff --git a/crates/acp_thread/src/acp_thread.rs b/crates/acp_thread/src/acp_thread.rs
-index a1496f8..07114fb 100644
+index eb072b3..135a703 100644
 --- a/crates/acp_thread/src/acp_thread.rs
 +++ b/crates/acp_thread/src/acp_thread.rs
 @@ -3684,6 +3684,20 @@ pub struct AgentTask {
@@ -116,7 +116,7 @@ index a1496f8..07114fb 100644
          }
      }
  }
-@@ -4802,6 +4826,17 @@ impl AcpThread {
+@@ -4803,6 +4827,17 @@ impl AcpThread {
              .stop_task(self.session_id(), task_id, cx)
      }
  
@@ -134,7 +134,7 @@ index a1496f8..07114fb 100644
      /// Resolves to `false` when the agent had nothing to move to the background.
      pub fn background_task(&self, tool_call_id: &str, cx: &mut App) -> Task<Result<bool>> {
          self.connection
-@@ -5063,10 +5098,14 @@ impl AcpThread {
+@@ -5064,10 +5099,14 @@ impl AcpThread {
                  {
                      match serde_json::from_value::<WireTasksSnapshot>(payload.clone()) {
                          Ok(snapshot) => self.apply_tasks_snapshot(snapshot, cx),
@@ -151,7 +151,7 @@ index a1496f8..07114fb 100644
                          ),
                      }
                  }
-@@ -8858,12 +8897,15 @@ mod tests {
+@@ -8881,12 +8920,15 @@ mod tests {
              "utilization": 0.40,
          })));
          for blank in ["", "   ", "\t\n"] {
@@ -173,7 +173,7 @@ index a1496f8..07114fb 100644
          }
          assert!(
              usage.is_empty(),
-@@ -22549,7 +22591,12 @@ mod tests {
+@@ -22634,7 +22676,12 @@ mod tests {
          });
  
          thread.read_with(cx, |thread, _| {
@@ -187,7 +187,7 @@ index a1496f8..07114fb 100644
              let compaction = compaction_entries(thread)
                  .pop()
                  .expect("the compaction entry survives the enrichment frame");
-@@ -26024,4 +26071,6 @@ mod tests {
+@@ -26115,4 +26162,6 @@ mod tests {
  
      include!("acp_thread_tasks_tests.rs");
      include!("acp_thread_tasks_review_tests.rs");
@@ -601,7 +601,7 @@ index 0000000..bc94905
 +    );
 +}
 diff --git a/crates/acp_thread/src/connection.rs b/crates/acp_thread/src/connection.rs
-index fbb32b6..15bb12f 100644
+index 029789d..497c9fb 100644
 --- a/crates/acp_thread/src/connection.rs
 +++ b/crates/acp_thread/src/connection.rs
 @@ -1,4 +1,4 @@
@@ -610,7 +610,7 @@ index fbb32b6..15bb12f 100644
  use agent_client_protocol::schema::{MaybeUndefined, v1 as acp_v1, v2 as acp_v2};
  use anyhow::Result;
  use chrono::{DateTime, Utc};
-@@ -139,6 +139,19 @@ pub trait AgentConnection {
+@@ -147,6 +147,19 @@ pub trait AgentConnection {
          Task::ready(Err(anyhow::Error::msg("Closing sessions is not supported")))
      }
  
@@ -704,7 +704,7 @@ index 0000000..63eb65f
 +  ]
 +}
 diff --git a/crates/agent_servers/src/acp/v1.rs b/crates/agent_servers/src/acp/v1.rs
-index 49e7c81..588fa7f 100644
+index 3d0f8b8..1f589c9 100644
 --- a/crates/agent_servers/src/acp/v1.rs
 +++ b/crates/agent_servers/src/acp/v1.rs
 @@ -55,6 +55,9 @@ const PARAMETERIZED_MODEL_PICKER_META_KEY: &str = "parameterizedModelPicker";
@@ -773,7 +773,7 @@ index 49e7c81..588fa7f 100644
      }
  
      fn open_or_create_session(
-@@ -2058,6 +2093,38 @@ impl AgentConnection for AcpConnection {
+@@ -2045,6 +2080,38 @@ impl AgentConnection for AcpConnection {
              .spawn(async move { request.await.map(|_| ()) })
      }
  
@@ -812,7 +812,7 @@ index 49e7c81..588fa7f 100644
      fn background_task(
          self: Rc<Self>,
          session_id: &acp_v2::SessionId,
-@@ -2434,6 +2501,17 @@ pub mod test_support {
+@@ -2421,6 +2488,17 @@ pub mod test_support {
                  .background_task(session_id, tool_call_id, cx)
          }
  
@@ -830,7 +830,7 @@ index 49e7c81..588fa7f 100644
          fn request_elicitations(&self) -> Option<Entity<ElicitationStore>> {
              self.inner.request_elicitations()
          }
-@@ -9625,6 +9703,8 @@ exit 7
+@@ -9613,6 +9691,8 @@ exit 7
      }
  
      include!("../acp_task_actions_tests.rs");
@@ -2885,7 +2885,7 @@ index 0000000..a64f9e2
 +    }
 +}
 diff --git a/crates/agent_ui/src/agent_panel.rs b/crates/agent_ui/src/agent_panel.rs
-index e2ca78f..acbf155 100644
+index c6a78a5..14a3f8b 100644
 --- a/crates/agent_ui/src/agent_panel.rs
 +++ b/crates/agent_ui/src/agent_panel.rs
 @@ -1580,6 +1580,30 @@ impl AgentPanel {
@@ -4284,10 +4284,10 @@ index 0000000..3586113
 +}
 diff --git a/crates/agent_ui/src/tasks_card/open_log_remote_tests.rs b/crates/agent_ui/src/tasks_card/open_log_remote_tests.rs
 new file mode 100644
-index 0000000..d7d468f
+index 0000000..53749f0
 --- /dev/null
 +++ b/crates/agent_ui/src/tasks_card/open_log_remote_tests.rs
-@@ -0,0 +1,512 @@
+@@ -0,0 +1,514 @@
 +// Story 041, task 7.2 — "Open Log" on a card row is refused in a remote project (R5.10; Q5, Q16).
 +// Filter: `cargo test -p agent_ui tasks_card::open_log` (the module path is
 +// `tasks_card::open_log_remote::…`, so the 6.2 filter selects these tests too).
@@ -4440,7 +4440,9 @@ index 0000000..d7d468f
 +        Task::ready(Ok(acp::PromptResponse::new(acp::StopReason::EndTurn)))
 +    }
 +
-+    fn cancel(&self, _session_id: &acp_v2::SessionId, _cx: &mut App) {}
++    fn cancel(&self, _session_id: &acp_v2::SessionId, _cx: &mut App) -> Result<()> {
++        Ok(())
++    }
 +
 +    fn fetch_task_output(
 +        self: Rc<Self>,
@@ -4802,10 +4804,10 @@ index 0000000..d7d468f
 +}
 diff --git a/crates/agent_ui/src/tasks_card/open_log_tests.rs b/crates/agent_ui/src/tasks_card/open_log_tests.rs
 new file mode 100644
-index 0000000..849b9c5
+index 0000000..226c6e6
 --- /dev/null
 +++ b/crates/agent_ui/src/tasks_card/open_log_tests.rs
-@@ -0,0 +1,560 @@
+@@ -0,0 +1,562 @@
 +// Story 041, task 6.2 — "Open Log" on a card row, and the copy of a shell's log when it ends
 +// (R5.1, R5.2, R5.3, R6.1, R6.4, R6.7; Q4, Q16). Filter: `tasks_card::open_log`.
 +//
@@ -4948,7 +4950,9 @@ index 0000000..849b9c5
 +        Task::ready(Ok(acp::PromptResponse::new(acp::StopReason::EndTurn)))
 +    }
 +
-+    fn cancel(&self, _session_id: &acp_v2::SessionId, _cx: &mut App) {}
++    fn cancel(&self, _session_id: &acp_v2::SessionId, _cx: &mut App) -> Result<()> {
++        Ok(())
++    }
 +
 +    fn fetch_task_output(
 +        self: Rc<Self>,
@@ -6395,7 +6399,7 @@ index 0000000..b15bbb1
 +    );
 +}
 diff --git a/crates/agent_ui/src/tasks_card/test_helpers.rs b/crates/agent_ui/src/tasks_card/test_helpers.rs
-index 218492b..0bb66ee 100644
+index 6b2f789..ada9d99 100644
 --- a/crates/agent_ui/src/tasks_card/test_helpers.rs
 +++ b/crates/agent_ui/src/tasks_card/test_helpers.rs
 @@ -171,7 +171,42 @@ impl AgentConnection for TaskActionsConnection {

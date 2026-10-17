@@ -73,7 +73,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 ---
 
 diff --git a/crates/agent_ui/src/agent_panel.rs b/crates/agent_ui/src/agent_panel.rs
-index b48fc70..dfb1aea 100644
+index de64522..39595f9 100644
 --- a/crates/agent_ui/src/agent_panel.rs
 +++ b/crates/agent_ui/src/agent_panel.rs
 @@ -1550,7 +1550,10 @@ impl AgentPanel {
@@ -775,7 +775,7 @@ index 0000000..2be26f8
 +}
 diff --git a/crates/agent_ui/src/tasks_card/tray/dedupe_tests.rs b/crates/agent_ui/src/tasks_card/tray/dedupe_tests.rs
 new file mode 100644
-index 0000000..31df055
+index 0000000..8583740
 --- /dev/null
 +++ b/crates/agent_ui/src/tasks_card/tray/dedupe_tests.rs
 @@ -0,0 +1,277 @@
@@ -927,7 +927,7 @@ index 0000000..31df055
 +        self.inner.prompt(params, cx)
 +    }
 +
-+    fn cancel(&self, session_id: &acp_v2::SessionId, cx: &mut App) {
++    fn cancel(&self, session_id: &acp_v2::SessionId, cx: &mut App) -> Result<()> {
 +        self.inner.cancel(session_id, cx)
 +    }
 +

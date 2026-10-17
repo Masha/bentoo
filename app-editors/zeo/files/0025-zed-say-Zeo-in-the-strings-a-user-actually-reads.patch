@@ -407,10 +407,10 @@ index 2ae5f82..3718383 100644
      }
  
 diff --git a/crates/zed/src/zed.rs b/crates/zed/src/zed.rs
-index 70c5df3..50959aa 100644
+index b2c47d9..601537b 100644
 --- a/crates/zed/src/zed.rs
 +++ b/crates/zed/src/zed.rs
-@@ -1718,7 +1718,7 @@ fn open_about_window(cx: &mut App) {
+@@ -1719,7 +1719,7 @@ fn open_about_window(cx: &mut App) {
      cx.open_window(
          WindowOptions {
              titlebar: Some(TitlebarOptions {

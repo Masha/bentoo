@@ -10,7 +10,7 @@ Content-Transfer-Encoding: 8bit
 Zed already has a context-compaction entry and a constructor for it -- and it
 already handles ACP's own compaction notification. `acp_thread.rs` matches
 `acp::SessionUpdate::CompactionUpdate`, and constructs `acp::CompactionUpdate`
-itself; the linked crate is `agent-client-protocol` 3.2.0 with schema 1.10.2.
+itself; the linked crate is `agent-client-protocol` 3.4.0 with schema 1.12.0.
 
 **That is a correction to this header, not a change of subject.** Until
 2026-09-22 this paragraph said the linked crate carried no compaction symbol at
@@ -91,7 +91,7 @@ status-less frame is read as in progress.
 ---
 
 diff --git a/crates/acp_thread/src/acp_thread.rs b/crates/acp_thread/src/acp_thread.rs
-index 9579b3c..f72682f 100644
+index 2176a03..1830184 100644
 --- a/crates/acp_thread/src/acp_thread.rs
 +++ b/crates/acp_thread/src/acp_thread.rs
 @@ -944,6 +944,30 @@ pub struct ContextCompactionUpdate {
@@ -125,7 +125,7 @@ index 9579b3c..f72682f 100644
  impl AgentThreadEntry {
      pub fn is_indented(&self) -> bool {
          match self {
-@@ -4730,10 +4754,24 @@ impl AcpThread {
+@@ -4731,10 +4755,24 @@ impl AcpThread {
                  );
              }
              acp_v1::SessionUpdate::ToolCall(tool_call) => {
@@ -152,7 +152,7 @@ index 9579b3c..f72682f 100644
              }
              acp_v1::SessionUpdate::CompactionUpdate(compaction_update) => {
                  self.upsert_context_compaction_update(
-@@ -5587,6 +5625,74 @@ impl AcpThread {
+@@ -5588,6 +5626,74 @@ impl AcpThread {
          }
      }
  
@@ -227,7 +227,7 @@ index 9579b3c..f72682f 100644
      pub fn can_set_title(&mut self, cx: &mut Context<Self>) -> bool {
          self.connection.set_title(self.session_id(), cx).is_some()
      }
-@@ -21861,6 +21967,582 @@ mod tests {
+@@ -21946,6 +22052,582 @@ mod tests {
              assert_eq!(usage.max_tokens, 10000);
          });
      }

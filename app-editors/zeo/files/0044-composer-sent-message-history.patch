@@ -183,7 +183,7 @@ index ffa4d41..f1135a3 100644
          CycleNextInlineAssist,
          /// Cycles to the previous inline assist suggestion.
 diff --git a/crates/agent_ui/src/conversation_view.rs b/crates/agent_ui/src/conversation_view.rs
-index f48068e..abe953b 100644
+index e40ece9..a4247b2 100644
 --- a/crates/agent_ui/src/conversation_view.rs
 +++ b/crates/agent_ui/src/conversation_view.rs
 @@ -111,6 +111,7 @@ pub(crate) const DRAFT_PROMPT_PERSIST_DEBOUNCE: Duration = Duration::from_millis
@@ -194,7 +194,7 @@ index f48068e..abe953b 100644
  mod session_stats;
  mod thread_search_bar;
  mod thread_view;
-@@ -1920,6 +1921,7 @@ impl ConversationView {
+@@ -1958,6 +1959,7 @@ impl ConversationView {
                      active.update(cx, |active, cx| {
                          for index in new_entries {
                              active.sync_elicitation_state_for_entry(index, window, cx);
@@ -202,7 +202,7 @@ index f48068e..abe953b 100644
                          }
                          active.sync_editor_mode(cx);
                          active.sync_generating_indicator(cx);
-@@ -4173,6 +4175,14 @@ pub(crate) mod tests {
+@@ -4211,6 +4213,14 @@ pub(crate) mod tests {
  
      use super::*;
  
@@ -2137,7 +2137,7 @@ index 0000000..949d577
 +    assert_eq!(composer_text(&view, cx), "my draft");
 +}
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
-index d6e7556..718502f 100644
+index fb343e9..1cdc301 100644
 --- a/crates/agent_ui/src/conversation_view/thread_view.rs
 +++ b/crates/agent_ui/src/conversation_view/thread_view.rs
 @@ -1,5 +1,6 @@
@@ -2225,7 +2225,7 @@ index d6e7556..718502f 100644
          if self.message_editor.read(cx).editor().read(cx).read_only(cx) {
              self.handle_thread_error(
                  anyhow!(
-@@ -2846,6 +2869,207 @@ impl ThreadView {
+@@ -2866,6 +2889,207 @@ impl ThreadView {
          self.move_queued_message_to_main_editor(last_id, None, None, window, cx);
      }
  
@@ -2433,7 +2433,7 @@ index d6e7556..718502f 100644
      // editor methods
  
      pub fn expand_message_editor(
-@@ -5020,6 +5244,8 @@ impl ThreadView {
+@@ -5038,6 +5262,8 @@ impl ThreadView {
              .bg(editor_bg_color)
              .justify_center()
              .on_action(cx.listener(Self::handle_message_editor_move_up))

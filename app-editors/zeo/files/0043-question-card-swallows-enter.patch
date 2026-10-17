@@ -185,10 +185,10 @@ index c73c58c..ffa4d41 100644
              filter.show_action_types(skill_creator_actions.iter());
          } else {
 diff --git a/crates/agent_ui/src/conversation_view.rs b/crates/agent_ui/src/conversation_view.rs
-index 432726d..f48068e 100644
+index 5f1f369..e40ece9 100644
 --- a/crates/agent_ui/src/conversation_view.rs
 +++ b/crates/agent_ui/src/conversation_view.rs
-@@ -6313,9 +6313,6 @@ pub(crate) mod tests {
+@@ -6422,9 +6422,6 @@ pub(crate) mod tests {
      #[gpui::test]
      async fn test_preloaded_question_counts_as_pending(cx: &mut TestAppContext) {
          init_test(cx);
@@ -198,7 +198,7 @@ index 432726d..f48068e 100644
  
          // The question is asked before the conversation registers the thread, so it never
          // sees `ElicitationRequested` -- the case `register_thread` seeds for.
-@@ -6345,6 +6342,333 @@ pub(crate) mod tests {
+@@ -6454,6 +6451,333 @@ pub(crate) mod tests {
          });
      }
  
@@ -532,7 +532,7 @@ index 432726d..f48068e 100644
      #[gpui::test]
      async fn test_resume_without_history_adds_notice(cx: &mut TestAppContext) {
          init_test(cx);
-@@ -13307,6 +13631,27 @@ pub(crate) mod tests {
+@@ -13428,6 +13752,27 @@ pub(crate) mod tests {
          }
      }
  
@@ -580,10 +580,10 @@ index 225e741..28598b3 100644
          let required = schema.required.as_deref().unwrap_or_default();
          let mut fields = HashMap::default();
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
-index 6ca76bb..d6e7556 100644
+index 2e080b4..fb343e9 100644
 --- a/crates/agent_ui/src/conversation_view/thread_view.rs
 +++ b/crates/agent_ui/src/conversation_view/thread_view.rs
-@@ -3127,6 +3127,17 @@ impl ThreadView {
+@@ -3147,6 +3147,17 @@ impl ThreadView {
          self.elicitation_form_states.contains_key(id)
      }
  
@@ -601,7 +601,7 @@ index 6ca76bb..d6e7556 100644
      fn submit_elicitation(
          &mut self,
          elicitation_id: ElicitationEntryId,
-@@ -8088,6 +8099,19 @@ impl ThreadView {
+@@ -8128,6 +8139,19 @@ impl ThreadView {
          self.message_editor.read(cx).set_local_commands(commands);
      }
  
@@ -621,7 +621,7 @@ index 6ca76bb..d6e7556 100644
      /// Whether this elicitation is drawn by the pinned card above the message
      /// editor rather than inline, in the conversation.
      ///
-@@ -13580,6 +13604,7 @@ impl Render for ThreadView {
+@@ -13622,6 +13646,7 @@ impl Render for ThreadView {
          // current availability of feedback/sharing, which can change between
          // renders (settings, connection state, feature flags).
          self.sync_local_commands(cx);
@@ -630,7 +630,7 @@ index 6ca76bb..d6e7556 100644
          let has_messages = self.has_visible_conversation(cx);
          let list_state = self.list_state.clone();
 diff --git a/crates/agent_ui/src/message_editor.rs b/crates/agent_ui/src/message_editor.rs
-index 459ae88..186d746 100644
+index 5c75144..653d207 100644
 --- a/crates/agent_ui/src/message_editor.rs
 +++ b/crates/agent_ui/src/message_editor.rs
 @@ -1,7 +1,7 @@
@@ -664,7 +664,7 @@ index 459ae88..186d746 100644
      agent_id: AgentId,
      thread_store: Option<Entity<ThreadStore>>,
      /// The rendered draft, while the preview is showing; `None` while editing.
-@@ -486,6 +492,7 @@ impl MessageEditor {
+@@ -491,6 +497,7 @@ impl MessageEditor {
              .upgrade()
              .map(|project| project.read(cx).languages().clone());
  
@@ -672,7 +672,7 @@ index 459ae88..186d746 100644
          let editor = cx.new(|cx| {
              let buffer = cx.new(|cx| {
                  let buffer = Buffer::local("", cx);
-@@ -509,7 +516,7 @@ impl MessageEditor {
+@@ -514,7 +521,7 @@ impl MessageEditor {
                  max_entries_visible: 12,
                  placement: None,
              });
@@ -681,7 +681,7 @@ index 459ae88..186d746 100644
  
              editor.set_custom_context_menu(|editor, _point, window, cx| {
                  let has_selection = editor.has_non_empty_selection(&editor.display_snapshot(cx));
-@@ -632,6 +639,8 @@ impl MessageEditor {
+@@ -637,6 +644,8 @@ impl MessageEditor {
              workspace,
              session_capabilities,
              local_commands,
@@ -690,7 +690,7 @@ index 459ae88..186d746 100644
              agent_id,
              thread_store,
              preview: None,
-@@ -645,6 +654,35 @@ impl MessageEditor {
+@@ -650,6 +659,35 @@ impl MessageEditor {
          *self.local_commands.write() = commands;
      }
  
@@ -726,7 +726,7 @@ index 459ae88..186d746 100644
      pub fn set_session_capabilities(
          &mut self,
          session_capabilities: SharedSessionCapabilities,
-@@ -2200,6 +2238,12 @@ impl Render for MessageEditor {
+@@ -2205,6 +2243,12 @@ impl Render for MessageEditor {
              .on_action(cx.listener(Self::chat))
              .on_action(cx.listener(Self::send_immediately))
              .on_action(cx.listener(Self::chat_with_follow))
@@ -739,7 +739,7 @@ index 459ae88..186d746 100644
              .on_action(cx.listener(Self::cancel))
              .capture_action(cx.listener(Self::copy))
              .capture_action(cx.listener(Self::cut))
-@@ -2209,6 +2253,7 @@ impl Render for MessageEditor {
+@@ -2214,6 +2258,7 @@ impl Render for MessageEditor {
                  this.toggle_preview(window, cx)
              }))
              .flex_1()
@@ -747,7 +747,7 @@ index 459ae88..186d746 100644
              .children(self.render_preview(window, cx))
              .child(div().flex_1().child({
                  let settings = ThemeSettings::get_global(cx);
-@@ -2239,11 +2284,13 @@ impl Render for MessageEditor {
+@@ -2244,11 +2289,13 @@ impl Render for MessageEditor {
      }
  }
  
@@ -764,7 +764,7 @@ index 459ae88..186d746 100644
      }
  }
  
-@@ -2261,6 +2308,9 @@ impl Addon for MessageEditorAddon {
+@@ -2266,6 +2313,9 @@ impl Addon for MessageEditorAddon {
          if settings.use_modifier_to_send {
              key_context.add("use_modifier_to_send");
          }

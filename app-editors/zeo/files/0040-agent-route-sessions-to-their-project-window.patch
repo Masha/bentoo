@@ -845,10 +845,10 @@ index 0000000..83ba40c
 +    assert_eq!(notice_of(&tasks_panel_b, &session, "t", &mut b.cx), None);
 +}
 diff --git a/crates/agent_tasks_panel/src/test_helpers.rs b/crates/agent_tasks_panel/src/test_helpers.rs
-index 173ab4b..80da5b8 100644
+index 6ffbbfc..a6e9b4b 100644
 --- a/crates/agent_tasks_panel/src/test_helpers.rs
 +++ b/crates/agent_tasks_panel/src/test_helpers.rs
-@@ -544,3 +544,203 @@ pub(crate) fn visible_keys(panels: &mut Panels) -> Vec<(String, String)> {
+@@ -546,3 +546,203 @@ pub(crate) fn visible_keys(panels: &mut Panels) -> Vec<(String, String)> {
          .map(|row| key_of(&row.entry))
          .collect()
  }
@@ -2442,10 +2442,10 @@ index a340b53..ca8cdbe 100644
  pub use crate::message_editor::MessageEditorEvent;
  pub use crate::task_label::{
 diff --git a/crates/agent_ui/src/conversation_view.rs b/crates/agent_ui/src/conversation_view.rs
-index 36c4aec..831cf57 100644
+index 512fd31..d7909bc 100644
 --- a/crates/agent_ui/src/conversation_view.rs
 +++ b/crates/agent_ui/src/conversation_view.rs
-@@ -1832,6 +1832,14 @@ impl ConversationView {
+@@ -1870,6 +1870,14 @@ impl ConversationView {
          matches!(self.server_state, ServerState::Loading { .. })
      }
  
@@ -2609,10 +2609,10 @@ index 7716724..35c551f 100644
      if stdout_is_a_pty() {
          if client::IMPERSONATE_LOGIN.is_some() {
 diff --git a/crates/zed/src/zed.rs b/crates/zed/src/zed.rs
-index a66df52..7930d72 100644
+index 2d0d6f5..d500ffc 100644
 --- a/crates/zed/src/zed.rs
 +++ b/crates/zed/src/zed.rs
-@@ -2929,6 +2929,10 @@ pub(crate) fn eager_load_active_theme_and_icon_theme(fs: Arc<dyn Fs>, cx: &mut A
+@@ -2930,6 +2930,10 @@ pub(crate) fn eager_load_active_theme_and_icon_theme(fs: Arc<dyn Fs>, cx: &mut A
      }
  }
  

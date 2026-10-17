@@ -69,10 +69,10 @@ of this patch said the same sentence, and it was right.
 ---
 
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
-index db2e748..84fa7fc 100644
+index 1709a7e..ed87701 100644
 --- a/crates/agent_ui/src/conversation_view/thread_view.rs
 +++ b/crates/agent_ui/src/conversation_view/thread_view.rs
-@@ -5076,6 +5076,10 @@ impl ThreadView {
+@@ -5094,6 +5094,10 @@ impl ThreadView {
                                      .flex_wrap()
                                      .gap_0p5()
                                      .child(self.render_add_context_button(cx))
@@ -84,7 +84,7 @@ index db2e748..84fa7fc 100644
                                      .children(self.render_fast_mode_control(cx))
                                      .children(self.render_thinking_control(cx)),
 diff --git a/crates/agent_ui/src/message_editor.rs b/crates/agent_ui/src/message_editor.rs
-index 5bb8456..459ae88 100644
+index bc678b3..5c75144 100644
 --- a/crates/agent_ui/src/message_editor.rs
 +++ b/crates/agent_ui/src/message_editor.rs
 @@ -25,10 +25,11 @@ use editor::{
@@ -137,7 +137,7 @@ index 5bb8456..459ae88 100644
      _subscriptions: Vec<Subscription>,
      _parse_slash_command_task: Task<()>,
  }
-@@ -567,6 +583,7 @@ impl MessageEditor {
+@@ -572,6 +588,7 @@ impl MessageEditor {
                      && !editor.read(cx).read_only(cx)
                  {
                      cx.emit(MessageEditorEvent::Edited);
@@ -145,7 +145,7 @@ index 5bb8456..459ae88 100644
                      editor.update(cx, |editor, cx| {
                          let snapshot = editor.snapshot(window, cx);
                          this.mention_set
-@@ -617,6 +634,8 @@ impl MessageEditor {
+@@ -622,6 +639,8 @@ impl MessageEditor {
              local_commands,
              agent_id,
              thread_store,
@@ -154,7 +154,7 @@ index 5bb8456..459ae88 100644
              _subscriptions: subscriptions,
              _parse_slash_command_task: Task::ready(()),
          }
-@@ -740,6 +759,37 @@ impl MessageEditor {
+@@ -745,6 +764,37 @@ impl MessageEditor {
          self.editor.read(cx).text(cx).trim().is_empty()
      }
  
@@ -192,7 +192,7 @@ index 5bb8456..459ae88 100644
      pub fn is_completions_menu_visible(&self, cx: &App) -> bool {
          self.editor
              .read(cx)
-@@ -2066,9 +2116,86 @@ impl Focusable for MessageEditor {
+@@ -2071,9 +2121,86 @@ impl Focusable for MessageEditor {
      }
  }
  
@@ -281,7 +281,7 @@ index 5bb8456..459ae88 100644
              .key_context("MessageEditor")
              .on_action(cx.listener(Self::chat))
              .on_action(cx.listener(Self::send_immediately))
-@@ -2078,8 +2205,12 @@ impl Render for MessageEditor {
+@@ -2083,8 +2210,12 @@ impl Render for MessageEditor {
              .capture_action(cx.listener(Self::cut))
              .on_action(cx.listener(Self::paste_raw))
              .capture_action(cx.listener(Self::paste))
@@ -295,7 +295,7 @@ index 5bb8456..459ae88 100644
                  let settings = ThemeSettings::get_global(cx);
  
                  let text_style = TextStyle {
-@@ -2104,7 +2235,7 @@ impl Render for MessageEditor {
+@@ -2109,7 +2240,7 @@ impl Render for MessageEditor {
                          ..Default::default()
                      },
                  )
@@ -304,7 +304,7 @@ index 5bb8456..459ae88 100644
      }
  }
  
-@@ -2315,6 +2446,7 @@ mod tests {
+@@ -2320,6 +2451,7 @@ mod tests {
      use std::{ops::Range, path::Path, path::PathBuf, rc::Rc, sync::Arc};
  
      use super::PromptLocalCommand;
@@ -312,7 +312,7 @@ index 5bb8456..459ae88 100644
      use acp_thread::MentionUri;
      use agent::{ThreadStore, outline};
      use agent_client_protocol::schema::v2 as acp_v2;
-@@ -6042,4 +6174,163 @@ mod tests {
+@@ -6246,4 +6378,163 @@ mod tests {
              "Expected text to start with 'prefix text\\n\\n', got: {text:?}"
          );
      }

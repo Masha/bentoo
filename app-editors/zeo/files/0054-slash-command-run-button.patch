@@ -63,7 +63,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 ---
 
 diff --git a/crates/agent_ui/src/agent_panel.rs b/crates/agent_ui/src/agent_panel.rs
-index 5d1c090..b5871e1 100644
+index 0238d92..e509fc2 100644
 --- a/crates/agent_ui/src/agent_panel.rs
 +++ b/crates/agent_ui/src/agent_panel.rs
 @@ -2332,6 +2332,87 @@ impl AgentPanel {
@@ -1133,7 +1133,7 @@ index e3b8c34..d8babd2 100644
  }
  
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
-index bb0e7c1..2fe0fe6 100644
+index 9cd5485..1686275 100644
 --- a/crates/agent_ui/src/conversation_view/thread_view.rs
 +++ b/crates/agent_ui/src/conversation_view/thread_view.rs
 @@ -830,6 +830,7 @@ impl ThreadView {
@@ -1171,7 +1171,7 @@ index bb0e7c1..2fe0fe6 100644
          }
          this
      }
-@@ -8882,8 +8895,9 @@ impl ThreadView {
+@@ -8922,8 +8935,9 @@ impl ThreadView {
      }
  
      /// `offers_slash_commands` is set only for an agent's message: a code block
@@ -1183,7 +1183,7 @@ index bb0e7c1..2fe0fe6 100644
      fn render_message_content(
          &self,
          entry_ix: usize,
-@@ -13149,43 +13163,40 @@ impl ThreadView {
+@@ -13187,43 +13201,40 @@ impl ThreadView {
      fn slash_command_action(
          &self,
          cx: &App,
@@ -1257,7 +1257,7 @@ index bb0e7c1..2fe0fe6 100644
          }
      }
  
-@@ -13879,6 +13890,71 @@ impl ThreadView {
+@@ -13921,6 +13932,71 @@ impl ThreadView {
      }
  }
  
@@ -1330,7 +1330,7 @@ index bb0e7c1..2fe0fe6 100644
      fn render(&mut self, window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
          // Keep the message editor's local slash commands in sync with the
 diff --git a/crates/agent_ui/src/message_editor.rs b/crates/agent_ui/src/message_editor.rs
-index 186d746..e822d08 100644
+index 653d207..06f86ca 100644
 --- a/crates/agent_ui/src/message_editor.rs
 +++ b/crates/agent_ui/src/message_editor.rs
 @@ -227,6 +227,9 @@ pub struct MessageEditor {
@@ -1343,7 +1343,7 @@ index 186d746..e822d08 100644
      agent_id: AgentId,
      thread_store: Option<Entity<ThreadStore>>,
      /// The rendered draft, while the preview is showing; `None` while editing.
-@@ -641,6 +644,7 @@ impl MessageEditor {
+@@ -646,6 +649,7 @@ impl MessageEditor {
              local_commands,
              question_pending,
              swallowed_send: false,
@@ -1351,7 +1351,7 @@ index 186d746..e822d08 100644
              agent_id,
              thread_store,
              preview: None,
-@@ -946,19 +950,28 @@ impl MessageEditor {
+@@ -951,19 +955,28 @@ impl MessageEditor {
              )
          };
          let agent_id = self.agent_id.clone();

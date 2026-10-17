@@ -66,7 +66,7 @@ Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>
 ---
 
 diff --git a/assets/settings/default.json b/assets/settings/default.json
-index 2ba29d6..928a375 100644
+index bbe2552..e6b6579 100644
 --- a/assets/settings/default.json
 +++ b/assets/settings/default.json
 @@ -186,6 +186,17 @@
@@ -88,10 +88,10 @@ index 2ba29d6..928a375 100644
    // The state is stored per pane.
    // When disabled, defaults are applied instead of the state restoration.
 diff --git a/crates/settings/src/vscode_import.rs b/crates/settings/src/vscode_import.rs
-index 1b5c2fd..95876b8 100644
+index 3cc0736..0c55dae 100644
 --- a/crates/settings/src/vscode_import.rs
 +++ b/crates/settings/src/vscode_import.rs
-@@ -1070,6 +1070,7 @@ impl VsCodeSettings {
+@@ -1071,6 +1071,7 @@ impl VsCodeSettings {
              centered_layout: None,
              cli_default_open_behavior: None,
              default_open_behavior: None,
@@ -100,10 +100,10 @@ index 1b5c2fd..95876b8 100644
              close_panel_on_toggle: None,
              command_aliases: Default::default(),
 diff --git a/crates/settings_content/src/workspace.rs b/crates/settings_content/src/workspace.rs
-index dbcb6fc..b9e403d 100644
+index 0a6429e..23b9c06 100644
 --- a/crates/settings_content/src/workspace.rs
 +++ b/crates/settings_content/src/workspace.rs
-@@ -58,6 +58,13 @@ pub struct WorkspaceSettingsContent {
+@@ -62,6 +62,13 @@ pub struct WorkspaceSettingsContent {
      ///
      /// Default: existing_window
      pub default_open_behavior: Option<DefaultOpenBehavior>,
@@ -117,7 +117,7 @@ index dbcb6fc..b9e403d 100644
      /// Whether to attempt to restore previous file's state when opening it again.
      /// The state is stored per pane.
      /// When disabled, defaults are applied instead of the state restoration.
-@@ -503,6 +510,32 @@ pub enum DefaultOpenBehavior {
+@@ -507,6 +514,32 @@ pub enum DefaultOpenBehavior {
      NewWindow,
  }
  
@@ -346,7 +346,7 @@ index 25771a8..9c03f26 100644
 +    }
  }
 diff --git a/crates/workspace/src/workspace_settings.rs b/crates/workspace/src/workspace_settings.rs
-index eff3a0a..915ea89 100644
+index 7bb4189..8e33e14 100644
 --- a/crates/workspace/src/workspace_settings.rs
 +++ b/crates/workspace/src/workspace_settings.rs
 @@ -24,6 +24,7 @@ pub struct WorkspaceSettings {
@@ -357,7 +357,7 @@ index eff3a0a..915ea89 100644
      pub restore_on_file_reopen: bool,
      pub reveal_if_open: bool,
      pub drop_target_size: f32,
-@@ -123,6 +124,7 @@ impl Settings for WorkspaceSettings {
+@@ -124,6 +125,7 @@ impl Settings for WorkspaceSettings {
              restore_on_startup: workspace.restore_on_startup.unwrap(),
              cli_default_open_behavior: workspace.cli_default_open_behavior.unwrap(),
              default_open_behavior: workspace.default_open_behavior.unwrap(),
