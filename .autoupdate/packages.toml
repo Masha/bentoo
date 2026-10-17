@@ -9888,6 +9888,8 @@ which is why this entry carried no revision until 2026-07-26.
 # END
 
 ["sci-ml/ollama"]
+enabled = false
+disabled_by = "parity-audit 2026-10-17: removed, ::gentoo 0.40.5 is better (LLAMA_CPP_tag b11669 as upstream asks, ours b11351) -- seventh resurrection, see comments"
 url = "https://api.github.com/repos/ollama/ollama/releases/latest"
 parser = "json"
 path = "tag_name"
@@ -10022,6 +10024,17 @@ day later (#29943, "refactor selective expert copying to user code"), and as of
 llama.cpp subtree was rejected: it would fork ::gentoo's ggml for every
 consumer (llama-cpp, whisper-cpp, ...) with an API that differs under the same
 0.26.0 version, for a feature-only ollama release.
+
+2026-10-17, seventh removal. Despite the note above, 686538e54 (2026-10-15)
+added 0.40.3/0.40.4 and the autoupdate bumped to 0.40.5 -- with the same two
+defects as the sixth occurrence: LLAMA_CPP_tag=b11351 while v0.40.5's
+LLAMA_CPP_VERSION asks b11669 (checked on raw.githubusercontent.com), and
+ollama-0.31.1-gcc17.patch back in eapply although b11351 and b11669 both
+already include <fstream> in common/common.h. The ggml blocker is gone:
+::gentoo has sci-ml/ggml-0.27.0, and its own 0.40.5 pins b11669.
+gentoo-parity.sh showed 0 rows for this package: it does not compare a
+variable feeding SRC_URI nor an eapply inside src_prepare, so a stale
+LLAMA_CPP_tag is invisible to the sweep. Diff it by hand if it ever returns.
 """
 # END
 

@@ -384,7 +384,9 @@ src_configure() {
 	elif use icu; then
 		myconf+=( --with-intl=full-icu )
 	else
-		myconf+=( --with-intl=none )
+		# ::gentoo's 26.12.0: the embedded English-only subset rather than no
+		# Intl at all, so USE=-icu still gets a working (if minimal) Intl.
+		myconf+=( --with-intl=small-icu )
 	fi
 	use inspector || myconf+=( --without-inspector )
 	use npm || myconf+=( --without-npm )
