@@ -48,6 +48,9 @@ RESTRICT="mirror strip"
 # whose libX11-xcb x11-libs/libX11 provides). The dlopen()ed
 # libraries are invisible to scanelf and are listed from what gpui loads at run
 # time: Vulkan, the Wayland client and libX11.
+# sys-apps/xdg-desktop-portal is neither: gpui reaches it over D-Bus (ashpd) for
+# file dialogs and screen capture, from both its X11 and Wayland backends, so
+# app-editors/zeo carries it unconditionally and so does this binary since -r2.
 RDEPEND="
 	!app-editors/zed
 	!app-editors/zed-bin
@@ -59,6 +62,7 @@ RDEPEND="
 	media-libs/vulkan-loader
 	dev-libs/wayland
 	x11-libs/libX11
+	sys-apps/xdg-desktop-portal
 	|| (
 		media-fonts/dejavu
 		media-fonts/cantarell
