@@ -3864,6 +3864,8 @@ sqlitebrowser — commit-tracked on master (uses COMMIT= without quotes); date Y
 # END
 
 ["dev-db/sqlite"]
+enabled = false
+disabled_by = "removed 2026-10-18: ::gentoo reached the same PV 3.54.1 and its copy is ahead (changeset patch, sqlite3-rsync, ASAN_OPTIONS) -- see comments"
 url = "https://sqlite.org/download.html"
 parser = "regex"
 pattern = 'PRODUCT,([0-9]+\.[0-9]+\.[0-9]+),[0-9]{4}/sqlite-src-'
@@ -3875,6 +3877,10 @@ embedded in download.html; anchoring on sqlite-src- picks the tarball the
 ebuild actually fetches. SRC_URI hardcodes the /2026/ directory, as ::gentoo
 does: the first release of a new year needs that path edited by hand.
 Remove the package (enabled = false) once ::gentoo reaches the same version.
+Removed 2026-10-18: ::gentoo's 3.54.1 now carries more than this copy did (the
+3.54.1-changeset.patch, the sqlite3-rsync tool under USE=tools, and the
+ASAN_OPTIONS guard in src_test). Re-enable only if bentoo needs to run ahead
+of ::gentoo again.
 """
 # END
 
