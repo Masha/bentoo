@@ -14,7 +14,10 @@ LICENSE="LGPL-2.1+"
 SLOT="0"
 # 1.18.x is flatpak's stable line (even minor, prerelease=false upstream), so it
 # carries the stable keywords inherited from ::gentoo's 1.16.6. The development
-# line lives alongside in flatpak-1.19.0.ebuild and stays ~arch.
+# line lives alongside in flatpak-1.19.x and stays ~arch.
+# Kept on purpose after ::gentoo added this same 1.18.4 as ~arch on 2026-10-19
+# (917bc6ea9a), its stable still at 1.18.1: aligning would downgrade every
+# stable-keyword user who already has 1.18.4 back to 1.18.1.
 KEYWORDS="amd64 arm arm64 ~loong ~ppc64 ~riscv x86"
 IUSE="doc introspection policykit seccomp systemd test X"
 RESTRICT="!test? ( test )"

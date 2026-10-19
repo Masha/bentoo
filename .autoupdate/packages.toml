@@ -1410,7 +1410,9 @@ qBittorrent — tag "release-X.Y.Z" ("release-" stripped).
 # END
 
 ["app-containers/containerd"]
-url = "https://api.github.com/repos/containerd/containerd/releases/latest"
+enabled = false
+disabled_by = "removed 2026-10-19: ::gentoo reached the mirrored 2.4.2 (917bc6ea9a) with a byte-identical ebuild -- see comments"
+url ="https://api.github.com/repos/containerd/containerd/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
@@ -1428,6 +1430,8 @@ deps tarball. Check go.mod's `go` line against the ebuild's go BDEPEND on
 every bump.
 RETIRE when ::gentoo reaches the mirrored version: delete the overlay copy
 and set enabled = false here (never delete the record).
+Retired 2026-10-19: ::gentoo added 2.4.2 in 917bc6ea9a, ebuild, files/ and
+metadata.xml identical to this copy. Re-enable only to run ahead again.
 """
 # END
 
@@ -9900,7 +9904,9 @@ which is why this entry carried no revision until 2026-07-26.
 # END
 
 ["sci-ml/ollama"]
-url = "https://api.github.com/repos/ollama/ollama/releases/latest"
+enabled = false
+disabled_by = "removed 2026-10-19 (eighth removal): ::gentoo reached 0.40.6 (917bc6ea9a) with a byte-identical ebuild -- see comments"
+url ="https://api.github.com/repos/ollama/ollama/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
@@ -10045,6 +10051,11 @@ already include <fstream> in common/common.h. The ggml blocker is gone:
 gentoo-parity.sh showed 0 rows for this package: it does not compare a
 variable feeding SRC_URI nor an eapply inside src_prepare, so a stale
 LLAMA_CPP_tag is invisible to the sweep. Diff it by hand if it ever returns.
+
+2026-10-19, eighth removal. 0c8871b4b (2026-10-17) re-added 0.40.6 ahead of
+::gentoo; ::gentoo added the same 0.40.6 in 917bc6ea9a, ebuild, files/ and
+Manifest identical to this copy, so the overlay copy only shadowed theirs.
+sci-ml/ollama-bin stays.
 """
 # END
 
@@ -10839,7 +10850,9 @@ because ::gentoo is stuck on 1.33 (2025).  Drop both once ::gentoo ships 2.x.
 # END
 
 ["sys-apps/memtest86+"]
-url = "https://api.github.com/repos/memtest86plus/memtest86plus/releases/latest"
+enabled = false
+disabled_by = "removed 2026-10-19: ::gentoo reached 9.00 (917bc6ea9a) with a byte-identical ebuild -- see comments"
+url ="https://api.github.com/repos/memtest86plus/memtest86plus/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
@@ -10851,6 +10864,9 @@ This record is temporary, like the package: bentoo mirrors ::gentoo's
 8.10-r1 ebuild forward to 9.00 (released 2026-10-15) and nothing else
 differs.  An 8.10 mirror existed for the same reason and was removed on
 2026-05-19 when ::gentoo caught up.  Drop both once ::gentoo ships 9.00.
+
+Retired 2026-10-19: ::gentoo added 9.00 in 917bc6ea9a, ebuild identical to
+this copy.
 """
 # END
 
