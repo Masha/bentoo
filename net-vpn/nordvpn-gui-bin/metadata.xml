@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@proton.me</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<longdescription lang="en">
+		Graphical NordVPN app for Linux (Flutter/GTK3), repackaged from the
+		official .deb. It is a front end for the nordvpnd daemon installed by
+		net-vpn/nordvpn-bin, which must be running and must be the same
+		version.
+	</longdescription>
+	<upstream>
+		<remote-id type="github">NordSecurity/nordvpn-linux</remote-id>
+		<bugs-to>https://github.com/NordSecurity/nordvpn-linux/issues</bugs-to>
+	</upstream>
+</pkgmetadata>

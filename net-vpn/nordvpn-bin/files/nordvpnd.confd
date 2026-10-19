@@ -1,0 +1,6 @@
+# Extra command-line arguments for nordvpnd.
+#
+# Settings (technology, kill switch, DNS, auto-connect, ...) are not set here:
+# change them with the "nordvpn set" command, which stores them under
+# /var/lib/nordvpn.
+NORDVPND_OPTS=""

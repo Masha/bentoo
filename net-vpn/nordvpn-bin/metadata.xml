@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@proton.me</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<longdescription lang="en">
+		NordVPN client for Linux, repackaged from the official .deb: the nordvpn
+		command-line tool, the nordvpnd system daemon it drives (OpenRC init
+		script always, systemd units with USE=systemd) and the NordLynx,
+		OpenVPN and NordWhisper technologies. Only members of the nordvpn group
+		can control the daemon. Needs a NordVPN subscription.
+	</longdescription>
+	<upstream>
+		<remote-id type="github">NordSecurity/nordvpn-linux</remote-id>
+		<bugs-to>https://github.com/NordSecurity/nordvpn-linux/issues</bugs-to>
+	</upstream>
+</pkgmetadata>

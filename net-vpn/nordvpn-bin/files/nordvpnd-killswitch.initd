@@ -1,0 +1,25 @@
+#!/sbin/openrc-run
+# Copyright 1999-2026 Gentoo Authors
+# Distributed under the terms of the GNU General Public License v2
+
+# OpenRC counterpart of upstream's nordvpnd-killswitch.service: a oneshot that
+# runs "nordvpnd --killswitch-mode" before the network comes up.  When the
+# kill switch is enabled ("nordvpn set killswitch on"), that call installs the
+# blocking firewall rules early, so nothing leaves the machine between boot and
+# the moment nordvpnd connects.  With the kill switch off it does nothing.
+#
+# Add it to the boot runlevel next to nordvpnd:
+#   rc-update add nordvpnd-killswitch boot
+
+description="Apply the NordVPN kill switch before the network starts"
+
+depend() {
+	need localmount
+	before net
+}
+
+start() {
+	ebegin "Applying NordVPN kill switch"
+	/usr/sbin/nordvpnd --killswitch-mode
+	eend $?
+}

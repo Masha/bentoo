@@ -1,0 +1,44 @@
+#!/sbin/openrc-run
+# Copyright 1999-2026 Gentoo Authors
+# Distributed under the terms of the GNU General Public License v2
+
+# OpenRC counterpart of upstream's nordvpnd.service + nordvpnd.socket.  The
+# SysV script the .deb ships as /etc/init.d/nordvpn sources the LSB helpers
+# (/lib/lsb/init-functions) and is not installed; this replaces it.
+#
+# How each unit directive maps here:
+#   ExecStart=/usr/sbin/nordvpnd         -> command
+#   Group=nordvpn                        -> command_user="root:nordvpn"
+#   RuntimeDirectory=nordvpn (0750)      -> checkpath in start_pre
+#   nordvpnd.socket (SocketGroup=nordvpn,
+#     SocketMode=0660)                   -> none needed: without LISTEN_FDS
+#                                           the daemon binds
+#                                           /run/nordvpn/nordvpnd.sock itself,
+#                                           as upstream's SysV script relies on
+#   Restart=always, RestartSec=5         -> supervise-daemon respawn
+#
+# Not mapped: RestartKillSignal=SIGUSR1.  SIGUSR1 tells nordvpnd to exit while
+# keeping its kill-switch firewall rules in place; a plain "restart" here sends
+# SIGTERM, so traffic can leave unprotected for the second the daemon is down.
+
+description="NordVPN daemon"
+
+command="/usr/sbin/nordvpnd"
+command_args="${NORDVPND_OPTS}"
+command_user="root:nordvpn"
+supervisor="supervise-daemon"
+respawn_delay=5
+output_log="/var/log/nordvpn/daemon.log"
+error_log="/var/log/nordvpn/daemon.log"
+
+depend() {
+	need net
+	use dns
+	after nordvpnd-killswitch firewall
+}
+
+start_pre() {
+	checkpath -d -o root:nordvpn -m 0750 /run/nordvpn
+	checkpath -d -o root:nordvpn -m 0750 /var/lib/nordvpn
+	checkpath -d -o root:nordvpn -m 0750 /var/log/nordvpn
+}

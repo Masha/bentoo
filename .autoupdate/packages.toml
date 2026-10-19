@@ -2773,6 +2773,41 @@ UI_NODE_MODULES_PV.
 """
 # END
 
+["net-vpn/nordvpn-bin"]
+url = "https://repo.nordvpn.com/deb/nordvpn/debian/dists/stable/main/binary-amd64/Packages"
+parser = "regex"
+pattern = 'Package: nordvpn\nVersion: ([0-9][0-9.]*)'
+select = "max"
+version = "5.4.1"
+comments = """
+NordVPN CLI + daemon — the Debian "Packages" index of the official APT
+repository SRC_URI pulls from. Plain text, NOT sorted (5.2.0 came first on
+2026-10-19), hence select = "max". Ten stanzas that day: five nordvpn and five
+nordvpn-gui; Version follows Package directly, and the "\\n" after "nordvpn"
+keeps nordvpn-gui out of the match.
+GitHub (NordSecurity/nordvpn-linux) tags the same versions but its releases
+carry no assets, and the public source cannot build NordWhisper (internal
+"quench" feature), which is why the package is the .deb.
+On the bump to 6.x the ebuild's pkg_postinst already warns about the settings
+migration and the renamed CLI commands; check readelf -d of nordvpnd and the
+lib/ directory for new libraries before trusting the applier.
+"""
+# END
+
+["net-vpn/nordvpn-gui-bin"]
+url = "https://repo.nordvpn.com/deb/nordvpn/debian/dists/stable/main/binary-amd64/Packages"
+parser = "regex"
+pattern = 'Package: nordvpn-gui\nVersion: ([0-9][0-9.]*)'
+select = "max"
+version = "5.4.1"
+comments = """
+NordVPN GUI — same APT index as net-vpn/nordvpn-bin, nordvpn-gui stanzas. The
+ebuild pins ~net-vpn/nordvpn-bin-${PV} (the .deb declares nordvpn (= PV)), so
+the two records must move together; if this one reports a version the other
+does not, wait for both.
+"""
+# END
+
 ["media-libs/dav1d"]
 enabled = false
 disabled_by = "parity-audit 2026-09-11: removed, byte-identical to ::gentoo 1.5.4"
