@@ -1291,6 +1291,8 @@ CRATES="
 	webpki-roots@1.0.8
 	weezl@0.1.10
 	which@8.0.5
+	whisper-rs-sys@0.15.0
+	whisper-rs@0.16.0
 	whoami@1.6.1
 	winapi-i686-pc-windows-gnu@0.4.0
 	winapi-util@0.1.11
@@ -1574,7 +1576,7 @@ WEBRTC_COMMIT="0001d84-4"
 # claude-agent-acp integrations; ::gentoo carries none.
 inherit cargo check-reqs desktop flag-o-matic llvm-r1 toolchain-funcs xdg
 
-# BENTOO-DIVERGENCE: metadata.xml - a <use> block describing fourteen flags,
+# BENTOO-DIVERGENCE: metadata.xml - a <use> block describing sixteen flags,
 # where ::gentoo's file has none. Every one of them is a flag this overlay adds
 # (see the IUSE tag). ::gentoo has nothing to describe because it exposes none
 # of them, and no ::gentoo package corresponds to this one at all.
@@ -1614,6 +1616,12 @@ LICENSE+="
 	CC0-1.0 CDLA-Permissive-2.0 ISC LGPL-3 MIT MIT-0 MPL-2.0 UoI-NCSA
 	Unicode-3.0 ZLIB BZIP2
 "
+# whisper-rs and whisper-rs-sys (0067) are Unlicense, and whisper.cpp, which
+# whisper-rs-sys bundles, is MIT. They reach the binary only with USE=voice, so
+# the licence is conditional here. pycargoebuild puts Unlicense in the block
+# above, because CRATES lists every crate whatever the USE flags; after a
+# regeneration, move it back here.
+LICENSE+=" voice? ( Unlicense )"
 SLOT="0"
 # The arm64 half of SRC_URI and of src_compile's LK_CUSTOM_WEBRTC is kept even
 # though KEYWORDS carries no ~arm64: it is what a future re-keyword needs, and
@@ -1635,6 +1643,28 @@ KEYWORDS="~amd64"
 # claude-agent-acp-plus group (0040's router, 0045's new thread), not
 # claude-code-ide.
 #
+# devtools-panel was added on 2026-10-15 (story 055): patch 0063, the Zeo half of
+# the zeo-devtools panel page -- devtools threads of the project, the
+# `devtools: start` / `devtools: open in browser` actions, and a badge and
+# filter in the thread list. On by default; it extends 0058's session code, so
+# it needs browser-extension.
+#
+# epic was added on 2026-10-18 (story 042): patch 0066, a read-only "Epic
+# Stories" dock panel listing the project's .epic/ stories with their status and
+# tasks.md progress, followed live. On by default; it is generated on top of the
+# claude-agent-acp-plus group (its wiring sits beside 0035's), so it needs that
+# flag, and nothing else.
+#
+# voice was added on 2026-10-19 (story 044): patch 0067, dictation into the
+# agent composer -- a microphone button and ctrl-alt-v, transcribed on this
+# machine by whisper.cpp (whisper-rs), the text left unsent. On by default; it
+# is generated on top of the claude-agent-acp-plus group (its composer hunks sit
+# beside 0043-0045's), so it needs that flag, and nothing else: it applied with
+# no fuzz in all eleven combinations of the other optional groups that were
+# checked. It also pulls in
+# app-accessibility/whisper-models[base], so the default model is on disk and
+# Zeo never has to download it.
+#
 # ai-jail was added on 2026-10-03, carried over from app-editors/zed when that
 # package stopped being part of this chain: it pulls in sys-apps/ai-jail, a
 # sandbox for AI coding agents. Since story 043 it also applies patch 0057, the
@@ -1654,8 +1684,8 @@ KEYWORDS="~amd64"
 # zed-extension, zed-remote-server -- and renaming Zed's server infrastructure is
 # not what a rebrand of the editor is for.
 IUSE="+X ai-jail +browser-extension +claude-agent-acp-plus +claude-agent-acp-tui
-	+claude-code-ide +devtools-bridge inspector +mimalloc neovim screen-capture test
-	tracy +wayland"
+	+claude-code-ide +devtools-bridge +devtools-panel +epic inspector +mimalloc
+	neovim screen-capture test tracy +voice +wayland"
 # BENTOO-DIVERGENCE: REQUIRED_USE - the || ( X wayland ) clause, which follows
 # from the X and wayland flags this overlay adds (see the IUSE tag). ::gentoo
 # exposes neither, so it has nothing to constrain. ai-jail? requires the agent
@@ -1663,14 +1693,22 @@ IUSE="+X ai-jail +browser-extension +claude-agent-acp-plus +claude-agent-acp-tui
 # devtools-bridge? requires the group 0052 is generated on top of.
 # browser-extension? requires devtools-bridge: the browser reaches Zeo through
 # 0052's bridge socket, and 0058 is generated on top of it.
+# devtools-panel? requires browser-extension: 0063 extends 0058's session code
+# and is generated on top of it.
+# epic? requires claude-agent-acp-plus: 0066 is generated on top of that group.
+# voice? requires claude-agent-acp-plus: 0067 is generated on top of that group,
+# and of no other (eleven combinations of the optional groups checked).
 # test? requires the adapter flags the test-only patches (0050, 0051) are
 # generated on top of.
 REQUIRED_USE="
 	|| ( X wayland )
 	ai-jail? ( claude-agent-acp-plus devtools-bridge )
 	browser-extension? ( devtools-bridge )
+	devtools-panel? ( browser-extension )
 	devtools-bridge? ( claude-agent-acp-plus )
+	epic? ( claude-agent-acp-plus )
 	test? ( claude-agent-acp-plus claude-code-ide )
+	voice? ( claude-agent-acp-plus )
 "
 RESTRICT="!test? ( test )"
 CHECKREQS_DISK_BUILD="18G"
@@ -1717,8 +1755,10 @@ DEPEND="
 	)
 "
 # BENTOO-DIVERGENCE: RDEPEND - dbus as above, plus dev-util/claude-agent-acp-plus
-# and -tui, which exist only in this overlay, and the ai-jail sandbox in either
-# of its two packagings.
+# and -tui, which exist only in this overlay, the ai-jail sandbox in either
+# of its two packagings, and app-accessibility/whisper-models for voice: the
+# speech model 0067 reads from /usr/share/whisper-models before it would
+# download one.
 # claude-agent-acp-plus >= 0.24.0: the first release that sends the
 # _claude/tasks snapshot 0034, 0037 and 0038 read; 0.23.6 sends only a count,
 # which leaves the tasks card empty.
@@ -1739,6 +1779,7 @@ RDEPEND="
 	claude-agent-acp-tui? ( dev-util/claude-agent-acp-tui )
 	claude-code-ide? ( dev-util/claude-code )
 	neovim? ( app-editors/neovim )
+	voice? ( app-accessibility/whisper-models[base] )
 "
 BDEPEND="
 	app-arch/unzip
@@ -1836,6 +1877,11 @@ src_prepare() {
 		"${FILESDIR}/0046-agent-default-agents-prefer-the-system-adapter.patch"
 		"${FILESDIR}/0048-agent-thread-organization-storage.patch"
 		"${FILESDIR}/0049-agent-sidebar-pinned-section.patch"
+		# 0065 (story 036) drags projects, threads and pinned threads in the
+		# agent sidebar to reorder them, plus "Sort by Recent". It consumes
+		# 0048's store and 0049's Pinned section, so it sits right after them;
+		# no flag gates it. 0028-0030 and 0063 are regenerated on top of it.
+		"${FILESDIR}/0065-agent-sidebar-drag-reorder.patch"
 		# 0061 starts every agent with ZEO_THREAD=1, so zeo-systray's hook can
 		# tell Zeo's sessions from any other Claude Code process and offer the
 		# tray link (0024) only for those. Ungrouped like 0024.
@@ -2097,6 +2143,36 @@ src_prepare() {
 		PATCHES+=( "${FILESDIR}/0058-browser-extension.patch" )
 	fi
 
+	# 0063 (story 055): the devtools panel -- the zeo-devtools panel page drives
+	# devtools threads of its own project through 0058's v2 sessions, plus the
+	# `devtools: start` / `open in browser` actions and the thread-list badge.
+	# Its own group, after browser-extension and before test; it applies with or
+	# without 0057, and 0050/0051 on top of it.
+	# It also widens 0065's drag guards to its "Devtools threads only" view, so
+	# the two ship together.
+	if use devtools-panel; then
+		PATCHES+=( "${FILESDIR}/0063-devtools-panel.patch" )
+	fi
+
+	# 0066 (story 042): the Epic Stories panel -- a read-only dock panel of the
+	# project's .epic/ stories, their status and tasks.md progress, followed
+	# live; it writes nothing and runs nothing. Its own group, after
+	# devtools-panel and before test; it applies with claude-code-ide and
+	# devtools-bridge each on or off, and 0050/0051 on top of it.
+	if use epic; then
+		PATCHES+=( "${FILESDIR}/0066-epic-panel.patch" )
+	fi
+
+	# 0067 (story 044): voice input -- a microphone button and ctrl-alt-v in the
+	# agent composer, transcribed on this machine by whisper.cpp (crates
+	# voice_input, whisper-rs, whisper-rs-sys), the text left unsent. Its own
+	# group, after epic and before test; it applies with the optional groups
+	# above on or off (eleven combinations checked), and 0050/0051 apply on top
+	# of it.
+	if use voice; then
+		PATCHES+=( "${FILESDIR}/0067-voice-input.patch" )
+	fi
+
 	# 0050 and 0051 change tests only -- nothing in them reaches the binary -- so
 	# they apply only when the suite is built. They are generated on top of every
 	# group above, which is what the test? clause in REQUIRED_USE enforces.
@@ -2279,6 +2355,24 @@ src_compile() {
 	# icon. app-editors/zed has exactly that gap today; it is masked on Wayland
 	# because the compositor resolves the INSTALLED icon by app_id instead.
 	export RELEASE_CHANNEL="zeo"
+	# whisper-rs-sys's build.rs hands every GGML_*, WHISPER_* and CMAKE_*
+	# variable to whisper.cpp's CMake. GGML_NATIVE defaults to ON, which is
+	# -march=native: the build machine's CPU, the AVX-512 trap that once broke
+	# zeo-bin. With it OFF, ggml switches its own x86 set on instead (SSE4.2,
+	# AVX, AVX2, BMI2, FMA, F16C); turning those off too leaves the instruction
+	# set to CFLAGS' -march. GGML_CCACHE=OFF keeps ggml from wrapping the
+	# compiler in ccache or sccache behind Portage's back (FEATURES=ccache
+	# decides that), as sci-ml/whisper-cpp and sci-ml/llama-cpp do here.
+	# WHISPER_DONT_GENERATE_BINDINGS uses the crate's bundled bindings instead
+	# of running bindgen. Without USE=voice nothing reads them: whisper-rs-sys
+	# is not in the lockfile.
+	# Exported here, they stay in the saved environment for src_test too.
+	# Accepted: whisper.cpp builds at -O3 (Release), not CFLAGS' -O level.
+	if use voice; then
+		export GGML_NATIVE=OFF GGML_SSE42=OFF GGML_AVX=OFF GGML_AVX2=OFF \
+			GGML_FMA=OFF GGML_F16C=OFF GGML_BMI2=OFF GGML_AVX512=OFF \
+			GGML_CCACHE=OFF WHISPER_DONT_GENERATE_BINDINGS=1
+	fi
 	if use arm64; then
 		export LK_CUSTOM_WEBRTC="${WORKDIR}/linux-arm64-release"
 	elif use amd64; then
