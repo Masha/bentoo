@@ -9804,12 +9804,11 @@ risen past the nodejs floor in RDEPEND.
 # END
 
 ["dev-lang/rust"]
-enabled = false
-disabled_by = "parity-audit 2026-10-12: removed, ::gentoo caught up at 1.99.0 (eclass row, bootstrap tarballs, 1.98.1 patchset applies with eapply fuzz 2)"
+hold = true
 url = "https://static.rust-lang.org/dist/channel-rust-stable.toml"
 parser = "regex"
 pattern = '\[pkg\.rust\]\s+version = "([0-9]+\.[0-9]+\.[0-9]+)'
-version = "1.99.0"
+version = "1.99.1"
 comments = """
 Stable Rust toolchain, anchored on the sole [pkg.rust] block (the toml also has
 cargo 0.97.x / rustc 0.1.x lines — an unanchored regex would grab the wrong one).
@@ -9833,30 +9832,30 @@ Removed by the parity audit on 2026-09-04 (::gentoo reached 1.98.1) and back on
 2026-10-10 at 1.99.0, again with a local patchset (no 1.99.0 tag) and this time
 with a fork of rust.eclass in eclass/, because ::gentoo's slot tables do not list
 1.99.0 yet. Retire the fork together with the trio when ::gentoo catches up.
+Removed on 2026-10-12 (::gentoo reached 1.99.0) and back on 2026-10-19 at 1.99.1,
+with the eclass fork re-cut from ::gentoo's current copy plus the 1.99.1 row.
 
 --- rust: source, -bin and -common share ONE stable Rust version (channel toml) ---
 """
 # END
 
 ["dev-lang/rust-bin"]
-enabled = false
-disabled_by = "parity-audit 2026-10-12: removed, ::gentoo caught up at 1.99.0 (eclass row, bootstrap tarballs, 1.98.1 patchset applies with eapply fuzz 2)"
+hold = true
 url = "https://static.rust-lang.org/dist/channel-rust-stable.toml"
 parser = "regex"
 pattern = '\[pkg\.rust\]\s+version = "([0-9]+\.[0-9]+\.[0-9]+)'
-version = "1.99.0"
+version = "1.99.1"
 comments = """
 Same stable Rust release as dev-lang/rust (binary toolchains from static.rust-lang.org/dist).
 """
 # END
 
 ["dev-lang/rust-common"]
-enabled = false
-disabled_by = "parity-audit 2026-10-12: removed, ::gentoo caught up at 1.99.0 (eclass row, bootstrap tarballs, 1.98.1 patchset applies with eapply fuzz 2)"
+hold = true
 url = "https://static.rust-lang.org/dist/channel-rust-stable.toml"
 parser = "regex"
 pattern = '\[pkg\.rust\]\s+version = "([0-9]+\.[0-9]+\.[0-9]+)'
-version = "1.99.0"
+version = "1.99.1"
 comments = """
 Pure-rename package shadowing the rust source PV; bump in lockstep with dev-lang/rust.
 """
