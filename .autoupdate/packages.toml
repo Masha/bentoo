@@ -1821,7 +1821,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "0.13.3"
+version = "0.13.4"
 comments = """
 uv (uv-bin) — tag bare "X.Y.Z".
 """
@@ -2093,7 +2093,7 @@ commit_sha_path = "[0].id"
 base_from = "file"
 base_url = "https://code.videolan.org/api/v4/projects/videolan%2Fvlc/repository/files/configure.ac/raw?ref=master"
 base_pattern = 'AC_INIT\(\[vlc\], \[([0-9][0-9.]*)-dev\]\)'
-version = "4.0.0_pre20261019"
+version = "4.0.0_pre20261020"
 comments = """
 vlc — 4.0 development snapshot, commit-tracked on master; _pre suffix
 preserved from the current ebuild. Only the 4.0 line lives here: 3.0.x is
@@ -3779,7 +3779,7 @@ transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "source"
 series = '^[0-9.]+(?:-r[0-9]+)?$'
-version = "1.24.3"
+version = "1.24.4"
 comments = """
 zed (stable channel), from source — since 2026-10-01 app-editors/zed builds
 upstream's tagged releases with no patches; the patched snapshot is app-editors/
@@ -3803,7 +3803,7 @@ select = "max"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "source"
 series = '_pre(?:-r[0-9]+)?$'
-version = "1.25.0_pre"
+version = "1.25.1_pre"
 comments = """
 zed (preview channel), from source — mirrors zed-bin@preview; the same manual
 follow-up as zed@stable applies to every bump.
@@ -3834,7 +3834,7 @@ path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
 series = '^[0-9.]+(?:-r[0-9]+)?$'
-version = "1.24.3"
+version = "1.24.4"
 comments = """
 zed-bin (stable channel) — releases/latest is the stable release by definition
 (prerelease=false); upstream tags it "vX.Y.Z" and the preview "vX.Y.Z-pre".
@@ -3859,7 +3859,7 @@ select = "max"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
 series = '_pre(?:-r[0-9]+)?$'
-version = "1.25.0_pre"
+version = "1.25.1_pre"
 comments = """
 zed-bin (preview channel) — releases/latest never returns a prerelease, so the
 preview needs the full list: the pattern takes only "vX.Y.Z-pre" tags and the
@@ -4088,7 +4088,7 @@ base_from = "file"
 base_url = "https://raw.githubusercontent.com/KhronosGroup/Vulkan-ValidationLayers/main/CMakeLists.txt"
 base_pattern = '(?m)^project\([A-Za-z_-]+ VERSION ([0-9][0-9.]*)'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.365_p20261019"
+version = "1.4.365_p20261020"
 comments = """
 vulkan-layers — commit-tracked on main (Vulkan-ValidationLayers); scans for "Update for Vulkan-Docs X.Y.Z".
 """
@@ -11653,7 +11653,7 @@ it must be DROPPED, not forced, once a release carries the fix).
 url = "https://deb.opera.com/opera-stable/dists/stable/non-free/binary-amd64/Packages"
 parser = "regex"
 pattern = 'Package: opera-stable\nVersion: ([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)'
-version = "137.0.6036.63"
+version = "138.0.6044.24"
 comments = """
 Opera — read the APT index of Opera's own repository. The download CDN
 (downloadN.operacdn.com, which SRC_URI uses) publishes no listing, and
@@ -11968,7 +11968,7 @@ parser = "regex"
 pattern = '"tag_name":\s*"v([0-9]+\.[0-9]+\.[0-9]+)"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "4.0.16"
+version = "4.0.17"
 comments = """
 CC Switch — a Tauri GUI for switching between Claude Code, Codex and Gemini
 CLI accounts. Tracks CC-Switch-v<PV>-Linux-{x86_64,arm64}.deb; note the asset
@@ -14315,7 +14315,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "0.8.0"
+version = "0.9.0"
 comments = """
 GridCraft (ArtCraft "Craft App Suite") — GitHub releases, tagged "vX.Y.Z"; same
 shape as media-gfx/photocraft-bin, whose record explains the -bin choice.
@@ -14363,7 +14363,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "0.8.0"
+version = "0.10.0"
 comments = """
 SoundCraft (ArtCraft "Craft App Suite") — GitHub releases, tagged "vX.Y.Z"; same
 shape as media-gfx/photocraft-bin, whose record explains the -bin choice.

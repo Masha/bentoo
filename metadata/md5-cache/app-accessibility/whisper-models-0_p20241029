@@ -1,0 +1,11 @@
+DEFINED_PHASES=install unpack
+DESCRIPTION=Whisper speech recognition models in ggml format, for whisper.cpp users
+EAPI=8
+HOMEPAGE=https://huggingface.co/ggerganov/whisper.cpp https://github.com/ggml-org/whisper.cpp
+IUSE=tiny +base small
+KEYWORDS=~amd64
+LICENSE=MIT
+REQUIRED_USE=|| ( tiny base small )
+SLOT=0
+SRC_URI=tiny? ( https://huggingface.co/ggerganov/whisper.cpp/resolve/5359861c739e955e79d9a303bcbc70fb988958b1/ggml-tiny.bin -> whisper-ggml-tiny-5359861.bin ) base? ( https://huggingface.co/ggerganov/whisper.cpp/resolve/5359861c739e955e79d9a303bcbc70fb988958b1/ggml-base.bin -> whisper-ggml-base-5359861.bin ) small? ( https://huggingface.co/ggerganov/whisper.cpp/resolve/5359861c739e955e79d9a303bcbc70fb988958b1/ggml-small.bin -> whisper-ggml-small-5359861.bin )
+_md5_=fca7499ab28a36bbc222378f29ff397e
