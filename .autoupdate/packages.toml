@@ -11732,7 +11732,7 @@ parser = "regex"
 pattern = '"tag_name":"v([0-9]+\.[0-9]+\.[0-9]+)","target_commitish":"[^"]*","name":"[^"]*","draft":false,"immutable":[a-z]+,"prerelease":false'
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "7.8.12"
+version = "7.8.15"
 comments = """
 Kilo Code — releases land several times a day (v7.6.1 and v7.6.2 shipped within
 hours of each other), so expect this record to move often.
