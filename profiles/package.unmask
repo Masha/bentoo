@@ -47,3 +47,22 @@
 # with google-chrome, vivaldi, opera and others, so it is not expected to
 # leave with the package; recheck `inherit` if it ever does.
 www-client/chromium
+
+# Lucas C.S. <lucascs@protonmail.com> (2026-10-20)
+# ::gentoo added app-text/podofo-1.1.2 on 2026-10-20 and masked
+# >=app-text/podofo-1 the same day (bug #984580): its 1.1.2 goes into SLOT 0,
+# replacing 0.10.x under /usr, and the 1.x API is a hard source break for the
+# 0.10.x consumers (app-office/scribus, kde-misc/krename).
+#
+# This overlay's podofo-1.1.2 is SLOT 1 and does not do that. It installs only
+# into a private prefix (/usr/include/podofo-1, /usr/$(get_libdir)/podofo-1),
+# coexists with ::gentoo's :0 and is picked up only by a consumer that opts
+# in -- today app-text/calibre 9.x, which needs the 1.x API. The reason for
+# the mask does not apply to it, while the mask itself made calibre 9
+# uninstallable on any system that did not already carry podofo:1.
+#
+# Bare atom for the same reason as the calibre entry above; the slot keeps
+# ::gentoo's own SLOT 0 1.1.2 masked, as ::gentoo intends.
+#
+# Remove this entry if ::gentoo lifts its mask.
+app-text/podofo:1
