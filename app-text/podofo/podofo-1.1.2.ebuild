@@ -22,7 +22,10 @@ SRC_URI="https://github.com/podofo/podofo/archive/refs/tags/${PV}.tar.gz -> ${P}
 # Only the LGPL-2+ library is installed.
 LICENSE="LGPL-2+"
 
-# BENTOO-DIVERGENCE: SLOT - ::gentoo ships 0/2 (PoDoFo 0.10.x). The 1.x API is a
+# BENTOO-DIVERGENCE: SLOT - ::gentoo's usable podofo is 0/2 (PoDoFo 0.10.x).
+# It added 1.1.2 as SLOT 0/4 on 2026-10-20 but masks >=app-text/podofo-1
+# (bug #984580: it breaks a major reverse dependency), which is exactly the
+# clash this private slot avoids. Revisit once that mask is lifted. The 1.x API is a
 # hard source break: PdfErrorCode::Flate became FlateError,
 # PdfOutlineItem::CreateChild() lost an argument, page appending moved to
 # PdfPageCollection::AppendDocumentPages(), and PdfMemDocument grew
@@ -79,9 +82,13 @@ BDEPEND="
 	test? ( fontconfig? ( media-fonts/liberation-fonts ) )
 "
 
-# BENTOO-DIVERGENCE: PATCHES - none, where ::gentoo backports
-# podofo-0.10.3-libcxx-20-from_chars.patch. That commit
-# (aa9267229b40b49e5927f286841be4cbe81d05d5) is already in the 1.x line.
+# BENTOO-DIVERGENCE: PATCHES - ::gentoo's test-output patch only, without its
+# podofo-1.1.2-fmt-uint128.patch: that one fixes the bundled fmt's fallback
+# uint128, used only on targets with no native __int128, which amd64 and arm64
+# both have.
+PATCHES=(
+	"${FILESDIR}"/${P}-test-output.patch
+)
 
 src_prepare() {
 	cmake_src_prepare
@@ -115,4 +122,26 @@ src_configure() {
 	)
 
 	cmake_src_configure
+}
+
+src_test() {
+	local CMAKE_SKIP_TESTS=(
+		# TestSaveOnSigning loads ReferenceImage.png for the signature appearance.
+		$(usev !png '^TestImage3$ ^TestSaveOnSigning$')
+		$(usev !jpeg '^TestImage(2|4|5)$')
+		$(usev !tiff '^TestImage(7|8)$')
+	)
+
+	if ! use fontconfig; then
+		# These tests search for system fonts by name.
+		CMAKE_SKIP_TESTS+=(
+			'^TestLoadEncrypedFilePdfMemDocument$'
+			'^TestLoadEncrypedFilePdfParser$'
+			'^TestCreateDelete$'
+			'^TestDrawTextMultipleTimes$'
+			'^TestEmbedFont$'
+		)
+	fi
+
+	cmake_src_test
 }

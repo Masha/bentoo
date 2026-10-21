@@ -9943,6 +9943,8 @@ which is why this entry carried no revision until 2026-07-26.
 # END
 
 ["sci-ml/ollama"]
+enabled = false
+disabled_by = "removed 2026-10-21 (ninth removal): ::gentoo ships 0.40.7 with the correct LLAMA_CPP_tag; ours carried a stale one -- see comments"
 url ="https://api.github.com/repos/ollama/ollama/releases/latest"
 parser = "json"
 path = "tag_name"
@@ -10093,6 +10095,14 @@ LLAMA_CPP_tag is invisible to the sweep. Diff it by hand if it ever returns.
 ::gentoo; ::gentoo added the same 0.40.6 in 917bc6ea9a, ebuild, files/ and
 Manifest identical to this copy, so the overlay copy only shadowed theirs.
 sci-ml/ollama-bin stays.
+
+2026-10-21, ninth removal. 798f2719a re-enabled this record and added
+0.40.6-r1 plus 0.40.7, both broken: 0.40.6-r1 was a copy of 0.40.7 with no
+DIST line for 0.40.6 in the Manifest (unfetchable), and 0.40.7 kept
+LLAMA_CPP_tag=b11669 -- the stale-tag defect of the seventh removal again --
+while ::gentoo's 0.40.7 pins b11738. ::gentoo already ships 0.40.7, so the
+overlay copy only shadowed a better one. If this record comes back to life
+without a reason written here, it is the --revive bug, not a decision.
 """
 # END
 
@@ -11653,6 +11663,8 @@ it must be DROPPED, not forced, once a release carries the fix).
 # END
 
 ["www-client/opera"]
+enabled = false
+disabled_by = "removed 2026-10-21: ::gentoo's 138.0.6044.24 is byte-identical, CHROMIUM_VERSION=153 included -- see comments"
 url = "https://deb.opera.com/opera-stable/dists/stable/non-free/binary-amd64/Packages"
 parser = "regex"
 pattern = 'Package: opera-stable\nVersion: ([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)'
@@ -11706,6 +11718,10 @@ the CDN can mean "skipped", not "not yet". .63 is a verbatim copy of ::gentoo's
 .39 ebuild: the .deb sha256 matches its .sha256sum, the binary still embeds
 Chrome/153.0.8010.55 and libffmpeg.so still reports N-127365-gd4e8713cee, so
 CHROMIUM_VERSION=153 holds, and ::gentoo ships ffmpeg-chromium-153 itself.
+
+Removed again on 2026-10-21: ::gentoo's opera-138.0.6044.24 is byte-identical
+to ours, CHROMIUM_VERSION=153 included, so the drop condition above is met.
+Revive only if the stable channel's Chromium moves past ::gentoo's pin again.
 """
 # END
 

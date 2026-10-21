@@ -1923,8 +1923,15 @@ filesdir_refs() {
 			# After the variable substitutions, so {50-${PN},...} has
 			# already become {50-openoffice-bin,...} by the time it splits.
 			FILESDIR_REFS+="$(expand_braces "${expr}") "
+		# A $(...) AFTER ${FILESDIR}/ is read as one unit, then globbed like
+		# an unknown ${VAR}: left to the plain character class, its space
+		# and ")" end the match early -- "$(ver_cut 1-2)-${p}" came out as
+		# "$(ver_cut" (A32). Only after the prefix: a reference sitting INSIDE
+		# one, as in $(cat "${FILESDIR}/condarc.user"), must still be read
+		# (A33). Non-nested forms only, which is every one in the tree.
 		done < <(grep -v '^[[:space:]]*#' "${eb}" 2>/dev/null |
-			grep -hoE '\$\{FILESDIR\}"?/[^[:space:])"'"'"';]+' |
+			grep -hoE '\$\{FILESDIR\}"?/(\$\([^()]*\)|[^[:space:])"'"'"';])+' |
+			sed -E 's/\$\([^()]*\)/*/g' |
 			sed -E 's|^\$\{FILESDIR\}"?/||')
 
 		# readme.gentoo-r1.eclass reads the file out of FILESDIR itself and
@@ -5374,6 +5381,39 @@ self_test_assertions() {
 		"$(split_by_reference '39_memtest86+-r3 39_memtest866-r3 a(1).sh x$y.conf foo-1.2.patch' \
 			'39_memtest86+-r3 a(1).sh x$y.conf foo-*.patch'
 			printf 'ref=%s orphan=%s' "${SPLIT_REFERENCED}" "${SPLIT_ORPHAN}")"
+
+	# A command substitution inside a ${FILESDIR} path is a wildcard, like an
+	# unknown ${VAR}. sys-kernel/bentoo-kernel-7.3.0 applies
+	# "${FILESDIR}/$(ver_cut 1-2)-${p}": the reader used to stop at the space
+	# and yield the pattern "$(ver_cut", so the sweep reported a [missing]
+	# reference that DIES at install and an orphan patch -- both false, and the
+	# pair turned a clean sweep red. The decoy pins that the pattern is not
+	# simply "*": an unrelated file with no dash must stay unreferenced.
+	assert_eq A32 \
+		'a $(...) inside a ${FILESDIR} path globs, it does not cut the reference' \
+		'refs=*-* ref=7.3-0002-fix.patch orphan=config' \
+		"$(mkdir -p -- "${scratch}/a32/cat/pkg" &&
+			printf '%s\n' 'EAPI=8' \
+				'src_prepare() { eapply "${FILESDIR}/$(ver_cut 1-2)-${p}"; }' \
+				>"${scratch}/a32/cat/pkg/pkg-7.3.0.ebuild" &&
+			filesdir_refs "${scratch}/a32" cat/pkg &&
+			split_by_reference '7.3-0002-fix.patch config' "${FILESDIR_REFS}" &&
+			printf 'refs=%s ref=%s orphan=%s' "${FILESDIR_REFS}" \
+				"${SPLIT_REFERENCED}" "${SPLIT_ORPHAN}")"
+
+	# The opposite shape, from dev-python/conda: the reference sits INSIDE a
+	# command substitution. A first fix for A32 globbed every $(...) before
+	# reading, which swallowed ${FILESDIR} with it and reported conda's three
+	# condarc.* files as orphans -- files the build needs.
+	assert_eq A33 \
+		'a ${FILESDIR} reference inside $(...) is still read' \
+		'refs=condarc.user' \
+		"$(mkdir -p -- "${scratch}/a33/cat/pkg" &&
+			printf '%s\n' 'EAPI=8' \
+				'src_install() { echo "$(cat "${FILESDIR}/condarc.user")" >x || die; }' \
+				>"${scratch}/a33/cat/pkg/pkg-1.0.ebuild" &&
+			filesdir_refs "${scratch}/a33" cat/pkg &&
+			printf 'refs=%s' "${FILESDIR_REFS}")"
 
 	rm -rf -- "${scratch}"
 }

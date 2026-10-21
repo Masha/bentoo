@@ -124,6 +124,12 @@ PATCHES+=(
 	"${FILESDIR}"/${PN}-6.11.1-musl-missing-includes.patch
 	"${FILESDIR}"/${PN}-6.11.1-musl-arm64-mte.patch
 	"${FILESDIR}"/${PN}-6.11.2-libcxx23.patch
+	# BENTOO-DIVERGENCE: PATCHES - of ::gentoo's two 6.11.2-r1 extras, only
+	# the CVE one. Its cert blocklist update is only in Chromium >=158 and
+	# the 6.140.0-rc chromium submodule (39352427a3) lacks it; the patch
+	# applies to that file as-is. QTBUG-149946 is left out because its own
+	# header says it is fixed in 6.140.0.
+	"${FILESDIR}"/${PN}-6.11.2-CVE-2026-111943.patch
 )
 
 python_check_deps() {
