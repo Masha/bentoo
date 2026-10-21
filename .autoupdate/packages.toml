@@ -14145,14 +14145,14 @@ neither fails the build when stale.
 hold = true
 url = "https://api.github.com/repos/CachyOS/linux/releases?per_page=20"
 parser = "regex"
-pattern = '"tag_name":\s*"cachyos-(7\.2\.[0-9]+)-[0-9]+"'
+pattern = '"tag_name":\s*"cachyos-(7\.3\.[0-9]+)-[0-9]+"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
 aux_var = "CACHY_REL"
-aux_pattern = '"tag_name":\s*"cachyos-7\.2\.[0-9]+-([0-9]+)"'
-version = "7.2.11"
+aux_pattern = '"tag_name":\s*"cachyos-7\.3\.[0-9]+-([0-9]+)"'
+version = "7.3.0"
 comments = """
 bentoo-kernel — CachyOS's signed source releases (tags cachyos-<kernel>-<N>).
-The pattern pins the 7.2 series and skips -rc tags; the first match is the
+The pattern pins the 7.3 series and skips -rc tags; the first match is the
 newest release, and CACHY_REL is its respin counter (a respin of the same
 kernel is a revbump, never a PV change: virtual/dist-kernel matches by PV).
 
@@ -14168,10 +14168,12 @@ hold is on because a bump is never PV-only. Each one needs, by hand:
     the SAME PVR as ::gentoo's (a revbump changes the subslot and rebuilds
     every out-of-tree module for every user).
   - sys-kernel/bentoo-kernel-bin rebuilt from the new ebuild (see its record).
-A new series (7.3) also means: this pattern and the -bin one; PATCHSET,
+A new series (7.4) also means: this pattern and the -bin one; PATCHSET,
 CONFIG_VER and GENTOO_CONFIG_P from the new gentoo-kernel; the BORE path
 <series>/sched/ in kernel-patches (may lag CachyOS's first release of the
-series); every INTEL_PATCHES entry; and a virtual/dist-kernel copy per PV.
+series); every INTEL_PATCHES entry (one that no longer applies goes rebased
+to files/<series>-<name> and into INTEL_PATCHES_REBASED, in both ebuilds);
+and a virtual/dist-kernel copy per PV.
 """
 # END
 
@@ -14179,11 +14181,11 @@ series); every INTEL_PATCHES entry; and a virtual/dist-kernel copy per PV.
 hold = true
 url = "https://api.github.com/repos/CachyOS/linux/releases?per_page=20"
 parser = "regex"
-pattern = '"tag_name":\s*"cachyos-(7\.2\.[0-9]+)-[0-9]+"'
+pattern = '"tag_name":\s*"cachyos-(7\.3\.[0-9]+)-[0-9]+"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
 aux_var = "CACHY_REL"
-aux_pattern = '"tag_name":\s*"cachyos-7\.2\.[0-9]+-([0-9]+)"'
-version = "7.2.11"
+aux_pattern = '"tag_name":\s*"cachyos-7\.3\.[0-9]+-([0-9]+)"'
+version = "7.3.0"
 comments = """
 bentoo-kernel-bin -- the binary of sys-kernel/bentoo-kernel, same upstream
 probe. Its gpkg is OURS, built by scripts/build-bentoo-kernel-bin.sh and
