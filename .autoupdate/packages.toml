@@ -14240,7 +14240,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "0.9.0"
+version = "0.10.1"
 comments = """
 PdfCraft (ArtCraft "Craft App Suite") — GitHub releases, tagged "vX.Y.Z"; same
 shape as media-gfx/photocraft-bin, whose record explains the -bin choice.
@@ -14256,7 +14256,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "0.9.0"
+version = "0.10.0"
 comments = """
 FilmCraft (ArtCraft "Craft App Suite") — GitHub releases, tagged "vX.Y.Z"; same
 shape as media-gfx/photocraft-bin, whose record explains the -bin choice.
@@ -14272,7 +14272,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "0.13.1"
+version = "0.14.0"
 comments = """
 VectorCraft (ArtCraft "Craft App Suite") — GitHub releases, tagged "vX.Y.Z"; same
 shape as media-gfx/photocraft-bin, whose record explains the -bin choice.
@@ -14288,7 +14288,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "0.9.1"
+version = "0.10.0"
 comments = """
 LightCraft (ArtCraft "Craft App Suite") — GitHub releases, tagged "vX.Y.Z"; same
 shape as media-gfx/photocraft-bin, whose record explains the -bin choice.
@@ -14320,7 +14320,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "0.11.1"
+version = "0.13.0"
 comments = """
 EffectCraft (ArtCraft "Craft App Suite") — GitHub releases, tagged "vX.Y.Z"; same
 shape as media-gfx/photocraft-bin, whose record explains the -bin choice.
@@ -14352,7 +14352,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "0.8.0"
+version = "0.10.0"
 comments = """
 CADCraft (ArtCraft "Craft App Suite") — GitHub releases, tagged "vX.Y.Z"; same
 shape as media-gfx/photocraft-bin, whose record explains the -bin choice.
@@ -14368,7 +14368,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "0.8.0"
+version = "0.9.0"
 comments = """
 DeckCraft (ArtCraft "Craft App Suite") — GitHub releases, tagged "vX.Y.Z"; same
 shape as media-gfx/photocraft-bin, whose record explains the -bin choice.
@@ -14400,9 +14400,25 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "0.8.0"
+version = "0.9.0"
 comments = """
 WordCraft (ArtCraft "Craft App Suite") — GitHub releases, tagged "vX.Y.Z"; same
+shape as media-gfx/photocraft-bin, whose record explains the -bin choice.
+
+A bump is PV plus one DIST, but LICENSE carries a crate-license survey pinned to
+the version (see the ebuild comment): redo it on every bump.
+"""
+# END
+
+["media-gfx/figcraft-bin"]
+url = "https://api.github.com/repos/storytold/figcraft/releases/latest"
+parser = "json"
+path = "tag_name"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+type = "bin"
+version = "0.8.0"
+comments = """
+FigCraft (ArtCraft "Craft App Suite") — GitHub releases, tagged "vX.Y.Z"; same
 shape as media-gfx/photocraft-bin, whose record explains the -bin choice.
 
 A bump is PV plus one DIST, but LICENSE carries a crate-license survey pinned to

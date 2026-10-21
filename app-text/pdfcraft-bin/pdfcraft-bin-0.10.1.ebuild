@@ -8,33 +8,34 @@ inherit optfeature xdg
 MY_PN="${PN%-bin}"
 MY_P="${MY_PN}-${PV}"
 
-DESCRIPTION="Clean-room PowerPoint-style presentation application (binary package)"
-HOMEPAGE="https://github.com/storytold/deckcraft"
+DESCRIPTION="Clean-room Acrobat-style PDF editor (binary package)"
+HOMEPAGE="https://github.com/storytold/pdfcraft"
 SRC_URI="https://github.com/storytold/${MY_PN}/releases/download/v${PV}/${MY_P}-linux-x86_64.tar.gz"
 S="${WORKDIR}/${MY_P}-linux-x86_64"
 
 # Fonts compiled into the binary: egui's defaults (Ubuntu Light, Hack, Noto
 # Emoji) and the suite's own OFL families.
-LICENSE="|| ( Apache-2.0 MIT ) BitstreamVera OFL-1.1 UbuntuFontLicense-1.0"
-# Dependent crate licenses, surveyed for 0.5.0 with `cargo tree -e normal
+# Also bundled: the ocrs text detection/recognition models in
+# /usr/share/pdfcraft/models (CC-BY-SA-4.0), PDFium's standard-14 fonts and
+# Adobe's CMaps (BSD) and two CC0-1.0 colour profiles.
+LICENSE="|| ( Apache-2.0 MIT ) BitstreamVera OFL-1.1 UbuntuFontLicense-1.0 BSD CC-BY-SA-4.0 CC0-1.0"
+# Dependent crate licenses, surveyed for 0.10.1 with `cargo tree -e normal
 # --target x86_64-unknown-linux-gnu --format {l}` over the two shipped
 # binaries. Only licenses that are not an "OR" alternative to one already
 # listed are named. Redo the survey on every bump: the version moves, this
 # list does not.
-LICENSE+=" Apache-2.0 BSD BSD-2 ISC MIT MPL-2.0 OFL-1.1 UbuntuFontLicense-1.0 Unicode-3.0 ZLIB"
+LICENSE+=" Apache-2.0 BSD BSD-2 ISC MIT OFL-1.1 UbuntuFontLicense-1.0 Unicode-3.0 ZLIB"
 SLOT="0"
 KEYWORDS="-* ~amd64"
 RESTRICT="strip"
 
-# The GUI binary also links libasound, hence alsa-lib.
-# Both binaries otherwise link only glibc; everything below is dlopen()ed at
+# Both binaries link only glibc; everything below is dlopen()ed at
 # runtime (winit, wgpu, rfd), so no tool would derive it. Measured with
-# LD_DEBUG=files on 0.5.0, on both the X11 and the Wayland backend; wgpu
+# LD_DEBUG=files on 0.6.0, on both the X11 and the Wayland backend; wgpu
 # tries Vulkan first and falls back to EGL.
 RDEPEND="
-	media-libs/alsa-lib
 	dev-libs/wayland
-	media-libs/libglvnd
+	media-libs/libglvnd[X]
 	media-libs/vulkan-loader
 	sys-apps/dbus
 	x11-libs/libX11
@@ -48,7 +49,7 @@ QA_PREBUILT="usr/bin/${MY_PN} usr/bin/${MY_PN}-cli"
 
 src_install() {
 	dobin bin/${MY_PN} bin/${MY_PN}-cli
-	dodoc share/doc/${MY_PN}/README.md
+	dodoc share/doc/${MY_PN}/{README.md,NOTICE}
 
 	# The doc tree went through dodoc; the icons' provenance sidecars would
 	# otherwise land inside the hicolor theme.

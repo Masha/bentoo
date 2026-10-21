@@ -8,22 +8,20 @@ inherit optfeature xdg
 MY_PN="${PN%-bin}"
 MY_P="${MY_PN}-${PV}"
 
-DESCRIPTION="Clean-room Word-style word processor (binary package)"
-HOMEPAGE="https://github.com/storytold/wordcraft"
+DESCRIPTION="Clean-room AutoCAD-style 2D drafting application (binary package)"
+HOMEPAGE="https://github.com/storytold/cadcraft"
 SRC_URI="https://github.com/storytold/${MY_PN}/releases/download/v${PV}/${MY_P}-linux-x86_64.tar.gz"
 S="${WORKDIR}/${MY_P}-linux-x86_64"
 
 # Fonts compiled into the binary: egui's defaults (Ubuntu Light, Hack, Noto
 # Emoji) and the suite's own OFL families.
-# Also bundled: English hyphenation data derived from the public-domain Moby
-# Hyphenator II list, released as CC0-1.0.
-LICENSE="|| ( Apache-2.0 MIT ) BitstreamVera OFL-1.1 UbuntuFontLicense-1.0 CC0-1.0 public-domain"
-# Dependent crate licenses, surveyed for 0.5.0 with `cargo tree -e normal
+LICENSE="|| ( Apache-2.0 MIT ) BitstreamVera OFL-1.1 UbuntuFontLicense-1.0"
+# Dependent crate licenses, surveyed for 0.10.0 with `cargo tree -e normal
 # --target x86_64-unknown-linux-gnu --format {l}` over the two shipped
 # binaries. Only licenses that are not an "OR" alternative to one already
 # listed are named. Redo the survey on every bump: the version moves, this
 # list does not.
-LICENSE+=" Apache-2.0 BSD BSD-2 ISC MIT OFL-1.1 UbuntuFontLicense-1.0 Unicode-3.0 ZLIB"
+LICENSE+=" Apache-2.0 BSD BSD-2 ISC MIT MPL-2.0 OFL-1.1 UbuntuFontLicense-1.0 Unicode-3.0 ZLIB"
 SLOT="0"
 KEYWORDS="-* ~amd64"
 RESTRICT="strip"

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@proton.me</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<longdescription>
+		FigCraft is an interface design and prototyping tool: frames with auto
+		layout, components with variants and overrides, vector networks,
+		styles and variables with modes, and prototypes with interactions and
+		a presentation view. Documents are .figcraft archives; it exports PNG,
+		JPG, WebP, SVG and PDF, and opens .fig files on a best-effort basis.
+		It ships a headless figcraft-cli for rendering, export, scripted
+		commands and an MCP server. This is the upstream prebuilt x86_64
+		release; it renders through Vulkan, or OpenGL/EGL where Vulkan is
+		missing.
+	</longdescription>
+	<upstream>
+		<bugs-to>https://github.com/storytold/figcraft/issues</bugs-to>
+		<remote-id type="github">storytold/figcraft</remote-id>
+	</upstream>
+</pkgmetadata>

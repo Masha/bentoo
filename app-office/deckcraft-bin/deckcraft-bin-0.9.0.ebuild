@@ -8,15 +8,15 @@ inherit optfeature xdg
 MY_PN="${PN%-bin}"
 MY_P="${MY_PN}-${PV}"
 
-DESCRIPTION="Motion graphics and visual effects compositor (binary package)"
-HOMEPAGE="https://github.com/storytold/effectcraft"
+DESCRIPTION="Clean-room PowerPoint-style presentation application (binary package)"
+HOMEPAGE="https://github.com/storytold/deckcraft"
 SRC_URI="https://github.com/storytold/${MY_PN}/releases/download/v${PV}/${MY_P}-linux-x86_64.tar.gz"
 S="${WORKDIR}/${MY_P}-linux-x86_64"
 
 # Fonts compiled into the binary: egui's defaults (Ubuntu Light, Hack, Noto
 # Emoji) and the suite's own OFL families.
 LICENSE="|| ( Apache-2.0 MIT ) BitstreamVera OFL-1.1 UbuntuFontLicense-1.0"
-# Dependent crate licenses, surveyed for 0.8.0 with `cargo tree -e normal
+# Dependent crate licenses, surveyed for 0.9.0 with `cargo tree -e normal
 # --target x86_64-unknown-linux-gnu --format {l}` over the two shipped
 # binaries. Only licenses that are not an "OR" alternative to one already
 # listed are named. Redo the survey on every bump: the version moves, this
@@ -29,7 +29,7 @@ RESTRICT="strip"
 # The GUI binary also links libasound, hence alsa-lib.
 # Both binaries otherwise link only glibc; everything below is dlopen()ed at
 # runtime (winit, wgpu, rfd), so no tool would derive it. Measured with
-# LD_DEBUG=files on 0.8.0, on both the X11 and the Wayland backend; wgpu
+# LD_DEBUG=files on 0.5.0, on both the X11 and the Wayland backend; wgpu
 # tries Vulkan first and falls back to EGL.
 RDEPEND="
 	media-libs/alsa-lib

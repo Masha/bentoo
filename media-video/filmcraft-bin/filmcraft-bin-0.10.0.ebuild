@@ -16,7 +16,7 @@ S="${WORKDIR}/${MY_P}-linux-x86_64"
 # Fonts compiled into the binary: egui's defaults (Ubuntu Light, Hack, Noto
 # Emoji) and the suite's own OFL families.
 LICENSE="|| ( Apache-2.0 MIT ) BitstreamVera OFL-1.1 UbuntuFontLicense-1.0"
-# Dependent crate licenses, surveyed for 0.6.0 with `cargo tree -e normal
+# Dependent crate licenses, surveyed for 0.10.0 with `cargo tree -e normal
 # --target x86_64-unknown-linux-gnu --format {l}` over the two shipped
 # binaries. Only licenses that are not an "OR" alternative to one already
 # listed are named. Redo the survey on every bump: the version moves, this
