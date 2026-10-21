@@ -80,10 +80,10 @@ changes.
 ---
 
 diff --git a/assets/keymaps/default-linux.json b/assets/keymaps/default-linux.json
-index 6e137b4..b5d3da9 100644
+index edd830c..691c9d1 100644
 --- a/assets/keymaps/default-linux.json
 +++ b/assets/keymaps/default-linux.json
-@@ -965,6 +965,12 @@
+@@ -986,6 +986,12 @@
        "ctrl-enter": "project_search::SearchInNew",
      },
    },
@@ -97,10 +97,10 @@ index 6e137b4..b5d3da9 100644
      "context": "OutlinePanel && not_editing",
      "bindings": {
 diff --git a/assets/keymaps/default-macos.json b/assets/keymaps/default-macos.json
-index a281490..24560ae 100644
+index 52d58f0..dc27e53 100644
 --- a/assets/keymaps/default-macos.json
 +++ b/assets/keymaps/default-macos.json
-@@ -1021,6 +1021,12 @@
+@@ -1042,6 +1042,12 @@
        "cmd-enter": "project_search::SearchInNew",
      },
    },

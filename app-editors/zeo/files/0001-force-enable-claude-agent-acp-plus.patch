@@ -70,8 +70,9 @@ HOW TO RE-CHECK THIS HEADER, IN ONE COMMAND
 
     rg -n 'AcpBetaFeatureFlag' crates/
 
-At this pin that yields exactly two non-test call sites, the two above
-(agent_servers/src/acp.rs:1887 and acp_thread/src/acp_thread.rs:3867), plus the
+At 92447a17 that yields exactly two non-test call sites:
+acp_thread/src/acp_thread.rs:6948 (the per-turn token count, item 1) and
+agent_servers/src/acp.rs:131 (the protocol choice, below), plus the
 declaration, two imports, and `cx.update_flags(..)` helpers inside `#[cfg(test)]`
 blocks. If that set changes, rewrite this header. If it empties out, or if every
 remaining site gains an unconditional fallback, drop the patch from `PATCHES` in
@@ -107,8 +108,60 @@ Refreshed onto 96984225 (0.4.0_p20261010): upstream stopped forcing acp-beta
 routing test, and no longer gates terminal auth on the flag, so the two test
 adaptations this patch carried are gone. What remains is the flag itself:
 upstream still reads it in acp_thread for the per-turn token count.
+
+Refreshed onto 92447a17 (0.6.1_p20261021): the flag now also picks the
+protocol. Upstream fae8a35482 moved `connect` into agent_servers/src/acp.rs,
+and with acp-beta on every ACP connection tries ACP v2 first and falls back to
+v1 only when the agent refuses the version. Forcing the flag therefore makes
+Zeo speak v2 to any agent that offers it. Claude Agent (Plus) answers protocol
+1, so each Plus connection starts the adapter twice: the v2 attempt is
+spawned, refused and dropped, and v1 spawns a fresh process -- a second
+adapter process, and its startup time, per connection. 0057 makes both
+attempts start a jailed command the same way. The selection tests' flag-off
+rows cannot be set up while the flag is forced, so the hunks below drop them
+and say so.
 ---
 
+diff --git a/crates/agent_servers/src/acp.rs b/crates/agent_servers/src/acp.rs
+index fc8c7ad..720d4d7 100644
+--- a/crates/agent_servers/src/acp.rs
++++ b/crates/agent_servers/src/acp.rs
+@@ -1016,7 +1016,9 @@ mod selection_tests {
+                     .insert("acp-beta".into(), if enabled { "on" } else { "off" }.into());
+             });
+         });
+-        assert_eq!(cx.has_flag::<AcpBetaFeatureFlag>(), enabled);
++        // Zeo forces acp-beta on (0001): `enabled_for_all` wins over the override above, so
++        // turning it off is a no-op and the flag reads on either way.
++        assert!(cx.has_flag::<AcpBetaFeatureFlag>());
+     }
+ 
+     #[gpui::test]
+@@ -1034,8 +1036,9 @@ mod selection_tests {
+         let project = Project::example([directory.path()], &mut cx.to_async()).await;
+         let v1 = r#""result":{"protocolVersion":1,"agentCapabilities":{},"agentInfo":{"name":"selected-v1","version":"1"}}"#;
+         let v2 = r#""result":{"protocolVersion":2,"info":{"name":"selected-v2","version":"1"},"capabilities":{"session":{}}}"#;
++        // Zeo forces acp-beta on (0001), so the flag-off row upstream starts with cannot be
++        // set up here: `enabled_for_all` wins over the settings override.
+         for (beta, response, exit_after_response, expected, requests) in [
+-            (false, v2, false, Some(false), "1"),
+             (true, v2, false, Some(true), "2"),
+             (true, v1, false, Some(false), "2 1"),
+             (
+@@ -1263,11 +1266,8 @@ done
+         let config = directory.path().join("claude-config");
+         std::fs::create_dir(&config).expect("isolated Claude configuration");
+         let project = Project::example([directory.path()], &mut cx.to_async()).await;
+-        for (beta, adapter_v2, expected_v2) in [
+-            (false, true, false),
+-            (true, true, true),
+-            (true, false, false),
+-        ] {
++        // Zeo forces acp-beta on (0001): the flag-off row cannot be set up here.
++        for (beta, adapter_v2, expected_v2) in [(true, true, true), (true, false, false)] {
+             cx.update(|cx| set_beta(beta, cx));
+             let command = AgentServerCommand {
+                 path: "npx".into(),
 diff --git a/crates/feature_flags/src/flags.rs b/crates/feature_flags/src/flags.rs
 index 6a10534..3375676 100644
 --- a/crates/feature_flags/src/flags.rs

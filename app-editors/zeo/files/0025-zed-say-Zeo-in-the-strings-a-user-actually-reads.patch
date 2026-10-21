@@ -196,7 +196,7 @@ index 2a0949a..98e4fde 100644
                                              window.dispatch_action(Box::new(OpenLog), cx);
                                              cx.emit(DismissEvent);
 diff --git a/crates/settings_ui/src/settings_ui.rs b/crates/settings_ui/src/settings_ui.rs
-index 857a0ce..627c367 100644
+index f2eef11..e3baa37 100644
 --- a/crates/settings_ui/src/settings_ui.rs
 +++ b/crates/settings_ui/src/settings_ui.rs
 @@ -894,7 +894,7 @@ fn open_settings_editor_with(
@@ -320,10 +320,10 @@ index 9c17f49..c2c3411 100644
              .tooltip(version)
              .disabled(true)
 diff --git a/crates/util/src/util.rs b/crates/util/src/util.rs
-index f0d61b3..94a1564 100644
+index df08f04..121c9ff 100644
 --- a/crates/util/src/util.rs
 +++ b/crates/util/src/util.rs
-@@ -228,8 +228,8 @@ pub fn prevent_root_execution() {
+@@ -227,8 +227,8 @@ pub fn prevent_root_execution() {
      if is_root && !allow_root {
          eprintln!(
              "\
@@ -407,7 +407,7 @@ index 2ae5f82..3718383 100644
      }
  
 diff --git a/crates/zed/src/zed.rs b/crates/zed/src/zed.rs
-index b2c47d9..601537b 100644
+index c80b1f9..734d916 100644
 --- a/crates/zed/src/zed.rs
 +++ b/crates/zed/src/zed.rs
 @@ -1719,7 +1719,7 @@ fn open_about_window(cx: &mut App) {

@@ -49,10 +49,10 @@ Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>
 ---
 
 diff --git a/crates/acp_thread/src/connection.rs b/crates/acp_thread/src/connection.rs
-index 9ede73f..f87f5ba 100644
+index 2c13590..9ffd842 100644
 --- a/crates/acp_thread/src/connection.rs
 +++ b/crates/acp_thread/src/connection.rs
-@@ -639,11 +639,27 @@ pub trait AgentModelSelector: 'static {
+@@ -644,11 +644,27 @@ pub trait AgentModelSelector: 'static {
      ///
      /// # Parameters
      /// - `model_id`: The model to select (should be one from [list_models]).
@@ -81,7 +81,7 @@ index 9ede73f..f87f5ba 100644
  
      /// Retrieves the currently selected model for a specific session (thread).
      ///
-@@ -1579,7 +1595,12 @@ mod test_support {
+@@ -1628,7 +1644,12 @@ mod test_support {
              Task::ready(Ok(AgentModelList::Flat(vec![model])))
          }
  
@@ -96,7 +96,7 @@ index 9ede73f..f87f5ba 100644
              Task::ready(Ok(()))
          }
 diff --git a/crates/agent/src/agent.rs b/crates/agent/src/agent.rs
-index 3c881d1..8a080fb 100644
+index 8e2a0cc..2d297d1 100644
 --- a/crates/agent/src/agent.rs
 +++ b/crates/agent/src/agent.rs
 @@ -3096,7 +3096,12 @@ impl acp_thread::AgentModelSelector for NativeAgentModelSelector {
@@ -407,10 +407,10 @@ index 3c881d1..8a080fb 100644
          thread.read_with(cx, |thread, _| {
              assert_eq!(thread.model().unwrap().id().0.as_ref(), "other-model-id");
 diff --git a/crates/agent_ui/src/agent_ui.rs b/crates/agent_ui/src/agent_ui.rs
-index ab42feb..2d6ff76 100644
+index ed99247..6260489 100644
 --- a/crates/agent_ui/src/agent_ui.rs
 +++ b/crates/agent_ui/src/agent_ui.rs
-@@ -24,6 +24,7 @@ mod mode_selector;
+@@ -25,6 +25,7 @@ mod model_search;
  mod model_selector;
  mod model_selector_popover;
  mod profile_selector;
@@ -419,39 +419,50 @@ index ab42feb..2d6ff76 100644
  mod terminal_inline_assistant;
  pub mod terminal_thread_metadata_store;
 diff --git a/crates/agent_ui/src/config_options.rs b/crates/agent_ui/src/config_options.rs
-index fe98bdf..320ceb9 100644
+index 3c36517..1d0baae 100644
 --- a/crates/agent_ui/src/config_options.rs
 +++ b/crates/agent_ui/src/config_options.rs
-@@ -22,6 +22,9 @@ use unicode_segmentation::UnicodeSegmentation;
- use util::ResultExt as _;
+@@ -22,6 +22,9 @@ use util::ResultExt as _;
  use zed_actions::agent::ToggleModelSelector;
  
+ use crate::model_search;
 +use crate::set_as_default::{
 +    SET_AS_DEFAULT_HINT, default_hint_footer, default_marker, persists_default,
 +};
  use crate::ui::documentation_aside_side;
  use crate::{
      CycleFavoriteModels, CycleModeSelector, CycleThinkingEffort, ToggleProfileSelector,
-@@ -107,15 +110,10 @@ impl ConfigOptionsView {
+@@ -107,15 +110,20 @@ impl ConfigOptionsView {
          let Some(next_value) = self.next_value_for_config(&config_id, favorites_only, cx) else {
              return false;
          };
--        let default_value = setting_value_for_config_option_value(&next_value);
--
--        self.agent_server.set_default_config_option(
--            config_id.0.as_ref(),
--            default_value,
+-        set_config_option_and_default(
+-            self.config_options.clone(),
+-            self.agent_server.clone(),
+-            config_id,
+-            next_value,
 -            self.fs.clone(),
 -            cx,
--        );
- 
+-        )
+-        .detach_and_log_err(cx);
++
 +        // Cycling is a thread-local gesture like every other one: it moves the
 +        // thread in front of you and leaves the default alone. Persisting is
 +        // reached through the menu, with Shift held.
-         let task = self
-             .config_options
-             .set_config_option(config_id, next_value, cx);
-@@ -594,6 +592,14 @@ impl Render for ConfigOptionSelector {
++        let task = self
++            .config_options
++            .set_config_option(config_id, next_value, cx);
++
++        cx.spawn(async move |_, _| {
++            if let Err(err) = task.await {
++                log::error!("Failed to set config option: {:?}", err);
++            }
++        })
++        .detach();
+ 
+         true
+     }
+@@ -584,6 +592,14 @@ impl Render for ConfigOptionSelector {
                                  .color(Color::Muted),
                          );
                      }
@@ -466,7 +477,7 @@ index fe98bdf..320ceb9 100644
                      content.into_any()
                  });
  
-@@ -624,7 +630,7 @@ impl Render for ConfigOptionSelector {
+@@ -614,7 +630,7 @@ impl Render for ConfigOptionSelector {
                          .label_size(LabelSize::Small)
                          .label_color(Color::Muted)
                          .disabled(self.setting_value)
@@ -475,28 +486,41 @@ index fe98bdf..320ceb9 100644
                              if !config_options.config_options().iter().any(|option| {
                                  option.config_id == config_id
                                      && matches!(&option.kind, acp::SessionConfigKind::Boolean(_))
-@@ -633,12 +639,14 @@ impl Render for ConfigOptionSelector {
+@@ -623,15 +639,24 @@ impl Render for ConfigOptionSelector {
                              }
  
                              let next_value = matches!(state, ToggleState::Selected);
--                            agent_server.set_default_config_option(
--                                config_id.0.as_ref(),
--                                Some(AgentConfigOptionValue::Boolean(next_value)),
+-                            set_config_option_and_default(
+-                                config_options.clone(),
+-                                agent_server.clone(),
+-                                config_id.clone(),
+-                                acp::SessionConfigOptionValue::boolean(next_value),
 -                                fs.clone(),
 -                                cx,
--                            );
+-                            )
+-                            .detach_and_log_err(cx);
++                            let value = acp::SessionConfigOptionValue::boolean(next_value);
++                            // Shift persists the choice, once the agent accepts it;
++                            // a plain click moves this thread only.
 +                            if persists_default(window) {
-+                                agent_server.set_default_config_option(
-+                                    config_id.0.as_ref(),
-+                                    Some(AgentConfigOptionValue::Boolean(next_value)),
++                                set_config_option_and_default(
++                                    config_options.clone(),
++                                    agent_server.clone(),
++                                    config_id.clone(),
++                                    value,
 +                                    fs.clone(),
 +                                    cx,
-+                                );
++                                )
++                                .detach_and_log_err(cx);
++                            } else {
++                                config_options
++                                    .set_config_option(config_id.clone(), value, cx)
++                                    .detach_and_log_err(cx);
 +                            }
- 
-                             let task = config_options.set_config_option(
-                                 config_id.clone(),
-@@ -823,7 +831,7 @@ impl PickerDelegate for ConfigOptionPickerDelegate {
+                         }),
+                     )
+                     .into_any_element()
+@@ -803,7 +828,7 @@ impl PickerDelegate for ConfigOptionPickerDelegate {
          })
      }
  
@@ -505,28 +529,41 @@ index fe98bdf..320ceb9 100644
          if let Some(ConfigOptionPickerEntry::Option(option)) =
              self.filtered_entries.get(self.selected_index)
          {
-@@ -835,12 +843,14 @@ impl PickerDelegate for ConfigOptionPickerDelegate {
+@@ -815,15 +840,24 @@ impl PickerDelegate for ConfigOptionPickerDelegate {
                  return;
              }
  
--            self.agent_server.set_default_config_option(
--                self.config_id.0.as_ref(),
--                Some(AgentConfigOptionValue::ValueId(option.value.0.to_string())),
+-            set_config_option_and_default(
+-                self.config_options.clone(),
+-                self.agent_server.clone(),
+-                self.config_id.clone(),
+-                acp::SessionConfigOptionValue::id(option.value.clone()),
 -                self.fs.clone(),
 -                cx,
--            );
+-            )
+-            .detach_and_log_err(cx);
++            let value = acp::SessionConfigOptionValue::id(option.value.clone());
++            // Shift persists the choice, once the agent accepts it; a plain
++            // confirm moves this thread only.
 +            if persists_default(window) {
-+                self.agent_server.set_default_config_option(
-+                    self.config_id.0.as_ref(),
-+                    Some(AgentConfigOptionValue::ValueId(option.value.0.to_string())),
++                set_config_option_and_default(
++                    self.config_options.clone(),
++                    self.agent_server.clone(),
++                    self.config_id.clone(),
++                    value,
 +                    self.fs.clone(),
 +                    cx,
-+                );
++                )
++                .detach_and_log_err(cx);
++            } else {
++                self.config_options
++                    .set_config_option(self.config_id.clone(), value, cx)
++                    .detach_and_log_err(cx);
 +            }
-             let task = self.config_options.set_config_option(
-                 self.config_id.clone(),
-                 acp::SessionConfigOptionValue::id(option.value.clone()),
-@@ -889,6 +899,13 @@ impl PickerDelegate for ConfigOptionPickerDelegate {
+ 
+             cx.emit(DismissEvent);
+         }
+@@ -860,6 +894,13 @@ impl PickerDelegate for ConfigOptionPickerDelegate {
                  let current_value = self.current_value();
                  let is_selected = current_value.as_ref() == Some(&option.value);
  
@@ -540,7 +577,7 @@ index fe98bdf..320ceb9 100644
                  let is_favorite = self.favorites.contains(&option.value);
  
                  let option_name = option.name.clone();
-@@ -915,9 +932,22 @@ impl PickerDelegate for ConfigOptionPickerDelegate {
+@@ -886,9 +927,22 @@ impl PickerDelegate for ConfigOptionPickerDelegate {
                                  .spacing(ListItemSpacing::Sparse)
                                  .toggle_state(selected)
                                  .child(h_flex().w_full().child(Label::new(option_name).truncate()))
@@ -566,7 +603,7 @@ index fe98bdf..320ceb9 100644
                                  .end_slot_on_hover(div().pr_1p5().child({
                                      let (icon, color, tooltip) = if is_favorite {
                                          (IconName::StarFilled, Color::Accent, "Unfavorite")
-@@ -980,6 +1010,14 @@ impl PickerDelegate for ConfigOptionPickerDelegate {
+@@ -951,6 +1005,14 @@ impl PickerDelegate for ConfigOptionPickerDelegate {
      fn documentation_aside_index(&self) -> Option<usize> {
          self.selected_description.as_ref().map(|(ix, _)| *ix)
      }
@@ -581,29 +618,98 @@ index fe98bdf..320ceb9 100644
  }
  
  fn extract_options(
-@@ -1052,20 +1090,6 @@ fn shows_manual_mode_badge_for_option(option: &acp::SessionConfigOption) -> bool
-         }
- }
+@@ -1290,8 +1352,11 @@ mod tests {
+         );
+     }
  
--fn setting_value_for_config_option_value(
--    value: &acp::SessionConfigOptionValue,
--) -> Option<AgentConfigOptionValue> {
--    match value {
--        acp::SessionConfigOptionValue::Id { value } => {
--            Some(AgentConfigOptionValue::ValueId(value.0.to_string()))
--        }
--        acp::SessionConfigOptionValue::Boolean { value } => {
--            Some(AgentConfigOptionValue::Boolean(*value))
--        }
--        _ => None,
--    }
--}
--
- fn options_to_picker_entries(
-     options: &[ConfigOptionValue],
-     favorites: &HashSet<acp::SessionConfigValueId>,
-@@ -1188,7 +1212,7 @@ mod tests {
-     use std::{any::Any, cell::RefCell};
++    // Upstream drove this through cycling; cycling never persists here (it is
++    // thread-local), so it drives the Shift-confirm path, which still waits
++    // for the agent's answer before it saves anything.
+     #[gpui::test]
+-    fn config_defaults_wait_for_authoritative_response(cx: &mut TestAppContext) {
++    fn shift_confirm_defaults_wait_for_authoritative_response(cx: &mut TestAppContext) {
+         for boolean in [false, true] {
+             let agent_server = Rc::new(TestAgentServer::default());
+             let offered = if boolean {
+@@ -1311,26 +1376,29 @@ mod tests {
+             let config_options = Rc::new(TestSessionConfigOptions::new(vec![offered.clone()]));
+             let _updates = config_options.updates.borrow().receiver();
+             let fs: Arc<dyn Fs> = FakeFs::new(cx.executor());
+-            let view = cx.update(|cx| {
++            let next = if boolean {
++                acp::SessionConfigOptionValue::boolean(true)
++            } else {
++                acp::SessionConfigOptionValue::id("manual")
++            };
++            let shift_confirm = |cx: &mut TestAppContext| {
+                 let config_options: Rc<dyn AgentSessionConfigOptions> = config_options.clone();
+                 let agent_server: Rc<dyn AgentServer> = agent_server.clone();
+-                cx.new(|_| ConfigOptionsView {
+-                    config_option_ids: ConfigOptionsView::config_option_ids(&config_options),
+-                    config_options,
+-                    selectors: Vec::new(),
+-                    agent_server,
+-                    fs,
+-                    _refresh_task: Task::ready(()),
+-                })
+-            });
++                let (fs, next) = (fs.clone(), next.clone());
++                cx.update(|cx| {
++                    set_config_option_and_default(
++                        config_options,
++                        agent_server,
++                        acp::SessionConfigId::new("config"),
++                        next,
++                        fs,
++                        cx,
++                    )
++                    .detach();
++                });
++            };
+             let rejected = config_options.defer_next_response();
+-            view.update(cx, |view, cx| {
+-                assert!(view.cycle_category_option(
+-                    acp::SessionConfigOptionCategory::ModelConfig,
+-                    false,
+-                    cx
+-                ));
+-            });
++            shift_confirm(cx);
+             assert!(
+                 agent_server.saved_defaults.lock().is_empty(),
+                 "do not persist before acceptance"
+@@ -1345,13 +1413,7 @@ mod tests {
+             );
+ 
+             let accepted = config_options.defer_next_response();
+-            view.update(cx, |view, cx| {
+-                assert!(view.cycle_category_option(
+-                    acp::SessionConfigOptionCategory::ModelConfig,
+-                    false,
+-                    cx
+-                ));
+-            });
++            shift_confirm(cx);
+             config_options.replace_options(vec![offered.clone()]);
+             accepted
+                 .send(Ok(vec![offered]))
+@@ -1368,13 +1430,7 @@ mod tests {
+             );
+ 
+             let removed = config_options.defer_next_response();
+-            view.update(cx, |view, cx| {
+-                assert!(view.cycle_category_option(
+-                    acp::SessionConfigOptionCategory::ModelConfig,
+-                    false,
+-                    cx
+-                ));
+-            });
++            shift_confirm(cx);
+             config_options.replace_options(Vec::new());
+             removed.send(Ok(Vec::new())).expect("option removed");
+             cx.run_until_parked();
+@@ -1387,7 +1443,7 @@ mod tests {
+     }
  
      #[gpui::test]
 -    fn cycling_config_option_saves_selected_value_as_default(cx: &mut TestAppContext) {
@@ -611,9 +717,9 @@ index fe98bdf..320ceb9 100644
          let agent_server = Rc::new(TestAgentServer::default());
          let config_options = Rc::new(TestSessionConfigOptions::new(vec![
              acp::SessionConfigOption::select(
-@@ -1222,12 +1246,9 @@ mod tests {
-             }));
+@@ -1422,12 +1478,9 @@ mod tests {
          });
+         cx.run_until_parked();
  
 -        assert_eq!(
 -            agent_server.saved_defaults.lock().as_slice(),
@@ -627,7 +733,7 @@ index fe98bdf..320ceb9 100644
          );
          assert_eq!(
              config_options.set_values.borrow().as_slice(),
-@@ -1239,7 +1260,7 @@ mod tests {
+@@ -1439,7 +1492,7 @@ mod tests {
      }
  
      #[gpui::test]
@@ -636,9 +742,9 @@ index fe98bdf..320ceb9 100644
          let agent_server = Rc::new(TestAgentServer::default());
          let config_options = Rc::new(TestSessionConfigOptions::new(vec![
              acp::SessionConfigOption::boolean("web_search", "Web Search", false)
-@@ -1265,12 +1286,9 @@ mod tests {
-             }));
+@@ -1466,12 +1519,9 @@ mod tests {
          });
+         cx.run_until_parked();
  
 -        assert_eq!(
 -            agent_server.saved_defaults.lock().as_slice(),
@@ -652,9 +758,9 @@ index fe98bdf..320ceb9 100644
          );
          assert_eq!(
              config_options.set_values.borrow().as_slice(),
-@@ -1318,12 +1336,9 @@ mod tests {
-             }));
+@@ -1520,12 +1570,9 @@ mod tests {
          });
+         cx.run_until_parked();
  
 -        assert_eq!(
 -            agent_server.saved_defaults.lock().as_slice(),
@@ -668,7 +774,7 @@ index fe98bdf..320ceb9 100644
          );
          assert_eq!(
              config_options.set_values.borrow().as_slice(),
-@@ -1448,13 +1463,9 @@ mod tests {
+@@ -1650,13 +1697,9 @@ mod tests {
                  acp::SessionConfigOptionValue::id("manual")
              )]
          );
@@ -686,7 +792,7 @@ index fe98bdf..320ceb9 100644
  
      // ---- R4.1/R4.2: manual-mode badge next to the Mode-category select trigger ----
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
-index c019f0c..9983745 100644
+index 9ca2b0a..c028d9a 100644
 --- a/crates/agent_ui/src/conversation_view/thread_view.rs
 +++ b/crates/agent_ui/src/conversation_view/thread_view.rs
 @@ -25,6 +25,7 @@ use sandbox::{SandboxFsPolicy, SandboxNetPolicy, SandboxPolicy};
@@ -697,7 +803,7 @@ index c019f0c..9983745 100644
  use crate::ui::{
      SandboxGroup, SandboxRow, SandboxSection, SandboxStatusTooltip, TerminalSandboxWarning,
      TerminalToolHeader,
-@@ -5868,12 +5869,17 @@ impl ThreadView {
+@@ -6040,12 +6041,17 @@ impl ThreadView {
                  }
              });
          let thinking_toggle = if supports_disabling_thinking {
@@ -716,7 +822,7 @@ index c019f0c..9983745 100644
                          let favorite_key = thread
                              .model()
                              .map(|model| (model.provider_id.0.to_string(), model.id.0.to_string()));
-@@ -6011,21 +6017,56 @@ impl ThreadView {
+@@ -6183,21 +6189,56 @@ impl ThreadView {
                  tooltip,
              )
              .menu(move |window, cx| {
@@ -779,7 +885,7 @@ index c019f0c..9983745 100644
                                  weak_self
                                      .update(cx, |this, cx| {
                                          if let Some(thread) = this.as_native_thread(cx) {
-@@ -6035,6 +6076,10 @@ impl ThreadView {
+@@ -6207,6 +6248,10 @@ impl ThreadView {
                                                      cx,
                                                  );
  
@@ -790,7 +896,7 @@ index c019f0c..9983745 100644
                                                  let favorite_key = thread.model().map(|model| {
                                                      (
                                                          model.provider_id().0.to_string(),
-@@ -6069,10 +6114,10 @@ impl ThreadView {
+@@ -6241,10 +6286,10 @@ impl ThreadView {
                                      })
                                      .ok();
                              }
@@ -803,7 +909,7 @@ index c019f0c..9983745 100644
                  }))
              })
              .with_handle(self.thinking_effort_menu_handle.clone())
-@@ -12950,7 +12995,9 @@ impl ThreadView {
+@@ -13132,7 +13177,9 @@ impl ThreadView {
          else {
              return;
          };
@@ -1065,13 +1171,13 @@ index 6c56637..9ce1fda 100644
      struct TestAgentServer {
          saved_defaults: Arc<Mutex<Vec<Option<acp::SessionConfigValueId>>>>,
 diff --git a/crates/agent_ui/src/model_selector.rs b/crates/agent_ui/src/model_selector.rs
-index d177f0a..560fd70 100644
+index 628fcbe..617e639 100644
 --- a/crates/agent_ui/src/model_selector.rs
 +++ b/crates/agent_ui/src/model_selector.rs
-@@ -20,6 +20,7 @@ use ui::{DocumentationAside, IntoElement, prelude::*};
- use util::ResultExt;
+@@ -20,6 +20,7 @@ use util::ResultExt;
  use zed_actions::agent::OpenSettings;
  
+ use crate::model_search;
 +use crate::set_as_default::{default_hint_footer, persists_default};
  use crate::ui::{
      ModelSelectorFooter, ModelSelectorHeader, ModelSelectorListItem, documentation_aside_side,
@@ -1142,7 +1248,7 @@ index d177f0a..560fd70 100644
      }
  }
  
-@@ -646,7 +658,12 @@ mod tests {
+@@ -636,7 +648,12 @@ mod tests {
              Task::ready(Ok(AgentModelList::Flat(self.models.clone())))
          }
  

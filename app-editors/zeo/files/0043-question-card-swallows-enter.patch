@@ -75,7 +75,7 @@ here because it sits beside this patch's tests.
 ---
 
 diff --git a/assets/keymaps/default-linux.json b/assets/keymaps/default-linux.json
-index b5d3da9..3e19b0b 100644
+index 691c9d1..9881670 100644
 --- a/assets/keymaps/default-linux.json
 +++ b/assets/keymaps/default-linux.json
 @@ -379,6 +379,17 @@
@@ -97,7 +97,7 @@ index b5d3da9..3e19b0b 100644
      "context": "Elicitation || (Elicitation > Editor)",
      "use_key_equivalents": true,
 diff --git a/assets/keymaps/default-macos.json b/assets/keymaps/default-macos.json
-index 24560ae..b2e462c 100644
+index dc27e53..3146444 100644
 --- a/assets/keymaps/default-macos.json
 +++ b/assets/keymaps/default-macos.json
 @@ -414,6 +414,17 @@
@@ -119,7 +119,7 @@ index 24560ae..b2e462c 100644
      "context": "Elicitation || (Elicitation > Editor)",
      "use_key_equivalents": true,
 diff --git a/assets/keymaps/default-windows.json b/assets/keymaps/default-windows.json
-index 90412a7..0c75810 100644
+index 215e45e..5cc894f 100644
 --- a/assets/keymaps/default-windows.json
 +++ b/assets/keymaps/default-windows.json
 @@ -382,6 +382,17 @@
@@ -141,10 +141,10 @@ index 90412a7..0c75810 100644
      "context": "Elicitation || (Elicitation > Editor)",
      "use_key_equivalents": true,
 diff --git a/assets/keymaps/vim.json b/assets/keymaps/vim.json
-index b815233..41dd2ec 100644
+index 9c765b2..7619988 100644
 --- a/assets/keymaps/vim.json
 +++ b/assets/keymaps/vim.json
-@@ -1197,6 +1197,14 @@
+@@ -1211,6 +1211,14 @@
        "enter": "agent::Chat",
      },
    },
@@ -160,10 +160,10 @@ index b815233..41dd2ec 100644
    {
      "context": "SettingsWindow > NavigationMenu && !search",
 diff --git a/crates/agent_ui/src/agent_ui.rs b/crates/agent_ui/src/agent_ui.rs
-index c73c58c..ffa4d41 100644
+index 73b416b..dbcee67 100644
 --- a/crates/agent_ui/src/agent_ui.rs
 +++ b/crates/agent_ui/src/agent_ui.rs
-@@ -336,6 +336,11 @@ actions!(
+@@ -337,6 +337,11 @@ actions!(
          RenameSelectedThread,
          /// Starts a chat conversation with follow-up enabled.
          ChatWithFollow,
@@ -175,7 +175,7 @@ index c73c58c..ffa4d41 100644
          /// Cycles to the next inline assist suggestion.
          CycleNextInlineAssist,
          /// Cycles to the previous inline assist suggestion.
-@@ -990,6 +995,8 @@ fn update_command_palette_filter(cx: &mut App) {
+@@ -991,6 +996,8 @@ fn update_command_palette_filter(cx: &mut App) {
          // Skills are surfaced through the settings UI now, so this command
          // should never appear in the palette.
          filter.hide_action_types(&manage_skills_action);
@@ -185,10 +185,10 @@ index c73c58c..ffa4d41 100644
              filter.show_action_types(skill_creator_actions.iter());
          } else {
 diff --git a/crates/agent_ui/src/conversation_view.rs b/crates/agent_ui/src/conversation_view.rs
-index 5f1f369..e40ece9 100644
+index c6c0810..9760677 100644
 --- a/crates/agent_ui/src/conversation_view.rs
 +++ b/crates/agent_ui/src/conversation_view.rs
-@@ -6422,9 +6422,6 @@ pub(crate) mod tests {
+@@ -7090,9 +7090,6 @@ pub(crate) mod tests {
      #[gpui::test]
      async fn test_preloaded_question_counts_as_pending(cx: &mut TestAppContext) {
          init_test(cx);
@@ -198,7 +198,7 @@ index 5f1f369..e40ece9 100644
  
          // The question is asked before the conversation registers the thread, so it never
          // sees `ElicitationRequested` -- the case `register_thread` seeds for.
-@@ -6454,6 +6451,333 @@ pub(crate) mod tests {
+@@ -7122,6 +7119,333 @@ pub(crate) mod tests {
          });
      }
  
@@ -532,7 +532,7 @@ index 5f1f369..e40ece9 100644
      #[gpui::test]
      async fn test_resume_without_history_adds_notice(cx: &mut TestAppContext) {
          init_test(cx);
-@@ -13428,6 +13752,27 @@ pub(crate) mod tests {
+@@ -14378,6 +14702,27 @@ pub(crate) mod tests {
          }
      }
  
@@ -580,10 +580,10 @@ index 225e741..28598b3 100644
          let required = schema.required.as_deref().unwrap_or_default();
          let mut fields = HashMap::default();
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
-index 2e080b4..fb343e9 100644
+index 102c04e..2b95b53 100644
 --- a/crates/agent_ui/src/conversation_view/thread_view.rs
 +++ b/crates/agent_ui/src/conversation_view/thread_view.rs
-@@ -3147,6 +3147,17 @@ impl ThreadView {
+@@ -3301,6 +3301,17 @@ impl ThreadView {
          self.elicitation_form_states.contains_key(id)
      }
  
@@ -601,7 +601,7 @@ index 2e080b4..fb343e9 100644
      fn submit_elicitation(
          &mut self,
          elicitation_id: ElicitationEntryId,
-@@ -8128,6 +8139,19 @@ impl ThreadView {
+@@ -8310,6 +8321,19 @@ impl ThreadView {
          self.message_editor.read(cx).set_local_commands(commands);
      }
  
@@ -621,7 +621,7 @@ index 2e080b4..fb343e9 100644
      /// Whether this elicitation is drawn by the pinned card above the message
      /// editor rather than inline, in the conversation.
      ///
-@@ -13622,6 +13646,7 @@ impl Render for ThreadView {
+@@ -13805,6 +13829,7 @@ impl Render for ThreadView {
          // current availability of feedback/sharing, which can change between
          // renders (settings, connection state, feature flags).
          self.sync_local_commands(cx);

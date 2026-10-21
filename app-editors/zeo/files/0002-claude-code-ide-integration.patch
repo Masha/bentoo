@@ -78,10 +78,10 @@ name are invalid. The terminal environment is one helper,
 ---
 
 diff --git a/Cargo.lock b/Cargo.lock
-index 0060a3f..3c21ef9 100644
+index 3ddbbde..c315abf 100644
 --- a/Cargo.lock
 +++ b/Cargo.lock
-@@ -3022,6 +3022,32 @@ version = "0.7.6"
+@@ -3066,6 +3066,32 @@ version = "0.7.6"
  source = "registry+https://github.com/rust-lang/crates.io-index"
  checksum = "a1d728cc89cf3aee9ff92b05e62b19ee65a02b5702cff7d5a377e32c6ae29d8d"
  
@@ -114,7 +114,7 @@ index 0060a3f..3c21ef9 100644
  [[package]]
  name = "cli"
  version = "0.1.0"
-@@ -22559,6 +22585,7 @@ dependencies = [
+@@ -22611,6 +22637,7 @@ dependencies = [
   "channel",
   "chrono",
   "clap",
@@ -123,10 +123,10 @@ index 0060a3f..3c21ef9 100644
   "client",
   "clock",
 diff --git a/Cargo.toml b/Cargo.toml
-index 34495ed..914592b 100644
+index ffc75c7..5e67f0d 100644
 --- a/Cargo.toml
 +++ b/Cargo.toml
-@@ -28,6 +28,7 @@ members = [
+@@ -29,6 +29,7 @@ members = [
      "crates/call",
      "crates/call_hierarchy",
      "crates/channel",
@@ -134,7 +134,7 @@ index 34495ed..914592b 100644
      "crates/cli",
      "crates/client",
      "crates/clock",
-@@ -307,6 +308,7 @@ buffer_diff = { path = "crates/buffer_diff" }
+@@ -308,6 +309,7 @@ buffer_diff = { path = "crates/buffer_diff" }
  call = { path = "crates/call" }
  call_hierarchy = { path = "crates/call_hierarchy" }
  channel = { path = "crates/channel" }
@@ -2271,10 +2271,10 @@ index 0000000..25f28f3
 +    }
 +}
 diff --git a/crates/project/src/project.rs b/crates/project/src/project.rs
-index c3a979e..23d90a3 100644
+index 5235a3e..cc86fc5 100644
 --- a/crates/project/src/project.rs
 +++ b/crates/project/src/project.rs
-@@ -255,6 +255,10 @@ pub struct Project {
+@@ -258,6 +258,10 @@ pub struct Project {
      agent_location: Option<AgentLocation>,
      downloading_files: Arc<Mutex<HashMap<(WorktreeId, String), DownloadingFile>>>,
      last_worktree_paths: WorktreePaths,
@@ -2285,7 +2285,7 @@ index c3a979e..23d90a3 100644
  }
  
  struct DownloadingFile {
-@@ -1229,6 +1233,17 @@ impl Project {
+@@ -1283,6 +1287,17 @@ impl Project {
          context_server_store::init(cx);
      }
  
@@ -2303,7 +2303,7 @@ index c3a979e..23d90a3 100644
      pub fn local(
          client: Arc<Client>,
          node: NodeRuntime,
-@@ -1431,6 +1446,7 @@ impl Project {
+@@ -1485,6 +1500,7 @@ impl Project {
                  agent_location: None,
                  downloading_files: Default::default(),
                  last_worktree_paths: WorktreePaths::default(),
@@ -2311,7 +2311,7 @@ index c3a979e..23d90a3 100644
              }
          })
      }
-@@ -1674,6 +1690,7 @@ impl Project {
+@@ -1728,6 +1744,7 @@ impl Project {
                  agent_location: None,
                  downloading_files: Default::default(),
                  last_worktree_paths: WorktreePaths::default(),
@@ -2319,7 +2319,7 @@ index c3a979e..23d90a3 100644
              };
  
              // remote server -> local machine handlers
-@@ -1965,6 +1982,7 @@ impl Project {
+@@ -2019,6 +2036,7 @@ impl Project {
                  agent_location: None,
                  downloading_files: Default::default(),
                  last_worktree_paths: WorktreePaths::default(),

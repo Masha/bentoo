@@ -171,10 +171,10 @@ sit above the two dropped crates, so only their index lines would differ.
 ---
 
 diff --git a/Cargo.lock b/Cargo.lock
-index fc1be19..f308b4d 100644
+index 610dbc6..44fdeb0 100644
 --- a/Cargo.lock
 +++ b/Cargo.lock
-@@ -2685,18 +2685,6 @@ dependencies = [
+@@ -2729,18 +2729,6 @@ dependencies = [
   "serde_core",
  ]
  
@@ -193,7 +193,7 @@ index fc1be19..f308b4d 100644
  [[package]]
  name = "cap-primitives"
  version = "4.0.3"
-@@ -2711,22 +2699,10 @@ dependencies = [
+@@ -2755,22 +2743,10 @@ dependencies = [
   "maybe-owned",
   "rustix",
   "rustix-linux-procfs",
@@ -217,7 +217,7 @@ index fc1be19..f308b4d 100644
  [[package]]
  name = "cargo-platform"
  version = "0.3.2"
-@@ -4014,27 +3990,27 @@ dependencies = [
+@@ -4064,27 +4040,27 @@ dependencies = [
  
  [[package]]
  name = "cranelift-assembler-x64"
@@ -251,7 +251,7 @@ index fc1be19..f308b4d 100644
  dependencies = [
   "cranelift-entity",
   "wasmtime-internal-core",
-@@ -4042,9 +4018,9 @@ dependencies = [
+@@ -4092,9 +4068,9 @@ dependencies = [
  
  [[package]]
  name = "cranelift-bitset"
@@ -263,7 +263,7 @@ index fc1be19..f308b4d 100644
  dependencies = [
   "serde",
   "serde_derive",
-@@ -4053,9 +4029,9 @@ dependencies = [
+@@ -4103,9 +4079,9 @@ dependencies = [
  
  [[package]]
  name = "cranelift-codegen"
@@ -275,7 +275,7 @@ index fc1be19..f308b4d 100644
  dependencies = [
   "bumpalo",
   "cranelift-assembler-x64",
-@@ -4084,9 +4060,9 @@ dependencies = [
+@@ -4134,9 +4110,9 @@ dependencies = [
  
  [[package]]
  name = "cranelift-codegen-meta"
@@ -287,7 +287,7 @@ index fc1be19..f308b4d 100644
  dependencies = [
   "cranelift-assembler-x64-meta",
   "cranelift-codegen-shared",
-@@ -4097,24 +4073,24 @@ dependencies = [
+@@ -4147,24 +4123,24 @@ dependencies = [
  
  [[package]]
  name = "cranelift-codegen-shared"
@@ -318,7 +318,7 @@ index fc1be19..f308b4d 100644
  dependencies = [
   "cranelift-bitset",
   "serde",
-@@ -4124,9 +4100,9 @@ dependencies = [
+@@ -4174,9 +4150,9 @@ dependencies = [
  
  [[package]]
  name = "cranelift-frontend"
@@ -330,7 +330,7 @@ index fc1be19..f308b4d 100644
  dependencies = [
   "cranelift-codegen",
   "hashbrown 0.17.1",
-@@ -4137,15 +4113,15 @@ dependencies = [
+@@ -4187,15 +4163,15 @@ dependencies = [
  
  [[package]]
  name = "cranelift-isle"
@@ -350,7 +350,7 @@ index fc1be19..f308b4d 100644
  dependencies = [
   "cranelift-codegen",
   "libc",
-@@ -4154,9 +4130,9 @@ dependencies = [
+@@ -4204,9 +4180,9 @@ dependencies = [
  
  [[package]]
  name = "cranelift-srcgen"
@@ -362,7 +362,7 @@ index fc1be19..f308b4d 100644
  
  [[package]]
  name = "crash-context"
-@@ -5085,7 +5061,7 @@ dependencies = [
+@@ -5135,7 +5111,7 @@ dependencies = [
   "libc",
   "option-ext",
   "redox_users",
@@ -371,7 +371,7 @@ index fc1be19..f308b4d 100644
  ]
  
  [[package]]
-@@ -5868,7 +5844,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
+@@ -5918,7 +5894,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
  checksum = "39cab71617ae0d63f51a36d69f866391735b51691dbda63cf6f96d042b63efeb"
  dependencies = [
   "libc",
@@ -380,7 +380,7 @@ index fc1be19..f308b4d 100644
  ]
  
  [[package]]
-@@ -6085,8 +6061,8 @@ dependencies = [
+@@ -6135,8 +6111,8 @@ dependencies = [
   "tracing",
   "url",
   "util",
@@ -391,7 +391,7 @@ index fc1be19..f308b4d 100644
   "which",
   "ztracing",
  ]
-@@ -6167,7 +6143,7 @@ dependencies = [
+@@ -6217,7 +6193,7 @@ dependencies = [
   "tracing",
   "url",
   "util",
@@ -400,7 +400,7 @@ index fc1be19..f308b4d 100644
   "wasmtime",
   "wasmtime-wasi",
   "zlog",
-@@ -6927,7 +6903,7 @@ dependencies = [
+@@ -6976,7 +6952,7 @@ dependencies = [
   "libc",
   "log",
   "rustversion",
@@ -409,7 +409,7 @@ index fc1be19..f308b4d 100644
   "windows-result 0.4.1",
  ]
  
-@@ -7059,7 +7035,7 @@ dependencies = [
+@@ -7108,7 +7084,7 @@ dependencies = [
   "gobject-sys",
   "libc",
   "system-deps",
@@ -418,7 +418,7 @@ index fc1be19..f308b4d 100644
  ]
  
  [[package]]
-@@ -8463,7 +8439,7 @@ dependencies = [
+@@ -8512,7 +8488,7 @@ dependencies = [
   "libc",
   "percent-encoding",
   "pin-project-lite",
@@ -427,7 +427,7 @@ index fc1be19..f308b4d 100644
   "tokio",
   "tower-service",
   "tracing",
-@@ -11099,7 +11075,7 @@ version = "0.6.1"
+@@ -11148,7 +11124,7 @@ version = "0.6.1"
  source = "registry+https://github.com/rust-lang/crates.io-index"
  checksum = "536bfad37a309d62069485248eeaba1e8d9853aaf951caaeaed0585a95346f08"
  dependencies = [
@@ -436,7 +436,7 @@ index fc1be19..f308b4d 100644
  ]
  
  [[package]]
-@@ -11477,7 +11453,7 @@ version = "0.50.3"
+@@ -11526,7 +11502,7 @@ version = "0.50.3"
  source = "registry+https://github.com/rust-lang/crates.io-index"
  checksum = "7957b9740744892f114936ab4a57b3f487491bbeafaf8083688b16841a4240e5"
  dependencies = [
@@ -445,7 +445,7 @@ index fc1be19..f308b4d 100644
  ]
  
  [[package]]
-@@ -14233,8 +14209,8 @@ version = "0.14.4"
+@@ -14285,8 +14261,8 @@ version = "0.14.4"
  source = "registry+https://github.com/rust-lang/crates.io-index"
  checksum = "03da047801ff44bb6a4d407d4860c05fd70bb81714e6b2f3812603d5b145b042"
  dependencies = [
@@ -456,7 +456,7 @@ index fc1be19..f308b4d 100644
   "log",
   "multimap",
   "petgraph",
-@@ -14253,7 +14229,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
+@@ -14305,7 +14281,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
  checksum = "b570b25f7617e43d59005d0990ccb79e950a423952cea19671b7a876da390adf"
  dependencies = [
   "anyhow",
@@ -465,7 +465,7 @@ index fc1be19..f308b4d 100644
   "proc-macro2",
   "quote",
   "syn 2.0.117",
-@@ -14404,9 +14380,9 @@ checksum = "bd348ff538bc9caeda7ee8cad2d1d48236a1f443c1fa3913c6a02fe0043b1dd3"
+@@ -14456,9 +14432,9 @@ checksum = "bd348ff538bc9caeda7ee8cad2d1d48236a1f443c1fa3913c6a02fe0043b1dd3"
  
  [[package]]
  name = "pulley-interpreter"
@@ -477,7 +477,7 @@ index fc1be19..f308b4d 100644
  dependencies = [
   "cranelift-bitset",
   "log",
-@@ -14416,9 +14392,9 @@ dependencies = [
+@@ -14468,9 +14444,9 @@ dependencies = [
  
  [[package]]
  name = "pulley-macros"
@@ -489,7 +489,7 @@ index fc1be19..f308b4d 100644
  dependencies = [
   "proc-macro2",
   "quote",
-@@ -14505,7 +14481,7 @@ dependencies = [
+@@ -14557,7 +14533,7 @@ dependencies = [
   "quinn-udp",
   "rustc-hash 2.1.1",
   "rustls",
@@ -498,7 +498,7 @@ index fc1be19..f308b4d 100644
   "thiserror 2.0.17",
   "tokio",
   "tracing",
-@@ -14543,7 +14519,7 @@ dependencies = [
+@@ -14595,7 +14571,7 @@ dependencies = [
   "cfg_aliases",
   "libc",
   "once_cell",
@@ -507,7 +507,7 @@ index fc1be19..f308b4d 100644
   "tracing",
   "windows-sys 0.60.2",
  ]
-@@ -15635,7 +15611,7 @@ dependencies = [
+@@ -15687,7 +15663,7 @@ dependencies = [
   "errno 0.3.14",
   "libc",
   "linux-raw-sys",
@@ -516,7 +516,7 @@ index fc1be19..f308b4d 100644
  ]
  
  [[package]]
-@@ -15661,9 +15637,9 @@ dependencies = [
+@@ -15713,9 +15689,9 @@ dependencies = [
  
  [[package]]
  name = "rustls"
@@ -528,7 +528,7 @@ index fc1be19..f308b4d 100644
  dependencies = [
   "aws-lc-rs",
   "log",
-@@ -15733,7 +15709,7 @@ dependencies = [
+@@ -15785,7 +15761,7 @@ dependencies = [
   "security-framework",
   "security-framework-sys",
   "webpki-root-certs",
@@ -537,7 +537,7 @@ index fc1be19..f308b4d 100644
  ]
  
  [[package]]
-@@ -16949,7 +16925,7 @@ version = "0.8.9"
+@@ -17001,7 +16977,7 @@ version = "0.8.9"
  source = "registry+https://github.com/rust-lang/crates.io-index"
  checksum = "c1c97747dbf44bb1ca44a561ece23508e99cb592e862f22222dcf42f51d1e451"
  dependencies = [
@@ -546,7 +546,7 @@ index fc1be19..f308b4d 100644
   "proc-macro2",
   "quote",
   "syn 2.0.117",
-@@ -17018,7 +16994,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
+@@ -17070,7 +17046,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
  checksum = "c3d1e2c7f27f8d4cb10542a02c49005dbd6e93095799d6f3be745fae9f8fedd4"
  dependencies = [
   "libc",
@@ -555,7 +555,7 @@ index fc1be19..f308b4d 100644
  ]
  
  [[package]]
-@@ -17332,7 +17308,7 @@ dependencies = [
+@@ -17384,7 +17360,7 @@ dependencies = [
   "cfg-if",
   "libc",
   "psm",
@@ -564,7 +564,7 @@ index fc1be19..f308b4d 100644
  ]
  
  [[package]]
-@@ -18062,7 +18038,7 @@ dependencies = [
+@@ -18114,7 +18090,7 @@ dependencies = [
   "getrandom 0.4.1",
   "once_cell",
   "rustix",
@@ -573,7 +573,7 @@ index fc1be19..f308b4d 100644
  ]
  
  [[package]]
-@@ -19975,12 +19951,12 @@ dependencies = [
+@@ -20027,12 +20003,12 @@ dependencies = [
  
  [[package]]
  name = "wasm-encoder"
@@ -589,7 +589,7 @@ index fc1be19..f308b4d 100644
  ]
  
  [[package]]
-@@ -20032,14 +20008,14 @@ dependencies = [
+@@ -20084,14 +20060,14 @@ dependencies = [
  
  [[package]]
  name = "wasm-metadata"
@@ -608,7 +608,7 @@ index fc1be19..f308b4d 100644
  ]
  
  [[package]]
-@@ -20103,9 +20079,9 @@ dependencies = [
+@@ -20155,9 +20131,9 @@ dependencies = [
  
  [[package]]
  name = "wasmparser"
@@ -620,7 +620,7 @@ index fc1be19..f308b4d 100644
  dependencies = [
   "bitflags 2.13.1",
   "hashbrown 0.17.1",
-@@ -20116,20 +20092,20 @@ dependencies = [
+@@ -20168,20 +20144,20 @@ dependencies = [
  
  [[package]]
  name = "wasmprinter"
@@ -646,7 +646,7 @@ index fc1be19..f308b4d 100644
  dependencies = [
   "addr2line 0.26.1",
   "async-trait",
-@@ -20153,7 +20129,7 @@ dependencies = [
+@@ -20205,7 +20181,7 @@ dependencies = [
   "serde_derive",
   "smallvec",
   "target-lexicon",
@@ -655,7 +655,7 @@ index fc1be19..f308b4d 100644
   "wasmtime-environ",
   "wasmtime-internal-component-macro",
   "wasmtime-internal-component-util",
-@@ -20169,9 +20145,9 @@ dependencies = [
+@@ -20221,9 +20197,9 @@ dependencies = [
  
  [[package]]
  name = "wasmtime-c-api-impl"
@@ -667,7 +667,7 @@ index fc1be19..f308b4d 100644
  dependencies = [
   "log",
   "tracing",
-@@ -20181,9 +20157,9 @@ dependencies = [
+@@ -20233,9 +20209,9 @@ dependencies = [
  
  [[package]]
  name = "wasmtime-environ"
@@ -679,7 +679,7 @@ index fc1be19..f308b4d 100644
  dependencies = [
   "anyhow",
   "cpp_demangle",
-@@ -20203,8 +20179,8 @@ dependencies = [
+@@ -20255,8 +20231,8 @@ dependencies = [
   "sha2",
   "smallvec",
   "target-lexicon",
@@ -690,7 +690,7 @@ index fc1be19..f308b4d 100644
   "wasmprinter",
   "wasmtime-internal-component-util",
   "wasmtime-internal-core",
-@@ -20212,9 +20188,9 @@ dependencies = [
+@@ -20264,9 +20240,9 @@ dependencies = [
  
  [[package]]
  name = "wasmtime-internal-c-api-macros"
@@ -702,7 +702,7 @@ index fc1be19..f308b4d 100644
  dependencies = [
   "proc-macro2",
   "quote",
-@@ -20222,9 +20198,9 @@ dependencies = [
+@@ -20274,9 +20250,9 @@ dependencies = [
  
  [[package]]
  name = "wasmtime-internal-component-macro"
@@ -714,7 +714,7 @@ index fc1be19..f308b4d 100644
  dependencies = [
   "anyhow",
   "proc-macro2",
-@@ -20232,20 +20208,20 @@ dependencies = [
+@@ -20284,20 +20260,20 @@ dependencies = [
   "syn 2.0.117",
   "wasmtime-internal-component-util",
   "wasmtime-internal-wit-bindgen",
@@ -740,7 +740,7 @@ index fc1be19..f308b4d 100644
  dependencies = [
   "anyhow",
   "hashbrown 0.17.1",
-@@ -20255,9 +20231,9 @@ dependencies = [
+@@ -20307,9 +20283,9 @@ dependencies = [
  
  [[package]]
  name = "wasmtime-internal-cranelift"
@@ -752,7 +752,7 @@ index fc1be19..f308b4d 100644
  dependencies = [
   "cranelift-codegen",
   "cranelift-control",
-@@ -20272,7 +20248,7 @@ dependencies = [
+@@ -20324,7 +20300,7 @@ dependencies = [
   "smallvec",
   "target-lexicon",
   "thiserror 2.0.17",
@@ -761,7 +761,7 @@ index fc1be19..f308b4d 100644
   "wasmtime-environ",
   "wasmtime-internal-core",
   "wasmtime-internal-unwinder",
-@@ -20281,9 +20257,9 @@ dependencies = [
+@@ -20333,9 +20309,9 @@ dependencies = [
  
  [[package]]
  name = "wasmtime-internal-fiber"
@@ -773,7 +773,7 @@ index fc1be19..f308b4d 100644
  dependencies = [
   "cc",
   "libc",
-@@ -20295,9 +20271,9 @@ dependencies = [
+@@ -20347,9 +20323,9 @@ dependencies = [
  
  [[package]]
  name = "wasmtime-internal-jit-debug"
@@ -785,7 +785,7 @@ index fc1be19..f308b4d 100644
  dependencies = [
   "cc",
   "wasmtime-internal-versioned-export-macros",
-@@ -20305,9 +20281,9 @@ dependencies = [
+@@ -20357,9 +20333,9 @@ dependencies = [
  
  [[package]]
  name = "wasmtime-internal-jit-icache-coherence"
@@ -797,7 +797,7 @@ index fc1be19..f308b4d 100644
  dependencies = [
   "libc",
   "wasmtime-internal-core",
-@@ -20316,9 +20292,9 @@ dependencies = [
+@@ -20368,9 +20344,9 @@ dependencies = [
  
  [[package]]
  name = "wasmtime-internal-unwinder"
@@ -809,7 +809,7 @@ index fc1be19..f308b4d 100644
  dependencies = [
   "cranelift-codegen",
   "log",
-@@ -20328,9 +20304,9 @@ dependencies = [
+@@ -20380,9 +20356,9 @@ dependencies = [
  
  [[package]]
  name = "wasmtime-internal-versioned-export-macros"
@@ -821,7 +821,7 @@ index fc1be19..f308b4d 100644
  dependencies = [
   "proc-macro2",
   "quote",
-@@ -20339,32 +20315,32 @@ dependencies = [
+@@ -20391,32 +20367,32 @@ dependencies = [
  
  [[package]]
  name = "wasmtime-internal-wit-bindgen"
@@ -861,7 +861,7 @@ index fc1be19..f308b4d 100644
   "thiserror 2.0.17",
   "tokio",
   "tracing",
-@@ -20372,13 +20348,14 @@ dependencies = [
+@@ -20424,13 +20400,14 @@ dependencies = [
   "wasmtime",
   "wasmtime-wasi-io",
   "windows-sys 0.61.2",
@@ -878,7 +878,7 @@ index fc1be19..f308b4d 100644
  dependencies = [
   "async-trait",
   "bytes 1.11.1",
-@@ -20884,7 +20861,7 @@ version = "0.1.11"
+@@ -20936,7 +20913,7 @@ version = "0.1.11"
  source = "registry+https://github.com/rust-lang/crates.io-index"
  checksum = "c2a7b1c03c876122aa43f3020e6c3c3ee5c05081c9a00739faf7503aeba10d22"
  dependencies = [
@@ -887,7 +887,7 @@ index fc1be19..f308b4d 100644
  ]
  
  [[package]]
-@@ -21923,9 +21900,9 @@ dependencies = [
+@@ -21975,9 +21952,9 @@ dependencies = [
  
  [[package]]
  name = "wit-component"
@@ -899,7 +899,7 @@ index fc1be19..f308b4d 100644
  dependencies = [
   "anyhow",
   "bitflags 2.13.1",
-@@ -21934,10 +21911,10 @@ dependencies = [
+@@ -21986,10 +21963,10 @@ dependencies = [
   "serde",
   "serde_derive",
   "serde_json",
@@ -914,7 +914,7 @@ index fc1be19..f308b4d 100644
  ]
  
  [[package]]
-@@ -21996,9 +21973,9 @@ dependencies = [
+@@ -22048,9 +22025,9 @@ dependencies = [
  
  [[package]]
  name = "wit-parser"
@@ -926,7 +926,7 @@ index fc1be19..f308b4d 100644
  dependencies = [
   "anyhow",
   "hashbrown 0.17.1",
-@@ -22010,7 +21987,7 @@ dependencies = [
+@@ -22062,7 +22039,7 @@ dependencies = [
   "serde_derive",
   "serde_json",
   "unicode-ident",
@@ -936,10 +936,10 @@ index fc1be19..f308b4d 100644
  
  [[package]]
 diff --git a/Cargo.toml b/Cargo.toml
-index 770f7d0..bc1ffe1 100644
+index 6db245e..0181fcb 100644
 --- a/Cargo.toml
 +++ b/Cargo.toml
-@@ -864,7 +864,7 @@ runtimelib = { version = "1.4.0", default-features = false, features = [
+@@ -871,7 +871,7 @@ runtimelib = { version = "1.4.0", default-features = false, features = [
  rust-embed = { version = "8.11", features = ["include-exclude", "compression"] }
  rustc-hash = "2.1.0"
  rustix = { version = "1.1", features = ["fs"] }
@@ -948,7 +948,7 @@ index 770f7d0..bc1ffe1 100644
  rustls-platform-verifier = "0.7"
  # WARNING: If you change this, you must also publish a new version of zed-scap to crates.io
  scap = { git = "https://github.com/zed-industries/scap", rev = "4afea48c3b002197176fb19cd0f9b180dd36eaac", default-features = false, package = "zed-scap", version = "0.0.8-zed" }
-@@ -963,7 +963,7 @@ wasm-encoder = "0.254"
+@@ -970,7 +970,7 @@ wasm-encoder = "0.254"
  # the wasm-bindgen init function with the positional arguments deprecated in 0.2.93.
  wasm_thread = { git = "https://github.com/zed-industries/wasm_thread", rev = "0cf96c7708dfb97ccf3da50347e25edcf75d6937", version = "0.3", features = ["es_modules"] }
  wasmparser = "0.254"
@@ -957,7 +957,7 @@ index 770f7d0..bc1ffe1 100644
      "anyhow",
      "async",
      "demangle",
-@@ -975,7 +975,7 @@ wasmtime = { version = "48", default-features = false, features = [
+@@ -982,7 +982,7 @@ wasmtime = { version = "48", default-features = false, features = [
  ] }
  wasm-bindgen = "0.2.120"
  wasm-bindgen-futures = "0.4"

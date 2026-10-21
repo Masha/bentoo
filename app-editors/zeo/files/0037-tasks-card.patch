@@ -291,7 +291,7 @@ index 0000000..54bdc62
 +    }
 +}
 diff --git a/crates/agent_ui/src/agent_panel.rs b/crates/agent_ui/src/agent_panel.rs
-index adb5469..de64522 100644
+index 7cf3a32..749e614 100644
 --- a/crates/agent_ui/src/agent_panel.rs
 +++ b/crates/agent_ui/src/agent_panel.rs
 @@ -39,6 +39,7 @@ use crate::ExpandMessageEditor;
@@ -827,7 +827,7 @@ index adb5469..de64522 100644
      #[gpui::test]
      async fn test_new_draft_survives_reload_when_real_thread_is_active(cx: &mut TestAppContext) {
          init_test(cx);
-@@ -14543,8 +14865,8 @@ mod tests {
+@@ -14583,8 +14905,8 @@ mod tests {
          // directly remove from retained_threads and drop the handle
          // so on_release → close_all_sessions fires only on A.
          drop(retained_conversation_a);
@@ -839,10 +839,10 @@ index adb5469..de64522 100644
          cx.run_until_parked();
  
 diff --git a/crates/agent_ui/src/agent_ui.rs b/crates/agent_ui/src/agent_ui.rs
-index 0da7203..7eb947e 100644
+index 8c8780a..69d96ed 100644
 --- a/crates/agent_ui/src/agent_ui.rs
 +++ b/crates/agent_ui/src/agent_ui.rs
-@@ -25,6 +25,7 @@ mod model_selector;
+@@ -26,6 +26,7 @@ mod model_selector;
  mod model_selector_popover;
  mod profile_selector;
  mod set_as_default;
@@ -850,7 +850,7 @@ index 0da7203..7eb947e 100644
  mod terminal_codegen;
  mod terminal_inline_assistant;
  pub mod terminal_thread_metadata_store;
-@@ -1108,6 +1109,10 @@ mod tests {
+@@ -1109,6 +1110,10 @@ mod tests {
              sandbox_permissions: Default::default(),
              show_turn_stats: false,
              elicitation_placement: settings::ElicitationPlacement::default(),
@@ -862,10 +862,10 @@ index 0da7203..7eb947e 100644
              max_idle_retained_threads: 5,
              threads_sidebar: agent_settings::ThreadsSidebarSettings {
 diff --git a/crates/agent_ui/src/conversation_view.rs b/crates/agent_ui/src/conversation_view.rs
-index 66ea39f..512fd31 100644
+index 8931246..d277313 100644
 --- a/crates/agent_ui/src/conversation_view.rs
 +++ b/crates/agent_ui/src/conversation_view.rs
-@@ -1910,21 +1910,30 @@ impl ConversationView {
+@@ -2000,21 +2000,30 @@ impl ConversationView {
              }
              AcpThreadEvent::NewEntry => {
                  let len = thread.read(cx).entries().len();
@@ -905,7 +905,7 @@ index 66ea39f..512fd31 100644
                          active.sync_editor_mode(cx);
                          active.sync_generating_indicator(cx);
                      });
-@@ -13335,6 +13344,47 @@ pub(crate) mod tests {
+@@ -14285,6 +14294,47 @@ pub(crate) mod tests {
          }
      }
  

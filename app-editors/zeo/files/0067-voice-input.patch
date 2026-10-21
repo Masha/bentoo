@@ -111,10 +111,10 @@ reqwest_client without_proxy.
 ---
 
 diff --git a/Cargo.lock b/Cargo.lock
-index 57e8251..38dd212 100644
+index 28a295c..96b1d95 100644
 --- a/Cargo.lock
 +++ b/Cargo.lock
-@@ -542,6 +542,7 @@ dependencies = [
+@@ -544,6 +544,7 @@ dependencies = [
   "command_palette_hooks",
   "component",
   "context_server",
@@ -122,7 +122,7 @@ index 57e8251..38dd212 100644
   "db",
   "editor",
   "eval_utils",
-@@ -618,6 +619,7 @@ dependencies = [
+@@ -621,6 +622,7 @@ dependencies = [
   "util",
   "uuid",
   "vim",
@@ -130,7 +130,7 @@ index 57e8251..38dd212 100644
   "watch",
   "workspace",
   "zed_actions",
-@@ -2286,6 +2288,8 @@ dependencies = [
+@@ -2302,6 +2304,8 @@ dependencies = [
   "cexpr",
   "clang-sys",
   "itertools 0.13.0",
@@ -139,7 +139,7 @@ index 57e8251..38dd212 100644
   "proc-macro2",
   "quote",
   "regex",
-@@ -19902,6 +19906,30 @@ dependencies = [
+@@ -19954,6 +19958,30 @@ dependencies = [
   "settings",
  ]
  
@@ -170,7 +170,7 @@ index 57e8251..38dd212 100644
  [[package]]
  name = "vscode_theme"
  version = "0.2.0"
-@@ -20980,6 +21008,29 @@ dependencies = [
+@@ -21032,6 +21060,29 @@ dependencies = [
   "zed_actions",
  ]
  
@@ -200,7 +200,7 @@ index 57e8251..38dd212 100644
  [[package]]
  name = "whoami"
  version = "1.6.1"
-@@ -22820,6 +22871,7 @@ dependencies = [
+@@ -22872,6 +22923,7 @@ dependencies = [
   "uuid",
   "vim",
   "vim_mode_setting",
@@ -209,10 +209,10 @@ index 57e8251..38dd212 100644
   "web_search",
   "web_search_providers",
 diff --git a/Cargo.toml b/Cargo.toml
-index 0398bfe..a04aea3 100644
+index 7d0d784..2043dd2 100644
 --- a/Cargo.toml
 +++ b/Cargo.toml
-@@ -237,6 +237,7 @@ members = [
+@@ -238,6 +238,7 @@ members = [
      "crates/util_macros",
      "crates/vim",
      "crates/vim_mode_setting",
@@ -220,7 +220,7 @@ index 0398bfe..a04aea3 100644
      "crates/watch",
      "crates/web_search",
      "crates/web_search_providers",
-@@ -514,6 +515,7 @@ util = { path = "crates/util" }
+@@ -515,6 +516,7 @@ util = { path = "crates/util" }
  util_macros = { path = "crates/util_macros" }
  vim = { path = "crates/vim" }
  vim_mode_setting = { path = "crates/vim_mode_setting" }
@@ -228,7 +228,7 @@ index 0398bfe..a04aea3 100644
  watch = { path = "crates/watch" }
  web_search = { path = "crates/web_search" }
  web_search_providers = { path = "crates/web_search_providers" }
-@@ -995,6 +997,7 @@ webrtc-sys = "0.3.23"
+@@ -1002,6 +1004,7 @@ webrtc-sys = "0.3.23"
  # 30.0.1 lacks the Vulkan surface-drop panic fix: https://github.com/gfx-rs/wgpu/pull/10230.
  wgpu = { git = "https://github.com/gfx-rs/wgpu", rev = "3b3506ea31154edc04de64debda0e780cba2639c", default-features = false }
  which = "8"
@@ -237,7 +237,7 @@ index 0398bfe..a04aea3 100644
  windows-registry = "0.6.0"
  xkbcommon = { version = "0.8", default-features = false }
 diff --git a/assets/keymaps/default-linux.json b/assets/keymaps/default-linux.json
-index c66e138..1f41042 100644
+index 2121900..1c0bdf1 100644
 --- a/assets/keymaps/default-linux.json
 +++ b/assets/keymaps/default-linux.json
 @@ -400,6 +400,46 @@
@@ -288,7 +288,7 @@ index c66e138..1f41042 100644
      "context": "Elicitation || (Elicitation > Editor)",
      "use_key_equivalents": true,
 diff --git a/assets/keymaps/default-macos.json b/assets/keymaps/default-macos.json
-index 3b4bb15..e85b03e 100644
+index f0475ea..c829688 100644
 --- a/assets/keymaps/default-macos.json
 +++ b/assets/keymaps/default-macos.json
 @@ -435,6 +435,46 @@
@@ -339,7 +339,7 @@ index 3b4bb15..e85b03e 100644
      "context": "Elicitation || (Elicitation > Editor)",
      "use_key_equivalents": true,
 diff --git a/assets/keymaps/default-windows.json b/assets/keymaps/default-windows.json
-index 2507362..4f772a6 100644
+index a7a911e..ea33513 100644
 --- a/assets/keymaps/default-windows.json
 +++ b/assets/keymaps/default-windows.json
 @@ -403,6 +403,46 @@
@@ -390,10 +390,10 @@ index 2507362..4f772a6 100644
      "context": "Elicitation || (Elicitation > Editor)",
      "use_key_equivalents": true,
 diff --git a/assets/keymaps/vim.json b/assets/keymaps/vim.json
-index ed7a9c2..f1561cb 100644
+index a3628f8..0c97cf3 100644
 --- a/assets/keymaps/vim.json
 +++ b/assets/keymaps/vim.json
-@@ -1215,6 +1215,50 @@
+@@ -1229,6 +1229,50 @@
        "enter": "agent::IgnoreSendWhileQuestionPending",
      },
    },
@@ -475,10 +475,10 @@ index 4101322..ce1bf12 100644
    // toggled at runtime.
    "instrumentation": {
 diff --git a/crates/agent_ui/Cargo.toml b/crates/agent_ui/Cargo.toml
-index c985917..592c5fb 100644
+index 66b9f67..a19c044 100644
 --- a/crates/agent_ui/Cargo.toml
 +++ b/crates/agent_ui/Cargo.toml
-@@ -114,6 +114,7 @@ unicode-segmentation.workspace = true
+@@ -115,6 +115,7 @@ unicode-segmentation.workspace = true
  url.workspace = true
  util.workspace = true
  uuid.workspace = true
@@ -486,7 +486,7 @@ index c985917..592c5fb 100644
  watch.workspace = true
  workspace.workspace = true
  git_ui_core.workspace = true
-@@ -128,6 +129,7 @@ agent = { workspace = true, features = ["test-support"] }
+@@ -129,6 +130,7 @@ agent = { workspace = true, features = ["test-support"] }
  agent_servers = { workspace = true, features = ["test-support"] }
  buffer_diff = { workspace = true, features = ["test-support"] }
  client = { workspace = true, features = ["test-support"] }
@@ -495,10 +495,10 @@ index c985917..592c5fb 100644
  editor = { workspace = true, features = ["test-support"] }
  eval_utils.workspace = true
 diff --git a/crates/agent_ui/src/agent_ui.rs b/crates/agent_ui/src/agent_ui.rs
-index fec4afd..d03847d 100644
+index 1cb5ab9..d0c700e 100644
 --- a/crates/agent_ui/src/agent_ui.rs
 +++ b/crates/agent_ui/src/agent_ui.rs
-@@ -50,6 +50,8 @@ pub mod thread_worktree_archive;
+@@ -51,6 +51,8 @@ pub mod thread_worktree_archive;
  pub mod threads_archive_view;
  mod ui;
  mod unicode_confusables;
@@ -507,7 +507,7 @@ index fec4afd..d03847d 100644
  
  use std::rc::Rc;
  use std::sync::Arc;
-@@ -770,6 +772,7 @@ pub fn init(
+@@ -771,6 +773,7 @@ pub fn init(
          init_language_model_settings(cx);
      }
      agent_panel::init(cx);
@@ -515,7 +515,7 @@ index fec4afd..d03847d 100644
      context_server_configuration::init(language_registry, fs.clone(), cx);
      thread_metadata_store::init(cx);
      thread_organization::init(cx);
-@@ -1123,6 +1126,43 @@ pub(crate) fn slash_command_in_code_block(code: &str) -> Option<&str> {
+@@ -1124,6 +1127,43 @@ pub(crate) fn slash_command_in_code_block(code: &str) -> Option<&str> {
      Some(command)
  }
  
@@ -560,7 +560,7 @@ index fec4afd..d03847d 100644
  mod slash_command_in_code_block_tests;
  
 diff --git a/crates/agent_ui/src/conversation_view.rs b/crates/agent_ui/src/conversation_view.rs
-index 788dc30..07eaf2d 100644
+index 4ce29af..62b2c11 100644
 --- a/crates/agent_ui/src/conversation_view.rs
 +++ b/crates/agent_ui/src/conversation_view.rs
 @@ -114,7 +114,7 @@ mod message_queue;
@@ -573,10 +573,10 @@ index 788dc30..07eaf2d 100644
  pub use thread_view::*;
  
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
-index 19fdce8..4b013fe 100644
+index ff15fda..ab49a0f 100644
 --- a/crates/agent_ui/src/conversation_view/thread_view.rs
 +++ b/crates/agent_ui/src/conversation_view/thread_view.rs
-@@ -26,12 +26,22 @@ use sandbox::{SandboxFsPolicy, SandboxNetPolicy, SandboxPolicy};
+@@ -27,12 +27,22 @@ use sandbox::{SandboxFsPolicy, SandboxNetPolicy, SandboxPolicy};
  
  use crate::completion_provider::{AvailableSkill, PromptLocalCommand, pluralize};
  use crate::message_editor::SharedSessionCapabilities;
@@ -599,7 +599,7 @@ index 19fdce8..4b013fe 100644
  
  use db::kvp::KeyValueStore;
  use gpui::List;
-@@ -666,7 +676,27 @@ pub struct ThreadView {
+@@ -727,7 +737,27 @@ pub struct ThreadView {
      dismissed_skill_loading_issues: HashSet<SkillLoadingIssue>,
      pub(crate) thread_search_bar: Option<Entity<super::thread_search_bar::ThreadSearchBar>>,
      pub(crate) thread_search_visible: bool,
@@ -627,7 +627,7 @@ index 19fdce8..4b013fe 100644
  impl Focusable for ThreadView {
      fn focus_handle(&self, _cx: &App) -> FocusHandle {
          self.focus_handle.clone()
-@@ -1113,12 +1143,14 @@ impl ThreadView {
+@@ -1235,12 +1265,14 @@ impl ThreadView {
              dismissed_skill_loading_issues: HashSet::default(),
              thread_search_bar: None,
              thread_search_visible: false,
@@ -642,7 +642,7 @@ index 19fdce8..4b013fe 100644
          let list_state_for_scroll = this.list_state.clone();
          let thread_view = cx.entity().downgrade();
  
-@@ -5475,6 +5507,25 @@ impl ThreadView {
+@@ -5631,6 +5663,25 @@ impl ThreadView {
          let has_messages = self.has_visible_conversation(cx);
          let fills_container = !has_messages || editor_expanded;
          let composer_is_read_only = self.message_editor.read(cx).editor().read(cx).read_only(cx);
@@ -668,7 +668,7 @@ index 19fdce8..4b013fe 100644
          let discard_draft_button = composer_is_read_only.then(|| {
              div()
                  .debug_selector(|| "discard-protected-draft".into())
-@@ -5487,6 +5538,7 @@ impl ThreadView {
+@@ -5643,6 +5694,7 @@ impl ThreadView {
                                  editor.set_read_only(false, cx);
                                  editor.set_message(Vec::new(), window, cx);
                              });
@@ -676,7 +676,7 @@ index 19fdce8..4b013fe 100644
                              this.clear_thread_error(cx);
                          })),
                  )
-@@ -5520,6 +5572,7 @@ impl ThreadView {
+@@ -5676,6 +5728,7 @@ impl ThreadView {
                      .flex_grow_0()
                      .justify_between()
                      .gap_2()
@@ -684,7 +684,7 @@ index 19fdce8..4b013fe 100644
                      .child(
                          v_flex()
                              .relative()
-@@ -5597,6 +5650,7 @@ impl ThreadView {
+@@ -5772,6 +5825,7 @@ impl ThreadView {
                                              .children(self.mode_selector.clone())
                                              .children(self.model_selector.clone()),
                                      })
@@ -692,7 +692,7 @@ index 19fdce8..4b013fe 100644
                                      .child(self.render_send_button(cx)),
                              ),
                      ),
-@@ -8689,6 +8743,259 @@ impl ThreadView {
+@@ -8873,6 +8927,259 @@ impl ThreadView {
          self.message_editor.read(cx).set_local_commands(commands);
      }
  
@@ -952,7 +952,7 @@ index 19fdce8..4b013fe 100644
      /// Mirrors the conversation's pending question into the composer's key
      /// context. Read on every render rather than on the elicitation events, so
      /// every way a question ends -- answered, declined, cancelled, the turn
-@@ -14315,6 +14622,8 @@ impl Render for ThreadView {
+@@ -14500,6 +14807,8 @@ impl Render for ThreadView {
          // renders (settings, connection state, feature flags).
          self.sync_local_commands(cx);
          self.sync_question_pending(cx);
@@ -961,7 +961,7 @@ index 19fdce8..4b013fe 100644
  
          let has_messages = self.has_visible_conversation(cx);
          let list_state = self.list_state.clone();
-@@ -14338,8 +14647,16 @@ impl Render for ThreadView {
+@@ -14523,8 +14832,16 @@ impl Render for ThreadView {
              });
  
          v_flex()
@@ -16324,7 +16324,7 @@ index 0808ffe..f345619 100644
              cx,
              app_state.fs.clone(),
 diff --git a/crates/zed/src/zed.rs b/crates/zed/src/zed.rs
-index d64cd06..6d52387 100644
+index 09d5b98..aad7d7c 100644
 --- a/crates/zed/src/zed.rs
 +++ b/crates/zed/src/zed.rs
 @@ -6076,6 +6076,7 @@ mod tests {

@@ -151,7 +151,7 @@ index 0a6429e..23b9c06 100644
      Copy,
      Clone,
 diff --git a/crates/workspace/src/pane.rs b/crates/workspace/src/pane.rs
-index 25771a8..9c03f26 100644
+index 70e7c50..29368c5 100644
 --- a/crates/workspace/src/pane.rs
 +++ b/crates/workspace/src/pane.rs
 @@ -1,5 +1,5 @@

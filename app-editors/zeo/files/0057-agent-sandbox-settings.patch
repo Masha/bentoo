@@ -108,13 +108,29 @@ in ai-jail's own environment and as `--env ZEO_THREAD`, since ai-jail passes
 on only the names given that way, and unjailed_agent_carries_the_zeo_thread_marker
 checks an unjailed start. They live here because this fixture is the one that
 spawns a real agent script and reads back its environment (story 050).
+
+ACP v2 (0.6.1_p20261021). Upstream fae8a35482 moved `connect` into acp.rs;
+with acp-beta on -- 0001 forces it in every Zeo build -- it tries ACP v2
+first and falls back to v1 when the agent refuses the version. Its v2 attempt
+spawned through the login shell, in the project's first folder, with Zeo's
+whole environment, and dropped the launch's io_ended signal: a jailed start
+leaked SHELL and every other variable into ai-jail, and the launch registry
+lost its record while the agent still ran. AcpV2Connection::stdio_with now
+takes the same StdioLaunch as v1 -- the override cwd, a cleared env, no login
+shell. The v2 attempt holds an end signal of its own, forwarded to the
+launch's only when the v2 connection is kept; on a v1 fallback the refused
+process is dropped and the record follows the v1 process. Tests:
+sandbox_hook_v2_tests -- a v2 start spawns once, in the root, with the
+cleared env, and its record ends with the connection; a v1 fallback spawns
+twice, both cleared, the refused process ends and the record follows the
+live one.
 ---
 
 diff --git a/Cargo.lock b/Cargo.lock
-index 0fda5dc..6a72659 100644
+index 37e1f8f..e133f7d 100644
 --- a/Cargo.lock
 +++ b/Cargo.lock
-@@ -368,6 +368,39 @@ dependencies = [
+@@ -369,6 +369,39 @@ dependencies = [
   "strum 0.28.0",
  ]
  
@@ -154,7 +170,7 @@ index 0fda5dc..6a72659 100644
  [[package]]
  name = "agent_servers"
  version = "0.1.0"
-@@ -375,6 +408,7 @@ dependencies = [
+@@ -376,6 +409,7 @@ dependencies = [
   "acp_thread",
   "action_log",
   "agent-client-protocol",
@@ -162,7 +178,7 @@ index 0fda5dc..6a72659 100644
   "anyhow",
   "async-channel 2.5.0",
   "base64 0.22.1",
-@@ -391,10 +425,12 @@ dependencies = [
+@@ -393,10 +427,12 @@ dependencies = [
   "indoc",
   "language_model",
   "log",
@@ -175,7 +191,7 @@ index 0fda5dc..6a72659 100644
   "serde",
   "serde_json",
   "settings",
-@@ -406,6 +442,7 @@ dependencies = [
+@@ -408,6 +444,7 @@ dependencies = [
   "util",
   "uuid",
   "watch",
@@ -183,7 +199,7 @@ index 0fda5dc..6a72659 100644
   "zed_credentials_provider",
  ]
  
-@@ -487,6 +524,7 @@ dependencies = [
+@@ -489,6 +526,7 @@ dependencies = [
   "action_log",
   "agent",
   "agent-client-protocol",
@@ -191,7 +207,7 @@ index 0fda5dc..6a72659 100644
   "agent_servers",
   "agent_settings",
   "agent_skills",
-@@ -16588,6 +16626,7 @@ name = "settings_ui"
+@@ -16640,6 +16678,7 @@ name = "settings_ui"
  version = "0.1.0"
  dependencies = [
   "agent",
@@ -199,7 +215,7 @@ index 0fda5dc..6a72659 100644
   "agent_settings",
   "agent_skills",
   "anyhow",
-@@ -16620,6 +16659,7 @@ dependencies = [
+@@ -16672,6 +16711,7 @@ dependencies = [
   "language_models",
   "log",
   "menu",
@@ -207,7 +223,7 @@ index 0fda5dc..6a72659 100644
   "paths",
   "picker",
   "platform_title_bar",
-@@ -16630,13 +16670,16 @@ dependencies = [
+@@ -16682,13 +16722,16 @@ dependencies = [
   "rodio",
   "schemars 1.0.4",
   "search",
@@ -224,7 +240,7 @@ index 0fda5dc..6a72659 100644
   "theme",
   "theme_settings",
   "ui",
-@@ -22593,6 +22636,7 @@ dependencies = [
+@@ -22645,6 +22688,7 @@ dependencies = [
   "activity_indicator",
   "agent",
   "agent-client-protocol",
@@ -233,7 +249,7 @@ index 0fda5dc..6a72659 100644
   "agent_settings",
   "agent_skills",
 diff --git a/Cargo.toml b/Cargo.toml
-index 92aa267..0a716d9 100644
+index 207c521..c346cee 100644
 --- a/Cargo.toml
 +++ b/Cargo.toml
 @@ -6,6 +6,7 @@ members = [
@@ -244,7 +260,7 @@ index 92aa267..0a716d9 100644
      "crates/agent_servers",
      "crates/agent_settings",
      "crates/agent_skills",
-@@ -289,6 +290,7 @@ acp_tools = { path = "crates/acp_tools" }
+@@ -290,6 +291,7 @@ acp_tools = { path = "crates/acp_tools" }
  action_log = { path = "crates/action_log" }
  activity_indicator = { path = "crates/activity_indicator" }
  agent = { path = "crates/agent" }
@@ -10679,7 +10695,7 @@ index 0000000..f3c1221
 +    );
 +}
 diff --git a/crates/agent_servers/Cargo.toml b/crates/agent_servers/Cargo.toml
-index a7e6306..6b8fc54 100644
+index d091060..37f2bc5 100644
 --- a/crates/agent_servers/Cargo.toml
 +++ b/crates/agent_servers/Cargo.toml
 @@ -29,6 +29,7 @@ doctest = false
@@ -10690,7 +10706,7 @@ index a7e6306..6b8fc54 100644
  async-channel.workspace = true
  agent-client-protocol.workspace = true
  anyhow.workspace = true
-@@ -73,7 +74,10 @@ indoc.workspace = true
+@@ -74,7 +75,10 @@ indoc.workspace = true
  acp_thread = { workspace = true, features = ["test-support"] }
  gpui = { workspace = true, features = ["test-support"] }
  gpui_tokio.workspace = true
@@ -10702,19 +10718,101 @@ index a7e6306..6b8fc54 100644
  tempfile.workspace = true
 +workspace = { workspace = true, features = ["test-support"] }
 diff --git a/crates/agent_servers/src/acp.rs b/crates/agent_servers/src/acp.rs
-index be1b72f..bc19a1d 100644
+index 55c50a9..fc23254 100644
 --- a/crates/agent_servers/src/acp.rs
 +++ b/crates/agent_servers/src/acp.rs
-@@ -12,7 +12,8 @@ use session_updates::{InboundSessionNotification, InboundSessionUpdate};
+@@ -10,6 +10,7 @@ use debug_log::AcpDebugLog;
+ pub use debug_log::{AcpDebugMessage, AcpDebugMessageContent, AcpDebugMessageDirection};
+ use session_updates::{InboundSessionNotification, InboundSessionUpdate, PendingSessionUpdates};
  pub use terminal_updates::{DecodedTerminalNotification, DecodedTerminalUpdate};
++pub(crate) use v1::StdioLaunch;
  #[cfg(any(test, feature = "test-support"))]
  pub use v1::test_support;
--pub use v1::{AcpConnection, AcpSessionList, GEMINI_TERMINAL_AUTH_METHOD_ID, connect};
-+pub use v1::{AcpConnection, AcpSessionList, GEMINI_TERMINAL_AUTH_METHOD_ID};
-+pub(crate) use v1::{StdioLaunch, connect};
- pub use v2::AcpV2Connection;
+ pub use v1::{AcpConnection, AcpSessionList, GEMINI_TERMINAL_AUTH_METHOD_ID};
+@@ -121,31 +122,53 @@ fn fallback_failure(failure: anyhow::Error, negotiation: anyhow::Error) -> anyho
+     failure.context(context)
+ }
  
- use acp_thread::{AcpThread, AuthRequired, ElicitationStore, LoadError};
+-pub async fn connect(
++pub(crate) async fn connect(
+     agent_id: AgentId,
+     project: Entity<Project>,
+     command: AgentServerCommand,
+     agent_server_store: WeakEntity<AgentServerStore>,
+     default_mode: Option<acp_v2::SessionConfigValueId>,
+     default_config_options: HashMap<String, settings::AgentConfigOptionValue>,
++    launch: StdioLaunch,
+     cx: &mut AsyncApp,
+ ) -> Result<Rc<dyn acp_thread::AgentConnection>> {
+-    let negotiation_error = if cx.update(|cx| cx.has_flag::<AcpBetaFeatureFlag>()) {
+-        match AcpV2Connection::stdio(
++    let StdioLaunch { cwd, io_ended } = launch;
++    // Both attempts start the command the same way: a jailed command runs in the root its launch
++    // decision checked, with only its own env, never through a login shell (story 043).
++    let (io_ended, negotiation_error) = if cx.update(|cx| cx.has_flag::<AcpBetaFeatureFlag>()) {
++        // The v2 attempt gets an end signal of its own. A refused negotiation is not the end of
++        // the launch -- the v1 retry below is the same launch -- so the caller's signal is
++        // forwarded only once a v2 connection is kept.
++        let (v2_io_ended, v2_io_ended_rx) = futures::channel::oneshot::channel::<()>();
++        match AcpV2Connection::stdio_with(
+             agent_id.clone(),
+             project.clone(),
+             command.clone(),
+             agent_server_store.clone(),
++            StdioLaunch {
++                cwd: cwd.clone(),
++                io_ended: Some(v2_io_ended),
++            },
+             cx,
+         )
+         .await
+         {
+-            Ok(connection) => return Ok(Rc::new(connection)),
+-            Err(error) if error.is::<UnsupportedVersion>() => Some(error),
++            Ok(connection) => {
++                if let Some(io_ended) = io_ended {
++                    cx.background_executor()
++                        .spawn(async move {
++                            v2_io_ended_rx.await.ok();
++                            drop(io_ended);
++                        })
++                        .detach();
++                }
++                return Ok(Rc::new(connection));
++            }
++            Err(error) if error.is::<UnsupportedVersion>() => (io_ended, Some(error)),
+             Err(error) => return Err(error),
+         }
+     } else {
+-        None
++        (io_ended, None)
+     };
+     v1::connect(
+         agent_id,
+@@ -154,6 +177,7 @@ pub async fn connect(
+         agent_server_store,
+         default_mode,
+         default_config_options,
++        StdioLaunch { cwd, io_ended },
+         cx,
+     )
+     .await
+@@ -1272,6 +1296,7 @@ done
+                         WeakEntity::new_invalid(),
+                         None,
+                         HashMap::default(),
++                        StdioLaunch::default(),
+                         &mut cx,
+                     )
+                     .await
+@@ -1425,6 +1450,7 @@ done
+                         WeakEntity::new_invalid(),
+                         None,
+                         HashMap::default(),
++                        StdioLaunch::default(),
+                         &mut cx,
+                     )
+                     .await
 diff --git a/crates/agent_servers/src/acp/transport.rs b/crates/agent_servers/src/acp/transport.rs
 index 86f3d0c..0dc9ca6 100644
 --- a/crates/agent_servers/src/acp/transport.rs
@@ -10929,7 +11027,7 @@ index 86f3d0c..0dc9ca6 100644
 +    }
  }
 diff --git a/crates/agent_servers/src/acp/v1.rs b/crates/agent_servers/src/acp/v1.rs
-index 9acd4bc..e44a5e8 100644
+index 69b3489..c1e3577 100644
 --- a/crates/agent_servers/src/acp/v1.rs
 +++ b/crates/agent_servers/src/acp/v1.rs
 @@ -378,22 +378,35 @@ impl AgentSessionList for AcpSessionList {
@@ -11021,7 +11119,7 @@ index 9acd4bc..e44a5e8 100644
          let mut child = transport::OwnedChild(child);
          let sessions = Rc::new(RefCell::new(HashMap::default()));
  
-@@ -611,7 +651,14 @@ impl AcpConnection {
+@@ -612,7 +652,14 @@ impl AcpConnection {
              connection_tx,
              runtime::shutdown_requested(shutdown),
          );
@@ -11038,29 +11136,132 @@ index 9acd4bc..e44a5e8 100644
          let connection_rx = async move {
              connection_rx
 diff --git a/crates/agent_servers/src/acp/v2.rs b/crates/agent_servers/src/acp/v2.rs
-index b5d42e0..7baabef 100644
+index e86d232..d4af414 100644
 --- a/crates/agent_servers/src/acp/v2.rs
 +++ b/crates/agent_servers/src/acp/v2.rs
-@@ -147,7 +147,7 @@ impl AcpV2Connection {
+@@ -1,6 +1,6 @@
+ use super::{
+     AcpDebugLog, AcpDebugMessage, AcpSession, ClientContext, ConfigOptions,
+-    ContextServerConfiguration, ForegroundWork, ModeTrigger, PendingSessionUpdates,
++    ContextServerConfiguration, ForegroundWork, ModeTrigger, PendingSessionUpdates, StdioLaunch,
+     UnsupportedVersion, apply_v2_session_notification, close_undelivered_session,
+     drain_foreground_queue, enqueue_notification, first_class_terminal_auth_task, map_acp_error,
+     mcp_configurations_for_project, runtime, transport, with_v2_client_ingress,
+@@ -212,6 +212,8 @@ struct StdioStartup {
+     stderr_task: Shared<Task<()>>,
+     runtime: Rc<RefCell<Option<ConnectionRuntime>>>,
+     drain: Option<futures::channel::oneshot::Sender<LocalBoxFuture<'static, ()>>>,
++    /// Held by the connection's IO task, like the v1 transport's `StdioLaunch::io_ended`.
++    io_ended: Option<futures::channel::oneshot::Sender<()>>,
+ }
+ 
+ impl AcpV2Connection {
+@@ -222,13 +224,36 @@ impl AcpV2Connection {
+         agent_server_store: WeakEntity<AgentServerStore>,
+         cx: &mut AsyncApp,
+     ) -> Result<Self> {
++        Self::stdio_with(
++            agent_id,
++            project,
++            command,
++            agent_server_store,
++            StdioLaunch::default(),
++            cx,
++        )
++        .await
++    }
++
++    /// [`Self::stdio`] with the launch a sandboxed start needs, on the same terms as the v1
++    /// transport's `stdio_with`: a `cwd` starts the command directly in that folder with only
++    /// its own env (no login shell), and `io_ended` is held by the connection's IO task.
++    pub(crate) async fn stdio_with(
++        agent_id: AgentId,
++        project: Entity<Project>,
++        command: AgentServerCommand,
++        agent_server_store: WeakEntity<AgentServerStore>,
++        launch: StdioLaunch,
++        cx: &mut AsyncApp,
++    ) -> Result<Self> {
++        let StdioLaunch { cwd, io_ended } = launch;
+         let transport::StdioProcess {
+             child,
+             incoming,
              outgoing,
              stderr,
              debug_log,
 -        } = transport::spawn_stdio(&project, command, cx)?;
-+        } = transport::spawn_stdio(&project, command, None, cx)?;
++        } = transport::spawn_stdio(&project, command, cwd.as_deref(), cx)?;
          let mut child = transport::OwnedChild(child);
-         let stderr_task = cx
-             .background_spawn(async move {
+         let status = child
+             .0
+@@ -270,6 +295,7 @@ impl AcpV2Connection {
+                         stderr_task,
+                         runtime,
+                         drain: Some(drain_sender),
++                        io_ended,
+                     }),
+                     &mut cx,
+                 )
+@@ -314,18 +340,20 @@ impl AcpV2Connection {
+         startup: Option<StdioStartup>,
+         cx: &mut AsyncApp,
+     ) -> Result<Self> {
+-        let (runtime, child, stderr_task, drain_sender) = match startup {
++        let (runtime, child, stderr_task, drain_sender, io_ended) = match startup {
+             Some(startup) => (
+                 startup.runtime,
+                 Some(startup.child),
+                 startup.stderr_task,
+                 startup.drain,
++                startup.io_ended,
+             ),
+             None => (
+                 Rc::new(RefCell::new(None)),
+                 None,
+                 Task::ready(()).shared(),
+                 None,
++                None,
+             ),
+         };
+         let request_elicitations = cx.new(|_| ElicitationStore::default());
+@@ -356,7 +384,15 @@ impl AcpV2Connection {
+                     )
+                     .await
+                 });
+-        client_runtime.start_io(runtime::finish_connection(connection_future, cleanup), cx);
++        let connection_future = runtime::finish_connection(connection_future, cleanup);
++        client_runtime.start_io(
++            async move {
++                // Dropped with this future, whether it completes or the task is cancelled.
++                let _io_ended = io_ended;
++                connection_future.await
++            },
++            cx,
++        );
+         let stderr_for_drain = stderr_task.clone();
+         *runtime.borrow_mut() = Some(ConnectionRuntime {
+             _client: client_runtime,
+@@ -6895,6 +6931,7 @@ exec sleep 60
+                     stderr_task: Task::ready(()).shared(),
+                     runtime: Rc::new(RefCell::new(None)),
+                     drain: None,
++                    io_ended: None,
+                 }),
+                 &mut cx,
+             )
 diff --git a/crates/agent_servers/src/agent_servers.rs b/crates/agent_servers/src/agent_servers.rs
-index ad59390..6eaef26 100644
+index ad59390..92ae407 100644
 --- a/crates/agent_servers/src/agent_servers.rs
 +++ b/crates/agent_servers/src/agent_servers.rs
-@@ -1,6 +1,10 @@
+@@ -1,6 +1,12 @@
  mod acp;
  mod custom;
  #[cfg(test)]
 +mod sandbox_hook_lifecycle_tests;
 +#[cfg(test)]
 +mod sandbox_hook_tests;
++#[cfg(test)]
++mod sandbox_hook_v2_tests;
 +#[cfg(test)]
  mod test_log_capture;
  pub mod thread_config_store;
@@ -11922,6 +12123,301 @@ index 0000000..be411ce
 +    assert_eq!(fields.get("jailed").map(String::as_str), Some("false"));
 +    assert_eq!(fields.get("reason").map(String::as_str), Some("off"));
 +}
+diff --git a/crates/agent_servers/src/sandbox_hook_v2_tests.rs b/crates/agent_servers/src/sandbox_hook_v2_tests.rs
+new file mode 100644
+index 0000000..c3c77b0
+--- /dev/null
++++ b/crates/agent_servers/src/sandbox_hook_v2_tests.rs
+@@ -0,0 +1,289 @@
++// A jailed start when acp-beta is on: `acp::connect` tries ACP v2 first and falls back to v1
++// on a version mismatch. Both attempts must start ai-jail the way story 043 starts it -- in the
++// launch root, with only the configured env, never through a login shell -- and the launch
++// record must follow the process that is actually kept. Zeo forces acp-beta on (0001), so
++// this is the path every jailed start takes.
++//
++// Behaviour-level, like `sandbox_hook_lifecycle_tests`: a fake ai-jail on the real filesystem
++// that logs every spawn and answers `initialize` itself.
++
++use std::os::unix::fs::PermissionsExt as _;
++use std::path::{Path, PathBuf};
++use std::rc::Rc;
++use std::time::Duration;
++
++use acp_thread::AgentConnection;
++use agent_sandbox::launch::LaunchRegistry;
++use fs::RealFs;
++use gpui::{TestAppContext, UpdateGlobal as _};
++use project::Project;
++use project::agent_server_store::AgentId;
++use serde_json::json;
++use settings::SettingsStore;
++
++use crate::acp::{AcpConnection, AcpV2Connection};
++use crate::custom::CustomAgentServer;
++use crate::{AgentServer as _, AgentServerDelegate};
++
++const AGENT: &str = "jailed-v2-agent";
++
++const V1_RESULT: &str = r#""result":{"protocolVersion":1,"agentCapabilities":{},"agentInfo":{"name":"jailed-v1","version":"1"}}"#;
++const V2_RESULT: &str = r#""result":{"protocolVersion":2,"info":{"name":"jailed-v2","version":"1"},"capabilities":{"session":{}}}"#;
++
++/// What `sandbox_jail_process_gets_only_the_configured_env_and_zeos_base` allows: the entry's
++/// env, Zeo's base, and what the fake's own /bin/sh sets.
++const ALLOWED_ENV: &[&str] = &[
++    "ZEO_THREAD",
++    "HOOK_SECRET",
++    "PATH",
++    "HOME",
++    "XDG_RUNTIME_DIR",
++    "LANG",
++    "PWD",
++    "OLDPWD",
++    "SHLVL",
++    "_",
++    "NO_PROXY",
++    "NO_BROWSER",
++];
++
++struct JailFixture {
++    _tmp: tempfile::TempDir,
++    base: PathBuf,
++    root: PathBuf,
++}
++
++impl JailFixture {
++    /// `v2_result` is what the fake answers to a v2 `initialize`; a v1 one is always answered.
++    fn new(v2_result: &str) -> Self {
++        let tmp = tempfile::tempdir().expect("tempdir");
++        let base = tmp.path().canonicalize().expect("canonical");
++        let root = base.join("app");
++        std::fs::create_dir_all(root.join(".git")).expect("project");
++        std::fs::create_dir_all(base.join("claude-jailed")).expect("claude dir");
++        std::fs::create_dir_all(base.join("bin")).expect("bin");
++        let script = r#"#!/bin/sh
++if [ "$1" = --version ]; then echo 'ai-jail 2.8.1'; exit 0; fi
++# The capability probe (`--help`) is not a start of the agent.
++if [ "$1" = --help ]; then exit 0; fi
++printf '%s %s\n' "$$" "$(pwd)" >> 'BASE/spawns.log'
++env > "BASE/jail.env.$$"
++while IFS= read -r request; do
++    case "$request" in
++        *'"method":"initialize"'*)
++            id=${request#*\"id\":}; id=${id%%,*}
++            case "$request" in
++                *'"protocolVersion":2'*) printf '{"jsonrpc":"2.0","id":%s,%s}\n' "$id" 'V2_RESULT' ;;
++                *) printf '{"jsonrpc":"2.0","id":%s,%s}\n' "$id" 'V1_RESULT' ;;
++            esac
++            ;;
++    esac
++done
++"#
++        .replace("BASE", &base.display().to_string())
++        .replace("V2_RESULT", v2_result)
++        .replace("V1_RESULT", V1_RESULT);
++        let ai_jail = base.join("bin/ai-jail");
++        std::fs::write(&ai_jail, script).expect("write ai-jail");
++        std::fs::set_permissions(&ai_jail, std::fs::Permissions::from_mode(0o755)).expect("chmod");
++        // The jailed command names the agent; ai-jail is a fake, so it never runs.
++        let agent = base.join("bin/claude-agent-acp-plus");
++        std::fs::write(&agent, "#!/bin/sh\nexit 9\n").expect("write agent");
++        std::fs::set_permissions(&agent, std::fs::Permissions::from_mode(0o755)).expect("chmod");
++        let settings = json!({
++            "agent_servers": {
++                AGENT: {
++                    "type": "custom",
++                    "command": agent,
++                    "args": [],
++                    "env": { "HOOK_SECRET": "hook-secret-value" }
++                }
++            },
++            "agent_sandbox": {
++                "enabled": true,
++                "ai_jail_path": ai_jail,
++                "claude_config_dir": base.join("claude-jailed"),
++            },
++            "agent_memory": { "enabled": false }
++        });
++        std::fs::write(base.join("settings.json"), settings.to_string()).expect("settings");
++        Self {
++            _tmp: tmp,
++            base,
++            root,
++        }
++    }
++
++    /// Every spawn of the fake, in order: (pid, working directory).
++    fn spawns(&self) -> Vec<(String, String)> {
++        std::fs::read_to_string(self.base.join("spawns.log"))
++            .unwrap_or_default()
++            .lines()
++            .filter_map(|line| line.split_once(' '))
++            .map(|(pid, cwd)| (pid.to_string(), cwd.to_string()))
++            .collect()
++    }
++
++    fn assert_cleared_env(&self, pid: &str) {
++        let dump = std::fs::read_to_string(self.base.join(format!("jail.env.{pid}")))
++            .expect("the fake dumped its env");
++        for name in dump
++            .lines()
++            .filter_map(|line| line.split_once('='))
++            .map(|(n, _)| n)
++        {
++            assert!(
++                ALLOWED_ENV.contains(&name),
++                "{name} reached ai-jail (pid {pid})"
++            );
++        }
++        assert!(dump.contains("HOOK_SECRET=hook-secret-value"));
++    }
++}
++
++fn init(f: &JailFixture, cx: &mut TestAppContext) {
++    cx.executor().allow_parking();
++    let settings = std::fs::read_to_string(f.base.join("settings.json")).expect("settings");
++    cx.update(|cx| {
++        let store = SettingsStore::test(cx);
++        cx.set_global(store);
++        release_channel::init(semver::Version::new(0, 0, 0), cx);
++        agent_sandbox::init(cx);
++        SettingsStore::update_global(cx, |store, cx| {
++            store
++                .set_user_settings(&settings, cx)
++                .result()
++                .expect("user settings parse");
++        });
++    });
++}
++
++async fn start(f: &JailFixture, cx: &mut TestAppContext) -> Rc<dyn AgentConnection> {
++    let project = Project::test(RealFs::new(None, cx.executor()), [f.root.as_path()], cx).await;
++    cx.run_until_parked();
++    let store = project.read_with(cx, |project, _| project.agent_server_store().clone());
++    let delegate = AgentServerDelegate::new(store, None, None);
++    let server = CustomAgentServer::new(AgentId::new(AGENT));
++    let connect = cx.update(|cx| server.connect(delegate, project.clone(), cx));
++    let timeout = cx.background_executor.timer(Duration::from_secs(10));
++    let result = futures::select! {
++        result = futures::FutureExt::fuse(connect) => result,
++        _ = futures::FutureExt::fuse(timeout) => panic!("timed out starting the agent"),
++    };
++    cx.run_until_parked();
++    result.expect("the jailed start connects")
++}
++
++fn has_record(f: &JailFixture, cx: &mut TestAppContext) -> bool {
++    cx.update(|cx| LaunchRegistry::get(&AgentId::new(AGENT), &f.root, cx).is_some())
++}
++
++/// Gone or a zombie: a killed child is not always reaped at once, and a zombie runs nothing.
++fn process_is_gone(pid: &str) -> bool {
++    match std::fs::read_to_string(Path::new("/proc").join(pid).join("stat")) {
++        Err(_) => true,
++        Ok(stat) => stat
++            .rsplit_once(')')
++            .is_some_and(|(_, rest)| rest.trim_start().starts_with('Z')),
++    }
++}
++
++async fn wait_until(
++    cx: &mut TestAppContext,
++    what: &str,
++    mut done: impl FnMut(&mut TestAppContext) -> bool,
++) {
++    for _ in 0..50 {
++        cx.run_until_parked();
++        if done(cx) {
++            return;
++        }
++        cx.background_executor
++            .timer(Duration::from_millis(100))
++            .await;
++    }
++    panic!("{what}");
++}
++
++#[gpui::test]
++async fn jailed_v2_start_spawns_once_in_the_root_with_the_cleared_env(cx: &mut TestAppContext) {
++    let f = JailFixture::new(V2_RESULT);
++    init(&f, cx);
++    let connection = start(&f, cx).await;
++    assert!(
++        connection.clone().downcast::<AcpV2Connection>().is_some(),
++        "the agent speaks v2, so the v2 connection is kept"
++    );
++
++    let spawns = f.spawns();
++    assert_eq!(spawns.len(), 1, "exactly one spawn: {spawns:?}");
++    let (pid, cwd) = &spawns[0];
++    assert_eq!(
++        cwd,
++        &f.root.display().to_string(),
++        "spawned in the launch root"
++    );
++    f.assert_cleared_env(pid);
++    assert!(
++        has_record(&f, cx),
++        "registered while the v2 connection lives"
++    );
++
++    drop(connection);
++    wait_until(cx, "the launch record outlived its v2 connection", |cx| {
++        !has_record(&f, cx)
++    })
++    .await;
++    wait_until(cx, "the v2 process outlived its connection", |_| {
++        process_is_gone(pid)
++    })
++    .await;
++}
++
++#[gpui::test]
++async fn jailed_v1_fallback_replaces_the_v2_attempt_and_keeps_the_record(cx: &mut TestAppContext) {
++    // A v1-only agent (the Plus adapter today) answers a v2 `initialize` with protocol 1.
++    let f = JailFixture::new(V1_RESULT);
++    init(&f, cx);
++    let connection = start(&f, cx).await;
++    assert!(
++        connection.clone().downcast::<AcpConnection>().is_some(),
++        "the v1 fallback is kept"
++    );
++
++    let spawns = f.spawns();
++    assert_eq!(
++        spawns.len(),
++        2,
++        "the v2 attempt, then the v1 retry: {spawns:?}"
++    );
++    let ((first, first_cwd), (second, second_cwd)) = (&spawns[0], &spawns[1]);
++    assert_ne!(first, second, "the fallback is a fresh process");
++    for (pid, cwd) in [(first, first_cwd), (second, second_cwd)] {
++        assert_eq!(
++            cwd,
++            &f.root.display().to_string(),
++            "pid {pid} in the launch root"
++        );
++        f.assert_cleared_env(pid);
++    }
++    wait_until(cx, "the refused v2 attempt is still running", |_| {
++        process_is_gone(first)
++    })
++    .await;
++    assert!(!process_is_gone(second), "the kept v1 process runs");
++    assert!(
++        has_record(&f, cx),
++        "the record follows the live v1 process, not the refused attempt"
++    );
++
++    drop(connection);
++    wait_until(cx, "the launch record outlived its v1 connection", |cx| {
++        !has_record(&f, cx)
++    })
++    .await;
++    wait_until(cx, "the v1 process outlived its connection", |_| {
++        process_is_gone(second)
++    })
++    .await;
++}
 diff --git a/crates/agent_servers/src/test_log_capture.rs b/crates/agent_servers/src/test_log_capture.rs
 index 4fb94c7..024a465 100644
 --- a/crates/agent_servers/src/test_log_capture.rs
@@ -12020,7 +12516,7 @@ index 4fb94c7..024a465 100644
  /// parallel in one process, so callers pass needles unique to their test.
  pub(crate) fn logged(needles: &[&str]) -> bool {
 diff --git a/crates/agent_ui/Cargo.toml b/crates/agent_ui/Cargo.toml
-index 2ff9434..8a4203c 100644
+index 4e9c635..b3c9b39 100644
 --- a/crates/agent_ui/Cargo.toml
 +++ b/crates/agent_ui/Cargo.toml
 @@ -31,6 +31,7 @@ action_log.workspace = true
@@ -12743,7 +13239,7 @@ index 0000000..1a9c116
 +    }
 +}
 diff --git a/crates/agent_ui/src/agent_panel.rs b/crates/agent_ui/src/agent_panel.rs
-index f900b0e..5b63220 100644
+index 5693c81..1ef6d5f 100644
 --- a/crates/agent_ui/src/agent_panel.rs
 +++ b/crates/agent_ui/src/agent_panel.rs
 @@ -723,6 +723,7 @@ pub fn init(cx: &mut App) {
@@ -13014,7 +13510,7 @@ index 0000000..51b1d6b
 +    }
 +}
 diff --git a/crates/agent_ui/src/agent_ui.rs b/crates/agent_ui/src/agent_ui.rs
-index 6fc9ad2..8a55068 100644
+index f714ad5..20798e2 100644
 --- a/crates/agent_ui/src/agent_ui.rs
 +++ b/crates/agent_ui/src/agent_ui.rs
 @@ -1,9 +1,11 @@
@@ -13029,7 +13525,7 @@ index 6fc9ad2..8a55068 100644
  mod agent_session_router;
  mod buffer_codegen;
  mod completion_provider;
-@@ -1110,6 +1112,9 @@ mod slash_command_in_code_block_tests;
+@@ -1111,6 +1113,9 @@ mod slash_command_in_code_block_tests;
  #[cfg(test)]
  mod devtools_mention_tests;
  
@@ -13040,10 +13536,10 @@ index 6fc9ad2..8a55068 100644
  mod devtools_delivery_tests;
  
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
-index 5b5763b..39c75dd 100644
+index a730a99..36a63d6 100644
 --- a/crates/agent_ui/src/conversation_view/thread_view.rs
 +++ b/crates/agent_ui/src/conversation_view/thread_view.rs
-@@ -6065,6 +6065,22 @@ impl ThreadView {
+@@ -6238,6 +6238,22 @@ impl ThreadView {
          )
      }
  
@@ -16252,7 +16748,7 @@ index b1a7977..4132e69 100644
          edit_prediction_registry::init(app_state.client.clone(), app_state.user_store.clone(), cx);
          let prompt_builder = PromptBuilder::load(app_state.fs.clone(), stdout_is_a_pty(), cx);
 diff --git a/crates/zed/src/zed.rs b/crates/zed/src/zed.rs
-index d500ffc..291378b 100644
+index d8785fb..681871c 100644
 --- a/crates/zed/src/zed.rs
 +++ b/crates/zed/src/zed.rs
 @@ -5984,6 +5984,8 @@ mod tests {

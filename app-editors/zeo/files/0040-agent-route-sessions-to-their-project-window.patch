@@ -2420,7 +2420,7 @@ index 0000000..5b85856
 +    assert_eq!(quick.await, Some(7), "an open that finishes in time keeps its result");
 +}
 diff --git a/crates/agent_ui/src/agent_ui.rs b/crates/agent_ui/src/agent_ui.rs
-index a340b53..ca8cdbe 100644
+index c0d49b9..f0eae0e 100644
 --- a/crates/agent_ui/src/agent_ui.rs
 +++ b/crates/agent_ui/src/agent_ui.rs
 @@ -4,6 +4,7 @@ mod agent_diff;
@@ -2431,7 +2431,7 @@ index a340b53..ca8cdbe 100644
  mod buffer_codegen;
  mod completion_provider;
  mod config_options;
-@@ -83,6 +84,9 @@ pub use crate::agent_panel::{
+@@ -84,6 +85,9 @@ pub use crate::agent_panel::{
      AgentPanel, AgentPanelEvent, AgentPanelTerminalInfo, TerminalId, ThreadTitleRegenerationResult,
  };
  use crate::agent_registry_ui::AgentRegistryPage;
@@ -2442,11 +2442,11 @@ index a340b53..ca8cdbe 100644
  pub use crate::message_editor::MessageEditorEvent;
  pub use crate::task_label::{
 diff --git a/crates/agent_ui/src/conversation_view.rs b/crates/agent_ui/src/conversation_view.rs
-index 512fd31..d7909bc 100644
+index d277313..7e01e30 100644
 --- a/crates/agent_ui/src/conversation_view.rs
 +++ b/crates/agent_ui/src/conversation_view.rs
-@@ -1870,6 +1870,14 @@ impl ConversationView {
-         matches!(self.server_state, ServerState::Loading { .. })
+@@ -1952,6 +1952,14 @@ impl ConversationView {
+         })
      }
  
 +    /// Why the conversation failed to load, if it did.
@@ -2609,7 +2609,7 @@ index 7716724..35c551f 100644
      if stdout_is_a_pty() {
          if client::IMPERSONATE_LOGIN.is_some() {
 diff --git a/crates/zed/src/zed.rs b/crates/zed/src/zed.rs
-index 2d0d6f5..d500ffc 100644
+index 81bd254..d8785fb 100644
 --- a/crates/zed/src/zed.rs
 +++ b/crates/zed/src/zed.rs
 @@ -2930,6 +2930,10 @@ pub(crate) fn eager_load_active_theme_and_icon_theme(fs: Arc<dyn Fs>, cx: &mut A

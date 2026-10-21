@@ -31,7 +31,7 @@ the About window's body so they can be tested.
 ---
 
 diff --git a/crates/zed/src/zed.rs b/crates/zed/src/zed.rs
-index 601537b..3289996 100644
+index 734d916..efd80bf 100644
 --- a/crates/zed/src/zed.rs
 +++ b/crates/zed/src/zed.rs
 @@ -1526,7 +1526,31 @@ fn initialize_pane(

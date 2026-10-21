@@ -152,7 +152,7 @@ index e9c089e..4101322 100644
    // that receives element selections from a dev-server page and hands them to
    // the agent panel. Turning it off stops listening and removes the socket.
 diff --git a/crates/agent_ui/src/agent_panel.rs b/crates/agent_ui/src/agent_panel.rs
-index 5b63220..de5b7dd 100644
+index 1ef6d5f..6ea3752 100644
 --- a/crates/agent_ui/src/agent_panel.rs
 +++ b/crates/agent_ui/src/agent_panel.rs
 @@ -3818,6 +3818,58 @@ impl AgentPanel {
@@ -241,7 +241,7 @@ index 5b63220..de5b7dd 100644
 -            .filter(|(_id, view)| {
 +            .filter(|(id, view)| {
                  let view = view.read(cx);
-                 if view.has_pending_selections() {
+                 if view.has_pending_selections() || view.has_saved_input() {
                      return false;
                  }
                  let Some(thread_view) = view.root_thread_view() else {
@@ -268,7 +268,7 @@ index 5b63220..de5b7dd 100644
      }
  
 diff --git a/crates/agent_ui/src/agent_ui.rs b/crates/agent_ui/src/agent_ui.rs
-index 92b827e..fec4afd 100644
+index e217855..1cb5ab9 100644
 --- a/crates/agent_ui/src/agent_ui.rs
 +++ b/crates/agent_ui/src/agent_ui.rs
 @@ -15,7 +15,11 @@ mod config_options;
@@ -283,7 +283,7 @@ index 92b827e..fec4afd 100644
  mod diagnostics;
  pub mod draft_prompt_store;
  mod entry_view_state;
-@@ -303,6 +307,8 @@ pub enum AgentThreadSource {
+@@ -304,6 +308,8 @@ pub enum AgentThreadSource {
      AgentPanel,
      GitPanel,
      Sidebar,
@@ -292,7 +292,7 @@ index 92b827e..fec4afd 100644
  }
  
  impl AgentThreadSource {
-@@ -311,6 +317,7 @@ impl AgentThreadSource {
+@@ -312,6 +318,7 @@ impl AgentThreadSource {
              Self::AgentPanel => "agent_panel",
              Self::GitPanel => "git_panel",
              Self::Sidebar => "sidebar",
@@ -300,7 +300,7 @@ index 92b827e..fec4afd 100644
          }
      }
  }
-@@ -766,8 +773,13 @@ pub fn init(
+@@ -767,8 +774,13 @@ pub fn init(
      context_server_configuration::init(language_registry, fs.clone(), cx);
      thread_metadata_store::init(cx);
      thread_organization::init(cx);
@@ -315,7 +315,7 @@ index 92b827e..fec4afd 100644
      inline_assistant::init(fs.clone(), prompt_builder.clone(), cx);
      terminal_inline_assistant::init(fs.clone(), prompt_builder, cx);
 diff --git a/crates/agent_ui/src/browser_channel.rs b/crates/agent_ui/src/browser_channel.rs
-index 3d9af37..e992f2f 100644
+index 7a6f0cf..a24dee3 100644
 --- a/crates/agent_ui/src/browser_channel.rs
 +++ b/crates/agent_ui/src/browser_channel.rs
 @@ -7,13 +7,20 @@
@@ -1184,7 +1184,7 @@ index 3d9af37..e992f2f 100644
  fn thread_info(located: &Located, followed: bool, cx: &App) -> ThreadInfo {
      let thread = located.thread.read(cx);
      let project = thread
-@@ -1380,7 +2000,7 @@ fn received_markdown(content: &MessageContent, cx: &App) -> String {
+@@ -1382,7 +2002,7 @@ fn received_markdown(content: &MessageContent, cx: &App) -> String {
  const TITLE_BYTES: usize = 4 * 1024;
  
  /// `text` cut to [`TITLE_BYTES`] on a character boundary, with an ellipsis when cut.
@@ -1193,7 +1193,7 @@ index 3d9af37..e992f2f 100644
      if text.len() <= TITLE_BYTES {
          return text.to_string();
      }
-@@ -1856,6 +2476,7 @@ fn review_streams(cx: &mut App) {
+@@ -1858,6 +2478,7 @@ fn review_streams(cx: &mut App) {
          .map(|(id, _)| id.clone())
          .collect();
      for id in closed {
@@ -1201,7 +1201,7 @@ index 3d9af37..e992f2f 100644
          if let Some(stream) = global(cx)
              .sessions
              .get_mut(&id)
-@@ -1863,6 +2484,10 @@ fn review_streams(cx: &mut App) {
+@@ -1865,6 +2486,10 @@ fn review_streams(cx: &mut App) {
          {
              stream.attached = None;
          }
@@ -1212,7 +1212,7 @@ index 3d9af37..e992f2f 100644
          if stream_send(&id, ServerMsg::ThreadClosed { v: V2 }, cx) {
              log_line(
                  log::Level::Debug,
-@@ -1926,6 +2551,94 @@ fn review_streams(cx: &mut App) {
+@@ -1928,6 +2553,94 @@ fn review_streams(cx: &mut App) {
      }
  }
  
@@ -1307,7 +1307,7 @@ index 3d9af37..e992f2f 100644
  // ---------------------------------------------------------------------------------------------
  // Driving a thread: send, stop, authorize, open in Zeo (R7, R5.7)
  
-@@ -1942,22 +2655,35 @@ struct Driven {
+@@ -1944,22 +2657,35 @@ struct Driven {
  
  /// The thread session `id` acts on: the one it streams, else the followed one (a session that
  /// never subscribed follows). A pinned thread that closed is `thread_closed`; nothing to follow
@@ -1347,7 +1347,7 @@ index 3d9af37..e992f2f 100644
      let thread = match attached {
          Some(thread) => thread,
          None if pinned => return Err(ChannelError::ThreadClosed),
-@@ -1999,17 +2725,26 @@ fn holder_of(thread: &Entity<AcpThread>, cx: &App) -> Option<Driven> {
+@@ -2001,17 +2727,26 @@ fn holder_of(thread: &Entity<AcpThread>, cx: &App) -> Option<Driven> {
  /// composer: a detached composer of the thread gets the text, one browser chip per element and
  /// capture, and the images when the agent takes them, then goes through the thread view's
  /// queue-or-send path (R7.1–R7.3, R7.9, R10.5). Answered once the thread has taken the message
@@ -1378,7 +1378,7 @@ index 3d9af37..e992f2f 100644
      };
      let attachment_count = attachments.len();
      let mut contents = Vec::new();
-@@ -2034,7 +2769,9 @@ fn send_message(id: &SessionId, request: SendRequest, cx: &mut App) -> &'static
+@@ -2036,7 +2771,9 @@ fn send_message(id: &SessionId, request: SendRequest, cx: &mut App) -> &'static
      let images = if sent_images == SentImages::Included {
          match decode_images(&images) {
              Ok(images) => images,
@@ -1389,7 +1389,7 @@ index 3d9af37..e992f2f 100644
          }
      } else {
          Vec::new()
-@@ -2063,7 +2800,7 @@ fn send_message(id: &SessionId, request: SendRequest, cx: &mut App) -> &'static
+@@ -2065,7 +2802,7 @@ fn send_message(id: &SessionId, request: SendRequest, cx: &mut App) -> &'static
          Ok(composed) => composed,
          Err(error) => {
              let error = error.context("composing the message");
@@ -1398,7 +1398,7 @@ index 3d9af37..e992f2f 100644
          }
      };
  
-@@ -2120,14 +2857,14 @@ fn send_message(id: &SessionId, request: SendRequest, cx: &mut App) -> &'static
+@@ -2122,14 +2859,14 @@ fn send_message(id: &SessionId, request: SendRequest, cx: &mut App) -> &'static
                  log_line(
                      log::Level::Info,
                      format!(
@@ -1416,7 +1416,7 @@ index 3d9af37..e992f2f 100644
              }
          });
      })
-@@ -2167,9 +2904,11 @@ fn sent_images_code(images: SentImages) -> &'static str {
+@@ -2169,9 +2906,11 @@ fn sent_images_code(images: SentImages) -> &'static str {
  }
  
  /// Answers `send_failed` with what failed after the contract's message, so the sidebar can say
@@ -1429,7 +1429,7 @@ index 3d9af37..e992f2f 100644
      request_id: String,
      error: &anyhow::Error,
      reason: &'static str,
-@@ -2189,18 +2928,18 @@ fn send_failed(
+@@ -2191,18 +2930,18 @@ fn send_failed(
      );
      log_line(
          log::Level::Warn,
@@ -1454,7 +1454,7 @@ index 3d9af37..e992f2f 100644
      };
      driven
          .view
-@@ -2225,14 +2964,17 @@ fn cancel(id: &SessionId, request_id: String, cx: &mut App) -> &'static str {
+@@ -2227,14 +2966,17 @@ fn cancel(id: &SessionId, request_id: String, cx: &mut App) -> &'static str {
  /// changes nothing.
  fn authorize(
      id: &SessionId,
@@ -1474,7 +1474,7 @@ index 3d9af37..e992f2f 100644
      };
      let found = driven
          .thread
-@@ -2343,7 +3085,7 @@ fn open_in_zeo(
+@@ -2345,7 +3087,7 @@ fn open_in_zeo(
      app_state: Arc<AppState>,
      cx: &mut App,
  ) -> &'static str {
@@ -1483,7 +1483,7 @@ index 3d9af37..e992f2f 100644
          Ok(driven) => driven,
          Err(error) => return reply_error(id, Some(request_id), error, cx),
      };
-@@ -2465,6 +3207,31 @@ fn send(id: &SessionId, msg: ServerMsg, cx: &mut App) {
+@@ -2467,6 +3209,31 @@ fn send(id: &SessionId, msg: ServerMsg, cx: &mut App) {
      }
  }
  
@@ -1515,7 +1515,7 @@ index 3d9af37..e992f2f 100644
  /// Answers `request_id` with `error`; returns the error's code for the log line.
  fn reply_error(
      id: &SessionId,
-@@ -2478,7 +3245,7 @@ fn reply_error(
+@@ -2480,7 +3247,7 @@ fn reply_error(
  
  /// Logs one of this module's event lines. Tests read back the lines their own thread logged:
  /// installing a `log` logger is not possible in a test binary that already has one.
@@ -1524,7 +1524,7 @@ index 3d9af37..e992f2f 100644
      #[cfg(test)]
      LOGGED.with_borrow_mut(|lines| lines.push((level, line.clone())));
      log::log!(level, "{line}");
-@@ -2506,9 +3273,51 @@ fn logged_levels() -> Vec<(log::Level, String)> {
+@@ -2508,9 +3275,51 @@ fn logged_levels() -> Vec<(log::Level, String)> {
  #[path = "browser_channel_tests/approval.rs"]
  mod approval;
  #[cfg(test)]
@@ -7126,7 +7126,7 @@ index b47903e..8e1e946 100644
  }
  
 diff --git a/crates/agent_ui/src/browser_wire.rs b/crates/agent_ui/src/browser_wire.rs
-index e94f505..a36a63a 100644
+index 82bee58..edcf6f9 100644
 --- a/crates/agent_ui/src/browser_wire.rs
 +++ b/crates/agent_ui/src/browser_wire.rs
 @@ -50,6 +50,10 @@ pub enum ChannelError {
@@ -11654,7 +11654,7 @@ index eb9f1ff..c72ded3 100644
              apply_live_row_state(
                  &mut row,
 diff --git a/crates/sidebar/src/sidebar.rs b/crates/sidebar/src/sidebar.rs
-index 26e1935..9c0aa94 100644
+index 40b8a25..1b76585 100644
 --- a/crates/sidebar/src/sidebar.rs
 +++ b/crates/sidebar/src/sidebar.rs
 @@ -6,6 +6,7 @@ use action_log::DiffStats;
@@ -11958,7 +11958,7 @@ index 26e1935..9c0aa94 100644
      fn start_renaming_entry(
          &mut self,
          ix: usize,
-@@ -6768,6 +6865,9 @@ impl Sidebar {
+@@ -6771,6 +6868,9 @@ impl Sidebar {
              .when_some(thread.pinned_project_label.clone(), |this, label| {
                  this.project_name(label)
              })
@@ -11968,7 +11968,7 @@ index 26e1935..9c0aa94 100644
              .timestamp(timestamp)
              .highlight_positions(thread.highlight_positions.to_vec())
              .title_generating(title_generating)
-@@ -7857,6 +7957,8 @@ impl Sidebar {
+@@ -7869,6 +7969,8 @@ impl Sidebar {
          let has_query = self.has_filter_query(cx);
          let message = if has_query {
              "No threads match your search."
@@ -11977,7 +11977,7 @@ index 26e1935..9c0aa94 100644
          } else {
              "No threads yet"
          };
-@@ -7963,6 +8065,20 @@ impl Sidebar {
+@@ -7975,6 +8077,20 @@ impl Sidebar {
                                      && !self.filter_editor.focus_handle(cx).is_focused(window),
                                  |this| this.child(KeyBinding::for_action(&FocusSidebarFilter, cx)),
                              )
@@ -12389,7 +12389,7 @@ index 5d35420..243b354 100644
      }
  
 diff --git a/crates/sidebar/src/sidebar_tests.rs b/crates/sidebar/src/sidebar_tests.rs
-index c9d25e3..e6ed40d 100644
+index 057d677..c06c3fa 100644
 --- a/crates/sidebar/src/sidebar_tests.rs
 +++ b/crates/sidebar/src/sidebar_tests.rs
 @@ -1547,6 +1547,7 @@ async fn test_neighboring_activatable_entry_stays_within_project(cx: &mut TestAp
@@ -12441,10 +12441,10 @@ index c9d25e3..e6ed40d 100644
              // Collapsed project header
              ListEntry::ProjectHeader {
 diff --git a/crates/ui/src/components/ai/thread_item.rs b/crates/ui/src/components/ai/thread_item.rs
-index e3f1333..ab3d9da 100644
+index 1f5d3af..1f4528b 100644
 --- a/crates/ui/src/components/ai/thread_item.rs
 +++ b/crates/ui/src/components/ai/thread_item.rs
-@@ -70,6 +70,7 @@ pub struct ThreadItem {
+@@ -71,6 +71,7 @@ pub struct ThreadItem {
      on_hover: Box<dyn Fn(&bool, &mut Window, &mut App) + 'static>,
      action_slot: Option<AnyElement>,
      base_bg: Option<Hsla>,
@@ -12452,7 +12452,7 @@ index e3f1333..ab3d9da 100644
  }
  
  impl ThreadItem {
-@@ -105,6 +106,7 @@ impl ThreadItem {
+@@ -106,6 +107,7 @@ impl ThreadItem {
              on_hover: Box::new(|_, _, _| {}),
              action_slot: None,
              base_bg: None,
@@ -12460,7 +12460,7 @@ index e3f1333..ab3d9da 100644
          }
      }
  
-@@ -252,6 +254,12 @@ impl ThreadItem {
+@@ -253,6 +255,12 @@ impl ThreadItem {
          self.base_bg = Some(color);
          self
      }
@@ -12473,7 +12473,7 @@ index e3f1333..ab3d9da 100644
  }
  
  impl RenderOnce for ThreadItem {
-@@ -372,13 +380,25 @@ impl RenderOnce for ThreadItem {
+@@ -379,13 +387,25 @@ impl RenderOnce for ThreadItem {
  
          let title = self.title;
          let highlight_positions = self.highlight_positions;
@@ -12500,7 +12500,7 @@ index e3f1333..ab3d9da 100644
                  .with_animation(
                      "generating-title",
                      Animation::new(Duration::from_secs(2))
-@@ -390,12 +410,12 @@ impl RenderOnce for ThreadItem {
+@@ -397,12 +417,12 @@ impl RenderOnce for ThreadItem {
          } else if highlight_positions.is_empty() {
              Label::new(title)
                  .when_some(self.title_label_color, |label, color| label.color(color))
@@ -12515,7 +12515,7 @@ index e3f1333..ab3d9da 100644
                  .into_any_element()
          };
  
-@@ -479,9 +499,10 @@ impl RenderOnce for ThreadItem {
+@@ -486,9 +506,10 @@ impl RenderOnce for ThreadItem {
                              .flex_1()
                              .gap_1p5()
                              .child(icon)
@@ -12528,7 +12528,7 @@ index e3f1333..ab3d9da 100644
                          this.child(gradient_overlay)
                      })
                      .when(self.hovered, |this| {
-@@ -1051,6 +1072,10 @@ impl Component for ThreadItem {
+@@ -1058,6 +1079,10 @@ impl Component for ThreadItem {
      }
  }
  
@@ -12661,7 +12661,7 @@ index 0000000..137512d
 +    );
 +}
 diff --git a/crates/zed/src/zed.rs b/crates/zed/src/zed.rs
-index de703f4..a466efd 100644
+index 32a8b49..816fa39 100644
 --- a/crates/zed/src/zed.rs
 +++ b/crates/zed/src/zed.rs
 @@ -6010,6 +6010,7 @@ mod tests {

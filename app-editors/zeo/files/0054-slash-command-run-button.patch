@@ -63,7 +63,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 ---
 
 diff --git a/crates/agent_ui/src/agent_panel.rs b/crates/agent_ui/src/agent_panel.rs
-index 0238d92..e509fc2 100644
+index c65f7f4..b9cc408 100644
 --- a/crates/agent_ui/src/agent_panel.rs
 +++ b/crates/agent_ui/src/agent_panel.rs
 @@ -2332,6 +2332,87 @@ impl AgentPanel {
@@ -1116,10 +1116,10 @@ index 0000000..d99f46a
 +    assert_sent_new_thread(&panel, &source, &source_agent, "/compact", &mut cx);
 +}
 diff --git a/crates/agent_ui/src/agent_ui.rs b/crates/agent_ui/src/agent_ui.rs
-index e3b8c34..d8babd2 100644
+index 1a53a37..6148773 100644
 --- a/crates/agent_ui/src/agent_ui.rs
 +++ b/crates/agent_ui/src/agent_ui.rs
-@@ -637,6 +637,12 @@ pub enum AgentInitialContent {
+@@ -638,6 +638,12 @@ pub enum AgentInitialContent {
          blocks: Vec<acp_v2::ContentBlock>,
          auto_submit: bool,
      },
@@ -1133,10 +1133,10 @@ index e3b8c34..d8babd2 100644
  }
  
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
-index 9cd5485..1686275 100644
+index 9c8c011..929e3cb 100644
 --- a/crates/agent_ui/src/conversation_view/thread_view.rs
 +++ b/crates/agent_ui/src/conversation_view/thread_view.rs
-@@ -830,6 +830,7 @@ impl ThreadView {
+@@ -952,6 +952,7 @@ impl ThreadView {
          let placeholder = placeholder_text(agent_display_name.as_ref(), has_slash_completions);
  
          let mut should_auto_submit = false;
@@ -1144,7 +1144,7 @@ index 9cd5485..1686275 100644
          let mut show_external_source_prompt_warning = false;
  
          let message_editor = cx.new(|cx| {
-@@ -860,6 +861,11 @@ impl ThreadView {
+@@ -982,6 +983,11 @@ impl ThreadView {
                          should_auto_submit = auto_submit;
                          Some(blocks)
                      }
@@ -1156,7 +1156,7 @@ index 9cd5485..1686275 100644
                      AgentInitialContent::FromExternalSource(prompt) => {
                          show_external_source_prompt_warning = true;
                          // SECURITY: Be explicit about not auto submitting prompt from external source.
-@@ -1132,7 +1138,14 @@ impl ThreadView {
+@@ -1254,7 +1260,14 @@ impl ThreadView {
              });
  
          if should_auto_submit {
@@ -1171,7 +1171,7 @@ index 9cd5485..1686275 100644
          }
          this
      }
-@@ -8922,8 +8935,9 @@ impl ThreadView {
+@@ -9104,8 +9117,9 @@ impl ThreadView {
      }
  
      /// `offers_slash_commands` is set only for an agent's message: a code block
@@ -1183,7 +1183,7 @@ index 9cd5485..1686275 100644
      fn render_message_content(
          &self,
          entry_ix: usize,
-@@ -13187,43 +13201,40 @@ impl ThreadView {
+@@ -13370,43 +13384,40 @@ impl ThreadView {
      fn slash_command_action(
          &self,
          cx: &App,
@@ -1257,7 +1257,7 @@ index 9cd5485..1686275 100644
          }
      }
  
-@@ -13921,6 +13932,71 @@ impl ThreadView {
+@@ -14104,6 +14115,71 @@ impl ThreadView {
      }
  }
  
@@ -1915,7 +1915,7 @@ index e38ceed..5ab92e1 100644
 +    );
  }
 diff --git a/crates/markdown/src/markdown.rs b/crates/markdown/src/markdown.rs
-index 6b77137..559d37f 100644
+index 876ebfa..ce9c5fe 100644
 --- a/crates/markdown/src/markdown.rs
 +++ b/crates/markdown/src/markdown.rs
 @@ -1739,7 +1739,7 @@ pub struct CodeBlockAction {

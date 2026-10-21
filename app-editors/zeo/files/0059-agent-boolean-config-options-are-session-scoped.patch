@@ -25,9 +25,10 @@ both keep it per session. Carried into new threads, or re-armed on reopen,
 it would spend on work nobody asked to run that way.
 
 What still applies to a switch: a `default_config_options` boolean written
-by hand in settings.json, on a new session and -- because nothing is
-recorded for it -- on a reopened one, exactly as before 0036. Only the UI
-stops writing one.
+by hand in settings.json, on a new session. Since 0.6.1_p20261021 not on a
+reopened one: nothing is recorded for a switch, and a reopen applies no
+entry default (0036 follows upstream 3c8e3b5a01), so a reopened thread keeps
+the agent's value. Only the UI stops writing one.
 
 Not changed: the native agent's thinking-mode button keeps 0010's
 Shift-click; it is not an ACP config option.
@@ -36,16 +37,16 @@ Tests: `load_ignores_a_recorded_toggle` (red without the load-side filter:
 `web_search: true` was sent), the snapshot test now pins that booleans are
 skipped, and the recorder and round-trip tests that asserted a recorded
 boolean were rewritten to the new contract -- the round trip now expects the
-entry default on reopen. agent_servers 150 passed; config_options 6 passed.
+agent's value on reopen (the entry default before 0.6.1_p20261021). agent_servers 150 passed; config_options 6 passed.
 
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 ---
 
 diff --git a/crates/agent_servers/src/acp/v1.rs b/crates/agent_servers/src/acp/v1.rs
-index 7bef412..19c5b36 100644
+index 1a92171..9ee945c 100644
 --- a/crates/agent_servers/src/acp/v1.rs
 +++ b/crates/agent_servers/src/acp/v1.rs
-@@ -1191,9 +1191,13 @@ impl AcpConnection {
+@@ -1199,9 +1199,13 @@ impl AcpConnection {
                          return None;
                      }
                      let config_id = option.config_id.0.as_ref();
@@ -132,10 +133,10 @@ index dc02398..46bc562 100644
          recorded_id(&config, "model").as_deref(),
          Some("sonnet"),
 diff --git a/crates/agent_servers/src/acp/v1/restore_options_tests.rs b/crates/agent_servers/src/acp/v1/restore_options_tests.rs
-index 4950ff0..472954c 100644
+index 6d4181b..d195f77 100644
 --- a/crates/agent_servers/src/acp/v1/restore_options_tests.rs
 +++ b/crates/agent_servers/src/acp/v1/restore_options_tests.rs
-@@ -375,3 +375,33 @@ async fn thread_config_store_corrupt_record_is_logged_and_load_applies_defaults(
+@@ -379,3 +379,33 @@ async fn thread_config_store_corrupt_record_is_logged_and_load_sends_nothing(
          "the read failure must be logged with the agent and the session id"
      );
  }
@@ -170,7 +171,7 @@ index 4950ff0..472954c 100644
 +    );
 +}
 diff --git a/crates/agent_servers/src/acp/v1/round_trip_tests.rs b/crates/agent_servers/src/acp/v1/round_trip_tests.rs
-index df1cda0..22591fe 100644
+index df1cda0..6e93613 100644
 --- a/crates/agent_servers/src/acp/v1/round_trip_tests.rs
 +++ b/crates/agent_servers/src/acp/v1/round_trip_tests.rs
 @@ -76,9 +76,10 @@ async fn round_trip_two_agents_sharing_a_session_id_restore_their_own_state(
@@ -182,28 +183,11 @@ index df1cda0..22591fe 100644
 -    // though the entry default differs.
 +    // R1.9, R2.1, R2.3: after the restart only the changed options are sent.
 +    // `web_search` is a toggle, which is session-scoped and not recorded
-+    // (patch 0059), so the reopened thread gets the entry default, as a new
-+    // thread would.
++    // (patch 0059), and a reopen never applies the entry defaults (upstream
++    // 3c8e3b5a01), so the reopened thread keeps the agent's value.
      let project = init(cx).await;
      {
          let agent = ConfigAgent::connect(script(PLUS), project.clone(), cx).await;
-@@ -109,6 +110,7 @@ async fn round_trip_restores_picked_and_agent_reported_values_after_a_restart(
-         vec![
-             wire("effort", serde_json::json!("low")),
-             wire("model", serde_json::json!("opus")),
-+            wire("web_search", serde_json::json!(true)),
-         ]
-     );
-     assert_eq!(
-@@ -121,7 +123,7 @@ async fn round_trip_restores_picked_and_agent_reported_values_after_a_restart(
-     );
-     assert_eq!(
-         agent.option_value("s-trip", "web_search"),
--        Some(serde_json::json!(false))
-+        Some(serde_json::json!(true))
-     );
- }
- 
 diff --git a/crates/agent_servers/src/thread_config_store.rs b/crates/agent_servers/src/thread_config_store.rs
 index da5b063..8185fa4 100644
 --- a/crates/agent_servers/src/thread_config_store.rs
@@ -283,12 +267,12 @@ index f471d4a..e4c858b 100644
  
  #[test]
 diff --git a/crates/agent_ui/src/config_options.rs b/crates/agent_ui/src/config_options.rs
-index 320ceb9..4d810f5 100644
+index 1d0baae..0feb1fc 100644
 --- a/crates/agent_ui/src/config_options.rs
 +++ b/crates/agent_ui/src/config_options.rs
-@@ -23,7 +23,7 @@ use util::ResultExt as _;
- use zed_actions::agent::ToggleModelSelector;
+@@ -23,7 +23,7 @@ use zed_actions::agent::ToggleModelSelector;
  
+ use crate::model_search;
  use crate::set_as_default::{
 -    SET_AS_DEFAULT_HINT, default_hint_footer, default_marker, persists_default,
 +    SESSION_ONLY_HINT, default_hint_footer, default_marker, persists_default,
@@ -356,22 +340,43 @@ index 320ceb9..4d810f5 100644
                              if !config_options.config_options().iter().any(|option| {
                                  option.config_id == config_id
                                      && matches!(&option.kind, acp::SessionConfigKind::Boolean(_))
-@@ -639,15 +631,6 @@ impl Render for ConfigOptionSelector {
+@@ -639,24 +631,18 @@ impl Render for ConfigOptionSelector {
                              }
  
                              let next_value = matches!(state, ToggleState::Selected);
+-                            let value = acp::SessionConfigOptionValue::boolean(next_value);
+-                            // Shift persists the choice, once the agent accepts it;
+-                            // a plain click moves this thread only.
 -                            if persists_default(window) {
--                                agent_server.set_default_config_option(
--                                    config_id.0.as_ref(),
--                                    Some(AgentConfigOptionValue::Boolean(next_value)),
+-                                set_config_option_and_default(
+-                                    config_options.clone(),
+-                                    agent_server.clone(),
+-                                    config_id.clone(),
+-                                    value,
 -                                    fs.clone(),
 -                                    cx,
--                                );
+-                                )
+-                                .detach_and_log_err(cx);
+-                            } else {
+-                                config_options
+-                                    .set_config_option(config_id.clone(), value, cx)
+-                                    .detach_and_log_err(cx);
 -                            }
--
-                             let task = config_options.set_config_option(
-                                 config_id.clone(),
-                                 acp::SessionConfigOptionValue::boolean(next_value),
++                            let task = config_options.set_config_option(
++                                config_id.clone(),
++                                acp::SessionConfigOptionValue::boolean(next_value),
++                                cx,
++                            );
++
++                            cx.spawn(async move |_| {
++                                if let Err(err) = task.await {
++                                    log::error!("Failed to set config option: {:?}", err);
++                                }
++                            })
++                            .detach();
+                         }),
+                     )
+                     .into_any_element()
 diff --git a/crates/agent_ui/src/set_as_default.rs b/crates/agent_ui/src/set_as_default.rs
 index a633d24..25b9ad2 100644
 --- a/crates/agent_ui/src/set_as_default.rs

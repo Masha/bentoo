@@ -69,10 +69,10 @@ of this patch said the same sentence, and it was right.
 ---
 
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
-index 1709a7e..ed87701 100644
+index 804c165..ad3e0ea 100644
 --- a/crates/agent_ui/src/conversation_view/thread_view.rs
 +++ b/crates/agent_ui/src/conversation_view/thread_view.rs
-@@ -5094,6 +5094,10 @@ impl ThreadView {
+@@ -5248,6 +5248,10 @@ impl ThreadView {
                                      .flex_wrap()
                                      .gap_0p5()
                                      .child(self.render_add_context_button(cx))

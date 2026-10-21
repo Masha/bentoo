@@ -122,10 +122,10 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 ---
 
 diff --git a/Cargo.lock b/Cargo.lock
-index 267d1dc..d8995cc 100644
+index 8e69503..bbb7bd7 100644
 --- a/Cargo.lock
 +++ b/Cargo.lock
-@@ -450,6 +450,33 @@ dependencies = [
+@@ -452,6 +452,33 @@ dependencies = [
   "util",
  ]
  
@@ -159,7 +159,7 @@ index 267d1dc..d8995cc 100644
  [[package]]
  name = "agent_ui"
  version = "0.1.0"
-@@ -22515,6 +22542,7 @@ dependencies = [
+@@ -22567,6 +22594,7 @@ dependencies = [
   "agent_servers",
   "agent_settings",
   "agent_skills",
@@ -168,7 +168,7 @@ index 267d1dc..d8995cc 100644
   "anyhow",
   "ashpd",
 diff --git a/Cargo.toml b/Cargo.toml
-index bc1ffe1..34495ed 100644
+index 0181fcb..ffc75c7 100644
 --- a/Cargo.toml
 +++ b/Cargo.toml
 @@ -9,6 +9,7 @@ members = [
@@ -177,9 +177,9 @@ index bc1ffe1..34495ed 100644
      "crates/agent_skills",
 +    "crates/agent_tasks_panel",
      "crates/agent_ui",
+     "crates/agent_ui_benchmarks",
      "crates/ai_onboarding",
-     "crates/anthropic",
-@@ -289,6 +290,7 @@ agent = { path = "crates/agent" }
+@@ -290,6 +291,7 @@ agent = { path = "crates/agent" }
  agent_servers = { path = "crates/agent_servers" }
  agent_settings = { path = "crates/agent_settings" }
  agent_skills = { path = "crates/agent_skills" }
@@ -188,7 +188,7 @@ index bc1ffe1..34495ed 100644
  ai_onboarding = { path = "crates/ai_onboarding" }
  anthropic = { path = "crates/anthropic" }
 diff --git a/assets/keymaps/default-linux.json b/assets/keymaps/default-linux.json
-index 89e589f..6e137b4 100644
+index a1b6f8d..edd830c 100644
 --- a/assets/keymaps/default-linux.json
 +++ b/assets/keymaps/default-linux.json
 @@ -711,6 +711,7 @@
@@ -200,7 +200,7 @@ index 89e589f..6e137b4 100644
        "ctrl-alt-s": "workspace::SaveAll",
        "ctrl-k n": "encoding_selector::Toggle",
 diff --git a/assets/keymaps/default-macos.json b/assets/keymaps/default-macos.json
-index 80c3a64..a281490 100644
+index 446b347..52d58f0 100644
 --- a/assets/keymaps/default-macos.json
 +++ b/assets/keymaps/default-macos.json
 @@ -763,6 +763,7 @@
@@ -5413,7 +5413,7 @@ index 0000000..6ffbbfc
 +        .collect()
 +}
 diff --git a/crates/agent_ui/src/agent_panel.rs b/crates/agent_ui/src/agent_panel.rs
-index 39595f9..e677841 100644
+index 65eaa92..124759b 100644
 --- a/crates/agent_ui/src/agent_panel.rs
 +++ b/crates/agent_ui/src/agent_panel.rs
 @@ -4554,8 +4554,8 @@ impl AgentPanel {
@@ -5428,10 +5428,10 @@ index 39595f9..e677841 100644
      }
  
 diff --git a/crates/agent_ui/src/agent_ui.rs b/crates/agent_ui/src/agent_ui.rs
-index 7eb947e..1d59119 100644
+index 69d96ed..72fa09e 100644
 --- a/crates/agent_ui/src/agent_ui.rs
 +++ b/crates/agent_ui/src/agent_ui.rs
-@@ -84,6 +84,7 @@ pub use crate::agent_panel::{
+@@ -85,6 +85,7 @@ pub use crate::agent_panel::{
  use crate::agent_registry_ui::AgentRegistryPage;
  pub use crate::inline_assistant::InlineAssistant;
  pub use crate::message_editor::MessageEditorEvent;
@@ -6896,7 +6896,7 @@ index 3718383..7716724 100644
  
          repl::init(app_state.fs.clone(), cx);
 diff --git a/crates/zed/src/zed.rs b/crates/zed/src/zed.rs
-index 3289996..2d0d6f5 100644
+index efd80bf..81bd254 100644
 --- a/crates/zed/src/zed.rs
 +++ b/crates/zed/src/zed.rs
 @@ -783,6 +783,8 @@ fn initialize_panels(window: &mut Window, cx: &mut Context<Workspace>) -> Task<a

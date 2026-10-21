@@ -53,7 +53,7 @@ conversation waiting, and answering it clears that.
 ---
 
 diff --git a/crates/agent_ui/src/conversation_view.rs b/crates/agent_ui/src/conversation_view.rs
-index 44d373c..734eddc 100644
+index 9ca4b3f..0be7491 100644
 --- a/crates/agent_ui/src/conversation_view.rs
 +++ b/crates/agent_ui/src/conversation_view.rs
 @@ -309,6 +309,22 @@ impl Conversation {
@@ -79,7 +79,7 @@ index 44d373c..734eddc 100644
  
          let subscription = cx.subscribe(&thread, {
              let session_id = session_id.clone();
-@@ -425,6 +441,12 @@ impl Conversation {
+@@ -427,6 +443,12 @@ impl Conversation {
          cx.notify();
      }
  
@@ -92,7 +92,7 @@ index 44d373c..734eddc 100644
      fn add_permission_request(
          &mut self,
          session_id: &acp_v2::SessionId,
-@@ -864,6 +886,13 @@ impl ConversationView {
+@@ -874,6 +896,13 @@ impl ConversationView {
          })
      }
  
@@ -106,7 +106,7 @@ index 44d373c..734eddc 100644
      pub(crate) fn root_thread(&self, cx: &App) -> Option<Entity<AcpThread>> {
          self.root_thread_view()
              .map(|view| view.read(cx).thread.clone())
-@@ -6291,6 +6320,41 @@ pub(crate) mod tests {
+@@ -6959,6 +6988,41 @@ pub(crate) mod tests {
          });
      }
  
@@ -148,7 +148,7 @@ index 44d373c..734eddc 100644
      #[gpui::test]
      async fn test_resume_without_history_adds_notice(cx: &mut TestAppContext) {
          init_test(cx);
-@@ -16795,6 +16859,76 @@ pub(crate) mod tests {
+@@ -17745,6 +17809,76 @@ pub(crate) mod tests {
          });
      }
  
@@ -226,32 +226,28 @@ index 44d373c..734eddc 100644
      async fn test_conversation_subagent_scoped_pending_tool_call(cx: &mut TestAppContext) {
          init_test(cx);
 diff --git a/crates/sidebar/src/sidebar.rs b/crates/sidebar/src/sidebar.rs
-index af841f7..26e1935 100644
+index 50e3184..40b8a25 100644
 --- a/crates/sidebar/src/sidebar.rs
 +++ b/crates/sidebar/src/sidebar.rs
-@@ -6154,7 +6154,9 @@ impl Sidebar {
-         match self.contents.entries.get(ix) {
-             Some(ListEntry::Thread(thread)) => {
-                 match thread.status {
--                    AgentThreadStatus::Running | AgentThreadStatus::WaitingForConfirmation => {
-+                    AgentThreadStatus::Running
-+                    | AgentThreadStatus::WaitingForConfirmation
+@@ -6159,7 +6159,8 @@ impl Sidebar {
+                     AgentThreadStatus::Running
+                     | AgentThreadStatus::WaitingForConfirmation
+                     | AgentThreadStatus::Unconfirmed
+-                    | AgentThreadStatus::Background => {
++                    | AgentThreadStatus::Background
 +                    | AgentThreadStatus::WaitingForAnswer => {
                          return;
                      }
-                     AgentThreadStatus::Completed
-@@ -6697,7 +6699,9 @@ impl Sidebar {
-         let is_empty_draft = thread.draft == Some(DraftKind::Empty);
-         let is_running = matches!(
-             thread.status,
--            AgentThreadStatus::Running | AgentThreadStatus::WaitingForConfirmation
-+            AgentThreadStatus::Running
-+                | AgentThreadStatus::WaitingForConfirmation
+                     AgentThreadStatus::Completed | AgentThreadStatus::Error => {}
+@@ -6703,6 +6704,7 @@ impl Sidebar {
+             AgentThreadStatus::Running
+                 | AgentThreadStatus::WaitingForConfirmation
+                 | AgentThreadStatus::Unconfirmed
 +                | AgentThreadStatus::WaitingForAnswer
          );
          let is_renaming =
              self.rename_target == Some(RenameTarget::Thread(thread.metadata.thread_id));
-@@ -8643,6 +8647,9 @@ fn all_thread_infos_for_workspace(
+@@ -8657,6 +8659,9 @@ fn all_thread_infos_for_workspace(
              let has_pending_tool_call = conversation_view
                  .read(cx)
                  .root_thread_has_pending_tool_call(cx);
@@ -261,7 +257,7 @@ index af841f7..26e1935 100644
              let conversation_thread_id = conversation_view.read(cx).parent_id();
              let thread_view = conversation_view.read(cx).root_thread_view()?;
              let thread_view_ref = thread_view.read(cx);
-@@ -8659,19 +8666,13 @@ fn all_thread_infos_for_workspace(
+@@ -8673,20 +8678,13 @@ fn all_thread_infos_for_workspace(
              let session_id = thread.session_id().clone();
              let is_background = agent_panel.is_retained_thread(&conversation_thread_id);
  
@@ -271,6 +267,7 @@ index af841f7..26e1935 100644
 -                AgentThreadStatus::Error
 -            } else {
 -                match thread.status() {
+-                    ThreadStatus::Unconfirmed => AgentThreadStatus::Unconfirmed,
 -                    ThreadStatus::Generating => AgentThreadStatus::Running,
 -                    ThreadStatus::Idle if thread.background_task_count() > 0 => {
 -                        AgentThreadStatus::Background
@@ -288,7 +285,7 @@ index af841f7..26e1935 100644
  
              let diff_stats = thread.action_log().read(cx).diff_stats(cx);
  
-@@ -8934,3 +8935,28 @@ fn dump_single_workspace(workspace: &Workspace, output: &mut String, cx: &gpui::
+@@ -8951,3 +8949,29 @@ fn dump_single_workspace(workspace: &Workspace, output: &mut String, cx: &gpui::
  
      writeln!(output).ok();
  }
@@ -311,6 +308,7 @@ index af841f7..26e1935 100644
 +        AgentThreadStatus::Error
 +    } else {
 +        match status {
++            ThreadStatus::Unconfirmed => AgentThreadStatus::Unconfirmed,
 +            ThreadStatus::Generating => AgentThreadStatus::Running,
 +            ThreadStatus::Idle if background_task_count > 0 => AgentThreadStatus::Background,
 +            ThreadStatus::Idle => AgentThreadStatus::Completed,
@@ -318,7 +316,7 @@ index af841f7..26e1935 100644
 +    }
 +}
 diff --git a/crates/sidebar/src/sidebar_tests.rs b/crates/sidebar/src/sidebar_tests.rs
-index f5bac68..c9d25e3 100644
+index 2872ae9..057d677 100644
 --- a/crates/sidebar/src/sidebar_tests.rs
 +++ b/crates/sidebar/src/sidebar_tests.rs
 @@ -689,6 +689,7 @@ pub(super) fn visible_entries_as_strings(
@@ -329,7 +327,7 @@ index f5bac68..c9d25e3 100644
                                  _ => "",
                              };
                              let notified = if sidebar
-@@ -4743,6 +4744,65 @@ async fn test_background_tasks_outlive_the_turn_in_the_sidebar(cx: &mut TestAppC
+@@ -4801,6 +4802,65 @@ async fn test_background_tasks_outlive_the_turn_in_the_sidebar(cx: &mut TestAppC
      );
  }
  
@@ -395,7 +393,7 @@ index f5bac68..c9d25e3 100644
  pub(super) fn type_in_search(
      sidebar: &Entity<Sidebar>,
      query: &str,
-@@ -16176,3 +16236,34 @@ async fn test_dropped_folders_open_as_projects(cx: &mut TestAppContext) {
+@@ -16234,3 +16294,34 @@ async fn test_dropped_folders_open_as_projects(cx: &mut TestAppContext) {
          ]
      );
  }
@@ -431,10 +429,10 @@ index f5bac68..c9d25e3 100644
 +    }
 +}
 diff --git a/crates/ui/src/components/ai/thread_item.rs b/crates/ui/src/components/ai/thread_item.rs
-index ba13b04..e3f1333 100644
+index 6ddf84a..1f5d3af 100644
 --- a/crates/ui/src/components/ai/thread_item.rs
 +++ b/crates/ui/src/components/ai/thread_item.rs
-@@ -16,6 +16,9 @@ pub enum AgentThreadStatus {
+@@ -17,6 +17,9 @@ pub enum AgentThreadStatus {
      /// backgrounded shell, an async subagent — which a new turn may follow.
      Background,
      WaitingForConfirmation,
@@ -444,9 +442,9 @@ index ba13b04..e3f1333 100644
      Error,
  }
  
-@@ -325,6 +328,12 @@ impl RenderOnce for ThreadItem {
-                     .size(IconSize::XSmall)
-                     .color(Color::Warning),
+@@ -332,6 +335,12 @@ impl RenderOnce for ThreadItem {
+                     .size(IconSize::Small)
+                     .color(Color::Muted),
              )
 +        } else if self.status == AgentThreadStatus::WaitingForAnswer {
 +            Some(
@@ -457,7 +455,7 @@ index ba13b04..e3f1333 100644
          } else if self.notified {
              Some(
                  Icon::new(IconName::Circle)
-@@ -418,6 +427,7 @@ impl RenderOnce for ThreadItem {
+@@ -425,6 +434,7 @@ impl RenderOnce for ThreadItem {
              self.status,
              AgentThreadStatus::Error
                  | AgentThreadStatus::WaitingForConfirmation
@@ -465,7 +463,7 @@ index ba13b04..e3f1333 100644
                  | AgentThreadStatus::Background
          );
  
-@@ -644,6 +654,15 @@ impl RenderOnce for ThreadItem {
+@@ -651,6 +661,15 @@ impl RenderOnce for ThreadItem {
                          )
                          .child(Label::new("Waiting for Confirmation"))
                          .into_any_element(),
@@ -481,7 +479,7 @@ index ba13b04..e3f1333 100644
                      AgentThreadStatus::Background => h_flex()
                          .gap_1()
                          .child(
-@@ -703,6 +722,16 @@ impl Component for ThreadItem {
+@@ -710,6 +729,16 @@ impl Component for ThreadItem {
                      )
                      .into_any_element(),
              ),

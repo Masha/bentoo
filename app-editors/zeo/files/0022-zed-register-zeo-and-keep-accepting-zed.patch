@@ -139,7 +139,7 @@ index 598cd35..2ae5f82 100644
                  || arg.starts_with("zed-cli://")
                  || arg.starts_with("ssh://")
 diff --git a/crates/zed/src/zed.rs b/crates/zed/src/zed.rs
-index 69bede9..b2c47d9 100644
+index 4a074c8..c80b1f9 100644
 --- a/crates/zed/src/zed.rs
 +++ b/crates/zed/src/zed.rs
 @@ -1280,7 +1280,7 @@ fn register_actions(

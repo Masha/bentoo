@@ -54,7 +54,7 @@ Pure Zed and generic ACP: it rides `claude-agent-acp-plus` BY CHOICE, like
 ---
 
 diff --git a/crates/agent_ui/src/agent_panel.rs b/crates/agent_ui/src/agent_panel.rs
-index 14a3f8b..0238d92 100644
+index 9e278e2..c65f7f4 100644
 --- a/crates/agent_ui/src/agent_panel.rs
 +++ b/crates/agent_ui/src/agent_panel.rs
 @@ -2332,6 +2332,72 @@ impl AgentPanel {
@@ -713,10 +713,10 @@ index 0000000..a7fa618
 +    );
 +}
 diff --git a/crates/agent_ui/src/agent_ui.rs b/crates/agent_ui/src/agent_ui.rs
-index f1135a3..e3b8c34 100644
+index 974c387..1a53a37 100644
 --- a/crates/agent_ui/src/agent_ui.rs
 +++ b/crates/agent_ui/src/agent_ui.rs
-@@ -1081,6 +1081,23 @@ fn update_active_language_model_from_settings(cx: &mut App) {
+@@ -1082,6 +1082,23 @@ fn update_active_language_model_from_settings(cx: &mut App) {
      });
  }
  
@@ -741,7 +741,7 @@ index f1135a3..e3b8c34 100644
  mod tests {
      use super::*;
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
-index 1cdc301..9cd5485 100644
+index aaccae9..9c8c011 100644
 --- a/crates/agent_ui/src/conversation_view/thread_view.rs
 +++ b/crates/agent_ui/src/conversation_view/thread_view.rs
 @@ -3,7 +3,7 @@ use crate::{
@@ -753,7 +753,7 @@ index 1cdc301..9cd5485 100644
      thread_metadata_store::{ThreadId, ThreadMetadataStore},
  };
  use agent_client_protocol::schema::v2 as acp_v2;
-@@ -7473,7 +7473,7 @@ impl ThreadView {
+@@ -7655,7 +7655,7 @@ impl ThreadView {
                                      div()
                                          .id(("assistant-message-chunk", chunk_ix))
                                          .child(self.render_message_content(
@@ -762,7 +762,7 @@ index 1cdc301..9cd5485 100644
                                          ))
                                          .into_any_element()
                                  })
-@@ -8921,11 +8921,15 @@ impl ThreadView {
+@@ -9103,11 +9103,15 @@ impl ThreadView {
          cx.notify();
      }
  
@@ -778,7 +778,7 @@ index 1cdc301..9cd5485 100644
          window: &Window,
          cx: &Context<Self>,
      ) -> Div {
-@@ -8935,9 +8939,19 @@ impl ThreadView {
+@@ -9117,9 +9121,19 @@ impl ThreadView {
                  .enumerate()
                  .filter(|(_, block)| block.visible_content(cx))
                  .map(|(block_ix, block)| {
@@ -801,7 +801,7 @@ index 1cdc301..9cd5485 100644
                      div()
                          .id(("message-content-block", block_ix))
                          .debug_selector(move || {
-@@ -9041,11 +9055,9 @@ impl ThreadView {
+@@ -9223,11 +9237,9 @@ impl ThreadView {
                                      this.track_scroll(&scroll_handle)
                                  })
                                  .overflow_hidden()
@@ -816,7 +816,7 @@ index 1cdc301..9cd5485 100644
                          )
                          .when(is_constrained, |this| {
                              this.child(div().absolute().inset_0().size_full().bg(linear_gradient(
-@@ -13172,6 +13184,49 @@ impl ThreadView {
+@@ -13355,6 +13367,49 @@ impl ThreadView {
          })
      }
  
@@ -1390,7 +1390,7 @@ index 0000000..e38ceed
 +    assert_eq!(second.clicked.borrow().len(), 1);
 +}
 diff --git a/crates/markdown/src/markdown.rs b/crates/markdown/src/markdown.rs
-index 10bd60d..6b77137 100644
+index fbd5217..876ebfa 100644
 --- a/crates/markdown/src/markdown.rs
 +++ b/crates/markdown/src/markdown.rs
 @@ -1731,6 +1731,16 @@ pub enum AutoscrollBehavior {

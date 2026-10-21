@@ -30,6 +30,15 @@ oracle; a Rust agreement test reads them through ZEO_BROWSER_CONTRACT_DIR):
   entry_updated (coalesced to <= 1 per 100 ms per entry), entries_removed,
   status, title, permission_requested/resolved, target_changed, thread_closed,
   sent {queued, images}, ok, error {error, message, fatal};
+- status.state is idle, working, unconfirmed, awaiting_permission or error.
+  `unconfirmed` (0.6.1_p20261021) is a resumed ACP v2 session whose activity
+  the agent has not reported yet, upstream's ThreadStatus::Unconfirmed; it
+  read `idle` before. zeo-browser's contract.ts must list it: an extension
+  whose schema does not drops every threads, snapshot and status message
+  that carries it;
+- a browser send is a manual send: it waits in Zeo's queue only while a turn
+  is generating or the window is still resolving a send, and goes out at once
+  on an Unconfirmed thread, as the composer's send button does;
 - entry indices are the thread's own, never snapshot-relative;
 - attachments are validated in Zeo against the contract limits (counts, sizes,
   canonical padded base64, image magic and dimensions, http(s)/file page URLs)
@@ -74,10 +83,10 @@ Story 045 (zed/.epic/stories/045-browser-extension), branch dev-045.
 ---
 
 diff --git a/Cargo.lock b/Cargo.lock
-index 6a72659..1cc3328 100644
+index e133f7d..8393389 100644
 --- a/Cargo.lock
 +++ b/Cargo.lock
-@@ -561,6 +561,7 @@ dependencies = [
+@@ -564,6 +564,7 @@ dependencies = [
   "http_client",
   "idna",
   "image",
@@ -85,7 +94,7 @@ index 6a72659..1cc3328 100644
   "indoc",
   "itertools 0.14.0",
   "jsonschema",
-@@ -600,6 +601,7 @@ dependencies = [
+@@ -603,6 +604,7 @@ dependencies = [
   "serde_json_lenient",
   "settings",
   "shlex 2.0.1",
@@ -93,7 +102,7 @@ index 6a72659..1cc3328 100644
   "streaming_diff",
   "task",
   "telemetry",
-@@ -23011,6 +23013,18 @@ version = "0.3.3"
+@@ -23063,6 +23065,18 @@ version = "0.3.3"
  source = "registry+https://github.com/rust-lang/crates.io-index"
  checksum = "6df3dc4292935e51816d896edcd52aa30bc297907c26167fec31e2b0c6a32524"
  
@@ -113,10 +122,10 @@ index 6a72659..1cc3328 100644
  name = "zerocopy"
  version = "0.8.27"
 diff --git a/Cargo.toml b/Cargo.toml
-index 0a716d9..2c4b17b 100644
+index c346cee..f08bd8c 100644
 --- a/Cargo.toml
 +++ b/Cargo.toml
-@@ -250,6 +250,7 @@ members = [
+@@ -251,6 +251,7 @@ members = [
      "crates/zed_actions",
      "crates/zed_credentials_provider",
      "crates/zed_env_vars",
@@ -125,7 +134,7 @@ index 0a716d9..2c4b17b 100644
      "crates/zlog",
      "crates/zlog_settings",
 diff --git a/crates/acp_thread/src/acp_thread.rs b/crates/acp_thread/src/acp_thread.rs
-index 5ac61fd..e1af25b 100644
+index 9cc9334..878d648 100644
 --- a/crates/acp_thread/src/acp_thread.rs
 +++ b/crates/acp_thread/src/acp_thread.rs
 @@ -8,6 +8,8 @@ mod diff;
@@ -138,10 +147,10 @@ index 5ac61fd..e1af25b 100644
  pub mod notices;
  pub mod prompt_capabilities;
 diff --git a/crates/acp_thread/src/connection.rs b/crates/acp_thread/src/connection.rs
-index 4ab1be3..df26798 100644
+index f9b7a3b..a6c40c1 100644
 --- a/crates/acp_thread/src/connection.rs
 +++ b/crates/acp_thread/src/connection.rs
-@@ -976,7 +976,7 @@ mod test_support {
+@@ -981,7 +981,7 @@ mod test_support {
      use gpui::{AppContext as _, WeakEntity};
      use parking_lot::Mutex;
  
@@ -150,23 +159,23 @@ index 4ab1be3..df26798 100644
  
      use super::*;
  
-@@ -1038,6 +1038,7 @@ mod test_support {
-         set_title_calls: Arc<Mutex<Vec<(acp_v2::SessionId, SharedString)>>>,
+@@ -1047,6 +1047,7 @@ mod test_support {
          cancel_calls: Arc<Mutex<Vec<acp_v2::SessionId>>>,
+         shutdown_calls: Arc<AtomicUsize>,
          next_cancel_error: Arc<Mutex<Option<anyhow::Error>>>,
 +        authorization_outcomes: Arc<Mutex<Vec<RequestPermissionOutcome>>>,
          supports_receipt_submissions: bool,
          supports_retry: bool,
          supports_load_session: bool,
-@@ -1081,6 +1082,7 @@ mod test_support {
-                 set_title_calls: Default::default(),
+@@ -1094,6 +1095,7 @@ mod test_support {
                  cancel_calls: Default::default(),
+                 shutdown_calls: Default::default(),
                  next_cancel_error: Default::default(),
 +                authorization_outcomes: Default::default(),
                  permission_requests: HashMap::default(),
                  sessions: Arc::default(),
                  supports_receipt_submissions: false,
-@@ -1143,6 +1145,11 @@ mod test_support {
+@@ -1180,6 +1182,11 @@ mod test_support {
              self.receipt_prompt.lock().take()
          }
  
@@ -178,7 +187,7 @@ index 4ab1be3..df26798 100644
          pub fn take_set_title_calls(&self) -> Vec<(acp_v2::SessionId, SharedString)> {
              std::mem::take(&mut *self.set_title_calls.lock())
          }
-@@ -1429,9 +1436,10 @@ mod test_support {
+@@ -1478,9 +1485,10 @@ mod test_support {
                      } else {
                          None
                      };
@@ -190,7 +199,7 @@ index 4ab1be3..df26798 100644
                                  .update(cx, |thread, cx| {
                                      thread.request_tool_call_authorization(
                                          tool_call.clone().into(),
-@@ -1441,6 +1449,7 @@ mod test_support {
+@@ -1490,6 +1498,7 @@ mod test_support {
                                      )
                                  })??
                                  .await;
@@ -576,10 +585,10 @@ index 1b2ab9c..aedf064 100644
  
                      language_model::MessageContent::Text(uri.as_link().to_string())
 diff --git a/crates/agent_ui/Cargo.toml b/crates/agent_ui/Cargo.toml
-index 8a4203c..c985917 100644
+index b3c9b39..66b9f67 100644
 --- a/crates/agent_ui/Cargo.toml
 +++ b/crates/agent_ui/Cargo.toml
-@@ -99,6 +99,7 @@ serde.workspace = true
+@@ -100,6 +100,7 @@ serde.workspace = true
  serde_json.workspace = true
  serde_json_lenient.workspace = true
  settings.workspace = true
@@ -587,7 +596,7 @@ index 8a4203c..c985917 100644
  streaming_diff.workspace = true
  task.workspace = true
  telemetry.workspace = true
-@@ -118,6 +119,7 @@ workspace.workspace = true
+@@ -119,6 +120,7 @@ workspace.workspace = true
  git_ui_core.workspace = true
  zed_actions.workspace = true
  image.workspace = true
@@ -596,7 +605,7 @@ index 8a4203c..c985917 100644
  
  [dev-dependencies]
 diff --git a/crates/agent_ui/src/agent_ui.rs b/crates/agent_ui/src/agent_ui.rs
-index 8a55068..92b827e 100644
+index 20798e2..e217855 100644
 --- a/crates/agent_ui/src/agent_ui.rs
 +++ b/crates/agent_ui/src/agent_ui.rs
 @@ -7,6 +7,8 @@ mod agent_panel;
@@ -608,7 +617,7 @@ index 8a55068..92b827e 100644
  mod buffer_codegen;
  mod completion_provider;
  mod config_options;
-@@ -91,7 +93,10 @@ pub use crate::agent_session_router::{
+@@ -92,7 +94,10 @@ pub use crate::agent_session_router::{
      OpenAgentSessionOptions, OpenedAgentSession, open_agent_session,
  };
  pub use crate::inline_assistant::InlineAssistant;
@@ -620,7 +629,7 @@ index 8a55068..92b827e 100644
  pub use crate::message_editor::MessageEditorEvent;
  pub use crate::task_label::{
      TASK_LABEL_MAX_CHARS, TaskLabels, collapse_label, display_label, normalize_user_label,
-@@ -1109,6 +1114,8 @@ pub(crate) fn slash_command_in_code_block(code: &str) -> Option<&str> {
+@@ -1110,6 +1115,8 @@ pub(crate) fn slash_command_in_code_block(code: &str) -> Option<&str> {
  #[cfg(test)]
  mod slash_command_in_code_block_tests;
  
@@ -631,10 +640,10 @@ index 8a55068..92b827e 100644
  
 diff --git a/crates/agent_ui/src/browser_channel.rs b/crates/agent_ui/src/browser_channel.rs
 new file mode 100644
-index 0000000..3d9af37
+index 0000000..7a6f0cf
 --- /dev/null
 +++ b/crates/agent_ui/src/browser_channel.rs
-@@ -0,0 +1,2519 @@
+@@ -0,0 +1,2521 @@
 +//! Answers browser sessions: what a `zeo-browser` sidebar, through `zeo-browser-host` and the
 +//! devtools bridge, may do to agent threads (story 045, design.md §B2).
 +//!
@@ -1932,6 +1941,8 @@ index 0000000..3d9af37
 +        (ThreadState::AwaitingPermission, None)
 +    } else if thread.status() == ThreadStatus::Generating {
 +        (ThreadState::Working, None)
++    } else if thread.status() == ThreadStatus::Unconfirmed {
++        (ThreadState::Unconfirmed, None)
 +    } else if let Some(error) = view.thread_error_text(cx) {
 +        (ThreadState::Error, Some(capped_title(&error)))
 +    } else {
@@ -4291,13 +4302,14 @@ index 0000000..8a3e0f7
 +}
 diff --git a/crates/agent_ui/src/browser_channel_tests/status.rs b/crates/agent_ui/src/browser_channel_tests/status.rs
 new file mode 100644
-index 0000000..c8ed307
+index 0000000..e443050
 --- /dev/null
 +++ b/crates/agent_ui/src/browser_channel_tests/status.rs
-@@ -0,0 +1,304 @@
+@@ -0,0 +1,353 @@
 +// Story 045, task 12.1 — the thread's error state and message in `Status` (design.md §Contract:
 +// `Status = { state: "idle" | "working" | "awaiting_permission" | "error"; message: string | null
-+// }`). Requirement: R6.7. Never logged: R13.4. Fixtures and seams: `test_support`.
++// }`, plus "unconfirmed" since upstream's resumed v2 sessions, the last test below). Requirement:
++// R6.7. Never logged: R13.4. Fixtures and seams: `test_support`.
 +//
 +// Wired INSIDE `src/browser_channel.rs`, next to the other test modules:
 +//
@@ -4319,7 +4331,7 @@ index 0000000..c8ed307
 +//     boundary, and its line still fits; a short one arrives whole and verbatim (plain text).
 +
 +use acp_thread::StubAgentConnection;
-+use agent_client_protocol::schema::v1 as acp_v1;
++use agent_client_protocol::schema::{v1 as acp_v1, v2 as acp_v2};
 +use gpui::TestAppContext;
 +use serde_json::{Value, json};
 +
@@ -4598,6 +4610,54 @@ index 0000000..c8ed307
 +        .as_str()
 +        .expect("the snapshot carries the capped message");
 +    assert!(message.len() <= bound, "{} > {bound} bytes", message.len());
++}
++
++// A resumed v2 session reads Unconfirmed until the agent reports its activity (upstream
++// da5921d6ba). The sidebar is told so rather than shown `idle`, and a browser send is a manual
++// send: it goes out at once, as the composer's does, instead of waiting in the queue for an
++// idle report that may never come.
++#[gpui::test]
++async fn status_an_unconfirmed_thread_reads_unconfirmed_and_takes_a_browser_send(
++    cx: &mut TestAppContext,
++) {
++    init(cx);
++    let fs = shared_fs(cx).await;
++    let connection = StubAgentConnection::new().with_receipt_submissions(true);
++    let win = window(&fs, "/p/app", Some(connection.clone()), cx).await;
++    let thread = win.thread();
++    thread.update(cx, |thread, cx| thread.mark_activity_unconfirmed(cx));
++    cx.run_until_parked();
++    assert_eq!(
++        thread.read_with(cx, |thread, _| thread.status()),
++        acp_thread::ThreadStatus::Unconfirmed
++    );
++
++    let (probe, snapshot) = fresh_subscribe(1, &win, json!({ "follow": true }), cx);
++    assert_eq!(
++        snapshot["status"]["state"], "unconfirmed",
++        "not `idle`: {snapshot}"
++    );
++    assert!(snapshot["status"]["message"].is_null());
++
++    let response = connection.defer_next_receipt_response();
++    probe.handle(
++        request("send", "m", json!({ "text": "go", "attachments": [] })),
++        &win.app_state(),
++        cx,
++    );
++    cx.run_until_parked();
++    assert_eq!(
++        connection.take_receipt_prompt(),
++        Some(vec!["go".into()]),
++        "the browser send went out while the thread was Unconfirmed"
++    );
++    win.view().read_with(cx, |view, _| {
++        assert_eq!(view.message_queue.len(), 0, "nothing was queued");
++    });
++    response
++        .send(Ok(acp_v2::PromptResponse::new("go")))
++        .expect("the receipt is still awaited");
++    cx.run_until_parked();
 +}
 diff --git a/crates/agent_ui/src/browser_channel_tests/stream.rs b/crates/agent_ui/src/browser_channel_tests/stream.rs
 new file mode 100644
@@ -5672,10 +5732,10 @@ index 0000000..9a9f8f4
 +}
 diff --git a/crates/agent_ui/src/browser_wire.rs b/crates/agent_ui/src/browser_wire.rs
 new file mode 100644
-index 0000000..e94f505
+index 0000000..82bee58
 --- /dev/null
 +++ b/crates/agent_ui/src/browser_wire.rs
-@@ -0,0 +1,965 @@
+@@ -0,0 +1,968 @@
 +//! The wire types of the v2 browser session protocol between the browser extension (through
 +//! `zeo-browser-host`) and Zeo: one JSON object per line, every message carrying `v: 2` and a
 +//! `kind`.
@@ -6303,6 +6363,9 @@ index 0000000..e94f505
 +pub enum ThreadState {
 +    Idle,
 +    Working,
++    /// A resumed session whose activity the agent has not reported yet (upstream's
++    /// `ThreadStatus::Unconfirmed`): neither working nor known to be idle.
++    Unconfirmed,
 +    AwaitingPermission,
 +    Error,
 +}
@@ -6642,10 +6705,10 @@ index 0000000..e94f505
 +    }
 +}
 diff --git a/crates/agent_ui/src/conversation_view.rs b/crates/agent_ui/src/conversation_view.rs
-index a4247b2..788dc30 100644
+index b1ebc5f..4ce29af 100644
 --- a/crates/agent_ui/src/conversation_view.rs
 +++ b/crates/agent_ui/src/conversation_view.rs
-@@ -737,7 +737,7 @@ pub struct StateChange;
+@@ -739,7 +739,7 @@ pub struct StateChange;
  
  impl EventEmitter<StateChange> for ConversationView {}
  
@@ -6655,10 +6718,10 @@ index a4247b2..788dc30 100644
      selection: Option<&thread_view::PermissionSelection>,
      is_allow: bool,
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
-index 39c75dd..19fdce8 100644
+index 36a63d6..ff15fda 100644
 --- a/crates/agent_ui/src/conversation_view/thread_view.rs
 +++ b/crates/agent_ui/src/conversation_view/thread_view.rs
-@@ -1277,7 +1277,7 @@ impl ThreadView {
+@@ -1399,7 +1399,7 @@ impl ThreadView {
      /// Resolves the message editor's contents into content blocks. For profiles
      /// that do not enable any tools, directory mentions are expanded to inline
      /// file contents since the agent can't read files on its own.
@@ -6667,7 +6730,7 @@ index 39c75dd..19fdce8 100644
          &self,
          message_editor: &Entity<MessageEditor>,
          cx: &mut App,
-@@ -2052,6 +2052,87 @@ impl ThreadView {
+@@ -2201,6 +2201,89 @@ impl ThreadView {
          self.send_content(contents_task, false, window, cx);
      }
  
@@ -6709,8 +6772,10 @@ index 39c75dd..19fdce8 100644
 +    ) -> Task<Result<bool>> {
 +        cx.emit(AcpThreadViewEvent::Interacted);
 +        // A send of the window's still resolving its contents counts as busy too: `send` would
-+        // drop the message there, and sending now would race it.
-+        if self.thread.read(cx).status() != ThreadStatus::Idle || self.is_loading_contents {
++        // drop the message there, and sending now would race it. A browser send is a manual
++        // send, so an Unconfirmed thread takes it the way the composer's send button does;
++        // only the automatic queue waits for the agent to confirm it is idle.
++        if self.thread.read(cx).status() == ThreadStatus::Generating || self.is_loading_contents {
 +            let (content, tracked_buffers) = contents;
 +            self.add_to_queue(content, tracked_buffers, window, cx);
 +            return Task::ready(Ok(true));
@@ -6755,7 +6820,7 @@ index 39c75dd..19fdce8 100644
      pub fn send_content(
          &mut self,
          contents_task: Task<
-@@ -2061,6 +2142,23 @@ impl ThreadView {
+@@ -2210,6 +2293,23 @@ impl ThreadView {
          window: &mut Window,
          cx: &mut Context<Self>,
      ) {
@@ -6779,7 +6844,7 @@ index 39c75dd..19fdce8 100644
          let session_id = self.thread.read(cx).session_id().clone();
          let parent_session_id = self.thread.read(cx).parent_session_id().cloned();
          let agent_telemetry_id = self.thread.read(cx).connection().telemetry_id();
-@@ -2093,9 +2191,11 @@ impl ThreadView {
+@@ -2242,9 +2342,11 @@ impl ThreadView {
                  (!uses_reported_activity).then(|| this.start_turn(cx))
              })?;
  
@@ -6794,7 +6859,7 @@ index 39c75dd..19fdce8 100644
  
              let _ = this.update(cx, |this, cx| {
                  this.list_state.scroll_to_end();
-@@ -2162,6 +2262,9 @@ impl ThreadView {
+@@ -2311,6 +2413,9 @@ impl ThreadView {
                  }
              })?;
              let submission_id = send.id;
@@ -6804,7 +6869,7 @@ index 39c75dd..19fdce8 100644
  
              let _ = this.update(cx, |this, cx| {
                  this.current_submission = Some(submission_id);
-@@ -2285,94 +2388,14 @@ impl ThreadView {
+@@ -2434,94 +2539,14 @@ impl ThreadView {
          cx.notify();
      }
  
@@ -6906,7 +6971,7 @@ index 39c75dd..19fdce8 100644
  
          let agent_telemetry_id = self.thread.read(cx).connection().telemetry_id();
          let session_id = self.thread.read(cx).session_id().clone();
-@@ -2393,6 +2416,99 @@ impl ThreadView {
+@@ -2542,6 +2567,99 @@ impl ThreadView {
          );
      }
  
@@ -7006,7 +7071,7 @@ index 39c75dd..19fdce8 100644
      pub fn cancel_generation(&mut self, cx: &mut Context<Self>) {
          self.thread_retry_status.take();
          self.thread_error.take();
-@@ -14801,6 +14917,7 @@ pub(crate) fn open_link(
+@@ -14984,6 +15102,7 @@ pub(crate) fn open_link(
              MentionUri::TerminalSelection { .. } => {}
              MentionUri::GitDiff { .. } => {}
              MentionUri::MergeConflict { .. } => {}
@@ -11788,7 +11853,7 @@ index 796efb7..cff7b56 100644
 +    }
 +}
 diff --git a/crates/zed/src/zed.rs b/crates/zed/src/zed.rs
-index 291378b..de703f4 100644
+index 681871c..32a8b49 100644
 --- a/crates/zed/src/zed.rs
 +++ b/crates/zed/src/zed.rs
 @@ -6010,6 +6010,7 @@ mod tests {

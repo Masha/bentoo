@@ -85,10 +85,10 @@ the fs symlink log line).
 ---
 
 diff --git a/Cargo.lock b/Cargo.lock
-index 1cc3328..57e8251 100644
+index 8393389..28a295c 100644
 --- a/Cargo.lock
 +++ b/Cargo.lock
-@@ -5911,6 +5911,30 @@ dependencies = [
+@@ -5961,6 +5961,30 @@ dependencies = [
   "serde",
  ]
  
@@ -119,7 +119,7 @@ index 1cc3328..57e8251 100644
  [[package]]
  name = "equator"
  version = "0.4.2"
-@@ -22683,6 +22707,7 @@ dependencies = [
+@@ -22735,6 +22759,7 @@ dependencies = [
   "editor",
   "encoding_selector",
   "env_logger 0.11.8",
@@ -128,10 +128,10 @@ index 1cc3328..57e8251 100644
   "extension",
   "extension_host",
 diff --git a/Cargo.toml b/Cargo.toml
-index 2c4b17b..0398bfe 100644
+index f08bd8c..7d0d784 100644
 --- a/Cargo.toml
 +++ b/Cargo.toml
-@@ -70,6 +70,7 @@ members = [
+@@ -71,6 +71,7 @@ members = [
      "crates/editor_benchmarks",
      "crates/encoding_selector",
      "crates/env_var",
@@ -139,7 +139,7 @@ index 2c4b17b..0398bfe 100644
      "crates/etw_tracing",
      "crates/eval_cli",
      "crates/eval_utils",
-@@ -353,6 +354,7 @@ edit_prediction_ui = { path = "crates/edit_prediction_ui" }
+@@ -354,6 +355,7 @@ edit_prediction_ui = { path = "crates/edit_prediction_ui" }
  editor = { path = "crates/editor" }
  encoding_selector = { path = "crates/encoding_selector" }
  env_var = { path = "crates/env_var" }
@@ -8403,7 +8403,7 @@ index 0000000..57367ee
 +    assert_eq!(probe.failures().len(), 1, "still reported only once");
 +}
 diff --git a/crates/fs/src/fs.rs b/crates/fs/src/fs.rs
-index 893c25f..d2d3a89 100644
+index 7cc7b2f..136c8e5 100644
 --- a/crates/fs/src/fs.rs
 +++ b/crates/fs/src/fs.rs
 @@ -1112,8 +1112,11 @@ impl Fs for RealFs {
@@ -8444,7 +8444,7 @@ index 4132e69..0808ffe 100644
  
          repl::init(app_state.fs.clone(), cx);
 diff --git a/crates/zed/src/zed.rs b/crates/zed/src/zed.rs
-index a466efd..d64cd06 100644
+index 816fa39..09d5b98 100644
 --- a/crates/zed/src/zed.rs
 +++ b/crates/zed/src/zed.rs
 @@ -785,6 +785,7 @@ fn initialize_panels(window: &mut Window, cx: &mut Context<Workspace>) -> Task<a

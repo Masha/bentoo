@@ -41,7 +41,7 @@ window and values above 1 are read as percentages.
 ---
 
 diff --git a/crates/acp_thread/src/acp_thread.rs b/crates/acp_thread/src/acp_thread.rs
-index 0dd9876..617a964 100644
+index e0816ce..a6a1e5d 100644
 --- a/crates/acp_thread/src/acp_thread.rs
 +++ b/crates/acp_thread/src/acp_thread.rs
 @@ -43,7 +43,7 @@ use serde::{Deserialize, Serialize};
@@ -260,39 +260,39 @@ index 0dd9876..617a964 100644
  pub const TOKEN_USAGE_WARNING_THRESHOLD: f32 = 0.8;
  
  impl TokenUsage {
-@@ -3479,6 +3679,7 @@ pub struct AcpThread {
-     submissions: SessionSubmissions,
-     activity: SessionActivity,
+@@ -3481,6 +3681,7 @@ pub struct AcpThread {
+     received_session_state: bool,
+     reported_usage: Option<ReportedTokenUsage>,
      token_usage: Option<TokenUsage>,
 +    account_usage: AccountUsage,
      cost: Option<SessionCost>,
      prompt_capabilities: acp_v2::PromptCapabilities,
      available_commands: Vec<acp_v2::AvailableCommand>,
-@@ -3606,6 +3807,7 @@ pub enum AcpThreadEvent {
+@@ -3631,6 +3832,7 @@ pub enum AcpThreadEvent {
      TitleUpdated,
      NoticesUpdated,
-     TokenUsageUpdated,
+     TokenUsageUpdated(OutputTokensUpdate),
 +    AccountUsageUpdated,
      EntryUpdated(usize),
      EntriesRemoved(Range<usize>),
      ToolAuthorizationRequested(PermissionRequestId),
-@@ -3758,6 +3960,7 @@ impl AcpThread {
+@@ -3786,6 +3988,7 @@ impl AcpThread {
                  | AcpThreadEvent::TitleUpdated
                  | AcpThreadEvent::NoticesUpdated
-                 | AcpThreadEvent::TokenUsageUpdated
+                 | AcpThreadEvent::TokenUsageUpdated(_)
 +                | AcpThreadEvent::AccountUsageUpdated
                  | AcpThreadEvent::EntryUpdated(_)
                  | AcpThreadEvent::Retry(_)
                  | AcpThreadEvent::SubagentSpawned(_)
-@@ -3817,6 +4020,7 @@ impl AcpThread {
-             activity: SessionActivity::default(),
+@@ -3848,6 +4051,7 @@ impl AcpThread {
+             reported_usage: None,
              connection,
              token_usage: None,
 +            account_usage: AccountUsage::default(),
              cost: None,
              prompt_capabilities,
              available_commands: Vec::new(),
-@@ -4371,6 +4575,15 @@ impl AcpThread {
+@@ -4496,6 +4700,15 @@ impl AcpThread {
          Ok(())
      }
  
@@ -308,7 +308,7 @@ index 0dd9876..617a964 100644
      pub fn cost(&self) -> Option<&SessionCost> {
          self.cost.as_ref()
      }
-@@ -5413,7 +5626,18 @@ impl AcpThread {
+@@ -5546,9 +5759,20 @@ impl AcpThread {
                  meta: cost.meta,
              });
          }
@@ -320,14 +320,16 @@ index 0dd9876..617a964 100644
 +            .as_ref()
 +            .and_then(|meta| meta.get(CLAUDE_RATE_LIMIT_META_KEY))
 +            .is_some_and(|payload| self.account_usage.ingest(payload));
-         cx.emit(AcpThreadEvent::TokenUsageUpdated);
+         cx.emit(AcpThreadEvent::TokenUsageUpdated(
+             OutputTokensUpdate::Unchanged,
+         ));
 +        if account_changed {
 +            cx.emit(AcpThreadEvent::AccountUsageUpdated);
 +        }
      }
  
      pub fn update_retry_status(&mut self, status: RetryStatus, cx: &mut Context<Self>) {
-@@ -7915,6 +8139,198 @@ fn update_markdown_in_place(markdown: &Entity<Markdown>, text: &str, cx: &mut Ap
+@@ -8055,6 +8279,198 @@ fn update_markdown_in_place(markdown: &Entity<Markdown>, text: &str, cx: &mut Ap
  
  #[cfg(test)]
  mod tests {
@@ -527,38 +529,38 @@ index 0dd9876..617a964 100644
      use anyhow::anyhow;
      use futures::stream::StreamExt as _;
 diff --git a/crates/agent_ui/src/agent_diff.rs b/crates/agent_ui/src/agent_diff.rs
-index 48f6487..f943a3c 100644
+index 91d5725..363e207 100644
 --- a/crates/agent_ui/src/agent_diff.rs
 +++ b/crates/agent_ui/src/agent_diff.rs
-@@ -1471,6 +1471,7 @@ impl AgentDiff {
+@@ -1475,6 +1475,7 @@ impl AgentDiff {
              | AcpThreadEvent::StatusChanged
              | AcpThreadEvent::SubmissionUpdated(_)
-             | AcpThreadEvent::TokenUsageUpdated
+             | AcpThreadEvent::TokenUsageUpdated(_)
 +            | AcpThreadEvent::AccountUsageUpdated
              | AcpThreadEvent::NoticesUpdated
              | AcpThreadEvent::SubagentSpawned(_)
              | AcpThreadEvent::EntriesRemoved(_)
 diff --git a/crates/agent_ui/src/conversation_view.rs b/crates/agent_ui/src/conversation_view.rs
-index 99435a9..8214b7a 100644
+index f7d67a6..db014fc 100644
 --- a/crates/agent_ui/src/conversation_view.rs
 +++ b/crates/agent_ui/src/conversation_view.rs
-@@ -348,6 +348,7 @@ impl Conversation {
+@@ -349,6 +349,7 @@ impl Conversation {
                      | AcpThreadEvent::SubmissionUpdated(_)
                      | AcpThreadEvent::TitleUpdated
-                     | AcpThreadEvent::TokenUsageUpdated
+                     | AcpThreadEvent::TokenUsageUpdated(_)
 +                    | AcpThreadEvent::AccountUsageUpdated
                      | AcpThreadEvent::EntryUpdated(_)
                      | AcpThreadEvent::EntriesRemoved(_)
                      | AcpThreadEvent::Retry(_)
-@@ -767,6 +768,7 @@ fn affects_thread_metadata(event: &AcpThreadEvent) -> bool {
+@@ -771,6 +772,7 @@ fn affects_thread_metadata(event: &AcpThreadEvent) -> bool {
          | AcpThreadEvent::EntriesRemoved(_)
          | AcpThreadEvent::Retry(_)
-         | AcpThreadEvent::TokenUsageUpdated
+         | AcpThreadEvent::TokenUsageUpdated(_)
 +        | AcpThreadEvent::AccountUsageUpdated
          | AcpThreadEvent::PromptCapabilitiesUpdated
          | AcpThreadEvent::AvailableCommandsUpdated(_)
          | AcpThreadEvent::ModeUpdated(_)
-@@ -2177,6 +2179,13 @@ impl ConversationView {
+@@ -2262,6 +2264,13 @@ impl ConversationView {
                      });
                  }
              }
@@ -573,19 +575,24 @@ index 99435a9..8214b7a 100644
                  if let Some(thread_view) = self.thread_view(&session_id) {
                      let available_skills = thread
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
-index 9983745..981a1c5 100644
+index c028d9a..cf0f0d1 100644
 --- a/crates/agent_ui/src/conversation_view/thread_view.rs
 +++ b/crates/agent_ui/src/conversation_view/thread_view.rs
-@@ -9,7 +9,7 @@ use agent_client_protocol::schema::v2 as acp_v2;
+@@ -9,9 +9,10 @@ use agent_client_protocol::schema::v2 as acp_v2;
  use std::{cell::RefCell, path::Path};
  
  use acp_thread::{
--    Elicitation, ElicitationEntryId, ElicitationStatus, ForegroundActivity,
+-    Elicitation, ElicitationEntryId, ElicitationStatus, ForegroundActivity, OutputTokensUpdate,
+-    SandboxAuthorizationDetails, SandboxFallbackAuthorizationDetails, SandboxNotAppliedReason,
+-    SubmissionId, SubmissionResponse, SubmissionState, ToolCallLocation, decode_path_escapes,
 +    AccountUsageStatus, Elicitation, ElicitationEntryId, ElicitationStatus, ForegroundActivity,
-     SandboxAuthorizationDetails, SandboxFallbackAuthorizationDetails, SandboxNotAppliedReason,
-     SubmissionId, SubmissionResponse, SubmissionState, ToolCallLocation, decode_path_escapes,
++    OutputTokensUpdate, SandboxAuthorizationDetails, SandboxFallbackAuthorizationDetails,
++    SandboxNotAppliedReason, SubmissionId, SubmissionResponse, SubmissionState, ToolCallLocation,
++    decode_path_escapes,
  };
-@@ -5424,6 +5424,32 @@ impl ThreadView {
+ use agent::{
+     SandboxStatusKey, SandboxStatusRefresh, SkillLoadingIssue, SkillLoadingIssueKind,
+@@ -5596,6 +5597,32 @@ impl ThreadView {
          let input_max_label = crate::humanize_token_count(max_input_tokens);
          let output_max_label = crate::humanize_token_count(max_output_tokens);
  
@@ -618,7 +625,7 @@ index 9983745..981a1c5 100644
          let build_tooltip = {
              move |_window: &mut Window, cx: &mut App| {
                  let percentage = percentage.clone();
-@@ -5436,8 +5462,11 @@ impl ThreadView {
+@@ -5608,8 +5635,11 @@ impl ThreadView {
                  let project_entry_ids = project_entry_ids.clone();
                  let workspace = workspace.clone();
                  let cost_label = cost_label.clone();
@@ -630,7 +637,7 @@ index 9983745..981a1c5 100644
                      used,
                      max,
                      input_tokens: input_tokens_label,
-@@ -6442,8 +6471,23 @@ impl ThreadView {
+@@ -6623,8 +6653,23 @@ impl ThreadView {
      }
  }
  
@@ -654,7 +661,7 @@ index 9983745..981a1c5 100644
      used: String,
      max: String,
      input_tokens: String,
-@@ -6471,6 +6515,8 @@ impl Render for TokenUsageTooltip {
+@@ -6652,6 +6697,8 @@ impl Render for TokenUsageTooltip {
          let output_max = self.output_max.clone();
          let show_split = self.show_split;
          let cost_label = self.cost_label.clone();
@@ -663,7 +670,7 @@ index 9983745..981a1c5 100644
          let global_agents_md_loaded = self.global_agents_md_loaded;
          let project_rules_count = self.project_rules_count;
          let project_entry_ids = self.project_entry_ids.clone();
-@@ -6533,6 +6579,68 @@ impl Render for TokenUsageTooltip {
+@@ -6714,6 +6761,68 @@ impl Render for TokenUsageTooltip {
                              .child(Label::new(cost_label)),
                      )
                  })

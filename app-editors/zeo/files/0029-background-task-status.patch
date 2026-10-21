@@ -46,9 +46,15 @@ What it deliberately does not do:
   agent panel observes every conversation view -- active or not -- and asks
   the sidebar to rebuild. The metadata route would have rewritten `updated_at`
   in the database twice per background task for nothing.
-- Stop and archive treat Background like Completed. "Stop Generation" cancels
-  a turn, and there is no turn to cancel; offering it would promise to kill
-  work it cannot reach.
+- Stop treats Background like Completed. "Stop Generation" cancels a turn,
+  and there is no turn to cancel; offering it would promise to kill work it
+  cannot reach.
+- It does not let a Background thread be archived. Since 0.6.1_p20261021 it
+  follows upstream, which refuses to archive a running or Unconfirmed
+  thread: ArchiveSelectedThread returns on Background too, and the row shows
+  no archive button, because archiving would hide a thread whose work still
+  runs. The row's context menu still offers Archive Thread, as upstream's
+  does for a running thread.
 - The collapsed project header's spinner is unchanged: it still means a turn
   is running.
 
@@ -57,10 +63,11 @@ claude-agent-acp-plus flag BY DEPENDENCY, like 0011 and 0013.
 
 Test added (0.2.3_p20261009): a malformed count (-1, "2", 1.5, null) leaves the last one.
 Tests added 2026-10-10 (story 032 v4): Background -> Completed marks a pinned row and header.
+Test added (0.6.1_p20261021): archiving a Background thread is refused.
 ---
 
 diff --git a/crates/acp_thread/src/acp_thread.rs b/crates/acp_thread/src/acp_thread.rs
-index f519dbf..cad2770 100644
+index c9697f8..339c53a 100644
 --- a/crates/acp_thread/src/acp_thread.rs
 +++ b/crates/acp_thread/src/acp_thread.rs
 @@ -3659,6 +3659,15 @@ impl AccountUsage {
@@ -79,31 +86,31 @@ index f519dbf..cad2770 100644
  pub const TOKEN_USAGE_WARNING_THRESHOLD: f32 = 0.8;
  
  impl TokenUsage {
-@@ -3756,6 +3765,7 @@ pub struct AcpThread {
-     activity: SessionActivity,
+@@ -3758,6 +3767,7 @@ pub struct AcpThread {
+     reported_usage: Option<ReportedTokenUsage>,
      token_usage: Option<TokenUsage>,
      account_usage: AccountUsage,
 +    background_task_count: usize,
      cost: Option<SessionCost>,
      prompt_capabilities: acp_v2::PromptCapabilities,
      available_commands: Vec<acp_v2::AvailableCommand>,
-@@ -3884,6 +3894,7 @@ pub enum AcpThreadEvent {
+@@ -3909,6 +3919,7 @@ pub enum AcpThreadEvent {
      NoticesUpdated,
-     TokenUsageUpdated,
+     TokenUsageUpdated(OutputTokensUpdate),
      AccountUsageUpdated,
 +    BackgroundTasksUpdated,
      EntryUpdated(usize),
      EntriesRemoved(Range<usize>),
      ToolAuthorizationRequested(PermissionRequestId),
-@@ -4037,6 +4048,7 @@ impl AcpThread {
+@@ -4065,6 +4076,7 @@ impl AcpThread {
                  | AcpThreadEvent::NoticesUpdated
-                 | AcpThreadEvent::TokenUsageUpdated
+                 | AcpThreadEvent::TokenUsageUpdated(_)
                  | AcpThreadEvent::AccountUsageUpdated
 +                | AcpThreadEvent::BackgroundTasksUpdated
                  | AcpThreadEvent::EntryUpdated(_)
                  | AcpThreadEvent::Retry(_)
                  | AcpThreadEvent::SubagentSpawned(_)
-@@ -4097,6 +4109,7 @@ impl AcpThread {
+@@ -4128,6 +4140,7 @@ impl AcpThread {
              connection,
              token_usage: None,
              account_usage: AccountUsage::default(),
@@ -111,7 +118,7 @@ index f519dbf..cad2770 100644
              cost: None,
              prompt_capabilities,
              available_commands: Vec::new(),
-@@ -4660,6 +4673,12 @@ impl AcpThread {
+@@ -4785,6 +4798,12 @@ impl AcpThread {
          (!self.account_usage.is_empty()).then_some(&self.account_usage)
      }
  
@@ -124,7 +131,7 @@ index f519dbf..cad2770 100644
      pub fn cost(&self) -> Option<&SessionCost> {
          self.cost.as_ref()
      }
-@@ -4825,6 +4844,22 @@ impl AcpThread {
+@@ -4950,6 +4969,22 @@ impl AcpThread {
                  self.push_notice(notices::from_v1(notice).map_err(acp_v1::Error::from)?, cx);
              }
              acp_v1::SessionUpdate::SessionInfoUpdate(info_update) => {
@@ -147,7 +154,7 @@ index f519dbf..cad2770 100644
                  self.update_session_info(info_update, cx);
              }
              acp_v1::SessionUpdate::AvailableCommandsUpdate(acp_v1::AvailableCommandsUpdate {
-@@ -21892,6 +21927,136 @@ mod tests {
+@@ -22408,6 +22443,136 @@ mod tests {
          );
      }
  
@@ -285,38 +292,38 @@ index f519dbf..cad2770 100644
      async fn test_session_info_update_replaces_provisional_title_and_emits_event(
          cx: &mut TestAppContext,
 diff --git a/crates/agent_ui/src/agent_diff.rs b/crates/agent_ui/src/agent_diff.rs
-index f943a3c..9727fae 100644
+index 363e207..73532b0 100644
 --- a/crates/agent_ui/src/agent_diff.rs
 +++ b/crates/agent_ui/src/agent_diff.rs
-@@ -1472,6 +1472,7 @@ impl AgentDiff {
+@@ -1476,6 +1476,7 @@ impl AgentDiff {
              | AcpThreadEvent::SubmissionUpdated(_)
-             | AcpThreadEvent::TokenUsageUpdated
+             | AcpThreadEvent::TokenUsageUpdated(_)
              | AcpThreadEvent::AccountUsageUpdated
 +            | AcpThreadEvent::BackgroundTasksUpdated
              | AcpThreadEvent::NoticesUpdated
              | AcpThreadEvent::SubagentSpawned(_)
              | AcpThreadEvent::EntriesRemoved(_)
 diff --git a/crates/agent_ui/src/conversation_view.rs b/crates/agent_ui/src/conversation_view.rs
-index 2742101..44d373c 100644
+index e3a6bf6..9ca4b3f 100644
 --- a/crates/agent_ui/src/conversation_view.rs
 +++ b/crates/agent_ui/src/conversation_view.rs
-@@ -349,6 +349,7 @@ impl Conversation {
+@@ -350,6 +350,7 @@ impl Conversation {
                      | AcpThreadEvent::TitleUpdated
-                     | AcpThreadEvent::TokenUsageUpdated
+                     | AcpThreadEvent::TokenUsageUpdated(_)
                      | AcpThreadEvent::AccountUsageUpdated
 +                    | AcpThreadEvent::BackgroundTasksUpdated
                      | AcpThreadEvent::EntryUpdated(_)
                      | AcpThreadEvent::EntriesRemoved(_)
                      | AcpThreadEvent::Retry(_)
-@@ -769,6 +770,7 @@ fn affects_thread_metadata(event: &AcpThreadEvent) -> bool {
+@@ -773,6 +774,7 @@ fn affects_thread_metadata(event: &AcpThreadEvent) -> bool {
          | AcpThreadEvent::Retry(_)
-         | AcpThreadEvent::TokenUsageUpdated
+         | AcpThreadEvent::TokenUsageUpdated(_)
          | AcpThreadEvent::AccountUsageUpdated
 +        | AcpThreadEvent::BackgroundTasksUpdated
          | AcpThreadEvent::PromptCapabilitiesUpdated
          | AcpThreadEvent::AvailableCommandsUpdated(_)
          | AcpThreadEvent::ModeUpdated(_)
-@@ -2179,6 +2181,10 @@ impl ConversationView {
+@@ -2264,6 +2266,10 @@ impl ConversationView {
                      });
                  }
              }
@@ -328,7 +335,7 @@ index 2742101..44d373c 100644
                  // A redraw is all this needs: the account section is built from the thread
                  // when the tooltip opens, so there is no per-turn state to recompute.
 diff --git a/crates/sidebar/src/sidebar.rs b/crates/sidebar/src/sidebar.rs
-index b4dc14b..af841f7 100644
+index 4c41ca9..50e3184 100644
 --- a/crates/sidebar/src/sidebar.rs
 +++ b/crates/sidebar/src/sidebar.rs
 @@ -449,7 +449,14 @@ fn apply_live_row_state(
@@ -359,20 +366,33 @@ index b4dc14b..af841f7 100644
                          {
                              notified_threads.insert(thread_id);
                          }
-@@ -6147,7 +6157,9 @@ impl Sidebar {
-                     AgentThreadStatus::Running | AgentThreadStatus::WaitingForConfirmation => {
+@@ -6144,9 +6154,12 @@ impl Sidebar {
+         match self.contents.entries.get(ix) {
+             Some(ListEntry::Thread(thread)) => {
+                 match thread.status {
++                    // Background work is work in progress: archiving would hide a thread whose
++                    // tasks still run, so it is refused like a running thread.
+                     AgentThreadStatus::Running
+                     | AgentThreadStatus::WaitingForConfirmation
+-                    | AgentThreadStatus::Unconfirmed => {
++                    | AgentThreadStatus::Unconfirmed
++                    | AgentThreadStatus::Background => {
                          return;
                      }
--                    AgentThreadStatus::Completed | AgentThreadStatus::Error => {}
-+                    AgentThreadStatus::Completed
-+                    | AgentThreadStatus::Background
-+                    | AgentThreadStatus::Error => {}
-                 }
-                 if thread.draft.is_some() {
-                     let workspace = thread.workspace.clone();
-@@ -8654,6 +8666,9 @@ fn all_thread_infos_for_workspace(
-             } else {
+                     AgentThreadStatus::Completed | AgentThreadStatus::Error => {}
+@@ -6875,6 +6888,9 @@ impl Sidebar {
+                                 })
+                                 .into_any_element(),
+                         ),
++                        // No archive button while background tasks run, as a running thread
++                        // shows none: the archive action refuses it.
++                        None if thread.status == AgentThreadStatus::Background => None,
+                         None => Some(
+                             IconButton::new("archive-thread", IconName::Archive)
+                                 .hover_background(button_hover_bg)
+@@ -8665,6 +8681,9 @@ fn all_thread_infos_for_workspace(
                  match thread.status() {
+                     ThreadStatus::Unconfirmed => AgentThreadStatus::Unconfirmed,
                      ThreadStatus::Generating => AgentThreadStatus::Running,
 +                    ThreadStatus::Idle if thread.background_task_count() > 0 => {
 +                        AgentThreadStatus::Background
@@ -604,7 +624,7 @@ index ae1b2e4..b33851e 100644
 +#[path = "sidebar_pinned_background_tests.rs"]
 +mod background;
 diff --git a/crates/sidebar/src/sidebar_tests.rs b/crates/sidebar/src/sidebar_tests.rs
-index 2e4e04b..f5bac68 100644
+index 910d5ff..2872ae9 100644
 --- a/crates/sidebar/src/sidebar_tests.rs
 +++ b/crates/sidebar/src/sidebar_tests.rs
 @@ -686,6 +686,7 @@ pub(super) fn visible_entries_as_strings(
@@ -615,7 +635,7 @@ index 2e4e04b..f5bac68 100644
                                  AgentThreadStatus::Error => " (error)",
                                  AgentThreadStatus::WaitingForConfirmation => " (waiting)",
                                  _ => "",
-@@ -4676,6 +4677,72 @@ async fn test_background_thread_completion_triggers_notification(cx: &mut TestAp
+@@ -4701,6 +4702,105 @@ async fn test_background_thread_completion_triggers_notification(cx: &mut TestAp
      );
  }
  
@@ -669,6 +689,39 @@ index 2e4e04b..f5bac68 100644
 +        ]
 +    );
 +
++    // Archiving is refused while the background work runs, as upstream refuses it for a
++    // running or Unconfirmed thread.
++    let background_index = sidebar.read_with(cx, |sidebar, _cx| {
++        sidebar
++            .contents
++            .entries
++            .iter()
++            .position(|entry| {
++                matches!(
++                    entry,
++                    ListEntry::Thread(thread) if thread.status == AgentThreadStatus::Background
++                )
++            })
++            .expect("the background thread is listed")
++    });
++    focus_sidebar(&sidebar, cx);
++    sidebar.update_in(cx, |sidebar, _window, _cx| {
++        sidebar.selection = Some(background_index);
++    });
++    cx.dispatch_action(ArchiveSelectedThread);
++    cx.run_until_parked();
++    assert_eq!(
++        visible_entries_as_strings(&sidebar, cx),
++        vec![
++            //
++            "v [project-a]",
++            "  Hello * (background)  <== selected",
++        ]
++    );
++    sidebar.update_in(cx, |sidebar, _window, _cx| {
++        sidebar.selection = None;
++    });
++
 +    // The last background task ends between turns, with no turn to carry the news.
 +    cx.update(|_, cx| {
 +        connection_a.send_update(session_id_a.clone(), background_tasks(0), cx);
@@ -689,12 +742,12 @@ index 2e4e04b..f5bac68 100644
      sidebar: &Entity<Sidebar>,
      query: &str,
 diff --git a/crates/ui/src/components/ai/thread_item.rs b/crates/ui/src/components/ai/thread_item.rs
-index 7cf5748..ba13b04 100644
+index 3df79d9..6ddf84a 100644
 --- a/crates/ui/src/components/ai/thread_item.rs
 +++ b/crates/ui/src/components/ai/thread_item.rs
-@@ -12,6 +12,9 @@ pub enum AgentThreadStatus {
-     #[default]
+@@ -13,6 +13,9 @@ pub enum AgentThreadStatus {
      Completed,
+     Unconfirmed,
      Running,
 +    /// The turn is over but the agent still has work running in the background — a
 +    /// backgrounded shell, an async subagent — which a new turn may follow.
@@ -702,7 +755,7 @@ index 7cf5748..ba13b04 100644
      WaitingForConfirmation,
      Error,
  }
-@@ -341,6 +344,17 @@ impl RenderOnce for ThreadItem {
+@@ -348,6 +351,17 @@ impl RenderOnce for ThreadItem {
                          .with_rotate_animation(2),
                  )
                  .into_any_element()
@@ -720,7 +773,7 @@ index 7cf5748..ba13b04 100644
          } else if let Some(status_icon) = status_icon {
              icon_container().child(status_icon).into_any_element()
          } else {
-@@ -402,7 +416,9 @@ impl RenderOnce for ThreadItem {
+@@ -409,7 +423,9 @@ impl RenderOnce for ThreadItem {
  
          let show_tooltip = matches!(
              self.status,
@@ -731,7 +784,7 @@ index 7cf5748..ba13b04 100644
          );
  
          let linked_worktrees: Vec<ThreadItemWorktreeInfo> = self
-@@ -628,6 +644,15 @@ impl RenderOnce for ThreadItem {
+@@ -635,6 +651,15 @@ impl RenderOnce for ThreadItem {
                          )
                          .child(Label::new("Waiting for Confirmation"))
                          .into_any_element(),
@@ -747,7 +800,7 @@ index 7cf5748..ba13b04 100644
                      _ => gpui::Empty.into_any_element(),
                  }))
              })
-@@ -699,6 +724,17 @@ impl Component for ThreadItem {
+@@ -706,6 +731,17 @@ impl Component for ThreadItem {
                      )
                      .into_any_element(),
              ),
