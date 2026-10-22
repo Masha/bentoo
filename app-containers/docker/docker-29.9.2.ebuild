@@ -5,7 +5,7 @@ EAPI=8
 
 inherit go-module linux-info optfeature systemd toolchain-funcs udev
 
-GIT_COMMIT="b26fb77d3e7b01f9d21b89539c1ab428f5ca431f"
+GIT_COMMIT="0367cbeb49b9d98cb0b4f51e95f7b54b4803e76c"
 
 DESCRIPTION="The core functions you need to create Docker images and run Docker containers"
 HOMEPAGE="https://www.docker.com/"

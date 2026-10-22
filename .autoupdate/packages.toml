@@ -185,7 +185,7 @@
 url = "https://registry.npmjs.org/@anthropic-ai/claude-code"
 parser = "json"
 path = "dist-tags.latest"
-version = "2.1.307"
+version = "2.1.308"
 comments = """
 claude-code — npm @anthropic-ai/claude-code; dist-tags.latest is the stable channel.
 
@@ -268,7 +268,7 @@ unconditional git-r3 form, which ::gentoo's tarball/9999 branch is not.
 url = "https://registry.npmjs.org/pnpm"
 parser = "json"
 path = "dist-tags.latest"
-version = "12.14.0"
+version = "12.15.0"
 comments = """
 pnpm — npm package, stable channel. dist-tags.latest is the RIGHT endpoint and
 must stay: pnpm promotes through next-<major> first, and that channel carries
@@ -337,7 +337,7 @@ url = "https://downloads.claude.ai/claude-desktop/apt/stable/dists/stable/main/b
 parser = "regex"
 pattern = 'Version: ([0-9][0-9.]*)'
 select = "max"
-version = "3.1623.1"
+version = "3.1623.4"
 comments = """
 Claude Desktop — the Debian "Packages" index of Anthropic's own APT repository,
 the one code.claude.com/docs/en/desktop-linux tells users to add. It is a flat
@@ -755,7 +755,7 @@ url = "https://dl.pstmn.io/api/version/latest?platform=linux64&channel=stable"
 parser = "json"
 path = "version"
 type = "bin"
-version = "12.33.2"
+version = "12.33.3"
 comments = """
 Postman — official version API; clean {"version":"..."}.
 """
@@ -968,7 +968,7 @@ ebuild, files/ and DIST line are identical to the overlay copy.
 url = "https://persistent.oaistatic.com/codex-app-prod/linux/deb/dists/stable/main/binary-amd64/Packages"
 parser = "regex"
 pattern = 'Package: chatgpt\nVersion: ([0-9]+\.[0-9]+\.[0-9]+)'
-version = "26.1016.51333"
+version = "26.1016.61520"
 comments = """
 OpenAI Codex/ChatGPT desktop app — read the APT index of the very repo that
 SRC_URI pulls from. Both openai.com and chatgpt.com sit behind Cloudflare and
@@ -1449,7 +1449,7 @@ headers = { "User-Agent" = "bentoo-autoupdate" }
 aux_var = "GIT_COMMIT"
 aux_pattern = '"sha":\s*"([0-9a-f]{40})"'
 aux_url = "https://api.github.com/repos/moby/moby/commits/docker-v{version}"
-version = "29.9.1"
+version = "29.9.2"
 comments = """
 docker — moby/moby releases/latest, tag "docker-vX.Y.Z". The repo also cuts
 "client/vX.Y.Z" and "api/vX.Y.Z" Go-module releases; if one of those ever
@@ -1491,7 +1491,7 @@ headers = { "User-Agent" = "bentoo-autoupdate" }
 aux_var = "GIT_COMMIT"
 aux_pattern = '"sha":\s*"([0-9a-f]{40})"'
 aux_url = "https://api.github.com/repos/docker/cli/commits/v{version}"
-version = "29.9.1"
+version = "29.9.2"
 comments = """
 docker-cli — probes moby/moby, not docker/cli: docker/cli publishes tags but
 no GitHub releases (releases/latest is 404), and ranking its tags lexically
@@ -1826,7 +1826,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "0.13.4"
+version = "0.13.5"
 comments = """
 uv (uv-bin) — tag bare "X.Y.Z".
 """
@@ -2098,7 +2098,7 @@ commit_sha_path = "[0].id"
 base_from = "file"
 base_url = "https://code.videolan.org/api/v4/projects/videolan%2Fvlc/repository/files/configure.ac/raw?ref=master"
 base_pattern = 'AC_INIT\(\[vlc\], \[([0-9][0-9.]*)-dev\]\)'
-version = "4.0.0_pre20261021"
+version = "4.0.0_pre20261022"
 comments = """
 vlc — 4.0 development snapshot, commit-tracked on master; _pre suffix
 preserved from the current ebuild. Only the 4.0 line lives here: 3.0.x is
@@ -2138,7 +2138,7 @@ parser = "regex"
 pattern = '"tag_name":\s*"bun-v([0-9]+\.[0-9]+\.[0-9]+)'
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "1.4.3"
+version = "1.4.4"
 comments = """
 bun (bun-bin) — tag "bun-vX.Y.Z"; regex on tag_name.
 """
@@ -2301,7 +2301,7 @@ url = "https://api.github.com/repos/bleachbit/bleachbit/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "6.0.4"
+version = "6.0.6"
 comments = """
 bleachbit — tag "vX.Y.Z".
 """
@@ -2641,7 +2641,7 @@ url = "https://api.github.com/repos/brave/brave-browser/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.97.59"
+version = "1.98.60"
 comments = """
 brave-browser — releases/latest is the stable channel (tag "vX.Y.Z").
 """
@@ -2765,7 +2765,7 @@ base_from = "file"
 base_url = "https://raw.githubusercontent.com/Sovereign-Engineering/obscuravpn-client/main/tag.json"
 base_pattern = '"version": "([0-9][0-9.]*)"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.184_p20261020"
+version = "1.184_p20261022"
 comments = """
 Obscura VPN from source — commit-tracked on main because upstream tags only
 the Android releases (v/1.x); Linux versions are "Tag v1.x." commits that bump
@@ -3101,7 +3101,7 @@ at configure — is no longer needed.
 url = "https://www.blender.org/download/"
 parser = "regex"
 pattern = 'blender-([0-9]+\.[0-9]+\.[0-9]+)'
-version = "5.2.2"
+version = "5.2.3"
 comments = """
 blender — download page; anchored to "blender-X.Y.Z".
 """
@@ -3112,7 +3112,7 @@ url = "https://www.blender.org/download/"
 parser = "regex"
 pattern = 'blender-([0-9]+\.[0-9]+\.[0-9]+)'
 type = "bin"
-version = "5.2.2"
+version = "5.2.3"
 comments = """
 blender-bin — deliberately the SAME endpoint and pattern as media-gfx/blender
 above, not a second probe for the same upstream. The two packages ship the same
@@ -4093,7 +4093,7 @@ base_from = "file"
 base_url = "https://raw.githubusercontent.com/KhronosGroup/Vulkan-ValidationLayers/main/CMakeLists.txt"
 base_pattern = '(?m)^project\([A-Za-z_-]+ VERSION ([0-9][0-9.]*)'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.365_p20261021"
+version = "1.4.365_p20261022"
 comments = """
 vulkan-layers — commit-tracked on main (Vulkan-ValidationLayers); scans for "Update for Vulkan-Docs X.Y.Z".
 """
@@ -9384,7 +9384,7 @@ url = "https://antigravity.google/download"
 parser = "regex"
 pattern = '/antigravity-hub/([0-9]+\.[0-9]+\.[0-9]+-[0-9]+)/'
 transform = [['-', "."]]
-version = "2.24.0.5780333019398144"
+version = "2.25.0.6535192714805248"
 comments = """
 Antigravity 2.0 — the standalone desktop hub (agent orchestration), a separate
 product from the IDE above. /download now ships the links in the raw HTML, so the
@@ -9641,7 +9641,7 @@ is a workspace and pycargoebuild refuses it.
 url = "https://pypi.org/pypi/openai/json"
 parser = "json"
 path = "info.version"
-version = "3.36.0"
+version = "3.36.1"
 comments = """
 openai — official Python SDK; core dep of sci-ml/amd-gaia. info.version is
 clean X.Y.Z. Live=3.0.0 == current PV.
@@ -10143,7 +10143,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "1.31.0"
+version = "1.32.0"
 comments = """
 Opengrep (LGPL fork of Semgrep CE) — GitHub releases/latest tag "vX.Y.Z"
 (v stripped). SRC_URI pulls the bare per-arch/libc release binaries
@@ -10518,7 +10518,7 @@ parser = "json"
 path = "[0].tag_name"
 transform = [['-', "_p"]]
 type = "bin"
-version = "158.0.1_p1"
+version = "158.0.1_p2"
 comments = """
 LibreWolf (bin) — NÃO usar as tags do repo "source": o upstream tagueia o
 source antes de publicar os binários, e o -bin morre com 404 no pkgdev
@@ -11545,7 +11545,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "3.1.2"
+version = "3.2.0"
 comments = """
 ai-memory — releases/latest on akitaonrails/ai-memory; tag_name is "vX.Y.Z" and
 the transform strips the v.  Verified by real request on 2026-09-07: tag_name
@@ -11594,7 +11594,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "3.1.2"
+version = "3.2.0"
 comments = """
 ai-memory-bin — same endpoint and same release as dev-util/ai-memory; this
 record exists separately only because the two are separate packages.  Bump them
@@ -11901,7 +11901,7 @@ parser = "regex"
 pattern = '"tag_name":\s*"v([0-9]+\.[0-9]+\.[0-9]+)"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "1.19.3"
+version = "1.19.4"
 comments = """
 opencode — the most-starred open-source coding agent. Repo lives at
 anomalyco/opencode (it was sst/opencode before; both answer today).

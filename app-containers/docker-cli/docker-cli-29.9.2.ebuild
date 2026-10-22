@@ -6,7 +6,7 @@ EAPI=8
 inherit shell-completion go-env go-module toolchain-funcs
 
 # update this on every bump
-GIT_COMMIT="dfc520dcc28994c4c699b9b219fd2f5a6bcec0ff"
+GIT_COMMIT="a82e528901260c8df6073311379eac65f92db204"
 
 DESCRIPTION="the command line binary for docker"
 HOMEPAGE="https://www.docker.com/"
