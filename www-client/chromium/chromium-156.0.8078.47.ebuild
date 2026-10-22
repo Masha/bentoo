@@ -23,7 +23,7 @@ EAPI=8
 # using an external CI system that we have some control over, in case
 # issues pop up again with official tarball generation.
 
-GN_MIN_VER=0.2540
+GN_MIN_VER=0.2578
 # chromium-tools/get-chromium-toolchain-strings.py (or just use Chromicler)
 # Node for M145+ should be 24.12.0 but that's not packaged in Gentoo yet. See #969145
 TEST_FONT="9c07d19d9c5ee1ff94f717e6fb17e0c8c354e6f9"
@@ -546,10 +546,10 @@ src_prepare() {
 	python_setup
 
 	# We'll fill this in as we go. Patches go in chromium-patches.
-	# BENTOO-DIVERGENCE: PATCHES - seven fixes with no counterpart:
+	# BENTOO-DIVERGENCE: PATCHES - nine fixes with no counterpart:
 	# unbundle-minizip-undo-unicode, cbor-crubit-optional,
 	# blink-fonts-cxx-not-crubit, revert-signed-web-bundles-crubit,
-	# athm-cxx-bridge, devtools-tsc-binary-via-node and
+	# revert-web-bundle-parser-crubit, compiler, athm-cxx-bridge, devtools-tsc-binary-via-node and
 	# fix-rust-2-oxidize-harder; plus one chromium-patches member dropped
 	# below.
 	# ::gentoo is on 142 and carries an old-fontconfig patch this series no
@@ -672,11 +672,16 @@ src_prepare() {
 			# on it, and M155 rewrote its client side again -- so it keeps
 			# upstream's Rust crate and reaches it through a small cxx bridge
 			# instead. Same reachability as the two above.
-			# Every one of these four is a stopgap: building Crubit for the
+			# M156 moved the Web Bundle parser itself to a second Rust crate,
+			# //components/web_package/rust, and deleted the C++ one; its revert
+			# restores the M155 parser and sits on the signed-web-bundles
+			# BUILD.gn hunks, so it must follow that patch.
+			# Every one of these five is a stopgap: building Crubit for the
 			# system toolchain needs a rustc-dev from the same rustc build and
 			# a Rust stdlib compiled by Chromium (assert(!rust_prebuilt_stdlib)
 			# in build/rust/gni_impl/cpp_api_from_rust.gni).
 			"${FILESDIR}/chromium-154-revert-signed-web-bundles-crubit.patch"
+			"${FILESDIR}/chromium-156-revert-web-bundle-parser-crubit.patch"
 			"${FILESDIR}/chromium-155-athm-cxx-bridge.patch"
 			# bentoo: rebase of chromium-patches' toolchain/
 			# cr152-fix-rust-2-oxidize-harder.patch, which teaches Crubit to take
@@ -692,11 +697,20 @@ src_prepare() {
 			# branch: the patchset's toolchain/ directory is applied by the loop
 			# below, which is inside this same USE=-bundled-toolchain else.
 			"${FILESDIR}/chromium-155-fix-rust-2-oxidize-harder.patch"
+			# bentoo: rebase of chromium-patches' toolchain/cr152-compiler.patch.
+			# Its hunk deleting config("clang_revision") no longer anchors: M156
+			# extended that config's Rust check to the crubit and bindgen
+			# revisions. Same reachability and same substitution as the rebase
+			# above; it runs before llvm/ and toolchain/, so it is cut against
+			# the pristine tree.
+			"${FILESDIR}/chromium-156-compiler.patch"
 		)
 
 		# See the rm above common/ for why substitution means deleting first.
 		rm "${WORKDIR}/chromium-patches-${PATCH_V}/toolchain/cr152-fix-rust-2-oxidize-harder.patch" ||
 			die "chromium-patches no longer ships cr152-fix-rust-2-oxidize-harder.patch; drop this rm and its rebase"
+		rm "${WORKDIR}/chromium-patches-${PATCH_V}/toolchain/cr152-compiler.patch" ||
+			die "chromium-patches no longer ships cr152-compiler.patch; drop this rm and its rebase"
 
 		# Automate conditional application of chromium-patches
 		# The directory structure is expected to be something like:
