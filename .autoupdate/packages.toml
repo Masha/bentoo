@@ -10101,6 +10101,14 @@ LLAMA_CPP_tag=b11669 -- the stale-tag defect of the seventh removal again --
 while ::gentoo's 0.40.7 pins b11738. ::gentoo already ships 0.40.7, so the
 overlay copy only shadowed a better one. If this record comes back to life
 without a reason written here, it is the --revive bug, not a decision.
+
+2026-10-22, back on purpose (record enabled). 7ef6fc11d revived it with
+0.40.7 and 0.40.8. 0.40.8 is ahead of ::gentoo (which stops at 0.40.7) and
+carries the right pin: v0.40.8/LLAMA_CPP_VERSION reads b11738, as does the
+ebuild. 0.40.7 was dropped again the same day: byte-identical to ::gentoo's
+0.40.7 and with no DIST line for its distfiles, so it only shadowed theirs.
+Retire the package once ::gentoo ships 0.40.8; until then every bump must
+still resync LLAMA_CPP_tag by hand from LLAMA_CPP_VERSION.
 """
 # END
 
