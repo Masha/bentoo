@@ -48,7 +48,17 @@ EAPI=8
 # re-uploading 39 MiB for four Windows-only crates. Cargo still needs them:
 # it resolves the whole lock before it filters by target. Drop them the next
 # time the tarball is regenerated -- the recipe above already includes them.
+#
+# 3.2.0 tops up two more, again an autoupdate bump that moved PV alone: the
+# lock moved rustls-webpki 0.103.15 -> 0.103.16 and webpki-root-certs
+# 1.0.9 -> 1.0.10, and the build died with "failed to select a version for
+# the requirement `rustls-webpki = "^0.103.14"` (locked to 0.103.16)".
+# Those two are the whole diff between the lock's registry entries and
+# tarball + CRATES (505 entries); the leftovers the lock dropped (zip 8.6.0,
+# basic-toml, and the two older versions) are unused and harmless.
 CRATES="
+	rustls-webpki@0.103.16
+	webpki-root-certs@1.0.10
 	windows-link@0.100.0
 	windows-registry@0.100.0
 	windows-result@0.100.0
