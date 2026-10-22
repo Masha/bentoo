@@ -43,11 +43,11 @@ LICENSE="LGPL-2+"
 # untouched. The subslot is upstream's SOVERSION (4 here, 2 in the 0.10.x line).
 SLOT="1/4"
 
-# BENTOO-DIVERGENCE: KEYWORDS - ~amd64 ~arm64 only, where ::gentoo's 0.10.x is
-# stable on several arches. Nothing here is amd64-specific; the narrower set is
-# "not yet built anywhere else", not a restriction, and widening it only needs a
-# build on the arch in question.
-KEYWORDS="~amd64 ~arm64"
+# BENTOO-DIVERGENCE: KEYWORDS - ~amd64 only, where ::gentoo keywords several
+# arches. This is an overlay-owned slot, not a ::gentoo mirror, so it follows
+# the overlay baseline: amd64 (x86-64-v3) is the only architecture bentoo can
+# test, and a keyword is a promise that the package works there.
+KEYWORDS="~amd64"
 
 # BENTOO-DIVERGENCE: IUSE - "lcms" is new (1.x added PODOFO_WITH_LCMS2 for ICC
 # profile reading), while "idn" and "tools" are gone: 1.x dropped the libidn

@@ -61,7 +61,9 @@ COMMON_DEPEND="
 # required: false, so without these atoms the tests are skipped in silence and
 # USE=test reports a pass it never earned -- which is equally true of the three
 # directories 24.1.13 already has. ::gentoo's own 24.1.13 has that same silent
-# skip. Drop this once ::gentoo ships a 26.x ebuild carrying the deps itself.
+# skip, and so does its 26.0.99.903 (re-checked 2026-10-21: its test? block is
+# still rendercheck + libX11 only). Drop this once a ::gentoo 26.x ebuild
+# carries libxcb and pytest under test? itself.
 DEPEND="
 	${COMMON_DEPEND}
 	>=x11-base/xorg-proto-2024.1
