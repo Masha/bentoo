@@ -9885,6 +9885,37 @@ would commit an ebuild that doesn't build. Probe kept live: `--check dev-lang/gh
 """
 # END
 
+["media-sound/audacious"]
+url = "https://audacious-media-player.org/download"
+parser = "regex"
+pattern = 'audacious-([0-9]+(?:\.[0-9]+)+)\.tar\.bz2'
+select = "max"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "4.6.2"
+comments = """
+Official download page; it links the same distfiles.audacious-media-player.org
+tarballs SRC_URI uses, so it never announces a version before its distfile exists.
+The digit right after "audacious-" keeps audacious-plugins-* out, and the \\.tar
+right after the version keeps -beta tarballs out.
+
+Bumps as a PAIR with media-plugins/audacious-plugins: each ebuild pins the other
+at ~${PV}, so one without the other is uninstallable.
+"""
+# END
+
+["media-plugins/audacious-plugins"]
+url = "https://audacious-media-player.org/download"
+parser = "regex"
+pattern = 'audacious-plugins-([0-9]+(?:\.[0-9]+)+)\.tar\.bz2'
+select = "max"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "4.6.2"
+comments = """
+Same page and rules as media-sound/audacious. Bumps as a PAIR with it (~${PV}
+pins in both directions).
+"""
+# END
+
 ["media-sound/audacity"]
 enabled = false
 disabled_by = "auto"
