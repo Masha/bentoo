@@ -9094,7 +9094,7 @@ url = "https://deps.gentoo.zip/dev-build/gn/"
 parser = "regex"
 pattern = 'gn-([0-9][0-9.]*)\.tar\.xz'
 select = "max"
-version = "0.2540"
+version = "0.2578"
 comments = """
 gn — deps.gentoo.zip lists tarballs in ascending order; select=max picks the
 highest (was SKIP: assumed git-only, but the mirror does host versioned tarballs).
