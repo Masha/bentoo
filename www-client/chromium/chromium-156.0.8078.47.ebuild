@@ -579,9 +579,14 @@ src_prepare() {
 		# third_party/typescript/linux-amd64. That directory is not in keeplibs
 		# (nothing else needs it), the ELF purge would strip the binary anyway,
 		# and there is no arm64 build of it. Point it at devtools' own JS tsc.
-		# The matching switch for //tools/typescript is the gn arg
-		# use_typescript_go=false in src_configure; the two go together.
+		# The matching fix for //tools/typescript is the patch below.
 		"${FILESDIR}/chromium-155-devtools-tsc-binary-via-node.patch"
+		# bentoo: M156 removed the use_typescript_go gn arg and the node
+		# branch of tools/typescript, so every WebUI ts_library now execs
+		# //third_party/typescript/typescript.py and its tsgo ELF. Redirect
+		# that script to the JS tsc in third_party/node/node_modules, the
+		# compiler the M155 node branch ran (TypeScript 6.0.2 in both).
+		"${FILESDIR}/chromium-156-webui-tsc-via-node.patch"
 	)
 
 	# So many fontconfig magic numbers to cover
@@ -1133,6 +1138,9 @@ src_prepare() {
 		third_party/tflite/src/third_party/xla/xla/tsl/platform
 		third_party/tflite/src/third_party/xla/xla/tsl/protobuf
 		third_party/tflite/src/third_party/xla/xla/tsl/util
+		# bentoo: only for typescript.py, which chromium-156-webui-tsc-via-node
+		# redirects to the JS tsc; the tsgo ELF beside it goes unused.
+		third_party/typescript
 		third_party/ukey2
 		third_party/utf
 		third_party/vulkan
@@ -1512,17 +1520,6 @@ chromium_configure() {
 		"use_thin_lto=${use_lto}"
 		# use system go
 		"tint_use_system_go=true"
-		# M153 (crbug.com/423789047) defaults use_typescript_go=true, which
-		# compiles WebUI TypeScript with the native tsgo binary shipped as a
-		# prebuilt ELF under third_party/typescript/linux-amd64/. That directory
-		# is not in keeplibs, so remove_bundled_libraries.py deletes it and
-		# ninja dies with "third_party/typescript/typescript.py ... missing and
-		# no known rule to make it". Keeping it would only move the failure:
-		# bin-finder.py --elf strips the prebuilt tsc, and there is no arm64
-		# build of it at all. Use the JS compiler (third_party/node/node_modules/
-		# typescript, run through the system node) that ts_library.py still
-		# supports as the non-tsgo branch.
-		"use_typescript_go=false"
 		# M155 generates V8's instance-types.h with metagen, which parses V8's
 		# headers through libclang: the prebuilt third_party/llvm-libclang (the
 		# tarball ships its bindings but not lib/libclang.so) plus the bundled
