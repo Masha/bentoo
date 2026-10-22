@@ -10547,19 +10547,21 @@ usually passes but a check can transiently fail. Live=v1.91.3.
 # END
 
 ["www-client/librewolf"]
-url = "https://codeberg.org/api/v1/repos/librewolf/source/releases?page=1&limit=1"
+url = "https://librewolf.dev/api/v1/repos/librewolf/source/releases?page=1&limit=1"
 parser = "json"
 path = "[0].tag_name"
 transform = [['-', "_p"]]
-version = "153.0.4_p1"
+version = "158.0.1_p2"
 comments = """
-LibreWolf — Codeberg releases API do repo "source", newest-first tag_name.
-O endpoint generic packages estoura o timeout, e o /tags passou a dar TLS
-handshake timeout (2026-07-31); /releases responde rápido e só existe DEPOIS
-que o workflow publica o tarball (assets librewolf-<ver>.source.tar.gz*), então
-nunca aponta para uma tag sem distfile — a tag é criada antes do upload.
-Version "153.0.1-1" maps to ebuild PV "153.0.1_p1" (transform "-"->"_p").
-Live=153.0.4-1 (verificado 2026-09-10: HTTP 200 em 0,7s).
+LibreWolf: Forgejo releases API of the "source" repo on librewolf.dev,
+newest-first tag_name. Upstream moved its forge from codeberg.org to
+librewolf.dev; the Codeberg mirror still receives tags but stopped receiving
+releases and tarballs at 153.0.4-1, so the old Codeberg probe reported
+"up to date" while the package fell behind (found 2026-10-22).
+A release exists only AFTER the workflow uploads the source tarball (assets
+librewolf-<ver>.source.tar.gz*), so it never points at a tag without a distfile.
+Version "158.0.1-2" maps to ebuild PV "158.0.1_p2" (transform "-"->"_p").
+Live=158.0.1-2 (verified 2026-10-22: HTTP 200, sha256 matches upstream).
 """
 # END
 

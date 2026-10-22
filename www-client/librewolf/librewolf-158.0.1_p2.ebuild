@@ -3,7 +3,7 @@
 
 EAPI=8
 
-FIREFOX_PATCHSET="firefox-153-patches-01.tar.xz"
+FIREFOX_PATCHSET="firefox-158-patches-02.tar.xz"
 
 LLVM_COMPAT=( 21 22 )
 
@@ -38,7 +38,7 @@ inherit check-reqs desktop flag-o-matic gnome2-utils linux-info llvm-r1 multipro
 	optfeature pax-utils python-any-r1 readme.gentoo-r1 rust rust-toolchain \
 	toolchain-funcs virtualx xdg
 
-LIBREWOLF_SRC_URI="https://codeberg.org/librewolf/source/releases/download/${LIBREWOLF_PV}/librewolf-${LIBREWOLF_PV}.source.tar.gz"
+LIBREWOLF_SRC_URI="https://librewolf.dev/librewolf/source/releases/download/${LIBREWOLF_PV}/librewolf-${LIBREWOLF_PV}.source.tar.gz"
 
 PATCH_URIS=(
 	https://dev.gentoo.org/~juippis/mozilla/patchsets/${FIREFOX_PATCHSET}
@@ -66,7 +66,7 @@ IUSE+=" +system-av1 +system-harfbuzz +system-icu +system-jpeg +system-libevent +
 IUSE+=" system-pipewire system-png +system-webp test valgrind wayland wifi +X"
 
 # Firefox-only IUSE
-IUSE+=" +gmp-autoupdate jpegxl +jumbo-build openh264 telemetry wasm-sandbox"
+IUSE+=" +gmp-autoupdate +jumbo-build openh264 telemetry wasm-sandbox"
 
 REQUIRED_USE="|| ( X wayland )
 	debug? ( !system-av1 )
@@ -90,7 +90,7 @@ BDEPEND="${PYTHON_DEPS}
 	app-arch/unzip
 	app-arch/zip
 	>=dev-util/cbindgen-0.29.4
-	net-libs/nodejs
+	net-libs/nodejs[ssl]
 	virtual/pkgconfig
 	amd64? ( >=dev-lang/nasm-2.14 )
 	pgo? (
@@ -108,7 +108,7 @@ COMMON_DEPEND="${FF_ONLY_DEPEND}
 	>=app-accessibility/at-spi2-core-2.46.0:2
 	dev-libs/glib:2
 	dev-libs/libffi:=
-	>=dev-libs/nss-3.125
+	>=dev-libs/nss-3.130
 	>=dev-libs/nspr-4.39
 	media-libs/alsa-lib
 	media-libs/fontconfig
@@ -136,7 +136,7 @@ COMMON_DEPEND="${FF_ONLY_DEPEND}
 	selinux? ( sec-policy/selinux-mozilla )
 	sndio? ( >=media-sound/sndio-1.8.0-r1 )
 	system-av1? (
-		>=media-libs/dav1d-1.0.0:=
+		>=media-libs/dav1d-1.5.4:=
 		>=media-libs/libaom-3.10.0:=
 	)
 	system-harfbuzz? (
@@ -578,10 +578,6 @@ src_unpack() {
 }
 
 src_prepare() {
-	if [[ ${use_lto} == "yes" ]]; then
-		rm -v "${WORKDIR}"/firefox-patches/*-LTO-Only-enable-LTO-*.patch || die
-	fi
-
 	# Workaround for bgo#915651 and bmo#1988166 on musl
 	if use elibc_glibc ; then
 		rm -v "${WORKDIR}"/firefox-patches/*bgo-967694-musl-prctrl-exception-on-musl.patch || die
@@ -688,6 +684,7 @@ src_prepare() {
 	# glslopt: bgo#969412
 	moz_clear_vendor_checksums glslopt
 	moz_clear_vendor_checksums encoding_rs
+	moz_clear_vendor_checksums bindgen
 
 	# Respect choice for "jumbo-build"
 	# Changing the value for FILES_PER_UNIFIED_FILE may not work, see #905431
@@ -808,7 +805,6 @@ src_configure() {
 		--disable-parental-controls \
 		--disable-strip \
 		--disable-updater \
-		--disable-wmf \
 		--enable-negotiateauth \
 		--enable-new-pass-manager \
 		--enable-packed-relative-relocs \
@@ -874,7 +870,6 @@ src_configure() {
 	# riscv-related options, bgo#947337, bgo#947338, bgo#977845
 	if use riscv ; then
 		mozconfig_add_options_ac 'Disable webrtc for RISC-V' --disable-webrtc
-		mozconfig_add_options_ac 'Disable JIT for RISC-V' --disable-jit
 	fi
 
 	if [[ -s "${S}/api-google.key" ]] ; then
@@ -925,6 +920,7 @@ src_configure() {
 
 	mozconfig_use_enable dbus
 	mozconfig_use_enable libproxy
+	mozconfig_use_enable jumbo-build unified-build
 	mozconfig_use_enable valgrind
 
 	use eme-free && mozconfig_add_options_ac '+eme-free' --disable-eme
@@ -948,8 +944,6 @@ src_configure() {
 
 	mozconfig_use_enable wifi necko-wifi
 
-	! use jumbo-build && mozconfig_add_options_ac '--disable-unified-build' --disable-unified-build
-
 	if use X && use wayland ; then
 		mozconfig_add_options_ac '+x11+wayland' --enable-default-toolkit=cairo-gtk3-x11-wayland
 	elif ! use X && use wayland ; then
@@ -966,8 +960,6 @@ src_configure() {
 		mozconfig_add_options_ac 'no wasm-sandbox' --without-wasm-sandboxed-libraries
 		mozconfig_use_with system-harfbuzz system-graphite2
 	fi
-
-	! use jpegxl && mozconfig_add_options_ac '-jpegxl' --disable-jxl
 
 	if [[ ${use_lto} == "yes" ]] ; then
 		if use clang ; then
@@ -1299,16 +1291,9 @@ src_install() {
 			EOF
 		fi
 
-		# Install the vaapitest binary on supported arches (122.0 supports all platforms, bmo#1865969)
+		# Install the gfxtest binary on supported arches
 		exeinto "${MOZILLA_FIVE_HOME}"
-		doexe "${BUILD_DIR}"/dist/bin/vaapitest
-		doexe "${BUILD_DIR}"/dist/bin/vulkantest
-
-		# Install the v4l2test on supported arches (+ arm, + riscv64 when keyworded)
-		if use arm64 ; then
-			exeinto "${MOZILLA_FIVE_HOME}"
-			doexe "${BUILD_DIR}"/dist/bin/v4l2test
-		fi
+		doexe "${BUILD_DIR}"/dist/bin/gfxtest
 	fi
 
 	if ! use gmp-autoupdate ; then
@@ -1374,12 +1359,6 @@ src_install() {
 	newmenu "${WORKDIR}/${PN}.desktop-template" "${desktop_filename}"
 
 	rm "${WORKDIR}/${PN}.desktop-template" || die
-
-	if use jpegxl ; then
-		cat >>"${GENTOO_PREFS}" <<-EOF || die "failed to enable jpegxl via pref"
-		pref("image.jxl.enabled", true);
-		EOF
-	fi
 
 	# Install wrapper script
 	[[ -f "${ED}/usr/bin/${PN}" ]] && rm "${ED}/usr/bin/${PN}"
