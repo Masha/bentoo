@@ -185,7 +185,7 @@
 url = "https://registry.npmjs.org/@anthropic-ai/claude-code"
 parser = "json"
 path = "dist-tags.latest"
-version = "2.1.306"
+version = "2.1.307"
 comments = """
 claude-code — npm @anthropic-ai/claude-code; dist-tags.latest is the stable channel.
 
@@ -312,7 +312,7 @@ url = "https://api2.cursor.sh/updates/api/download/stable/linux-x64/cursor"
 parser = "json"
 path = "version"
 commit_sha_path = "commitSha"
-version = "3.26.13"
+version = "3.26.16"
 comments = """
 Cursor — official download API; "version" is the full version. commitSha is the
 per-release BUILD_ID embedded in SRC_URI; the applier substitutes it into the
@@ -337,7 +337,7 @@ url = "https://downloads.claude.ai/claude-desktop/apt/stable/dists/stable/main/b
 parser = "regex"
 pattern = 'Version: ([0-9][0-9.]*)'
 select = "max"
-version = "3.1623.0"
+version = "3.1623.1"
 comments = """
 Claude Desktop — the Debian "Packages" index of Anthropic's own APT repository,
 the one code.claude.com/docs/en/desktop-linux tells users to add. It is a flat
@@ -766,7 +766,7 @@ url = "https://nodejs.org/dist/latest-v24.x/SHASUMS256.txt"
 parser = "regex"
 pattern = 'node-v(24\.[0-9]+\.[0-9]+)\.tar\.xz'
 select = "max"
-version = "24.22.0"
+version = "24.22.1"
 comments = """
 Node.js SLOT 24 — the previous LTS line.
 
@@ -811,7 +811,7 @@ url = "https://nodejs.org/dist/latest-v26.x/SHASUMS256.txt"
 parser = "regex"
 pattern = 'node-v(26\.[0-9]+\.[0-9]+)\.tar\.xz'
 select = "max"
-version = "26.12.0-r1"
+version = "26.12.1"
 comments = """
 Node.js SLOT 26 — the current line.
 Identical in shape to net-libs/nodejs:24 above, which carries the shared
@@ -1510,7 +1510,7 @@ url = "https://api.github.com/repos/kata-containers/kata-containers/releases/lat
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "4.3.0"
+version = "4.3.1"
 comments = """
 Kata Containers — tag "X.Y.Z", no prefix. The applier only moves PV; a bump
 also needs, from the new release's versions.yaml and tools/packaging/kernel:
@@ -1814,7 +1814,7 @@ url = "https://api.github.com/repos/conda/conda/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "26.9.3"
+version = "26.9.4"
 comments = """
 conda — tag bare "X.Y.Z".
 """
@@ -2098,7 +2098,7 @@ commit_sha_path = "[0].id"
 base_from = "file"
 base_url = "https://code.videolan.org/api/v4/projects/videolan%2Fvlc/repository/files/configure.ac/raw?ref=master"
 base_pattern = 'AC_INIT\(\[vlc\], \[([0-9][0-9.]*)-dev\]\)'
-version = "4.0.0_pre20261020"
+version = "4.0.0_pre20261021"
 comments = """
 vlc — 4.0 development snapshot, commit-tracked on master; _pre suffix
 preserved from the current ebuild. Only the 4.0 line lives here: 3.0.x is
@@ -2218,7 +2218,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "0.40.7"
+version = "0.40.8"
 comments = """
 ollama-bin — same upstream repo.
 """
@@ -2255,7 +2255,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "2026.42.1"
+version = "2026.43.3"
 comments = """
 lemonade — GitHub release tag "vX.Y.Z" ("v" stripped). Built from source
 (CMake); the webapp node_modules distfile on distfiles.obentoo.org is NOT
@@ -2270,7 +2270,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "2026.42.1"
+version = "2026.43.3"
 comments = """
 lemonade-bin — same upstream as sci-ml/lemonade, prebuilt "embeddable"
 tarball plus arch-independent data from the .deb.
@@ -2494,7 +2494,7 @@ url = "https://api.github.com/repos/chromium-linux-tarballs/chromium-tarballs/re
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "155.0.8059.84"
+version = "156.0.8078.47"
 comments = """
 chromium — probes the TARBALL repo, not chromiumdash or the Chrome release
 feed, because that repo is what actually gates a bump: SRC_URI points at
@@ -2736,7 +2736,7 @@ networkmanager-openvpn — default (commit-recency) order; version sort returns 
 url = "https://linux-pkgs.obscura.com/deb/dists/stable/main/binary-amd64/Packages"
 parser = "regex"
 pattern = 'Package: obscura-cli\n(?:[^\n]*\n)*?Version: ([0-9][0-9.]*)'
-version = "1.182"
+version = "1.184"
 comments = """
 Obscura VPN — the Debian "Packages" index of the APT repository SRC_URI pulls
 from (the one obscura-repository.deb configures). Plain text; four stanzas on
@@ -2783,7 +2783,7 @@ url = "https://repo.nordvpn.com/deb/nordvpn/debian/dists/stable/main/binary-amd6
 parser = "regex"
 pattern = 'Package: nordvpn\nVersion: ([0-9][0-9.]*)'
 select = "max"
-version = "5.4.1"
+version = "6.0.1"
 comments = """
 NordVPN CLI + daemon — the Debian "Packages" index of the official APT
 repository SRC_URI pulls from. Plain text, NOT sorted (5.2.0 came first on
@@ -2804,7 +2804,7 @@ url = "https://repo.nordvpn.com/deb/nordvpn/debian/dists/stable/main/binary-amd6
 parser = "regex"
 pattern = 'Package: nordvpn-gui\nVersion: ([0-9][0-9.]*)'
 select = "max"
-version = "5.4.1"
+version = "6.0.1"
 comments = """
 NordVPN GUI — same APT index as net-vpn/nordvpn-bin, nordvpn-gui stanzas. The
 ebuild pins ~net-vpn/nordvpn-bin-${PV} (the .deb declares nordvpn (= PV)), so
@@ -2842,7 +2842,7 @@ url = "https://downloads.isc.org/isc/bind9/"
 parser = "regex"
 pattern = 'href="(9\.20\.[0-9]+)/"'
 select = "max"
-version = "9.20.29"
+version = "9.20.30"
 fallback_url = "https://api.github.com/repos/isc-projects/bind9/git/matching-refs/tags/v9.20."
 fallback_parser = "regex"
 fallback_pattern = '"refs/tags/v(9\.20\.[0-9]+)"'
@@ -3254,7 +3254,7 @@ commit_sha_path = "[0].id"
 base_from = "file"
 base_url = "https://gitlab.freedesktop.org/mesa/mesa/-/raw/main/VERSION"
 base_pattern = '^([0-9][0-9.]*)-devel'
-version = "27.0.0_pre20261021"
+version = "27.0.0_pre20261022"
 comments = """
 mesa — commit-tracked on main; _pre suffix preserved from current ebuild.
 
@@ -3272,7 +3272,7 @@ commit_sha_path = "[0].id"
 base_from = "file"
 base_url = "https://gitlab.freedesktop.org/mesa/mesa/-/raw/main/VERSION"
 base_pattern = '^([0-9][0-9.]*)-devel'
-version = "27.0.0_pre20261021"
+version = "27.0.0_pre20261022"
 comments = """
 mesa_clc — part of the mesa tree; same source/rule as media-libs/mesa.
 """
@@ -3784,7 +3784,7 @@ transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "source"
 series = '^[0-9.]+(?:-r[0-9]+)?$'
-version = "1.24.4"
+version = "1.25.2"
 comments = """
 zed (stable channel), from source — since 2026-10-01 app-editors/zed builds
 upstream's tagged releases with no patches; the patched snapshot is app-editors/
@@ -3808,7 +3808,7 @@ select = "max"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "source"
 series = '_pre(?:-r[0-9]+)?$'
-version = "1.25.1_pre"
+version = "1.26.1_pre"
 comments = """
 zed (preview channel), from source — mirrors zed-bin@preview; the same manual
 follow-up as zed@stable applies to every bump.
@@ -3839,7 +3839,7 @@ path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
 series = '^[0-9.]+(?:-r[0-9]+)?$'
-version = "1.24.4"
+version = "1.25.2"
 comments = """
 zed-bin (stable channel) — releases/latest is the stable release by definition
 (prerelease=false); upstream tags it "vX.Y.Z" and the preview "vX.Y.Z-pre".
@@ -3864,7 +3864,7 @@ select = "max"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
 series = '_pre(?:-r[0-9]+)?$'
-version = "1.25.1_pre"
+version = "1.26.1_pre"
 comments = """
 zed-bin (preview channel) — releases/latest never returns a prerelease, so the
 preview needs the full list: the pattern takes only "vX.Y.Z-pre" tags and the
@@ -3879,7 +3879,7 @@ url = "https://delta.dev/api/releases/stable/latest/asset?asset=delta&os=linux&a
 parser = "json"
 path = "version"
 type = "bin"
-version = "0.20.1"
+version = "0.21.0"
 comments = """
 Delta (Zed Industries) — the endpoint delta.dev/download calls when the Linux x64
 button is pressed (found in /_astro/query-client.*.js). Answers anonymously with
@@ -3901,7 +3901,7 @@ base_from = "file"
 base_url = "https://raw.githubusercontent.com/sqlitebrowser/sqlitebrowser/master/CMakeLists.txt"
 base_pattern = '(?m)^\s+VERSION ([0-9][0-9.]*)'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "3.13.99_p20261018"
+version = "3.13.99_p20261021"
 comments = """
 sqlitebrowser — commit-tracked on master (uses COMMIT= without quotes); date YYYYMMDD becomes _pDATE suffix.
 """
@@ -3982,7 +3982,7 @@ base_from = "tag"
 base_url = "https://api.github.com/repos/KhronosGroup/glslang/git/refs/tags"
 base_tag_pattern = '^vulkan-sdk-([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)$'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.363.0_p20261020"
+version = "1.4.363.0_p20261021"
 comments = """
 glslang — commit-tracked on main; scans titles for vulkan-sdk-X.Y.Z.W to detect base bump.
 """
@@ -3999,7 +3999,7 @@ base_from = "tag"
 base_url = "https://api.github.com/repos/KhronosGroup/SPIRV-Headers/git/refs/tags"
 base_tag_pattern = '^vulkan-sdk-([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)$'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.363.0_p20261002"
+version = "1.4.363.0_p20261021"
 comments = """
 spirv-headers — commit-tracked on main; scans titles for vulkan-sdk-X.Y.Z.W to detect base bump.
 """
@@ -4016,7 +4016,7 @@ base_from = "tag"
 base_url = "https://api.github.com/repos/KhronosGroup/SPIRV-Tools/git/refs/tags"
 base_tag_pattern = '^vulkan-sdk-([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)$'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.363.0_p20261016"
+version = "1.4.363.0_p20261021"
 comments = """
 spirv-tools — commit-tracked on main; scans titles for vulkan-sdk-X.Y.Z.W to detect base bump.
 """
@@ -9641,7 +9641,7 @@ is a workspace and pycargoebuild refuses it.
 url = "https://pypi.org/pypi/openai/json"
 parser = "json"
 path = "info.version"
-version = "3.35.1"
+version = "3.36.0"
 comments = """
 openai — official Python SDK; core dep of sci-ml/amd-gaia. info.version is
 clean X.Y.Z. Live=3.0.0 == current PV.
@@ -9690,7 +9690,7 @@ pattern = '"name":\s*"Hermes Agent v([0-9]+\.[0-9]+\.[0-9]+)'
 headers = { "User-Agent" = "bentoo-autoupdate" }
 aux_var = "MY_TAG"
 aux_pattern = '"tag_name":\s*"v([0-9]+\.[0-9]+\.[0-9]+)"'
-version = "0.22.2"
+version = "0.22.4"
 comments = """
 hermes-agent -- tags are dated (v2026.9.24) while PV is the pyproject SemVer
 (0.21.5); the release name carries both: "Hermes Agent v0.21.5 (v2026.9.24)".
@@ -9943,13 +9943,11 @@ which is why this entry carried no revision until 2026-07-26.
 # END
 
 ["sci-ml/ollama"]
-enabled = false
-disabled_by = "removed 2026-10-21 (ninth removal): ::gentoo ships 0.40.7 with the correct LLAMA_CPP_tag; ours carried a stale one -- see comments"
 url ="https://api.github.com/repos/ollama/ollama/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.40.7"
+version = "0.40.8"
 comments = """
 ollama source — same repo as ollama-bin; tag "vX.Y.Z" (leading v stripped).
 
@@ -10111,7 +10109,7 @@ url = "https://api.github.com/repos/aquasecurity/trivy/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.76.0"
+version = "0.76.1"
 comments = """
 Trivy — GitHub releases/latest tag "vX.Y.Z" (leading v stripped). Live=v0.72.0.
 
@@ -10333,7 +10331,7 @@ pattern = '"name":\s*"([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 series = '^2\.'
-version = "2.38.3"
+version = "2.38.4"
 comments = """
 aws-cli v2 — GitHub tag index, pinned to the 2.x series. Verified 2026-08-19
 against the live endpoint: 100 matches, all of them 2.x, max = 2.36.27 = ebuild.
@@ -11779,7 +11777,7 @@ parser = "regex"
 pattern = '"tag_name":\s*"v([0-9]+\.[0-9]+\.[0-9]+)"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "1.0.101"
+version = "1.0.102"
 comments = """
 GitHub Copilot CLI — TWO PARALLEL TRAINS out of one repository, and picking the
 wrong one is the whole trap here:
@@ -11953,7 +11951,7 @@ tree rather than a single binary; those are not used.
 url = "https://registry.npmjs.org/@qwen-code%2fqwen-code"
 parser = "json"
 path = "dist-tags.latest"
-version = "0.25.3"
+version = "0.26.0"
 comments = """
 Qwen Code — probed through npm's dist-tags.latest, NOT through GitHub, although
 the distfiles come from GitHub release assets (releases/download/v${PV}).
@@ -11987,7 +11985,7 @@ parser = "regex"
 pattern = '"tag_name":\s*"v([0-9]+\.[0-9]+\.[0-9]+)"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "4.0.17"
+version = "4.0.18"
 comments = """
 CC Switch — a Tauri GUI for switching between Claude Code, Codex and Gemini
 CLI accounts. Tracks CC-Switch-v<PV>-Linux-{x86_64,arm64}.deb; note the asset
@@ -12032,7 +12030,7 @@ url = "https://registry.npmjs.org/@ccusage/ccusage-linux-x64/latest"
 parser = "regex"
 pattern = '"version":"([0-9]+\.[0-9]+\.[0-9]+)"'
 type = "bin"
-version = "20.0.37"
+version = "20.0.40"
 comments = """
 ccusage — probed on the PER-PLATFORM npm package, not on the main "ccusage"
 one and not on GitHub, and the distinction is load-bearing.
@@ -13156,7 +13154,7 @@ parser = "regex"
 pattern = 'href="(6\.[0-9]+\.[0-9]+-(?:rc|beta[0-9]*))/"'
 transform = [['-', "_"]]
 select = "max"
-version = "6.140.0_rc"
+version = "6.140.0_rc-r1"
 comments = """
 qtwebengine -- since 6.140 released apart from Qt and numbered after its
 Chromium base; 6.11.2 was the last one inside the Qt release and it pins
@@ -14221,7 +14219,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "0.11.1"
+version = "0.12.0"
 comments = """
 PhotoCraft (ArtCraft "Craft App Suite") — GitHub releases, tagged "vX.Y.Z".
 SRC_URI is the upstream linux-x86_64 tarball, so a bump is PV plus one DIST --
@@ -14240,7 +14238,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "0.10.1"
+version = "0.11.0"
 comments = """
 PdfCraft (ArtCraft "Craft App Suite") — GitHub releases, tagged "vX.Y.Z"; same
 shape as media-gfx/photocraft-bin, whose record explains the -bin choice.
@@ -14288,7 +14286,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "0.10.0"
+version = "0.11.0"
 comments = """
 LightCraft (ArtCraft "Craft App Suite") — GitHub releases, tagged "vX.Y.Z"; same
 shape as media-gfx/photocraft-bin, whose record explains the -bin choice.
@@ -14304,7 +14302,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "0.10.0"
+version = "0.11.0"
 comments = """
 DesignCraft (ArtCraft "Craft App Suite") — GitHub releases, tagged "vX.Y.Z"; same
 shape as media-gfx/photocraft-bin, whose record explains the -bin choice.
@@ -14320,7 +14318,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "0.13.0"
+version = "0.14.0"
 comments = """
 EffectCraft (ArtCraft "Craft App Suite") — GitHub releases, tagged "vX.Y.Z"; same
 shape as media-gfx/photocraft-bin, whose record explains the -bin choice.
@@ -14336,7 +14334,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "0.9.0"
+version = "0.10.0"
 comments = """
 GridCraft (ArtCraft "Craft App Suite") — GitHub releases, tagged "vX.Y.Z"; same
 shape as media-gfx/photocraft-bin, whose record explains the -bin choice.
@@ -14384,7 +14382,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "0.10.0"
+version = "0.11.0"
 comments = """
 SoundCraft (ArtCraft "Craft App Suite") — GitHub releases, tagged "vX.Y.Z"; same
 shape as media-gfx/photocraft-bin, whose record explains the -bin choice.
@@ -14416,7 +14414,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "0.8.0"
+version = "0.9.0"
 comments = """
 FigCraft (ArtCraft "Craft App Suite") — GitHub releases, tagged "vX.Y.Z"; same
 shape as media-gfx/photocraft-bin, whose record explains the -bin choice.
