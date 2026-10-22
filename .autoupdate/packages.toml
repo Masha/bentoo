@@ -9992,6 +9992,8 @@ which is why this entry carried no revision until 2026-07-26.
 # END
 
 ["sci-ml/ollama"]
+enabled = false
+disabled_by = "parity-audit 2026-10-22: removed, byte-identical to ::gentoo 0.40.8 (ebuild, files/ and Manifest) -- see comments"
 url ="https://api.github.com/repos/ollama/ollama/releases/latest"
 parser = "json"
 path = "tag_name"
