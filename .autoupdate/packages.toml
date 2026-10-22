@@ -368,6 +368,9 @@ url = "https://api.github.com/repos/tmux/tmux/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+patched = """
+Applies files/tmux-3.7-flags.patch (::gentoo's tmux-2.4-flags.patch rebased onto 3.7's Makefile.am; ::gentoo's 3.8 dropped it) plus replace-flags -Os -O2, and installs an OpenRC user init script in /etc/user/init.d (overlay rule: every daemon startable without systemd). The 9999/_rc branches are not carried.
+"""
 version = "3.8"
 comments = """
 tmux - GitHub release tag, a bare version with no "v" prefix.
@@ -415,6 +418,9 @@ parser = "regex"
 pattern = '"name":\s*"([0-9]+(?:\.[0-9]+)+)"'
 select = "max"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+patched = """
+Applies files/honggfuzz-bfd-bool.patch, which ::gentoo does not ship: 2.6 does not build against binutils 2.47 (its feature probe picks the pre-2.29 disassembler() prototype, and it still names the TRUE/FALSE macros bfd.h dropped). Upstream has tagged nothing since 2.6. Drop if ::gentoo carries an equivalent.
+"""
 version = "2.6"
 comments = """
 honggfuzz - PROBE THE TAGS, AND ONLY THE NUMERIC ONES. Both releases/latest and
@@ -766,6 +772,9 @@ url = "https://nodejs.org/dist/latest-v24.x/SHASUMS256.txt"
 parser = "regex"
 pattern = 'node-v(24\.[0-9]+\.[0-9]+)\.tar\.xz'
 select = "max"
+patched = """
+Slotted by major (SLOT is the bare major, per-slot prefix, eselect-nodejs, versioned symlinks, no shell-completion inherit), +system-icu by default, a pnpm USE flag and its own patch set. Every axis carries a BENTOO-DIVERGENCE block in the ebuild; ::gentoo's later in-place fixes (brotli floor, riscv Highway flags) are not followed automatically.
+"""
 version = "24.22.1"
 comments = """
 Node.js SLOT 24 — the previous LTS line.
@@ -811,6 +820,9 @@ url = "https://nodejs.org/dist/latest-v26.x/SHASUMS256.txt"
 parser = "regex"
 pattern = 'node-v(26\.[0-9]+\.[0-9]+)\.tar\.xz'
 select = "max"
+patched = """
+Slotted by major (SLOT is the bare major, per-slot prefix, eselect-nodejs, versioned symlinks, no shell-completion inherit), +system-icu by default, a pnpm USE flag and its own patch set. Every axis carries a BENTOO-DIVERGENCE block in the ebuild; ::gentoo's later in-place fixes (brotli floor, riscv Highway flags) are not followed automatically.
+"""
 version = "26.12.1"
 comments = """
 Node.js SLOT 26 — the current line.
@@ -2653,6 +2665,9 @@ parser = "regex"
 pattern = '"name":\s*"vim-core-([0-9]+\.[0-9]+\.[0-9]+)\.ebuild"'
 select = "max"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+patched = """
+USE_RUBY adds ruby34 and ruby40 to ::gentoo's ruby32/ruby33 (reaches DEPEND and RDEPEND through RUBY_DEPS): without them USE=ruby is unsatisfiable on a host carrying only current ruby slots. src_test also skips Test_spelldump and Test_spelldump_bang, which hang. Drop the ebuild once ::gentoo widens USE_RUBY.
+"""
 version = "9.2.1202"
 comments = """
 vim — follows ::gentoo's app-editors/vim-core, NOT upstream vim tags.
@@ -3222,6 +3237,9 @@ url = "https://api.github.com/repos/podofo/podofo/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
+patched = """
+PoDoFo 1.x installed in a private prefix (SLOT 1/4, headers and libs under podofo-1) beside ::gentoo's 0.10.x at 0/2; adds USE=lcms, drops USE=tools and its GPL-2+ licence branch, defaults fontconfig/jpeg/png on, ~amd64 only, and omits the fmt-uint128 patch (needed only on targets without native __int128).
+"""
 series = '^1\.'
 version = "1.1.2"
 comments = """
@@ -11127,6 +11145,9 @@ url = "https://gitlab.freedesktop.org/api/v4/projects/xorg%2Fxserver/repository/
 parser = "regex"
 pattern = '"name":"xwayland-([0-9.]+)"'
 select = "max"
+patched = """
+Keywords the 26 release candidate, which ::gentoo leaves unkeyworded (the reason this mirror exists); adds x11-libs/libxcb and dev-python/pytest under test? so the meson tests are not skipped in silence; drops the 9999-only -Dxorg/-Dxnest/-Dxvfb args, which the 26 series no longer declares. Drop once ::gentoo keywords a 26.x.
+"""
 version = "26.0.99.903"
 comments = """
 xwayland — the xorg/xserver tag list on gitlab.freedesktop.org, narrowed to the
@@ -12680,6 +12701,9 @@ url = "https://download.qt.io/official_releases/qt/6.12/"
 parser = "regex"
 pattern = 'href="(6\.12\.[0-9]+)/"'
 select = "max"
+patched = """
+Applies files/qtdeclarative-6.12.0-QTBUG-149607.patch (KDE #508377), which ::gentoo does not ship: the 6.12 cherry-pick landed after the 6.12.0 tag. Drop on 6.12.1.
+"""
 version = "6.12.0"
 comments = """
 qtdeclarative -- the one survivor of the Qt 6.12 mirror. On 2026-10-01
@@ -14160,6 +14184,9 @@ parser = "json"
 path = "tag_name"
 transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
+patched = """
+Adds +usb, +v4l and +vaapi USE flags (meson options ::gentoo builds unconditionally or not at all; 5.0 added VA-API decoding), floors ffmpeg at 6 as 5.0 requires, and pulls ffmpeg[drm,vaapi] plus libdrm under vaapi. All three default on, matching upstream.
+"""
 version = "5.0.1"
 comments = """
 scrcpy — releases/latest; tag_name is "vX.Y", transform strips the v.
