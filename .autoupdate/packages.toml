@@ -6071,7 +6071,7 @@ as invalid and never rechecks it, so brightness control is lost for the whole \
 session. Drop this once upstream (and then ::gentoo) carries the fix.\
 """
 series = '^[0-9]+\.[0-9]+\.(?:[0-9]|[1-8][0-9])(?:\.[0-9]+)?(?:-r[0-9]+)?$'
-version = "6.8.0"
+version = "6.8.1"
 comments = """
 powerdevil -> plasma/powerdevil. ::gentoo's ebuild plus the DDC/CI patch in
 `patched`; nothing else differs. Carried since the 6.8 beta (6.7.91-r1) and

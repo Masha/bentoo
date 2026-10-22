@@ -3,11 +3,12 @@
 
 EAPI=8
 
-# ::gentoo's 6.8.0 plus one patch, which makes powerdevil redetect monitors
+# ::gentoo's 6.8.1 plus one patch, which makes powerdevil redetect monitors
 # whose DDC/CI was not ready yet when it started (seen at login on an HDMI
 # monitor): libddcutil marks them invalid and never rechecks them, so
 # brightness control is lost for the whole session. Still needed on upstream
-# master as of 2026-10-08. The patch name carries no version on purpose: the
+# master as of 2026-10-08, and 6.8.1 leaves ddcutildetector.cpp untouched
+# (checked 2026-10-22). The patch name carries no version on purpose: the
 # autoupdate applier never renames files/, so a versioned name breaks a bump.
 # BENTOO-DIVERGENCE: PATCHES - redetect monitors whose DDC/CI was not ready at startup.
 
