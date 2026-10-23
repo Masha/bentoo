@@ -1,11 +1,13 @@
-DEFINED_PHASES=compile install unpack
+BDEPEND=>=dev-lang/go-1.26 >=dev-lang/go-1.24.11:= app-arch/unzip
+DEFINED_PHASES=compile install test unpack
 DESCRIPTION=Superset of JavaScript with optional static typing (native Go compiler)
 EAPI=8
-HOMEPAGE=https://www.typescriptlang.org/ https://github.com/microsoft/TypeScript/ https://github.com/microsoft/typescript-go/
-KEYWORDS=-* ~amd64 ~arm ~arm64 ~loong ~riscv
+HOMEPAGE=https://www.typescriptlang.org/ https://github.com/microsoft/TypeScript/
+INHERIT=go-module
+KEYWORDS=~amd64
 LICENSE=Apache-2.0 BSD BSD-2 CC-BY-4.0 MIT Unicode-DFS-2016 W3C
-RDEPEND=>=net-libs/nodejs-16.20.0:*
-RESTRICT=strip
+RDEPEND=!dev-lang/typescript-bin
 SLOT=0
-SRC_URI=https://registry.npmjs.org/typescript/-/typescript-7.0.2.tgz amd64? ( https://registry.npmjs.org/@typescript/typescript-linux-x64/-/typescript-linux-x64-7.0.2.tgz -> typescript-7.0.2-linux-x64.tgz ) arm? ( https://registry.npmjs.org/@typescript/typescript-linux-arm/-/typescript-linux-arm-7.0.2.tgz -> typescript-7.0.2-linux-arm.tgz ) arm64? ( https://registry.npmjs.org/@typescript/typescript-linux-arm64/-/typescript-linux-arm64-7.0.2.tgz -> typescript-7.0.2-linux-arm64.tgz ) loong? ( https://registry.npmjs.org/@typescript/typescript-linux-loong64/-/typescript-linux-loong64-7.0.2.tgz -> typescript-7.0.2-linux-loong64.tgz ) riscv? ( https://registry.npmjs.org/@typescript/typescript-linux-riscv64/-/typescript-linux-riscv64-7.0.2.tgz -> typescript-7.0.2-linux-riscv64.tgz )
-_md5_=435280e64e27400e2e7226893d5b6102
+SRC_URI=https://github.com/microsoft/TypeScript/archive/refs/tags/v7.0.2.tar.gz -> typescript-7.0.2.tar.gz https://distfiles.obentoo.org/typescript-7.0.2-vendor.tar.xz
+_eclasses_=toolchain-funcs	58a918e3a42d0156f010dcfd43725be5	flag-o-matic	fd3558f73f6503093adee69adf41020d	multiprocessing	45d0620f25c2f063ad6276ecd9ed9399	sysroot	4c36abaf94ebd3ab32f8abea9a444121	go-env	fca4e820393c2eac25a944be8bdf6a3a	go-module	3d4b6f3f29b3ebdeb708785b3cb1743b
+_md5_=15ffd85b77ab689daadd3dd8cb3e9e5b

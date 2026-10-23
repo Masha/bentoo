@@ -39,6 +39,16 @@ RUST_SHORT_HASH=${BUNDLED_RUST_VER:0:10}-${BUNDLED_RUST_VER##*-}
 NODE_VER="24.16.0-r1"
 GO_MIN_VER="1.25.0"
 ESBUILD_VER="0.28.2"
+# TypeScript 7 (tsgo), the compiler every TypeScript step of the build runs:
+# WebUI through third_party/typescript/typescript.py, devtools-frontend and
+# chromium-bidi through tsc_binary. Must equal the Version: line of
+# third_party/typescript/README.chromium -- src_prepare checks it -- because
+# the compiler reads the lib.*.d.ts files the tarball ships beside it, which
+# Chromium patches (3pp/patches/typescript_native_preview.patch).
+# BENTOO-DIVERGENCE: BDEPEND - dev-lang/typescript or dev-lang/typescript-bin
+# at TSGO_VER: the system tsgo replaces the prebuilt one the ELF purge removes.
+# ::gentoo's 151 predates tsgo in the build.
+TSGO_VER="7.0.2"
 VIRTUALX_REQUIRED="pgo"
 
 CHROMIUM_LANGS="af am ar bg bn ca cs da de el en-GB es es-419 et fa fi fil fr gu he
@@ -271,6 +281,10 @@ BDEPEND="
 	dev-lang/perl
 	>=dev-util/gperf-3.2
 	dev-util/esbuild:${ESBUILD_VER}
+	|| (
+		~dev-lang/typescript-${TSGO_VER}
+		~dev-lang/typescript-bin-${TSGO_VER}
+	)
 	dev-vcs/git
 	>=net-libs/nodejs-${NODE_VER}[inspector]
 	sys-apps/hwdata
@@ -546,10 +560,10 @@ src_prepare() {
 	python_setup
 
 	# We'll fill this in as we go. Patches go in chromium-patches.
-	# BENTOO-DIVERGENCE: PATCHES - nine fixes with no counterpart:
+	# BENTOO-DIVERGENCE: PATCHES - eight fixes with no counterpart:
 	# unbundle-minizip-undo-unicode, cbor-crubit-optional,
 	# blink-fonts-cxx-not-crubit, revert-signed-web-bundles-crubit,
-	# revert-web-bundle-parser-crubit, compiler, athm-cxx-bridge, devtools-tsc-binary-via-node and
+	# revert-web-bundle-parser-crubit, compiler, athm-cxx-bridge and
 	# fix-rust-2-oxidize-harder; plus one chromium-patches member dropped
 	# below.
 	# ::gentoo is on 142 and carries an old-fontconfig patch this series no
@@ -574,19 +588,6 @@ src_prepare() {
 
 	PATCHES+=(
 		"${WORKDIR}/chromium-patches-${PATCH_V}/common/"
-		# bentoo: every devtools-frontend TypeScript step execs `tsc_binary`
-		# from typescript_vars.gni, which names the prebuilt tsgo ELF under
-		# third_party/typescript/linux-amd64. That directory is not in keeplibs
-		# (nothing else needs it), the ELF purge would strip the binary anyway,
-		# and there is no arm64 build of it. Point it at devtools' own JS tsc.
-		# The matching fix for //tools/typescript is the patch below.
-		"${FILESDIR}/chromium-155-devtools-tsc-binary-via-node.patch"
-		# bentoo: M156 removed the use_typescript_go gn arg and the node
-		# branch of tools/typescript, so every WebUI ts_library now execs
-		# //third_party/typescript/typescript.py and its tsgo ELF. Redirect
-		# that script to the JS tsc in third_party/node/node_modules, the
-		# compiler the M155 node branch ran (TypeScript 6.0.2 in both).
-		"${FILESDIR}/chromium-156-webui-tsc-via-node.patch"
 	)
 
 	# So many fontconfig magic numbers to cover
@@ -826,6 +827,13 @@ src_prepare() {
 		die "esbuild version mismatch: expected ${ESBUILD_VER}, found ${found}"
 	fi
 
+	# Same check for tsgo: the system compiler replaces the purged one below
+	# and must read the patched lib.*.d.ts of exactly its own version.
+	found=$(awk '/^Version:/ {print $2}' "${S}/third_party/typescript/README.chromium")
+	if [[ "${found}" != "${TSGO_VER}" ]]; then
+		die "tsgo version mismatch: expected ${TSGO_VER}, found ${found}"
+	fi
+
 	elog "Removing bundled binaries from source tree ..."
 	# Purge bundled ELF files: These are non-portable and will cause issues if used instead of system versions.
 	# Use `--wasm` to also remove WebAssembly binaries, if desired - they're portable so shouldn't break builds.
@@ -854,6 +862,17 @@ src_prepare() {
 			die "Expected to find ${src} to restore ${dst}, but it does not exist."
 		fi
 	done
+
+	# bentoo: the system tsgo, from dev-lang/typescript or -bin. Copied, not
+	# symlinked like the tools above: a noembed tsgo loads lib.*.d.ts from the
+	# directory of its resolved path, so a symlink would read the system's
+	# stock libs instead of the tarball's patched ones beside it, and WebUI
+	# code typed against Trusted Types stops compiling.
+	local tsgo_dst="${S}/third_party/typescript/linux-amd64/src/lib/tsc"
+	cp "$(realpath "${BROOT}/usr/bin/tsgo")" "${tsgo_dst}" ||
+		die "Failed to copy the system tsgo to ${tsgo_dst}"
+	[[ $("${tsgo_dst}" -v) == "Version ${TSGO_VER}" ]] ||
+		die "The system tsgo is not ${TSGO_VER}"
 
 	# adjust python interpreter version
 	sed -i -e "s|\(^script_executable = \).*|\1\"${EPYTHON}\"|g" .gn || die
@@ -1138,8 +1157,8 @@ src_prepare() {
 		third_party/tflite/src/third_party/xla/xla/tsl/platform
 		third_party/tflite/src/third_party/xla/xla/tsl/protobuf
 		third_party/tflite/src/third_party/xla/xla/tsl/util
-		# bentoo: only for typescript.py, which chromium-156-webui-tsc-via-node
-		# redirects to the JS tsc; the tsgo ELF beside it goes unused.
+		# bentoo: typescript.py and the patched lib.*.d.ts beside the tsgo
+		# ELF, which src_prepare replaces with the system one.
 		third_party/typescript
 		third_party/ukey2
 		third_party/utf

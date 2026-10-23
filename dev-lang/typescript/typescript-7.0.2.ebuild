@@ -3,151 +3,99 @@
 
 EAPI=8
 
-# TypeScript 7 is the native port of the compiler, written in Go. The
-# "typescript" npm package is now only a thin JavaScript launcher (bin/tsc)
-# plus the unstable IPC API under dist/; the compiler itself is a prebuilt,
-# statically linked Go executable shipped in a per-platform package,
-# @typescript/typescript-<os>-<arch>, that the launcher resolves through
-# Node's module resolution.
+# TypeScript 7 is the native port of the compiler, written in Go and kept in
+# the tsc/ directory of the TypeScript repository (formerly
+# microsoft/typescript-go). This builds that compiler, cmd/tsgo, from source;
+# dev-lang/typescript-bin installs Microsoft's prebuilt npm build of it. Both
+# own /usr/bin/tsc, so they block each other.
 #
-# There is no tsserver.js and no lib/typescript.js any more, and the package's
-# main export only reports the version. Consumers that drive tsserver or load
-# the JavaScript compiler API (typescript-language-server, editor plugins,
-# ts-node and friends) must depend on <dev-lang/typescript-7, which keeps the
-# 6.x series from ::gentoo installable in the same slot.
+# Only the compiler is installed: no Node launcher and no dist/ IPC API, which
+# npm builds from TypeScript sources with a JavaScript toolchain. There is no
+# tsserver.js and no JavaScript compiler API in 7.x at all; consumers that
+# need either must depend on <dev-lang/typescript-7, which keeps the 6.x
+# series from ::gentoo installable.
 #
 # Every divergence below follows from that rewrite; ::gentoo's counterpart is
 # the 6.x JavaScript compiler, a different artifact rather than an older copy.
 # BENTOO-DIVERGENCE: EAPI - 8, where ::gentoo's 6.0.3 is 9. Nothing here needs
 # an EAPI 9 feature, and this ebuild was never derived from that one.
-# BENTOO-DIVERGENCE: HOMEPAGE - adds microsoft/typescript-go, where the native
-# compiler is actually developed.
-# BENTOO-DIVERGENCE: DEFINED_PHASES - src_unpack, which places the per-platform
-# compiler package beside the launcher; 6.x is one tarball and needs none.
+# BENTOO-DIVERGENCE: INHERIT - go-module; 6.x is plain JavaScript run by node.
+# BENTOO-DIVERGENCE: DEFINED_PHASES - the go-module phases plus src_test; 6.x
+# only overrides src_compile and src_install around npm.
+# BENTOO-DIVERGENCE: SRC_URI - the repository tarball plus a `go mod vendor`
+# tree hosted on distfiles.obentoo.org; 6.x installs the npm tarball.
+# BENTOO-DIVERGENCE: S - the Go module lives in tsc/ of the repository.
 # BENTOO-DIVERGENCE: LICENSE - the Go modules linked into the executable and
 # the material in lib.*.d.ts, itemised at LICENSE below; 6.x is Apache-2.0 only.
-# BENTOO-DIVERGENCE: KEYWORDS - "-*" plus exactly the arches npm publishes a
-# compiler for. arm and loong are added; ppc64 is dropped because npm's build
-# is little-endian only (see the SRC_URI comment).
-# BENTOO-DIVERGENCE: BDEPEND - none. 6.x runs npm at install time; 7.x installs
-# prebuilt files with doins, so nodejs is a runtime dependency only.
+# BENTOO-DIVERGENCE: KEYWORDS - ~amd64 only, the overlay's platform baseline.
+# BENTOO-DIVERGENCE: RDEPEND - no nodejs: the compiler is a static Go
+# executable. Blocks dev-lang/typescript-bin, which installs the same files.
+# BENTOO-DIVERGENCE: BDEPEND - Go instead of npm.
 # BENTOO-DIVERGENCE: metadata.xml - the longdescription states the 6.x/7.x API
-# split and upstream lists the typescript-go repository; maintainer is ours.
+# split and the source/binary split; maintainer is ours.
+
+inherit go-module
+
+MY_P="TypeScript-${PV}"
 
 DESCRIPTION="Superset of JavaScript with optional static typing (native Go compiler)"
 HOMEPAGE="
 	https://www.typescriptlang.org/
 	https://github.com/microsoft/TypeScript/
-	https://github.com/microsoft/typescript-go/
 "
-
-TS_PLATFORM_URI="https://registry.npmjs.org/@typescript/typescript"
-# Gentoo arch -> npm platform package (linux-${process.arch}).
-# Not packaged:
-# - ppc64: npm's linux-ppc64 build is little-endian only (ELFv2, ppc64le),
-#   while the ppc64 keyword also covers big-endian systems, where it would
-#   install a compiler that cannot execute.
-# - x86: upstream publishes no linux-ia32 package.
-# - s390, mips: linux-s390x / linux-mips64el exist upstream but are untested;
-#   mips would also need a guard, as mips64el is one ABI of several.
-SRC_URI="
-	https://registry.npmjs.org/${PN}/-/${P}.tgz
-	amd64? (
-		${TS_PLATFORM_URI}-linux-x64/-/typescript-linux-x64-${PV}.tgz
-			-> ${P}-linux-x64.tgz
-	)
-	arm? (
-		${TS_PLATFORM_URI}-linux-arm/-/typescript-linux-arm-${PV}.tgz
-			-> ${P}-linux-arm.tgz
-	)
-	arm64? (
-		${TS_PLATFORM_URI}-linux-arm64/-/typescript-linux-arm64-${PV}.tgz
-			-> ${P}-linux-arm64.tgz
-	)
-	loong? (
-		${TS_PLATFORM_URI}-linux-loong64/-/typescript-linux-loong64-${PV}.tgz
-			-> ${P}-linux-loong64.tgz
-	)
-	riscv? (
-		${TS_PLATFORM_URI}-linux-riscv64/-/typescript-linux-riscv64-${PV}.tgz
-			-> ${P}-linux-riscv64.tgz
-	)
-"
-S="${WORKDIR}/package"
+SRC_URI="https://github.com/microsoft/TypeScript/archive/refs/tags/v${PV}.tar.gz -> ${P}.tar.gz"
+# Vendored dependency tree, generated with `go mod vendor` in tsc/ and hosted
+# by the overlay; its top directory is ${MY_P}/tsc/vendor. scripts/go-vendor.sh
+# expects go.mod at the top of the source tarball, so it cannot regenerate this
+# one: on a bump, run `go mod vendor` in tsc/ and tar ${MY_P}/tsc/vendor by
+# hand.
+SRC_URI+=" https://distfiles.obentoo.org/${P}-vendor.tar.xz"
+S="${WORKDIR}/${MY_P}/tsc"
 
 # Apache-2.0: TypeScript itself and github.com/mackerelio/go-osstat.
 # Bundled into the Go executable (see NOTICE.txt):
 #   BSD: golang.org/x/{sync,sys,term,text}, github.com/go-json-experiment/json
 #   BSD-2: github.com/zeebo/xxh3
 #   MIT: github.com/klauspost/cpuid/v2
-# Shipped alongside it: MIT for the vendored vscode-jsonrpc, DefinitelyTyped
-# and Khronos WebGL declarations; W3C, CC-BY-4.0 (WHATWG DOM) and
-# Unicode-DFS-2016 for material in the lib.*.d.ts files.
+# Installed alongside it: MIT for the DefinitelyTyped and Khronos WebGL
+# declarations; W3C, CC-BY-4.0 (WHATWG DOM) and Unicode-DFS-2016 for material
+# in the lib.*.d.ts files.
 LICENSE="Apache-2.0 BSD BSD-2 CC-BY-4.0 MIT Unicode-DFS-2016 W3C"
 SLOT="0"
-KEYWORDS="-* ~amd64 ~arm ~arm64 ~loong ~riscv"
-# lib/tsc is already stripped by upstream, and lib/tsc.sig is a detached
-# signature over the exact bytes of that file; stripping again can only
-# break the match.
-RESTRICT="strip"
+KEYWORDS="~amd64"
 
-# engines.node in package.json.
-RDEPEND=">=net-libs/nodejs-16.20.0:*"
-
-QA_PREBUILT="usr/lib/node_modules/typescript/node_modules/@typescript/typescript-linux-*/lib/tsc"
-
-# Print the npm platform name for the arch being built (linux-<node arch>).
-ts_platform() {
-	if use amd64; then
-		echo linux-x64
-	elif use arm; then
-		echo linux-arm
-	elif use arm64; then
-		echo linux-arm64
-	elif use loong; then
-		echo linux-loong64
-	elif use riscv; then
-		echo linux-riscv64
-	else
-		die "no TypeScript native compiler package for ARCH=${ARCH}"
-	fi
-}
-
-src_unpack() {
-	# Both tarballs extract to package/, so the platform one gets its own
-	# directory.
-	unpack "${P}.tgz"
-
-	mkdir "${WORKDIR}/platform" || die
-	pushd "${WORKDIR}/platform" >/dev/null || die
-	unpack "${P}-$(ts_platform).tgz"
-	popd >/dev/null || die
-}
+RDEPEND="!dev-lang/typescript-bin"
+# tsc/go.mod: go 1.26.
+BDEPEND=">=dev-lang/go-1.26"
 
 src_compile() {
-	# Prebuilt; nothing to compile.
-	:
+	# The flags of upstream's release build (Herebyfile.mjs, buildTsgo),
+	# minus `-ldflags=-s -w`: stripping is Portage's job. `noembed` makes the
+	# executable read the lib.*.d.ts files from its own directory -- after
+	# resolving symlinks -- instead of compiling them in, which is how the npm
+	# build ships and what Chromium relies on to substitute its patched copies.
+	CGO_ENABLED=0 ego build -trimpath -tags noembed -o tsgo ./cmd/tsgo
+}
+
+src_test() {
+	# The compiler's own unit tests; the conformance suites need the
+	# TypeScript git submodule, which the release tarball does not carry.
+	ego test -tags noembed ./internal/core/... ./internal/tspath/... \
+		./internal/scanner/... ./internal/parser/...
 }
 
 src_install() {
-	# Same location as the 6.x series, which is installed with
-	# npm --global --prefix=/usr: always lib/, never lib64/.
-	local dest=/usr/lib/node_modules/${PN}
-	local platform=$(ts_platform)
-	local platdir=${dest}/node_modules/@typescript/typescript-${platform}
+	local dest=/usr/lib/${PN}
 
+	exeinto "${dest}"
+	newexe tsgo tsc
 	insinto "${dest}"
-	doins -r bin lib dist vendor package.json
-	fperms 0755 "${dest}"/bin/tsc
+	doins internal/bundled/libs/*.d.ts
 
-	# getExePath.js resolves @typescript/typescript-<platform>/package.json
-	# from lib/, so a node_modules/ nested inside the package is found first.
-	# The Go executable reads the lib.*.d.ts files that sit next to it.
-	insinto "${platdir}"
-	doins -r "${WORKDIR}"/platform/package/{lib,package.json}
-	fperms 0755 "${platdir}"/lib/tsc
-
-	dosym -r "${dest}"/bin/tsc /usr/bin/tsc
+	dosym -r "${dest}"/tsc /usr/bin/tsc
+	# The name both TypeScript 7 packages share for the executable itself; see
+	# dev-lang/typescript-bin.
+	dosym -r "${dest}"/tsc /usr/bin/tsgo
 
 	dodoc README.md NOTICE.txt
 }
