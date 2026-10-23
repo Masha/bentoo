@@ -53,7 +53,7 @@ media-libs/libjxl-compat
 =sys-kernel/gentoo-kernel-7.3.0
 =virtual/dist-kernel-7.3.0
 ~sys-kernel/bentoo-kernel-7.3.0
-=sys-kernel/bentoo-kernel-bin-7.3.0
+~sys-kernel/bentoo-kernel-bin-7.3.0
 
 # Lucas C.S. <lucascs@protonmail.com> (2026-10-02)
 # The Qt 6.12 family, opt-in only: this overlay's two survivors of the 6.12
