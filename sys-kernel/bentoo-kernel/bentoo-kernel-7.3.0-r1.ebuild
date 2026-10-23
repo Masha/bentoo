@@ -29,14 +29,14 @@ inherit kernel-build llvm-r2 toolchain-funcs verify-sig
 # not exist yet when CachyOS ships the series), every INTEL_PATCHES entry,
 # the ".autoupdate/packages.toml" pattern, and sys-kernel/bentoo-kernel-bin,
 # which has to be rebuilt from this ebuild (scripts/build-bentoo-kernel-bin.sh).
-CACHY_REL=2
+CACHY_REL=4
 MY_P=cachyos-${PV}-${CACHY_REL}
 # Keep these four in step with sys-kernel/gentoo-kernel-${PV}.
 PATCHSET=linux-gentoo-patches-7.1.9
 CONFIG_VER=7.2.10-gentoo
 GENTOO_CONFIG_P=gentoo-kernel-config-g19
 # Last commit touching $(ver_cut 1-2)/sched/0001-bore-cachy.patch.
-BORE_COMMIT=2b4e3ce8fbd987d83d55fb9aa36c305c68be088c
+BORE_COMMIT=6847663965a6f8edeca780385148528bdf184963
 # big-comm/big-kernel commit the Intel patches are taken from, in the order
 # its PKGBUILD applies them. Drop each one once a kernel release has it: on
 # a bump, a patch that fails forward but applies with -R is already in.

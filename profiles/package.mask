@@ -43,7 +43,7 @@ media-libs/libjxl-compat
 # which is where these ebuilds live. To opt in, unmask the kernel you use
 # together with the virtual, e.g.:
 #
-#   =sys-kernel/bentoo-kernel-7.3.0
+#   ~sys-kernel/bentoo-kernel-7.3.0
 #   =virtual/dist-kernel-7.3.0
 #
 # Lift this entry once a gentoo-kernel-bin-7.3.x exists (in ::gentoo, or
@@ -52,7 +52,7 @@ media-libs/libjxl-compat
 # virtual/dist-kernel copy stay.
 =sys-kernel/gentoo-kernel-7.3.0
 =virtual/dist-kernel-7.3.0
-=sys-kernel/bentoo-kernel-7.3.0
+~sys-kernel/bentoo-kernel-7.3.0
 =sys-kernel/bentoo-kernel-bin-7.3.0
 
 # Lucas C.S. <lucascs@protonmail.com> (2026-10-02)
