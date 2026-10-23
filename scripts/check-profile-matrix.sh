@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Copyright 1999-2026 Gentoo Authors
-# Distributed under the terms of the GNU General Public License v2
+# Copyright 2026 Lucas C.S. and bentoo contributors
+# SPDX-License-Identifier: MIT
 #
 # Validate the composable system profiles: the base presets, the layers under
 # profiles/{targets,features}, the contract that describes them
