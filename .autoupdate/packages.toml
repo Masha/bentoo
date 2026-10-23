@@ -14603,3 +14603,47 @@ go.mod pins the toolchain floor (go 1.26.5 at 5.6.0): keep BDEPEND in step.
 The bundled-module LICENSE+= list is a manual survey: recheck it on a bump.
 """
 # END
+
+["dev-libs/openssl"]
+url = "https://api.github.com/repos/openssl/openssl/releases?per_page=30"
+parser = "regex"
+pattern = '"tag_name": ?"openssl-([0-9]+\.[0-9]+\.[0-9]+)"'
+select = "max"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "4.1.0"
+comments = """
+OpenSSL — GitHub releases list, highest "openssl-X.Y.Z" tag. The pattern skips
+the -alphaN/-betaN prereleases; select = "max" because upstream publishes
+several series (3.4/3.5/3.6/4.0/4.1) on the same day, so neither the list order
+nor releases/latest is guaranteed to be the newest series.
+Mirror of ::gentoo's newest 4.x ebuild, kept byte-identical (4.1.0 = 4.0.3
+copy). ::gentoo masks =dev-libs/openssl-4* (bug #972902) and that mask is kept
+on purpose: no package.unmask entry. No hold: the copy needs no manual work
+per release (4.0.1-x86-avx2.patch still applies), and hold would skip the
+probe entirely. Exit: remove the ebuild (record -> enabled = false) once
+::gentoo carries >=4.1.0.
+"""
+# END
+
+["media-video/ffmpeg"]
+url = "https://ffmpeg.org/releases/"
+parser = "regex"
+pattern = 'ffmpeg-([0-9]+\.[0-9]+(?:\.[0-9]+)?)\.tar\.xz"'
+select = "max"
+type = "source"
+version = "9.1_pre20261023"
+comments = """
+FFmpeg — official release index, highest ffmpeg-X.Y[.Z].tar.xz (the .asc and
+other archive formats are excluded by the trailing quote). Mirror of ::gentoo's
+ffmpeg-9.0.2 ebuild, carried AHEAD of a release: 9.1_pre20261023 is the
+release/9.1 branch head 47b92841e3 ("Prepare release/9.1", 2026-10-23), taken
+before the n9.1 tag existed, from the GitHub mirror's archive tarball. The
+ebuild keeps ::gentoo's real-release path (ffmpeg.org tarball + verify-sig)
+for any non-_pre PV, so 9.1 > 9.1_pre20261023 is an ordinary bump; until then
+the probe returns 9.0.2, below the ebuild. KEYWORDS stay commented out, as in
+::gentoo. Exit: remove the ebuild (record -> enabled = false) once ::gentoo
+carries >=9.1.
+type = "source" overrides the RESTRICT heuristic, which reads
+RESTRICT="gpl? ( fdk? ( bindist ) )" as a binary package.
+"""
+# END
