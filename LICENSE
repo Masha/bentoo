@@ -1,6 +1,32 @@
+bentoo is distributed under two licenses. Which one applies to a file is
+decided by that file, in this order:
+
+1. A licence header in the file wins. Every ebuild, every eclass and the
+   scripts that carry "Distributed under the terms of the GNU General Public
+   License v2" are GPL-2 (full text in COPYING). That covers everything
+   derived from the Gentoo repository, which is GPL-2 and cannot be
+   relicensed here.
+
+2. Files under a package's files/ directory that modify or come from
+   third-party code (patches, unit files, upstream config files) stay under
+   the licence of that upstream, not under either licence below.
+
+3. Everything else written for bentoo that carries no header -- for
+   instance .autoupdate/, layers/, profiles/catalog.toml, the profile layers
+   under profiles/targets/ and profiles/features/, scripts/ without a GPL-2
+   header, and the documentation -- is MIT, as follows.
+
+Generated data (metadata/md5-cache/, Manifest) follows the file it was
+generated from.
+
+The licenses/ directory is not about this repository: it holds the texts
+Portage reads for the ACCEPT_LICENSE of the packages the overlay ships.
+
+-------------------------------------------------------------------------------
+
 MIT License
 
-Copyright (c) 2018 Lucas C.S.
+Copyright (c) 2018-2026 Lucas C.S. and bentoo contributors
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

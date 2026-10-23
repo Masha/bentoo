@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>otakugeekx@gmail.com</email>
+		<name>Lucas Couto</name>
+	</maintainer>
+	<longdescription lang="en">
+		zizmor statically analyses GitHub Actions workflows and composite
+		actions for security problems: template injection, excessive token
+		permissions, credential persistence, unpinned or impostor actions,
+		dangerous triggers and similar CI hardening issues.
+	</longdescription>
+	<upstream>
+		<bugs-to>https://github.com/zizmorcore/zizmor/issues</bugs-to>
+		<remote-id type="github">zizmorcore/zizmor</remote-id>
+	</upstream>
+</pkgmetadata>

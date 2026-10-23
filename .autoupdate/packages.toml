@@ -10020,13 +10020,11 @@ which is why this entry carried no revision until 2026-07-26.
 # END
 
 ["sci-ml/ollama"]
-enabled = false
-disabled_by = "parity-audit 2026-10-22: removed, byte-identical to ::gentoo 0.40.8 (ebuild, files/ and Manifest) -- see comments"
 url ="https://api.github.com/repos/ollama/ollama/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.40.8"
+version = "0.40.9"
 comments = """
 ollama source — same repo as ollama-bin; tag "vX.Y.Z" (leading v stripped).
 
@@ -10730,7 +10728,7 @@ parser = "json"
 path = "tag_name"
 transform = [['^v', ""]]
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "4.11.0"
+version = "4.12.0"
 comments = """
 LocalAI — releases/latest; tag_name is "vX.Y.Z", so the transform strips the
 leading v to match PV.  Verified on 2026-09-05: tag_name "v4.9.0", published
@@ -14551,5 +14549,61 @@ ONLYOFFICE Desktop Editors — mirror of the ::gentoo ebuild, carried ahead of
 ::gentoo (9.4.0 when added, 2026-10-13). GitHub releases, tagged "vX.Y.Z"; the
 .deb asset name is not versioned, so SRC_URI renames it with ->. Remove the
 package (enabled = false) once ::gentoo ships the same version.
+"""
+# END
+
+["sys-process/parallel"]
+url = "https://ftp.gnu.org/gnu/parallel/"
+parser = "regex"
+pattern = 'parallel-([0-9]{8})\.tar\.bz2'
+select = "max"
+version = "20260922"
+comments = """
+GNU parallel — mirror of the ::gentoo ebuild, carried ahead of ::gentoo
+(20250722-r1 when added, 2026-10-23). Monthly date-stamped releases
+"parallel-YYYYMMDD.tar.bz2" in the GNU ftp dir; the listing also holds the
+.sig files and "parallel-latest.tar.bz2", which the 8-digit pattern skips.
+select = "max" because the Apache listing is alphabetical, not by date.
+Remove the package (enabled = false) once ::gentoo ships the same version.
+"""
+# END
+
+["dev-util/zizmor"]
+url = "https://api.github.com/repos/zizmorcore/zizmor/releases/latest"
+parser = "json"
+path = "tag_name"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "1.31.1"
+comments = """
+zizmor — GitHub release tag "vX.Y.Z" ("v" stripped by normalizer). Rust
+workspace: a bump must regenerate CRATES with pycargoebuild run from
+crates/zizmor (not the repo root, which is a virtual workspace).
+"""
+# END
+
+["dev-util/actionlint"]
+url = "https://api.github.com/repos/rhysd/actionlint/releases/latest"
+parser = "json"
+path = "tag_name"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "1.7.12"
+comments = """
+actionlint — GitHub release tag "vX.Y.Z" ("v" stripped by normalizer). No
+vendor-deps tarball, build fetches Go modules (RESTRICT=network-sandbox). The
+bundled-module LICENSE+= list is a manual survey: recheck it on a bump.
+"""
+# END
+
+["dev-util/scorecard"]
+url = "https://api.github.com/repos/ossf/scorecard/releases/latest"
+parser = "json"
+path = "tag_name"
+headers = { "User-Agent" = "bentoo-autoupdate" }
+version = "5.6.0"
+comments = """
+OpenSSF Scorecard — GitHub release tag "vX.Y.Z" ("v" stripped by normalizer).
+No vendor-deps tarball, build fetches Go modules (RESTRICT=network-sandbox).
+go.mod pins the toolchain floor (go 1.26.5 at 5.6.0): keep BDEPEND in step.
+The bundled-module LICENSE+= list is a manual survey: recheck it on a bump.
 """
 # END
