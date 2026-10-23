@@ -47,10 +47,10 @@ fx_init() {
 # fx_raw -- append stdin verbatim to the catalog.
 fx_raw() { cat >>"$CAT"; }
 
-# fx_header -- `schema = 1`, [attributes] and [types] exactly as design.md
+# fx_header -- `schema = 2`, [attributes] and [types] exactly as design.md
 # "Data Models". FX_SCHEMA replaces the schema line; FX_SCHEMA= omits it.
 fx_header() {
-  local schema=${FX_SCHEMA-schema = 1}
+  local schema=${FX_SCHEMA-schema = 2}
   if [ -n "$schema" ]; then printf '%s\n' "$schema" >>"$CAT"; fi
   fx_raw <<'EOF'
 
@@ -60,7 +60,8 @@ multilib = [true, false]
 desktop  = ["none", "generic", "plasma", "gnome"]
 hardened = [true, false]
 selinux  = [true, false]
-llvm     = [true, false]
+toolchain = ["gcc", "llvm"]
+libc     = ["glibc", "musl"]
 
 [types.flavor]
 rank = 1
@@ -84,13 +85,15 @@ fx_preset_dir() {
   printf '5\n' >"$FX/profiles/$1/eapi"
 }
 
-# fx_preset ID INIT MULTILIB DESKTOP [HARDENED SELINUX LLVM]
-#   catalog entry + profiles.desc line + directory.
+# fx_preset ID INIT MULTILIB DESKTOP [HARDENED SELINUX TOOLCHAIN LIBC]
+#   catalog entry + profiles.desc line + directory. TOOLCHAIN and LIBC are
+#   bare words written as TOML strings (default gcc, glibc).
 #   FX_NODESC=1 skips the desc line, FX_NODIR=1 skips the directory.
 fx_preset() {
-  local id=$1 init=$2 ml=$3 desk=$4 hard=${5:-false} sel=${6:-false} llvm=${7:-false}
-  printf '\n[[preset]]\nid       = "%s"\nstatus   = "stable"\ninit     = "%s"\nmultilib = %s\ndesktop  = "%s"\nhardened = %s\nselinux  = %s\nllvm     = %s\n' \
-    "$id" "$init" "$ml" "$desk" "$hard" "$sel" "$llvm" >>"$CAT"
+  local id=$1 init=$2 ml=$3 desk=$4 hard=${5:-false} sel=${6:-false}
+  local tc=${7:-gcc} libc=${8:-glibc}
+  printf '\n[[preset]]\nid       = "%s"\nstatus   = "stable"\ninit     = "%s"\nmultilib = %s\ndesktop  = "%s"\nhardened = %s\nselinux  = %s\ntoolchain = "%s"\nlibc     = "%s"\n' \
+    "$id" "$init" "$ml" "$desk" "$hard" "$sel" "$tc" "$libc" >>"$CAT"
   if [ -z "${FX_NODESC:-}" ]; then printf 'amd64\t%s\tstable\n' "$id" >>"$DESC"; fi
   if [ -z "${FX_NODIR:-}" ]; then
     mkdir -p "$FX/profiles/$id"

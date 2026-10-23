@@ -2,7 +2,7 @@
 # Unit -- Task 2.2: catalog schema checks of `--static`.
 # Requirements: R4.1, R4.2, R4.3, R4.4, R4.5, R4.6.
 #
-# Contract (design.md C3 / "Data Models", schema 1): top-level `schema = 1`,
+# Contract (design.md C3 / "Data Models", schema 2): top-level `schema = 2`,
 # [attributes], [types.*], [[preset]], [[layer]]; ids are paths relative to
 # profiles/; preset ids equal the amd64 lines of profiles/profiles.desc;
 # features/branding is not a layer. Failure lines are
@@ -18,7 +18,7 @@ load lib/fixture
 
 # --- R4.1: the valid half ---------------------------------------------------
 
-@test "R4.1 a complete schema-1 catalog matching its tree passes --static: exit 0" {
+@test "R4.1 a complete schema-2 catalog matching its tree passes --static: exit 0" {
   fx_standard
   run "$SCRIPT" --static
   status_is 0
@@ -34,10 +34,10 @@ load lib/fixture
   status_is 0
 }
 
-# --- R4.1: schema = 1 -------------------------------------------------------
+# --- R4.1: schema = 2 -------------------------------------------------------
 
-@test "R4.1 schema = 2 is rejected naming schema" {
-  FX_SCHEMA='schema = 2' fx_standard
+@test "R4.1 schema = 1 is rejected naming schema" {
+  FX_SCHEMA='schema = 1' fx_standard
   run "$SCRIPT" --static
   status_is 1
   catalog_line_names schema
@@ -50,15 +50,15 @@ load lib/fixture
   catalog_line_names schema
 }
 
-@test "R4.1 schema = true is not schema 1 (a boolean must not pass as the integer 1)" {
+@test "R4.1 schema = true is not schema 2 (a boolean must not pass as an integer)" {
   FX_SCHEMA='schema = true' fx_standard
   run "$SCRIPT" --static
   status_is 1
   catalog_line_names schema
 }
 
-@test "R4.1 schema = \"1\" (a string) is not schema 1" {
-  FX_SCHEMA='schema = "1"' fx_standard
+@test "R4.1 schema = \"2\" (a string) is not schema 2" {
+  FX_SCHEMA='schema = "2"' fx_standard
   run "$SCRIPT" --static
   status_is 1
   catalog_line_names schema
@@ -218,7 +218,8 @@ multilib = true
 desktop  = "kde"
 hardened = false
 selinux  = false
-llvm     = false
+toolchain = "gcc"
+libc     = "glibc"
 EOF
   fx_preset_dir default/linux/amd64/23.0/kwin
   run "$SCRIPT" --static
@@ -238,7 +239,8 @@ multilib = 1
 desktop  = "none"
 hardened = false
 selinux  = false
-llvm     = false
+toolchain = "gcc"
+libc     = "glibc"
 EOF
   fx_preset_dir default/linux/amd64/23.0/one
   run "$SCRIPT" --static
@@ -258,7 +260,8 @@ multilib = "true"
 desktop  = "none"
 hardened = false
 selinux  = false
-llvm     = false
+toolchain = "gcc"
+libc     = "glibc"
 EOF
   fx_preset_dir default/linux/amd64/23.0/quoted
   run "$SCRIPT" --static
@@ -415,16 +418,17 @@ TOML
   catalog_line_names 'exclusive' 'flavor|types.flavor'
 }
 
-@test "types: an [attributes] table missing one of the six is rejected naming it" {
+@test "types: an [attributes] table missing one of the seven is rejected naming it" {
   fx_init
   fx_header
-  sed -i '/^llvm     = \[true, false\]$/d' "$CAT"
-  [ -z "$(grep '^llvm' "$CAT")" ] # guard: the attribute is gone
+  sed -i '/^toolchain = \["gcc", "llvm"\]$/d' "$CAT"
+  [ -z "$(grep '^toolchain' "$CAT")" ] # guard: the attribute is gone
   fx_preset "$P_PLAIN" openrc true none
-  sed -i '/^llvm     = false$/d' "$CAT" # the preset must not carry it either
+  sed -i '/^toolchain = "gcc"$/d' "$CAT" # the preset must not carry it either
+  [ -z "$(grep '^toolchain' "$CAT")" ] # guard: neither does the preset
   run "$SCRIPT" --static
   status_is 1
-  catalog_line_names llvm
+  catalog_line_names toolchain
 }
 
 @test "types: a services entry missing systemd is rejected naming the layer" {

@@ -368,9 +368,14 @@ def load_catalog(tree, stream=None):
         sys.exit(GAP)
 
 
-# --- schema 1 (design.md "Data Models") ---------------------------------------
+# --- schema 2 (design.md "Data Models") ---------------------------------------
 
-ATTRIBUTES = ("init", "multilib", "desktop", "hardened", "selinux", "llvm")
+SCHEMA = 2
+# Schema 2 retired the boolean `llvm` for two string axes, `toolchain` and
+# `libc`: a leftover `llvm` key is an unknown key, never an attribute.
+ATTRIBUTES = (
+    "init", "multilib", "desktop", "hardened", "selinux", "toolchain", "libc",
+)
 TOP_KEYS = ("schema", "attributes", "types", "preset", "layer")
 TYPE_KEYS = ("rank", "exclusive")
 PRESET_KEYS = ("id", "status") + ATTRIBUTES
@@ -490,7 +495,10 @@ class CatalogCheck:
         self.failures.append(f"{line}: {one_line(detail)}" if detail else line)
 
     def run(self):
-        self.top_level()
+        if not self.top_level():
+            # A catalog of another schema is not judged by this one's rules:
+            # its schema gap is the only line it gets.
+            return self.failures
         self.attributes()
         self.type_table()
         for subject, entry in self.presets:
@@ -528,13 +536,22 @@ class CatalogCheck:
         return out
 
     def top_level(self):
-        self.unknown_keys("top level", self.catalog, TOP_KEYS)
+        """False when the catalog does not declare exactly `schema = 2` (an
+        integer: "2" and 2.0 are not it), after recording that one gap;
+        otherwise check the top-level keys and collect the entries."""
         if "schema" not in self.catalog:
-            self.fail("schema", "top level", "schema is missing, expected schema = 1")
-        elif not same(self.catalog["schema"], 1):
-            self.fail("schema", "top level", f"schema = {show(self.catalog['schema'])}, expected schema = 1")
+            self.fail("schema", "top level", f"schema is missing, expected schema = {SCHEMA}")
+            return False
+        if not same(self.catalog["schema"], SCHEMA):
+            self.fail(
+                "schema", "top level",
+                f"schema = {show(self.catalog['schema'])}, expected schema = {SCHEMA}",
+            )
+            return False
+        self.unknown_keys("top level", self.catalog, TOP_KEYS)
         self.presets = self.entries("preset")
         self.layers = self.entries("layer")
+        return True
 
     def attributes(self):
         table = self.catalog.get("attributes")
@@ -593,7 +610,9 @@ class CatalogCheck:
 
     def attribute_value(self, subject, attr, value, where):
         """`value` must be one of the [attributes] values of `attr`; skipped
-        when [attributes] itself lacks `attr` (already reported there)."""
+        when [attributes] itself lacks `attr` (already reported there).
+        same() compares types, so a boolean never matches a string value:
+        `toolchain = true` is not "gcc" and `libc = false` is not "glibc"."""
         allowed = self.allowed.get(attr)
         if allowed is not None and not any(same(value, a) for a in allowed):
             self.fail(

@@ -24,7 +24,7 @@
 # the same verdict as --compose on every case below, and the same --static
 # verdict on catalog-schema.bats and fragments.bats. Reuse, unchanged:
 #   scripts/tests/check-profile-matrix/compose.bats         composition rule, parent order
-#   scripts/tests/check-profile-matrix/catalog-schema.bats  catalog.toml schema 1
+#   scripts/tests/check-profile-matrix/catalog-schema.bats  catalog.toml schema 2
 #   scripts/tests/check-profile-matrix/fragments.bats       layers/ tree rules
 #   scripts/tests/check-profile-matrix/lib/fixture.bash     the fixture builders
 # A schema bump in profiles/catalog.toml invalidates them together.
@@ -34,7 +34,7 @@ load lib/fixture
 setup() {
   fx_init
   fx_raw <<'EOF'
-schema = 1
+schema = 2
 
 [attributes]
 init     = ["openrc", "systemd"]
@@ -42,7 +42,8 @@ multilib = [true, false]
 desktop  = ["none", "generic", "plasma", "gnome"]
 hardened = [true, false]
 selinux  = [true, false]
-llvm     = [true, false]
+toolchain = ["gcc", "llvm"]
+libc     = ["glibc", "musl"]
 
 # declared out of rank order on purpose; 10 < 2 as text, 10 > 2 as a number
 [types.hardware]
@@ -293,7 +294,7 @@ expect_parent() {
 # --- a catalog that does not parse is not a rejected selection -----------------
 
 @test "--compose: an unparsable catalog exits 2 with nothing on stdout (not a rule rejection)" {
-  printf 'schema = = 1\n' >>"$CAT"
+  printf 'schema = = 2\n' >>"$CAT"
   run --separate-stderr "$SCRIPT" --compose "$P_PLAIN" targets/server
   status_is 2
   output_is ""
