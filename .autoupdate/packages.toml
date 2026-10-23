@@ -506,7 +506,7 @@ url = "https://api.github.com/repos/trufflesecurity/trufflehog/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "3.99.3"
+version = "3.99.4"
 comments = """
 trufflehog - releases/latest returns "vX.Y.Z". Upstream ships several releases
 a week, so this record moves often.
@@ -3214,7 +3214,7 @@ url = "https://api.github.com/repos/kovidgoyal/calibre/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "9.16.0-r1"
+version = "9.17.0"
 comments = """
 calibre — GitHub release tag "vX.Y.Z" ("v" stripped). releases/latest, not the
 tag list: upstream tags every point release and ranking refs/tags would report a
@@ -10660,7 +10660,7 @@ parser = "regex"
 pattern = '"name": ?"v([0-9]+\.[0-9]+\.[0-9]+)"'
 select = "max"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.13.8"
+version = "2.0.0"
 comments = """
 sherpa-onnx — TAG list, highest "vX.Y.Z". This is the axis the ebuild itself
 consumes: SRC_URI takes archive/refs/tags/v${PV}.tar.gz, never a release asset.
@@ -12075,7 +12075,7 @@ parser = "regex"
 pattern = '"tag_name":\s*"v([0-9]+\.[0-9]+\.[0-9]+)"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "4.0.18"
+version = "4.0.19"
 comments = """
 CC Switch — a Tauri GUI for switching between Claude Code, Codex and Gemini
 CLI accounts. Tracks CC-Switch-v<PV>-Linux-{x86_64,arm64}.deb; note the asset
