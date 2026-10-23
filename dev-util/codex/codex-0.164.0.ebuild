@@ -31,39 +31,34 @@ CRATES="
 # Upstream moved crossterm from nornagon to openai-oss-forks in 0.147.0 and
 # dropped its ratatui fork back to crates.io.
 #
-# microsoft/mxc is one git repository holding eight workspace members, so it
-# gets eight entries pointing at the same commit. That is not redundancy: the
-# eclass emits one "<crate> = { path = ... }" line per key under a single
+# A git repository holding several workspace members gets one entry per member
+# the lock references, all pointing at the same commit. That is not redundancy:
+# the eclass emits one "<crate> = { path = ... }" line per key under a single
 # [patch.'<uri>'] block, and a member with no key is left resolving to the git
-# source, which dies under --offline exactly like the un-patched one did.
-# SRC_URI and DISTDIR see the same tarball eight times and deduplicate it, the
-# way nucleo/nucleo-matcher already do below. hyperium/h3 is the second such
-# repository, with two members -- h3 and h3-quinn -- both reached by the new
-# codex-rs/tcp-tunnel workspace member in 0.156.0.
+# source, which dies under --offline with "can't checkout <repo>". SRC_URI and
+# DISTDIR see the same tarball several times and deduplicate it. That covers
+# nucleo/nucleo-matcher, hyperium/h3 (h3 + h3-quinn, since 0.156.0) and
+# modelcontextprotocol/rust-sdk (rmcp + rmcp-macros, since 0.161.0).
 #
-# Every one of them is dead code here -- codex-sandboxing declares
-# appcontainer_common under [target.'cfg(windows)'.dependencies], and KEYWORDS
-# is Linux-only. They are vendored anyway because cargo resolves the whole
-# dependency graph before it ever looks at the target, so a Windows-gated git
-# dependency still has to be fetchable. Deleting them from Cargo.toml instead
-# would work and would be a divergence from upstream's lock to re-apply, and
-# re-verify, on every bump; at 6 MB the tarball is the cheaper contract.
+# microsoft/mxc held eight such members up to 0.163; 0.164.0 replaced all of
+# them with a single mxc-sdk crate (src/mxc-sdk), reached by the new
+# codex-rs/mxc-sandbox workspace member, and moved the commit with it. Keeping
+# the eight old keys failed exactly as above, because mxc-sdk had none.
+#
+# Windows-only git dependencies are vendored anyway, because cargo resolves the
+# whole dependency graph before it ever looks at the target, so a
+# Windows-gated git dependency still has to be fetchable. Deleting them from
+# Cargo.toml instead would work and would be a divergence from upstream's lock
+# to re-apply, and re-verify, on every bump.
 declare -A GIT_CRATES=(
-	[appcontainer_common]='https://github.com/microsoft/mxc;6cd3d58f05d3447e67109cfb75e042803b843ca4;mxc-%commit%/src/backends/appcontainer/common'
-	[learning_mode_core]='https://github.com/microsoft/mxc;6cd3d58f05d3447e67109cfb75e042803b843ca4;mxc-%commit%/src/core/learning_mode_core'
-	[learning_mode_windows]='https://github.com/microsoft/mxc;6cd3d58f05d3447e67109cfb75e042803b843ca4;mxc-%commit%/src/backends/learning_mode/windows'
-	[mxc_config_contract]='https://github.com/microsoft/mxc;6cd3d58f05d3447e67109cfb75e042803b843ca4;mxc-%commit%/src/core/mxc_config_contract'
-	[mxc_telemetry]='https://github.com/microsoft/mxc;6cd3d58f05d3447e67109cfb75e042803b843ca4;mxc-%commit%/src/mxc_telemetry'
-	[process_security_environment_spec]='https://github.com/microsoft/mxc;6cd3d58f05d3447e67109cfb75e042803b843ca4;mxc-%commit%/src/core/generated/process_security_environment_specification'
-	[sandbox_spec]='https://github.com/microsoft/mxc;6cd3d58f05d3447e67109cfb75e042803b843ca4;mxc-%commit%/src/core/generated/base_container_specification'
-	[wxc_common]='https://github.com/microsoft/mxc;6cd3d58f05d3447e67109cfb75e042803b843ca4;mxc-%commit%/src/core/wxc_common'
+	[mxc-sdk]='https://github.com/microsoft/mxc;b21120168d70befe12356411423266bfef168446;mxc-%commit%/src/mxc-sdk'
 	[crossterm]='https://github.com/openai-oss-forks/crossterm;ed1cdab335221515706178d68495bba2aed1924f;crossterm-%commit%'
 	[h3-quinn]='https://github.com/hyperium/h3;e07e69412876f7e26f026bd75a48b2704d8c8283;h3-%commit%/h3-quinn'
 	[h3]='https://github.com/hyperium/h3;e07e69412876f7e26f026bd75a48b2704d8c8283;h3-%commit%/h3'
 	[nucleo-matcher]='https://github.com/helix-editor/nucleo;4253de9faabb4e5c6d81d946a5e35a90f87347ee;nucleo-%commit%/matcher'
 	[nucleo]='https://github.com/helix-editor/nucleo;4253de9faabb4e5c6d81d946a5e35a90f87347ee;nucleo-%commit%'
-	[rmcp-macros]='https://github.com/modelcontextprotocol/rust-sdk;4048ac40e958fb1a7d614617a2ae8d26666ee2fa;rust-sdk-%commit%/crates/rmcp-macros'
-	[rmcp]='https://github.com/modelcontextprotocol/rust-sdk;4048ac40e958fb1a7d614617a2ae8d26666ee2fa;rust-sdk-%commit%/crates/rmcp'
+	[rmcp-macros]='https://github.com/modelcontextprotocol/rust-sdk;98a54789b80110ad210495c4ad845c89e1980471;rust-sdk-%commit%/crates/rmcp-macros'
+	[rmcp]='https://github.com/modelcontextprotocol/rust-sdk;98a54789b80110ad210495c4ad845c89e1980471;rust-sdk-%commit%/crates/rmcp'
 	[runfiles]='https://github.com/dzbarsky/rules_rust;b56cbaa8465e74127f1ea216f813cd377295ad81;rules_rust-%commit%/rust/runfiles'
 	[tokio-tungstenite]='https://github.com/openai-oss-forks/tokio-tungstenite;0e5b2d73aa18dd9f0a50ee9ff199d5aef7594186;tokio-tungstenite-%commit%'
 	[tungstenite]='https://github.com/openai-oss-forks/tungstenite-rs;4fffad30fe373adbdcffab9545e9e9bf4f2fc19f;tungstenite-rs-%commit%'
