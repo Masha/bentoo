@@ -1,6 +1,7 @@
 # Claude Code
 .claude/
 .epic/
+.epico/
 .playwright-mcp/
 .playwright-cli/
 
