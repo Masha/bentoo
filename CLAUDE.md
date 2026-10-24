@@ -85,20 +85,28 @@ it before editing either file.
 A system is **one preset plus optional layers**, all plain profiles of this
 overlay; nothing is generated and no ebuild is touched.
 
-- **Presets** — the 20 `profiles/default/linux/amd64/23.0/*` entries of
-  `profiles.desc` (each `gentoo:<same path>` + `:features/branding`). They carry
-  every Gentoo variant (multilib, hardened, selinux, llvm, init, desktop).
+- **Presets** — the 27 `profiles/default/linux/amd64/23.0/*` entries of
+  `profiles.desc` (each `gentoo:<same path>` + `:features/branding`): 20 glibc
+  and 7 musl (`23.0/musl/*`, merged-/usr only, no-multilib, no desktop). They
+  carry every Gentoo variant on seven axes: init, multilib, desktop, hardened,
+  selinux, `toolchain` (`gcc`/`llvm`) and `libc` (`glibc`/`musl`).
 - **Layers** — `profiles/targets/<flavor>` (workstation, server, headless,
   container; at most one), `profiles/features/<mix-in>` (games) and
   `profiles/features/hardware/<hw>` (nvidia, nvidia-legacy, amd, intel; any
   number). A layer directory is one holding `eapi`; `features/branding` is the
   exception, inherited by every preset.
-- **`profiles/catalog.toml`** — the contract (`schema = 1`) read by
-  `scripts/check-profile-matrix.sh` and by `bentoo profile`
-  (app-portage/bentoolkit): each preset's attributes, each layer's type, `base`
-  constraints, `conflicts`, `requires`, `has_files` and `services`. The `parent`
-  order is type rank, then declaration order. An incompatible change bumps
-  `schema`.
+- **`profiles/catalog.toml`** — the contract (`schema = 2`) read by
+  `scripts/check-profile-matrix.sh`, by `bentoo profile`
+  (app-portage/bentoolkit, Go) and by `shidashi order` (Python): each preset's
+  attributes, each layer's type, `base` constraints, `conflicts`, `requires`,
+  `has_files` and `services`. The `parent` order is type rank, then
+  declaration order. An incompatible change bumps `schema`. The NVIDIA layers
+  carry `base = { libc = ["glibc"] }`: ::gentoo masks nvidia-drivers on musl.
+- **`profiles/catalog-vectors.toml`** — the composition rule as conformance
+  vectors (same `schema`): a selection and either its exact `parent` lines or
+  the set of rules it breaks. Every consumer above runs them, so no
+  implementation of the rule drifts from the others; a change to the rule
+  changes a vector first.
 - **`layers/<layer-id>/etc/**/<x>.d/<bentoo-...>`** — `/etc` drop-ins a layer
   installs through `bentoo profile`; regular files only, no symlink, no execute
   bit, a `bentoo-` name.
@@ -132,7 +140,7 @@ surfaces on a user's machine.
 | `check-edk2-dbx-freshness.sh` | `sys-firmware/edk2`'s `SBO_VER` still names the newest Secure Boot revocation list; exits `2`, not `1`, when the network is the problem |
 | `go-vendor.sh [--check] <cat/pkg>` | a Go package's `*-vendor.tar.xz` on distfiles.obentoo.org still matches its `go.mod`; without `--check` it regenerates the tarball into DISTDIR and prints the R2 upload (never uploads). Needs the network; run it after autoupdate bumps one of these |
 | `test-eselect-nodejs.sh` | slot ordering (`node9` vs `node10`) and directory replacement in the eselect module |
-| `check-profile-matrix.sh --static\|--staged\|--full\|--compose <preset> [layer…]\|--self-test` | `profiles/catalog.toml`, the layers and their `layers/` drop-ins agree (`--static`, seconds); every allowed layer combination resolves in an isolated root and every forbidden one is rejected (`--staged`: layers touched by the index, 5 reference presets; `--full`: all 20 presets, ~3 min); `--compose` prints the `parent` lines `bentoo profile` must also produce. Resolution needs `bwrap` and `emerge`, never root |
+| `check-profile-matrix.sh --static\|--vectors\|--staged\|--full\|--compose <preset> [layer…]\|--self-test` | `profiles/catalog.toml` (schema 2), `profiles/catalog-vectors.toml`, the layers and their `layers/` drop-ins agree (`--static`, seconds); `--vectors` runs every conformance vector through `--compose` (~0.13 s, no Portage); every allowed layer combination resolves in an isolated root and every forbidden one is rejected (`--staged`: `--vectors`, then layers touched by the index over 6 reference presets, one musl, ~25 s per touched layer; `--full`: all 27 presets, ~3m40s); `--compose` prints the `parent` lines `bentoo profile` must also produce. Resolution needs `bwrap` and `emerge`, never root |
 
 `check-openrc-coverage.sh`, `gentoo-parity.sh`,
 `check-edk2-dbx-freshness.sh` and `check-profile-matrix.sh` also take
@@ -145,7 +153,7 @@ real-tree half of `check-profile-matrix.sh`'s suite is
 when the commit stages a path under `profiles/`, `layers/` or
 `metadata/layout.conf`; every other commit pays nothing for it.
 Run `--full` by hand after a batch of layer edits, before you push them:
-the hook resolves 5 reference presets, `--full` all 20.
+the hook resolves 6 reference presets, `--full` all 27.
 
 `check-edk2-dbx-freshness.sh` and `go-vendor.sh` are the ones that need the
 network, which is why they are deliberately absent from `.git/hooks/pre-commit`:

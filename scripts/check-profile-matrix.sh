@@ -36,8 +36,9 @@
 #                       code path: a valid one must print exactly its parent
 #                       lines, an invalid one the same SET of rule names.
 #                       Seconds; never calls Portage.
-#   --staged            --static, then resolution of every layer the index
-#                       touches over the 5 reference presets (the hook mode).
+#   --staged            --vectors (so --static first), then resolution of
+#                       every layer the index touches over the 6 reference
+#                       presets, one of them musl (the hook mode).
 #   --full              --static, then every layer alone, every pair and the
 #                       largest allowed selection over every preset (manual).
 #   --compose <preset-id> [layer-id...]
@@ -209,7 +210,7 @@ Usage: check-profile-matrix.sh MODE
 Modes:
   --static                             catalog schema + fragment rules (seconds)
   --vectors                            --static, then every conformance vector through --compose (seconds)
-  --staged                             --static, then resolve the layers the index touches
+  --staged                             --vectors, then resolve the layers the index touches
   --full                               --static, then resolve every combination (minutes)
   --compose <preset-id> [layer-id...]  print the composed parent lines, or the broken rule
   --self-test                          run the unit fixtures (no tree, no ::gentoo)
@@ -1404,13 +1405,16 @@ def compose(tree, preset_id, layer_args):
 
 GENTOO_REPO = "/var/db/repos/gentoo"
 # One preset per axis that changes resolution most; the desktop one is what
-# lets desktop-only layers (workstation, games) be resolved by the hook at all.
+# lets desktop-only layers (workstation, games) be resolved by the hook at all,
+# and the musl one is where a libc-sensitive layer fails first (its @system
+# resolves alone: story 002, task 2.4).
 REF_PRESETS = (
     "default/linux/amd64/23.0",
     "default/linux/amd64/23.0/systemd",
     "default/linux/amd64/23.0/no-multilib",
     "default/linux/amd64/23.0/hardened",
     "default/linux/amd64/23.0/desktop/plasma/systemd",
+    "default/linux/amd64/23.0/musl",
 )
 TOUCH_ALL = ("profiles/catalog.toml", "metadata/layout.conf", "profiles/profiles.desc")
 # Top-level profile files only humans read: changing one touches no layer.
@@ -1811,11 +1815,18 @@ def use_targets(tree, layer_id):
 
 
 def resolve(tree, work, mode, staged_file=None):
-    failures = CatalogCheck(tree, load_catalog(tree)).run()
-    if failures:
-        for line in failures:
-            print(line)
-        return GAP  # the static rules fail first: nothing is resolved over them
+    if mode == "staged":
+        # R5.7: the hook runs --vectors (which runs every --static check
+        # first) before resolving anything; it costs well under a second.
+        status = vectors(tree)
+        if status != CLEAN:
+            return status
+    else:
+        failures = CatalogCheck(tree, load_catalog(tree)).run()
+        if failures:
+            for line in failures:
+                print(line)
+            return GAP  # the static rules fail first: nothing is resolved over them
     catalog = load_catalog(tree)
     layer_ids = [l["id"] for l in catalog.get("layer", [])]
     presets = {p["id"]: p for p in catalog.get("preset", [])}

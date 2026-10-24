@@ -24,14 +24,16 @@ TREE=${BENTOO_TREE:-$(cd "$BATS_TEST_DIRNAME/../../../.." && pwd -P)}
 SCRIPT=${CHECK_PROFILE_MATRIX:-$TREE/scripts/check-profile-matrix.sh}
 GENTOO_REPO=/var/db/repos/gentoo
 
-# The 5 reference presets of --staged (design.md C6, plus the desktop axis:
-# without a desktop preset the desktop-only layers are never resolved).
+# The 6 reference presets of --staged (design.md C6, plus the desktop axis:
+# without a desktop preset the desktop-only layers are never resolved, and the
+# musl one of story 002, where a libc-sensitive layer fails first).
 REF_PRESETS=(
   default/linux/amd64/23.0
   default/linux/amd64/23.0/systemd
   default/linux/amd64/23.0/no-multilib
   default/linux/amd64/23.0/hardened
   default/linux/amd64/23.0/desktop/plasma/systemd
+  default/linux/amd64/23.0/musl
 )
 
 need_portage() {
