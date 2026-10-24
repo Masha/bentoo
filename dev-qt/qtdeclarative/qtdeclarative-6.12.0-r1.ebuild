@@ -39,9 +39,11 @@ BDEPEND="
 # tarball: the 6.12 cherry-pick 8c23f65ec488 landed after the tag, which is why
 # ::gentoo's 6.12.9999 template carries no patch. ::gentoo's 6.11.2 patch does
 # not apply here (qqmlpropertyvalidator.cpp); this is upstream's own pick.
-# Drop on 6.12.1.
+# Drop on 6.12.1. The pager/plasmashell-exit patch is ::gentoo's own, taken
+# from its 6.12.0-r1 so this copy is a strict superset of it.
 PATCHES=(
 	"${FILESDIR}"/${PN}-6.12.0-QTBUG-149607.patch
+	"${FILESDIR}"/${PN}-6.12.0-pager-plasmashell-exit.patch
 )
 
 src_configure() {
