@@ -1,0 +1,221 @@
+# profiles/catalog-vectors.toml -- the composition rule of catalog.toml as
+# executable cases (conformance vectors).
+#
+# Every consumer of profiles/catalog.toml runs these cases and must agree with
+# all of them, so no implementation of the rule can drift from the others:
+#   * scripts/check-profile-matrix.sh  checks this file's shape and coverage
+#     (--static) and runs every case through its own --compose (--vectors);
+#   * `bentoo profile` (app-portage/bentoolkit, Go);
+#   * `shidashi order` (Python).
+#
+# `schema` is the catalog's schema these cases are written for; a consumer
+# refuses a schema it does not know, here as in catalog.toml.
+#
+# Each [[vector]] has exactly these keys:
+#   name    unique, so a failing case can be named;
+#   preset  a preset id (an unknown one is itself a case);
+#   layers  layer ids as a user would give them: any order, duplicates allowed;
+#   expect  "valid" or "invalid";
+#   parent  (valid only) the exact, ordered parent lines the selection
+#           composes to: the preset, then the layers by type rank and, within
+#           a rank, by declaration order in catalog.toml, each layer once;
+#   rules   (invalid only) the SET of rule names the selection breaks, among
+#           unknown-preset, unknown-layer, exclusive, conflict, requires, base.
+#
+# How a consumer runs a vector: compose `preset` + `layers` with its own
+# implementation of the rule; for "valid" it must accept and produce `parent`
+# line for line, in order; for "invalid" it must reject and report every
+# broken rule -- compared as a set, never as the first failure or in a fixed
+# order. One exception: an unknown id stops the check, so a selection naming
+# an unknown preset or layer reports only unknown-preset/unknown-layer (both
+# when both apply), whatever else it would break. Here:
+# `check-profile-matrix.sh --compose <preset> <layer>...`.
+#
+# rules_without_instance lists rules that no catalog entry can break today, so
+# no vector can exist for them. check-profile-matrix.sh fails --static if a
+# listed rule gains an instance (the list cannot outlive its reason), and its
+# self-test fixtures cover every rule regardless.
+
+schema = 2
+
+# No layer declares `requires` yet.
+rules_without_instance = ["requires"]
+
+# --- one vector per rule ------------------------------------------------------
+
+[[vector]]
+name   = "unknown-preset"
+preset = "default/linux/amd64/23.0/no-such-preset"
+layers = []
+expect = "invalid"
+rules  = ["unknown-preset"]
+
+[[vector]]
+name   = "unknown-layer"
+preset = "default/linux/amd64/23.0"
+layers = ["features/hardware/no-such-gpu"]
+expect = "invalid"
+rules  = ["unknown-layer"]
+
+[[vector]]
+name   = "two-flavors"
+preset = "default/linux/amd64/23.0"
+layers = ["targets/server", "targets/headless"]
+expect = "invalid"
+rules  = ["exclusive"]
+
+[[vector]]
+name   = "nvidia-with-nvidia-legacy"
+preset = "default/linux/amd64/23.0/desktop/plasma"
+layers = ["features/hardware/nvidia", "features/hardware/nvidia-legacy"]
+expect = "invalid"
+rules  = ["conflict"]
+
+[[vector]]
+name   = "server-on-a-desktop-preset"
+preset = "default/linux/amd64/23.0/desktop/plasma/systemd"
+layers = ["targets/server"]
+expect = "invalid"
+rules  = ["base"]
+
+# --- musl: what glibc-only layers do over it ----------------------------------
+
+[[vector]]
+name   = "musl-rejects-nvidia"
+preset = "default/linux/amd64/23.0/musl"
+layers = ["features/hardware/nvidia"]
+expect = "invalid"
+rules  = ["base"]
+
+[[vector]]
+name   = "musl-rejects-nvidia-legacy"
+preset = "default/linux/amd64/23.0/musl/systemd"
+layers = ["features/hardware/nvidia-legacy"]
+expect = "invalid"
+rules  = ["base"]
+
+[[vector]]
+name   = "musl-rejects-games"
+preset = "default/linux/amd64/23.0/musl"
+layers = ["features/games"]
+expect = "invalid"
+rules  = ["base"]
+
+[[vector]]
+name   = "musl-rejects-workstation"
+preset = "default/linux/amd64/23.0/musl/llvm"
+layers = ["targets/workstation"]
+expect = "invalid"
+rules  = ["base"]
+
+# --- shapes a consumer must handle --------------------------------------------
+
+# Two rules at once: two flavors (exclusive) and container with a GPU
+# (conflict). A consumer reports both, not the first one it meets.
+[[vector]]
+name   = "two-rules-flavors-and-container-gpu"
+preset = "default/linux/amd64/23.0"
+layers = ["targets/server", "targets/container", "features/hardware/amd"]
+expect = "invalid"
+rules  = ["exclusive", "conflict"]
+
+# An unknown id stops the check: only the unknown-* rules are reported, both
+# of them here, although two flavors are also given.
+[[vector]]
+name   = "unknown-ids-stop-the-check"
+preset = "default/linux/amd64/23.0/no-such-preset"
+layers = ["features/hardware/no-such-gpu", "targets/server", "targets/headless"]
+expect = "invalid"
+rules  = ["unknown-preset", "unknown-layer"]
+
+# A layer failing base still takes part in conflict: both are reported.
+[[vector]]
+name   = "musl-container-nvidia-base-and-conflict"
+preset = "default/linux/amd64/23.0/musl"
+layers = ["features/hardware/nvidia", "targets/container"]
+expect = "invalid"
+rules  = ["conflict", "base"]
+
+# --- valid compositions -------------------------------------------------------
+
+# musl x llvm; layers given out of rank order (hardware before flavor).
+[[vector]]
+name   = "musl-llvm-server-amd"
+preset = "default/linux/amd64/23.0/musl/llvm"
+layers = ["features/hardware/amd", "targets/server"]
+expect = "valid"
+parent = [
+  "bentoo:default/linux/amd64/23.0/musl/llvm",
+  "bentoo:targets/server",
+  "bentoo:features/hardware/amd",
+]
+
+# glibc x gcc desktop, one layer of each type, given in reverse rank order.
+[[vector]]
+name   = "glibc-desktop-full-stack"
+preset = "default/linux/amd64/23.0/desktop/plasma/systemd"
+layers = ["features/hardware/amd", "targets/workstation", "features/games"]
+expect = "valid"
+parent = [
+  "bentoo:default/linux/amd64/23.0/desktop/plasma/systemd",
+  "bentoo:targets/workstation",
+  "bentoo:features/games",
+  "bentoo:features/hardware/amd",
+]
+
+# glibc x llvm.
+[[vector]]
+name   = "glibc-llvm-headless-intel"
+preset = "default/linux/amd64/23.0/llvm/systemd"
+layers = ["targets/headless", "features/hardware/intel"]
+expect = "valid"
+parent = [
+  "bentoo:default/linux/amd64/23.0/llvm/systemd",
+  "bentoo:targets/headless",
+  "bentoo:features/hardware/intel",
+]
+
+# Hybrid laptop: two layers of one rank, given against declaration order
+# (catalog.toml declares nvidia before intel).
+[[vector]]
+name   = "hybrid-intel-nvidia-declaration-order"
+preset = "default/linux/amd64/23.0/desktop/gnome"
+layers = ["features/hardware/intel", "features/hardware/nvidia"]
+expect = "valid"
+parent = [
+  "bentoo:default/linux/amd64/23.0/desktop/gnome",
+  "bentoo:features/hardware/nvidia",
+  "bentoo:features/hardware/intel",
+]
+
+# The same layer given twice composes to one line.
+[[vector]]
+name   = "layer-given-twice"
+preset = "default/linux/amd64/23.0/no-multilib"
+layers = ["features/hardware/intel", "features/hardware/intel"]
+expect = "valid"
+parent = [
+  "bentoo:default/linux/amd64/23.0/no-multilib",
+  "bentoo:features/hardware/intel",
+]
+
+# A preset alone is a composition too.
+[[vector]]
+name   = "musl-hardened-selinux-alone"
+preset = "default/linux/amd64/23.0/musl/hardened/selinux"
+layers = []
+expect = "valid"
+parent = ["bentoo:default/linux/amd64/23.0/musl/hardened/selinux"]
+
+# Hardware only over musl: libc-neutral GPUs pass, in declaration order (amd
+# before intel) against the order given.
+[[vector]]
+name   = "musl-hardware-only-hybrid"
+preset = "default/linux/amd64/23.0/musl/systemd"
+layers = ["features/hardware/intel", "features/hardware/amd"]
+expect = "valid"
+parent = [
+  "bentoo:default/linux/amd64/23.0/musl/systemd",
+  "bentoo:features/hardware/amd",
+  "bentoo:features/hardware/intel",
+]

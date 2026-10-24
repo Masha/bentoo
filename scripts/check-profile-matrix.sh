@@ -31,6 +31,11 @@
 #
 #   --static            the catalog against its schema and the tree, and the
 #                       layers/ fragment rules. Seconds; never calls Portage.
+#   --vectors           --static, then every vector of
+#                       profiles/catalog-vectors.toml through the --compose
+#                       code path: a valid one must print exactly its parent
+#                       lines, an invalid one the same SET of rule names.
+#                       Seconds; never calls Portage.
 #   --staged            --static, then resolution of every layer the index
 #                       touches over the 5 reference presets (the hook mode).
 #   --full              --static, then every layer alone, every pair and the
@@ -65,7 +70,7 @@
 # Prerequisites are checked PER MODE, and the first missing one is named with
 # exit 2: every mode needs bash >= 5 and python3 with tomllib; --staged and
 # --full also need emerge, portageq, bwrap and /var/db/repos/gentoo; --self-test also
-# needs bats. --static, --compose and --self-test never read
+# needs bats. --static, --vectors, --compose and --self-test never read
 # /var/db/repos/gentoo, so they run on a host without Portage.
 #
 # The script is ONE self-contained file - no sourced helper, no separate .py,
@@ -78,10 +83,11 @@
 #     reach for it. Isolating it (unshare -n) needs user namespaces, which a
 #     container or a hardened host may refuse, and a guard that fails there is
 #     a guard people learn to skip.
-#   * "--static and --compose never read /var/db/repos/gentoo" is held by
-#     construction (neither mode references the path), not by a test: the
-#     directory cannot be made to disappear without root, and its path is not
-#     overridable on purpose.
+#   * "--compose never reads /var/db/repos/gentoo" is held by construction
+#     (the mode never references the path), not by its own test; its path is
+#     not overridable on purpose. --static and --vectors are tested
+#     (vectors-boundaries.bats) under a bwrap tmpfs of mode 000 over the path,
+#     and that case is a counted skip where bwrap or user namespaces are off.
 #   * A `parent` line naming another repository (`gentoo:...`, as every
 #     preset's first line does) is not resolved by --static: that would read
 #     /var/db/repos/gentoo. Only this repo's lines (`:path`, `bentoo:path`,
@@ -202,6 +208,7 @@ Usage: check-profile-matrix.sh MODE
 
 Modes:
   --static                             catalog schema + fragment rules (seconds)
+  --vectors                            --static, then every conformance vector through --compose (seconds)
   --staged                             --static, then resolve the layers the index touches
   --full                               --static, then resolve every combination (minutes)
   --compose <preset-id> [layer-id...]  print the composed parent lines, or the broken rule
@@ -227,7 +234,7 @@ parse_args() {
 		usage
 		exit 0
 		;;
-	--static | --staged | --full | --self-test)
+	--static | --vectors | --staged | --full | --self-test)
 		MODE=$1
 		(($# == 1)) || bad_usage "$1 takes no argument, got: ${*:2}"
 		;;
@@ -1287,6 +1294,10 @@ def static(tree):
             vectors = load_catalog(tree, stream=sys.stderr, rel=VECTORS, optional=True)
         except SystemExit as stop:
             if stop.code == GAP:
+                # The catalog gaps already found still name real defects:
+                # keep them, on stderr like the rest of an exit-2 report.
+                for line in failures:
+                    print(line, file=sys.stderr)
                 print(f"static: {VECTORS} cannot be read; nothing compared", file=sys.stderr)
                 return NOTHING
             raise
@@ -1563,6 +1574,65 @@ def compose_verdict(tree, preset_id, selection, seam):
     else:
         why = f"exit {rc}"
     return None, [], f"{why}: {tail}" if tail else why
+
+
+# --- the conformance vectors against --compose (design.md C4, R5) ---------------
+
+
+def verdict_text(accepted, lines):
+    """One side of a --vectors mismatch: `valid, parent [...]` or `invalid,
+    rules [...]`, the rules sorted because they are compared as a set."""
+    if accepted:
+        return f"valid, parent {show(list(lines))}"
+    return f"invalid, rules {show(sorted(set(lines)))}"
+
+
+def rules_of(lines):
+    """The SET of rule names a --compose rejection reports: it prints every
+    broken rule in its own order, `base` once per constrained layer."""
+    return {
+        m.group(1) for line in lines
+        if (m := RULE_LINE.match(line)) and m.group(1) in COMPOSE_RULES
+    }
+
+
+def vectors(tree):
+    """--static first (its gap is the run's gap, nothing compared), then every
+    vector through the --compose code path. A valid vector agrees on an
+    acceptance printing exactly its `parent` lines in order; an invalid one on
+    a rejection whose rule-name set equals `rules`. Every disagreement is one
+    line; a --compose that broke is exit 2 naming the vector, never a
+    mismatch. Neither step reads /var/db/repos/gentoo nor calls Portage."""
+    status = static(tree)
+    if status != CLEAN:
+        return status
+    data = load_catalog(tree, stream=sys.stderr, rel=VECTORS)
+    seam = compose_seam()
+    mismatches = []
+    for vector in data.get("vector", []):
+        name = vector["name"]
+        accepted, lines, why = compose_verdict(tree, vector["preset"], vector["layers"], seam)
+        if accepted is None:
+            # exit 2 reports on stderr only, as static() does
+            for line in mismatches:
+                print(line, file=sys.stderr)
+            print(f"vectors: vector {one_line(name)}: --compose broke: {one_line(why)}; nothing compared",
+                  file=sys.stderr)
+            return NOTHING
+        if vector["expect"] == "valid":
+            agrees = accepted and lines == vector["parent"]
+            expected = verdict_text(True, vector["parent"])
+        else:
+            agrees = not accepted and rules_of(lines) == set(vector["rules"])
+            expected = verdict_text(False, vector["rules"])
+        if not agrees:
+            gave = verdict_text(accepted, lines if accepted else rules_of(lines))
+            # --static accepts any non-empty string: a newline in a name or a
+            # parent line must not forge a second report line.
+            mismatches.append(one_line(f"vector {name}: expected {expected}, --compose gave {gave}"))
+    for line in mismatches:
+        print(line)
+    return GAP if mismatches else CLEAN
 
 
 def make_croot(work, name, tree, parent_lines):
@@ -1858,6 +1928,8 @@ def main(argv):
         return static(tree)
     if sub == "compose":
         return compose(tree, argv[3], argv[4:])
+    if sub == "vectors":
+        return vectors(tree)
     if sub == "resolve":
         return resolve(tree, argv[3], argv[4], argv[5] if len(argv) > 5 else None)
     print(f"internal error: unknown subcommand {sub!r}", file=sys.stderr)
@@ -1914,6 +1986,8 @@ resolve_py() {
 run_static() { catalog_py static; }
 
 run_compose() { catalog_py compose "$@"; }
+
+run_vectors() { catalog_py vectors; }
 
 # run_staged -- the paths staged in TREE's index pick the layers to resolve.
 run_staged() {
@@ -1985,7 +2059,7 @@ main() {
 	parse_args "$@"
 	check_prerequisites
 	case $MODE in
-	--static | --staged | --full | --compose) resolve_tree ;;
+	--static | --vectors | --staged | --full | --compose) resolve_tree ;;
 	esac
 	make_workdir
 
@@ -1996,6 +2070,7 @@ main() {
 	# on_exit maps it to the public one.
 	case $MODE in
 	--static) run_static ;;
+	--vectors) run_vectors ;;
 	--staged) run_staged ;;
 	--full) run_full ;;
 	--compose) run_compose "${COMPOSE_ARGS[@]}" ;;
