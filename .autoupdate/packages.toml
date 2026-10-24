@@ -10296,8 +10296,6 @@ releases/download/v${PV}/zeo-browser-firefox-${PV}.xpi. Live=v0.1.0 (2026-10-15)
 # END
 
 ["net-im/telegram-desktop"]
-enabled = false
-disabled_by = "removed 2026-10-24: ::gentoo ships 7.3.1 with tlottie and wallet-engine as system libraries (gui-libs/tlottie, net-libs/wallet-engine-telegram), so building tdesktop_rust inside the ebuild no longer buys anything; every divergence this ebuild declared was '::gentoo is on 7.1'. Reopen only if ::gentoo falls a series behind again."
 hold = true
 url = "https://api.github.com/repos/telegramdesktop/tdesktop/releases/latest"
 parser = "json"
@@ -12736,7 +12734,7 @@ select = "max"
 patched = """
 Applies files/qtdeclarative-6.12.0-QTBUG-149607.patch (KDE #508377), which ::gentoo does not ship: the 6.12 cherry-pick landed after the 6.12.0 tag. Drop on 6.12.1.
 """
-version = "6.12.0"
+version = "6.12.0-r1"
 comments = """
 qtdeclarative -- the one survivor of the Qt 6.12 mirror. On 2026-10-01
 ::gentoo shipped all 32 modules at 6.12.0 (masked until 6.12.1) and the other
