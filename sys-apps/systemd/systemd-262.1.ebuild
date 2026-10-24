@@ -263,15 +263,13 @@ src_unpack() {
 }
 
 src_prepare() {
-	# BENTOO-DIVERGENCE: PATCHES - backport of upstream PR #43948 (commit
-	# 847a40e16c, still unmerged). v262 made systemd-tpm2-setup-early fail when
-	# the booted UKI carries no signed PCR policy, which is every UKI dracut
-	# builds; systemd-pcrproduct and systemd-pcrlogin@ then fail in cascade
-	# (https://github.com/systemd/systemd/issues/43848). bentoo carries this
-	# revision only until ::gentoo ships a systemd with the fix - delete it then.
-	local PATCHES=(
-		"${FILESDIR}/${P}-nvpcr-no-policy.patch"
-	)
+	# BENTOO-DIVERGENCE: version - bentoo ships 262.1 ahead of ::gentoo because it
+	# carries upstream PR #43948. v262 made systemd-tpm2-setup-early fail when the
+	# booted UKI carries no signed PCR policy, which is every UKI dracut builds;
+	# systemd-pcrproduct and systemd-pcrlogin@ then fail in cascade
+	# (https://github.com/systemd/systemd/issues/43848). Delete this package once
+	# ::gentoo ships >=262.1.
+	local PATCHES=()
 
 	if ! use vanilla; then
 		PATCHES+=(
