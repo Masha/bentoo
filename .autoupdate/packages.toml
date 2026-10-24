@@ -506,7 +506,7 @@ url = "https://api.github.com/repos/trufflesecurity/trufflehog/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "3.99.4"
+version = "3.99.7"
 comments = """
 trufflehog - releases/latest returns "vX.Y.Z". Upstream ships several releases
 a week, so this record moves often.
