@@ -3107,6 +3107,9 @@ a real X.Y.Z release, never an rc.
 url = "https://www.qemu.org/download/"
 parser = "regex"
 pattern = 'qemu-([0-9]+\.[0-9]+\.[0-9]+)'
+patched = """
+::gentoo's 11.1.2 plus three things: a <dev-libs/nettle-4.0 bound (11.1.2 builds against nettle 4 but miscalls its digest functions at runtime, and bentoo ships nettle 4.0), USE=jemalloc wired to conf_malloc, and fdt required by five more softmmu targets (aarch64, hexagon, loongarch64, or1k, rx). Each is tagged BENTOO-DIVERGENCE in the ebuild.
+"""
 version = "11.1.2"
 comments = """
 qemu — /download/ puts the current "qemu-X.Y.Z.tar.xz" link first.

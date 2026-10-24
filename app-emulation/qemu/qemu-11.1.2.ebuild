@@ -6,50 +6,68 @@ EAPI=8
 # Generate using https://github.com/thesamesam/sam-gentoo-scripts/blob/main/niche/generate-qemu-docs
 # Set to 1 if prebuilt, 0 if not
 # (the construct below is to allow overriding from env for script)
-# No prebuilt docs tarball published for 11.1 yet, so generate them here.
-QEMU_DOCS_PREBUILT=${QEMU_DOCS_PREBUILT:-0}
+QEMU_DOCS_PREBUILT=${QEMU_DOCS_PREBUILT:-1}
 QEMU_DOCS_PREBUILT_DEV=sam
-QEMU_DOCS_VERSION=$(ver_cut 1-2).0
+#QEMU_DOCS_VERSION=$(ver_cut 1-2).0
+QEMU_DOCS_VERSION=11.1.2
 # Default to generating docs (inc. man pages) if no prebuilt; overridden later
 # bug #830088
-# BENTOO-DIVERGENCE: IUSE_DEFAULTS - doc defaults on here while ::gentoo ships
-# it off, and that is not a policy choice: it falls out of QEMU_DOCS_PREBUILT=0
-# above. ::gentoo's 10.2.x can set 1 because a qemu-10.2-docs.tar.xz exists on
-# dev.gentoo.org/~sam; no such tarball is published for 11.1, so the docs have
-# to be generated locally and the flag flips to "+doc" by the line below. It
-# reverts by itself the moment a prebuilt 11.1 tarball appears and
-# QEMU_DOCS_PREBUILT goes back to 1.
 QEMU_DOC_USEFLAG="+doc"
 
-PYTHON_COMPAT=( python3_{12..14} )
+DISTUTILS_USE_PEP517=setuptools
+DISTUTILS_OPTIONAL=1
+PYTHON_COMPAT=( python3_{13..15} )
+# See bug #913084 for ensurepip
 PYTHON_REQ_USE="ensurepip(-),ncurses,readline"
 
-inherit eapi9-ver flag-o-matic linux-info toolchain-funcs python-r1 udev fcaps \
-		readme.gentoo-r1 pax-utils verify-sig xdg-utils
+inherit distutils-r1 eapi9-ver flag-o-matic linux-info toolchain-funcs udev fcaps \
+		readme.gentoo-r1 pax-utils xdg-utils
 
-MY_P="${PN}-${PV/_rc/-rc}"
-SRC_URI="
-	https://download.qemu.org/${MY_P}.tar.xz
-	verify-sig? ( https://download.qemu.org/${MY_P}.tar.xz.sig )
-"
+if [[ ${PV} == *9999* ]]; then
+	QEMU_DOCS_PREBUILT=0
 
-if [[ ${QEMU_DOCS_PREBUILT} == 1 ]] ; then
-	SRC_URI+=" !doc? ( https://dev.gentoo.org/~${QEMU_DOCS_PREBUILT_DEV}/distfiles/${CATEGORY}/${PN}/${PN}-${QEMU_DOCS_VERSION}-docs.tar.xz )"
+	EGIT_REPO_URI="https://gitlab.com/qemu-project/qemu.git/"
+	EGIT_SUBMODULES=()
+	inherit git-r3
+	declare -A SUBPROJECTS=(
+		[keycodemapdb]="f5772a62ec52591ff6870b7e8ef32482371f22c6"
+		[berkeley-softfloat-3]="b64af41c3276f97f0e181920400ee056b9c88037"
+		[berkeley-testfloat-3]="e7af9751d9f9fd3b47911f51a5cfd08af256a9ab"
+	)
+
+	for proj in "${!SUBPROJECTS[@]}"; do
+		c=${SUBPROJECTS[${proj}]}
+		SRC_URI+=" https://gitlab.com/qemu-project/${proj}/-/archive/${c}/${proj}-${c}.tar.bz2"
+	done
+else
+	inherit verify-sig
+	MY_P="${PN}-${PV/_rc/-rc}"
+	SRC_URI="
+		https://download.qemu.org/${MY_P}.tar.xz
+		verify-sig? ( https://download.qemu.org/${MY_P}.tar.xz.sig )
+	"
+
+	if [[ ${QEMU_DOCS_PREBUILT} == 1 ]] ; then
+		SRC_URI+=" !doc? ( https://dev.gentoo.org/~${QEMU_DOCS_PREBUILT_DEV}/distfiles/${CATEGORY}/${PN}/${PN}-${QEMU_DOCS_VERSION}-docs.tar.xz )"
+	fi
+
+	S="${WORKDIR}/${MY_P}"
+	[[ "${PV}" != *_rc* ]] && KEYWORDS="-alpha ~amd64 -arm ~arm64 -hppa -m68k -mips -ppc ~ppc64 -x86"
 fi
-
-S="${WORKDIR}/${MY_P}"
 
 DESCRIPTION="QEMU + Kernel-based Virtual Machine userland tools"
 HOMEPAGE="https://www.qemu.org https://www.linux-kvm.org"
 
 LICENSE="GPL-2 LGPL-2 BSD-2"
 SLOT="0"
-KEYWORDS="~amd64 ~arm ~arm64 ~loong ~ppc ~ppc64 ~riscv ~x86"
 
 [[ ${QEMU_DOCS_PREBUILT} == 1 ]] && QEMU_DOC_USEFLAG="doc"
 
+# BENTOO-DIVERGENCE: IUSE - jemalloc, offered through conf_malloc. ::gentoo
+# still defines conf_malloc but, with the GlusterFS driver gone in series 11,
+# no longer calls it; this overlay wires jemalloc to it.
 IUSE="accessibility +aio alsa bpf bzip2 capstone +curl debug ${QEMU_DOC_USEFLAG}
-	+fdt fuse +gnutls gtk infiniband iscsi io-uring
+	elfutils +fdt fuse +gnutls gtk infiniband iscsi io-uring
 	jack jemalloc +jpeg keyutils
 	lzo multipath
 	ncurses nfs nls numa opengl +oss pam passt +pin-upstream-blobs pipewire
@@ -59,20 +77,6 @@ IUSE="accessibility +aio alsa bpf bzip2 capstone +curl debug ${QEMU_DOC_USEFLAG}
 	usbredir valgrind vde +vhost-net virgl virtfs +vnc vte wayland X xattr xdp xen
 	zstd"
 
-# hexagon gained system emulation (hexagon-softmmu) in QEMU 11.1, so it moved
-# from the user-only list into the shared one.
-#
-# BENTOO-DIVERGENCE: IUSE - the emulation target lists track series 11, so they
-# differ from ::gentoo's stable 10.2.x on two flags, both dictated by what the
-# 11.1.0 tarball actually ships in configs/targets/:
-#   qemu_softmmu_targets_hexagon     gained: hexagon-softmmu.mak is new in 11.1
-#   qemu_softmmu_targets_microblazeel  lost: 11.1 ships microblaze-softmmu.mak
-#                                    but no microblazeel-softmmu.mak, so that
-#                                    target survives only as linux-user
-# ::gentoo's own qemu-9999, which follows the same series, already made the
-# microblazeel move; its 10.2.x ebuilds simply predate both changes. Note that
-# qemu_softmmu_targets_hexagon needs profiles/desc/qemu_softmmu_targets.desc in
-# this overlay -- ::gentoo has not described the flag yet.
 COMMON_TARGETS="
 	aarch64
 	alpha
@@ -126,15 +130,10 @@ RESTRICT="!test? ( test )"
 
 # Allow no targets to be built so that people can get a tools-only build.
 # Block USE flag configurations known to not work.
-#
-# The fdt list below is the set of softmmu targets carrying TARGET_NEED_FDT=y
-# in configs/targets/*.mak (meson hard-errors on those without libfdt when the
-# target is requested explicitly), plus a few historical entries kept from the
-# ::gentoo ebuild.
-# BENTOO-DIVERGENCE: REQUIRED_USE - qemu_softmmu_targets_hexagon gained and
-# qemu_softmmu_targets_microblazeel gone. Neither is a decision taken here: the
-# softmmu target list is upstream's and moved between ::gentoo's 10.2.3-r1 and
-# this 11.1.1. It travels with the IUSE tag above.
+# BENTOO-DIVERGENCE: REQUIRED_USE - five more softmmu targets require fdt:
+# aarch64, hexagon, loongarch64, or1k and rx carry TARGET_NEED_FDT=y in the
+# 11.1 tarball's configs/targets/*.mak, and meson hard-errors on them without
+# libfdt when the target is requested explicitly. ::gentoo's list predates it.
 REQUIRED_USE="
 	${PYTHON_REQUIRED_USE}
 	qemu_softmmu_targets_aarch64? ( fdt )
@@ -164,6 +163,8 @@ for smname in ${IUSE_SOFTMMU_TARGETS} ; do
 	REQUIRED_USE+=" qemu_softmmu_targets_${smname}? ( kernel_linux? ( seccomp ) )"
 done
 
+# TODO: python bindings have an optional unpackaged dependency 'pyfuse'
+
 # Dependencies required for qemu tools (qemu-nbd, qemu-img, qemu-io, ...)
 # and user/softmmu targets (qemu-*, qemu-system-*).
 #
@@ -175,30 +176,32 @@ done
 ALL_DEPEND="
 	dev-libs/glib:2[static-libs(+)]
 	virtual/zlib:=[static-libs(+)]
-	python? ( ${PYTHON_DEPS} )
+	python? (
+		${PYTHON_DEPS}
+		>=dev-python/qemu-qmp-0.0.5[${PYTHON_USEDEP}]
+	)
 	systemtap? ( dev-debug/systemtap )
 	xattr? ( sys-apps/attr[static-libs(+)] )
 "
 
 # Dependencies required for qemu tools (qemu-nbd, qemu-img, qemu-io, ...)
 # softmmu targets (qemu-system-*).
+# BENTOO-DIVERGENCE: DEPEND - nettle upper bound, because this overlay ships
+# dev-libs/nettle-4.0. QEMU 11.1.2 BUILDS against nettle 4 (it includes
+# <nettle/sha1.h> and <nettle/sha2.h> instead of the deleted <nettle/sha.h>),
+# and that is all it fixed. crypto/hash-nettle.c and crypto/hmac-nettle.c cast
+# every *_digest to a three-argument function pointer; nettle 4 dropped the
+# length argument, so the cast silences the compiler and the call then hands
+# the length to nettle in the register it reads as the output pointer.
+# Measured: a SHA-256 finalize passes 0x20 as `digest`, i.e. a 32-byte write to
+# the zero page, on every hash and HMAC the nettle backend serves -- LUKS/qcow2
+# crypto, VNC auth, virtio-crypto, TLS. Guest- and network-reachable, and a
+# crash, not a build failure.
 #
-# BENTOO-DIVERGENCE: DEPEND - nettle upper bound. ::gentoo carries no bound, this
-# overlay adds `<dev-libs/nettle-4.0`.  Since 11.1.2 QEMU BUILDS against
-# nettle 4 (upstream now includes <nettle/sha1.h> and <nettle/sha2.h> instead of
-# the deleted <nettle/sha.h>), and that is all it fixed.  crypto/hash-nettle.c and crypto/hmac-nettle.c cast every
-# *_digest to a three-argument function pointer; nettle 4 dropped the length
-# argument, so the cast silences the compiler and the call then hands the
-# length to nettle in the register it reads as the output pointer.  Measured:
-# a SHA-256 finalize passes 0x20 as `digest`, i.e. a 32-byte write to the zero
-# page, on every hash and HMAC the nettle backend serves -- LUKS/qcow2 crypto,
-# VNC auth, virtio-crypto, TLS.  Guest- and network-reachable, and a crash, not
-# a build failure, which is the worse of the two.
-#
-# profiles/package.mask already masks >=dev-libs/nettle-4.0 for this reason, but
-# a mask is user-overridable and this is not: the bound makes the broken pairing
-# unsatisfiable rather than merely discouraged.  Drop it, not the mask, once
+# profiles/package.mask also masks >=dev-libs/nettle-4.0 for this reason, but a
+# mask is user-overridable and this is not. Drop the bound, not the mask, once
 # QEMU's crypto backend is ported to the two-argument digest API.
+# BENTOO-DIVERGENCE: RDEPEND - same nettle bound, and jemalloc (see IUSE).
 SOFTMMU_TOOLS_DEPEND="
 	>=x11-libs/pixman-0.28.0[static-libs(+)]
 	accessibility? (
@@ -211,10 +214,13 @@ SOFTMMU_TOOLS_DEPEND="
 	bzip2? ( app-arch/bzip2[static-libs(+)] )
 	capstone? ( dev-libs/capstone:=[static-libs(+)] )
 	curl? ( >=net-misc/curl-7.15.4[static-libs(+)] )
+	elfutils? ( dev-libs/elfutils[static-libs(+)] )
 	fdt? ( >=sys-apps/dtc-1.5.1[static-libs(+)] )
 	fuse? ( >=sys-fs/fuse-3.1:3=[static-libs(+)] )
 	gnutls? (
+		dev-libs/gmp[static-libs(+)]
 		>=net-libs/gnutls-3.7.5:=[static-libs(+)]
+		>=dev-libs/nettle-3.7.3:=[gmp]
 		>=dev-libs/nettle-3.7.3:=[static-libs(+)]
 		<dev-libs/nettle-4.0
 	)
@@ -256,7 +262,7 @@ SOFTMMU_TOOLS_DEPEND="
 		media-libs/libsdl2[static-libs(+)]
 	)
 	sdl-image? ( media-libs/sdl2-image[static-libs(+)] )
-	seccomp? ( >=sys-libs/libseccomp-2.3.0[static-libs(+)] )
+	seccomp? ( >=sys-libs/libseccomp-2.1.0[static-libs(+)] )
 	slirp? ( net-libs/libslirp[static-libs(+)] )
 	smartcard? ( >=app-emulation/libcacard-2.5.0[static-libs(+)] )
 	snappy? ( app-arch/snappy:= )
@@ -271,6 +277,7 @@ SOFTMMU_TOOLS_DEPEND="
 	vde? ( net-misc/vde[static-libs(+)] )
 	virgl? ( media-libs/virglrenderer[static-libs(+)] )
 	virtfs? ( sys-libs/libcap )
+	X? ( x11-libs/libX11 )
 	xdp? ( net-libs/xdp-tools )
 	xen? ( app-emulation/xen-tools:= )
 	zstd? ( >=app-arch/zstd-1.4.0[static-libs(+)] )
@@ -284,15 +291,15 @@ SOFTMMU_TOOLS_DEPEND="
 # and might have other unwanted consequences. For now, let us try to
 # synchronize firmware blobs with the ones bundled in upstream qemu. Simply
 # check the upstream git repository for any changes, for example:
-#   https://github.com/qemu/qemu/tree/v11.1.0/roms for the 11.1.0 release.
+#   https://github.com/qemu/qemu/tree/v10.0.2/roms for the 10.0.2 release.
 #
 # When changing pinned firmware versions
 #  - create a separate ebuild with revision -r50
 #  - update the FIRMWARE_ABI_VERSION to the current package version
 #
 
-FIRMWARE_ABI_VERSION="11.1.0"
-EDK2_OVMF_VERSION="202605"
+FIRMWARE_ABI_VERSION="10.0.2"
+EDK2_OVMF_VERSION="202408"
 SEABIOS_VERSION="1.16.3"
 
 X86_FIRMWARE_DEPEND="
@@ -327,32 +334,34 @@ PPC_FIRMWARE_DEPEND="
 	)
 "
 
-# See bug #913084 for pip dep
 BDEPEND="
 	${PYTHON_DEPS}
 	dev-python/distlib[${PYTHON_USEDEP}]
 	dev-lang/perl
-	>=dev-build/meson-1.5.0
+	>=dev-build/meson-0.63.0
 	>=dev-util/gdbus-codegen-2.80.5-r1
 	app-alternatives/ninja
 	virtual/pkgconfig
 	doc? (
-		>=dev-python/sphinx-1.6.0[${PYTHON_USEDEP}]
-		dev-python/sphinx-rtd-theme[${PYTHON_USEDEP}]
+		>=dev-python/sphinx-7.2.7[${PYTHON_USEDEP}]
+		>=dev-python/sphinx-rtd-theme-1.2.2[${PYTHON_USEDEP}]
 	)
 	gtk? ( nls? ( sys-devel/gettext ) )
+	python? ( ${DISTUTILS_DEPS} )
 	test? (
 		app-alternatives/bc
 		dev-libs/glib[utils]
-		dev-python/pycotap[${PYTHON_USEDEP}]
+		>=dev-python/pycotap-1.1.0[${PYTHON_USEDEP}]
+		>=dev-python/qemu-qmp-0.0.5[${PYTHON_USEDEP}]
+		>=dev-python/setuptools-63.1.0[${PYTHON_USEDEP}]
+		>=dev-python/wheel-0.41.2[${PYTHON_USEDEP}]
 	)
 "
-
-# https://www.qemu.org/download/ -- releases are signed by Michael Roth
-# (CEACC9E15534EBABB82D3FA03353C9CEF108B584), verified against the 11.1.0
-# detached signature.
-BDEPEND+=" verify-sig? ( sec-keys/openpgp-keys-mdroth )"
-VERIFY_SIG_OPENPGP_KEY_PATH=/usr/share/openpgp-keys/mdroth.asc
+if [[ ${PV} != 9999 ]]; then
+	# https://www.qemu.org/download/
+	BDEPEND+=" verify-sig? ( sec-keys/openpgp-keys-mdroth )"
+	VERIFY_SIG_OPENPGP_KEY_PATH=/usr/share/openpgp-keys/mdroth.asc
+fi
 CDEPEND="
 	${ALL_DEPEND//\[static-libs(+)]}
 	${SOFTMMU_TOOLS_DEPEND//\[static-libs(+)]}
@@ -367,9 +376,6 @@ DEPEND="
 	static-user? ( ${ALL_DEPEND} )
 	valgrind? ( dev-debug/valgrind )
 "
-# BENTOO-DIVERGENCE: RDEPEND - jemalloc where ::gentoo has glusterfs. Series
-# 11 dropped the GlusterFS block driver, so that flag has nothing left to
-# enable; jemalloc is offered instead through conf_malloc.
 RDEPEND="
 	${CDEPEND}
 	acct-group/kvm
@@ -379,30 +385,14 @@ RDEPEND="
 	)
 "
 
-# PATCHES, for a reader -- deliberately NOT a BENTOO-DIVERGENCE tag: the
-# comparison tracks four axes only (inherit, options, iuse, deps), so a tag on a
-# PATCHES axis would be well-formed, match no finding, and declare nothing while
-# looking like it declared something.
-#
-# The optionrom patch is the same fix as ::gentoo's, carried under a different
-# filename: ::gentoo renames it to the oldest version it still applies to
-# (qemu-10.2.2-...), this overlay kept the name minted when the series 11 ebuild
-# was first written (qemu-11.0.0-...).
-# All six patches below were re-verified against the 11.1.2 tarball with
-# `patch -p1 --dry-run`; none needed a rebase.
-#
-# The nettle-4 build fix (qemu-11.1.0-nettle-4.patch) was dropped at 11.1.2:
-# it is upstream, and the tarball carries it verbatim. It never fixed the
-# runtime breakage against nettle 4 -- the DEPEND bound above still does that.
-# BENTOO-DIVERGENCE: PATCHES - the optionrom fix is the same one ::gentoo
-# carries, rebased from 10.2.2 onto 11.0.0.
 PATCHES=(
 	"${FILESDIR}"/${PN}-10.1.2-fix_passt.patch
 	"${FILESDIR}"/${PN}-9.0.0-disable-keymap.patch
 	"${FILESDIR}"/${PN}-9.2.0-capstone-include-path.patch
 	"${FILESDIR}"/${PN}-8.1.0-skip-tests.patch
 	"${FILESDIR}"/${PN}-8.1.0-find-sphinx.patch
-	"${FILESDIR}"/${PN}-11.0.0-optionrom-pass-Wl-no-error-rwx-segments.patch
+	"${FILESDIR}"/${PN}-10.2.2-optionrom-pass-Wl-no-error-rwx-segments.patch
+	"${FILESDIR}"/${PN}-11.1.2-fix-container-sandbox-violation.patch
 )
 
 QA_PREBUILT="
@@ -530,7 +520,25 @@ check_targets() {
 		die "sync ${var} to the list of targets"
 	fi
 
-	popd >/dev/null || die
+	popd >/dev/null
+}
+
+src_unpack() {
+	if [[ ${PV} == 9999 ]] ; then
+		git-r3_src_unpack
+		for file in ${A}; do
+			unpack "${file}"
+		done
+		cd "${WORKDIR}" || die
+		for proj in "${!SUBPROJECTS[@]}"; do
+			mv "${proj}-${SUBPROJECTS[${proj}]}" "${S}/subprojects/${proj}" || die
+		done
+		cd "${S}" || die
+		meson subprojects packagefiles --apply || die
+	else
+		use verify-sig && verify-sig_verify_detached "${DISTDIR}"/${MY_P}.tar.xz{,.sig}
+		default
+	fi
 }
 
 src_prepare() {
@@ -555,8 +563,11 @@ src_prepare() {
 		EOF
 	fi
 
-	# Verbose builds
-	MAKEOPTS+=" V=1"
+	if use python; then
+		pushd python >/dev/null || die
+		distutils-r1_src_prepare
+		popd >/dev/null || die
+	fi
 
 	# Remove bundled modules
 	rm -r roms/*/ || die
@@ -588,15 +599,6 @@ qemu_src_configure() {
 		--disable-guest-agent
 		--disable-strip
 		--disable-download
-
-		# New in 11.1: a standalone D-Bus VNC server. Upstream builds it
-		# but never installs it (tools/qemu-vnc/meson.build calls
-		# executable() with no install:), so it is pure build cost here.
-		# Worse, it links libqemuui, which drags ui/ into a tools-only
-		# tree where neither trace/trace-ui.h nor the input-keymap .c.inc
-		# files are generated -- both are still gated on have_system --
-		# and the build dies. Revisit if upstream ever installs it.
-		--disable-qemu-vnc
 		--python="${PYTHON}"
 
 		# bug #746752: TCG interpreter has a few limitations:
@@ -673,6 +675,7 @@ qemu_src_configure() {
 		$(conf_notuser capstone)
 		$(conf_notuser curl)
 		$(conf_tools doc docs)
+		$(conf_notuser elfutils libdw)
 		$(conf_notuser fdt)
 		$(conf_notuser fuse)
 		$(conf_notuser gnutls)
@@ -712,6 +715,7 @@ qemu_src_configure() {
 		$(conf_notuser virgl virglrenderer)
 		$(conf_softmmu virtfs)
 		$(conf_notuser vnc)
+		--disable-qemu-vnc # fails to build, otherwise automagically enabled for dbus+vnc+tools
 		$(conf_notuser vte)
 		$(conf_softmmu xdp af-xdp)
 		$(conf_notuser xen)
@@ -798,7 +802,7 @@ qemu_src_configure() {
 	conf_opts+=( ${EXTRA_CONF_QEMU} )
 
 	echo "../configure ${conf_opts[*]}"
-	cd "${builddir}" || die
+	cd "${builddir}"
 	../configure "${conf_opts[@]}" || die "configure failed"
 }
 
@@ -830,37 +834,47 @@ src_configure() {
 	[[ -n ${softmmu_targets} ]] && qemu_src_configure "softmmu"
 	[[ -n ${user_targets}    ]] && qemu_src_configure "user"
 	qemu_src_configure "tools"
+
+	if use python; then
+		pushd python >/dev/null || die
+		distutils-r1_src_configure
+		popd >/dev/null || die
+	fi
 }
 
 src_compile() {
 	if [[ -n ${user_targets} ]]; then
 		cd "${S}/user-build" || die
-		default
+		emake V=1
 	fi
 
 	if [[ -n ${softmmu_targets} ]]; then
 		cd "${S}/softmmu-build" || die
-		default
+		emake V=1
 	fi
 
 	cd "${S}/tools-build" || die
-	default
+	emake V=1
+
+	if use python; then
+		pushd python >/dev/null || die
+		distutils-r1_src_compile
+		popd >/dev/null || die
+	fi
 }
 
 src_test() {
 	if [[ -n ${softmmu_targets} ]]; then
 		cd "${S}/softmmu-build" || die
 		pax-mark m */qemu-system-* #515550
-		emake check
+		emake V=1 check
 	fi
 }
 
-qemu_python_install() {
-	python_domodule "${S}/python/qemu"
+python_install() {
+	distutils-r1_python_install
 
 	python_doscript "${S}/scripts/kvm/vmxcap"
-	python_doscript "${S}/scripts/qmp/qmp-shell"
-	python_doscript "${S}/scripts/qmp/qemu-ga-client"
 }
 
 # Generate binfmt support files.
@@ -874,7 +888,7 @@ generate_initd() {
 	einfo "Generating qemu binfmt scripts and configuration files"
 
 	# Generate the debian fragments first.
-	mkdir -p "${d}" || die
+	mkdir -p "${d}"
 	"${S}"/scripts/qemu-binfmt-conf.sh \
 		--debian \
 		--exportdir "${d}" \
@@ -918,7 +932,7 @@ EOF
 
 src_install() {
 	if [[ -n ${user_targets} ]]; then
-		cd "${S}/user-build" || die
+		cd "${S}/user-build"
 		emake DESTDIR="${ED}" install
 
 		# Install binfmt handler init script for user targets.
@@ -931,7 +945,7 @@ src_install() {
 	fi
 
 	if [[ -n ${softmmu_targets} ]]; then
-		cd "${S}/softmmu-build" || die
+		cd "${S}/softmmu-build"
 		emake DESTDIR="${ED}" install
 
 		# This might not exist if the test failed. #512010
@@ -940,10 +954,12 @@ src_install() {
 		if use kernel_linux; then
 			udev_newrules "${FILESDIR}"/65-kvm.rules-r2 65-kvm.rules
 		fi
+	fi
 
-		if use python; then
-			python_foreach_impl qemu_python_install
-		fi
+	if use python; then
+		pushd python >/dev/null || die
+		distutils-r1_src_install
+		popd >/dev/null || die
 	fi
 
 	cd "${S}/tools-build" || die
@@ -980,12 +996,12 @@ src_install() {
 		fi
 
 		# Remove vgabios since we're using the seavgabios packaged one
-		rm "${ED}/usr/share/qemu/vgabios.bin" || die
-		rm "${ED}/usr/share/qemu/vgabios-cirrus.bin" || die
-		rm "${ED}/usr/share/qemu/vgabios-qxl.bin" || die
-		rm "${ED}/usr/share/qemu/vgabios-stdvga.bin" || die
-		rm "${ED}/usr/share/qemu/vgabios-virtio.bin" || die
-		rm "${ED}/usr/share/qemu/vgabios-vmware.bin" || die
+		rm "${ED}/usr/share/qemu/vgabios.bin"
+		rm "${ED}/usr/share/qemu/vgabios-cirrus.bin"
+		rm "${ED}/usr/share/qemu/vgabios-qxl.bin"
+		rm "${ED}/usr/share/qemu/vgabios-stdvga.bin"
+		rm "${ED}/usr/share/qemu/vgabios-virtio.bin"
+		rm "${ED}/usr/share/qemu/vgabios-vmware.bin"
 
 		# PPC/PPC64 loads vgabios-stdvga
 		if use qemu_softmmu_targets_x86_64 || use qemu_softmmu_targets_i386 || use qemu_softmmu_targets_ppc || use qemu_softmmu_targets_ppc64; then
@@ -1036,13 +1052,13 @@ pkg_postinst() {
 		if has_version 'sys-firmware/edk2-bin'; then
 			ewarn "	$(best_version sys-firmware/edk2-bin)"
 		else
-			ewarn "	$(best_version sys-firmware/edk2)"
+			ewarn " $(best_version sys-firmware/edk2)"
 		fi
 
 		if has_version 'sys-firmware/seabios-bin'; then
 			ewarn "	$(best_version sys-firmware/seabios-bin)"
 		else
-			ewarn "	$(best_version sys-firmware/seabios)"
+			ewarn " $(best_version sys-firmware/seabios)"
 		fi
 
 		ewarn "	$(best_version sys-firmware/ipxe)"
