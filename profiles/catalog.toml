@@ -1,12 +1,32 @@
 # profiles/catalog.toml -- what a bentoo system can be composed from.
 #
-# Schema 1. Two consumers read this file; Portage ignores it:
+# Schema 2. Three consumers read this file; Portage ignores it:
 #   * scripts/check-profile-matrix.sh  validates it (--static) and applies the
 #     composition rule (--compose) before every commit that touches profiles/;
-#   * `bentoo profile` (app-portage/bentoolkit) offers these presets and layers
-#     to users and writes /etc/portage/make.profile/parent from them.
-# Both must agree, so any incompatible change bumps `schema` -- the tool
-# refuses a schema it does not know rather than guessing.
+#   * `bentoo profile` (app-portage/bentoolkit, Go) offers these presets and
+#     layers to users and writes /etc/portage/make.profile/parent from them;
+#   * `shidashi order` (Python) reads the same presets and layers.
+# All of them must agree, so any incompatible change bumps `schema` -- a
+# consumer refuses a schema it does not know rather than guessing.
+#
+# Schema 2 describes every preset on seven axes. Two of them are new:
+#   * toolchain = "gcc" | "llvm" -- the compiler the ::gentoo profile builds
+#     with. It replaces the former boolean `llvm` key, which no longer exists.
+#   * libc = "glibc" | "musl" -- the C library. The glibc presets are the
+#     default/linux/amd64/23.0 profiles; the musl presets are ::gentoo's amd64
+#     23.0/musl profiles (merged-/usr only, never split-usr), every one of
+#     them no-multilib and without a desktop.
+#
+# profiles/catalog-vectors.toml, which carries the same `schema`, holds the
+# composition rule as executable cases: a selection, then either the parent
+# lines it produces or the set of rules it breaks. check-profile-matrix.sh
+# and every other consumer run the same cases, so no implementation of the
+# rule can drift from the others.
+#
+# Binhost coverage is NOT catalog data. The official binhost serves
+# no-multilib x glibc x gcc x non-hardened x {openrc, systemd}; a consumer
+# learns what it covers from the binhost index, never from this file, so the
+# two can never disagree.
 #
 # A composition is one [[preset]] (a ::gentoo profile plus features/branding)
 # followed by at most one layer per exclusive type and any number of the
@@ -18,18 +38,20 @@
 #
 # Ids are paths relative to profiles/, so an id is also the `bentoo:<id>` line
 # Portage reads. Preset entries mirror profiles/profiles.desc one to one,
-# status included. hardened, selinux and llvm constrain no v1 layer; they are
-# in schema 1 so adding a layer that needs them costs no schema bump.
+# status included. A layer that only works on some value of an axis says so
+# in its `base`; hardened, selinux and toolchain constrain no layer yet, and
+# they are axes anyway so adding a layer that needs them costs no bump.
 
-schema = 1
+schema = 2
 
 [attributes]
-init     = ["openrc", "systemd"]
-multilib = [true, false]
-desktop  = ["none", "generic", "plasma", "gnome"]
-hardened = [true, false]
-selinux  = [true, false]
-llvm     = [true, false]
+init      = ["openrc", "systemd"]
+multilib  = [true, false]
+desktop   = ["none", "generic", "plasma", "gnome"]
+hardened  = [true, false]
+selinux   = [true, false]
+toolchain = ["gcc", "llvm"]
+libc      = ["glibc", "musl"]
 
 # rank orders the parent lines; exclusive allows at most one layer of the type.
 [types.flavor]
@@ -47,204 +69,301 @@ exclusive = false
 # --- presets: one per amd64 line of profiles.desc --------------------------
 
 [[preset]]
-id       = "default/linux/amd64/23.0"
-status   = "stable"
-init     = "openrc"
-multilib = true
-desktop  = "none"
-hardened = false
-selinux  = false
-llvm     = false
+id        = "default/linux/amd64/23.0"
+status    = "stable"
+init      = "openrc"
+multilib  = true
+desktop   = "none"
+hardened  = false
+selinux   = false
+toolchain = "gcc"
+libc      = "glibc"
 
 [[preset]]
-id       = "default/linux/amd64/23.0/systemd"
-status   = "stable"
-init     = "systemd"
-multilib = true
-desktop  = "none"
-hardened = false
-selinux  = false
-llvm     = false
+id        = "default/linux/amd64/23.0/systemd"
+status    = "stable"
+init      = "systemd"
+multilib  = true
+desktop   = "none"
+hardened  = false
+selinux   = false
+toolchain = "gcc"
+libc      = "glibc"
 
 [[preset]]
-id       = "default/linux/amd64/23.0/desktop"
-status   = "stable"
-init     = "openrc"
-multilib = true
-desktop  = "generic"
-hardened = false
-selinux  = false
-llvm     = false
+id        = "default/linux/amd64/23.0/desktop"
+status    = "stable"
+init      = "openrc"
+multilib  = true
+desktop   = "generic"
+hardened  = false
+selinux   = false
+toolchain = "gcc"
+libc      = "glibc"
 
 [[preset]]
-id       = "default/linux/amd64/23.0/desktop/systemd"
-status   = "stable"
-init     = "systemd"
-multilib = true
-desktop  = "generic"
-hardened = false
-selinux  = false
-llvm     = false
+id        = "default/linux/amd64/23.0/desktop/systemd"
+status    = "stable"
+init      = "systemd"
+multilib  = true
+desktop   = "generic"
+hardened  = false
+selinux   = false
+toolchain = "gcc"
+libc      = "glibc"
 
 [[preset]]
-id       = "default/linux/amd64/23.0/desktop/gnome"
-status   = "stable"
-init     = "openrc"
-multilib = true
-desktop  = "gnome"
-hardened = false
-selinux  = false
-llvm     = false
+id        = "default/linux/amd64/23.0/desktop/gnome"
+status    = "stable"
+init      = "openrc"
+multilib  = true
+desktop   = "gnome"
+hardened  = false
+selinux   = false
+toolchain = "gcc"
+libc      = "glibc"
 
 [[preset]]
-id       = "default/linux/amd64/23.0/desktop/gnome/systemd"
-status   = "stable"
-init     = "systemd"
-multilib = true
-desktop  = "gnome"
-hardened = false
-selinux  = false
-llvm     = false
+id        = "default/linux/amd64/23.0/desktop/gnome/systemd"
+status    = "stable"
+init      = "systemd"
+multilib  = true
+desktop   = "gnome"
+hardened  = false
+selinux   = false
+toolchain = "gcc"
+libc      = "glibc"
 
 [[preset]]
-id       = "default/linux/amd64/23.0/desktop/plasma"
-status   = "stable"
-init     = "openrc"
-multilib = true
-desktop  = "plasma"
-hardened = false
-selinux  = false
-llvm     = false
+id        = "default/linux/amd64/23.0/desktop/plasma"
+status    = "stable"
+init      = "openrc"
+multilib  = true
+desktop   = "plasma"
+hardened  = false
+selinux   = false
+toolchain = "gcc"
+libc      = "glibc"
 
 [[preset]]
-id       = "default/linux/amd64/23.0/desktop/plasma/systemd"
-status   = "stable"
-init     = "systemd"
-multilib = true
-desktop  = "plasma"
-hardened = false
-selinux  = false
-llvm     = false
+id        = "default/linux/amd64/23.0/desktop/plasma/systemd"
+status    = "stable"
+init      = "systemd"
+multilib  = true
+desktop   = "plasma"
+hardened  = false
+selinux   = false
+toolchain = "gcc"
+libc      = "glibc"
 
 [[preset]]
-id       = "default/linux/amd64/23.0/no-multilib"
-status   = "stable"
-init     = "openrc"
-multilib = false
-desktop  = "none"
-hardened = false
-selinux  = false
-llvm     = false
+id        = "default/linux/amd64/23.0/no-multilib"
+status    = "stable"
+init      = "openrc"
+multilib  = false
+desktop   = "none"
+hardened  = false
+selinux   = false
+toolchain = "gcc"
+libc      = "glibc"
 
 [[preset]]
-id       = "default/linux/amd64/23.0/no-multilib/systemd"
-status   = "stable"
-init     = "systemd"
-multilib = false
-desktop  = "none"
-hardened = false
-selinux  = false
-llvm     = false
+id        = "default/linux/amd64/23.0/no-multilib/systemd"
+status    = "stable"
+init      = "systemd"
+multilib  = false
+desktop   = "none"
+hardened  = false
+selinux   = false
+toolchain = "gcc"
+libc      = "glibc"
 
 [[preset]]
-id       = "default/linux/amd64/23.0/no-multilib/hardened"
-status   = "stable"
-init     = "openrc"
-multilib = false
-desktop  = "none"
-hardened = true
-selinux  = false
-llvm     = false
+id        = "default/linux/amd64/23.0/no-multilib/hardened"
+status    = "stable"
+init      = "openrc"
+multilib  = false
+desktop   = "none"
+hardened  = true
+selinux   = false
+toolchain = "gcc"
+libc      = "glibc"
 
 [[preset]]
-id       = "default/linux/amd64/23.0/no-multilib/hardened/systemd"
-status   = "stable"
-init     = "systemd"
-multilib = false
-desktop  = "none"
-hardened = true
-selinux  = false
-llvm     = false
+id        = "default/linux/amd64/23.0/no-multilib/hardened/systemd"
+status    = "stable"
+init      = "systemd"
+multilib  = false
+desktop   = "none"
+hardened  = true
+selinux   = false
+toolchain = "gcc"
+libc      = "glibc"
 
 [[preset]]
-id       = "default/linux/amd64/23.0/no-multilib/hardened/selinux"
-status   = "stable"
-init     = "openrc"
-multilib = false
-desktop  = "none"
-hardened = true
-selinux  = true
-llvm     = false
+id        = "default/linux/amd64/23.0/no-multilib/hardened/selinux"
+status    = "stable"
+init      = "openrc"
+multilib  = false
+desktop   = "none"
+hardened  = true
+selinux   = true
+toolchain = "gcc"
+libc      = "glibc"
 
 [[preset]]
-id       = "default/linux/amd64/23.0/no-multilib/hardened/selinux/systemd"
-status   = "stable"
-init     = "systemd"
-multilib = false
-desktop  = "none"
-hardened = true
-selinux  = true
-llvm     = false
+id        = "default/linux/amd64/23.0/no-multilib/hardened/selinux/systemd"
+status    = "stable"
+init      = "systemd"
+multilib  = false
+desktop   = "none"
+hardened  = true
+selinux   = true
+toolchain = "gcc"
+libc      = "glibc"
 
 [[preset]]
-id       = "default/linux/amd64/23.0/hardened"
-status   = "stable"
-init     = "openrc"
-multilib = true
-desktop  = "none"
-hardened = true
-selinux  = false
-llvm     = false
+id        = "default/linux/amd64/23.0/hardened"
+status    = "stable"
+init      = "openrc"
+multilib  = true
+desktop   = "none"
+hardened  = true
+selinux   = false
+toolchain = "gcc"
+libc      = "glibc"
 
 [[preset]]
-id       = "default/linux/amd64/23.0/hardened/systemd"
-status   = "stable"
-init     = "systemd"
-multilib = true
-desktop  = "none"
-hardened = true
-selinux  = false
-llvm     = false
+id        = "default/linux/amd64/23.0/hardened/systemd"
+status    = "stable"
+init      = "systemd"
+multilib  = true
+desktop   = "none"
+hardened  = true
+selinux   = false
+toolchain = "gcc"
+libc      = "glibc"
 
 [[preset]]
-id       = "default/linux/amd64/23.0/hardened/selinux"
-status   = "stable"
-init     = "openrc"
-multilib = true
-desktop  = "none"
-hardened = true
-selinux  = true
-llvm     = false
+id        = "default/linux/amd64/23.0/hardened/selinux"
+status    = "stable"
+init      = "openrc"
+multilib  = true
+desktop   = "none"
+hardened  = true
+selinux   = true
+toolchain = "gcc"
+libc      = "glibc"
 
 [[preset]]
-id       = "default/linux/amd64/23.0/hardened/selinux/systemd"
-status   = "stable"
-init     = "systemd"
-multilib = true
-desktop  = "none"
-hardened = true
-selinux  = true
-llvm     = false
+id        = "default/linux/amd64/23.0/hardened/selinux/systemd"
+status    = "stable"
+init      = "systemd"
+multilib  = true
+desktop   = "none"
+hardened  = true
+selinux   = true
+toolchain = "gcc"
+libc      = "glibc"
 
 [[preset]]
-id       = "default/linux/amd64/23.0/llvm"
-status   = "exp"
-init     = "openrc"
-multilib = true
-desktop  = "none"
-hardened = false
-selinux  = false
-llvm     = true
+id        = "default/linux/amd64/23.0/llvm"
+status    = "exp"
+init      = "openrc"
+multilib  = true
+desktop   = "none"
+hardened  = false
+selinux   = false
+toolchain = "llvm"
+libc      = "glibc"
 
 [[preset]]
-id       = "default/linux/amd64/23.0/llvm/systemd"
-status   = "exp"
-init     = "systemd"
-multilib = true
-desktop  = "none"
-hardened = false
-selinux  = false
-llvm     = true
+id        = "default/linux/amd64/23.0/llvm/systemd"
+status    = "exp"
+init      = "systemd"
+multilib  = true
+desktop   = "none"
+hardened  = false
+selinux   = false
+toolchain = "llvm"
+libc      = "glibc"
+
+[[preset]]
+id        = "default/linux/amd64/23.0/musl"
+status    = "dev"
+init      = "openrc"
+multilib  = false
+desktop   = "none"
+hardened  = false
+selinux   = false
+toolchain = "gcc"
+libc      = "musl"
+
+[[preset]]
+id        = "default/linux/amd64/23.0/musl/systemd"
+status    = "dev"
+init      = "systemd"
+multilib  = false
+desktop   = "none"
+hardened  = false
+selinux   = false
+toolchain = "gcc"
+libc      = "musl"
+
+[[preset]]
+id        = "default/linux/amd64/23.0/musl/llvm"
+status    = "exp"
+init      = "openrc"
+multilib  = false
+desktop   = "none"
+hardened  = false
+selinux   = false
+toolchain = "llvm"
+libc      = "musl"
+
+[[preset]]
+id        = "default/linux/amd64/23.0/musl/llvm/systemd"
+status    = "exp"
+init      = "systemd"
+multilib  = false
+desktop   = "none"
+hardened  = false
+selinux   = false
+toolchain = "llvm"
+libc      = "musl"
+
+[[preset]]
+id        = "default/linux/amd64/23.0/musl/hardened"
+status    = "exp"
+init      = "openrc"
+multilib  = false
+desktop   = "none"
+hardened  = true
+selinux   = false
+toolchain = "gcc"
+libc      = "musl"
+
+[[preset]]
+id        = "default/linux/amd64/23.0/musl/hardened/systemd"
+status    = "exp"
+init      = "systemd"
+multilib  = false
+desktop   = "none"
+hardened  = true
+selinux   = false
+toolchain = "gcc"
+libc      = "musl"
+
+[[preset]]
+id        = "default/linux/amd64/23.0/musl/hardened/selinux"
+status    = "exp"
+init      = "openrc"
+multilib  = false
+desktop   = "none"
+hardened  = true
+selinux   = true
+toolchain = "gcc"
+libc      = "musl"
 
 # --- flavors: what the machine is for. At most one. -------------------------
 # Declared in this order on purpose: check-profile-matrix.sh builds the
@@ -303,6 +422,9 @@ base        = { multilib = [true], desktop = ["generic", "plasma", "gnome"] }
 id          = "features/hardware/nvidia"
 type        = "hardware"
 description = "NVIDIA proprietary driver (current branch, Turing and newer)"
+# ::gentoo profiles/features/musl/package.mask masks x11-drivers/nvidia-drivers:
+# "nvidia-drivers only works against glibc."
+base        = { libc = ["glibc"] }
 conflicts   = ["features/hardware/nvidia-legacy", "targets/container"]
 has_files   = true
 services    = [{ openrc = "nvidia-persistenced", systemd = "nvidia-persistenced.service" }]
@@ -311,6 +433,9 @@ services    = [{ openrc = "nvidia-persistenced", systemd = "nvidia-persistenced.
 id          = "features/hardware/nvidia-legacy"
 type        = "hardware"
 description = "NVIDIA proprietary driver held on the 580.x branch (Pascal)"
+# ::gentoo profiles/features/musl/package.mask masks x11-drivers/nvidia-drivers:
+# "nvidia-drivers only works against glibc."
+base        = { libc = ["glibc"] }
 conflicts   = ["features/hardware/nvidia", "targets/container"]
 has_files   = true
 services    = [{ openrc = "nvidia-persistenced", systemd = "nvidia-persistenced.service" }]

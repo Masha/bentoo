@@ -1,8 +1,9 @@
 # Each profile below is the ::gentoo profile of the same path plus
 # features/branding, which turns the system into bentoo (os-release, logo).
-# Only amd64 23.0 with merged /usr and glibc: split-usr is being phased out of
-# ::gentoo, and prefix, x32 and musl sit outside the platform baseline
-# (CLAUDE.md). The status column copies the ::gentoo one.
+# Only amd64 23.0 with merged /usr, on glibc or musl. Left out on purpose:
+# split-usr, which ::gentoo is phasing out; prefix, which is not a system
+# profile; and x32, an ABI outside the amd64 x86-64-v3 platform baseline.
+# The status column copies the ::gentoo one.
 #
 # Select with:  eselect profile set bentoo:default/linux/amd64/23.0/<variant>
 amd64	default/linux/amd64/23.0	stable
@@ -25,3 +26,10 @@ amd64	default/linux/amd64/23.0/hardened/selinux	stable
 amd64	default/linux/amd64/23.0/hardened/selinux/systemd	stable
 amd64	default/linux/amd64/23.0/llvm	exp
 amd64	default/linux/amd64/23.0/llvm/systemd	exp
+amd64	default/linux/amd64/23.0/musl	dev
+amd64	default/linux/amd64/23.0/musl/systemd	dev
+amd64	default/linux/amd64/23.0/musl/llvm	exp
+amd64	default/linux/amd64/23.0/musl/llvm/systemd	exp
+amd64	default/linux/amd64/23.0/musl/hardened	exp
+amd64	default/linux/amd64/23.0/musl/hardened/systemd	exp
+amd64	default/linux/amd64/23.0/musl/hardened/selinux	exp

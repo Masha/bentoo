@@ -1,8 +1,8 @@
 #!/usr/bin/env bats
 # bats file_tags=integration
 #
-# Integration -- Task 3.2: the 20 presets still load the same profile stack.
-# Requirement: R1.3.
+# Integration -- Task 3.2: the presets still load the same profile stack.
+# Requirement: R1.3. Story 002 grew the list from 20 to 27 presets (R2.1).
 #
 # "Before this story" a preset was selected by pointing make.profile at the
 # preset directory (eselect). "After", the sibling tool writes a make.profile
@@ -11,7 +11,9 @@
 #   baseline : make.profile -> <BASELINE_REF tree>/profiles/<preset>
 #   composed : make.profile/parent = `--compose <preset>`, bentoo = TREE
 # BASELINE_REF (default: master) is extracted with `git archive` -- read-only
-# for the repository.
+# for the repository. A preset the baseline does not have yet (the seven musl
+# presets, until story 002 lands on master) has no "before" to compare: it is
+# still composed, and its stack is pinned by integration/musl-presets.bats.
 
 load lib
 
@@ -31,7 +33,7 @@ norm_stack() { # CROOT BENTOO-LOCATION
   done
 }
 
-@test "R1.3 each of the 20 presets composed with no layer loads the stack it loaded before" {
+@test "R1.3 each of the 27 presets composed with no layer loads the stack it loaded before" {
   local ref=${BASELINE_REF:-master}
   git -C "$TREE" rev-parse --verify -q "$ref^{commit}" >/dev/null ||
     skip "baseline ref $ref not found in $TREE"
@@ -39,19 +41,21 @@ norm_stack() { # CROOT BENTOO-LOCATION
   mkdir -p "$base"
   git -C "$TREE" archive "$ref" profiles metadata/layout.conf | tar -C "$base" -xf -
 
-  local presets n=0 failed=0 p cr0 cr1 want got
+  local presets n=0 compared=0 failed=0 p cr0 cr1 want got
   presets=$(awk '$1 == "amd64" { print $2 }' "$TREE/profiles/profiles.desc")
   for p in $presets; do
     n=$((n + 1))
+    run --separate-stderr "$SCRIPT" --compose "$p"
+    status_is 0
+    output_is "bentoo:$p"
+    [ -d "$base/profiles/$p" ] || continue # newer than the baseline
+
+    compared=$((compared + 1))
     cr0=$BATS_TEST_TMPDIR/base-$n
     cr1=$BATS_TEST_TMPDIR/comp-$n
     mk_croot "$cr0" "$base"
     rmdir "$cr0/etc/portage/make.profile"
     ln -s "$base/profiles/$p" "$cr0/etc/portage/make.profile"
-
-    run --separate-stderr "$SCRIPT" --compose "$p"
-    status_is 0
-    output_is "bentoo:$p"
     mk_croot "$cr1" "$TREE"
     printf '%s\n' "$output" >"$cr1/etc/portage/make.profile/parent"
 
@@ -62,6 +66,8 @@ norm_stack() { # CROOT BENTOO-LOCATION
       printf '%s: stack differs\n--- before ---\n%s\n--- composed ---\n%s\n' "$p" "$want" "$got" >&2
     fi
   done
-  [ "$n" -eq 20 ]
+  [ "$n" -eq 27 ]
+  # the 20 glibc presets predate story 002, so every baseline has them
+  [ "$compared" -ge 20 ]
   [ "$failed" -eq 0 ]
 }
