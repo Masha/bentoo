@@ -144,7 +144,7 @@ load lib/fixture
 
 @test "R4.4 hostile: desc lines written differently still match (comments, blanks, spaces, other arches)" {
   fx_standard
-  # Rewrite profiles.desc with the same three amd64 presets, one of them
+  # Rewrite profiles.desc with the same four amd64 presets, one of them
   # space-separated instead of tab-separated, plus lines the rule must ignore.
   {
     printf '# Select with: eselect profile set bentoo:<id>\n\n'
@@ -153,6 +153,7 @@ load lib/fixture
     printf 'x86\tdefault/linux/x86/23.0\tstable\n'
     printf '\n# trailing comment\n'
     printf 'amd64\t%s\tstable\n' "$P_KDE"
+    printf 'amd64\t%s\tstable\n' "$P_TINYCL"
   } >"$DESC"
   run "$SCRIPT" --static
   status_is 0

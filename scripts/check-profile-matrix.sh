@@ -331,6 +331,8 @@ import tomllib
 from pathlib import Path
 
 CATALOG = "profiles/catalog.toml"
+# The conformance vectors (design.md C3): read by --static, never by --compose.
+VECTORS = "profiles/catalog-vectors.toml"
 
 # Exit statuses (see catalog_py in the shell above): 0 clean, GAP a gap,
 # NOTHING nothing compared. GAP is 3 because the interpreter exits 1 by
@@ -340,31 +342,35 @@ NOTHING = 2
 GAP = 3
 
 
-def load_catalog(tree, stream=None):
-    """Return the parsed catalog, or exit: NOTHING when absent, GAP when
-    invalid. A gap is printed on `stream` (stdout by default)."""
+def load_catalog(tree, stream=None, rel=CATALOG, optional=False):
+    """Return the parsed TOML file `rel` (the catalog by default), or exit:
+    NOTHING when absent, GAP when invalid. A gap is printed on `stream`
+    (stdout by default). With `optional`, an absent file returns None and the
+    caller decides what its absence means."""
     stream = stream or sys.stdout
-    path = tree / CATALOG
+    path = tree / rel
     try:
         raw = path.read_bytes()
     except FileNotFoundError:
+        if optional:
+            return None
         # Nothing can be compared: a message that leads to exit 2 goes to stderr.
-        print(f"catalog: missing: {CATALOG}", file=sys.stderr)
+        print(f"catalog: missing: {rel}", file=sys.stderr)
         sys.exit(NOTHING)
     try:
         return tomllib.loads(raw.decode("utf-8"))
     except UnicodeDecodeError as err:
-        print(f"catalog: encoding: {CATALOG}: not UTF-8 ({err.reason})", file=stream)
+        print(f"catalog: encoding: {rel}: not UTF-8 ({err.reason})", file=stream)
         sys.exit(GAP)
     except tomllib.TOMLDecodeError as err:
         # str(err) carries "(at line N, column M)" on every Python >= 3.11;
         # the .lineno/.msg attributes only exist from 3.14 on.
-        print(f"catalog: toml: {CATALOG}: {err}", file=stream)
+        print(f"catalog: toml: {rel}: {err}", file=stream)
         sys.exit(GAP)
     except RecursionError:
-        # tomllib recurses per nesting level: a catalog nested thousands deep
-        # is a broken catalog, not a crash of this script.
-        print(f"catalog: toml: {CATALOG}: nested too deeply to parse", file=stream)
+        # tomllib recurses per nesting level: a file nested thousands deep
+        # is a broken file, not a crash of this script.
+        print(f"catalog: toml: {rel}: nested too deeply to parse", file=stream)
         sys.exit(GAP)
 
 
@@ -472,6 +478,12 @@ def parent_lines(path):
     return lines
 
 
+def failure_line(rule, subject, detail=""):
+    """One --static failure: `catalog: <rule>: <subject>[: <detail>]`."""
+    line = f"catalog: {rule}: {one_line(subject)}"
+    return f"{line}: {one_line(detail)}" if detail else line
+
+
 class CatalogCheck:
     """Every --static catalog rule. Each failure is one line
     `catalog: <rule>: <subject>[: <detail>]`, collected, never raised: the run
@@ -489,16 +501,17 @@ class CatalogCheck:
         self.ids = []  # (kind, id) of every entry whose id is valid
         self.layer_dirs = []  # every layer directory found on disk
         self.walked_symlinks = set()  # symlinks the layer walk already reported
+        self.judged = False  # True once the schema matched and the rules ran
 
     def fail(self, rule, subject, detail=""):
-        line = f"catalog: {rule}: {one_line(subject)}"
-        self.failures.append(f"{line}: {one_line(detail)}" if detail else line)
+        self.failures.append(failure_line(rule, subject, detail))
 
     def run(self):
         if not self.top_level():
             # A catalog of another schema is not judged by this one's rules:
             # its schema gap is the only line it gets.
             return self.failures
+        self.judged = True
         self.attributes()
         self.type_table()
         for subject, entry in self.presets:
@@ -1030,8 +1043,254 @@ CatalogCheck.fragments = _fragments
 CatalogCheck.fragment = _fragment
 
 
+# --- the conformance vectors (design.md C3) ---------------------------------------
+
+# The rules compose() names in a rejection: `compose: <rule>: ...`. A vector's
+# `rules` and the vectors' `rules_without_instance` speak the same names.
+COMPOSE_RULES = ("unknown-preset", "unknown-layer", "exclusive", "conflict", "requires", "base")
+VECTORS_TOP_KEYS = ("schema", "rules_without_instance", "vector")
+VECTOR_REQUIRED = ("name", "preset", "layers", "expect")
+# `parent` belongs to an accepted selection, `rules` to a rejected one.
+VECTOR_BY_EXPECT = {"valid": "parent", "invalid": "rules"}
+VECTOR_KEYS = VECTOR_REQUIRED + tuple(VECTOR_BY_EXPECT.values())
+# Every value of these attributes must be reached by some VALID vector.
+COVERED_ATTRIBUTES = ("libc", "toolchain")
+
+
+def is_str_array(value):
+    return is_array(value) and all(is_str(v) for v in value)
+
+
+class VectorCheck:
+    """Every --static rule of the vectors file, on a catalog CatalogCheck has
+    already judged: vector-schema, vector-key, vector-id, vector-coverage.
+    Failures use CatalogCheck's line format and are collected, never raised.
+    Ids are checked only in `valid` vectors: an unknown id is exactly what the
+    unknown-* vectors exercise."""
+
+    def __init__(self, check, vectors):
+        self.check = check
+        self.catalog = check.catalog
+        self.vectors = vectors  # None when the file is absent
+        self.failures = []
+        self.entries = []  # (subject, table) of every [[vector]]
+        self.preset_entries = {
+            entry["id"]: entry for _, entry in check.presets if valid_id(entry.get("id"))
+        }
+        self.layer_ids = set(check.unique_ids("layer"))
+
+    def fail(self, rule, subject, detail=""):
+        self.failures.append(failure_line(rule, subject, detail))
+
+    def run(self):
+        if not self.schema():
+            # Vectors of another schema, or none at all: that one gap only.
+            return self.failures
+        self.top_level()
+        listed = self.rules_without_instance()
+        for subject, vector in self.entries:
+            self.vector(subject, vector)
+        self.duplicate_names()
+        self.rule_coverage(listed)
+        self.value_coverage()
+        return self.failures
+
+    # --- the file: schema and top level (vector-schema, vector-key) -----------
+
+    def schema(self):
+        want = self.catalog["schema"]
+        if self.vectors is None:
+            self.fail("vector-schema", VECTORS, "missing: --static needs the conformance vectors")
+            return False
+        if "schema" not in self.vectors:
+            self.fail("vector-schema", VECTORS, f"schema is missing, expected schema = {show(want)} (the catalog's)")
+            return False
+        if not same(self.vectors["schema"], want):
+            self.fail(
+                "vector-schema", VECTORS,
+                f"schema = {show(self.vectors['schema'])}, expected schema = {show(want)} (the catalog's)",
+            )
+            return False
+        return True
+
+    def top_level(self):
+        for key in self.vectors:
+            if key not in VECTORS_TOP_KEYS:
+                self.fail("vector-key", "top level", f"unknown key {key}")
+        value = self.vectors.get("vector", [])
+        if not is_array(value) or not all(is_table(v) for v in value):
+            self.fail("vector-key", "top level", "vector must be an array of tables ([[vector]])")
+            return
+        for n, vector in enumerate(value, 1):
+            name = vector.get("name")
+            subject = name if is_str(name) and name else f"[[vector]] #{n}"
+            self.entries.append((subject, vector))
+
+    def rules_without_instance(self):
+        value = self.vectors.get("rules_without_instance", [])
+        if not is_str_array(value):
+            self.fail("vector-key", "top level", "rules_without_instance must be an array of rule names")
+            return set()
+        for rule in value:
+            if rule not in COMPOSE_RULES:
+                self.fail(
+                    "vector-key", "rules_without_instance",
+                    f"{rule} is not one of {show(list(COMPOSE_RULES))}",
+                )
+        return set(value)
+
+    # --- one vector (vector-key, vector-id) -----------------------------------
+
+    def vector(self, subject, vector):
+        for key in vector:
+            if key not in VECTOR_KEYS:
+                self.fail("vector-key", subject, f"unknown key {key}")
+        for key in VECTOR_REQUIRED:
+            if key not in vector:
+                self.fail("vector-key", subject, f"lacks {key}")
+        if "name" in vector and not (is_str(vector["name"]) and vector["name"]):
+            self.fail("vector-key", subject, f"name must be a non-empty string, got {show(vector['name'])}")
+        if "preset" in vector and not is_str(vector["preset"]):
+            self.fail("vector-key", subject, f"preset must be a string, got {show(vector['preset'])}")
+        if "layers" in vector and not is_str_array(vector["layers"]):
+            self.fail("vector-key", subject, f"layers must be an array of layer ids, got {show(vector['layers'])}")
+        expect = vector.get("expect")
+        if "expect" in vector and not any(same(expect, e) for e in VECTOR_BY_EXPECT):
+            self.fail(
+                "vector-key", subject,
+                f"expect = {show(expect)}, expected one of {show(list(VECTOR_BY_EXPECT))}",
+            )
+        if "parent" in vector and not is_str_array(vector["parent"]):
+            self.fail("vector-key", subject, f"parent must be an array of parent lines, got {show(vector['parent'])}")
+        if "rules" in vector:
+            self.rules_key(subject, vector["rules"])
+        if is_str(expect) and expect in VECTOR_BY_EXPECT:
+            self.keys_of_expect(subject, vector, expect)
+            if expect == "valid":
+                self.ids_resolve(subject, vector)
+
+    def rules_key(self, subject, rules):
+        if not is_str_array(rules) or not rules:
+            self.fail("vector-key", subject, f"rules must be a non-empty array of rule names, got {show(rules)}")
+            return
+        for rule in rules:
+            if rule not in COMPOSE_RULES:
+                self.fail("vector-key", subject, f"rules lists {show(rule)}, not one of {show(list(COMPOSE_RULES))}")
+
+    def keys_of_expect(self, subject, vector, expect):
+        """`parent` exactly when expect = "valid", `rules` exactly when
+        expect = "invalid"."""
+        for kind, key in VECTOR_BY_EXPECT.items():
+            if kind == expect and key not in vector:
+                self.fail("vector-key", subject, f'lacks {key}, required when expect = "{kind}"')
+            elif kind != expect and key in vector:
+                self.fail("vector-key", subject, f'{key} is only allowed when expect = "{kind}"')
+
+    def ids_resolve(self, subject, vector):
+        preset = vector.get("preset")
+        if is_str(preset) and preset not in self.preset_entries:
+            self.fail("vector-id", subject, f"preset {preset} is not a [[preset]] in the catalog")
+        layers = vector.get("layers")
+        if is_str_array(layers):
+            for ident in dict.fromkeys(layers):
+                if ident not in self.layer_ids:
+                    self.fail("vector-id", subject, f"layer {ident} is not a [[layer]] in the catalog")
+
+    def duplicate_names(self):
+        seen = set()
+        reported = set()
+        for _, vector in self.entries:
+            name = vector.get("name")
+            if not (is_str(name) and name):
+                continue
+            if name in seen and name not in reported:
+                self.fail("vector-id", name, "name used by more than one vector")
+                reported.add(name)
+            seen.add(name)
+
+    # --- coverage (vector-coverage) -----------------------------------------
+
+    def with_expect(self, expect):
+        return [v for _, v in self.entries if same(v.get("expect"), expect)]
+
+    def rule_coverage(self, listed):
+        """Every rule is expected by some invalid vector (a vector naming two
+        rules covers both) or listed in rules_without_instance; a listed rule
+        must have no instance in the catalog, so the list cannot outlive its
+        reason."""
+        covered = set()
+        for vector in self.with_expect("invalid"):
+            rules = vector.get("rules")
+            if is_str_array(rules):
+                covered.update(rules)
+        for rule in COMPOSE_RULES:
+            if rule in listed:
+                instance = self.instance(rule)
+                if instance:
+                    self.fail(
+                        "vector-coverage", rule,
+                        f"listed in rules_without_instance, but the catalog has an instance: {instance}",
+                    )
+            elif rule not in covered:
+                self.fail(
+                    "vector-coverage", rule,
+                    "no invalid vector expects it and rules_without_instance does not list it",
+                )
+
+    def instance(self, rule):
+        """Where the catalog can break `rule`, or None when it cannot."""
+        if rule in ("unknown-preset", "unknown-layer"):
+            return "any id outside the catalog breaks it"
+        if rule == "exclusive":
+            types = self.catalog.get("types")
+            types = types if is_table(types) else {}
+            for name, spec in types.items():
+                if not (is_table(spec) and spec.get("exclusive") is True):
+                    continue
+                members = [e for _, e in self.check.layers if same(e.get("type"), name)]
+                if len(members) > 1:
+                    return f"types.{name} is exclusive and holds {len(members)} layers"
+            return None
+        # conflict, requires, base: a layer declaring a non-empty one.
+        key = {"conflict": "conflicts", "requires": "requires", "base": "base"}[rule]
+        for subject, entry in self.check.layers:
+            value = entry.get(key)
+            if (is_array(value) or is_table(value)) and value:
+                return f"{subject} declares {key}"
+        return None
+
+    def value_coverage(self):
+        """Every [attributes] value of COVERED_ATTRIBUTES is the value of the
+        preset of some valid vector whose preset is in the catalog."""
+        presets = [
+            self.preset_entries[v["preset"]]
+            for v in self.with_expect("valid")
+            if is_str(v.get("preset")) and v["preset"] in self.preset_entries
+        ]
+        for attr in COVERED_ATTRIBUTES:
+            # A malformed [attributes] array is already a catalog gap.
+            for value in self.check.allowed.get(attr, []):
+                if not any(attr in p and same(p[attr], value) for p in presets):
+                    self.fail(
+                        "vector-coverage", f"{attr} = {show(value)}",
+                        "no valid vector uses a preset with this value",
+                    )
+
+
 def static(tree):
-    failures = CatalogCheck(tree, load_catalog(tree)).run()
+    check = CatalogCheck(tree, load_catalog(tree))
+    failures = check.run()
+    if check.judged:
+        # A vectors file that cannot be parsed is not a vectors gap: nothing
+        # about it can be compared, so it is exit 2, on stderr.
+        try:
+            vectors = load_catalog(tree, stream=sys.stderr, rel=VECTORS, optional=True)
+        except SystemExit as stop:
+            if stop.code == GAP:
+                print(f"static: {VECTORS} cannot be read; nothing compared", file=sys.stderr)
+                return NOTHING
+            raise
+        failures += VectorCheck(check, vectors).run()
     for line in failures:
         print(line)
     return GAP if failures else CLEAN
@@ -1250,8 +1509,8 @@ def compose_lines(tree, preset_id, selection):
     return status, buf.getvalue().splitlines()
 
 
-# The rules compose() names in a rejection: `compose: <rule>: ...`.
-COMPOSE_RULES = ("unknown-preset", "unknown-layer", "exclusive", "conflict", "requires", "base")
+# COMPOSE_RULES (the rule names of a rejection) is defined with the vectors
+# checks above, which need the same six names.
 RULE_LINE = re.compile(r"compose: ([a-z-]+): ")
 # TEST-ONLY seam (R6.7). judge() and compose() live in this one program and
 # agree by construction, so a --compose that disagrees with the catalog data

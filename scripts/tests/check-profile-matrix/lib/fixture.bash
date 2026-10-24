@@ -20,9 +20,13 @@ SCRIPT=${CHECK_PROFILE_MATRIX:-$BATS_TEST_DIRNAME/../../check-profile-matrix.sh}
 # Fixture preset ids deliberately contain no attribute or type name (desktop,
 # multilib, init, flavor, ...): an assertion that the output "names the
 # attribute" must not be satisfied by an id that merely contains the word.
-P_PLAIN=default/linux/amd64/23.0        # openrc, multilib,       desktop none
-P_PURE=default/linux/amd64/23.0/pure64  # openrc, multilib false, desktop none
-P_KDE=default/linux/amd64/23.0/kde/sd   # systemd, multilib,      desktop plasma
+# P_TINYCL is the one musl + llvm preset: without it no valid conformance
+# vector could reach those two values, and --static would fail every fx_base
+# tree (fx_vectors).
+P_PLAIN=default/linux/amd64/23.0             # openrc, multilib,       desktop none
+P_PURE=default/linux/amd64/23.0/pure64       # openrc, multilib false, desktop none
+P_KDE=default/linux/amd64/23.0/kde/sd        # systemd, multilib,      desktop plasma
+P_TINYCL=default/linux/amd64/23.0/tiny/clang # openrc, multilib false, desktop none, llvm, musl
 
 # fx_init -- empty overlay skeleton: layout.conf, repo_name, eapi, the
 # features/branding directory (exists in the real tree, is NOT a layer), an
@@ -41,6 +45,7 @@ fx_init() {
   printf '*x11-themes/bentoo-logos\n' >"$FX/profiles/features/branding/packages"
   : >"$CAT"
   : >"$DESC"
+  VEC=$FX/profiles/catalog-vectors.toml
   export BENTOO_TREE=$FX
 }
 
@@ -129,13 +134,37 @@ fx_frag() {
   chmod "${3:-0644}" "$f"
 }
 
-# fx_base -- skeleton + header + the three fixture presets, no layer.
+# fx_vectors -- a conformance-vectors file (design.md C3) that meets every
+# --static coverage rule over any fx_base catalog, whatever layers a test adds:
+# one invalid vector per --compose rule (their ids are never checked by
+# --static, so no rule needs a rules_without_instance listing), and two valid
+# vectors with no layer over P_PLAIN (glibc, gcc) and P_TINYCL (musl, llvm).
+# vectors.bats and its siblings build their own through lib/vectors-fixture.
+fx_vectors() {
+  local rule
+  {
+    printf 'schema = 2\nrules_without_instance = []\n'
+    for rule in unknown-preset unknown-layer exclusive conflict requires base; do
+      printf '\n[[vector]]\nname   = "fx-%s"\npreset = "%s"\nlayers = []\nexpect = "invalid"\nrules  = ["%s"]\n' \
+        "$rule" "$P_PLAIN" "$rule"
+    done
+    for rule in "$P_PLAIN" "$P_TINYCL"; do
+      printf '\n[[vector]]\nname   = "fx-valid-%s"\npreset = "%s"\nlayers = []\nexpect = "valid"\nparent = ["bentoo:%s"]\n' \
+        "${rule//\//-}" "$rule" "$rule"
+    done
+  } >"$VEC"
+}
+
+# fx_base -- skeleton + header + the four fixture presets + fx_vectors, no
+# layer.
 fx_base() {
   fx_init
   fx_header
   fx_preset "$P_PLAIN" openrc true none
   fx_preset "$P_PURE" openrc false none
   fx_preset "$P_KDE" systemd true plasma
+  fx_preset "$P_TINYCL" openrc false none false false llvm musl
+  fx_vectors
 }
 
 # fx_standard -- a complete VALID fixture mirroring the v1 layer set:
