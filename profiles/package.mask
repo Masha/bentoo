@@ -49,21 +49,6 @@ media-libs/libjxl-compat
 =dev-qt/qtdeclarative-6.12.0*
 =dev-qt/qtwebengine-6.140.0*
 
-# Lucas C.S. <lucascs@protonmail.com> (2026-09-29)
-# simdjson 5.0.1, a major release published 2026-09-28. Masked for two reasons:
-# it is younger than the 7-day floor for new dependency versions, and
-# net-libs/nodejs (24 and 26) depends on >=dev-libs/simdjson-4.6.1:= with no
-# upper bound, so unmasking it rebuilds every nodejs install against a new ABI
-# (subslot 0/33 -> 0/34) that no nodejs build has been tested against yet.
-#
-# The atom is deliberately unqualified: Portage stamps it "::bentoo", so only
-# this copy is masked and nodejs keeps resolving to ::gentoo's 4.6.x.
-#
-# Lift it once both hold: the date is past 2026-10-05, and net-libs/nodejs
-# (every slot in the tree, --shared-simdjson) builds and passes its tests
-# against 5.x.
-=dev-libs/simdjson-5.0.1
-
 # Lucas C.S. <lucascs@protonmail.com> (2026-09-04)
 # The GStreamer 1.29 development line is missing 29 security advisories and
 # there is no release to move to. 1.29.2 was tagged 2026-06-29; the fixes for
@@ -320,38 +305,3 @@ media-libs/libjxl-compat
 # ship has no source here -- notably Node 22, in Maintenance until
 # 2027-04-30. See the nodejs-slotted news item.
 net-libs/nodejs:0::gentoo
-
-# Lucas C.S. <lucascs@protonmail.com> (2026-09-16)
-# dev-python/tree-sitter-0.26.0 is the release that regressed Point: its
-# Point.row and Point.column getters hand out PyTuple_GetItem(self, n)
-# directly, a borrowed reference where PyGetSetDef requires a strong one, so
-# destroying a temporary Point frees an integer its caller still holds. The
-# visible victim is dev-util/pkgcheck, which sorts nodes by
-# attrgetter("start_point.row", "start_point.column"): measured here, 3/6, 2/6,
-# 3/6 and 4/8 scans died with SIGSEGV. The crash lands in a multiprocessing
-# worker, so pkgcheck still exits 0 -- a scan can drop whole checks and still
-# look green. QA that lies is worse than QA that fails.
-#
-# This entry REPLACES the ">0.26.0-r1::gentoo" one removed the same day. That
-# one existed to protect this overlay's own patched ebuild from being outranked
-# by a ::gentoo bump. Upstream has since fixed it (PR #466) and ::gentoo now
-# packages a snapshot downstream of the merge, so our ebuild and our patch are
-# gone and the old mask went with them -- left in place it would have barred
-# the very snapshot that carries the fix.
-#
-# What survives is narrower and points at one version. The fix reached
-# ::gentoo only as 0.26.0_p20260816, which is ~arch on every arch, while broken
-# 0.26.0 is STABLE on amd64, arm, arm64, ppc, ppc64 and x86. Without this mask
-# a stable system resolves to the broken one -- the snapshot is newer but
-# unkeyworded for it. Masking 0.26.0 alone leaves both usable answers: the
-# snapshot for ~arch, and 0.25.2-r1 for stable, which predates the regression
-# entirely (it built Point with PyStructSequence, whose accessors CPython
-# generates with correct refcounting).
-#
-# Lift this when ::gentoo stabilises a version carrying the fix, and ask the
-# source rather than the version number:
-#
-#   grep -c Py_NewRef tree_sitter/binding/point.c
-#
-# Two hits in the getters mean that version is safe.
-=dev-python/tree-sitter-0.26.0::gentoo
