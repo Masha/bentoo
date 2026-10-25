@@ -16,45 +16,6 @@ www-client/orion-bin
 dev-libs/icu-compat
 media-libs/libjxl-compat
 
-# Lucas C.S. <lucascs@protonmail.com> (2026-10-19)
-# Linux 7.3.0 as a dist-kernel, ahead of ::gentoo, opt-in only. It replaces
-# the 7.3_rc series that sat under this same mask.
-#
-# The kernel itself is final. What keeps it masked is gentoo-kernel-bin:
-# ::gentoo has no 7.3 binpkgs yet, and its -bin ebuild PDEPENDs on
-# >=virtual/dist-kernel-${PV} with no upper bound. Unmasked, a -bin user's
-# `emerge -uDN @world` upgrades the virtual to 7.3.0, whose only satisfiable
-# alternative is ~sys-kernel/gentoo-kernel-7.3.0 - a full kernel compile
-# pulled onto a machine that chose -bin to avoid one. Measured 2026-10-19 in
-# an isolated root holding gentoo-kernel-bin-7.2.11 + nvidia-drivers:
-# "[ebuild U] virtual/dist-kernel-7.3.0 [7.2.11]" and
-# "[ebuild N] sys-kernel/gentoo-kernel-7.3.0". bentoo-kernel users are safe
-# either way: their kernel pins the virtual to its own PV.
-#
-# The virtual is masked with the kernel, for that reason.
-#
-# (2026-10-21) bentoo-kernel{,-bin}-7.3.0 join the mask: both require
-# ~virtual/dist-kernel-7.3.0, so with the virtual masked they cannot be
-# installed anyway, and masking them keeps a bentoo-kernel host's
-# `emerge -uDN @world` quietly on 7.2.11 instead of failing on a masked
-# dependency.
-#
-# The atoms are deliberately unqualified: Portage stamps them "::bentoo",
-# which is where these ebuilds live. To opt in, unmask the kernel you use
-# together with the virtual, e.g.:
-#
-#   ~sys-kernel/bentoo-kernel-7.3.0
-#   =virtual/dist-kernel-7.3.0
-#
-# Lift this entry once a gentoo-kernel-bin-7.3.x exists (in ::gentoo, or
-# mirrored here). Once ::gentoo ships its first 7.3 dist-kernel, remove the
-# gentoo-kernel mirror with it; bentoo-kernel{,-bin} and the matching
-# virtual/dist-kernel copy stay.
-=sys-kernel/gentoo-kernel-7.3.0
-=virtual/dist-kernel-7.3.0
-~sys-kernel/bentoo-kernel-7.3.0
-~sys-kernel/bentoo-kernel-bin-7.3.0
-
 # Lucas C.S. <lucascs@protonmail.com> (2026-10-02)
 # The Qt 6.12 family, opt-in only: this overlay's two survivors of the 6.12
 # mirror (fb3c2d3c7, trimmed in 7d5bb0165). qtdeclarative-6.12.0 is a .0
