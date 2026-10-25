@@ -160,10 +160,10 @@ index 9c765b2..7619988 100644
    {
      "context": "SettingsWindow > NavigationMenu && !search",
 diff --git a/crates/agent_ui/src/agent_ui.rs b/crates/agent_ui/src/agent_ui.rs
-index 73b416b..dbcee67 100644
+index be8d9d5..2b9616c 100644
 --- a/crates/agent_ui/src/agent_ui.rs
 +++ b/crates/agent_ui/src/agent_ui.rs
-@@ -337,6 +337,11 @@ actions!(
+@@ -339,6 +339,11 @@ actions!(
          RenameSelectedThread,
          /// Starts a chat conversation with follow-up enabled.
          ChatWithFollow,
@@ -175,7 +175,7 @@ index 73b416b..dbcee67 100644
          /// Cycles to the next inline assist suggestion.
          CycleNextInlineAssist,
          /// Cycles to the previous inline assist suggestion.
-@@ -991,6 +996,8 @@ fn update_command_palette_filter(cx: &mut App) {
+@@ -993,6 +998,8 @@ fn update_command_palette_filter(cx: &mut App) {
          // Skills are surfaced through the settings UI now, so this command
          // should never appear in the palette.
          filter.hide_action_types(&manage_skills_action);

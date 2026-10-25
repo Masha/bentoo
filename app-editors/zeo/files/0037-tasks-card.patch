@@ -839,7 +839,7 @@ index 7cf3a32..749e614 100644
          cx.run_until_parked();
  
 diff --git a/crates/agent_ui/src/agent_ui.rs b/crates/agent_ui/src/agent_ui.rs
-index 8c8780a..69d96ed 100644
+index f072899..b90a0d8 100644
 --- a/crates/agent_ui/src/agent_ui.rs
 +++ b/crates/agent_ui/src/agent_ui.rs
 @@ -26,6 +26,7 @@ mod model_selector;
@@ -850,7 +850,7 @@ index 8c8780a..69d96ed 100644
  mod terminal_codegen;
  mod terminal_inline_assistant;
  pub mod terminal_thread_metadata_store;
-@@ -1109,6 +1110,10 @@ mod tests {
+@@ -1111,6 +1112,10 @@ mod tests {
              sandbox_permissions: Default::default(),
              show_turn_stats: false,
              elicitation_placement: settings::ElicitationPlacement::default(),

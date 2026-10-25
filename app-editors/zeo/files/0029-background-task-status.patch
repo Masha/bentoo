@@ -335,10 +335,10 @@ index e3a6bf6..9ca4b3f 100644
                  // A redraw is all this needs: the account section is built from the thread
                  // when the tooltip opens, so there is no per-turn state to recompute.
 diff --git a/crates/sidebar/src/sidebar.rs b/crates/sidebar/src/sidebar.rs
-index 4c41ca9..50e3184 100644
+index c5a986c..797d883 100644
 --- a/crates/sidebar/src/sidebar.rs
 +++ b/crates/sidebar/src/sidebar.rs
-@@ -449,7 +449,14 @@ fn apply_live_row_state(
+@@ -464,7 +464,14 @@ fn apply_live_row_state(
          && session_id
              .as_ref()
              .and_then(|sid| context.old_statuses.get(sid))
@@ -354,7 +354,7 @@ index 4c41ca9..50e3184 100644
      {
          notified_threads.insert(thread.metadata.thread_id);
      }
-@@ -2014,7 +2021,10 @@ impl Sidebar {
+@@ -2030,7 +2037,10 @@ impl Sidebar {
                          let old_status = old_statuses.get(&info.session_id).map(|(s, _)| *s);
                          new_live_statuses.insert(info.session_id.clone(), (info.status, thread_id));
                          if info.status == AgentThreadStatus::Completed
@@ -366,7 +366,7 @@ index 4c41ca9..50e3184 100644
                          {
                              notified_threads.insert(thread_id);
                          }
-@@ -6144,9 +6154,12 @@ impl Sidebar {
+@@ -6200,9 +6210,12 @@ impl Sidebar {
          match self.contents.entries.get(ix) {
              Some(ListEntry::Thread(thread)) => {
                  match thread.status {
@@ -380,7 +380,7 @@ index 4c41ca9..50e3184 100644
                          return;
                      }
                      AgentThreadStatus::Completed | AgentThreadStatus::Error => {}
-@@ -6875,6 +6888,9 @@ impl Sidebar {
+@@ -6932,6 +6945,9 @@ impl Sidebar {
                                  })
                                  .into_any_element(),
                          ),
@@ -390,7 +390,7 @@ index 4c41ca9..50e3184 100644
                          None => Some(
                              IconButton::new("archive-thread", IconName::Archive)
                                  .hover_background(button_hover_bg)
-@@ -8665,6 +8681,9 @@ fn all_thread_infos_for_workspace(
+@@ -8734,6 +8750,9 @@ fn all_thread_infos_for_workspace(
                  match thread.status() {
                      ThreadStatus::Unconfirmed => AgentThreadStatus::Unconfirmed,
                      ThreadStatus::Generating => AgentThreadStatus::Running,
@@ -742,7 +742,7 @@ index 910d5ff..2872ae9 100644
      sidebar: &Entity<Sidebar>,
      query: &str,
 diff --git a/crates/ui/src/components/ai/thread_item.rs b/crates/ui/src/components/ai/thread_item.rs
-index 3df79d9..6ddf84a 100644
+index a2020c0..bb94064 100644
 --- a/crates/ui/src/components/ai/thread_item.rs
 +++ b/crates/ui/src/components/ai/thread_item.rs
 @@ -13,6 +13,9 @@ pub enum AgentThreadStatus {
@@ -755,7 +755,7 @@ index 3df79d9..6ddf84a 100644
      WaitingForConfirmation,
      Error,
  }
-@@ -348,6 +351,17 @@ impl RenderOnce for ThreadItem {
+@@ -389,6 +392,17 @@ impl RenderOnce for ThreadItem {
                          .with_rotate_animation(2),
                  )
                  .into_any_element()
@@ -773,7 +773,7 @@ index 3df79d9..6ddf84a 100644
          } else if let Some(status_icon) = status_icon {
              icon_container().child(status_icon).into_any_element()
          } else {
-@@ -409,7 +423,9 @@ impl RenderOnce for ThreadItem {
+@@ -520,7 +534,9 @@ impl RenderOnce for ThreadItem {
  
          let show_tooltip = matches!(
              self.status,
@@ -784,7 +784,7 @@ index 3df79d9..6ddf84a 100644
          );
  
          let linked_worktrees: Vec<ThreadItemWorktreeInfo> = self
-@@ -635,6 +651,15 @@ impl RenderOnce for ThreadItem {
+@@ -749,6 +765,15 @@ impl RenderOnce for ThreadItem {
                          )
                          .child(Label::new("Waiting for Confirmation"))
                          .into_any_element(),
@@ -800,7 +800,7 @@ index 3df79d9..6ddf84a 100644
                      _ => gpui::Empty.into_any_element(),
                  }))
              })
-@@ -706,6 +731,17 @@ impl Component for ThreadItem {
+@@ -820,6 +845,17 @@ impl Component for ThreadItem {
                      )
                      .into_any_element(),
              ),

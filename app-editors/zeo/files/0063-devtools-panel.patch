@@ -116,6 +116,20 @@ the hidden ones' places. 0065's ThreadEntry test fixture gains is_devtools,
 and sidebar_organization_filter_tests.rs gains the two devtools-only drop
 tests and their helpers.
 
+Since story 037 (2026-10-20) ThreadItem's badge builder, its rendering
+and thread_item_badge_tests.rs come from 0068, which generalised them to
+several badges, and so does the pub(crate) visibility of
+thread_organization's test_helpers, capture_logs and all_lines_lowercased;
+this patch keeps only its badge(IconName::ToolWeb, "Devtools thread")
+call. sidebar_devtools_tests.rs gains a test that the devtools-only view
+and 0068's #tag filter both hold, in groups and in the Pinned section.
+
+Since story 038 (2026-10-20) 0069's Lists view builds its rows through
+0049's build_pinned_rows too, so this patch also sets is_devtools in
+that second PinnedBuildContext, in rebuild_contents' Lists hook: a
+devtools thread filed in a list carries the same globe badge as in its
+group.
+
 USE devtools-panel (default on) needs browser-extension. Applies on top of 0058
 with or without 0057; 0050/0051 apply on top of it unchanged.
 
@@ -152,10 +166,10 @@ index e9c089e..4101322 100644
    // that receives element selections from a dev-server page and hands them to
    // the agent panel. Turning it off stops listening and removes the socket.
 diff --git a/crates/agent_ui/src/agent_panel.rs b/crates/agent_ui/src/agent_panel.rs
-index 1ef6d5f..6ea3752 100644
+index 78bd403..2fe7b22 100644
 --- a/crates/agent_ui/src/agent_panel.rs
 +++ b/crates/agent_ui/src/agent_panel.rs
-@@ -3818,6 +3818,58 @@ impl AgentPanel {
+@@ -3830,6 +3830,58 @@ impl AgentPanel {
          thread_id
      }
  
@@ -214,7 +228,7 @@ index 1ef6d5f..6ea3752 100644
      pub fn activate_retained_thread(
          &mut self,
          id: ThreadId,
-@@ -4702,6 +4754,19 @@ impl AgentPanel {
+@@ -4714,6 +4766,19 @@ impl AgentPanel {
              .collect()
      }
  
@@ -234,7 +248,7 @@ index 1ef6d5f..6ea3752 100644
      pub fn active_thread_view(&self, cx: &App) -> Option<Entity<ThreadView>> {
          let server_view = self.active_conversation_view()?;
          server_view.read(cx).root_thread_view()
-@@ -5002,13 +5067,17 @@ impl AgentPanel {
+@@ -5014,13 +5079,17 @@ impl AgentPanel {
          let mut potential_removals = self
              .retained_threads
              .iter()
@@ -254,7 +268,7 @@ index 1ef6d5f..6ea3752 100644
                  };
                  let thread = thread_view.read(cx).thread.read(cx);
                  thread.connection().supports_load_session() && thread.is_idle_for_retention()
-@@ -5025,7 +5094,11 @@ impl AgentPanel {
+@@ -5037,7 +5106,11 @@ impl AgentPanel {
              .take(n)
              .collect::<Vec<_>>();
          for id in to_remove {
@@ -268,7 +282,7 @@ index 1ef6d5f..6ea3752 100644
      }
  
 diff --git a/crates/agent_ui/src/agent_ui.rs b/crates/agent_ui/src/agent_ui.rs
-index e217855..1cb5ab9 100644
+index 46dd209..0475b45 100644
 --- a/crates/agent_ui/src/agent_ui.rs
 +++ b/crates/agent_ui/src/agent_ui.rs
 @@ -15,7 +15,11 @@ mod config_options;
@@ -283,7 +297,7 @@ index e217855..1cb5ab9 100644
  mod diagnostics;
  pub mod draft_prompt_store;
  mod entry_view_state;
-@@ -304,6 +308,8 @@ pub enum AgentThreadSource {
+@@ -312,6 +316,8 @@ pub enum AgentThreadSource {
      AgentPanel,
      GitPanel,
      Sidebar,
@@ -292,7 +306,7 @@ index e217855..1cb5ab9 100644
  }
  
  impl AgentThreadSource {
-@@ -312,6 +318,7 @@ impl AgentThreadSource {
+@@ -320,6 +326,7 @@ impl AgentThreadSource {
              Self::AgentPanel => "agent_panel",
              Self::GitPanel => "git_panel",
              Self::Sidebar => "sidebar",
@@ -300,7 +314,7 @@ index e217855..1cb5ab9 100644
          }
      }
  }
-@@ -767,8 +774,13 @@ pub fn init(
+@@ -775,8 +782,13 @@ pub fn init(
      context_server_configuration::init(language_registry, fs.clone(), cx);
      thread_metadata_store::init(cx);
      thread_organization::init(cx);
@@ -10142,7 +10156,7 @@ index 0000000..2da52ba
 +    );
 +}
 diff --git a/crates/agent_ui/src/thread_organization.rs b/crates/agent_ui/src/thread_organization.rs
-index fc86555..3366294 100644
+index 85e2eca..3366294 100644
 --- a/crates/agent_ui/src/thread_organization.rs
 +++ b/crates/agent_ui/src/thread_organization.rs
 @@ -12,6 +12,7 @@
@@ -10311,14 +10325,7 @@ index fc86555..3366294 100644
              },
          );
      }
-@@ -1335,12 +1391,16 @@ fn load(db: &ThreadOrganizationDb) -> Result<Loaded> {
- 
- #[cfg(test)]
- #[path = "thread_organization/test_helpers.rs"]
--mod test_helpers;
-+pub(crate) mod test_helpers;
- 
- #[cfg(test)]
+@@ -1341,6 +1397,10 @@ pub(crate) mod test_helpers;
  #[path = "thread_organization/migration_tests.rs"]
  mod migration;
  
@@ -10559,28 +10566,6 @@ index 0000000..05d75a7
 +    });
 +    assert_eq!(pins, (true, true), "both pins survived the marks");
 +}
-diff --git a/crates/agent_ui/src/thread_organization/test_helpers.rs b/crates/agent_ui/src/thread_organization/test_helpers.rs
-index b2b7ff7..5fbcd0a 100644
---- a/crates/agent_ui/src/thread_organization/test_helpers.rs
-+++ b/crates/agent_ui/src/thread_organization/test_helpers.rs
-@@ -405,7 +405,7 @@ static INSTALL: Once = Once::new();
- 
- /// Starts capturing log lines on this thread. Panics when another logger owns the process,
- /// rather than letting a log assertion pass or fail for the wrong reason.
--pub(super) fn capture_logs() {
-+pub(crate) fn capture_logs() {
-     INSTALL.call_once(|| {
-         log::set_boxed_logger(Box::new(CaptureLogger))
-             .expect("another logger is installed; the log capture cannot run");
-@@ -434,7 +434,7 @@ pub(super) fn warn_lines() -> Vec<String> {
- }
- 
- /// Every captured line, any level, lowercased — for "this text never reaches a log".
--pub(super) fn all_lines_lowercased() -> Vec<String> {
-+pub(crate) fn all_lines_lowercased() -> Vec<String> {
-     CAPTURED.with(|captured| {
-         captured
-             .borrow()
 diff --git a/crates/devtools_bridge/src/channel.rs b/crates/devtools_bridge/src/channel.rs
 index ad274ef..205e571 100644
 --- a/crates/devtools_bridge/src/channel.rs
@@ -11612,7 +11597,7 @@ index 787849a..ae70e43 100644
  #[derive(
      Copy,
 diff --git a/crates/sidebar/src/organization.rs b/crates/sidebar/src/organization.rs
-index 55c7c53..643a3e9 100644
+index e7e0d95..b75df66 100644
 --- a/crates/sidebar/src/organization.rs
 +++ b/crates/sidebar/src/organization.rs
 @@ -335,7 +335,7 @@ impl Sidebar {
@@ -11632,12 +11617,12 @@ index 55c7c53..643a3e9 100644
 +        if ThreadOrganizationStore::try_global(cx).is_none() || self.is_filtering(cx) {
              return row;
          }
-         let Some(origin) = row_origin(&self.contents.entries, ix) else {
+         // A Lists row's `ix` indexes that view's rows, not `contents`: no group order to drag in.
 diff --git a/crates/sidebar/src/pinned_section.rs b/crates/sidebar/src/pinned_section.rs
-index eb9f1ff..c72ded3 100644
+index 1d03f24..08f1224 100644
 --- a/crates/sidebar/src/pinned_section.rs
 +++ b/crates/sidebar/src/pinned_section.rs
-@@ -40,6 +40,7 @@ pub(crate) struct PinnedBuildContext<'a> {
+@@ -41,6 +41,7 @@ pub(crate) struct PinnedBuildContext<'a> {
      pub path_detail_map: &'a HashMap<PathBuf, usize>,
      pub branch_by_path: &'a HashMap<PathBuf, SharedString>,
      pub resolve_agent_icon: &'a dyn Fn(&AgentId) -> (IconName, Option<SharedString>),
@@ -11645,7 +11630,7 @@ index eb9f1ff..c72ded3 100644
      pub new_live_statuses: &'a mut HashMap<acp::SessionId, (AgentThreadStatus, ThreadId)>,
      pub notified_threads: &'a mut HashSet<ThreadId>,
  }
-@@ -115,6 +116,7 @@ pub(crate) fn build_pinned_rows(
+@@ -116,6 +117,7 @@ pub(crate) fn build_pinned_rows(
                  worktrees,
                  diff_stats: DiffStats::default(),
                  pinned_project_label: Some(label),
@@ -11654,7 +11639,7 @@ index eb9f1ff..c72ded3 100644
              apply_live_row_state(
                  &mut row,
 diff --git a/crates/sidebar/src/sidebar.rs b/crates/sidebar/src/sidebar.rs
-index 40b8a25..1b76585 100644
+index 8adeb99..1aa0f60 100644
 --- a/crates/sidebar/src/sidebar.rs
 +++ b/crates/sidebar/src/sidebar.rs
 @@ -6,6 +6,7 @@ use action_log::DiffStats;
@@ -11665,17 +11650,17 @@ index 40b8a25..1b76585 100644
  use agent_ui::terminal_thread_metadata_store::{
      TerminalThreadMetadata, TerminalThreadMetadataStore, terminal_title_prefix,
  };
-@@ -98,6 +99,9 @@ mod sidebar_organization_filter_tests;
- #[cfg(test)]
- mod sidebar_organization_tests;
+@@ -108,6 +109,9 @@ mod sidebar_tags_notify_tests;
+ mod sidebar_tags_tests;
+ mod thread_tags;
  
 +#[cfg(test)]
 +mod sidebar_devtools_tests;
 +
- gpui::actions!(
-     agents_sidebar,
-     [
-@@ -382,6 +386,9 @@ struct ThreadEntry {
+ mod lists_view;
+ #[cfg(test)]
+ mod sidebar_lists_tests;
+@@ -400,6 +404,9 @@ struct ThreadEntry {
      /// `Some` only on a row of the Pinned section, which names the thread's project because it
      /// sits outside its project group.
      pinned_project_label: Option<SharedString>,
@@ -11685,7 +11670,7 @@ index 40b8a25..1b76585 100644
  }
  
  #[derive(Clone)]
-@@ -940,6 +947,10 @@ pub struct Sidebar {
+@@ -958,6 +965,10 @@ pub struct Sidebar {
      cross_channel_import_channels: Vec<SharedString>,
      /// Never serialized: the Pinned section's collapsed state lasts for the session.
      pinned_collapsed: bool,
@@ -11696,7 +11681,7 @@ index 40b8a25..1b76585 100644
  }
  
  impl Sidebar {
-@@ -1027,6 +1038,20 @@ impl Sidebar {
+@@ -1045,6 +1056,20 @@ impl Sidebar {
          })
          .detach();
  
@@ -11717,7 +11702,7 @@ index 40b8a25..1b76585 100644
          cx.observe(
              &TerminalThreadMetadataStore::global(cx),
              |this, _store, cx| {
-@@ -1093,6 +1118,8 @@ impl Sidebar {
+@@ -1111,6 +1136,8 @@ impl Sidebar {
              import_banners_use_verbose_labels: None,
              cross_channel_import_channels: Vec::new(),
              pinned_collapsed: false,
@@ -11726,10 +11711,10 @@ index 40b8a25..1b76585 100644
          }
      }
  
-@@ -1595,6 +1622,14 @@ impl Sidebar {
-             .map(|ws| ws.read(cx).project().read(cx).agent_server_store().clone());
+@@ -1614,6 +1641,14 @@ impl Sidebar {
  
          let query = self.filter_editor.read(cx).text(cx);
+         let tag_query = agent_ui::thread_tag_filter::parse_tag_query(&query);
 +        let devtools_only = self.devtools_only;
 +        let devtools_threads = self
 +            .devtools_threads
@@ -11741,7 +11726,7 @@ index 40b8a25..1b76585 100644
  
          let previous = mem::take(&mut self.contents);
  
-@@ -1784,6 +1819,9 @@ impl Sidebar {
+@@ -1803,6 +1838,9 @@ impl Sidebar {
                      .has_notification
                      .then_some(terminal.metadata.terminal_id)
              }));
@@ -11751,7 +11736,7 @@ index 40b8a25..1b76585 100644
              if group_key.path_list().paths().is_empty() {
                  continue;
              }
-@@ -1791,7 +1829,7 @@ impl Sidebar {
+@@ -1810,7 +1848,7 @@ impl Sidebar {
              let label = group_key.display_name(&path_detail_map);
  
              let is_collapsed = self.is_group_collapsed(group_key, cx);
@@ -11760,7 +11745,7 @@ index 40b8a25..1b76585 100644
  
              let is_active = active_workspace
                  .as_ref()
-@@ -1827,6 +1865,7 @@ impl Sidebar {
+@@ -1846,6 +1884,7 @@ impl Sidebar {
                          // pass below downgrades them to `Empty` if no draft
                          // label can be derived.
                          let draft = row.is_draft().then_some(DraftKind::WithContent);
@@ -11768,7 +11753,7 @@ index 40b8a25..1b76585 100644
                          Arc::new(ThreadEntry {
                              metadata: row,
                              icon,
-@@ -1841,6 +1880,7 @@ impl Sidebar {
+@@ -1860,6 +1899,7 @@ impl Sidebar {
                              worktrees,
                              diff_stats: DiffStats::default(),
                              pinned_project_label: None,
@@ -11776,7 +11761,7 @@ index 40b8a25..1b76585 100644
                          })
                      };
  
-@@ -1954,6 +1994,11 @@ impl Sidebar {
+@@ -1973,6 +2013,11 @@ impl Sidebar {
                      if thread.draft != Some(DraftKind::Empty) {
                          return true;
                      }
@@ -11788,7 +11773,7 @@ index 40b8a25..1b76585 100644
                      if pending_activation.is_some() {
                          return false;
                      }
-@@ -1996,6 +2041,18 @@ impl Sidebar {
+@@ -2015,6 +2060,18 @@ impl Sidebar {
                      let b_time = Self::thread_display_time(&b.metadata);
                      b_time.cmp(&a_time)
                  });
@@ -11807,10 +11792,10 @@ index 40b8a25..1b76585 100644
              } else {
                  for info in live_infos {
                      if info.status == AgentThreadStatus::Running {
-@@ -2112,7 +2169,10 @@ impl Sidebar {
-                     }
+@@ -2147,7 +2204,10 @@ impl Sidebar {
+                 if tag_query.has_keys() && matched_threads.is_empty() {
+                     continue;
                  }
- 
 -                if matched_threads.is_empty() && matched_terminals.is_empty() && !workspace_matched
 +                // A project whose name matches still lists no thread when none is a devtools one.
 +                if matched_threads.is_empty()
@@ -11819,7 +11804,7 @@ index 40b8a25..1b76585 100644
                  {
                      continue;
                  }
-@@ -2147,6 +2207,10 @@ impl Sidebar {
+@@ -2182,6 +2242,10 @@ impl Sidebar {
                      cx,
                  );
              } else {
@@ -11830,7 +11815,7 @@ index 40b8a25..1b76585 100644
                  let has_terminal_notifications = terminals
                      .iter()
                      .any(|t| notified_terminals.contains(&t.metadata.terminal_id));
-@@ -2188,7 +2252,8 @@ impl Sidebar {
+@@ -2223,7 +2287,8 @@ impl Sidebar {
                      has_threads,
                  });
  
@@ -11840,7 +11825,7 @@ index 40b8a25..1b76585 100644
                      continue;
                  }
  
-@@ -2213,6 +2278,7 @@ impl Sidebar {
+@@ -2248,6 +2313,7 @@ impl Sidebar {
                  path_detail_map: &path_detail_map,
                  branch_by_path: &branch_by_path,
                  resolve_agent_icon: &resolve_agent_icon,
@@ -11848,8 +11833,8 @@ index 40b8a25..1b76585 100644
                  new_live_statuses: &mut new_live_statuses,
                  notified_threads: &mut notified_threads,
              },
-@@ -2220,7 +2286,16 @@ impl Sidebar {
-         );
+@@ -2257,7 +2323,16 @@ impl Sidebar {
+             thread_tags::retain_tagged_rows(pinned_rows, &tag_query, &mut current_thread_ids, cx);
          // Like a group's rows, a pinned row the filter drops is not registered below, so the
          // header is decided by, and reports notifications of, only the rows that are shown.
 -        let pinned_rows = pinned_section::filter_pinned_rows(pinned_rows, &query);
@@ -11866,7 +11851,7 @@ index 40b8a25..1b76585 100644
          if !pinned_rows.is_empty() {
              // Registered even while the section is collapsed, so the retains below keep the
              // notifications its header reports.
-@@ -2236,7 +2311,7 @@ impl Sidebar {
+@@ -2273,7 +2348,7 @@ impl Sidebar {
              project_header_indices.push(entries.len());
              entries.push(ListEntry::PinnedHeader { has_notifications });
              // Like a project group, a collapsed section still shows what the filter matches.
@@ -11875,7 +11860,15 @@ index 40b8a25..1b76585 100644
                  entries.extend(pinned_rows.into_iter().map(ListEntry::Thread));
              }
          }
-@@ -2573,7 +2648,7 @@ impl Sidebar {
+@@ -2289,6 +2364,7 @@ impl Sidebar {
+                         path_detail_map: &path_detail_map,
+                         branch_by_path: &branch_by_path,
+                         resolve_agent_icon: &resolve_agent_icon,
++                        is_devtools: &is_devtools,
+                         new_live_statuses: &mut new_live_statuses,
+                         notified_threads: &mut notified_threads,
+                     };
+@@ -2632,7 +2708,7 @@ impl Sidebar {
      ) -> AnyElement {
          let host = key.host();
  
@@ -11884,7 +11877,7 @@ index 40b8a25..1b76585 100644
  
          let id_prefix = if is_sticky { "sticky-" } else { "" };
          let id = SharedString::from(format!("{id_prefix}project-header-{ix}"));
-@@ -2759,7 +2834,7 @@ impl Sidebar {
+@@ -2818,7 +2894,7 @@ impl Sidebar {
                  cx.listener(move |this, event: &gpui::ClickEvent, window, cx| {
                      if event.modifiers().secondary() {
                          this.activate_or_open_workspace_for_group(&key_for_focus, window, cx);
@@ -11893,7 +11886,7 @@ index 40b8a25..1b76585 100644
                          this.toggle_collapse(&key_for_toggle, window, cx);
                      }
                  }),
-@@ -2813,7 +2888,7 @@ impl Sidebar {
+@@ -2872,7 +2948,7 @@ impl Sidebar {
              SharedString::from(format!("{id_prefix}project-header-new-thread-{ix}")),
              IconName::Plus,
          )
@@ -11902,7 +11895,7 @@ index 40b8a25..1b76585 100644
              let color = cx.theme().colors();
              button
                  .hover_background(color.element_background)
-@@ -3123,7 +3198,7 @@ impl Sidebar {
+@@ -3182,7 +3258,7 @@ impl Sidebar {
              .with_handle(menu_handle)
              .trigger(
                  IconButton::new(trigger_id, IconName::Ellipsis)
@@ -11911,7 +11904,7 @@ index 40b8a25..1b76585 100644
                          let color = cx.theme().colors();
                          button
                              .hover_background(color.element_background)
-@@ -3512,7 +3587,7 @@ impl Sidebar {
+@@ -3571,7 +3647,7 @@ impl Sidebar {
                          .color(Color::Accent),
                  )
              })
@@ -11920,7 +11913,7 @@ index 40b8a25..1b76585 100644
                  this.child(
                      Icon::new(disclosure_icon)
                          .size(IconSize::Small)
-@@ -3521,7 +3596,7 @@ impl Sidebar {
+@@ -3580,7 +3656,7 @@ impl Sidebar {
              })
              .cursor_pointer()
              .on_click(cx.listener(|this, _: &gpui::ClickEvent, _window, cx| {
@@ -11929,7 +11922,7 @@ index 40b8a25..1b76585 100644
                      this.set_pinned_collapsed(!this.pinned_collapsed, cx);
                  }
              }))
-@@ -3745,6 +3820,28 @@ impl Sidebar {
+@@ -3804,6 +3880,28 @@ impl Sidebar {
          !self.filter_editor.read(cx).text(cx).is_empty()
      }
  
@@ -11958,17 +11951,17 @@ index 40b8a25..1b76585 100644
      fn start_renaming_entry(
          &mut self,
          ix: usize,
-@@ -6771,6 +6868,9 @@ impl Sidebar {
+@@ -6830,6 +6928,9 @@ impl Sidebar {
              .when_some(thread.pinned_project_label.clone(), |this, label| {
                  this.project_name(label)
              })
 +            .when(thread.is_devtools, |this| {
 +                this.badge(IconName::ToolWeb, "Devtools thread")
 +            })
+             .map(|item| sub_thread_marker::mark_sub_thread(item, thread.metadata.thread_id, cx))
+             .tags(thread_tags::tag_chips_for(thread.metadata.thread_id, cx))
              .timestamp(timestamp)
-             .highlight_positions(thread.highlight_positions.to_vec())
-             .title_generating(title_generating)
-@@ -7869,6 +7969,8 @@ impl Sidebar {
+@@ -7933,6 +8034,8 @@ impl Sidebar {
          let has_query = self.has_filter_query(cx);
          let message = if has_query {
              "No threads match your search."
@@ -11977,7 +11970,7 @@ index 40b8a25..1b76585 100644
          } else {
              "No threads yet"
          };
-@@ -7975,6 +8077,20 @@ impl Sidebar {
+@@ -8039,6 +8142,20 @@ impl Sidebar {
                                      && !self.filter_editor.focus_handle(cx).is_focused(window),
                                  |this| this.child(KeyBinding::for_action(&FocusSidebarFilter, cx)),
                              )
@@ -12000,10 +11993,10 @@ index 40b8a25..1b76585 100644
                                      IconButton::new("clear_filter", IconName::Close)
 diff --git a/crates/sidebar/src/sidebar_devtools_tests.rs b/crates/sidebar/src/sidebar_devtools_tests.rs
 new file mode 100644
-index 0000000..cc3699c
+index 0000000..65a7d8a
 --- /dev/null
 +++ b/crates/sidebar/src/sidebar_devtools_tests.rs
-@@ -0,0 +1,266 @@
+@@ -0,0 +1,335 @@
 +// Story 055, task 14.1 (sidebar half) — devtools threads in Zeo's thread list: the badge and the
 +// "Devtools threads only" filter (design.md §B8). Requirements: R8.1, R8.2 (Q2, Q5).
 +//
@@ -12270,6 +12263,75 @@ index 0000000..cc3699c
 +        "R8.1: badged from memory"
 +    );
 +}
++
++// ═══ Story 037, task 5.2 — the `#tag` filter composes with the devtools-only view ═══════════
++//
++// Appended to 0063's file; the hunk belongs to 0063's regeneration (story 037, Task 8), not to
++// 037's own patch. Everything above this banner is 0063's file at the series tip, unchanged.
++// Requirements: R4.10, R3.2. Filter: `cargo test -p sidebar devtools`.
++//
++// Hostile halves first: with both filters on, a tagged EDITOR thread (in its group and pinned)
++// stays out — the tag term must not replace the devtools view — and an UNTAGGED devtools thread
++// stays out — the devtools view must not replace the tag term; only then the thread passing both
++// is shown. Turning the view off keeps the tag term in force.
++
++fn tag(id: ThreadId, tag: &str, cx: &mut TestAppContext) {
++    cx.update(|cx| {
++        ThreadOrganizationStore::global(cx).update(cx, |store, cx| store.add_tag(id, tag, cx))
++    })
++    .expect("fixture: a saved thread takes a valid tag");
++    cx.run_until_parked();
++}
++
++fn sorted(mut rows: Vec<String>) -> Vec<String> {
++    rows.sort();
++    rows
++}
++
++#[gpui::test]
++async fn hostile_devtools_only_and_a_tag_term_both_hold(cx: &mut TestAppContext) {
++    let (sidebar, mut vcx) = setup(cx).await;
++    let editor_php = thread("s-editor-php", "Editor php work", 1, cx);
++    let devtools_php = thread("s-devtools-php", "Browser php work", 2, cx);
++    let devtools_plain = thread("s-devtools-plain", "Browser plain work", 3, cx);
++    let pinned_editor_php = thread("s-pinned-editor", "Pinned editor php", 4, cx);
++    mark_devtools(devtools_php, cx);
++    mark_devtools(devtools_plain, cx);
++    tag(editor_php, "php", cx);
++    tag(devtools_php, "php", cx);
++    tag(pinned_editor_php, "php", cx);
++    pin(pinned_editor_php, cx);
++
++    type_in_search(&sidebar, "#php", &mut vcx);
++    devtools_only(&sidebar, true, &mut vcx);
++    assert_eq!(
++        thread_rows(&sidebar, &mut vcx),
++        vec!["Browser php work".to_string()],
++        "R4.10: tagged editor threads are not devtools threads, and the untagged devtools \
++         thread does not carry the tag"
++    );
++
++    devtools_only(&sidebar, false, &mut vcx);
++    assert_eq!(
++        sorted(thread_rows(&sidebar, &mut vcx)),
++        sorted(vec![
++            "Browser php work".to_string(),
++            "Editor php work".to_string(),
++            "Pinned editor php".to_string(),
++        ]),
++        "the view off, the tag term still holds"
++    );
++
++    type_in_search(&sidebar, "", &mut vcx);
++    assert_eq!(
++        sorted(badged(&sidebar, &mut vcx)),
++        sorted(vec![
++            "Browser php work".to_string(),
++            "Browser plain work".to_string(),
++        ]),
++        "R3.2: the devtools threads keep their badge"
++    );
++}
 diff --git a/crates/sidebar/src/sidebar_organization_filter_tests.rs b/crates/sidebar/src/sidebar_organization_filter_tests.rs
 index 48c8d98..4112c3f 100644
 --- a/crates/sidebar/src/sidebar_organization_filter_tests.rs
@@ -12440,226 +12502,6 @@ index 057d677..c06c3fa 100644
              })),
              // Collapsed project header
              ListEntry::ProjectHeader {
-diff --git a/crates/ui/src/components/ai/thread_item.rs b/crates/ui/src/components/ai/thread_item.rs
-index 1f5d3af..1f4528b 100644
---- a/crates/ui/src/components/ai/thread_item.rs
-+++ b/crates/ui/src/components/ai/thread_item.rs
-@@ -71,6 +71,7 @@ pub struct ThreadItem {
-     on_hover: Box<dyn Fn(&bool, &mut Window, &mut App) + 'static>,
-     action_slot: Option<AnyElement>,
-     base_bg: Option<Hsla>,
-+    badge: Option<(IconName, SharedString)>,
- }
- 
- impl ThreadItem {
-@@ -106,6 +107,7 @@ impl ThreadItem {
-             on_hover: Box::new(|_, _, _| {}),
-             action_slot: None,
-             base_bg: None,
-+            badge: None,
-         }
-     }
- 
-@@ -253,6 +255,12 @@ impl ThreadItem {
-         self.base_bg = Some(color);
-         self
-     }
-+
-+    /// A small icon drawn right after the title, with `tooltip` saying what it marks.
-+    pub fn badge(mut self, icon: IconName, tooltip: impl Into<SharedString>) -> Self {
-+        self.badge = Some((icon, tooltip.into()));
-+        self
-+    }
- }
- 
- impl RenderOnce for ThreadItem {
-@@ -379,13 +387,25 @@ impl RenderOnce for ThreadItem {
- 
-         let title = self.title;
-         let highlight_positions = self.highlight_positions;
-+        // A badge must stay visible right after the title, so a long title ends in an ellipsis
-+        // instead of running under the fade, which would also paint over the badge.
-+        let has_badge = self.badge.is_some();
-+        let truncate_title = !opaque_window || has_badge;
-+        let badge = self.badge.map(|(icon, tooltip)| {
-+            h_flex()
-+                .id("thread-item-badge")
-+                .debug_selector(|| "THREAD_ITEM_BADGE".to_owned())
-+                .flex_none()
-+                .child(Icon::new(icon).size(IconSize::XSmall).color(Color::Muted))
-+                .tooltip(Tooltip::text(tooltip))
-+        });
- 
-         let title_label = if let Some(title_slot) = self.title_slot {
-             title_slot
-         } else if self.title_generating {
-             Label::new(title)
-                 .color(Color::Muted)
--                .when(!opaque_window, |label| label.truncate())
-+                .when(truncate_title, |label| label.truncate())
-                 .with_animation(
-                     "generating-title",
-                     Animation::new(Duration::from_secs(2))
-@@ -397,12 +417,12 @@ impl RenderOnce for ThreadItem {
-         } else if highlight_positions.is_empty() {
-             Label::new(title)
-                 .when_some(self.title_label_color, |label, color| label.color(color))
--                .when(!opaque_window, |label| label.truncate())
-+                .when(truncate_title, |label| label.truncate())
-                 .into_any_element()
-         } else {
-             HighlightedLabel::new(title, highlight_positions)
-                 .when_some(self.title_label_color, |label, color| label.color(color))
--                .when(!opaque_window, |label| label.truncate())
-+                .when(truncate_title, |label| label.truncate())
-                 .into_any_element()
-         };
- 
-@@ -486,9 +506,10 @@ impl RenderOnce for ThreadItem {
-                             .flex_1()
-                             .gap_1p5()
-                             .child(icon)
--                            .child(title_label),
-+                            .child(title_label)
-+                            .children(badge),
-                     )
--                    .when(self.is_truncated && opaque_window, |this| {
-+                    .when(self.is_truncated && opaque_window && !has_badge, |this| {
-                         this.child(gradient_overlay)
-                     })
-                     .when(self.hovered, |this| {
-@@ -1058,6 +1079,10 @@ impl Component for ThreadItem {
-     }
- }
- 
-+#[cfg(test)]
-+#[path = "thread_item_badge_tests.rs"]
-+mod badge_tests;
-+
- #[cfg(test)]
- mod tests {
-     use super::*;
-diff --git a/crates/ui/src/components/ai/thread_item_badge_tests.rs b/crates/ui/src/components/ai/thread_item_badge_tests.rs
-new file mode 100644
-index 0000000..137512d
---- /dev/null
-+++ b/crates/ui/src/components/ai/thread_item_badge_tests.rs
-@@ -0,0 +1,115 @@
-+// Story 055, task 14.1 (ui half) — `ThreadItem::badge(icon, tooltip)`, a new optional builder
-+// field drawn after the title (design.md §B8). Requirement: R8.1 (Q2, Q5).
-+//
-+// Materialize with, in `crates/ui/src/components/ai/thread_item.rs`, beside `mod tests`:
-+//     #[cfg(test)]
-+//     #[path = "thread_item_badge_tests.rs"]
-+//     mod badge_tests;
-+// Filter: `cargo test -p ui thread_item` (paths `components::ai::thread_item::badge_tests::…`).
-+//
-+// A child module of `thread_item`, so it reads the builder's private field. Assumed seam: the
-+// field is `badge: Option<(IconName, SharedString)>`; adjust `badge_of()` alone if it moved.
-+// Rendering is checked with the debug selector the badge is expected to carry,
-+// `THREAD_ITEM_BADGE` (the pattern of the existing `ACTION_SLOT` test).
-+//
-+// Hostile halves first: a row WITHOUT the builder call has no badge (no default badge, which would
-+// mark every editor thread), and the badge does not displace the action slot — the row with the
-+// badge still routes a click on its action slot to the action, not to the row.
-+
-+use super::*;
-+use gpui::{Modifiers, MouseButton, TestAppContext, point};
-+
-+fn badge_of(item: &ThreadItem) -> Option<(IconName, SharedString)> {
-+    item.badge.clone()
-+}
-+
-+fn init(cx: &mut TestAppContext) {
-+    cx.update(|cx| {
-+        let settings_store = settings::SettingsStore::test(cx);
-+        cx.set_global(settings_store);
-+        theme_settings::init(theme::LoadThemes::JustBase, cx);
-+    });
-+}
-+
-+#[test]
-+fn hostile_no_badge_unless_asked() {
-+    assert_eq!(badge_of(&ThreadItem::new("t", "Editor thread")), None);
-+}
-+
-+#[test]
-+fn the_builder_records_icon_and_tooltip() {
-+    let item = ThreadItem::new("t", "Browser thread").badge(IconName::ToolWeb, "Devtools thread");
-+    assert_eq!(
-+        badge_of(&item),
-+        Some((IconName::ToolWeb, SharedString::from("Devtools thread")))
-+    );
-+}
-+
-+struct Row {
-+    badge: bool,
-+    row_clicks: usize,
-+}
-+
-+impl Render for Row {
-+    fn render(&mut self, _window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
-+        let item = ThreadItem::new("thread", "A rather long thread title that will truncate")
-+            .hovered(true)
-+            .action_slot(
-+                div()
-+                    .debug_selector(|| "ACTION_SLOT".to_owned())
-+                    .child(IconButton::new("action", IconName::Archive).on_click(|_, _, _| {})),
-+            )
-+            .on_click(cx.listener(|row, _, _, _| row.row_clicks += 1));
-+        let item = if self.badge {
-+            item.badge(IconName::ToolWeb, "Devtools thread")
-+        } else {
-+            item
-+        };
-+        div()
-+            .size_full()
-+            .p(px(20.))
-+            .child(div().w(px(260.)).child(item))
-+    }
-+}
-+
-+#[gpui::test]
-+fn the_badge_is_drawn_only_when_set(cx: &mut TestAppContext) {
-+    init(cx);
-+    let (_with, with_cx) = cx.add_window_view(|_, _| Row {
-+        badge: true,
-+        row_clicks: 0,
-+    });
-+    assert!(
-+        with_cx.debug_bounds("THREAD_ITEM_BADGE").is_some(),
-+        "R8.1: drawn"
-+    );
-+    let (_without, without_cx) = cx.add_window_view(|_, _| Row {
-+        badge: false,
-+        row_clicks: 0,
-+    });
-+    assert!(without_cx.debug_bounds("THREAD_ITEM_BADGE").is_none());
-+}
-+
-+#[gpui::test]
-+fn hostile_the_badge_does_not_displace_the_action_slot(cx: &mut TestAppContext) {
-+    init(cx);
-+    let (view, cx) = cx.add_window_view(|_, _| Row {
-+        badge: true,
-+        row_clicks: 0,
-+    });
-+    let badge = cx.debug_bounds("THREAD_ITEM_BADGE").expect("badge bounds");
-+    let action = cx.debug_bounds("ACTION_SLOT").expect("action bounds");
-+    assert!(
-+        badge.right() <= action.left(),
-+        "the badge sits after the title and before the action slot: {badge:?} vs {action:?}"
-+    );
-+    let position = point(action.center().x, action.center().y);
-+    cx.simulate_mouse_move(position, None, Modifiers::default());
-+    cx.simulate_mouse_down(position, MouseButton::Left, Modifiers::default());
-+    cx.simulate_mouse_up(position, MouseButton::Left, Modifiers::default());
-+    assert_eq!(
-+        view.read_with(cx, |row, _| row.row_clicks),
-+        0,
-+        "the click went to the action"
-+    );
-+}
 diff --git a/crates/zed/src/zed.rs b/crates/zed/src/zed.rs
 index 32a8b49..816fa39 100644
 --- a/crates/zed/src/zed.rs

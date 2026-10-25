@@ -1885,6 +1885,18 @@ src_prepare() {
 		# 0048's store and 0049's Pinned section, so it sits right after them;
 		# no flag gates it. 0028-0030 and 0063 are regenerated on top of it.
 		"${FILESDIR}/0065-agent-sidebar-drag-reorder.patch"
+		# 0068 (story 037) tags threads from their context menu, draws the tags
+		# as chips on thread rows and filters the sidebar and History by #tag.
+		# It consumes 0048's store, 0049's Pinned section and 0065's drag guard,
+		# so it sits right after 0065; no flag gates it. It also owns the
+		# multi-badge thread row 0063 builds on.
+		"${FILESDIR}/0068-agent-thread-tags-and-filter.patch"
+		# 0069 (story 038) adds a Lists view beside the thread list and History,
+		# "Move to List" in the thread context menu and list management. It
+		# consumes 0048's store and 0049's row builder and edits the regions
+		# 0068 edits, so it sits right after 0068; no flag gates it. 0028-0030
+		# and 0063 are regenerated on top of it.
+		"${FILESDIR}/0069-sidebar-thread-lists-view.patch"
 		# 0061 starts every agent with ZEO_THREAD=1, so zeo-systray's hook can
 		# tell Zeo's sessions from any other Claude Code process and offer the
 		# tray link (0024) only for those. Ungrouped like 0024.
@@ -2115,6 +2127,19 @@ src_prepare() {
 			# a Git LFS agent or extension) or cannot be read; the error names the
 			# key and nothing is created. Pure Zed, BY CHOICE (PARITY item 105).
 			"${FILESDIR}/0062-git-refuse-worktree-when-repo-config-can-run-programs.patch"
+			# 0070 (story 039): select text in an agent reply, right-click, and
+			# open a "Clean sub-thread" or a "Sub-thread with context" (the
+			# session forked through ACP session/fork, still unstable_), linked
+			# to the parent in 0048's store with a header and a sidebar marker
+			# through 0068's badge. Last of this group: it calls 0045's prefilled
+			# thread and extends 0036's config recorder; 0052, 0057, 0058, 0063
+			# and 0067 are generated on top of it.
+			"${FILESDIR}/0070-agent-ui-sub-thread-from-selection.patch"
+			# 0071: Send to Parent in a sub-thread's footer, and sub-threads as
+			# items of 0035's panel and 0037's card (task history steps 5 and
+			# 6). After 0070, whose parent links it reads; 0052, 0057, 0058,
+			# 0063 and 0067 are regenerated on top of it.
+			"${FILESDIR}/0071-agent-send-to-parent-and-sub-thread-items.patch"
 		)
 	fi
 

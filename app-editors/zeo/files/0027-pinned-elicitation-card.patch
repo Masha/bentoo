@@ -256,10 +256,10 @@ index 3ddf266..12ae52c 100644
                              menu = menu.separator()
                          }
 diff --git a/crates/agent_ui/src/agent_ui.rs b/crates/agent_ui/src/agent_ui.rs
-index 6260489..8c8780a 100644
+index 74965b9..f072899 100644
 --- a/crates/agent_ui/src/agent_ui.rs
 +++ b/crates/agent_ui/src/agent_ui.rs
-@@ -1108,6 +1108,7 @@ mod tests {
+@@ -1110,6 +1110,7 @@ mod tests {
              tool_permissions: Default::default(),
              sandbox_permissions: Default::default(),
              show_turn_stats: false,

@@ -1116,10 +1116,10 @@ index 0000000..d99f46a
 +    assert_sent_new_thread(&panel, &source, &source_agent, "/compact", &mut cx);
 +}
 diff --git a/crates/agent_ui/src/agent_ui.rs b/crates/agent_ui/src/agent_ui.rs
-index 1a53a37..6148773 100644
+index 87407a8..10fd33a 100644
 --- a/crates/agent_ui/src/agent_ui.rs
 +++ b/crates/agent_ui/src/agent_ui.rs
-@@ -638,6 +638,12 @@ pub enum AgentInitialContent {
+@@ -640,6 +640,12 @@ pub enum AgentInitialContent {
          blocks: Vec<acp_v2::ContentBlock>,
          auto_submit: bool,
      },
