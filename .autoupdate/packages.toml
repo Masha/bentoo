@@ -10296,14 +10296,12 @@ releases/download/v${PV}/zeo-browser-firefox-${PV}.xpi. Live=v0.1.0 (2026-10-15)
 # END
 
 ["net-im/telegram-desktop"]
-enabled = false
-disabled_by = "removed 2026-10-24: ::gentoo ships 7.3.1 with tlottie and wallet-engine as system libraries (gui-libs/tlottie, net-libs/wallet-engine-telegram), so building tdesktop_rust inside the ebuild no longer buys anything; every divergence this ebuild declared was '::gentoo is on 7.1'. Reopen only if ::gentoo falls a series behind again."
 hold = true
 url = "https://api.github.com/repos/telegramdesktop/tdesktop/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "7.3.0"
+version = "7.3.3"
 comments = """
 Telegram Desktop — GitHub releases/latest tag "vX.Y.Z" (v stripped). Verified
 2026-07-24: releases/latest correctly skips the beta prereleases upstream also
@@ -10342,6 +10340,22 @@ Cargo.lock) plus wallet-engine's bindgen/cpp/Cargo.lock. A stale pin does not
 fail: it silently ships a renderer or wallet upstream never shipped. That is
 why hold = true stays: the applier cannot read those pins, so every bump of
 this package is a hand bump, and the check still reports when one is due.
+
+2026-10-25: BACK as a thin, temporary mirror of ::gentoo's ebuild, which ships
+7.3.1 while upstream is on 7.3.3. The 2026-10-24 removal stands as the rule;
+this is the exception, and it ends the day ::gentoo lists >=7.3.3: then drop
+the package and set enabled = false here again (disabled_by: ::gentoo caught
+up). Everything above about tdesktop_rust, CRATES and the three pins is
+HISTORY: the mirror links ::gentoo's gui-libs/tlottie and
+net-libs/wallet-engine-telegram, so a bump must instead check that
+tdesktop's prepare.py tlottieRevision / walletEngineRevision still match what
+those two packages build (7.3.1 and 7.3.3: identical, 92df98dc20 / e59e0d89).
+hold = true stays for a second reason the 7.3.3 bump proved: src_prepare's
+global sed turns every new QUIET find_package REQUIRED, and 7.3.3 added
+find_package(KF6WindowSystem 6.28 QUIET) in lib_base. Diff every
+find_*/pkg_check_modules call between old and new tarball before bumping.
+The only divergence from ::gentoo is USE=qt-private-api (default on; off sets
+DESKTOP_APP_DISABLE_PRIVATE_QT_API, new in 7.3.3).
 """
 # END
 
