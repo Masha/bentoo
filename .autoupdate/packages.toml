@@ -10296,6 +10296,9 @@ releases/download/v${PV}/zeo-browser-firefox-${PV}.xpi. Live=v0.1.0 (2026-10-15)
 # END
 
 ["net-im/telegram-desktop"]
+enabled = false
+disabled_by = "removed 2026-10-24: ::gentoo ships 7.3.1 with tlottie and wallet-engine as system libraries (gui-libs/tlottie, net-libs/wallet-engine-telegram), so building tdesktop_rust inside the ebuild no longer buys anything; every divergence this ebuild declared was '::gentoo is on 7.1'. Reopen only if ::gentoo falls a series behind again."
+hold = true
 url = "https://api.github.com/repos/telegramdesktop/tdesktop/releases/latest"
 parser = "json"
 path = "tag_name"
