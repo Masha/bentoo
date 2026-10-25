@@ -121,14 +121,14 @@ RESTRICT="!test? ( test )"
 # the version but how the library was compiled. V8's builtins-typed-array.cc is
 # compiled with -std=gnu++20 and calls simdutf::atomic_binary_to_base64 /
 # simdutf::atomic_base64_to_binary_safe, which libsimdutf.so only exports when
-# it was itself built as C++20 -- i.e. with USE=atomic-base64. Without it,
-# --shared-simdutf fails to link mksnapshot. ::gentoo grew that flag in its
-# simdutf-9.2.1 (default off; bentoo's copy turns it on), so the USE dependency
-# below holds against either repository's ebuild.
+# it was itself built as C++20. Without it, --shared-simdutf fails to link
+# mksnapshot. ::gentoo's simdutf-9.3.2 builds as C++20 unconditionally (the
+# atomic-base64 flag its 9.2.1 had is gone), so the floor below is what carries
+# that guarantee -- do not lower it to a version that may build as C++17.
 COMMON_DEPEND=">=app-arch/brotli-1.2.0:=
 	dev-db/sqlite:3
 	>=dev-cpp/ada-4.0.0:=
-	>=dev-cpp/simdutf-9.2.1:=[atomic-base64]
+	>=dev-cpp/simdutf-9.3.2:=
 	>=dev-libs/libuv-1.52.1:=
 	>=dev-libs/simdjson-5.0.3:=
 	>=net-dns/c-ares-1.34.8:=

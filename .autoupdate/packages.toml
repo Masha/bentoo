@@ -10296,6 +10296,8 @@ releases/download/v${PV}/zeo-browser-firefox-${PV}.xpi. Live=v0.1.0 (2026-10-15)
 # END
 
 ["net-im/telegram-desktop"]
+enabled = false
+disabled_by = "removed 2026-10-24: ::gentoo ships 7.3.1 with tlottie and wallet-engine as system libraries (gui-libs/tlottie, net-libs/wallet-engine-telegram), so building tdesktop_rust inside the ebuild no longer buys anything; every divergence this ebuild declared was '::gentoo is on 7.1'. Reopen only if ::gentoo falls a series behind again."
 hold = true
 url = "https://api.github.com/repos/telegramdesktop/tdesktop/releases/latest"
 parser = "json"
@@ -10822,6 +10824,8 @@ letter. Pulled in as a hard dependency of sci-libs/onnxruntime.
 # END
 
 ["dev-cpp/simdutf"]
+enabled = false
+disabled_by = "removed 2026-10-24: ::gentoo 9.3.2 builds with -DSIMDUTF_CXX_STANDARD=20 unconditionally and dropped the atomic-base64 flag, so its build exports the atomic base64 API nodejs needs; net-libs/nodejs now depends on >=dev-cpp/simdutf-9.3.2:= instead of [atomic-base64]. Reopen only if ::gentoo goes back to C++17."
 url = "https://api.github.com/repos/simdutf/simdutf/releases/latest"
 parser = "json"
 path = "tag_name"
@@ -14609,6 +14613,8 @@ The bundled-module LICENSE+= list is a manual survey: recheck it on a bump.
 # END
 
 ["dev-libs/openssl"]
+enabled = false
+disabled_by = "removed 2026-10-24: ::gentoo carries 4.1.0, the exit condition below; the overlay copy had fallen behind it (no-makedepend, ktls pkg_setup). Reopen only if ::gentoo falls a 4.x release behind again."
 url = "https://api.github.com/repos/openssl/openssl/releases?per_page=30"
 parser = "regex"
 pattern = '"tag_name": ?"openssl-([0-9]+\.[0-9]+\.[0-9]+)"'
