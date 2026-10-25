@@ -56,8 +56,16 @@ EAPI=8
 # Those two are the whole diff between the lock's registry entries and
 # tarball + CRATES (505 entries); the leftovers the lock dropped (zip 8.6.0,
 # basic-toml, and the two older versions) are unused and harmless.
+#
+# 3.2.3 tops up two more, the same way: the lock moved tokio 1.52.3 -> 1.54.1
+# and added ruzstd 0.9.1 (new to the set), and the build died with "failed to
+# select a version for the requirement `tokio = "^1"` (locked to 1.54.1)".
+# Eight top-ups now: the next bump that touches the lock should regenerate
+# the tarball instead.
 CRATES="
+	ruzstd@0.9.1
 	rustls-webpki@0.103.16
+	tokio@1.54.1
 	webpki-root-certs@1.0.10
 	windows-link@0.100.0
 	windows-registry@0.100.0
