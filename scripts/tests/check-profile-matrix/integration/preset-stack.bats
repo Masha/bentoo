@@ -11,9 +11,9 @@
 #   baseline : make.profile -> <BASELINE_REF tree>/profiles/<preset>
 #   composed : make.profile/parent = `--compose <preset>`, bentoo = TREE
 # BASELINE_REF (default: master) is extracted with `git archive` -- read-only
-# for the repository. A preset the baseline does not have yet (the seven musl
-# presets, until story 002 lands on master) has no "before" to compare: it is
-# still composed, and its stack is pinned by integration/musl-presets.bats.
+# for the repository. Every preset must exist on the baseline: master has all
+# 27 since 6ba1d30fd, so a preset missing there is a failure, not a skip. Set
+# BASELINE_REF to an older commit only to compare against it on purpose.
 
 load lib
 
@@ -48,7 +48,10 @@ norm_stack() { # CROOT BENTOO-LOCATION
     run --separate-stderr "$SCRIPT" --compose "$p"
     status_is 0
     output_is "bentoo:$p"
-    [ -d "$base/profiles/$p" ] || continue # newer than the baseline
+    if [ ! -d "$base/profiles/$p" ]; then
+      printf '%s: not on the baseline %s\n' "$p" "$ref" >&2
+      continue
+    fi
 
     compared=$((compared + 1))
     cr0=$BATS_TEST_TMPDIR/base-$n
@@ -67,7 +70,7 @@ norm_stack() { # CROOT BENTOO-LOCATION
     fi
   done
   [ "$n" -eq 27 ]
-  # the 20 glibc presets predate story 002, so every baseline has them
-  [ "$compared" -ge 20 ]
+  # every preset was compared against the baseline, none skipped
+  [ "$compared" -eq "$n" ]
   [ "$failed" -eq 0 ]
 }
