@@ -2229,7 +2229,7 @@ parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "0.40.10"
+version = "0.40.11"
 comments = """
 ollama-bin — same upstream repo.
 """
@@ -2673,7 +2673,7 @@ headers = { "User-Agent" = "bentoo-autoupdate" }
 patched = """
 USE_RUBY adds ruby34 and ruby40 to ::gentoo's ruby32/ruby33 (reaches DEPEND and RDEPEND through RUBY_DEPS): without them USE=ruby is unsatisfiable on a host carrying only current ruby slots. src_test also skips Test_spelldump and Test_spelldump_bang, which hang. Drop the ebuild once ::gentoo widens USE_RUBY.
 """
-version = "9.2.1202"
+version = "9.2.1229"
 comments = """
 vim — follows ::gentoo's app-editors/vim-core, NOT upstream vim tags.
 
@@ -2756,7 +2756,7 @@ networkmanager-openvpn — default (commit-recency) order; version sort returns 
 url = "https://linux-pkgs.obscura.com/deb/dists/stable/main/binary-amd64/Packages"
 parser = "regex"
 pattern = 'Package: obscura-cli\n(?:[^\n]*\n)*?Version: ([0-9][0-9.]*)'
-version = "1.184"
+version = "1.185"
 comments = """
 Obscura VPN — the Debian "Packages" index of the APT repository SRC_URI pulls
 from (the one obscura-repository.deb configures). Plain text; four stanzas on
@@ -4042,7 +4042,7 @@ base_from = "tag"
 base_url = "https://api.github.com/repos/KhronosGroup/SPIRV-Tools/git/refs/tags"
 base_tag_pattern = '^vulkan-sdk-([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)$'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.363.0_p20261023"
+version = "1.4.363.0_p20261024"
 comments = """
 spirv-tools — commit-tracked on main; scans titles for vulkan-sdk-X.Y.Z.W to detect base bump.
 """
@@ -4119,7 +4119,7 @@ base_from = "file"
 base_url = "https://raw.githubusercontent.com/KhronosGroup/Vulkan-ValidationLayers/main/CMakeLists.txt"
 base_pattern = '(?m)^project\([A-Za-z_-]+ VERSION ([0-9][0-9.]*)'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.366_p20261023"
+version = "1.4.366_p20261024"
 comments = """
 vulkan-layers — commit-tracked on main (Vulkan-ValidationLayers); scans for "Update for Vulkan-Docs X.Y.Z".
 """
@@ -4136,7 +4136,7 @@ base_from = "file"
 base_url = "https://raw.githubusercontent.com/KhronosGroup/Vulkan-Loader/main/CMakeLists.txt"
 base_pattern = '(?m)^project\([A-Za-z_-]+ VERSION ([0-9][0-9.]*)'
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "1.4.366_p20261023"
+version = "1.4.366_p20261024"
 comments = """
 vulkan-loader — commit-tracked on main; scans for "Update for Vulkan-Docs X.Y.Z" to detect base bump.
 """
@@ -9631,7 +9631,7 @@ of the Python binding needs no re-verification.
 url = "https://pypi.org/pypi/pyee/json"
 parser = "json"
 path = "info.version"
-version = "15.0.0"
+version = "16.0.0"
 comments = """
 inherit pypi; PyPI info.version is canonical. Live=13.0.1 == current PV (no prefix to strip).
 """
@@ -10024,7 +10024,7 @@ url ="https://api.github.com/repos/ollama/ollama/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.40.10"
+version = "0.40.11"
 comments = """
 ollama source — same repo as ollama-bin; tag "vX.Y.Z" (leading v stripped).
 
@@ -12041,7 +12041,7 @@ tree rather than a single binary; those are not used.
 url = "https://registry.npmjs.org/@qwen-code%2fqwen-code"
 parser = "json"
 path = "dist-tags.latest"
-version = "0.26.0"
+version = "0.26.1"
 comments = """
 Qwen Code — probed through npm's dist-tags.latest, NOT through GitHub, although
 the distfiles come from GitHub release assets (releases/download/v${PV}).
@@ -12075,7 +12075,7 @@ parser = "regex"
 pattern = '"tag_name":\s*"v([0-9]+\.[0-9]+\.[0-9]+)"'
 headers = { "User-Agent" = "bentoo-autoupdate" }
 type = "bin"
-version = "4.0.19"
+version = "4.0.20"
 comments = """
 CC Switch — a Tauri GUI for switching between Claude Code, Codex and Gemini
 CLI accounts. Tracks CC-Switch-v<PV>-Linux-{x86_64,arm64}.deb; note the asset
@@ -12120,7 +12120,7 @@ url = "https://registry.npmjs.org/@ccusage/ccusage-linux-x64/latest"
 parser = "regex"
 pattern = '"version":"([0-9]+\.[0-9]+\.[0-9]+)"'
 type = "bin"
-version = "20.0.42"
+version = "20.0.44"
 comments = """
 ccusage — probed on the PER-PLATFORM npm package, not on the main "ccusage"
 one and not on GitHub, and the distinction is load-bearing.

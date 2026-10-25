@@ -39,8 +39,9 @@
 #   --staged            --vectors (so --static first), then resolution of
 #                       every layer the index touches over the 6 reference
 #                       presets, one of them musl (the hook mode).
-#   --full              --static, then every layer alone, every pair and the
-#                       largest allowed selection over every preset (manual).
+#   --full              --static, then every preset alone, every layer alone,
+#                       every pair and the largest allowed selection over every
+#                       preset (manual).
 #   --compose <preset-id> [layer-id...]
 #                       the composition validity rule: print the ordered
 #                       `parent` lines, or name the broken rule.
@@ -1857,6 +1858,11 @@ def resolve(tree, work, mode, staged_file=None):
             seen.add(key)
             selections.append((pid, tuple(sel)))
     for pid in preset_ids:
+        # R6.3: --full also resolves every preset with no layer, so a preset
+        # that breaks on its own is named as itself, never blamed on a layer.
+        # --staged keeps its touched-layer scope.
+        if mode == "full":
+            add(pid, [])
         for t in sorted(touched, key=layer_ids.index):
             add(pid, [t])
             for o in layer_ids:
@@ -1874,11 +1880,11 @@ def resolve(tree, work, mode, staged_file=None):
         expected = judge(catalog, presets[pid], sel)
         accepted, lines, broke = compose_verdict(tree, pid, sel, seam)
         if broke is not None:
-            print(f"resolve: --compose broke on {pid} {' '.join(sel)}: {broke}", file=sys.stderr)
+            print(f"resolve: --compose broke on {' '.join((pid, *sel))}: {broke}", file=sys.stderr)
             return NOTHING
         if accepted != expected:
             verdict = "accepts" if accepted else "rejects"
-            print(f"resolve: FAIL {pid} {' '.join(sel)}: --compose {verdict} a selection the catalog data "
+            print(f"resolve: FAIL {' '.join((pid, *sel))}: --compose {verdict} a selection the catalog data "
                   f"{'forbids' if accepted else 'allows'}")
             failed += 1
         elif expected:
@@ -1886,7 +1892,9 @@ def resolve(tree, work, mode, staged_file=None):
         else:
             forbidden += 1
 
-    # One baseline (the preset alone) per preset, then every allowed selection.
+    # One base croot (the preset alone) per preset, read by content_checks
+    # only -- it is never emerged; in full mode the empty selection above is
+    # what resolves a preset alone. Then one croot per allowed selection.
     from concurrent.futures import ThreadPoolExecutor
     bases = {pid: make_croot(work, f"base-{n}", tree, [f"bentoo:{pid}"]) for n, pid in enumerate(preset_ids)}
     jobs = [(make_croot(work, f"sel-{n}", tree, lines), pid, sel) for n, (pid, sel, lines) in enumerate(allowed)]
@@ -1920,7 +1928,7 @@ def resolve(tree, work, mode, staged_file=None):
     for (croot, pid, sel), ok, excerpt, fails in results:
         if not ok:
             failed += 1
-            print(f"resolve: FAIL {pid} {' '.join(sel)}")
+            print(f"resolve: FAIL {' '.join((pid, *sel))}")
             print(excerpt)
         for line in fails:
             failed += 1
