@@ -12,6 +12,6 @@ LICENSE=GPL-3+ MPL-2.0
 RDEPEND=>=app-editors/qhexedit2-0.8.10:= dev-db/sqlite:3 >=dev-libs/qcustomplot-2.1.1-r10 dev-qt/qt5compat:6 dev-qt/qtbase:6[gui,network,ssl,widgets,xml] >=x11-libs/qscintilla-2.14.1-r1:=[qt6(+)] sqlcipher? ( dev-db/sqlcipher )
 RESTRICT=!test? ( test )
 SLOT=0
-SRC_URI=https://github.com/sqlitebrowser/sqlitebrowser/archive/8bd53e75eaa619bc3b08daf30efeca5f2f7a4768.tar.gz -> sqlitebrowser-3.13.99_p20261023-8bd53e75.tar.gz
+SRC_URI=https://github.com/sqlitebrowser/sqlitebrowser/archive/ba3a34f7373f4200a9cc1647dee0496e6d7404c9.tar.gz -> sqlitebrowser-3.13.99_p20261025-ba3a34f7.tar.gz
 _eclasses_=toolchain-funcs	58a918e3a42d0156f010dcfd43725be5	flag-o-matic	fd3558f73f6503093adee69adf41020d	multiprocessing	45d0620f25c2f063ad6276ecd9ed9399	ninja-utils	d063ea1900a793f93eb095010d6d9156	xdg-utils	42869b3c8d86a70ef3cf75165a395e09	cmake	3530055400d05e64deaba3042af30af6	xdg	3ef49a87c52c8b77c476351195dfe575
-_md5_=9b600ca27d2a76371b4ee8c07b5818c1
+_md5_=caa5ea5cd808ef1fadb001b502278976
