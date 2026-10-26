@@ -161,19 +161,21 @@ BDEPEND="
 #                       silently missing a real fix. Added here under ::gentoo's
 #                       exact filename so the sweep can pair them.
 # BENTOO-DIVERGENCE: files/content - our copy of
-# freecad-1.1.1-fix-sketcher-toolbars.patch differs from ::gentoo's byte for
-# byte, and that is deliberate: it is the SAME fix, rebased onto a different
-# source tree.
+# freecad-1.1.1-fix-sketcher-toolbars.patch differs from ::gentoo's, and that
+# is deliberate: it carries only HALF of their fix.
 #
-# Both carry the same two upstream commits (4859a133 and 7db3f901) and the same
-# hunks. What differs is the offsets -- ours starts at @@ -841, theirs at
-# @@ -844 -- because the two ebuilds extract different tarballs. ::gentoo
-# fetches the release asset freecad_source_${PV}.tar.gz; this ebuild fetches
-# the git tag archive plus AddonManager, as SRC_URI above shows. Copying their
-# file over ours would make the hunks miss.
+# ::gentoo's file (written for 1.1.1/1.1.3) holds two upstream commits:
+# 4859a133 (src/Gui/ToolBarManager.cpp) and 7db3f901
+# (src/Mod/Sketcher/Gui/ViewProviderSketch.cpp). The first was backported to
+# the 1.1 branch as 01ad563ece and ships in 1.1.4, so its hunk FAILS here
+# (bentoo issue #54); only 7db3f901 is still needed -- 1.1.4 still calls
+# Workbench::leaveEditMode() in unsetEdit(). Our offsets also differ from
+# theirs because this ebuild extracts the git tag archive plus AddonManager,
+# not the release asset freecad_source_${PV}.tar.gz, as SRC_URI above shows.
 #
 # Same filename on purpose, so the parity sweep pairs the two and reports the
-# content difference instead of an orphan on each side.
+# content difference instead of an orphan on each side. Drop the patch once
+# upstream backports 7db3f901 to the 1.1 branch.
 PATCHES=(
 	"${FILESDIR}"/freecad-1.1.1-fix-sketcher-toolbars.patch
 )
