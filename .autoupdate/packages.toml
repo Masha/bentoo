@@ -10012,6 +10012,9 @@ parser = "regex"
 pattern = 'webkitgtk-(2\.54\.[0-9]+)\.tar\.xz'
 select = "max"
 revision = 410
+patched = """
+Adds a webdriver USE flag (ENABLE_WEBDRIVER=$(usex webdriver), where ::gentoo hardcodes OFF in both slots) guarded by a cross-slot !net-libs/webkit-gtk:6[webdriver] blocker, since the WebKitWebDriver binary has one fixed path; a +jumbo-build flag driving ENABLE_UNIFIED_BUILDS; and keeps files/2.52.5-EventTarget-gcc16.patch (bug 970412) in PATCHES, which ::gentoo dropped at 2.52.5. webdriver defaults off in this slot.
+"""
 version = "2.54.2-r410"
 comments = """
 revision is the SLOT's BASE revision, not whatever the current ebuild carries.
@@ -10037,6 +10040,9 @@ parser = "regex"
 pattern = 'webkitgtk-(2\.54\.[0-9]+)\.tar\.xz'
 select = "max"
 revision = 600
+patched = """
+Adds a webdriver USE flag (ENABLE_WEBDRIVER=$(usex webdriver), where ::gentoo hardcodes OFF in both slots) guarded by a cross-slot !net-libs/webkit-gtk:4.1[webdriver] blocker, since the WebKitWebDriver binary has one fixed path; a +jumbo-build flag driving ENABLE_UNIFIED_BUILDS; and keeps files/2.52.5-EventTarget-gcc16.patch (bug 970412) in PATCHES, which ::gentoo dropped at 2.52.5. webdriver defaults on in this slot.
+"""
 version = "2.54.2-r600"
 comments = """
 600 is the base for this SLOT (::gentoo ships -r600 for every PV and -r601 as
