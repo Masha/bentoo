@@ -9640,6 +9640,30 @@ inherit pypi; PyPI info.version is canonical. Live=13.0.1 == current PV (no pref
 """
 # END
 
+["dev-python/qemu-qmp"]
+url = "https://pypi.org/pypi/qemu.qmp/json"
+parser = "json"
+path = "info.version"
+version = "0.0.6"
+comments = """
+qemu-qmp — temporary mirror of ::gentoo's 0.0.6, carried ONLY for its blocker
+(bentoo issue #53). PyPI dist is "qemu.qmp" (dotted); info.version is clean.
+Live=0.0.6 == current PV on 2026-10-26.
+
+::gentoo blocks !<app-emulation/qemu-11.1.2-r0[python]. This overlay's own
+qemu-11.1.2 was forked from 10.2.x until 2026-10-24 and installed qmp-shell
+itself; the rebase onto ::gentoo kept the same PVR, so that blocker misses the
+old image and merging qemu-qmp dies on a file collision. The mirror raises it to
+<11.1.2-r1 and qemu was revbumped to -r1 alongside. Measured on stub ebuilds in
+a scratch ROOT: revbump alone and PDEPEND both still collide; only the raised
+blocker merges.
+
+A bump here MUST keep the -r1 blocker. Exit: delete the mirror and set
+enabled = false once no supported install can still carry the pre-rebase
+image.
+"""
+# END
+
 ["dev-python/toml"]
 url = "https://pypi.org/pypi/toml/json"
 parser = "json"
