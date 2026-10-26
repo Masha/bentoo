@@ -6,5 +6,5 @@ KEYWORDS=-* ~amd64
 LICENSE=Apache-2.0
 RESTRICT=bindist mirror strip
 SLOT=0
-SRC_URI=amd64? ( https://registry.npmjs.org/@cline/cli-linux-x64/-/cli-linux-x64-3.0.73.tgz -> cline-bin-3.0.73-amd64.tgz )
+SRC_URI=amd64? ( https://registry.npmjs.org/@cline/cli-linux-x64/-/cli-linux-x64-3.0.74.tgz -> cline-bin-3.0.74-amd64.tgz )
 _md5_=aec7bc2d2c40f15733aa086c47fed79e
