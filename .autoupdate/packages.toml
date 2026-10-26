@@ -9495,13 +9495,11 @@ from the same release. Live=0.3.0. (A bump must re-check the mozjs/xargs build g
 # END
 
 ["dev-db/redis"]
-enabled = false
-disabled_by = "removed 2026-09-18: the revival condition expired within a day. ::gentoo shipped redis-8.10.2 at 04:07 on 2026-09-18, so 'one release ahead' became 'tied', and the overlay copy is byte-identical to ::gentoo's on every file -- ebuild, all 14 files/ entries, metadata.xml and the DIST hashes. ::gentoo carries priority = -1000, so at a tied PV this overlay WINS and was intercepting ::gentoo with an exact copy of it. That is the 2026-09-07 failure mode itself, not merely a resemblance: a frozen copy goes stale in silence while repo priority hides ::gentoo's improvements, which is how the zstd USE flag failed to reach anyone. Being identical today does not protect against that; only removal does. Reopen only to carry a version ::gentoo does not have, and close it again the moment ::gentoo catches up."
 url = "https://api.github.com/repos/redis/redis/releases/latest"
 parser = "json"
 path = "tag_name"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "8.10.2"
+version = "8.10.3"
 comments = """
 redis/redis official Releases; tag is bare X.Y.Z (no "v"), matching the SRC_URI
 archive tag and PV. Live latest=8.8.0 (prerelease=false) — the 8.x line, not a Valkey fork.
@@ -9520,6 +9518,11 @@ app-arch/fakeroot: the overlay carries it only while ::gentoo lags. That block s
 the exit condition as "DROP IT AGAIN the moment ::gentoo ships >=8.10.2", and it
 was met the next morning -- see disabled_by above. Kept here because the record of
 WHY it came back is what stops the same case being re-argued from scratch.
+
+The disabled_by quoted above was cleared on 2026-10-26, when the record was
+revived at 8.10.3 for the same reason as before: ::gentoo stops at 8.10.2. The
+ebuild is ::gentoo's 8.10.2 copied verbatim. Same exit condition: drop it once
+::gentoo ships >=8.10.3.
 """
 # END
 
@@ -11769,12 +11772,10 @@ it must be DROPPED, not forced, once a release carries the fix).
 # END
 
 ["www-client/opera"]
-enabled = false
-disabled_by = "removed 2026-10-21: ::gentoo's 138.0.6044.24 is byte-identical, CHROMIUM_VERSION=153 included -- see comments"
 url = "https://deb.opera.com/opera-stable/dists/stable/non-free/binary-amd64/Packages"
 parser = "regex"
 pattern = 'Package: opera-stable\nVersion: ([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)'
-version = "138.0.6044.24"
+version = "139.0.6053.14"
 comments = """
 Opera — read the APT index of Opera's own repository. The download CDN
 (downloadN.operacdn.com, which SRC_URI uses) publishes no listing, and
@@ -11828,6 +11829,16 @@ CHROMIUM_VERSION=153 holds, and ::gentoo ships ffmpeg-chromium-153 itself.
 Removed again on 2026-10-21: ::gentoo's opera-138.0.6044.24 is byte-identical
 to ours, CHROMIUM_VERSION=153 included, so the drop condition above is met.
 Revive only if the stable channel's Chromium moves past ::gentoo's pin again.
+
+Revived 2026-10-26 at 139.0.6053.14, because that happened: the binary reads
+Chrome/155.0.8059.85 while ::gentoo stops at opera-138 / ffmpeg-chromium:154.
+CHROMIUM_VERSION=155, served by this overlay's media-video/ffmpeg-chromium-155,
+whose COMMIT is exactly the ffmpeg_revision in chromium/src's DEPS at tag
+155.0.8059.85. Opera's own libffmpeg.so reports git-2026-08-25-e5441fe421 (its
+private build), but every one of the av* symbols the binary imports is
+exported even by the installed 154 build. All four operacdn.com mirrors were
+404 for this PV while the APT pool already had it (sha256 matches the index),
+so the ebuild now lists the pool as the last amd64 URI.
 """
 # END
 
