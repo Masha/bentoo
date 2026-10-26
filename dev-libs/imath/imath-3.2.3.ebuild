@@ -3,7 +3,7 @@
 
 EAPI=8
 
-PYTHON_COMPAT=( python3_{12..14} )
+PYTHON_COMPAT=( python3_{13..14} )
 
 # BENTOO-DIVERGENCE: PATCHES - none, where ::gentoo carries
 # imath-3.1.11-fix_cmake_module_export.patch. It edits

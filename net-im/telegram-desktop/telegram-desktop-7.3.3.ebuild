@@ -17,11 +17,20 @@ S="${WORKDIR}/${MY_P}"
 LICENSE="BSD GPL-3-with-openssl-exception LGPL-2+"
 SLOT="0"
 KEYWORDS="~amd64"
+# BENTOO-DIVERGENCE: IUSE - "qt-private-api" (default on), which ::gentoo lacks:
+# it always builds against Qt's private API. 7.3.3 is the first release with
+# DESKTOP_APP_DISABLE_PRIVATE_QT_API, and turning it off drops the := slot
+# operator on qtbase, so a Qt patch bump no longer forces a rebuild.
+# BENTOO-DIVERGENCE: REQUIRED_USE - the pango constraint that option imposes.
 IUSE="dbus enchant +fonts +pango +qt-private-api screencast wayland webkit +X"
 # Without the private Qt API upstream forces DESKTOP_APP_USE_PANGO=ON
 # (cmake_dependent_option in cmake/variables.cmake), so pango is not optional.
 REQUIRED_USE="!qt-private-api? ( pango )"
 
+# BENTOO-DIVERGENCE: DEPEND - qtbase with or without := under the same flag, and
+# kde-frameworks/kwindowsystem[wayland], which replaces the private API on
+# Wayland (xdg-activation, xdg-foreign) only when the flag is off.
+# BENTOO-DIVERGENCE: RDEPEND - the same atoms, through CDEPEND.
 CDEPEND="
 	!net-im/telegram-desktop-bin
 	app-arch/lz4:=
