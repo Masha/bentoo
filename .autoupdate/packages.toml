@@ -5850,6 +5850,7 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-plasma/breeze-gtk"]
+hold = true
 url = "https://api.github.com/repos/KDE/breeze-gtk/tags"
 parser = "regex"
 pattern = '"name":"v([0-9]+\.[0-9]+\.[0-9]+(?:\.[0-9]+)?)"'
@@ -5858,6 +5859,13 @@ headers = { "User-Agent" = "bentoo-autoupdate" }
 series = '^[0-9]+\.[0-9]+\.(?:[0-9]|[1-8][0-9])(?:\.[0-9]+)?(?:-r[0-9]+)?$'
 version = "6.8.2"
 comments = """
+2026-10-27: carried again as one of the 72 ebuilds of the whole Plasma 6.8.2
+family, shipped ahead of ::gentoo (still at 6.8.1). hold = true because the
+family moves in lockstep: each ebuild asks for its siblings at >=${KDE_CATV},
+so a lone bump to 6.8.3 asks for siblings nothing provides (the kwin-6.8.2
+break of 644b48b13, revived without the rest). Exit: once ::gentoo ships
+6.8.2, delete the family copies and set enabled = false again.
+
 breeze-gtk -> KDE/breeze-gtk. KDE Plasma family: the whole series is released in lockstep.
 
 Probed with `parser = "regex"` + `select = "max"` + `series`, NOT `[0].name`.
@@ -5876,6 +5884,7 @@ for 6.7.90 siblings that ::gentoo does not have, and nothing satisfies them.
 # END
 
 ["kde-plasma/discover"]
+hold = true
 url = "https://api.github.com/repos/KDE/discover/tags"
 parser = "regex"
 pattern = '"name":"v([0-9]+\.[0-9]+\.[0-9]+(?:\.[0-9]+)?)"'
@@ -5884,6 +5893,13 @@ headers = { "User-Agent" = "bentoo-autoupdate" }
 series = '^[0-9]+\.[0-9]+\.(?:[0-9]|[1-8][0-9])(?:\.[0-9]+)?(?:-r[0-9]+)?$'
 version = "6.8.2"
 comments = """
+2026-10-27: carried again as one of the 72 ebuilds of the whole Plasma 6.8.2
+family, shipped ahead of ::gentoo (still at 6.8.1). hold = true because the
+family moves in lockstep: each ebuild asks for its siblings at >=${KDE_CATV},
+so a lone bump to 6.8.3 asks for siblings nothing provides (the kwin-6.8.2
+break of 644b48b13, revived without the rest). Exit: once ::gentoo ships
+6.8.2, delete the family copies and set enabled = false again.
+
 discover -> KDE/discover. KDE Plasma family: the whole series is released in lockstep.
 
 Probed with `parser = "regex"` + `select = "max"` + `series`, NOT `[0].name`.
@@ -5902,6 +5918,7 @@ for 6.7.90 siblings that ::gentoo does not have, and nothing satisfies them.
 # END
 
 ["kde-plasma/drkonqi"]
+hold = true
 url = "https://api.github.com/repos/KDE/drkonqi/tags"
 parser = "regex"
 pattern = '"name":"v([0-9]+\.[0-9]+\.[0-9]+(?:\.[0-9]+)?)"'
@@ -5910,6 +5927,13 @@ headers = { "User-Agent" = "bentoo-autoupdate" }
 series = '^[0-9]+\.[0-9]+\.(?:[0-9]|[1-8][0-9])(?:\.[0-9]+)?(?:-r[0-9]+)?$'
 version = "6.8.2"
 comments = """
+2026-10-27: carried again as one of the 72 ebuilds of the whole Plasma 6.8.2
+family, shipped ahead of ::gentoo (still at 6.8.1). hold = true because the
+family moves in lockstep: each ebuild asks for its siblings at >=${KDE_CATV},
+so a lone bump to 6.8.3 asks for siblings nothing provides (the kwin-6.8.2
+break of 644b48b13, revived without the rest). Exit: once ::gentoo ships
+6.8.2, delete the family copies and set enabled = false again.
+
 drkonqi -> KDE/drkonqi. KDE Plasma family: the whole series is released in lockstep.
 
 Probed with `parser = "regex"` + `select = "max"` + `series`, NOT `[0].name`.
@@ -5956,6 +5980,7 @@ for 6.7.90 siblings that ::gentoo does not have, and nothing satisfies them.
 # END
 
 ["kde-plasma/kdeplasma-addons"]
+hold = true
 url = "https://api.github.com/repos/KDE/kdeplasma-addons/tags"
 parser = "regex"
 pattern = '"name":"v([0-9]+\.[0-9]+\.[0-9]+(?:\.[0-9]+)?)"'
@@ -5964,6 +5989,13 @@ headers = { "User-Agent" = "bentoo-autoupdate" }
 series = '^[0-9]+\.[0-9]+\.(?:[0-9]|[1-8][0-9])(?:\.[0-9]+)?(?:-r[0-9]+)?$'
 version = "6.8.2"
 comments = """
+2026-10-27: carried again as one of the 72 ebuilds of the whole Plasma 6.8.2
+family, shipped ahead of ::gentoo (still at 6.8.1). hold = true because the
+family moves in lockstep: each ebuild asks for its siblings at >=${KDE_CATV},
+so a lone bump to 6.8.3 asks for siblings nothing provides (the kwin-6.8.2
+break of 644b48b13, revived without the rest). Exit: once ::gentoo ships
+6.8.2, delete the family copies and set enabled = false again.
+
 kdeplasma-addons -> KDE/kdeplasma-addons. KDE Plasma family: the whole series is released in lockstep.
 
 Probed with `parser = "regex"` + `select = "max"` + `series`, NOT `[0].name`.
@@ -5982,6 +6014,7 @@ for 6.7.90 siblings that ::gentoo does not have, and nothing satisfies them.
 # END
 
 ["kde-plasma/kwin"]
+hold = true
 url = "https://api.github.com/repos/KDE/kwin/tags"
 parser = "regex"
 pattern = '"name":"v([0-9]+\.[0-9]+\.[0-9]+(?:\.[0-9]+)?)"'
@@ -5990,6 +6023,13 @@ headers = { "User-Agent" = "bentoo-autoupdate" }
 series = '^[0-9]+\.[0-9]+\.(?:[0-9]|[1-8][0-9])(?:\.[0-9]+)?(?:-r[0-9]+)?$'
 version = "6.8.2"
 comments = """
+2026-10-27: carried again as one of the 72 ebuilds of the whole Plasma 6.8.2
+family, shipped ahead of ::gentoo (still at 6.8.1). hold = true because the
+family moves in lockstep: each ebuild asks for its siblings at >=${KDE_CATV},
+so a lone bump to 6.8.3 asks for siblings nothing provides (the kwin-6.8.2
+break of 644b48b13, revived without the rest). Exit: once ::gentoo ships
+6.8.2, delete the family copies and set enabled = false again.
+
 kwin -> KDE/kwin. KDE Plasma family: the whole series is released in lockstep.
 
 Probed with `parser = "regex"` + `select = "max"` + `series`, NOT `[0].name`.
@@ -6008,6 +6048,7 @@ for 6.7.90 siblings that ::gentoo does not have, and nothing satisfies them.
 # END
 
 ["kde-plasma/plasma-desktop"]
+hold = true
 url = "https://api.github.com/repos/KDE/plasma-desktop/tags"
 parser = "regex"
 pattern = '"name":"v([0-9]+\.[0-9]+\.[0-9]+(?:\.[0-9]+)?)"'
@@ -6016,6 +6057,13 @@ headers = { "User-Agent" = "bentoo-autoupdate" }
 series = '^[0-9]+\.[0-9]+\.(?:[0-9]|[1-8][0-9])(?:\.[0-9]+)?(?:-r[0-9]+)?$'
 version = "6.8.2"
 comments = """
+2026-10-27: carried again as one of the 72 ebuilds of the whole Plasma 6.8.2
+family, shipped ahead of ::gentoo (still at 6.8.1). hold = true because the
+family moves in lockstep: each ebuild asks for its siblings at >=${KDE_CATV},
+so a lone bump to 6.8.3 asks for siblings nothing provides (the kwin-6.8.2
+break of 644b48b13, revived without the rest). Exit: once ::gentoo ships
+6.8.2, delete the family copies and set enabled = false again.
+
 plasma-desktop -> KDE/plasma-desktop. KDE Plasma family: the whole series is released in lockstep.
 
 Probed with `parser = "regex"` + `select = "max"` + `series`, NOT `[0].name`.
@@ -6034,6 +6082,7 @@ for 6.7.90 siblings that ::gentoo does not have, and nothing satisfies them.
 # END
 
 ["kde-plasma/plasma-firewall"]
+hold = true
 url = "https://api.github.com/repos/KDE/plasma-firewall/tags"
 parser = "regex"
 pattern = '"name":"v([0-9]+\.[0-9]+\.[0-9]+(?:\.[0-9]+)?)"'
@@ -6042,6 +6091,13 @@ headers = { "User-Agent" = "bentoo-autoupdate" }
 series = '^[0-9]+\.[0-9]+\.(?:[0-9]|[1-8][0-9])(?:\.[0-9]+)?(?:-r[0-9]+)?$'
 version = "6.8.2"
 comments = """
+2026-10-27: carried again as one of the 72 ebuilds of the whole Plasma 6.8.2
+family, shipped ahead of ::gentoo (still at 6.8.1). hold = true because the
+family moves in lockstep: each ebuild asks for its siblings at >=${KDE_CATV},
+so a lone bump to 6.8.3 asks for siblings nothing provides (the kwin-6.8.2
+break of 644b48b13, revived without the rest). Exit: once ::gentoo ships
+6.8.2, delete the family copies and set enabled = false again.
+
 plasma-firewall -> KDE/plasma-firewall. KDE Plasma family: the whole series is released in lockstep.
 
 Probed with `parser = "regex"` + `select = "max"` + `series`, NOT `[0].name`.
@@ -6073,8 +6129,15 @@ as invalid and never rechecks it, so brightness control is lost for the whole \
 session. Drop this once upstream (and then ::gentoo) carries the fix.\
 """
 series = '^[0-9]+\.[0-9]+\.(?:[0-9]|[1-8][0-9])(?:\.[0-9]+)?(?:-r[0-9]+)?$'
-version = "6.8.1"
+version = "6.8.2"
 comments = """
+2026-10-27: carried again as one of the 72 ebuilds of the whole Plasma 6.8.2
+family, shipped ahead of ::gentoo (still at 6.8.1). hold = true because the
+family moves in lockstep: each ebuild asks for its siblings at >=${KDE_CATV},
+so a lone bump to 6.8.3 asks for siblings nothing provides (the kwin-6.8.2
+break of 644b48b13, revived without the rest). Exit: once ::gentoo ships
+6.8.2, delete the family copies (this one stays while the DDC patch is needed) and set enabled = false again.
+
 powerdevil -> plasma/powerdevil. ::gentoo's ebuild plus the DDC/CI patch in
 `patched`; nothing else differs. Carried since the 6.8 beta (6.7.91-r1) and
 kept past 2026-10-15, when the rest of the 6.7.91 family left because ::gentoo
@@ -6130,22 +6193,22 @@ package.mask block, and set this record enabled = false.
 # END
 
 ["kde-plasma/spectacle"]
+hold = true
 url = "https://api.github.com/repos/KDE/plasma-workspace/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"v([0-9]+\.[0-9]+\.[0-9]+(?:\.[0-9]+)?)"'
 select = "max"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-patched = """
-Applies files/spectacle-opencv5.patch, which ::gentoo does not ship at 6.7.4 — \
-it carries no files/ directory for this package at all — and adds a \
-pkg_postinst calling xdg_pkg_postinst (xdg is already inherited). The patch is \
-named ${PN}-opencv5.patch, not ${P}-, deliberately: it has been byte-identical \
-since 6.7.1, and a version in the filename would make every bump rename it by \
-hand. Drop this once ::gentoo carries the opencv5 fix itself.\
-"""
 series = '^[0-9]+\.[0-9]+\.(?:[0-9]|[1-8][0-9])(?:\.[0-9]+)?(?:-r[0-9]+)?$'
 version = "6.8.2"
 comments = """
+2026-10-27: carried again as one of the 72 ebuilds of the whole Plasma 6.8.2
+family, shipped ahead of ::gentoo (still at 6.8.1). hold = true because the
+family moves in lockstep: each ebuild asks for its siblings at >=${KDE_CATV},
+so a lone bump to 6.8.3 asks for siblings nothing provides (the kwin-6.8.2
+break of 644b48b13, revived without the rest). Exit: once ::gentoo ships
+6.8.2, delete the family copies and set enabled = false again.
+
 spectacle -> KDE/plasma-workspace (anchor: overlay versions it as Plasma).
 
 `series` excludes the BETAS. Plasma numbers the next series' beta as x.y.90 /

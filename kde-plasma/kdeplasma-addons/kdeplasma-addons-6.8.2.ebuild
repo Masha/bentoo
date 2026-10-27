@@ -16,7 +16,7 @@ inherit cargo ecm flag-o-matic plasma.kde.org optfeature xdg
 DESCRIPTION="Extra Plasma applets and engines"
 
 if [[ ${KDE_BUILD_TYPE} == release ]] && [[ ${PKGBUMPING} != ${PVR} ]]; then
-	# No crate tarball published for 6.8.2 yet; reuse 6.8.1's
+	# BENTOO-DIVERGENCE: SRC_URI - gentoo-crate-dist has no 6.8.2 tarball; 6.8.2 leaves Cargo.lock as 6.8.1 had it.
 	CRATES_PV=6.8.1
 	if [[ ${KDE_ORG_UNRELEASED} && ${PV} == *.*.0 ]] ; then
 		# For unreleased versions (only .0), the last tag will (typically) be x.y.91.
