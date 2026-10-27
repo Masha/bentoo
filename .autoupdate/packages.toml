@@ -593,20 +593,26 @@ at a commit that changes without a version to announce it.
 # END
 
 ["dev-util/cargo-geiger"]
-url = "https://api.github.com/repos/geiger-rs/cargo-geiger/releases/latest"
+url = "https://crates.io/api/v1/crates/cargo-geiger"
 parser = "json"
-path = "tag_name"
-transform = [['^cargo-geiger-', '']]
+path = "crate.max_stable_version"
 headers = { "User-Agent" = "bentoo-autoupdate" }
-version = "0.13.0"
+version = "0.14.0"
 comments = """
-cargo-geiger - the tag is PREFIXED with the crate name, "cargo-geiger-X.Y.Z",
-because the repository is a workspace that also tags geiger-X.Y.Z and
-cargo-geiger-serde-X.Y.Z from the same space. Ranking tags here would happily
-return a geiger-0.4.x and read as a massive downgrade; the transform strips the
-prefix off the release endpoint instead.
+cargo-geiger - probed on crates.io, NOT on GitHub releases. The repository is a
+workspace (cargo-geiger, geiger, cargo-geiger-serde) and its tag prefix is not
+stable: up to 0.13.0 the release tag was "cargo-geiger-X.Y.Z", but 0.14.0
+(2026-10-12) was released under "geiger-0.14.0" (one tag for the whole
+workspace; "cargo-geiger-0.14.0" does not exist). releases/latest with a
+'^cargo-geiger-' transform then returned "geiger-0.14.0" -> "not comparable".
+crates.io max_stable_version is the bare version of the binary crate itself,
+whatever the tag is called (verified 2026-10-27: 200, "0.14.0").
 
-Upstream has been quiet since August 2025. A long gap is expected.
+Because the probe no longer sees the tag, a bump must check it by hand: since
+0.14.0 SRC_URI fetches .../tags/geiger-${PV}.tar.gz (S=${PN}-geiger-${PV});
+if upstream goes back to "cargo-geiger-X.Y.Z" the fetch 404s. CRATES= must be
+regenerated on every bump (pycargoebuild from the cargo-geiger/ member, not
+the workspace root).
 """
 # END
 
