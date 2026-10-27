@@ -2749,6 +2749,8 @@ mdds — default tag order; clean semver.
 # END
 
 ["net-vpn/networkmanager-openvpn"]
+enabled = false
+disabled_by = "parity-audit 2026-10-27: removed, ::gentoo 1.12.5 is ahead of our copy (tmpfiles, networkmanager-1.52.2 floor, ~arch KEYWORDS); ours carried only a comment"
 url = "https://gitlab.gnome.org/api/v4/projects/GNOME%2FNetworkManager-openvpn/repository/tags"
 parser = "json"
 path = "[0].name"
