@@ -1,16 +1,16 @@
 # Copyright 1999-2026 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=8
-
-# ::gentoo's 6.8.1 plus one patch, which makes powerdevil redetect monitors
+# ::gentoo's 6.8.2 plus one patch, which makes powerdevil redetect monitors
 # whose DDC/CI was not ready yet when it started (seen at login on an HDMI
 # monitor): libddcutil marks them invalid and never rechecks them, so
 # brightness control is lost for the whole session. Still needed on upstream
-# master as of 2026-10-08, and 6.8.1 leaves ddcutildetector.cpp untouched
-# (checked 2026-10-22). The patch name carries no version on purpose: the
+# master as of 2026-10-08, and it applies cleanly to 6.8.2 (checked
+# 2026-10-27). The patch name carries no version on purpose: the
 # autoupdate applier never renames files/, so a versioned name breaks a bump.
 # BENTOO-DIVERGENCE: PATCHES - redetect monitors whose DDC/CI was not ready at startup.
+
+EAPI=8
 
 ECM_HANDBOOK="optional"
 ECM_TEST="true"
@@ -58,7 +58,7 @@ COMMON_DEPEND="
 	brightness-control? ( app-misc/ddcutil:= )
 "
 DEPEND="${COMMON_DEPEND}
-	>=dev-libs/plasma-wayland-protocols-1.20.0
+	>=dev-libs/plasma-wayland-protocols-1.23.0
 "
 RDEPEND="${COMMON_DEPEND}
 	!<kde-plasma/plasma-workspace-6.1.90:*
@@ -78,12 +78,12 @@ BDEPEND="
 	>=kde-frameworks/kcmutils-${KFMIN}:6
 "
 
+# -m 0755 to avoid suid with USE="-filecaps"
+FILECAPS=( -m 0755 cap_wake_alarm=ep usr/libexec/org_kde_powerdevil )
+
 PATCHES=(
 	"${FILESDIR}"/${PN}-ddc-redetect-invalid-displays.patch
 )
-
-# -m 0755 to avoid suid with USE="-filecaps"
-FILECAPS=( -m 0755 cap_wake_alarm=ep usr/libexec/org_kde_powerdevil )
 
 src_configure() {
 	local mycmakeargs=(

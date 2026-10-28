@@ -5846,7 +5846,8 @@ freezes on purpose: a :7 category would be a different set of ebuilds.
 # END
 
 ["kde-plasma/breeze-gtk"]
-hold = true
+enabled = false
+disabled_by = "removed 2026-10-28: ::gentoo ships the Plasma 6.8.2 family; the copies taken from its 6.8.1 shadowed its newer 6.8.2 ebuilds"
 url = "https://api.github.com/repos/KDE/breeze-gtk/tags"
 parser = "regex"
 pattern = '"name":"v([0-9]+\.[0-9]+\.[0-9]+(?:\.[0-9]+)?)"'
@@ -5855,6 +5856,10 @@ headers = { "User-Agent" = "bentoo-autoupdate" }
 series = '^[0-9]+\.[0-9]+\.(?:[0-9]|[1-8][0-9])(?:\.[0-9]+)?(?:-r[0-9]+)?$'
 version = "6.8.2"
 comments = """
+2026-10-28: removed with the whole 6.8.2 family copy, the exit condition below
+met -- ::gentoo now ships 6.8.2. Every divergence `bentoo overlay compare`
+reported against it came from ::gentoo's side.
+
 2026-10-27: carried again as one of the 72 ebuilds of the whole Plasma 6.8.2
 family, shipped ahead of ::gentoo (still at 6.8.1). hold = true because the
 family moves in lockstep: each ebuild asks for its siblings at >=${KDE_CATV},
@@ -5880,7 +5885,8 @@ for 6.7.90 siblings that ::gentoo does not have, and nothing satisfies them.
 # END
 
 ["kde-plasma/discover"]
-hold = true
+enabled = false
+disabled_by = "removed 2026-10-28: ::gentoo ships the Plasma 6.8.2 family; the copies taken from its 6.8.1 shadowed its newer 6.8.2 ebuilds"
 url = "https://api.github.com/repos/KDE/discover/tags"
 parser = "regex"
 pattern = '"name":"v([0-9]+\.[0-9]+\.[0-9]+(?:\.[0-9]+)?)"'
@@ -5889,6 +5895,10 @@ headers = { "User-Agent" = "bentoo-autoupdate" }
 series = '^[0-9]+\.[0-9]+\.(?:[0-9]|[1-8][0-9])(?:\.[0-9]+)?(?:-r[0-9]+)?$'
 version = "6.8.2"
 comments = """
+2026-10-28: removed with the whole 6.8.2 family copy, the exit condition below
+met -- ::gentoo now ships 6.8.2. Every divergence `bentoo overlay compare`
+reported against it came from ::gentoo's side.
+
 2026-10-27: carried again as one of the 72 ebuilds of the whole Plasma 6.8.2
 family, shipped ahead of ::gentoo (still at 6.8.1). hold = true because the
 family moves in lockstep: each ebuild asks for its siblings at >=${KDE_CATV},
@@ -5914,7 +5924,8 @@ for 6.7.90 siblings that ::gentoo does not have, and nothing satisfies them.
 # END
 
 ["kde-plasma/drkonqi"]
-hold = true
+enabled = false
+disabled_by = "removed 2026-10-28: ::gentoo ships the Plasma 6.8.2 family; the copies taken from its 6.8.1 shadowed its newer 6.8.2 ebuilds"
 url = "https://api.github.com/repos/KDE/drkonqi/tags"
 parser = "regex"
 pattern = '"name":"v([0-9]+\.[0-9]+\.[0-9]+(?:\.[0-9]+)?)"'
@@ -5923,6 +5934,10 @@ headers = { "User-Agent" = "bentoo-autoupdate" }
 series = '^[0-9]+\.[0-9]+\.(?:[0-9]|[1-8][0-9])(?:\.[0-9]+)?(?:-r[0-9]+)?$'
 version = "6.8.2"
 comments = """
+2026-10-28: removed with the whole 6.8.2 family copy, the exit condition below
+met -- ::gentoo now ships 6.8.2. Every divergence `bentoo overlay compare`
+reported against it came from ::gentoo's side.
+
 2026-10-27: carried again as one of the 72 ebuilds of the whole Plasma 6.8.2
 family, shipped ahead of ::gentoo (still at 6.8.1). hold = true because the
 family moves in lockstep: each ebuild asks for its siblings at >=${KDE_CATV},
@@ -5976,7 +5991,8 @@ for 6.7.90 siblings that ::gentoo does not have, and nothing satisfies them.
 # END
 
 ["kde-plasma/kdeplasma-addons"]
-hold = true
+enabled = false
+disabled_by = "removed 2026-10-28: ::gentoo ships the Plasma 6.8.2 family; the copies taken from its 6.8.1 shadowed its newer 6.8.2 ebuilds"
 url = "https://api.github.com/repos/KDE/kdeplasma-addons/tags"
 parser = "regex"
 pattern = '"name":"v([0-9]+\.[0-9]+\.[0-9]+(?:\.[0-9]+)?)"'
@@ -5985,6 +6001,10 @@ headers = { "User-Agent" = "bentoo-autoupdate" }
 series = '^[0-9]+\.[0-9]+\.(?:[0-9]|[1-8][0-9])(?:\.[0-9]+)?(?:-r[0-9]+)?$'
 version = "6.8.2"
 comments = """
+2026-10-28: removed with the whole 6.8.2 family copy, the exit condition below
+met -- ::gentoo now ships 6.8.2. Every divergence `bentoo overlay compare`
+reported against it came from ::gentoo's side.
+
 2026-10-27: carried again as one of the 72 ebuilds of the whole Plasma 6.8.2
 family, shipped ahead of ::gentoo (still at 6.8.1). hold = true because the
 family moves in lockstep: each ebuild asks for its siblings at >=${KDE_CATV},
@@ -6010,7 +6030,8 @@ for 6.7.90 siblings that ::gentoo does not have, and nothing satisfies them.
 # END
 
 ["kde-plasma/kwin"]
-hold = true
+enabled = false
+disabled_by = "removed 2026-10-28: ::gentoo ships the Plasma 6.8.2 family; the copies taken from its 6.8.1 shadowed its newer 6.8.2 ebuilds"
 url = "https://api.github.com/repos/KDE/kwin/tags"
 parser = "regex"
 pattern = '"name":"v([0-9]+\.[0-9]+\.[0-9]+(?:\.[0-9]+)?)"'
@@ -6019,6 +6040,10 @@ headers = { "User-Agent" = "bentoo-autoupdate" }
 series = '^[0-9]+\.[0-9]+\.(?:[0-9]|[1-8][0-9])(?:\.[0-9]+)?(?:-r[0-9]+)?$'
 version = "6.8.2"
 comments = """
+2026-10-28: removed with the whole 6.8.2 family copy, the exit condition below
+met -- ::gentoo now ships 6.8.2. Every divergence `bentoo overlay compare`
+reported against it came from ::gentoo's side.
+
 2026-10-27: carried again as one of the 72 ebuilds of the whole Plasma 6.8.2
 family, shipped ahead of ::gentoo (still at 6.8.1). hold = true because the
 family moves in lockstep: each ebuild asks for its siblings at >=${KDE_CATV},
@@ -6044,7 +6069,8 @@ for 6.7.90 siblings that ::gentoo does not have, and nothing satisfies them.
 # END
 
 ["kde-plasma/plasma-desktop"]
-hold = true
+enabled = false
+disabled_by = "removed 2026-10-28: ::gentoo ships the Plasma 6.8.2 family; the copies taken from its 6.8.1 shadowed its newer 6.8.2 ebuilds"
 url = "https://api.github.com/repos/KDE/plasma-desktop/tags"
 parser = "regex"
 pattern = '"name":"v([0-9]+\.[0-9]+\.[0-9]+(?:\.[0-9]+)?)"'
@@ -6053,6 +6079,10 @@ headers = { "User-Agent" = "bentoo-autoupdate" }
 series = '^[0-9]+\.[0-9]+\.(?:[0-9]|[1-8][0-9])(?:\.[0-9]+)?(?:-r[0-9]+)?$'
 version = "6.8.2"
 comments = """
+2026-10-28: removed with the whole 6.8.2 family copy, the exit condition below
+met -- ::gentoo now ships 6.8.2. Every divergence `bentoo overlay compare`
+reported against it came from ::gentoo's side.
+
 2026-10-27: carried again as one of the 72 ebuilds of the whole Plasma 6.8.2
 family, shipped ahead of ::gentoo (still at 6.8.1). hold = true because the
 family moves in lockstep: each ebuild asks for its siblings at >=${KDE_CATV},
@@ -6078,7 +6108,8 @@ for 6.7.90 siblings that ::gentoo does not have, and nothing satisfies them.
 # END
 
 ["kde-plasma/plasma-firewall"]
-hold = true
+enabled = false
+disabled_by = "removed 2026-10-28: ::gentoo ships the Plasma 6.8.2 family; the copies taken from its 6.8.1 shadowed its newer 6.8.2 ebuilds"
 url = "https://api.github.com/repos/KDE/plasma-firewall/tags"
 parser = "regex"
 pattern = '"name":"v([0-9]+\.[0-9]+\.[0-9]+(?:\.[0-9]+)?)"'
@@ -6087,6 +6118,10 @@ headers = { "User-Agent" = "bentoo-autoupdate" }
 series = '^[0-9]+\.[0-9]+\.(?:[0-9]|[1-8][0-9])(?:\.[0-9]+)?(?:-r[0-9]+)?$'
 version = "6.8.2"
 comments = """
+2026-10-28: removed with the whole 6.8.2 family copy, the exit condition below
+met -- ::gentoo now ships 6.8.2. Every divergence `bentoo overlay compare`
+reported against it came from ::gentoo's side.
+
 2026-10-27: carried again as one of the 72 ebuilds of the whole Plasma 6.8.2
 family, shipped ahead of ::gentoo (still at 6.8.1). hold = true because the
 family moves in lockstep: each ebuild asks for its siblings at >=${KDE_CATV},
@@ -6133,6 +6168,9 @@ family moves in lockstep: each ebuild asks for its siblings at >=${KDE_CATV},
 so a lone bump to 6.8.3 asks for siblings nothing provides (the kwin-6.8.2
 break of 644b48b13, revived without the rest). Exit: once ::gentoo ships
 6.8.2, delete the family copies (this one stays while the DDC patch is needed) and set enabled = false again.
+2026-10-28: ::gentoo ships 6.8.2 and the family copies are gone; this ebuild
+was rebuilt from ::gentoo's 6.8.2 plus the DDC patch (it had kept the 6.8.1
+copy's plasma-wayland-protocols floor of 1.20.0; ::gentoo's is 1.23.0).
 
 powerdevil -> plasma/powerdevil. ::gentoo's ebuild plus the DDC/CI patch in
 `patched`; nothing else differs. Carried since the 6.8 beta (6.7.91-r1) and
@@ -6189,7 +6227,8 @@ package.mask block, and set this record enabled = false.
 # END
 
 ["kde-plasma/spectacle"]
-hold = true
+enabled = false
+disabled_by = "removed 2026-10-28: ::gentoo ships the Plasma 6.8.2 family; the copies taken from its 6.8.1 shadowed its newer 6.8.2 ebuilds"
 url = "https://api.github.com/repos/KDE/plasma-workspace/tags?per_page=20"
 parser = "regex"
 pattern = '"name":"v([0-9]+\.[0-9]+\.[0-9]+(?:\.[0-9]+)?)"'
@@ -6198,6 +6237,10 @@ headers = { "User-Agent" = "bentoo-autoupdate" }
 series = '^[0-9]+\.[0-9]+\.(?:[0-9]|[1-8][0-9])(?:\.[0-9]+)?(?:-r[0-9]+)?$'
 version = "6.8.2"
 comments = """
+2026-10-28: removed with the whole 6.8.2 family copy, the exit condition below
+met -- ::gentoo now ships 6.8.2. Every divergence `bentoo overlay compare`
+reported against it came from ::gentoo's side.
+
 2026-10-27: carried again as one of the 72 ebuilds of the whole Plasma 6.8.2
 family, shipped ahead of ::gentoo (still at 6.8.1). hold = true because the
 family moves in lockstep: each ebuild asks for its siblings at >=${KDE_CATV},
