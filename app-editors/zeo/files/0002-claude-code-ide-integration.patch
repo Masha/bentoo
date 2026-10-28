@@ -78,7 +78,7 @@ name are invalid. The terminal environment is one helper,
 ---
 
 diff --git a/Cargo.lock b/Cargo.lock
-index 3ddbbde..c315abf 100644
+index 40d5377..527ef16 100644
 --- a/Cargo.lock
 +++ b/Cargo.lock
 @@ -3066,6 +3066,32 @@ version = "0.7.6"
@@ -114,7 +114,7 @@ index 3ddbbde..c315abf 100644
  [[package]]
  name = "cli"
  version = "0.1.0"
-@@ -22611,6 +22637,7 @@ dependencies = [
+@@ -22587,6 +22613,7 @@ dependencies = [
   "channel",
   "chrono",
   "clap",
@@ -123,7 +123,7 @@ index 3ddbbde..c315abf 100644
   "client",
   "clock",
 diff --git a/Cargo.toml b/Cargo.toml
-index ffc75c7..5e67f0d 100644
+index f25de04..ea634a1 100644
 --- a/Cargo.toml
 +++ b/Cargo.toml
 @@ -29,6 +29,7 @@ members = [
@@ -2405,7 +2405,7 @@ index c940607..e9aae69 100644
 +    }
 +}
 diff --git a/crates/zed/Cargo.toml b/crates/zed/Cargo.toml
-index 34cd9fe..0c89d5f 100644
+index 00dc57c..a13638e 100644
 --- a/crates/zed/Cargo.toml
 +++ b/crates/zed/Cargo.toml
 @@ -86,6 +86,7 @@ call.workspace = true
@@ -2417,7 +2417,7 @@ index 34cd9fe..0c89d5f 100644
  cli.workspace = true
  client.workspace = true
 diff --git a/crates/zed/src/main.rs b/crates/zed/src/main.rs
-index 63a1ed8..9db8556 100644
+index f9fa130..1403ec2 100644
 --- a/crates/zed/src/main.rs
 +++ b/crates/zed/src/main.rs
 @@ -702,6 +702,7 @@ fn main() {

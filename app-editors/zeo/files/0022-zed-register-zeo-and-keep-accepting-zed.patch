@@ -127,7 +127,7 @@ index 048b2dd..ec48354 100644
 +    cx.update(|cx| cx.register_url_scheme(ZEO_URL_SCHEME)).await
  }
 diff --git a/crates/zed/src/main.rs b/crates/zed/src/main.rs
-index 598cd35..2ae5f82 100644
+index 6212be8..0aa2f02 100644
 --- a/crates/zed/src/main.rs
 +++ b/crates/zed/src/main.rs
 @@ -1891,6 +1891,7 @@ fn parse_url_arg(arg: &str, cx: &App) -> String {
@@ -139,7 +139,7 @@ index 598cd35..2ae5f82 100644
                  || arg.starts_with("zed-cli://")
                  || arg.starts_with("ssh://")
 diff --git a/crates/zed/src/zed.rs b/crates/zed/src/zed.rs
-index 4a074c8..c80b1f9 100644
+index 82b392c..f977f8a 100644
 --- a/crates/zed/src/zed.rs
 +++ b/crates/zed/src/zed.rs
 @@ -1280,7 +1280,7 @@ fn register_actions(

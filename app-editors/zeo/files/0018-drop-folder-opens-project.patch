@@ -66,7 +66,7 @@ Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>
 ---
 
 diff --git a/assets/settings/default.json b/assets/settings/default.json
-index bbe2552..e6b6579 100644
+index 8172ebd..206448b 100644
 --- a/assets/settings/default.json
 +++ b/assets/settings/default.json
 @@ -186,6 +186,17 @@
@@ -100,7 +100,7 @@ index 3cc0736..0c55dae 100644
              close_panel_on_toggle: None,
              command_aliases: Default::default(),
 diff --git a/crates/settings_content/src/workspace.rs b/crates/settings_content/src/workspace.rs
-index 0a6429e..23b9c06 100644
+index 6d3c958..0dfbb6a 100644
 --- a/crates/settings_content/src/workspace.rs
 +++ b/crates/settings_content/src/workspace.rs
 @@ -62,6 +62,13 @@ pub struct WorkspaceSettingsContent {
@@ -151,7 +151,7 @@ index 0a6429e..23b9c06 100644
      Copy,
      Clone,
 diff --git a/crates/workspace/src/pane.rs b/crates/workspace/src/pane.rs
-index 70e7c50..29368c5 100644
+index 621b753..9413d5c 100644
 --- a/crates/workspace/src/pane.rs
 +++ b/crates/workspace/src/pane.rs
 @@ -1,5 +1,5 @@
@@ -170,7 +170,7 @@ index 70e7c50..29368c5 100644
  use std::{
      any::Any,
      cmp, fmt, mem,
-@@ -4207,6 +4207,44 @@ impl Pane {
+@@ -4217,6 +4217,44 @@ impl Pane {
                          paths
                      };
  
@@ -215,7 +215,7 @@ index 70e7c50..29368c5 100644
                      if let Ok((open_task, to_pane)) =
                          workspace.update_in(cx, |workspace, window, cx| {
                              if let Some(split_direction) = split_direction {
-@@ -5080,6 +5118,26 @@ impl Render for DraggedTab {
+@@ -5090,6 +5128,26 @@ impl Render for DraggedTab {
      }
  }
  
@@ -242,7 +242,7 @@ index 70e7c50..29368c5 100644
  #[cfg(test)]
  mod tests {
      use std::{cell::Cell, iter::zip, num::NonZero, rc::Rc};
-@@ -9664,4 +9722,102 @@ mod tests {
+@@ -9784,4 +9842,102 @@ mod tests {
              }
          }
      }

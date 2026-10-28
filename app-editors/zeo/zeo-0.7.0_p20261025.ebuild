@@ -17,9 +17,9 @@ CRATES="
 	adler2@2.0.1
 	adler32@1.2.0
 	aes@0.8.4
-	agent-client-protocol-derive@3.4.0
+	agent-client-protocol-derive@3.5.0
 	agent-client-protocol-schema@1.12.0
-	agent-client-protocol@3.4.0
+	agent-client-protocol@3.5.0
 	ahash@0.8.12
 	aho-corasick@1.1.3
 	aliasable@0.1.3
@@ -30,7 +30,7 @@ CRATES="
 	alsa-sys@0.4.0
 	alsa@0.11.0
 	ambient-authority@0.0.2
-	ammonia@4.1.4
+	ammonia@4.1.8
 	android_system_properties@0.1.5
 	anes@0.1.6
 	annotate-snippets@0.12.12
@@ -201,9 +201,7 @@ CRATES="
 	cmake@0.1.56
 	cobs@0.3.0
 	cocoa-foundation@0.1.2
-	cocoa-foundation@0.2.0
 	cocoa@0.25.0
-	cocoa@0.26.0
 	codespan-reporting@0.13.0
 	color_quant@1.1.0
 	colorchoice@1.0.4
@@ -242,19 +240,19 @@ CRATES="
 	cpp_demangle@0.5.1
 	cpufeatures@0.2.17
 	cpufeatures@0.3.0
-	cranelift-assembler-x64-meta@0.135.6
-	cranelift-assembler-x64@0.135.6
-	cranelift-bforest@0.135.6
-	cranelift-bitset@0.135.6
-	cranelift-codegen-meta@0.135.6
-	cranelift-codegen-shared@0.135.6
-	cranelift-codegen@0.135.6
-	cranelift-control@0.135.6
-	cranelift-entity@0.135.6
-	cranelift-frontend@0.135.6
-	cranelift-isle@0.135.6
-	cranelift-native@0.135.6
-	cranelift-srcgen@0.135.6
+	cranelift-assembler-x64-meta@0.135.7
+	cranelift-assembler-x64@0.135.7
+	cranelift-bforest@0.135.7
+	cranelift-bitset@0.135.7
+	cranelift-codegen-meta@0.135.7
+	cranelift-codegen-shared@0.135.7
+	cranelift-codegen@0.135.7
+	cranelift-control@0.135.7
+	cranelift-entity@0.135.7
+	cranelift-frontend@0.135.7
+	cranelift-isle@0.135.7
+	cranelift-native@0.135.7
+	cranelift-srcgen@0.135.7
 	crash-context@0.8.0
 	crash-handler@0.8.0
 	crc-catalog@2.4.0
@@ -265,7 +263,7 @@ CRATES="
 	criterion@0.8.2
 	crossbeam-channel@0.5.15
 	crossbeam-deque@0.8.6
-	crossbeam-epoch@0.9.18
+	crossbeam-epoch@0.9.20
 	crossbeam-queue@0.3.12
 	crossbeam-utils@0.8.21
 	crunchy@0.2.4
@@ -367,7 +365,7 @@ CRATES="
 	euclid@0.22.14
 	event-listener-strategy@0.5.4
 	event-listener@2.5.3
-	event-listener@5.4.1
+	event-listener@5.4.2
 	exec@0.3.1
 	exr@1.74.0
 	extended@0.1.0
@@ -640,7 +638,7 @@ CRATES="
 	mdbook@0.4.40
 	memchr@2.8.3
 	memfd@0.6.5
-	memmap2@0.9.8
+	memmap2@0.9.11
 	memoffset@0.9.1
 	merge@0.1.0
 	merge_derive@0.1.0
@@ -738,7 +736,6 @@ CRATES="
 	octocrab@0.49.7
 	once_cell@1.21.4
 	once_cell_polyfill@1.70.1
-	oo7@0.6.0
 	oorandom@11.1.5
 	open@5.3.2
 	opener@0.7.2
@@ -863,8 +860,8 @@ CRATES="
 	pulldown-cmark-escape@0.10.1
 	pulldown-cmark@0.10.3
 	pulldown-cmark@0.13.4
-	pulley-interpreter@48.0.6
-	pulley-macros@48.0.6
+	pulley-interpreter@48.0.7
+	pulley-macros@48.0.7
 	pxfm@0.1.25
 	qoi@0.4.1
 	quick-error@1.2.3
@@ -873,7 +870,7 @@ CRATES="
 	quick-xml@0.37.5
 	quick-xml@0.39.3
 	quick-xml@0.41.0
-	quinn-proto@0.11.17
+	quinn-proto@0.11.18
 	quinn-udp@0.5.14
 	quinn@0.11.9
 	quote@1.0.47
@@ -933,7 +930,7 @@ CRATES="
 	rpassword@7.5.2
 	rsa@0.9.10
 	rtoolbox@0.0.3
-	rtrb@0.3.2
+	rtrb@0.3.5
 	runtimelib@1.4.0
 	rust-embed-impl@8.11.0
 	rust-embed-utils@8.11.0
@@ -952,7 +949,7 @@ CRATES="
 	rustls-pki-types@1.12.0
 	rustls-platform-verifier-android@0.1.1
 	rustls-platform-verifier@0.7.0
-	rustls-webpki@0.103.15
+	rustls-webpki@0.103.16
 	rustls@0.23.46
 	rustversion@1.0.22
 	rusty-fork@0.3.1
@@ -1105,7 +1102,7 @@ CRATES="
 	system-configuration@0.5.1
 	system-configuration@0.8.0
 	system-deps@7.0.7
-	taffy@0.13.0
+	taffy@0.15.0
 	tagptr@0.2.0
 	tao-core-video-sys@0.2.0
 	target-lexicon@0.13.5
@@ -1263,22 +1260,22 @@ CRATES="
 	wasmparser@0.244.0
 	wasmparser@0.254.2
 	wasmprinter@0.254.2
-	wasmtime-c-api-impl@48.0.6
-	wasmtime-environ@48.0.6
-	wasmtime-internal-c-api-macros@48.0.6
-	wasmtime-internal-component-macro@48.0.6
-	wasmtime-internal-component-util@48.0.6
-	wasmtime-internal-core@48.0.6
-	wasmtime-internal-cranelift@48.0.6
-	wasmtime-internal-fiber@48.0.6
-	wasmtime-internal-jit-debug@48.0.6
-	wasmtime-internal-jit-icache-coherence@48.0.6
-	wasmtime-internal-unwinder@48.0.6
-	wasmtime-internal-versioned-export-macros@48.0.6
-	wasmtime-internal-wit-bindgen@48.0.6
-	wasmtime-wasi-io@48.0.6
-	wasmtime-wasi@48.0.6
-	wasmtime@48.0.6
+	wasmtime-c-api-impl@48.0.7
+	wasmtime-environ@48.0.7
+	wasmtime-internal-c-api-macros@48.0.7
+	wasmtime-internal-component-macro@48.0.7
+	wasmtime-internal-component-util@48.0.7
+	wasmtime-internal-core@48.0.7
+	wasmtime-internal-cranelift@48.0.7
+	wasmtime-internal-fiber@48.0.7
+	wasmtime-internal-jit-debug@48.0.7
+	wasmtime-internal-jit-icache-coherence@48.0.7
+	wasmtime-internal-unwinder@48.0.7
+	wasmtime-internal-versioned-export-macros@48.0.7
+	wasmtime-internal-wit-bindgen@48.0.7
+	wasmtime-wasi-io@48.0.7
+	wasmtime-wasi@48.0.7
+	wasmtime@48.0.7
 	wax@0.7.0
 	wayland-backend@0.3.15
 	wayland-client@0.31.11
@@ -1291,9 +1288,9 @@ CRATES="
 	web-sys@0.3.106
 	web-time@1.1.0
 	web_atoms@0.2.6
-	webpki-root-certs@1.0.9
-	webpki-roots@0.26.8
-	webpki-roots@1.0.8
+	webpki-root-certs@1.0.10
+	webpki-roots@0.26.11
+	webpki-roots@1.0.10
 	weezl@0.1.10
 	which@8.0.5
 	whisper-rs-sys@0.15.0
@@ -1487,12 +1484,13 @@ declare -A GIT_CRATES=(
 	[livekit-protocol]='https://github.com/zed-industries/livekit-rust-sdks;0a1c519cfce9b365229026b55de9b9dbdb6fed3c;livekit-rust-sdks-%commit%/livekit-protocol'
 	[livekit-runtime]='https://github.com/zed-industries/livekit-rust-sdks;0a1c519cfce9b365229026b55de9b9dbdb6fed3c;livekit-rust-sdks-%commit%/livekit-runtime'
 	[livekit]='https://github.com/zed-industries/livekit-rust-sdks;0a1c519cfce9b365229026b55de9b9dbdb6fed3c;livekit-rust-sdks-%commit%/livekit'
-	[lsp-types]='https://github.com/zed-industries/lsp-types;f1783e63a7f4eb4397bf51d4148b4895a1f7ab16;lsp-types-%commit%'
+	[lsp-types]='https://github.com/zed-industries/lsp-types;82d7fc66ebdfabcfeb26ba16bbed9f3d26211fc3;lsp-types-%commit%'
 	[naga-types]='https://github.com/gfx-rs/wgpu;3b3506ea31154edc04de64debda0e780cba2639c;wgpu-%commit%/naga-types'
 	[naga]='https://github.com/gfx-rs/wgpu;3b3506ea31154edc04de64debda0e780cba2639c;wgpu-%commit%/naga'
 	[notify-types]='https://github.com/zed-industries/notify;d842f16b2716bd60f09caf3ae3a894237ab38f54;notify-%commit%/notify-types'
 	[notify]='https://github.com/zed-industries/notify;d842f16b2716bd60f09caf3ae3a894237ab38f54;notify-%commit%/notify'
 	[nvim-rs]='https://github.com/KillTheMule/nvim-rs;764dd270c642f77f10f3e19d05cc178a6cbe69f3;nvim-rs-%commit%'
+	[oo7]='https://github.com/zed-industries/oo7;731c1215edb6905876c6137ab300428c7b8d7c13;oo7-%commit%/client'
 	[pet-conda]='https://github.com/zed-industries/python-environment-tools;5aad7164bfc2a58977b103c8ef8fdd7302ed2e9f;python-environment-tools-%commit%/crates/pet-conda'
 	[pet-core]='https://github.com/zed-industries/python-environment-tools;5aad7164bfc2a58977b103c8ef8fdd7302ed2e9f;python-environment-tools-%commit%/crates/pet-core'
 	[pet-env-var-path]='https://github.com/zed-industries/python-environment-tools;5aad7164bfc2a58977b103c8ef8fdd7302ed2e9f;python-environment-tools-%commit%/crates/pet-env-var-path'
@@ -1563,7 +1561,7 @@ declare -A GIT_CRATES=(
 # rewrites the date and EGIT_COMMIT; a second version variable it could not
 # keep current would leave a new tarball under an old, already-manifested name).
 
-EGIT_COMMIT="92447a17cc008225c73619f1c3f0cdefc8ababf3"
+EGIT_COMMIT="a5c4ca8bf6c4717a328a4a61b42d6d1d38949bcc"
 # LLVM 23 only, so it is the default slot: llvm-r1 would always prefer slot 22
 # (its newest stable) whenever 22 is listed. RUST_NEEDS_LLVM ties the Rust slot
 # to it, so this builds with Rust 1.99, one release past upstream's 1.98.1 pin
@@ -1901,13 +1899,6 @@ src_prepare() {
 		# tell Zeo's sessions from any other Claude Code process and offer the
 		# tray link (0024) only for those. Ungrouped like 0024.
 		"${FILESDIR}/0061-agent-mark-agent-servers-with-zeo-thread.patch"
-		# 0064 moves wasmtime/wasmtime-wasi 48.0.1 -> 48.0.6 and rustls
-		# 0.23.45 -> 0.23.46 for 26 RustSec advisories, six of them reachable
-		# from an installed extension or any HTTPS connection. Cargo.toml and
-		# Cargo.lock only, so CRATES above lists the moved versions. A security
-		# fix for every build, so ungrouped; 0002, 0035, 0052, 0057 and 0058,
-		# which also edit Cargo.lock, are regenerated on top of it.
-		"${FILESDIR}/0064-wasmtime-48-0-6-rustls-0-23-46.patch"
 	)
 
 	if use claude-agent-acp-plus; then

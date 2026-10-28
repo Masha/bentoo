@@ -43,10 +43,10 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 ---
 
 diff --git a/crates/agent_servers/src/acp/v1.rs b/crates/agent_servers/src/acp/v1.rs
-index 1a92171..9ee945c 100644
+index 5d6f198..a689988 100644
 --- a/crates/agent_servers/src/acp/v1.rs
 +++ b/crates/agent_servers/src/acp/v1.rs
-@@ -1199,9 +1199,13 @@ impl AcpConnection {
+@@ -1278,9 +1278,13 @@ impl AcpConnection {
                          return None;
                      }
                      let config_id = option.config_id.0.as_ref();
@@ -267,7 +267,7 @@ index f471d4a..e4c858b 100644
  
  #[test]
 diff --git a/crates/agent_ui/src/config_options.rs b/crates/agent_ui/src/config_options.rs
-index 1d0baae..0feb1fc 100644
+index 6d53973..6dc7806 100644
 --- a/crates/agent_ui/src/config_options.rs
 +++ b/crates/agent_ui/src/config_options.rs
 @@ -23,7 +23,7 @@ use zed_actions::agent::ToggleModelSelector;
@@ -279,7 +279,7 @@ index 1d0baae..0feb1fc 100644
  };
  use crate::ui::documentation_aside_side;
  use crate::{
-@@ -294,8 +294,6 @@ impl Render for ConfigOptionsView {
+@@ -301,8 +301,6 @@ impl Render for ConfigOptionsView {
  struct ConfigOptionSelector {
      config_options: Rc<dyn AgentSessionConfigOptions>,
      config_id: acp::SessionConfigId,
@@ -288,7 +288,7 @@ index 1d0baae..0feb1fc 100644
      picker_handle: Option<PopoverMenuHandle<Picker<ConfigOptionPickerDelegate>>>,
      picker: Option<Entity<Picker<ConfigOptionPickerDelegate>>>,
      setting_value: bool,
-@@ -327,8 +325,6 @@ impl ConfigOptionSelector {
+@@ -334,8 +332,6 @@ impl ConfigOptionSelector {
          let (picker_handle, picker) = if is_select {
              let config_options = config_options.clone();
              let config_id = config_id.clone();
@@ -297,7 +297,7 @@ index 1d0baae..0feb1fc 100644
              let picker = cx.new(move |picker_cx| {
                  let delegate = ConfigOptionPickerDelegate::new(
                      config_options,
-@@ -355,8 +351,6 @@ impl ConfigOptionSelector {
+@@ -362,8 +358,6 @@ impl ConfigOptionSelector {
          Self {
              config_options,
              config_id,
@@ -306,7 +306,7 @@ index 1d0baae..0feb1fc 100644
              picker_handle,
              picker,
              setting_value: false,
-@@ -592,11 +586,11 @@ impl Render for ConfigOptionSelector {
+@@ -622,11 +616,11 @@ impl Render for ConfigOptionSelector {
                                  .color(Color::Muted),
                          );
                      }
@@ -322,7 +322,7 @@ index 1d0baae..0feb1fc 100644
                              .size(LabelSize::Small)
                              .color(Color::Muted),
                      );
-@@ -605,8 +599,6 @@ impl Render for ConfigOptionSelector {
+@@ -635,8 +629,6 @@ impl Render for ConfigOptionSelector {
  
                  let config_id = self.config_id.clone();
                  let config_options = self.config_options.clone();
@@ -331,7 +331,7 @@ index 1d0baae..0feb1fc 100644
                  let current_value = boolean.current_value;
                  let toggle_state = if current_value {
                      ToggleState::Selected
-@@ -630,7 +622,7 @@ impl Render for ConfigOptionSelector {
+@@ -660,7 +652,7 @@ impl Render for ConfigOptionSelector {
                          .label_size(LabelSize::Small)
                          .label_color(Color::Muted)
                          .disabled(self.setting_value)
@@ -340,7 +340,7 @@ index 1d0baae..0feb1fc 100644
                              if !config_options.config_options().iter().any(|option| {
                                  option.config_id == config_id
                                      && matches!(&option.kind, acp::SessionConfigKind::Boolean(_))
-@@ -639,24 +631,18 @@ impl Render for ConfigOptionSelector {
+@@ -669,24 +661,18 @@ impl Render for ConfigOptionSelector {
                              }
  
                              let next_value = matches!(state, ToggleState::Selected);

@@ -70,11 +70,12 @@ HOW TO RE-CHECK THIS HEADER, IN ONE COMMAND
 
     rg -n 'AcpBetaFeatureFlag' crates/
 
-At 92447a17 that yields exactly two non-test call sites:
-acp_thread/src/acp_thread.rs:6948 (the per-turn token count, item 1) and
-agent_servers/src/acp.rs:131 (the protocol choice, below), plus the
-declaration, two imports, and `cx.update_flags(..)` helpers inside `#[cfg(test)]`
-blocks. If that set changes, rewrite this header. If it empties out, or if every
+At a5c4ca8b that yields three non-test call sites:
+acp_thread/src/acp_thread.rs:8103 (the per-turn token count, item 1),
+agent_servers/src/acp.rs:142 (the protocol choice, below) and
+agent_servers/src/acp/v1.rs:671 (the v1 `subagents` client capability, see the
+a5c4ca8b review below), plus the declaration, three imports, and
+`cx.update_flags(..)` helpers inside `#[cfg(test)]` blocks. If that set changes, rewrite this header. If it empties out, or if every
 remaining site gains an unconditional fallback, drop the patch from `PATCHES` in
 the ebuild with a comment naming what superseded it.
 
@@ -120,13 +121,25 @@ adapter process, and its startup time, per connection. 0057 makes both
 attempts start a jailed command the same way. The selection tests' flag-off
 rows cannot be set up while the flag is forced, so the hunks below drop them
 and say so.
+
+a5c4ca8b review (2026-10-25, story 061): acp-beta now gates a third thing. v1's
+AcpConnection::stdio offers `clientCapabilities.subagents` only with the flag
+(acp/v1.rs:671, through client_capabilities_for_agent), and derives
+accepts_subagent_updates from it; without it, SubagentUpdate and SessionMessage
+notifications are dropped with a warning. Forced on, every Zeo build advertises
+the capability to every v1 agent and renders the subagent sessions they announce.
+Claude Agent (Plus) emits no SubagentUpdate, so nothing changes for it; upstream's
+claude-agent-acp does, and its subagents appear natively. The flag-off row of
+upstream's stdio_offers_subagents_only_behind_acp_beta cannot be set up, so this
+patch drops it like the selection tests' rows. A setting to switch the forcing
+off is story 064's.
 ---
 
 diff --git a/crates/agent_servers/src/acp.rs b/crates/agent_servers/src/acp.rs
-index fc8c7ad..720d4d7 100644
+index 6fce82c..c5f3196 100644
 --- a/crates/agent_servers/src/acp.rs
 +++ b/crates/agent_servers/src/acp.rs
-@@ -1016,7 +1016,9 @@ mod selection_tests {
+@@ -1164,7 +1164,9 @@ mod selection_tests {
                      .insert("acp-beta".into(), if enabled { "on" } else { "off" }.into());
              });
          });
@@ -137,7 +150,7 @@ index fc8c7ad..720d4d7 100644
      }
  
      #[gpui::test]
-@@ -1034,8 +1036,9 @@ mod selection_tests {
+@@ -1182,8 +1184,9 @@ mod selection_tests {
          let project = Project::example([directory.path()], &mut cx.to_async()).await;
          let v1 = r#""result":{"protocolVersion":1,"agentCapabilities":{},"agentInfo":{"name":"selected-v1","version":"1"}}"#;
          let v2 = r#""result":{"protocolVersion":2,"info":{"name":"selected-v2","version":"1"},"capabilities":{"session":{}}}"#;
@@ -148,7 +161,7 @@ index fc8c7ad..720d4d7 100644
              (true, v2, false, Some(true), "2"),
              (true, v1, false, Some(false), "2 1"),
              (
-@@ -1263,11 +1266,8 @@ done
+@@ -1411,11 +1414,8 @@ done
          let config = directory.path().join("claude-config");
          std::fs::create_dir(&config).expect("isolated Claude configuration");
          let project = Project::example([directory.path()], &mut cx.to_async()).await;
@@ -162,6 +175,20 @@ index fc8c7ad..720d4d7 100644
              cx.update(|cx| set_beta(beta, cx));
              let command = AgentServerCommand {
                  path: "npx".into(),
+diff --git a/crates/agent_servers/src/acp/v1.rs b/crates/agent_servers/src/acp/v1.rs
+index 6bc9ab4..9cfe6b8 100644
+--- a/crates/agent_servers/src/acp/v1.rs
++++ b/crates/agent_servers/src/acp/v1.rs
+@@ -7177,7 +7177,8 @@ exec cat >/dev/null
+ "#,
+         );
+ 
+-        for enabled in [false, true] {
++        // Zeo forces acp-beta on (0001): the flag-off row cannot be set up here.
++        for enabled in [true] {
+             cx.update(|cx| crate::acp::selection_tests::set_beta(enabled, cx));
+             let command = AgentServerCommand {
+                 path: "/bin/sh".into(),
 diff --git a/crates/feature_flags/src/flags.rs b/crates/feature_flags/src/flags.rs
 index 6a10534..3375676 100644
 --- a/crates/feature_flags/src/flags.rs

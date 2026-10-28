@@ -170,7 +170,7 @@ index 840d930..270f1ac 100644
          {
              let fs = <dyn Fs>::global(cx);
 diff --git a/crates/onboarding/src/onboarding.rs b/crates/onboarding/src/onboarding.rs
-index 220c2b0..294f71e 100644
+index 7f27bc3..3878d0d 100644
 --- a/crates/onboarding/src/onboarding.rs
 +++ b/crates/onboarding/src/onboarding.rs
 @@ -351,7 +351,7 @@ impl Render for Onboarding {
@@ -196,7 +196,7 @@ index 2a0949a..98e4fde 100644
                                              window.dispatch_action(Box::new(OpenLog), cx);
                                              cx.emit(DismissEvent);
 diff --git a/crates/settings_ui/src/settings_ui.rs b/crates/settings_ui/src/settings_ui.rs
-index f2eef11..e3baa37 100644
+index 96371f9..d62b097 100644
 --- a/crates/settings_ui/src/settings_ui.rs
 +++ b/crates/settings_ui/src/settings_ui.rs
 @@ -894,7 +894,7 @@ fn open_settings_editor_with(
@@ -335,10 +335,10 @@ index df08f04..121c9ff 100644
         If you wish to proceed anyways, set `ZED_ALLOW_ROOT=true` in your environment."
          );
 diff --git a/crates/workspace/src/notifications.rs b/crates/workspace/src/notifications.rs
-index 9a07a77..4a37184 100644
+index ec5bec4..2830982 100644
 --- a/crates/workspace/src/notifications.rs
 +++ b/crates/workspace/src/notifications.rs
-@@ -1269,7 +1269,7 @@ pub mod simple_message_notification {
+@@ -1275,7 +1275,7 @@ pub mod simple_message_notification {
              });
  
              let with_primary_action = cx.new(|cx| {
@@ -347,7 +347,7 @@ index 9a07a77..4a37184 100644
                      .with_title("Update Available")
                      .primary_message("Restart Now")
                      .primary_icon(IconName::ArrowCircle)
-@@ -1372,7 +1372,7 @@ pub mod simple_message_notification {
+@@ -1378,7 +1378,7 @@ pub mod simple_message_notification {
                      "Linux desktop portal initialization failed.".into()
                  }
                  fn secondary_message(&self) -> Option<SharedString> {
@@ -357,10 +357,10 @@ index 9a07a77..4a37184 100644
                  fn severity(&self) -> ErrorSeverity {
                      ErrorSeverity::Critical
 diff --git a/crates/workspace/src/welcome.rs b/crates/workspace/src/welcome.rs
-index 837418e..990abed 100644
+index ea31eb4..06c053a 100644
 --- a/crates/workspace/src/welcome.rs
 +++ b/crates/workspace/src/welcome.rs
-@@ -448,9 +448,9 @@ impl Render for WelcomePage {
+@@ -451,9 +451,9 @@ impl Render for WelcomePage {
          };
  
          let welcome_label = if self.fallback_to_recent_projects {
@@ -373,7 +373,7 @@ index 837418e..990abed 100644
  
          h_flex()
 diff --git a/crates/zed/src/main.rs b/crates/zed/src/main.rs
-index 2ae5f82..3718383 100644
+index 0aa2f02..91045fb 100644
 --- a/crates/zed/src/main.rs
 +++ b/crates/zed/src/main.rs
 @@ -94,7 +94,7 @@ fn build_application() -> Application {
@@ -407,7 +407,7 @@ index 2ae5f82..3718383 100644
      }
  
 diff --git a/crates/zed/src/zed.rs b/crates/zed/src/zed.rs
-index c80b1f9..734d916 100644
+index f977f8a..4ccb3be 100644
 --- a/crates/zed/src/zed.rs
 +++ b/crates/zed/src/zed.rs
 @@ -1719,7 +1719,7 @@ fn open_about_window(cx: &mut App) {

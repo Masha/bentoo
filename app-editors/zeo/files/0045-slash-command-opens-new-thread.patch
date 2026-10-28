@@ -54,7 +54,7 @@ Pure Zed and generic ACP: it rides `claude-agent-acp-plus` BY CHOICE, like
 ---
 
 diff --git a/crates/agent_ui/src/agent_panel.rs b/crates/agent_ui/src/agent_panel.rs
-index 9e278e2..c65f7f4 100644
+index be5c3b0..992d909 100644
 --- a/crates/agent_ui/src/agent_panel.rs
 +++ b/crates/agent_ui/src/agent_panel.rs
 @@ -2332,6 +2332,72 @@ impl AgentPanel {
@@ -741,7 +741,7 @@ index 9cc6406..87407a8 100644
  mod tests {
      use super::*;
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
-index aaccae9..9c8c011 100644
+index bb0ab3a..73ea745 100644
 --- a/crates/agent_ui/src/conversation_view/thread_view.rs
 +++ b/crates/agent_ui/src/conversation_view/thread_view.rs
 @@ -3,7 +3,7 @@ use crate::{
@@ -753,7 +753,7 @@ index aaccae9..9c8c011 100644
      thread_metadata_store::{ThreadId, ThreadMetadataStore},
  };
  use agent_client_protocol::schema::v2 as acp_v2;
-@@ -7655,7 +7655,7 @@ impl ThreadView {
+@@ -7914,7 +7914,7 @@ impl ThreadView {
                                      div()
                                          .id(("assistant-message-chunk", chunk_ix))
                                          .child(self.render_message_content(
@@ -762,7 +762,7 @@ index aaccae9..9c8c011 100644
                                          ))
                                          .into_any_element()
                                  })
-@@ -9103,11 +9103,15 @@ impl ThreadView {
+@@ -9381,11 +9381,15 @@ impl ThreadView {
          cx.notify();
      }
  
@@ -778,7 +778,7 @@ index aaccae9..9c8c011 100644
          window: &Window,
          cx: &Context<Self>,
      ) -> Div {
-@@ -9117,9 +9121,19 @@ impl ThreadView {
+@@ -9395,9 +9399,19 @@ impl ThreadView {
                  .enumerate()
                  .filter(|(_, block)| block.visible_content(cx))
                  .map(|(block_ix, block)| {
@@ -801,7 +801,7 @@ index aaccae9..9c8c011 100644
                      div()
                          .id(("message-content-block", block_ix))
                          .debug_selector(move || {
-@@ -9223,11 +9237,9 @@ impl ThreadView {
+@@ -9501,11 +9515,9 @@ impl ThreadView {
                                      this.track_scroll(&scroll_handle)
                                  })
                                  .overflow_hidden()
@@ -816,7 +816,23 @@ index aaccae9..9c8c011 100644
                          )
                          .when(is_constrained, |this| {
                              this.child(div().absolute().inset_0().size_full().bg(linear_gradient(
-@@ -13355,6 +13367,49 @@ impl ThreadView {
+@@ -9788,7 +9800,14 @@ impl ThreadView {
+                     .pl_3()
+                     .border_l_2()
+                     .border_color(cx.theme().colors().border)
+-                    .child(self.render_message_content(entry_ix, 0, &message.content, window, cx)),
++                    .child(self.render_message_content(
++                        entry_ix,
++                        0,
++                        &message.content,
++                        false,
++                        window,
++                        cx,
++                    )),
+             )
+     }
+ 
+@@ -13724,6 +13743,49 @@ impl ThreadView {
          })
      }
  
@@ -1390,10 +1406,10 @@ index 0000000..e38ceed
 +    assert_eq!(second.clicked.borrow().len(), 1);
 +}
 diff --git a/crates/markdown/src/markdown.rs b/crates/markdown/src/markdown.rs
-index fbd5217..876ebfa 100644
+index 44e732c..bddd094 100644
 --- a/crates/markdown/src/markdown.rs
 +++ b/crates/markdown/src/markdown.rs
-@@ -1731,6 +1731,16 @@ pub enum AutoscrollBehavior {
+@@ -1771,6 +1771,16 @@ pub enum AutoscrollBehavior {
      Controlled(ScrollHandle),
  }
  
@@ -1410,7 +1426,7 @@ index fbd5217..876ebfa 100644
  pub struct MarkdownElement {
      markdown: Entity<Markdown>,
      style: MarkdownStyle,
-@@ -1742,6 +1752,7 @@ pub struct MarkdownElement {
+@@ -1782,6 +1792,7 @@ pub struct MarkdownElement {
      on_source_click: Option<SourceClickCallback>,
      on_checkbox_toggle: Option<CheckboxToggleCallback>,
      on_mermaid_zoom: Option<MermaidZoomCallback>,
@@ -1418,7 +1434,7 @@ index fbd5217..876ebfa 100644
      image_resolver: Option<Box<dyn Fn(&str, &App) -> Option<ImageSource>>>,
      show_root_block_markers: bool,
      autoscroll: AutoscrollBehavior,
-@@ -1769,6 +1780,7 @@ impl MarkdownElement {
+@@ -1809,6 +1820,7 @@ impl MarkdownElement {
              on_source_click: None,
              on_checkbox_toggle: None,
              on_mermaid_zoom: None,
@@ -1426,7 +1442,7 @@ index fbd5217..876ebfa 100644
              image_resolver: None,
              show_root_block_markers: false,
              autoscroll: AutoscrollBehavior::Propagate,
-@@ -1832,6 +1844,16 @@ impl MarkdownElement {
+@@ -1872,6 +1884,16 @@ impl MarkdownElement {
          self
      }
  
@@ -1443,7 +1459,7 @@ index fbd5217..876ebfa 100644
      pub fn on_code_span_link(
          mut self,
          callback: impl Fn(&str, &App) -> Option<SharedString> + 'static,
-@@ -3163,6 +3185,13 @@ impl Element for MarkdownElement {
+@@ -3210,6 +3232,13 @@ impl Element for MarkdownElement {
                          {
                              let copy_button_visibility = *copy_button_visibility;
                              let wrap_button_visibility = *wrap_button_visibility;
@@ -1457,7 +1473,7 @@ index fbd5217..876ebfa 100644
                              builder.modify_current_div(|el| {
                                  let any_hover = copy_button_visibility
                                      == CopyButtonVisibility::VisibleOnHover
-@@ -3203,6 +3232,14 @@ impl Element for MarkdownElement {
+@@ -3250,6 +3279,14 @@ impl Element for MarkdownElement {
                                              ))
                                          },
                                      )
@@ -1472,7 +1488,7 @@ index fbd5217..876ebfa 100644
                                      .when(
                                          copy_button_visibility != CopyButtonVisibility::Hidden,
                                          |this| {
-@@ -3580,6 +3617,24 @@ fn render_wrap_code_block_button(
+@@ -3627,6 +3664,24 @@ fn render_wrap_code_block_button(
          })
  }
  
@@ -1497,7 +1513,7 @@ index fbd5217..876ebfa 100644
  fn render_copy_code_block_button(
      id: usize,
      code: String,
-@@ -5229,6 +5284,9 @@ impl InputHandler for MarkdownInputHandler {
+@@ -5276,6 +5331,9 @@ impl InputHandler for MarkdownInputHandler {
      }
  }
  

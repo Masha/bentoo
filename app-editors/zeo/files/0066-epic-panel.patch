@@ -85,10 +85,10 @@ the fs symlink log line).
 ---
 
 diff --git a/Cargo.lock b/Cargo.lock
-index 8393389..28a295c 100644
+index e350b86..d89226a 100644
 --- a/Cargo.lock
 +++ b/Cargo.lock
-@@ -5961,6 +5961,30 @@ dependencies = [
+@@ -5936,6 +5936,30 @@ dependencies = [
   "serde",
  ]
  
@@ -119,7 +119,7 @@ index 8393389..28a295c 100644
  [[package]]
  name = "equator"
  version = "0.4.2"
-@@ -22735,6 +22759,7 @@ dependencies = [
+@@ -22711,6 +22735,7 @@ dependencies = [
   "editor",
   "encoding_selector",
   "env_logger 0.11.8",
@@ -128,7 +128,7 @@ index 8393389..28a295c 100644
   "extension",
   "extension_host",
 diff --git a/Cargo.toml b/Cargo.toml
-index f08bd8c..7d0d784 100644
+index e71bf1b..2ef35f8 100644
 --- a/Cargo.toml
 +++ b/Cargo.toml
 @@ -71,6 +71,7 @@ members = [
@@ -8403,10 +8403,10 @@ index 0000000..57367ee
 +    assert_eq!(probe.failures().len(), 1, "still reported only once");
 +}
 diff --git a/crates/fs/src/fs.rs b/crates/fs/src/fs.rs
-index 7cc7b2f..136c8e5 100644
+index e6ef06b..853dc56 100644
 --- a/crates/fs/src/fs.rs
 +++ b/crates/fs/src/fs.rs
-@@ -1112,8 +1112,11 @@ impl Fs for RealFs {
+@@ -1116,8 +1116,11 @@ impl Fs for RealFs {
                  Err(err) => {
                      if err.kind() != io::ErrorKind::NotFound {
                          // TODO: Also FilesystemLoop when that's stable
@@ -8420,7 +8420,7 @@ index 7cc7b2f..136c8e5 100644
                      }
                      // For a broken or recursive symlink, return the symlink metadata. (Or
 diff --git a/crates/zed/Cargo.toml b/crates/zed/Cargo.toml
-index f441800..5aceaa4 100644
+index af3273a..7b9729a 100644
 --- a/crates/zed/Cargo.toml
 +++ b/crates/zed/Cargo.toml
 @@ -111,6 +111,7 @@ devtools_bridge.workspace = true
@@ -8432,7 +8432,7 @@ index f441800..5aceaa4 100644
  extension.workspace = true
  extension_host.workspace = true
 diff --git a/crates/zed/src/main.rs b/crates/zed/src/main.rs
-index 4132e69..0808ffe 100644
+index c5eb571..ba61816 100644
 --- a/crates/zed/src/main.rs
 +++ b/crates/zed/src/main.rs
 @@ -725,6 +725,7 @@ fn main() {
@@ -8444,7 +8444,7 @@ index 4132e69..0808ffe 100644
  
          repl::init(app_state.fs.clone(), cx);
 diff --git a/crates/zed/src/zed.rs b/crates/zed/src/zed.rs
-index 816fa39..09d5b98 100644
+index ae8adb5..bd1861f 100644
 --- a/crates/zed/src/zed.rs
 +++ b/crates/zed/src/zed.rs
 @@ -785,6 +785,7 @@ fn initialize_panels(window: &mut Window, cx: &mut Context<Workspace>) -> Task<a
@@ -8463,7 +8463,7 @@ index 816fa39..09d5b98 100644
              initialize_agent_panel(workspace_handle.clone(), cx.clone()).map(|r| r.log_err()),
          );
  
-@@ -6016,6 +6018,7 @@ mod tests {
+@@ -6322,6 +6324,7 @@ mod tests {
                  "edit_prediction",
                  "editor",
                  "encoding_selector",

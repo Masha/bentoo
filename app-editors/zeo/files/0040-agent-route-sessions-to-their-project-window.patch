@@ -2442,10 +2442,10 @@ index 3ba1d2a..9b41954 100644
  pub use crate::message_editor::MessageEditorEvent;
  pub use crate::task_label::{
 diff --git a/crates/agent_ui/src/conversation_view.rs b/crates/agent_ui/src/conversation_view.rs
-index d277313..7e01e30 100644
+index 7d65a65..7fac3a8 100644
 --- a/crates/agent_ui/src/conversation_view.rs
 +++ b/crates/agent_ui/src/conversation_view.rs
-@@ -1952,6 +1952,14 @@ impl ConversationView {
+@@ -1972,6 +1972,14 @@ impl ConversationView {
          })
      }
  
@@ -2461,7 +2461,7 @@ index d277313..7e01e30 100644
          &mut self,
          thread: &Entity<AcpThread>,
 diff --git a/crates/zed/src/main.rs b/crates/zed/src/main.rs
-index 7716724..35c551f 100644
+index 52d59fb..93caeab 100644
 --- a/crates/zed/src/main.rs
 +++ b/crates/zed/src/main.rs
 @@ -1040,47 +1040,42 @@ fn handle_open_request(request: OpenRequest, app_state: Arc<AppState>, cx: &mut
@@ -2609,7 +2609,7 @@ index 7716724..35c551f 100644
      if stdout_is_a_pty() {
          if client::IMPERSONATE_LOGIN.is_some() {
 diff --git a/crates/zed/src/zed.rs b/crates/zed/src/zed.rs
-index 81bd254..d8785fb 100644
+index 7823cd9..d6abb1e 100644
 --- a/crates/zed/src/zed.rs
 +++ b/crates/zed/src/zed.rs
 @@ -2930,6 +2930,10 @@ pub(crate) fn eager_load_active_theme_and_icon_theme(fs: Arc<dyn Fs>, cx: &mut A

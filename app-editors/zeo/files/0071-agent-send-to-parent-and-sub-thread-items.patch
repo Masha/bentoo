@@ -1735,7 +1735,7 @@ index 0000000..6eed9b2
 +    assert!(tombstones(&db).await.is_empty(), "and is no tombstone");
 +}
 diff --git a/crates/agent_tasks_panel/src/panel.rs b/crates/agent_tasks_panel/src/panel.rs
-index 622dcd9..d9a305e 100644
+index 991006f..3822374 100644
 --- a/crates/agent_tasks_panel/src/panel.rs
 +++ b/crates/agent_tasks_panel/src/panel.rs
 @@ -40,6 +40,8 @@ use workspace::{
@@ -3395,10 +3395,10 @@ index ac7eefe..e97a26b 100644
      TASK_LABEL_MAX_CHARS, TaskLabels, collapse_label, display_label, normalize_user_label,
  };
 diff --git a/crates/agent_ui/src/conversation_view.rs b/crates/agent_ui/src/conversation_view.rs
-index 31b488a..7e9147d 100644
+index 0742f4b..aa203fd 100644
 --- a/crates/agent_ui/src/conversation_view.rs
 +++ b/crates/agent_ui/src/conversation_view.rs
-@@ -2008,6 +2008,20 @@ impl ConversationView {
+@@ -2028,6 +2028,20 @@ impl ConversationView {
          if !is_current_owner {
              return;
          };
@@ -3420,10 +3420,10 @@ index 31b488a..7e9147d 100644
          if !is_subagent && affects_thread_metadata(event) {
              cx.emit(RootThreadUpdated);
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
-index d35c8f2..9456478 100644
+index 9e69511..3b8d7b8 100644
 --- a/crates/agent_ui/src/conversation_view/thread_view.rs
 +++ b/crates/agent_ui/src/conversation_view/thread_view.rs
-@@ -639,6 +639,9 @@ impl PermissionSelection {
+@@ -767,6 +767,9 @@ impl PermissionSelection {
  
  pub struct ThreadView {
      pub(crate) root_thread_id: ThreadId,
@@ -3433,7 +3433,7 @@ index d35c8f2..9456478 100644
      pub session_id: acp_v2::SessionId,
      pub parent_session_id: Option<acp_v2::SessionId>,
      pub thread: Entity<AcpThread>,
-@@ -1162,6 +1165,8 @@ impl ThreadView {
+@@ -1302,6 +1305,8 @@ impl ThreadView {
          let current_submission = thread.read(cx).latest_submission_id();
          let mut this = Self {
              root_thread_id,
@@ -3442,7 +3442,7 @@ index d35c8f2..9456478 100644
              session_id,
              parent_session_id,
              focus_handle: cx.focus_handle(),
-@@ -5513,6 +5518,7 @@ impl ThreadView {
+@@ -5765,6 +5770,7 @@ impl ThreadView {
          let has_messages = self.has_visible_conversation(cx);
          let fills_container = !has_messages || editor_expanded;
          let composer_is_read_only = self.message_editor.read(cx).editor().read(cx).read_only(cx);
@@ -3450,7 +3450,7 @@ index d35c8f2..9456478 100644
          let discard_draft_button = composer_is_read_only.then(|| {
              div()
                  .debug_selector(|| "discard-protected-draft".into())
-@@ -5558,6 +5564,7 @@ impl ThreadView {
+@@ -5810,6 +5816,7 @@ impl ThreadView {
                      .flex_grow_0()
                      .justify_between()
                      .gap_2()
@@ -3458,7 +3458,7 @@ index d35c8f2..9456478 100644
                      .child(
                          v_flex()
                              .relative()
-@@ -9572,7 +9579,7 @@ impl ThreadView {
+@@ -9850,7 +9857,7 @@ impl ThreadView {
              .into_any_element()
      }
  

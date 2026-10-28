@@ -124,10 +124,20 @@ sandbox_hook_v2_tests -- a v2 start spawns once, in the root, with the
 cleared env, and its record ends with the connection; a v1 fallback spawns
 twice, both cleared, the refused process ends and the record follows the
 live one.
+
+a5c4ca8b review (2026-10-25, story 061): upstream's only Linux sandbox change
+is in AcpThread::create_terminal, which builds the shell non_interactive() when a
+sandbox_wrap is present. That wrap is Zed's own sandbox for the native agent's
+terminal tool (passed from agent.rs, applied in acp_thread's terminal.rs); the
+terminal and terminal_view diffs only move to Modifiers::secondary(cx). This
+patch jails the adapter process at spawn and leaves the native agent out of
+scope, so the two never meet: argv, cleared env, v2 spawn and fail-closed are
+unchanged. Terminals an ACP agent asks Zeo to create still run outside the jail,
+as before. No code change needed.
 ---
 
 diff --git a/Cargo.lock b/Cargo.lock
-index 37e1f8f..e133f7d 100644
+index 4dee21e..cee1ded 100644
 --- a/Cargo.lock
 +++ b/Cargo.lock
 @@ -369,6 +369,39 @@ dependencies = [
@@ -207,7 +217,7 @@ index 37e1f8f..e133f7d 100644
   "agent_servers",
   "agent_settings",
   "agent_skills",
-@@ -16640,6 +16678,7 @@ name = "settings_ui"
+@@ -16616,6 +16654,7 @@ name = "settings_ui"
  version = "0.1.0"
  dependencies = [
   "agent",
@@ -215,7 +225,7 @@ index 37e1f8f..e133f7d 100644
   "agent_settings",
   "agent_skills",
   "anyhow",
-@@ -16672,6 +16711,7 @@ dependencies = [
+@@ -16649,6 +16688,7 @@ dependencies = [
   "language_models",
   "log",
   "menu",
@@ -223,7 +233,7 @@ index 37e1f8f..e133f7d 100644
   "paths",
   "picker",
   "platform_title_bar",
-@@ -16682,13 +16722,16 @@ dependencies = [
+@@ -16659,13 +16699,16 @@ dependencies = [
   "rodio",
   "schemars 1.0.4",
   "search",
@@ -240,7 +250,7 @@ index 37e1f8f..e133f7d 100644
   "theme",
   "theme_settings",
   "ui",
-@@ -22645,6 +22688,7 @@ dependencies = [
+@@ -22621,6 +22664,7 @@ dependencies = [
   "activity_indicator",
   "agent",
   "agent-client-protocol",
@@ -249,7 +259,7 @@ index 37e1f8f..e133f7d 100644
   "agent_settings",
   "agent_skills",
 diff --git a/Cargo.toml b/Cargo.toml
-index 207c521..c346cee 100644
+index 02268b5..8842237 100644
 --- a/Cargo.toml
 +++ b/Cargo.toml
 @@ -6,6 +6,7 @@ members = [
@@ -269,10 +279,10 @@ index 207c521..c346cee 100644
  agent_settings = { path = "crates/agent_settings" }
  agent_skills = { path = "crates/agent_skills" }
 diff --git a/assets/settings/default.json b/assets/settings/default.json
-index ff0a42e..e9c089e 100644
+index a73fd01..9c153ee 100644
 --- a/assets/settings/default.json
 +++ b/assets/settings/default.json
-@@ -3083,4 +3083,26 @@
+@@ -3090,4 +3090,26 @@
    "devtools_bridge": {
      "enabled": true,
    },
@@ -10718,7 +10728,7 @@ index d091060..37f2bc5 100644
  tempfile.workspace = true
 +workspace = { workspace = true, features = ["test-support"] }
 diff --git a/crates/agent_servers/src/acp.rs b/crates/agent_servers/src/acp.rs
-index cd4eaca..d387a35 100644
+index 8cad630..e393988 100644
 --- a/crates/agent_servers/src/acp.rs
 +++ b/crates/agent_servers/src/acp.rs
 @@ -10,6 +10,7 @@ use debug_log::AcpDebugLog;
@@ -10729,7 +10739,7 @@ index cd4eaca..d387a35 100644
  #[cfg(any(test, feature = "test-support"))]
  pub use v1::test_support;
  pub use v1::{AcpConnection, AcpSessionList, GEMINI_TERMINAL_AUTH_METHOD_ID};
-@@ -121,31 +122,53 @@ fn fallback_failure(failure: anyhow::Error, negotiation: anyhow::Error) -> anyho
+@@ -125,31 +126,53 @@ fn fallback_failure(failure: anyhow::Error, negotiation: anyhow::Error) -> anyho
      failure.context(context)
  }
  
@@ -10789,7 +10799,7 @@ index cd4eaca..d387a35 100644
      };
      v1::connect(
          agent_id,
-@@ -154,6 +177,7 @@ pub async fn connect(
+@@ -158,6 +181,7 @@ pub async fn connect(
          agent_server_store,
          default_mode,
          default_config_options,
@@ -10797,7 +10807,7 @@ index cd4eaca..d387a35 100644
          cx,
      )
      .await
-@@ -1276,6 +1300,7 @@ done
+@@ -1431,6 +1455,7 @@ done
                          WeakEntity::new_invalid(),
                          None,
                          HashMap::default(),
@@ -10805,7 +10815,7 @@ index cd4eaca..d387a35 100644
                          &mut cx,
                      )
                      .await
-@@ -1429,6 +1454,7 @@ done
+@@ -1584,6 +1609,7 @@ done
                          WeakEntity::new_invalid(),
                          None,
                          HashMap::default(),
@@ -11027,10 +11037,10 @@ index 86f3d0c..0dc9ca6 100644
 +    }
  }
 diff --git a/crates/agent_servers/src/acp/v1.rs b/crates/agent_servers/src/acp/v1.rs
-index 47b0a8b..34de72d 100644
+index 7d7c63f..8c2321d 100644
 --- a/crates/agent_servers/src/acp/v1.rs
 +++ b/crates/agent_servers/src/acp/v1.rs
-@@ -378,22 +378,35 @@ impl AgentSessionList for AcpSessionList {
+@@ -414,22 +414,35 @@ impl AgentSessionList for AcpSessionList {
      }
  }
  
@@ -11069,7 +11079,7 @@ index 47b0a8b..34de72d 100644
          cx,
      )
      .await?;
-@@ -555,6 +568,9 @@ impl AcpConnection {
+@@ -597,6 +610,9 @@ impl AcpConnection {
          self.debug_log.subscribe()
      }
  
@@ -11079,7 +11089,7 @@ index 47b0a8b..34de72d 100644
      pub async fn stdio(
          agent_id: AgentId,
          project: Entity<Project>,
-@@ -564,6 +580,30 @@ impl AcpConnection {
+@@ -606,6 +622,30 @@ impl AcpConnection {
          default_config_options: HashMap<String, AgentConfigOptionValue>,
          cx: &mut AsyncApp,
      ) -> Result<Self> {
@@ -11110,7 +11120,7 @@ index 47b0a8b..34de72d 100644
          let original_command = command.clone();
          let transport::StdioProcess {
              child,
-@@ -571,7 +611,7 @@ impl AcpConnection {
+@@ -613,7 +653,7 @@ impl AcpConnection {
              outgoing,
              stderr,
              debug_log,
@@ -11119,7 +11129,7 @@ index 47b0a8b..34de72d 100644
          let mut child = transport::OwnedChild(child);
          let sessions = Rc::new(RefCell::new(HashMap::default()));
  
-@@ -612,7 +652,14 @@ impl AcpConnection {
+@@ -658,7 +698,14 @@ impl AcpConnection {
              connection_tx,
              runtime::shutdown_requested(shutdown),
          );
@@ -11136,18 +11146,19 @@ index 47b0a8b..34de72d 100644
          let connection_rx = async move {
              connection_rx
 diff --git a/crates/agent_servers/src/acp/v2.rs b/crates/agent_servers/src/acp/v2.rs
-index e86d232..d4af414 100644
+index 7115933..95cc69d 100644
 --- a/crates/agent_servers/src/acp/v2.rs
 +++ b/crates/agent_servers/src/acp/v2.rs
-@@ -1,6 +1,6 @@
+@@ -1,7 +1,7 @@
  use super::{
      AcpDebugLog, AcpDebugMessage, AcpSession, ClientContext, ConfigOptions,
--    ContextServerConfiguration, ForegroundWork, ModeTrigger, PendingSessionUpdates,
-+    ContextServerConfiguration, ForegroundWork, ModeTrigger, PendingSessionUpdates, StdioLaunch,
-     UnsupportedVersion, apply_v2_session_notification, close_undelivered_session,
-     drain_foreground_queue, enqueue_notification, first_class_terminal_auth_task, map_acp_error,
+     ContextServerConfiguration, ForegroundWork, ModeTrigger, PendingSessionUpdates,
+-    ReadOnlyConfigOptions, UnsupportedVersion, apply_v2_session_notification,
++    ReadOnlyConfigOptions, StdioLaunch, UnsupportedVersion, apply_v2_session_notification,
+     close_undelivered_session, drain_foreground_queue, enqueue_notification,
+     first_class_terminal_auth_task, is_disconnect_error, map_acp_error,
      mcp_configurations_for_project, runtime, transport, with_v2_client_ingress,
-@@ -212,6 +212,8 @@ struct StdioStartup {
+@@ -217,6 +217,8 @@ struct StdioStartup {
      stderr_task: Shared<Task<()>>,
      runtime: Rc<RefCell<Option<ConnectionRuntime>>>,
      drain: Option<futures::channel::oneshot::Sender<LocalBoxFuture<'static, ()>>>,
@@ -11156,7 +11167,7 @@ index e86d232..d4af414 100644
  }
  
  impl AcpV2Connection {
-@@ -222,13 +224,36 @@ impl AcpV2Connection {
+@@ -227,13 +229,36 @@ impl AcpV2Connection {
          agent_server_store: WeakEntity<AgentServerStore>,
          cx: &mut AsyncApp,
      ) -> Result<Self> {
@@ -11194,7 +11205,7 @@ index e86d232..d4af414 100644
          let mut child = transport::OwnedChild(child);
          let status = child
              .0
-@@ -270,6 +295,7 @@ impl AcpV2Connection {
+@@ -275,6 +300,7 @@ impl AcpV2Connection {
                          stderr_task,
                          runtime,
                          drain: Some(drain_sender),
@@ -11202,7 +11213,7 @@ index e86d232..d4af414 100644
                      }),
                      &mut cx,
                  )
-@@ -314,18 +340,20 @@ impl AcpV2Connection {
+@@ -319,18 +345,20 @@ impl AcpV2Connection {
          startup: Option<StdioStartup>,
          cx: &mut AsyncApp,
      ) -> Result<Self> {
@@ -11224,7 +11235,7 @@ index e86d232..d4af414 100644
              ),
          };
          let request_elicitations = cx.new(|_| ElicitationStore::default());
-@@ -356,7 +384,15 @@ impl AcpV2Connection {
+@@ -362,7 +390,15 @@ impl AcpV2Connection {
                      )
                      .await
                  });
@@ -11241,7 +11252,7 @@ index e86d232..d4af414 100644
          let stderr_for_drain = stderr_task.clone();
          *runtime.borrow_mut() = Some(ConnectionRuntime {
              _client: client_runtime,
-@@ -6895,6 +6931,7 @@ exec sleep 60
+@@ -7648,6 +7684,7 @@ exec sleep 60
                      stderr_task: Task::ready(()).shared(),
                      runtime: Rc::new(RefCell::new(None)),
                      drain: None,
@@ -13239,7 +13250,7 @@ index 0000000..1a9c116
 +    }
 +}
 diff --git a/crates/agent_ui/src/agent_panel.rs b/crates/agent_ui/src/agent_panel.rs
-index ae4569d..78bd403 100644
+index 01f9574..44f3977 100644
 --- a/crates/agent_ui/src/agent_panel.rs
 +++ b/crates/agent_ui/src/agent_panel.rs
 @@ -723,6 +723,7 @@ pub fn init(cx: &mut App) {
@@ -13536,10 +13547,10 @@ index cdb9dc5..6b43e4b 100644
  mod devtools_delivery_tests;
  
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
-index af69c15..6a3f3e7 100644
+index abff0f3..c030f3c 100644
 --- a/crates/agent_ui/src/conversation_view/thread_view.rs
 +++ b/crates/agent_ui/src/conversation_view/thread_view.rs
-@@ -6245,6 +6245,22 @@ impl ThreadView {
+@@ -6504,6 +6504,22 @@ impl ThreadView {
          )
      }
  
@@ -13868,7 +13879,7 @@ index 7975d2b..6e29b30 100644
      defaults: {},
  });
 diff --git a/crates/settings_ui/Cargo.toml b/crates/settings_ui/Cargo.toml
-index 861b71e..dc896e6 100644
+index b0b2f7c..456a63c 100644
 --- a/crates/settings_ui/Cargo.toml
 +++ b/crates/settings_ui/Cargo.toml
 @@ -18,6 +18,7 @@ test-support = []
@@ -13887,7 +13898,7 @@ index 861b71e..dc896e6 100644
  serde.workspace = true
  serde_json.workspace = true
  serde_yaml_ng.workspace = true
-@@ -79,12 +81,16 @@ zed_credentials_provider.workspace = true
+@@ -80,12 +82,16 @@ credentials_provider = { workspace = true, features = ["test-support"] }
  fs = { workspace = true, features = ["test-support"] }
  futures.workspace = true
  gpui = { workspace = true, features = ["test-support"] }
@@ -13905,7 +13916,7 @@ index 861b71e..dc896e6 100644
  
  [package.metadata.cargo-shear]
 diff --git a/crates/settings_ui/src/page_data.rs b/crates/settings_ui/src/page_data.rs
-index 138acac..9a9b77f 100644
+index eefb373..2e6c0ca 100644
 --- a/crates/settings_ui/src/page_data.rs
 +++ b/crates/settings_ui/src/page_data.rs
 @@ -13,9 +13,10 @@ use crate::{
@@ -16724,7 +16735,7 @@ index 0000000..8fac6d8
 +    }
 +}
 diff --git a/crates/zed/Cargo.toml b/crates/zed/Cargo.toml
-index d76bc86..f441800 100644
+index 599d627..af3273a 100644
 --- a/crates/zed/Cargo.toml
 +++ b/crates/zed/Cargo.toml
 @@ -70,6 +70,7 @@ action_log = { workspace = true, optional = true }
@@ -16736,7 +16747,7 @@ index d76bc86..f441800 100644
  agent_settings.workspace = true
  agent_skills.workspace = true
 diff --git a/crates/zed/src/main.rs b/crates/zed/src/main.rs
-index b1a7977..4132e69 100644
+index 71ec5c5..c5eb571 100644
 --- a/crates/zed/src/main.rs
 +++ b/crates/zed/src/main.rs
 @@ -707,6 +707,7 @@ fn main() {
@@ -16748,10 +16759,10 @@ index b1a7977..4132e69 100644
          edit_prediction_registry::init(app_state.client.clone(), app_state.user_store.clone(), cx);
          let prompt_builder = PromptBuilder::load(app_state.fs.clone(), stdout_is_a_pty(), cx);
 diff --git a/crates/zed/src/zed.rs b/crates/zed/src/zed.rs
-index d8785fb..681871c 100644
+index d6abb1e..e33f5fe 100644
 --- a/crates/zed/src/zed.rs
 +++ b/crates/zed/src/zed.rs
-@@ -5984,6 +5984,8 @@ mod tests {
+@@ -6290,6 +6290,8 @@ mod tests {
                  "action",
                  "activity_indicator",
                  "agent",

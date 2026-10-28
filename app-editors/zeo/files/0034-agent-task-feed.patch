@@ -77,10 +77,10 @@ clause in `is_idle_for_retention`, or TasksUpdated in agent_panel's match arm.
 ---
 
 diff --git a/crates/acp_thread/src/acp_thread.rs b/crates/acp_thread/src/acp_thread.rs
-index 339c53a..d014f2a 100644
+index 1c50fa9..b32faa0 100644
 --- a/crates/acp_thread/src/acp_thread.rs
 +++ b/crates/acp_thread/src/acp_thread.rs
-@@ -49,7 +49,7 @@ use std::fmt::{Formatter, Write};
+@@ -50,7 +50,7 @@ use std::fmt::{Formatter, Write};
  use std::ops::Range;
  use std::process::ExitStatus;
  use std::rc::Rc;
@@ -89,7 +89,7 @@ index 339c53a..d014f2a 100644
  use std::{fmt::Display, mem, path::PathBuf, sync::Arc};
  pub use submission::*;
  use task::{Shell, ShellBuilder};
-@@ -3668,6 +3668,134 @@ const CLAUDE_RATE_LIMIT_META_KEY: &str = "_claude/rateLimit";
+@@ -3738,6 +3738,134 @@ const CLAUDE_RATE_LIMIT_META_KEY: &str = "_claude/rateLimit";
  /// `background_tasks_changed` level here, as `{ "count": n, "tasks": [...] }`.
  const CLAUDE_BACKGROUND_TASKS_META_KEY: &str = "_claude/backgroundTasks";
  
@@ -224,7 +224,7 @@ index 339c53a..d014f2a 100644
  pub const TOKEN_USAGE_WARNING_THRESHOLD: f32 = 0.8;
  
  impl TokenUsage {
-@@ -3768,6 +3896,10 @@ pub struct AcpThread {
+@@ -3842,6 +3970,10 @@ pub struct AcpThread {
      token_usage: Option<TokenUsage>,
      account_usage: AccountUsage,
      background_task_count: usize,
@@ -235,7 +235,7 @@ index 339c53a..d014f2a 100644
      cost: Option<SessionCost>,
      prompt_capabilities: acp_v2::PromptCapabilities,
      available_commands: Vec<acp_v2::AvailableCommand>,
-@@ -3920,6 +4052,11 @@ pub enum AcpThreadEvent {
+@@ -3998,6 +4130,11 @@ pub enum AcpThreadEvent {
      TokenUsageUpdated(OutputTokensUpdate),
      AccountUsageUpdated,
      BackgroundTasksUpdated,
@@ -247,7 +247,7 @@ index 339c53a..d014f2a 100644
      EntryUpdated(usize),
      EntriesRemoved(Range<usize>),
      ToolAuthorizationRequested(PermissionRequestId),
-@@ -4077,6 +4214,8 @@ impl AcpThread {
+@@ -4156,6 +4293,8 @@ impl AcpThread {
                  | AcpThreadEvent::TokenUsageUpdated(_)
                  | AcpThreadEvent::AccountUsageUpdated
                  | AcpThreadEvent::BackgroundTasksUpdated
@@ -256,7 +256,7 @@ index 339c53a..d014f2a 100644
                  | AcpThreadEvent::EntryUpdated(_)
                  | AcpThreadEvent::Retry(_)
                  | AcpThreadEvent::SubagentSpawned(_)
-@@ -4141,6 +4280,8 @@ impl AcpThread {
+@@ -4227,6 +4366,8 @@ impl AcpThread {
              token_usage: None,
              account_usage: AccountUsage::default(),
              background_task_count: 0,
@@ -265,7 +265,7 @@ index 339c53a..d014f2a 100644
              cost: None,
              prompt_capabilities,
              available_commands: Vec::new(),
-@@ -4513,6 +4654,9 @@ impl AcpThread {
+@@ -4656,6 +4797,9 @@ impl AcpThread {
                  }
                  _ => false,
              })
@@ -275,7 +275,7 @@ index 339c53a..d014f2a 100644
      }
  
      pub fn forget_submission(&mut self, id: SubmissionId, cx: &mut Context<Self>) {
-@@ -4804,6 +4948,89 @@ impl AcpThread {
+@@ -4977,6 +5121,89 @@ impl AcpThread {
          self.background_task_count
      }
  
@@ -365,7 +365,7 @@ index 339c53a..d014f2a 100644
      pub fn cost(&self) -> Option<&SessionCost> {
          self.cost.as_ref()
      }
-@@ -4985,6 +5212,22 @@ impl AcpThread {
+@@ -5161,6 +5388,22 @@ impl AcpThread {
                      self.background_task_count = count;
                      cx.emit(AcpThreadEvent::BackgroundTasksUpdated);
                  }
@@ -388,7 +388,7 @@ index 339c53a..d014f2a 100644
                  self.update_session_info(info_update, cx);
              }
              acp_v1::SessionUpdate::AvailableCommandsUpdate(acp_v1::AvailableCommandsUpdate {
-@@ -8238,6 +8481,9 @@ impl AcpThread {
+@@ -8632,6 +8875,9 @@ impl AcpThread {
      }
  
      pub fn emit_load_error(&mut self, error: LoadError, cx: &mut Context<Self>) {
@@ -398,7 +398,7 @@ index 339c53a..d014f2a 100644
          cx.emit(AcpThreadEvent::LoadError(error));
      }
  
-@@ -26669,4 +26915,7 @@ mod tests {
+@@ -27597,4 +27843,7 @@ mod tests {
          request.await.expect("turn should complete");
          assert_eq!(cx.active_idle_sleep_preventions(), 0);
      }
@@ -1254,10 +1254,10 @@ index 0000000..e5e982c
 +    }
 +}
 diff --git a/crates/acp_thread/src/connection.rs b/crates/acp_thread/src/connection.rs
-index 9ffd842..83f053a 100644
+index 08a4156..b0c93e9 100644
 --- a/crates/acp_thread/src/connection.rs
 +++ b/crates/acp_thread/src/connection.rs
-@@ -152,6 +152,31 @@ pub trait AgentConnection {
+@@ -158,6 +158,31 @@ pub trait AgentConnection {
          Task::ready(Err(anyhow::Error::msg("Closing sessions is not supported")))
      }
  
@@ -1346,25 +1346,24 @@ index 0000000..3b4d6ad
 +  ]
 +}
 diff --git a/crates/agent_servers/src/acp/v1.rs b/crates/agent_servers/src/acp/v1.rs
-index 140d332..3b7b3e3 100644
+index cc0f7fb..46fc835 100644
 --- a/crates/agent_servers/src/acp/v1.rs
 +++ b/crates/agent_servers/src/acp/v1.rs
-@@ -17,11 +17,12 @@ use agent_client_protocol::schema::{
-     v2 as acp_v2,
+@@ -19,11 +19,11 @@ use agent_client_protocol::schema::{
  };
  use agent_client_protocol::{
--    Agent, Builder, Client, ConnectionTo, HandleDispatchFrom, Lines, Responder, V2Builder,
-+    Agent, Builder, Client, ConnectionTo, HandleDispatchFrom, Lines, Responder, UntypedMessage,
-+    V2Builder,
+     Agent, Builder, Client, ConnectionTo, HandleDispatchFrom, JsonRpcRequest, Lines, Responder,
+-    V2Builder,
++    UntypedMessage, V2Builder,
  };
  use anyhow::anyhow;
  use async_channel;
 -use collections::HashMap;
 +use collections::{HashMap, HashSet};
+ use feature_flags::{AcpBetaFeatureFlag, FeatureFlagAppExt as _};
  use futures::channel::mpsc;
  use futures::future::Shared;
- use futures::{Future, FutureExt as _};
-@@ -51,6 +52,9 @@ use crate::{CURSOR_ID, GEMINI_ID};
+@@ -54,6 +54,9 @@ use crate::{CURSOR_ID, GEMINI_ID};
  
  pub const GEMINI_TERMINAL_AUTH_METHOD_ID: &str = "spawn-gemini-cli";
  const PARAMETERIZED_MODEL_PICKER_META_KEY: &str = "parameterizedModelPicker";
@@ -1374,7 +1373,7 @@ index 140d332..3b7b3e3 100644
  async fn close_session_and_drain(
      connection: &ConnectionTo<Agent>,
      session_id: acp_v2::SessionId,
-@@ -69,6 +73,25 @@ async fn close_session_and_drain(
+@@ -72,6 +75,25 @@ async fn close_session_and_drain(
      drain_foreground_queue(dispatch_tx).await
  }
  
@@ -1400,7 +1399,7 @@ index 140d332..3b7b3e3 100644
  pub struct AcpConnection {
      id: AgentId,
      telemetry_id: SharedString,
-@@ -76,6 +99,9 @@ pub struct AcpConnection {
+@@ -79,6 +101,9 @@ pub struct AcpConnection {
      connection: ConnectionTo<Agent>,
      sessions: Rc<RefCell<HashMap<acp_v2::SessionId, AcpSession>>>,
      pending_sessions: RefCell<HashMap<acp_v2::SessionId, PendingAcpSession>>,
@@ -1410,15 +1409,15 @@ index 140d332..3b7b3e3 100644
      auth_methods: Vec<acp_v2::AuthMethod>,
      agent_server_store: WeakEntity<AgentServerStore>,
      agent_capabilities: acp::AgentCapabilities,
-@@ -683,6 +709,7 @@ impl AcpConnection {
+@@ -730,6 +755,7 @@ impl AcpConnection {
              agent_version,
              sessions,
              pending_sessions: RefCell::new(HashMap::default()),
 +            closing_sessions: RefCell::new(HashSet::default()),
              agent_capabilities: response.agent_capabilities,
+             accepts_subagent_updates,
              request_elicitations,
-             defaults,
-@@ -726,6 +753,7 @@ impl AcpConnection {
+@@ -775,6 +801,7 @@ impl AcpConnection {
              connection,
              sessions,
              pending_sessions: RefCell::new(HashMap::default()),
@@ -1426,7 +1425,7 @@ index 140d332..3b7b3e3 100644
              auth_methods: vec![],
              agent_server_store,
              agent_capabilities,
-@@ -836,6 +864,7 @@ impl AcpConnection {
+@@ -887,6 +914,7 @@ impl AcpConnection {
          cx: &mut App,
      ) {
          if self.pending_sessions.borrow().contains_key(&session_id)
@@ -1434,7 +1433,7 @@ index 140d332..3b7b3e3 100644
              || !self
                  .sessions
                  .borrow()
-@@ -882,6 +911,18 @@ impl AcpConnection {
+@@ -933,6 +961,18 @@ impl AcpConnection {
          self.agent_capabilities.session_capabilities.close.is_some()
      }
  
@@ -1450,10 +1449,10 @@ index 140d332..3b7b3e3 100644
 +            .is_some_and(|version| version >= 1)
 +    }
 +
-     fn open_or_create_session(
-         self: Rc<Self>,
-         session_id: acp_v2::SessionId,
-@@ -1929,6 +1970,130 @@ impl AgentConnection for AcpConnection {
+     /// `rpc_call` gets a receiver that resolves once its response has been applied, and
+     /// holds the agent's later messages until then (see `ordered_response`). With
+     /// `replays_history`, the response ends a history replay.
+@@ -2012,6 +2052,130 @@ impl AgentConnection for AcpConnection {
          Ok(())
      }
  
@@ -1584,7 +1583,7 @@ index 140d332..3b7b3e3 100644
      fn request_elicitations(&self) -> Option<Entity<ElicitationStore>> {
          Some(self.request_elicitations.clone())
      }
-@@ -2250,6 +2415,26 @@ pub mod test_support {
+@@ -2342,6 +2506,26 @@ pub mod test_support {
              self.inner.cancel(session_id, cx)
          }
  
@@ -1611,7 +1610,7 @@ index 140d332..3b7b3e3 100644
          fn request_elicitations(&self) -> Option<Entity<ElicitationStore>> {
              self.inner.request_elicitations()
          }
-@@ -9528,6 +9713,8 @@ exit 7
+@@ -10146,6 +10330,8 @@ exit 7
          cx.update(|_| ());
          cx.run_until_parked();
      }
@@ -1622,10 +1621,10 @@ index 140d332..3b7b3e3 100644
  fn mcp_servers_for_project(project: &Entity<Project>, cx: &App) -> Vec<acp::McpServer> {
 diff --git a/crates/agent_servers/src/acp_task_actions_tests.rs b/crates/agent_servers/src/acp_task_actions_tests.rs
 new file mode 100644
-index 0000000..c1b73e5
+index 0000000..47d30c8
 --- /dev/null
 +++ b/crates/agent_servers/src/acp_task_actions_tests.rs
-@@ -0,0 +1,453 @@
+@@ -0,0 +1,455 @@
 +// Story 012 / patch 0032 — `AcpConnection::{stop_task, background_task}` against a
 +// fake ACP peer (R4.5, R4.6, R4.7, R2.7) and session close interrupting tasks (R4.11).
 +//
@@ -1763,6 +1762,7 @@ index 0000000..c1b73e5
 +        request_elicitations: request_elicitations.clone(),
 +        active_request_scopes: None,
 +        pending_session_updates: None,
++        accepts_subagent_updates: false,
 +    };
 +    let dispatch_task = cx.spawn({
 +        let mut dispatch_rx = dispatch_rx;
@@ -1781,6 +1781,7 @@ index 0000000..c1b73e5
 +            client_conn,
 +            sessions,
 +            response.agent_capabilities,
++            false,
 +            request_elicitations,
 +            agent_server_store,
 +            client_io_task,
@@ -2080,10 +2081,10 @@ index 0000000..c1b73e5
 +    );
 +}
 diff --git a/crates/agent_ui/src/agent_diff.rs b/crates/agent_ui/src/agent_diff.rs
-index 73532b0..23ccbbd 100644
+index 63b7ec7..2a2aa9d 100644
 --- a/crates/agent_ui/src/agent_diff.rs
 +++ b/crates/agent_ui/src/agent_diff.rs
-@@ -1477,6 +1477,8 @@ impl AgentDiff {
+@@ -1490,6 +1490,8 @@ impl AgentDiff {
              | AcpThreadEvent::TokenUsageUpdated(_)
              | AcpThreadEvent::AccountUsageUpdated
              | AcpThreadEvent::BackgroundTasksUpdated
@@ -2091,9 +2092,9 @@ index 73532b0..23ccbbd 100644
 +            | AcpThreadEvent::TaskEnded { .. }
              | AcpThreadEvent::NoticesUpdated
              | AcpThreadEvent::SubagentSpawned(_)
-             | AcpThreadEvent::EntriesRemoved(_)
+             | AcpThreadEvent::SubagentAssociationUpdated
 diff --git a/crates/agent_ui/src/agent_panel.rs b/crates/agent_ui/src/agent_panel.rs
-index 12ae52c..7cf3a32 100644
+index 49f9ac2..8e28a7c 100644
 --- a/crates/agent_ui/src/agent_panel.rs
 +++ b/crates/agent_ui/src/agent_panel.rs
 @@ -4310,6 +4310,9 @@ impl AgentPanel {
@@ -2180,10 +2181,10 @@ index 12ae52c..7cf3a32 100644
      async fn test_cleanup_retained_threads_preserves_idle_non_loadable_threads(
          cx: &mut TestAppContext,
 diff --git a/crates/agent_ui/src/conversation_view.rs b/crates/agent_ui/src/conversation_view.rs
-index 0a8876c..8931246 100644
+index a6c2431..58bf88a 100644
 --- a/crates/agent_ui/src/conversation_view.rs
 +++ b/crates/agent_ui/src/conversation_view.rs
-@@ -367,6 +367,8 @@ impl Conversation {
+@@ -368,6 +368,8 @@ impl Conversation {
                      | AcpThreadEvent::TokenUsageUpdated(_)
                      | AcpThreadEvent::AccountUsageUpdated
                      | AcpThreadEvent::BackgroundTasksUpdated
@@ -2192,7 +2193,7 @@ index 0a8876c..8931246 100644
                      | AcpThreadEvent::EntryUpdated(_)
                      | AcpThreadEvent::EntriesRemoved(_)
                      | AcpThreadEvent::Retry(_)
-@@ -797,6 +799,8 @@ fn affects_thread_metadata(event: &AcpThreadEvent) -> bool {
+@@ -811,6 +813,8 @@ fn affects_thread_metadata(event: &AcpThreadEvent) -> bool {
          | AcpThreadEvent::TokenUsageUpdated(_)
          | AcpThreadEvent::AccountUsageUpdated
          | AcpThreadEvent::BackgroundTasksUpdated
@@ -2201,7 +2202,7 @@ index 0a8876c..8931246 100644
          | AcpThreadEvent::PromptCapabilitiesUpdated
          | AcpThreadEvent::AvailableCommandsUpdated(_)
          | AcpThreadEvent::ModeUpdated(_)
-@@ -2299,6 +2303,8 @@ impl ConversationView {
+@@ -2324,6 +2328,8 @@ impl ConversationView {
              // sidebar: the agent panel observes every conversation view, active or not,
              // and asks the sidebar to rebuild, which re-reads the thread's status.
              AcpThreadEvent::BackgroundTasksUpdated => {}

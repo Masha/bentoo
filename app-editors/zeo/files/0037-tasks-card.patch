@@ -120,10 +120,10 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 ---
 
 diff --git a/assets/settings/default.json b/assets/settings/default.json
-index e5ffea4..9a5d375 100644
+index 09c4733..0670107 100644
 --- a/assets/settings/default.json
 +++ b/assets/settings/default.json
-@@ -1427,6 +1427,15 @@
+@@ -1434,6 +1434,15 @@
      //
      // Default: card
      "elicitation_placement": "card",
@@ -291,7 +291,7 @@ index 0000000..54bdc62
 +    }
 +}
 diff --git a/crates/agent_ui/src/agent_panel.rs b/crates/agent_ui/src/agent_panel.rs
-index 7cf3a32..749e614 100644
+index 8e28a7c..e95b373 100644
 --- a/crates/agent_ui/src/agent_panel.rs
 +++ b/crates/agent_ui/src/agent_panel.rs
 @@ -39,6 +39,7 @@ use crate::ExpandMessageEditor;
@@ -743,7 +743,7 @@ index 7cf3a32..749e614 100644
          // - Files can be dropped into the panel
          let content = v_flex()
 +            .debug_selector(|| "agent-panel".into())
-             .key_context(self.key_context())
+             .key_context(self.key_context(cx))
              .relative()
              .size_full()
 @@ -6767,7 +7033,8 @@ impl Render for AgentPanel {
@@ -862,10 +862,10 @@ index f072899..b90a0d8 100644
              max_idle_retained_threads: 5,
              threads_sidebar: agent_settings::ThreadsSidebarSettings {
 diff --git a/crates/agent_ui/src/conversation_view.rs b/crates/agent_ui/src/conversation_view.rs
-index 8931246..d277313 100644
+index 58bf88a..7d65a65 100644
 --- a/crates/agent_ui/src/conversation_view.rs
 +++ b/crates/agent_ui/src/conversation_view.rs
-@@ -2000,21 +2000,30 @@ impl ConversationView {
+@@ -2020,21 +2020,30 @@ impl ConversationView {
              }
              AcpThreadEvent::NewEntry => {
                  let len = thread.read(cx).entries().len();
@@ -905,7 +905,7 @@ index 8931246..d277313 100644
                          active.sync_editor_mode(cx);
                          active.sync_generating_indicator(cx);
                      });
-@@ -14285,6 +14294,47 @@ pub(crate) mod tests {
+@@ -14789,6 +14798,47 @@ pub(crate) mod tests {
          }
      }
  
@@ -954,10 +954,10 @@ index 8931246..d277313 100644
          unsupported: agent_client_protocol::schema::v2::ContentBlock,
          cx: &mut TestAppContext,
 diff --git a/crates/agent_ui/src/entry_view_state.rs b/crates/agent_ui/src/entry_view_state.rs
-index 1ffc8b6..1d9ea45 100644
+index 0009183..f2922a3 100644
 --- a/crates/agent_ui/src/entry_view_state.rs
 +++ b/crates/agent_ui/src/entry_view_state.rs
-@@ -233,6 +233,11 @@ impl EntryViewState {
+@@ -259,6 +259,11 @@ impl EntryViewState {
          self.entries.get(index)
      }
  

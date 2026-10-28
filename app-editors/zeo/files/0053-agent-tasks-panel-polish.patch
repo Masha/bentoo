@@ -171,7 +171,7 @@ index 78490ea..2198618 100644
      run_sql(&db, "DROP TRIGGER fail_delete_mid_batch").await;
      db.delete(&batch).await.unwrap();
 diff --git a/crates/agent_tasks_panel/src/panel.rs b/crates/agent_tasks_panel/src/panel.rs
-index dcb229b..5026377 100644
+index dcb229b..84104b7 100644
 --- a/crates/agent_tasks_panel/src/panel.rs
 +++ b/crates/agent_tasks_panel/src/panel.rs
 @@ -23,13 +23,16 @@ use collections::HashMap;
@@ -938,7 +938,7 @@ index dcb229b..5026377 100644
 +                // Escape would still go to whatever had focus before (R5.8).
 +                move |panel, event: &ClickEvent, window, cx| {
 +                    let modifiers = event.modifiers();
-+                    if modifiers.secondary() {
++                    if modifiers.secondary(cx) {
 +                        window.focus(&open_focus, cx);
 +                        panel.toggle_selected(&key, cx);
 +                    } else if modifiers.shift {
@@ -3107,10 +3107,10 @@ index 0000000..398ec39
 +}
 diff --git a/crates/agent_tasks_panel/src/panel/selection_gesture_tests.rs b/crates/agent_tasks_panel/src/panel/selection_gesture_tests.rs
 new file mode 100644
-index 0000000..83420dc
+index 0000000..7eb7710
 --- /dev/null
 +++ b/crates/agent_tasks_panel/src/panel/selection_gesture_tests.rs
-@@ -0,0 +1,424 @@
+@@ -0,0 +1,387 @@
 +// Story 034, task 4.2 — selection gestures, rendering and the keyboard (R5.1, R5.3, R5.4, R5.5,
 +// R5.8, and R2.3 for the selection). Module path: `panel::selection_gesture`. Every test name
 +// starts with `selection_gesture_`, the task's validation filter. Hostile fixtures come before
@@ -3124,7 +3124,7 @@ index 0000000..83420dc
 +//
 +// Contract assumed (adjust HERE when the implementation drifts):
 +//   - a click on the row's label slot (`agent-tasks-row-label-{task_id}`, 0039) is a click on
-+//     its open control; `Modifiers::secondary_key()` toggles, `Modifiers::shift()` selects the
++//     its open control; `Modifiers::secondary_key(cx)` toggles, `Modifiers::shift()` selects the
 +//     range, no modifier clears and opens;
 +//   - a selected row's open control is announced "Open thread: {label}, selected";
 +//   - the action `ToggleSelected` (`agent_tasks_panel::ToggleSelected`) is defined in the panel
@@ -3163,6 +3163,13 @@ index 0000000..83420dc
 +        .unwrap_or_else(|| panic!("{selector} is painted"));
 +    panels.cx.simulate_click(bounds.center(), modifiers);
 +    panels.cx.run_until_parked();
++}
++
++/// The secondary modifier is the platform's (cmd on macOS, ctrl elsewhere), read from the
++/// app since gpui asks for it there rather than at compile time.
++fn secondary_click_row(panels: &mut Panels, selector: &'static str) {
++    let modifiers = panels.cx.update(|_, cx| Modifiers::secondary_key(cx));
++    click_row(panels, selector, modifiers);
 +}
 +
 +fn selected_tasks(panels: &mut Panels) -> Vec<String> {
@@ -3222,19 +3229,11 @@ index 0000000..83420dc
 +async fn selection_gesture_secondary_click_selects_without_opening(cx: &mut TestAppContext) {
 +    let (mut panels, _a, _b, c) = three_threads(cx).await;
 +
-+    click_row(
-+        &mut panels,
-+        "agent-tasks-row-label-ta",
-+        Modifiers::secondary_key(),
-+    );
++    secondary_click_row(&mut panels, "agent-tasks-row-label-ta");
 +    assert_eq!(selected_tasks(&mut panels), vec!["ta"]);
 +    assert_eq!(active(&panels), Some(c.clone()), "thread A is not opened");
 +
-+    click_row(
-+        &mut panels,
-+        "agent-tasks-row-label-ta",
-+        Modifiers::secondary_key(),
-+    );
++    secondary_click_row(&mut panels, "agent-tasks-row-label-ta");
 +    assert!(
 +        selected_tasks(&mut panels).is_empty(),
 +        "a second one deselects"
@@ -3256,11 +3255,7 @@ index 0000000..83420dc
 +    let mut panels = open_panels(cx).await;
 +    show_panel(&panels.workspace.clone(), &mut panels.cx);
 +
-+    click_row(
-+        &mut panels,
-+        "agent-tasks-row-label-tg",
-+        Modifiers::secondary_key(),
-+    );
++    secondary_click_row(&mut panels, "agent-tasks-row-label-tg");
 +    click_row(&mut panels, "agent-tasks-row-label-tg", Modifiers::shift());
 +    assert_eq!(
 +        find_row(&mut panels, "gone", "tg").unwrap().notice,
@@ -3282,11 +3277,7 @@ index 0000000..83420dc
 +async fn selection_gesture_shift_click_selects_the_range_without_opening(cx: &mut TestAppContext) {
 +    let (mut panels, _a, _b, c) = three_threads(cx).await;
 +
-+    click_row(
-+        &mut panels,
-+        "agent-tasks-row-label-ta",
-+        Modifiers::secondary_key(),
-+    );
++    secondary_click_row(&mut panels, "agent-tasks-row-label-ta");
 +    click_row(&mut panels, "agent-tasks-row-label-tc", Modifiers::shift());
 +    assert_eq!(selected_tasks(&mut panels), vec!["ta", "tb", "tc"]);
 +    assert_eq!(active(&panels), Some(c), "no thread opened");
@@ -3296,16 +3287,8 @@ index 0000000..83420dc
 +#[gpui::test]
 +async fn selection_gesture_plain_click_clears_the_selection_and_opens(cx: &mut TestAppContext) {
 +    let (mut panels, a, _b, _c) = three_threads(cx).await;
-+    click_row(
-+        &mut panels,
-+        "agent-tasks-row-label-ta",
-+        Modifiers::secondary_key(),
-+    );
-+    click_row(
-+        &mut panels,
-+        "agent-tasks-row-label-tb",
-+        Modifiers::secondary_key(),
-+    );
++    secondary_click_row(&mut panels, "agent-tasks-row-label-ta");
++    secondary_click_row(&mut panels, "agent-tasks-row-label-tb");
 +    assert_eq!(selected_tasks(&mut panels), vec!["ta", "tb"]);
 +
 +    click_row(&mut panels, "agent-tasks-row-label-ta", Modifiers::none());
@@ -3320,11 +3303,7 @@ index 0000000..83420dc
 +#[gpui::test]
 +async fn selection_gesture_selected_row_is_announced(cx: &mut TestAppContext) {
 +    let (mut panels, _a, _b, _c) = three_threads(cx).await;
-+    click_row(
-+        &mut panels,
-+        "agent-tasks-row-label-tb",
-+        Modifiers::secondary_key(),
-+    );
++    secondary_click_row(&mut panels, "agent-tasks-row-label-tb");
 +
 +    let labels = labels(&mut panels);
 +    assert!(
@@ -3415,16 +3394,8 @@ index 0000000..83420dc
 +            KeyBinding::new("escape", menu::Cancel, None),
 +        ])
 +    });
-+    click_row(
-+        &mut panels,
-+        "agent-tasks-row-label-ta",
-+        Modifiers::secondary_key(),
-+    );
-+    click_row(
-+        &mut panels,
-+        "agent-tasks-row-label-tb",
-+        Modifiers::secondary_key(),
-+    );
++    secondary_click_row(&mut panels, "agent-tasks-row-label-ta");
++    secondary_click_row(&mut panels, "agent-tasks-row-label-tb");
 +
 +    panels
 +        .tasks_panel
@@ -3465,16 +3436,8 @@ index 0000000..83420dc
 +#[gpui::test]
 +async fn selection_gesture_selection_survives_the_x_and_reopening(cx: &mut TestAppContext) {
 +    let (mut panels, _a, _b, _c) = three_threads(cx).await;
-+    click_row(
-+        &mut panels,
-+        "agent-tasks-row-label-ta",
-+        Modifiers::secondary_key(),
-+    );
-+    click_row(
-+        &mut panels,
-+        "agent-tasks-row-label-tc",
-+        Modifiers::secondary_key(),
-+    );
++    secondary_click_row(&mut panels, "agent-tasks-row-label-ta");
++    secondary_click_row(&mut panels, "agent-tasks-row-label-tc");
 +
 +    draw(&mut panels.cx);
 +    let close = panels

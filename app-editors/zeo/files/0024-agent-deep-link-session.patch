@@ -94,7 +94,7 @@ still correct, and on X11 it is enough on its own.
 ---
 
 diff --git a/crates/agent_ui/src/agent_panel.rs b/crates/agent_ui/src/agent_panel.rs
-index d992a67..6b7e8b9 100644
+index c5a19bc..35390e0 100644
 --- a/crates/agent_ui/src/agent_panel.rs
 +++ b/crates/agent_ui/src/agent_panel.rs
 @@ -1702,6 +1702,39 @@ impl AgentPanel {
@@ -244,7 +244,7 @@ index d992a67..6b7e8b9 100644
      async fn test_new_draft_survives_reload_when_real_thread_is_active(cx: &mut TestAppContext) {
          init_test(cx);
 diff --git a/crates/zed/src/main.rs b/crates/zed/src/main.rs
-index c3bde91..598cd35 100644
+index 78dad31..6212be8 100644
 --- a/crates/zed/src/main.rs
 +++ b/crates/zed/src/main.rs
 @@ -1037,29 +1037,78 @@ fn handle_open_request(request: OpenRequest, app_state: Arc<AppState>, cx: &mut

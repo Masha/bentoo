@@ -183,7 +183,7 @@ index 2b9616c..9cc6406 100644
          CycleNextInlineAssist,
          /// Cycles to the previous inline assist suggestion.
 diff --git a/crates/agent_ui/src/conversation_view.rs b/crates/agent_ui/src/conversation_view.rs
-index 9760677..b1ebc5f 100644
+index 3dcbc1d..b9909d4 100644
 --- a/crates/agent_ui/src/conversation_view.rs
 +++ b/crates/agent_ui/src/conversation_view.rs
 @@ -111,6 +111,7 @@ pub(crate) const DRAFT_PROMPT_PERSIST_DEBOUNCE: Duration = Duration::from_millis
@@ -192,9 +192,9 @@ index 9760677..b1ebc5f 100644
  mod message_queue;
 +mod sent_history;
  mod session_stats;
+ mod subagent_card;
  mod thread_search_bar;
- mod thread_view;
-@@ -2048,6 +2049,7 @@ impl ConversationView {
+@@ -2068,6 +2069,7 @@ impl ConversationView {
                      active.update(cx, |active, cx| {
                          for index in new_entries {
                              active.sync_elicitation_state_for_entry(index, window, cx);
@@ -202,7 +202,7 @@ index 9760677..b1ebc5f 100644
                          }
                          active.sync_editor_mode(cx);
                          active.sync_generating_indicator(cx);
-@@ -4372,6 +4374,14 @@ pub(crate) mod tests {
+@@ -4461,6 +4463,14 @@ pub(crate) mod tests {
  
      use super::*;
  
@@ -1552,7 +1552,7 @@ index 0000000..51ed194
 +}
 diff --git a/crates/agent_ui/src/conversation_view/tests/recall_tests.rs b/crates/agent_ui/src/conversation_view/tests/recall_tests.rs
 new file mode 100644
-index 0000000..949d577
+index 0000000..96d4c2b
 --- /dev/null
 +++ b/crates/agent_ui/src/conversation_view/tests/recall_tests.rs
 @@ -0,0 +1,580 @@
@@ -1699,7 +1699,7 @@ index 0000000..949d577
 +                let bound = bindings.iter().any(|binding| {
 +                    binding.action().name() == action
 +                        && binding.keystrokes().len() == 1
-+                        && binding.keystrokes()[0].unparse() == key
++                        && binding.keystrokes()[0].unparse(cx.platform_info().os) == key
 +                        && format!("{:?}", binding.predicate()).contains("AcpThread")
 +                });
 +                assert!(
@@ -2091,7 +2091,7 @@ index 0000000..949d577
 +                let bound = bindings.iter().any(|binding| {
 +                    binding.action().name() == action
 +                        && binding.keystrokes().len() == 1
-+                        && binding.keystrokes()[0].unparse() == key
++                        && binding.keystrokes()[0].unparse(cx.platform_info().os) == key
 +                        && format!("{:?}", binding.predicate()).contains(context)
 +                });
 +                assert!(bound, "{keymap}: `{key}` must be bound to {action}");
@@ -2137,7 +2137,7 @@ index 0000000..949d577
 +    assert_eq!(composer_text(&view, cx), "my draft");
 +}
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
-index 2b95b53..aaccae9 100644
+index 9186c15..bb0ab3a 100644
 --- a/crates/agent_ui/src/conversation_view/thread_view.rs
 +++ b/crates/agent_ui/src/conversation_view/thread_view.rs
 @@ -1,5 +1,6 @@
@@ -2148,7 +2148,7 @@ index 2b95b53..aaccae9 100644
      conversation_view::thread_search_bar::{ThreadSearchBar, ThreadSearchBarEvent},
      entry_view_state::TERMINAL_CONTENT_TOP_PADDING,
      open_abs_path_at_point, project_path_for_file_link,
-@@ -116,6 +117,11 @@ impl ThreadRecovery {
+@@ -159,6 +160,11 @@ impl ThreadRecovery {
      }
  }
  
@@ -2160,7 +2160,7 @@ index 2b95b53..aaccae9 100644
  #[derive(Default)]
  struct ThreadFeedbackState {
      feedback: Option<ThreadFeedback>,
-@@ -674,6 +680,10 @@ pub struct ThreadView {
+@@ -802,6 +808,10 @@ pub struct ThreadView {
      pub should_be_following: bool,
      pub editing_message: Option<usize>,
      pub message_queue: MessageQueue,
@@ -2171,7 +2171,7 @@ index 2b95b53..aaccae9 100644
      pub turn_fields: TurnFields,
      pub discarded_partial_edits: HashSet<acp_v2::ToolCallId>,
      pub is_loading_contents: bool,
-@@ -1105,7 +1115,9 @@ impl ThreadView {
+@@ -1245,7 +1255,9 @@ impl ThreadView {
          }
  
          subscriptions.push(cx.observe(&message_editor, |this, editor, cx| {
@@ -2182,7 +2182,7 @@ index 2b95b53..aaccae9 100644
                  this._draft_resolve_task.take();
                  return;
              }
-@@ -1123,7 +1135,9 @@ impl ThreadView {
+@@ -1263,7 +1275,9 @@ impl ThreadView {
                      None
                  };
                  this.update(cx, |this, cx| {
@@ -2193,7 +2193,7 @@ index 2b95b53..aaccae9 100644
                          return;
                      }
                      this.thread.update(cx, |thread, cx| {
-@@ -1179,6 +1193,8 @@ impl ThreadView {
+@@ -1319,6 +1333,8 @@ impl ThreadView {
              should_be_following: false,
              editing_message: None,
              message_queue: MessageQueue::default(),
@@ -2202,7 +2202,7 @@ index 2b95b53..aaccae9 100644
              turn_fields: TurnFields::default(),
              discarded_partial_edits: HashSet::default(),
              is_loading_contents: false,
-@@ -1304,7 +1320,13 @@ impl ThreadView {
+@@ -1444,7 +1460,13 @@ impl ThreadView {
                  self.run_local_command(*command, window, cx);
              }
              MessageEditorEvent::InputAttempted { .. } => {}
@@ -2217,7 +2217,7 @@ index 2b95b53..aaccae9 100644
          }
      }
  
-@@ -1965,6 +1987,7 @@ impl ThreadView {
+@@ -2122,6 +2144,7 @@ impl ThreadView {
      }
  
      pub fn send(&mut self, window: &mut Window, cx: &mut Context<Self>) {
@@ -2225,7 +2225,7 @@ index 2b95b53..aaccae9 100644
          if self.message_editor.read(cx).editor().read(cx).read_only(cx) {
              self.handle_thread_error(
                  anyhow!(
-@@ -3020,6 +3043,207 @@ impl ThreadView {
+@@ -3177,6 +3200,207 @@ impl ThreadView {
          self.move_queued_message_to_main_editor(last_id, None, None, window, cx);
      }
  
@@ -2433,7 +2433,7 @@ index 2b95b53..aaccae9 100644
      // editor methods
  
      pub fn expand_message_editor(
-@@ -5192,6 +5416,8 @@ impl ThreadView {
+@@ -5444,6 +5668,8 @@ impl ThreadView {
              .bg(editor_bg_color)
              .justify_center()
              .on_action(cx.listener(Self::handle_message_editor_move_up))

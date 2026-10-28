@@ -594,7 +594,7 @@ index 0000000..55c7c53
 +    }
 +}
 diff --git a/crates/sidebar/src/sidebar.rs b/crates/sidebar/src/sidebar.rs
-index 75b4558..b447759 100644
+index 6aac7a3..442520e 100644
 --- a/crates/sidebar/src/sidebar.rs
 +++ b/crates/sidebar/src/sidebar.rs
 @@ -92,6 +92,12 @@ mod sidebar_tests;

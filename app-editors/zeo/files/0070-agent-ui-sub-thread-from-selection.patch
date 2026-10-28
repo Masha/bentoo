@@ -139,20 +139,20 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 ---
 
 diff --git a/crates/acp_thread/src/acp_thread.rs b/crates/acp_thread/src/acp_thread.rs
-index 80c2ec3..71fc08d 100644
+index d5faf87..5a57d5a 100644
 --- a/crates/acp_thread/src/acp_thread.rs
 +++ b/crates/acp_thread/src/acp_thread.rs
-@@ -3901,6 +3901,9 @@ fn stop_reason_from_v1(reason: &acp_v1::StopReason) -> Option<acp_v2::StopReason
- pub struct AcpThread {
-     session_info: AgentSessionInfo,
-     parent_session_id: Option<acp_v2::SessionId>,
+@@ -3975,6 +3975,9 @@ pub struct AcpThread {
+     subagents: IndexMap<acp_v2::SessionId, Entity<AcpThread>>,
+     /// Set when this session is an ACP subagent announced by its parent.
+     subagent_association: Option<subagents::SubagentAssociation>,
 +    /// The session this one was forked from (`session/fork`), unlike `parent_session_id`,
 +    /// which names the session that spawned a subagent.
 +    forked_from: Option<acp_v2::SessionId>,
      provisional_title: Option<SharedString>,
      entries: Vec<AgentThreadEntry>,
      // Notices stay with the live session, but never enter conversation history or exports.
-@@ -4282,6 +4285,7 @@ impl AcpThread {
+@@ -4362,6 +4365,7 @@ impl AcpThread {
          let receipt_submissions = connection.receipt_submissions(&session_id, cx);
          Self {
              parent_session_id,
@@ -160,7 +160,7 @@ index 80c2ec3..71fc08d 100644
              session_info: AgentSessionInfo {
                  session_id,
                  work_dirs,
-@@ -4359,8 +4363,18 @@ impl AcpThread {
+@@ -4492,8 +4496,18 @@ impl AcpThread {
          cx.emit(AcpThreadEvent::AvailableCommandsUpdated(commands));
      }
  
@@ -181,10 +181,10 @@ index 80c2ec3..71fc08d 100644
  
      pub fn draft_prompt(&self) -> Option<&[acp_v2::ContentBlock]> {
 diff --git a/crates/acp_thread/src/connection.rs b/crates/acp_thread/src/connection.rs
-index f9b7a3b..f5192d1 100644
+index 5834473..6567834 100644
 --- a/crates/acp_thread/src/connection.rs
 +++ b/crates/acp_thread/src/connection.rs
-@@ -152,6 +152,24 @@ pub trait AgentConnection {
+@@ -158,6 +158,24 @@ pub trait AgentConnection {
          Task::ready(Err(anyhow::Error::msg("Closing sessions is not supported")))
      }
  
@@ -209,7 +209,7 @@ index f9b7a3b..f5192d1 100644
      /// Read the end of one of the session's tasks' output (`_claude/tasks/output`,
      /// version 2). Unsupported unless the connection overrides it.
      fn fetch_task_output(
-@@ -1042,6 +1060,7 @@ mod test_support {
+@@ -1053,6 +1071,7 @@ mod test_support {
          receipt_prompt: Arc<Mutex<Option<Vec<acp_v2::ContentBlock>>>>,
          next_truncate: Arc<Mutex<Option<oneshot::Receiver<()>>>>,
          close_session_calls: Arc<Mutex<Vec<acp_v2::SessionId>>>,
@@ -217,15 +217,15 @@ index f9b7a3b..f5192d1 100644
          next_close_responses: Arc<Mutex<VecDeque<oneshot::Receiver<Result<()>>>>>,
          set_title_calls: Arc<Mutex<Vec<(acp_v2::SessionId, SharedString)>>>,
          cancel_calls: Arc<Mutex<Vec<acp_v2::SessionId>>>,
-@@ -1051,6 +1070,7 @@ mod test_support {
-         supports_retry: bool,
+@@ -1063,6 +1082,7 @@ mod test_support {
          supports_load_session: bool,
          supports_close_session: bool,
+         announces_subagents: bool,
 +        supports_fork_session: bool,
          close_sessions_on_release: bool,
          supports_session_additional_directories: bool,
          supports_set_title: bool,
-@@ -1089,6 +1109,7 @@ mod test_support {
+@@ -1101,6 +1121,7 @@ mod test_support {
                  receipt_prompt: Default::default(),
                  next_truncate: Default::default(),
                  close_session_calls: Default::default(),
@@ -233,15 +233,15 @@ index f9b7a3b..f5192d1 100644
                  next_close_responses: Default::default(),
                  set_title_calls: Default::default(),
                  cancel_calls: Default::default(),
-@@ -1100,6 +1121,7 @@ mod test_support {
-                 supports_retry: false,
+@@ -1113,6 +1134,7 @@ mod test_support {
                  supports_load_session: false,
                  supports_close_session: false,
+                 announces_subagents: false,
 +                supports_fork_session: false,
                  close_sessions_on_release: true,
                  supports_session_additional_directories: false,
                  supports_set_title: true,
-@@ -1241,6 +1263,17 @@ mod test_support {
+@@ -1271,6 +1293,17 @@ mod test_support {
              self
          }
  
@@ -259,7 +259,7 @@ index f9b7a3b..f5192d1 100644
          pub fn with_prompt_capabilities(
              mut self,
              prompt_capabilities_rx: watch::Receiver<acp_v2::PromptCapabilities>,
-@@ -1401,6 +1434,28 @@ mod test_support {
+@@ -1435,6 +1468,28 @@ mod test_support {
              }
          }
  
@@ -288,7 +288,7 @@ index f9b7a3b..f5192d1 100644
          fn supports_session_additional_directories(&self) -> bool {
              self.supports_session_additional_directories
          }
-@@ -1420,6 +1475,17 @@ mod test_support {
+@@ -1454,6 +1509,17 @@ mod test_support {
              if let Some(error) = self.next_load_error.lock().take() {
                  return Task::ready(Err(error));
              }
@@ -306,7 +306,7 @@ index f9b7a3b..f5192d1 100644
              let thread = self.create_session(session_id, project, work_dirs, title, cx);
              Task::ready(Ok(thread))
          }
-@@ -1722,6 +1788,9 @@ mod test_support {
+@@ -1756,6 +1822,9 @@ mod test_support {
  #[cfg(any(test, feature = "test-support"))]
  pub use test_support::*;
  
@@ -783,10 +783,10 @@ index 0000000..ca4491d
 +    assert_eq!(thread.read_with(cx, |t, _| t.forked_from().cloned()), None);
 +}
 diff --git a/crates/agent_servers/src/acp.rs b/crates/agent_servers/src/acp.rs
-index 55c50a9..cd4eaca 100644
+index 1846ccb..8cad630 100644
 --- a/crates/agent_servers/src/acp.rs
 +++ b/crates/agent_servers/src/acp.rs
-@@ -488,6 +488,10 @@ impl ConfigRecorder {
+@@ -522,6 +522,10 @@ impl ConfigRecorder {
          config_options: Option<&ConfigOptions>,
          modes: Option<Rc<RefCell<acp::SessionModeState>>>,
          mode_rx: watch::Receiver<()>,
@@ -797,7 +797,7 @@ index 55c50a9..cd4eaca 100644
          cx: &App,
      ) -> Self {
          // Taken from the sender, the receiver starts at the current version:
-@@ -496,7 +500,7 @@ impl ConfigRecorder {
+@@ -530,7 +534,7 @@ impl ConfigRecorder {
          let options = config_options.map(|options| options.config_options.clone());
          let mut mode_rx = Some(mode_rx);
          let task = cx.spawn(async move |cx| {
@@ -807,10 +807,10 @@ index 55c50a9..cd4eaca 100644
                  // The watch coalesces wakes, so the cells are read as they are
                  // now rather than per signal.
 diff --git a/crates/agent_servers/src/acp/v1.rs b/crates/agent_servers/src/acp/v1.rs
-index 69b3489..47b0a8b 100644
+index 2f2fb13..7d7c63f 100644
 --- a/crates/agent_servers/src/acp/v1.rs
 +++ b/crates/agent_servers/src/acp/v1.rs
-@@ -850,11 +850,171 @@ impl AcpConnection {
+@@ -900,11 +900,171 @@ impl AcpConnection {
          );
      }
  
@@ -983,7 +983,7 @@ index 69b3489..47b0a8b 100644
          let mut sessions = self.sessions.borrow_mut();
          let Some(session) = sessions.get_mut(session_id) else {
              return;
-@@ -866,6 +1026,7 @@ impl AcpConnection {
+@@ -916,6 +1076,7 @@ impl AcpConnection {
              session.config_options.as_ref(),
              session.session_modes.clone(),
              mode_rx,
@@ -991,7 +991,7 @@ index 69b3489..47b0a8b 100644
              cx,
          ));
      }
-@@ -944,6 +1105,12 @@ impl AcpConnection {
+@@ -994,6 +1155,12 @@ impl AcpConnection {
          self.agent_capabilities.session_capabilities.close.is_some()
      }
  
@@ -1004,9 +1004,9 @@ index 69b3489..47b0a8b 100644
      /// Keyed on the capability alone: the entry id is whatever the user named it, and
      /// the agent's self-reported name differs between the fork and the published package.
      ///
-@@ -1146,7 +1313,9 @@ impl AcpConnection {
-                                 cx,
-                             );
+@@ -1223,7 +1390,9 @@ impl AcpConnection {
+                                 thread.invalidate_replayed_subagent_state(cx)
+                             });
                          }
 -                        cx.update(|cx| connection_state.start_config_recorder(&session_id, cx));
 +                        cx.update(|cx| {
@@ -1015,7 +1015,7 @@ index 69b3489..47b0a8b 100644
                          connection_state.remove_pending_session(&session_id, thread.entity_id());
                          return Ok(());
                      }
-@@ -1183,10 +1352,11 @@ impl AcpConnection {
+@@ -1262,10 +1431,11 @@ impl AcpConnection {
      }
  
      /// Applies the config options of a session as it opens. A newly created
@@ -1031,7 +1031,7 @@ index 69b3489..47b0a8b 100644
      fn apply_session_config_options(
          &self,
          session_id: &acp_v2::SessionId,
-@@ -1355,6 +1525,12 @@ impl AcpConnection {
+@@ -1434,6 +1604,12 @@ impl AcpConnection {
      }
  }
  
@@ -1044,7 +1044,7 @@ index 69b3489..47b0a8b 100644
  /// What restoring one config option asks of the agent.
  #[derive(Debug, Clone, PartialEq)]
  enum Choice {
-@@ -1498,6 +1674,12 @@ mod recorder_mode_tests;
+@@ -1577,6 +1753,12 @@ mod recorder_mode_tests;
  #[cfg(test)]
  mod round_trip_tests;
  
@@ -1057,7 +1057,7 @@ index 69b3489..47b0a8b 100644
  #[derive(Clone, Debug, PartialEq, Eq)]
  struct SessionDirectories {
      cwd: PathBuf,
-@@ -1530,6 +1712,17 @@ impl SessionDirectories {
+@@ -1609,6 +1791,17 @@ impl SessionDirectories {
              .additional_directories(self.additional_directories)
              .mcp_servers(mcp_servers)
      }
@@ -1075,7 +1075,7 @@ index 69b3489..47b0a8b 100644
  }
  
  fn session_directories_from_work_dirs(
-@@ -1623,7 +1816,6 @@ impl AgentConnection for AcpConnection {
+@@ -1702,7 +1895,6 @@ impl AgentConnection for AcpConnection {
              Ok(directories) => directories,
              Err(error) => return Task::ready(Err(error)),
          };
@@ -1083,7 +1083,7 @@ index 69b3489..47b0a8b 100644
          let mcp_servers = mcp_servers_for_project(&project, cx);
  
          cx.spawn(async move |cx| {
-@@ -1683,99 +1875,15 @@ impl AgentConnection for AcpConnection {
+@@ -1762,99 +1954,15 @@ impl AgentConnection for AcpConnection {
                  .context("ACP new-session response callback was cancelled")?
                  .map_err(map_acp_error)?;
  
@@ -1192,7 +1192,7 @@ index 69b3489..47b0a8b 100644
  
              registered
                  .send(())
-@@ -1795,6 +1903,113 @@ impl AgentConnection for AcpConnection {
+@@ -1878,6 +1986,113 @@ impl AgentConnection for AcpConnection {
              .is_some()
      }
  
@@ -1308,10 +1308,10 @@ index 69b3489..47b0a8b 100644
              .session_capabilities
 diff --git a/crates/agent_servers/src/acp/v1/fork_config_tests.rs b/crates/agent_servers/src/acp/v1/fork_config_tests.rs
 new file mode 100644
-index 0000000..2469e8d
+index 0000000..23562be
 --- /dev/null
 +++ b/crates/agent_servers/src/acp/v1/fork_config_tests.rs
-@@ -0,0 +1,654 @@
+@@ -0,0 +1,656 @@
 +//! Story 039, task 10.1 — a fork keeps the parent's thread configuration (R6.5, R6.6; Q4, Q5):
 +//! the real `AcpConnection` against a scripted agent on the SDK's in-memory channel, with the
 +//! production client handler set, so the fork's `session/set_config_option` and
@@ -1551,6 +1551,7 @@ index 0000000..2469e8d
 +        let dispatch_context = ClientContext {
 +            sessions: sessions.clone(),
 +            pending_session_updates: None,
++            accepts_subagent_updates: false,
 +            session_list: client_session_list.clone(),
 +            request_elicitations: request_elicitations.clone(),
 +            active_request_scopes: None,
@@ -1571,6 +1572,7 @@ index 0000000..2469e8d
 +                client_conn,
 +                sessions,
 +                response.agent_capabilities,
++                false,
 +                request_elicitations,
 +                agent_server_store,
 +                client_io_task,
@@ -1968,10 +1970,10 @@ index 0000000..2469e8d
 +}
 diff --git a/crates/agent_servers/src/acp/v1/fork_session_tests.rs b/crates/agent_servers/src/acp/v1/fork_session_tests.rs
 new file mode 100644
-index 0000000..3be7f08
+index 0000000..49f2b79
 --- /dev/null
 +++ b/crates/agent_servers/src/acp/v1/fork_session_tests.rs
-@@ -0,0 +1,444 @@
+@@ -0,0 +1,446 @@
 +//! Story 039, task 3.2 — `session/fork` over ACP v1 (R6.1, R6.2, R6.3; Q4, Q5, Q7): the real
 +//! `AcpConnection` against a scripted agent on the SDK's in-memory channel, with the production
 +//! client handler set, so the fork request travels exactly as it does to the Plus adapter.
@@ -2156,6 +2158,7 @@ index 0000000..3be7f08
 +        let dispatch_context = ClientContext {
 +            sessions: sessions.clone(),
 +            pending_session_updates: None,
++            accepts_subagent_updates: false,
 +            session_list: client_session_list.clone(),
 +            request_elicitations: request_elicitations.clone(),
 +            active_request_scopes: None,
@@ -2176,6 +2179,7 @@ index 0000000..3be7f08
 +                client_conn,
 +                sessions,
 +                response.agent_capabilities,
++                false,
 +                request_elicitations,
 +                agent_server_store,
 +                client_io_task,
@@ -2417,7 +2421,7 @@ index 0000000..3be7f08
 +    );
 +}
 diff --git a/crates/agent_ui/src/agent_panel.rs b/crates/agent_ui/src/agent_panel.rs
-index b9cc408..0e9ce2e 100644
+index f8e1e9b..6d5197e 100644
 --- a/crates/agent_ui/src/agent_panel.rs
 +++ b/crates/agent_ui/src/agent_panel.rs
 @@ -1710,6 +1710,10 @@ impl AgentPanel {
@@ -2602,7 +2606,7 @@ index 10fd33a..ac7eefe 100644
  mod tasks_card;
  mod terminal_codegen;
 diff --git a/crates/agent_ui/src/conversation_view.rs b/crates/agent_ui/src/conversation_view.rs
-index b1ebc5f..31b488a 100644
+index b9909d4..0742f4b 100644
 --- a/crates/agent_ui/src/conversation_view.rs
 +++ b/crates/agent_ui/src/conversation_view.rs
 @@ -113,6 +113,7 @@ pub(crate) mod elicitation;
@@ -2610,10 +2614,10 @@ index b1ebc5f..31b488a 100644
  mod sent_history;
  mod session_stats;
 +mod sub_thread_header;
+ mod subagent_card;
  mod thread_search_bar;
  mod thread_view;
- pub use message_queue::*;
-@@ -845,6 +846,7 @@ pub struct ConversationView {
+@@ -860,6 +861,7 @@ pub struct ConversationView {
      /// Shared with the child [`ThreadView`] when one is constructed.
      pub(crate) code_span_resolver: AgentCodeSpanResolver,
      request_elicitation_form_states: HashMap<ElicitationEntryId, ElicitationFormState>,
@@ -2621,7 +2625,7 @@ index b1ebc5f..31b488a 100644
      _subscriptions: Vec<Subscription>,
  }
  
-@@ -996,6 +998,7 @@ enum ServerState {
+@@ -1011,6 +1013,7 @@ enum ServerState {
      LoadError {
          error: LoadError,
      },
@@ -2629,7 +2633,7 @@ index b1ebc5f..31b488a 100644
      Connected(ConnectedServerState),
  }
  
-@@ -1144,6 +1147,8 @@ impl ConversationView {
+@@ -1159,6 +1162,8 @@ impl ConversationView {
              }
          }));
  
@@ -2638,7 +2642,7 @@ index b1ebc5f..31b488a 100644
          cx.on_release(|this, cx| {
              this.request_elicitation_form_states.clear();
              if let Some(connected) = this.as_connected() {
-@@ -1195,14 +1200,17 @@ impl ConversationView {
+@@ -1210,14 +1215,17 @@ impl ConversationView {
              draft_prompt_persist_task: None,
              code_span_resolver,
              request_elicitation_form_states: HashMap::default(),
@@ -2658,7 +2662,7 @@ index b1ebc5f..31b488a 100644
              && let Some(recovery) = view.read(cx).snapshot_recovery(cx)
          {
              self.draft_prompt_persist_task.take();
-@@ -1271,7 +1279,8 @@ impl ConversationView {
+@@ -1286,7 +1294,8 @@ impl ConversationView {
              ServerState::Loading {
                  connection: None, ..
              }
@@ -2668,7 +2672,7 @@ index b1ebc5f..31b488a 100644
          }
      }
  
-@@ -1570,6 +1579,9 @@ impl ConversationView {
+@@ -1585,6 +1594,9 @@ impl ConversationView {
                              this.saved_submissions.extend(recovery.submissions);
                          }
                      }
@@ -2678,7 +2682,7 @@ index b1ebc5f..31b488a 100644
                      Err(err) => {
                          this.handle_load_error(
                              LoadError::Other(err.to_string().into()),
-@@ -1878,7 +1890,7 @@ impl ConversationView {
+@@ -1898,7 +1910,7 @@ impl ConversationView {
          // when agent.connect() fails during loading), retry loading the thread.
          // This handles the case where a thread is restored before authentication completes.
          let should_retry = match &self.server_state {
@@ -2687,7 +2691,7 @@ index b1ebc5f..31b488a 100644
              ServerState::LoadError { .. } => true,
              ServerState::Connected(connected) => {
                  connected.auth_state.is_ok() && connected.has_thread_error(cx)
-@@ -1931,6 +1943,7 @@ impl ConversationView {
+@@ -1951,6 +1963,7 @@ impl ConversationView {
                  LoadError::Exited { .. } => format!("{} Exited", self.agent.agent_id()).into(),
                  LoadError::Other(_) => format!("Error Loading {}", self.agent.agent_id()).into(),
              },
@@ -2695,7 +2699,7 @@ index b1ebc5f..31b488a 100644
          }
      }
  
-@@ -4036,6 +4049,7 @@ impl Render for ConversationView {
+@@ -4125,6 +4138,7 @@ impl Render for ConversationView {
                  .justify_end()
                  .child(self.render_load_error(e, window, cx))
                  .into_any(),
@@ -2703,7 +2707,7 @@ index b1ebc5f..31b488a 100644
              ServerState::Connected(ConnectedServerState {
                  connection,
                  auth_state:
-@@ -7992,6 +8006,7 @@ pub(crate) mod tests {
+@@ -8350,6 +8364,7 @@ pub(crate) mod tests {
                          ServerState::Loading { .. } => "Loading (stuck!)",
                          ServerState::LoadError { .. } => "LoadError (wrong variant)",
                          ServerState::Connected(_) => "Connected",
@@ -2976,10 +2980,10 @@ index 0000000..a44821a
 +    }
 +}
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
-index bd786d0..d35c8f2 100644
+index a142352..9e69511 100644
 --- a/crates/agent_ui/src/conversation_view/thread_view.rs
 +++ b/crates/agent_ui/src/conversation_view/thread_view.rs
-@@ -9336,6 +9336,7 @@ impl ThreadView {
+@@ -9614,6 +9614,7 @@ impl ThreadView {
                              entry_ix,
                              block.markdown().cloned(),
                              content,
@@ -2987,7 +2991,7 @@ index bd786d0..d35c8f2 100644
                              cx,
                          ))
                  }),
-@@ -9411,7 +9412,13 @@ impl ThreadView {
+@@ -9689,7 +9690,13 @@ impl ThreadView {
                          this.toggle_thinking_block_expansion(key, window, cx);
                      }))
                      .map(|header| {
@@ -3002,7 +3006,7 @@ index bd786d0..d35c8f2 100644
                      }),
              )
              .when(is_open, |this| {
-@@ -9451,6 +9458,7 @@ impl ThreadView {
+@@ -9729,6 +9736,7 @@ impl ThreadView {
          entry_ix: usize,
          markdown: Option<Entity<Markdown>>,
          message_body: AnyElement,
@@ -3010,7 +3014,7 @@ index bd786d0..d35c8f2 100644
          cx: &Context<Self>,
      ) -> AnyElement {
          let entity = cx.entity();
-@@ -9474,6 +9482,7 @@ impl ThreadView {
+@@ -9752,6 +9760,7 @@ impl ThreadView {
                          .and_then(|markdown| markdown.context_menu_selected_text().cloned());
                      let selected_markdown = markdown
                          .and_then(|markdown| markdown.context_menu_selected_markdown().cloned());
@@ -3018,7 +3022,7 @@ index bd786d0..d35c8f2 100644
  
                      let copy_this_agent_response =
                          ContextMenuEntry::new("Copy This Agent Response").handler({
-@@ -9550,6 +9559,10 @@ impl ThreadView {
+@@ -9828,6 +9837,10 @@ impl ThreadView {
                                  },
                              )
                          })
@@ -3029,7 +3033,7 @@ index bd786d0..d35c8f2 100644
                          .item(copy_this_agent_response)
                          .separator()
                          .item(scroll_item)
-@@ -13594,7 +13607,11 @@ impl ThreadView {
+@@ -13970,7 +13983,11 @@ impl ThreadView {
                      IconName::ThreadFromSummary,
                      "New Thread with This Command",
                      "new thread",
@@ -3042,7 +3046,7 @@ index bd786d0..d35c8f2 100644
                  ),
              ]
          }
-@@ -14371,6 +14388,7 @@ impl Render for ThreadView {
+@@ -14747,6 +14764,7 @@ impl Render for ThreadView {
          let list_state = self.list_state.clone();
  
          let conversation = v_flex()
@@ -3052,10 +3056,10 @@ index bd786d0..d35c8f2 100644
              })
 diff --git a/crates/agent_ui/src/sub_thread.rs b/crates/agent_ui/src/sub_thread.rs
 new file mode 100644
-index 0000000..a1dec63
+index 0000000..59a1fd1
 --- /dev/null
 +++ b/crates/agent_ui/src/sub_thread.rs
-@@ -0,0 +1,348 @@
+@@ -0,0 +1,350 @@
 +//! Sub-threads opened from a selection in a thread (story 039): a clean thread that starts
 +//! from the quoted excerpt, or a fork of the parent session that inherits its conversation.
 +
@@ -3113,7 +3117,9 @@ index 0000000..a1dec63
 +    entries
 +        .iter()
 +        .filter(|entry| match entry {
-+            AgentThreadEntry::UserMessage(_) => true,
++            // A message between sessions, such as a parent and its subagent, is part of the
++            // transcript the fork inherits.
++            AgentThreadEntry::UserMessage(_) | AgentThreadEntry::SessionMessage(_) => true,
 +            AgentThreadEntry::AssistantMessage(message) => message
 +                .chunks
 +                .iter()
@@ -5197,10 +5203,10 @@ index 0000000..1bec946
 +}
 diff --git a/crates/agent_ui/src/sub_thread_tests/menu_subagent.rs b/crates/agent_ui/src/sub_thread_tests/menu_subagent.rs
 new file mode 100644
-index 0000000..c6a9641
+index 0000000..a42e2ac
 --- /dev/null
 +++ b/crates/agent_ui/src/sub_thread_tests/menu_subagent.rs
-@@ -0,0 +1,184 @@
+@@ -0,0 +1,187 @@
 +// Story 039, task 11.1 — no sub-thread entries in a subagent's thread view (R1.9; refine v5).
 +// Wiring: `support.rs`, mounted as `mod menu_subagent` beside `mod menu` in `sub_thread.rs`.
 +// Filter: `cargo test -p agent_ui sub_thread::menu` (selects this file and `menu.rs`).
@@ -5281,7 +5287,10 @@ index 0000000..c6a9641
 +        thread
 +            .handle_session_update(acp_v1::SessionUpdate::ToolCall(call), cx)
 +            .expect("the Agent tool call applies");
-+        thread.subagent_spawned(session.clone(), cx);
++    });
++    let root_session = root.read_with(cx, |thread, _| thread.session_id().clone());
++    conversation(h, cx).update(cx, |view, cx| {
++        view.load_subagent_session_for_test(session.clone(), root_session, cx)
 +    });
 +    settle(cx);
 +    let loaded = conversation(h, cx).read_with(cx, |view, _| view.thread_view(&session).is_some());
@@ -6401,7 +6410,7 @@ index 0000000..a2a6293
 +        .any(|line| line.split_whitespace().any(|word| word == "code=none"))
 +}
 diff --git a/crates/sidebar/src/sidebar.rs b/crates/sidebar/src/sidebar.rs
-index 491cf2d..8adeb99 100644
+index 137666f..a9f2a70 100644
 --- a/crates/sidebar/src/sidebar.rs
 +++ b/crates/sidebar/src/sidebar.rs
 @@ -91,6 +91,9 @@ mod sidebar_tests;

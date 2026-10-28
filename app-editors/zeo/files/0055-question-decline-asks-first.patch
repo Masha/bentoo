@@ -61,7 +61,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 ---
 
 diff --git a/crates/agent_ui/src/conversation_view/elicitation.rs b/crates/agent_ui/src/conversation_view/elicitation.rs
-index 28598b3..5ecd72b 100644
+index b895b63..e56e60b 100644
 --- a/crates/agent_ui/src/conversation_view/elicitation.rs
 +++ b/crates/agent_ui/src/conversation_view/elicitation.rs
 @@ -59,6 +59,10 @@ pub(crate) struct ElicitationFormState {
@@ -114,7 +114,7 @@ index 28598b3..5ecd72b 100644
      }
  
      /// The field groups a paginated card steps through. One entry when the
-@@ -2091,6 +2116,15 @@ fn property_meta(property: &acp::ElicitationPropertySchema) -> Option<&acp::Meta
+@@ -2092,6 +2117,15 @@ fn property_meta(property: &acp::ElicitationPropertySchema) -> Option<&acp::Meta
      }
  }
  
@@ -130,7 +130,7 @@ index 28598b3..5ecd72b 100644
  /// The field this one is the custom-answer companion of, if it is one.
  /// Tolerant in the same way as the option previews above: an absent key, a
  /// non-object entry or a wrong-typed field all yield `None`, never an error.
-@@ -3340,3 +3374,6 @@ impl<'a> ElicitationCard<'a> {
+@@ -3341,3 +3375,6 @@ impl<'a> ElicitationCard<'a> {
              .into_any_element()
      }
  }
@@ -419,7 +419,7 @@ index 0000000..5f74176
 +    );
 +}
 diff --git a/crates/agent_ui/src/conversation_view/thread_view.rs b/crates/agent_ui/src/conversation_view/thread_view.rs
-index 929e3cb..4afb228 100644
+index e7cd37c..a7ddc0a 100644
 --- a/crates/agent_ui/src/conversation_view/thread_view.rs
 +++ b/crates/agent_ui/src/conversation_view/thread_view.rs
 @@ -36,6 +36,7 @@ use crate::unicode_confusables;
@@ -437,9 +437,9 @@ index 929e3cb..4afb228 100644
 -    should_render_elicitation,
 +    is_question_shaped, should_render_elicitation,
  };
+ use super::subagent_card::{SubagentCardId, SubagentCardState, SubagentStatus, acp_subagent_card};
  use super::*;
- 
-@@ -690,6 +691,9 @@ pub struct ThreadView {
+@@ -818,6 +819,9 @@ pub struct ThreadView {
      pub new_server_version_available: Option<SharedString>,
      pub resumed_without_history: bool,
      elicitation_form_states: HashMap<ElicitationEntryId, ElicitationFormState>,
@@ -449,7 +449,7 @@ index 929e3cb..4afb228 100644
      question_queue: QuestionQueue,
      pub _cancel_task: Option<Task<()>>,
      _save_task: Option<Task<()>>,
-@@ -1206,6 +1210,7 @@ impl ThreadView {
+@@ -1346,6 +1350,7 @@ impl ThreadView {
              is_loading_contents: false,
              new_server_version_available: None,
              elicitation_form_states: HashMap::default(),
@@ -457,7 +457,7 @@ index 929e3cb..4afb228 100644
              question_queue: QuestionQueue::default(),
              _cancel_task: None,
              _save_task: None,
-@@ -3631,12 +3636,113 @@ impl ThreadView {
+@@ -3788,12 +3793,113 @@ impl ThreadView {
          }
      }
  
@@ -572,7 +572,7 @@ index 929e3cb..4afb228 100644
          self.respond_to_elicitation(
              elicitation_id,
              acp_v2::CreateElicitationResponse::new(acp_v2::ElicitationAction::Decline),
-@@ -7761,6 +7867,10 @@ impl ThreadView {
+@@ -8020,6 +8126,10 @@ impl ThreadView {
              AgentThreadEntry::Elicitation(elicitation_id) => {
                  let thread = self.thread.read(cx);
                  if let Some((_, elicitation)) = thread.elicitation(elicitation_id)
@@ -583,7 +583,7 @@ index 929e3cb..4afb228 100644
                      && should_render_elicitation(elicitation)
                      && !Self::renders_elicitation_as_card(elicitation, cx)
                  {
-@@ -7926,6 +8036,43 @@ impl ThreadView {
+@@ -8204,6 +8314,43 @@ impl ThreadView {
          .render(cx)
      }
  
@@ -627,7 +627,7 @@ index 929e3cb..4afb228 100644
      fn elicitation_card_handlers(&self, cx: &Context<Self>) -> ElicitationCardHandlers {
          let view = cx.entity().downgrade();
  
-@@ -14909,6 +15056,14 @@ fn strip_leading_command(text: &str, command_name: &str) -> String {
+@@ -15285,6 +15432,14 @@ fn strip_leading_command(text: &str, command_name: &str) -> String {
  
  #[cfg(test)]
  mod tests {
@@ -1020,7 +1020,7 @@ index 0000000..d53eb66
 +}
 diff --git a/crates/agent_ui/src/conversation_view/thread_view/tests/decline_contract_tests.rs b/crates/agent_ui/src/conversation_view/thread_view/tests/decline_contract_tests.rs
 new file mode 100644
-index 0000000..d4f3fb0
+index 0000000..8e98f71
 --- /dev/null
 +++ b/crates/agent_ui/src/conversation_view/thread_view/tests/decline_contract_tests.rs
 @@ -0,0 +1,140 @@
@@ -1060,7 +1060,7 @@ index 0000000..d4f3fb0
 +    });
 +}
 +
-+fn press_keys(cx: &mut VisualTestContext, keys: &str) {
++fn press_keys(cx: &mut VisualTestContext, keys: &'static str) {
 +    for key in keys.split_whitespace() {
 +        cx.simulate_keystrokes(key);
 +        cx.update(|window, cx| {

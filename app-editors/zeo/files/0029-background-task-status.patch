@@ -67,10 +67,10 @@ Test added (0.6.1_p20261021): archiving a Background thread is refused.
 ---
 
 diff --git a/crates/acp_thread/src/acp_thread.rs b/crates/acp_thread/src/acp_thread.rs
-index c9697f8..339c53a 100644
+index d60be95..1c50fa9 100644
 --- a/crates/acp_thread/src/acp_thread.rs
 +++ b/crates/acp_thread/src/acp_thread.rs
-@@ -3659,6 +3659,15 @@ impl AccountUsage {
+@@ -3729,6 +3729,15 @@ impl AccountUsage {
  /// forwards the SDK's `rate_limit_event` here instead of dropping it.
  const CLAUDE_RATE_LIMIT_META_KEY: &str = "_claude/rateLimit";
  
@@ -86,7 +86,7 @@ index c9697f8..339c53a 100644
  pub const TOKEN_USAGE_WARNING_THRESHOLD: f32 = 0.8;
  
  impl TokenUsage {
-@@ -3758,6 +3767,7 @@ pub struct AcpThread {
+@@ -3832,6 +3841,7 @@ pub struct AcpThread {
      reported_usage: Option<ReportedTokenUsage>,
      token_usage: Option<TokenUsage>,
      account_usage: AccountUsage,
@@ -94,7 +94,7 @@ index c9697f8..339c53a 100644
      cost: Option<SessionCost>,
      prompt_capabilities: acp_v2::PromptCapabilities,
      available_commands: Vec<acp_v2::AvailableCommand>,
-@@ -3909,6 +3919,7 @@ pub enum AcpThreadEvent {
+@@ -3987,6 +3997,7 @@ pub enum AcpThreadEvent {
      NoticesUpdated,
      TokenUsageUpdated(OutputTokensUpdate),
      AccountUsageUpdated,
@@ -102,7 +102,7 @@ index c9697f8..339c53a 100644
      EntryUpdated(usize),
      EntriesRemoved(Range<usize>),
      ToolAuthorizationRequested(PermissionRequestId),
-@@ -4065,6 +4076,7 @@ impl AcpThread {
+@@ -4144,6 +4155,7 @@ impl AcpThread {
                  | AcpThreadEvent::NoticesUpdated
                  | AcpThreadEvent::TokenUsageUpdated(_)
                  | AcpThreadEvent::AccountUsageUpdated
@@ -110,7 +110,7 @@ index c9697f8..339c53a 100644
                  | AcpThreadEvent::EntryUpdated(_)
                  | AcpThreadEvent::Retry(_)
                  | AcpThreadEvent::SubagentSpawned(_)
-@@ -4128,6 +4140,7 @@ impl AcpThread {
+@@ -4214,6 +4226,7 @@ impl AcpThread {
              connection,
              token_usage: None,
              account_usage: AccountUsage::default(),
@@ -118,7 +118,7 @@ index c9697f8..339c53a 100644
              cost: None,
              prompt_capabilities,
              available_commands: Vec::new(),
-@@ -4785,6 +4798,12 @@ impl AcpThread {
+@@ -4958,6 +4971,12 @@ impl AcpThread {
          (!self.account_usage.is_empty()).then_some(&self.account_usage)
      }
  
@@ -131,7 +131,7 @@ index c9697f8..339c53a 100644
      pub fn cost(&self) -> Option<&SessionCost> {
          self.cost.as_ref()
      }
-@@ -4950,6 +4969,22 @@ impl AcpThread {
+@@ -5126,6 +5145,22 @@ impl AcpThread {
                  self.push_notice(notices::from_v1(notice).map_err(acp_v1::Error::from)?, cx);
              }
              acp_v1::SessionUpdate::SessionInfoUpdate(info_update) => {
@@ -154,7 +154,7 @@ index c9697f8..339c53a 100644
                  self.update_session_info(info_update, cx);
              }
              acp_v1::SessionUpdate::AvailableCommandsUpdate(acp_v1::AvailableCommandsUpdate {
-@@ -22408,6 +22443,136 @@ mod tests {
+@@ -23277,6 +23312,136 @@ mod tests {
          );
      }
  
@@ -292,22 +292,22 @@ index c9697f8..339c53a 100644
      async fn test_session_info_update_replaces_provisional_title_and_emits_event(
          cx: &mut TestAppContext,
 diff --git a/crates/agent_ui/src/agent_diff.rs b/crates/agent_ui/src/agent_diff.rs
-index 363e207..73532b0 100644
+index 69d201e..63b7ec7 100644
 --- a/crates/agent_ui/src/agent_diff.rs
 +++ b/crates/agent_ui/src/agent_diff.rs
-@@ -1476,6 +1476,7 @@ impl AgentDiff {
+@@ -1489,6 +1489,7 @@ impl AgentDiff {
              | AcpThreadEvent::SubmissionUpdated(_)
              | AcpThreadEvent::TokenUsageUpdated(_)
              | AcpThreadEvent::AccountUsageUpdated
 +            | AcpThreadEvent::BackgroundTasksUpdated
              | AcpThreadEvent::NoticesUpdated
              | AcpThreadEvent::SubagentSpawned(_)
-             | AcpThreadEvent::EntriesRemoved(_)
+             | AcpThreadEvent::SubagentAssociationUpdated
 diff --git a/crates/agent_ui/src/conversation_view.rs b/crates/agent_ui/src/conversation_view.rs
-index e3a6bf6..9ca4b3f 100644
+index 5421a80..3a03b67 100644
 --- a/crates/agent_ui/src/conversation_view.rs
 +++ b/crates/agent_ui/src/conversation_view.rs
-@@ -350,6 +350,7 @@ impl Conversation {
+@@ -351,6 +351,7 @@ impl Conversation {
                      | AcpThreadEvent::TitleUpdated
                      | AcpThreadEvent::TokenUsageUpdated(_)
                      | AcpThreadEvent::AccountUsageUpdated
@@ -315,7 +315,7 @@ index e3a6bf6..9ca4b3f 100644
                      | AcpThreadEvent::EntryUpdated(_)
                      | AcpThreadEvent::EntriesRemoved(_)
                      | AcpThreadEvent::Retry(_)
-@@ -773,6 +774,7 @@ fn affects_thread_metadata(event: &AcpThreadEvent) -> bool {
+@@ -787,6 +788,7 @@ fn affects_thread_metadata(event: &AcpThreadEvent) -> bool {
          | AcpThreadEvent::Retry(_)
          | AcpThreadEvent::TokenUsageUpdated(_)
          | AcpThreadEvent::AccountUsageUpdated
@@ -323,7 +323,7 @@ index e3a6bf6..9ca4b3f 100644
          | AcpThreadEvent::PromptCapabilitiesUpdated
          | AcpThreadEvent::AvailableCommandsUpdated(_)
          | AcpThreadEvent::ModeUpdated(_)
-@@ -2264,6 +2266,10 @@ impl ConversationView {
+@@ -2289,6 +2291,10 @@ impl ConversationView {
                      });
                  }
              }
@@ -335,7 +335,7 @@ index e3a6bf6..9ca4b3f 100644
                  // A redraw is all this needs: the account section is built from the thread
                  // when the tooltip opens, so there is no per-turn state to recompute.
 diff --git a/crates/sidebar/src/sidebar.rs b/crates/sidebar/src/sidebar.rs
-index c5a986c..797d883 100644
+index 4546628..2b0c815 100644
 --- a/crates/sidebar/src/sidebar.rs
 +++ b/crates/sidebar/src/sidebar.rs
 @@ -464,7 +464,14 @@ fn apply_live_row_state(
@@ -624,7 +624,7 @@ index ae1b2e4..b33851e 100644
 +#[path = "sidebar_pinned_background_tests.rs"]
 +mod background;
 diff --git a/crates/sidebar/src/sidebar_tests.rs b/crates/sidebar/src/sidebar_tests.rs
-index 910d5ff..2872ae9 100644
+index 09a5cef..0ad4dd4 100644
 --- a/crates/sidebar/src/sidebar_tests.rs
 +++ b/crates/sidebar/src/sidebar_tests.rs
 @@ -686,6 +686,7 @@ pub(super) fn visible_entries_as_strings(
@@ -635,7 +635,7 @@ index 910d5ff..2872ae9 100644
                                  AgentThreadStatus::Error => " (error)",
                                  AgentThreadStatus::WaitingForConfirmation => " (waiting)",
                                  _ => "",
-@@ -4701,6 +4702,105 @@ async fn test_background_thread_completion_triggers_notification(cx: &mut TestAp
+@@ -4712,6 +4713,105 @@ async fn test_background_thread_completion_triggers_notification(cx: &mut TestAp
      );
  }
  
