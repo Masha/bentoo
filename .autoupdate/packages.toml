@@ -847,6 +847,8 @@ be fixed there before any entry could ever track it.
 # END
 
 ["mail-client/thunderbird"]
+enabled = false
+disabled_by = "removed 2026-10-29: ::gentoo reached 159.0 and moved past this copy (firefox-159-patches-01t, higher nss/libaom/rust floors) -- see comments"
 url ="https://product-details.mozilla.org/1.0/thunderbird_versions.json"
 parser = "json"
 path = "LATEST_THUNDERBIRD_VERSION"
@@ -911,10 +913,17 @@ Manifest still pinned the old hash, so a clean fetch failed the digest check,
 and the `rm ... || die` would have died on the new tarball anyway. Before a
 revival, compare the patchset DIST size/hash on both sides, not only the
 ebuild text.
+Left a fourth time on 2026-10-29 at 159.0, together with thunderbird-l10n:
+::gentoo shipped 159.0 on firefox-159-patches-01t with higher floors, while
+this copy was still a 158 carry-over (158-02t, the audio_thread_priority
+checksum clearing). Same PVR, so the overlay copy won by repository priority
+and served the staler ebuild. Revive only when ::gentoo is behind again.
 """
 # END
 
 ["mail-client/thunderbird-l10n"]
+enabled = false
+disabled_by = "removed 2026-10-29: ::gentoo reached 159.0 and moved past this copy (firefox-159-patches-01t, higher nss/libaom/rust floors) -- see comments"
 url ="https://product-details.mozilla.org/1.0/thunderbird_versions.json"
 parser = "json"
 path = "LATEST_THUNDERBIRD_VERSION"
