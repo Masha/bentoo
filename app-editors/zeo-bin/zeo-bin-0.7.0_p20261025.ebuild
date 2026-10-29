@@ -13,7 +13,7 @@ inherit xdg
 # targets znver5 and put AVX-512 into the binary; this build refuses any
 # compiler-generated AVX-512. PROVENANCE.txt inside the tarball names the commit,
 # every patch with its sha256, the toolchains and the flags.
-EGIT_COMMIT="92447a17cc008225c73619f1c3f0cdefc8ababf3"
+EGIT_COMMIT="a5c4ca8bf6c4717a328a4a61b42d6d1d38949bcc"
 
 DESCRIPTION="Zeo - the Zed editor, rebranded, with the bentoo patch series (binary)"
 HOMEPAGE="https://github.com/zeo-workspace/zeo https://zed.dev"
