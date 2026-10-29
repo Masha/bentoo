@@ -10738,6 +10738,10 @@ A release exists only AFTER the workflow uploads the source tarball (assets
 librewolf-<ver>.source.tar.gz*), so it never points at a tag without a distfile.
 Version "158.0.1-2" maps to ebuild PV "158.0.1_p2" (transform "-"->"_p").
 Live=158.0.1-2 (verified 2026-10-22: HTTP 200, sha256 matches upstream).
+FIREFOX_PATCHSET is NOT bumped by the applier: on a new major, set it to the
+one ::gentoo's www-client/firefox-<major> uses. 159.0_p1 kept the 158 set and
+died in src_prepare on 0027-bmo-2071536 (merged upstream in 159); fixed
+2026-10-29 by moving to firefox-159-patches-01.
 """
 # END
 
