@@ -19,9 +19,11 @@ MY_P="${MY_PN}-${MY_PV}"
 # tarball carries only those subtrees (paths preserved). Upstream 2.14 moved the
 # base from 7.1.3 to 7.2, where Sean Wang's full MT7927 (Filogic 380) series
 # landed in mainline: that is why the numbered WiFi patch set collapsed from 32
-# to the 4 AP-mode additions still out of tree. The version-guarded compat shims
-# let the 7.2 code build against hosts from 6.17 up.
-MT76_KVER="7.2"
+# to the 4 AP-mode additions still out of tree. Upstream 2.17 moved it again to
+# 7.3 (new mt7925/nan.c); its patches do not apply to 7.2, so this MUST follow
+# the PKGBUILD's _mt76_kver on every bump. The compat shims let the 7.3 code
+# build against hosts from 6.17 up.
+MT76_KVER="7.3"
 KSRC_P="mt7927-kernel-src-${MT76_KVER}"
 # Pre-extracted MT6639 Bluetooth firmware blob (proprietary, from the ASUS
 # driver package V5603998_20250709R). The blob does not change with the dkms
@@ -98,8 +100,9 @@ src_prepare() {
 
 	# Apply the upstream MT7927 WiFi patch series (same order as upstream's
 	# `make sources` glob: the numbered 01..04 AP-mode additions first, then the
-	# version-guarded compat shims -- action frame for pre-7.1, the renamed EML
-	# capability macros for pre-7.2, and kzalloc_flex for pre-7.0 hosts).
+	# compat shims -- action frame, EML capability macros, kzalloc_flex, NAN and
+	# regd/AQL. The last two are switched on by Kbuild probes of the host
+	# headers, not by the kernel version).
 	pushd "${build}/mt76" >/dev/null || die
 	eapply "${S}"/mt7927-wifi-*.patch
 	popd >/dev/null || die
@@ -119,10 +122,11 @@ src_prepare() {
 		-C "${build}/bt" \
 		"linux-${MT76_KVER}/drivers/bluetooth" || die
 
-	# Apply the MT6639 Bluetooth patches: the numbered one adds the HP EliteMini
-	# 0489:e156 ID missing from the 7.2 tables, then the version-guarded compat
-	# shim (kmalloc_obj, hci_discovery_active) for pre-7.0 hosts -- same set,
-	# same order as the jetm Makefile.
+	# Apply the MT6639 Bluetooth patches: the numbered ones (the HP EliteMini
+	# 0489:e156 ID missing from the 7.3 tables, no reset when the firmware is
+	# absent), then every compat shim -- same set, same order as the jetm
+	# Makefile. bt-local-version.h is not generated, so the module keeps the
+	# in-tree MODULE_VERSION.
 	pushd "${build}/bt" >/dev/null || die
 	eapply "${S}"/mt6639-bt-[0-9]*.patch
 	eapply "${S}"/mt6639-bt-compat-*.patch
