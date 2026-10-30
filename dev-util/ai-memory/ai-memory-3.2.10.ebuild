@@ -62,7 +62,12 @@ EAPI=8
 # select a version for the requirement `tokio = "^1"` (locked to 1.54.1)".
 # Eight top-ups now: the next bump that touches the lock should regenerate
 # the tarball instead.
+#
+# 3.2.10 tops up a ninth anyway, deliberately: the only registry change in
+# its lock is libz-sys 1.1.28 -> 1.1.31 (pulled by libgit2-sys), and one
+# crate does not justify re-uploading 39 MiB. Regenerate on the next one.
 CRATES="
+	libz-sys@1.1.31
 	ruzstd@0.9.1
 	rustls-webpki@0.103.16
 	tokio@1.54.1
@@ -75,10 +80,12 @@ CRATES="
 
 # 3.1.0 replaced crates.io's zip with a [patch.crates-io] git pin on the
 # v8.6.0 release commit: crates.io yanked every zip 8.x compatible with
-# candle 0.11. The tarball's registry zip-8.6.0 is now unused. Remove this
+# candle 0.11. 3.2.10 moved the pin to upstream's 8.x security backport for
+# GHSA-m665-v7pm-7grj; the guard in src_prepare dies when it moves again.
+# The tarball's registry zip-8.6.0 is now unused. Remove this
 # entry once upstream drops the patch.
 declare -A GIT_CRATES=(
-	[zip]='https://github.com/zip-rs/zip2;771dfc534d2614158af5497ea3dff4d4208d7db1;zip2-%commit%'
+	[zip]='https://github.com/zip-rs/zip2;507c5c76ddd4cde767e64832fc6f848c51a99e44;zip2-%commit%'
 )
 
 # Version of the crates tarball to fetch, which is NOT always ${PV}: when a
@@ -212,10 +219,10 @@ src_prepare() {
 	# cargo.eclass writes for GIT_CRATES is ignored and the offline build
 	# dies with "can't checkout from 'https://github.com/zip-rs/zip2'".
 	# Point the upstream patch at the unpacked GIT_CRATES tarball instead.
-	local zip_git='zip = { git = "https://github.com/zip-rs/zip2", rev = "771dfc534d2614158af5497ea3dff4d4208d7db1" }'
+	local zip_git='zip = { git = "https://github.com/zip-rs/zip2", rev = "507c5c76ddd4cde767e64832fc6f848c51a99e44" }'
 	grep -qxF "${zip_git}" Cargo.toml \
-		|| die "Cargo.toml no longer pins zip to zip2@771dfc53; update GIT_CRATES and this sed"
-	sed -i "s|^zip = { git = .*|zip = { path = \"${WORKDIR}/zip2-771dfc534d2614158af5497ea3dff4d4208d7db1\" }|" \
+		|| die "Cargo.toml no longer pins zip to zip2@507c5c76; update GIT_CRATES and this sed"
+	sed -i "s|^zip = { git = .*|zip = { path = \"${WORKDIR}/zip2-507c5c76ddd4cde767e64832fc6f848c51a99e44\" }|" \
 		Cargo.toml || die
 
 	# crates/ai-memory-web/build.rs copies the VENDORED stylesheet into
