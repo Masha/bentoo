@@ -33,7 +33,7 @@ CRATES="
 	ring@0.17.14
 	rustls-pki-types@1.15.1
 	rustls-webpki@0.103.15
-	rustls@0.23.45
+	rustls@0.23.46
 	seccompiler@0.5.0
 	serde@1.0.228
 	serde_core@1.0.228
