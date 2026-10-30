@@ -104,6 +104,9 @@ BDEPEND="
 # servers/xr/xr_interface_extension.cpp still use it unguarded, so
 # USE=-deprecated cannot build. Still unfixed in upstream master on
 # 2026-09-16. Drop when upstream compiles with deprecated=no.
+# DROPPED at 4.8_beta2: every hunk touching the unguarded callers fails to
+# apply (mobile_vr, all four xr_nodes sites, the extension definitions), i.e.
+# upstream reworked that code; revisit if USE=-deprecated FTBFS again.
 #
 # The two deprecated-editor-screen patches were DROPPED at 4.8_alpha5 as their
 # own headers instructed: upstream commit 2e26ab8a3afb ("Fix deprecated build
@@ -130,7 +133,6 @@ BDEPEND="
 PATCHES=(
 	"${FILESDIR}"/${PN}-4.8-scons-toolchain.patch
 	"${FILESDIR}"/${PN}-4.8-system-pcre2.patch
-	"${FILESDIR}"/${PN}-4.8-xr-no-deprecated.patch
 )
 
 src_prepare() {
