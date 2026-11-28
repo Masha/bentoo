@@ -1,0 +1,1636 @@
+From c793f47d0d48ab9044f7d6419a6aae81fcc02c3e Mon Sep 17 00:00:00 2001
+From: lucascouts <lucascs@protonmail.com>
+Date: Sat, 28 Nov 2026 10:00:07 -0300
+Subject: [PATCH] agent_sandbox, settings_ui: a jail logs in with a kyomei
+ account
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Zeo next §6.65 and the first step of §6.70. Since 0141 each jailed project has its own
+CLAUDE_CONFIG_DIR, so every new project -- and every new worktree, whose canonical root is a new
+state folder -- asks for a Claude login of its own. Sharing one login is not the fix: Anthropic's
+refresh token is single-use, so two copies of a credential kill each other, and a shared or
+bind-mounted file breaks because Claude Code saves by renaming over it.
+
+Decided 2026-11-22 (operator): wait for kyomei, used the way Claude Swap is, delivering into a
+thread's config dir only the token that logs it in. Asked again 2026-11-28 (operator): "use an
+existing account inside kyomei or connect a new one", done directly.
+
+- `agent_sandbox.account` (the default) and `agent_sandbox.projects[root].account` name a kyomei
+  account -- a slot number, an alias or an e-mail. Unset leaves each project its own login, as
+  before; a project's empty string is its own login under a default account.
+- Before each jailed start, `jail_account::deliver` runs `kyomei deliver <account> --config-dir
+  <project>/claude --json`. kyomei renews the account if it has under an hour left and writes a
+  badge -- the access token with no refreshToken key -- merged key by key under Claude Code's three
+  locks. Without the key Claude Code uses the token and never touches the file (kyomei briefing
+  09, R9); a placeholder would make it blank the token. Zeo reads back only the account number,
+  its e-mail and the expiry; kyomei's stderr is never read.
+- A delivery that fails refuses the start (`LaunchCause::Account`, cause=account), naming the
+  reason: kyomei missing, blocked (a lock held, or the account quarantined after invalid_grant),
+  timed out, or an answer of another schema version. Starting anyway would land on Claude's login
+  screen with no word of why.
+- `agent_sandbox.kyomei_path` (unset: PATH). The account and the path are in the settings
+  fingerprint, so a new choice shows the lock's restart (0057, §6.50).
+- The Agent Sandbox page gets a Claude account block beside the secrets: one switch per kyomei
+  account plus the project's own login, exactly one on; "Use the default account"; "Connect a new
+  account…", which runs `kyomei add` in a terminal of the workspace -- a fresh login in a scratch
+  directory, a token family of its own, which kyomei stores and deletes the scratch copy of -- and
+  reads the list again when it ends; and Refresh.
+- Messages in the nine languages.
+
+Measured live on 2026-11-28 with a real login, Claude Code 2.1.332: a badge alone answers a
+`claude -p` turn and the file is left untouched (R9 holds); kyomei's renewal against the real
+endpoint rotates, and a second one succeeds, so the rotated token was persisted; a renewal
+REVOKES the previous access token ("OAuth token revoked"), so every directory of the account is
+redelivered at once; and a running session whose token was revoked and rewritten under it
+answered its next turn -- Claude Code re-reads the file. A long session therefore survives a
+renewal without a restart.
+
+Tests: agent_sandbox `jail_account_tests` (default, own choice, opt-out, schema version, exit 3,
+argv of a fake kyomei); settings_ui `agent_jail_account_tests` (rows, one switch on, a choice
+kyomei no longer holds, quarantine note, toggling off falls back to the own login).
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+
+diff --git a/Cargo.lock b/Cargo.lock
+index 8668629..58474fe 100644
+--- a/Cargo.lock
++++ b/Cargo.lock
+@@ -16983,6 +16983,7 @@ dependencies = [
+  "settings",
+  "shell_command_parser",
+  "strum 0.28.0",
++ "task",
+  "telemetry",
+  "tempfile",
+  "theme",
+diff --git a/assets/settings/default.json b/assets/settings/default.json
+index 067df5b..d7ce85c 100644
+--- a/assets/settings/default.json
++++ b/assets/settings/default.json
+@@ -3227,6 +3227,13 @@
+     // login): a directory per project under this one. Needs an ai-jail with --state-root;
+     // without one, the jail uses `claude_config_dir`.
+     "state_root": "~/.local/state/zeo/jail",
++    // The kyomei account every jailed project logs in with (a slot number, an alias or an
++    // e-mail from `kyomei list`). Before each start Zeo runs `kyomei deliver`, which writes
++    // only an access token into the project's Claude config -- the refresh token stays in
++    // kyomei's vault -- so a new project needs no login. null: each project logs in by itself.
++    "account": null,
++    // The kyomei binary; null looks it up on PATH.
++    "kyomei_path": null,
+     // Resource limits for every jailed project; a project's own replace them one by one,
+     // and 0 (or "0") turns one off. A limit the installed ai-jail cannot apply keeps the
+     // agent from starting.
+diff --git a/crates/agent_sandbox/src/agent_sandbox.rs b/crates/agent_sandbox/src/agent_sandbox.rs
+index d844beb..a7f1619 100644
+--- a/crates/agent_sandbox/src/agent_sandbox.rs
++++ b/crates/agent_sandbox/src/agent_sandbox.rs
+@@ -13,6 +13,7 @@ pub mod cpu_reserve;
+ pub mod disk_watch;
+ pub mod git_reach;
+ pub mod host_view;
++pub mod jail_account;
+ pub mod jail_hostname;
+ pub mod jail_secrets;
+ pub mod jail_ssh;
+@@ -58,6 +59,8 @@ mod host_view_launch_tests;
+ #[cfg(test)]
+ mod host_view_layer_tests;
+ #[cfg(test)]
++mod jail_account_tests;
++#[cfg(test)]
+ mod jail_hostname_tests;
+ #[cfg(test)]
+ mod jail_secrets_tests;
+diff --git a/crates/agent_sandbox/src/capabilities.rs b/crates/agent_sandbox/src/capabilities.rs
+index 0584f5c..53d71c0 100644
+--- a/crates/agent_sandbox/src/capabilities.rs
++++ b/crates/agent_sandbox/src/capabilities.rs
+@@ -328,6 +328,12 @@ pub fn set_project_secret(root: &Path, reference: &str, on: bool, cx: &mut App)
+     )
+ }
+ 
++/// The kyomei account the project's jail logs in with (§6.65): `Some(reference)` binds it,
++/// `Some("")` is its own login, `None` follows `agent_sandbox.account`. Applies at the next start.
++pub fn set_project_account(root: &Path, account: Option<String>, cx: &mut App) -> Task<bool> {
++    write_entry(root, "account", move |entry| entry.account = account, cx)
++}
++
+ /// Drops the project's own secret list: the default applies again.
+ pub fn reset_project_secrets(root: &Path, cx: &mut App) -> Task<bool> {
+     write_project(
+diff --git a/crates/agent_sandbox/src/jail_account.rs b/crates/agent_sandbox/src/jail_account.rs
+new file mode 100644
+index 0000000..c77561f
+--- /dev/null
++++ b/crates/agent_sandbox/src/jail_account.rs
+@@ -0,0 +1,245 @@
++//! A Claude account for a jail, from kyomei (Zeo next §6.65, §6.70).
++//!
++//! Without it each jailed project has its own `CLAUDE_CONFIG_DIR` and logs in by itself. A copy of
++//! one login cannot be shared instead: Anthropic's refresh token is single-use, so two copies kill
++//! each other. kyomei keeps every refresh token in its vault and writes into a project's config
++//! dir a *badge* -- the access token alone -- before each start, and rewrites it before it expires
++//! (`kyomei redeliver`). The jail can use the account and cannot renew, leak or destroy it.
++//!
++//! Zeo never reads a token: it runs `kyomei deliver` and reads back only the account number, its
++//! e-mail and the expiry, and `kyomei list` for the picker.
++
++use std::io;
++use std::path::{Path, PathBuf};
++use std::pin::pin;
++use std::process::Stdio;
++use std::time::Duration;
++
++use futures::{AsyncReadExt as _, FutureExt as _};
++use gpui::BackgroundExecutor;
++use serde::Deserialize;
++
++/// A delivery may renew the account first, which is one HTTPS round trip to Anthropic; kyomei
++/// bounds that at 30 s, and its lock waits at 9 s each.
++const DELIVER_TIMEOUT: Duration = Duration::from_secs(60);
++const LIST_TIMEOUT: Duration = Duration::from_secs(10);
++/// kyomei's JSON is a few hundred bytes per account.
++const MAX_OUTPUT_BYTES: u64 = 256 * 1024;
++
++/// kyomei's exit codes (its docs/overview/06-interfaces.md §1.1).
++const EXIT_NOTHING: i32 = 2;
++const EXIT_BLOCKED: i32 = 3;
++
++/// The one `--json` contract version this Zeo reads.
++const SCHEMA_VERSION: u32 = 1;
++
++/// Why an account could not be handed to a jail. Each names a cause and never a value: kyomei's
++/// own diagnostics stay in its stderr, which is not read.
++#[derive(Debug, Clone, PartialEq, Eq)]
++pub enum AccountProblem {
++    /// No kyomei at the configured path or on `PATH`.
++    NotInstalled,
++    /// kyomei could not be started.
++    Spawn(String),
++    TimedOut,
++    /// Exit 3: a credential lock held past the wait, or the account quarantined -- its refresh
++    /// token was refused and someone must log in to it again (`kyomei add`).
++    Blocked,
++    /// Any other failure; the exit code, when there is one.
++    Failed(Option<i32>),
++    /// An answer this Zeo does not read: another schema version, or not JSON.
++    Unreadable,
++}
++
++impl AccountProblem {
++    /// The `reason=` token of the refusal's log line and the message's argument.
++    pub fn as_str(&self) -> &'static str {
++        match self {
++            Self::NotInstalled => "not-installed",
++            Self::Spawn(_) => "spawn",
++            Self::TimedOut => "timed-out",
++            Self::Blocked => "blocked",
++            Self::Failed(_) => "failed",
++            Self::Unreadable => "unreadable",
++        }
++    }
++}
++
++/// One account kyomei holds, as the picker shows it.
++#[derive(Clone, Debug, Deserialize, PartialEq, Eq)]
++#[serde(rename_all = "camelCase")]
++pub struct KyomeiAccount {
++    pub number: u32,
++    #[serde(default)]
++    pub alias: Option<String>,
++    #[serde(default)]
++    pub email: Option<String>,
++    /// valid · expiring · expired · invalid_grant. An expired slot is normal: the next delivery
++    /// renews it. invalid_grant cannot be delivered until someone logs in again.
++    pub auth_status: String,
++}
++
++impl KyomeiAccount {
++    /// The reference the setting stores: the alias when there is one, since it survives the
++    /// account being logged in again, else the slot number.
++    pub fn reference(&self) -> String {
++        match self.alias.as_deref().filter(|alias| !alias.is_empty()) {
++            Some(alias) => alias.to_string(),
++            None => self.number.to_string(),
++        }
++    }
++
++    /// Whether `reference`, as stored in a setting, names this account.
++    pub fn answers_to(&self, reference: &str) -> bool {
++        reference == self.number.to_string()
++            || self.alias.as_deref() == Some(reference)
++            || self.email.as_deref() == Some(reference)
++    }
++
++    pub fn quarantined(&self) -> bool {
++        self.auth_status == "invalid_grant"
++    }
++}
++
++/// What a delivery wrote, minus the token.
++#[derive(Clone, Debug, Deserialize, PartialEq, Eq)]
++#[serde(rename_all = "camelCase")]
++pub struct Delivered {
++    pub account: u32,
++    #[serde(default)]
++    pub email: Option<String>,
++    pub expires_at: String,
++}
++
++#[derive(Deserialize)]
++#[serde(rename_all = "camelCase")]
++struct ListAnswer {
++    schema_version: u32,
++    accounts: Vec<KyomeiAccount>,
++}
++
++#[derive(Deserialize)]
++#[serde(rename_all = "camelCase")]
++struct DeliverAnswer {
++    schema_version: u32,
++    delivered: Delivered,
++}
++
++/// Where kyomei is: the setting, `~` expanded, else `PATH`.
++pub fn locate(setting: Option<&Path>) -> Option<PathBuf> {
++    match setting {
++        Some(path) => Some(match path.strip_prefix("~") {
++            Ok(rest) => paths::home_dir().join(rest),
++            Err(_) => path.to_path_buf(),
++        }),
++        None => which::which("kyomei").ok(),
++    }
++}
++
++/// Writes `account`'s badge into `claude_dir`: `kyomei deliver <account> --config-dir <dir>`.
++pub async fn deliver(
++    kyomei: &Path,
++    account: &str,
++    claude_dir: &Path,
++    executor: &BackgroundExecutor,
++) -> Result<Delivered, AccountProblem> {
++    let dir = claude_dir.as_os_str().to_owned();
++    let args = [
++        "deliver".into(),
++        account.into(),
++        "--config-dir".into(),
++        dir,
++        "--json".into(),
++    ];
++    let stdout = run(kyomei, &args, DELIVER_TIMEOUT, executor).await?;
++    parse_deliver(&stdout)
++}
++
++/// The accounts kyomei holds: `kyomei list --json`.
++pub async fn list(
++    kyomei: &Path,
++    executor: &BackgroundExecutor,
++) -> Result<Vec<KyomeiAccount>, AccountProblem> {
++    let args = ["list".into(), "--json".into()];
++    let stdout = run(kyomei, &args, LIST_TIMEOUT, executor).await?;
++    parse_list(&stdout)
++}
++
++pub(crate) fn parse_list(stdout: &[u8]) -> Result<Vec<KyomeiAccount>, AccountProblem> {
++    let answer: ListAnswer =
++        serde_json::from_slice(stdout).map_err(|_| AccountProblem::Unreadable)?;
++    if answer.schema_version != SCHEMA_VERSION {
++        return Err(AccountProblem::Unreadable);
++    }
++    Ok(answer.accounts)
++}
++
++pub(crate) fn parse_deliver(stdout: &[u8]) -> Result<Delivered, AccountProblem> {
++    let answer: DeliverAnswer =
++        serde_json::from_slice(stdout).map_err(|_| AccountProblem::Unreadable)?;
++    if answer.schema_version != SCHEMA_VERSION {
++        return Err(AccountProblem::Unreadable);
++    }
++    Ok(answer.delivered)
++}
++
++/// Maps kyomei's exit status to a problem; `None` is success.
++pub(crate) fn exit_problem(success: bool, code: Option<i32>) -> Option<AccountProblem> {
++    match (success, code) {
++        (true, _) => None,
++        (false, Some(EXIT_BLOCKED)) => Some(AccountProblem::Blocked),
++        // `list` answers 2 only without --json; a deliver never does. Either way it delivered
++        // nothing, so it is a failure here.
++        (false, Some(EXIT_NOTHING)) => Some(AccountProblem::Failed(Some(EXIT_NOTHING))),
++        (false, code) => Some(AccountProblem::Failed(code)),
++    }
++}
++
++async fn run(
++    program: &Path,
++    args: &[std::ffi::OsString],
++    timeout: Duration,
++    executor: &BackgroundExecutor,
++) -> Result<Vec<u8>, AccountProblem> {
++    if !program.is_file() {
++        return Err(AccountProblem::NotInstalled);
++    }
++    let mut work = pin!(run_untimed(program, args).fuse());
++    let mut timer = pin!(executor.timer(timeout).fuse());
++    futures::select_biased! {
++        output = work => output,
++        () = timer => Err(AccountProblem::TimedOut),
++    }
++}
++
++async fn run_untimed(
++    program: &Path,
++    args: &[std::ffi::OsString],
++) -> Result<Vec<u8>, AccountProblem> {
++    // kyomei inherits Zeo's environment: it reads its vault from the XDG directories, may sit
++    // behind an HTTPS proxy, and runs no agent, so nothing in that environment reaches a jail.
++    // Its stderr -- events and diagnostics -- is dropped: Zeo logs the exit, not kyomei's words.
++    let mut child = smol::process::Command::new(program)
++        .args(args)
++        .stdin(Stdio::null())
++        .stdout(Stdio::piped())
++        .stderr(Stdio::null())
++        .kill_on_drop(true)
++        .spawn()
++        .map_err(|error: io::Error| AccountProblem::Spawn(error.kind().to_string()))?;
++    let mut stdout = Vec::new();
++    if let Some(pipe) = child.stdout.take() {
++        pipe.take(MAX_OUTPUT_BYTES)
++            .read_to_end(&mut stdout)
++            .await
++            .map_err(|error| AccountProblem::Spawn(error.kind().to_string()))?;
++    }
++    let status = child
++        .status()
++        .await
++        .map_err(|error| AccountProblem::Spawn(error.kind().to_string()))?;
++    match exit_problem(status.success(), status.code()) {
++        None => Ok(stdout),
++        Some(problem) => Err(problem),
++    }
++}
+diff --git a/crates/agent_sandbox/src/jail_account_tests.rs b/crates/agent_sandbox/src/jail_account_tests.rs
+new file mode 100644
+index 0000000..45f63c3
+--- /dev/null
++++ b/crates/agent_sandbox/src/jail_account_tests.rs
+@@ -0,0 +1,211 @@
++//! Zeo next §6.65: the kyomei account a jail logs in with -- which account a project gets, what
++//! Zeo reads back from kyomei, and the delivery run against a fake kyomei.
++
++use std::os::unix::fs::PermissionsExt as _;
++use std::path::{Path, PathBuf};
++
++use gpui::{TestAppContext, UpdateGlobal as _};
++use serde_json::json;
++use settings::{Settings as _, SettingsStore};
++
++use crate::AgentSandboxSettings;
++use crate::jail_account::{
++    AccountProblem, KyomeiAccount, deliver, exit_problem, list, parse_deliver, parse_list,
++};
++
++fn init(cx: &mut TestAppContext) {
++    cx.update(|cx| {
++        let store = SettingsStore::test(cx);
++        cx.set_global(store);
++        release_channel::init(semver::Version::new(0, 0, 0), cx);
++        crate::init(cx);
++    });
++}
++
++fn set_user_settings(json: serde_json::Value, cx: &mut TestAppContext) {
++    cx.update(|cx| {
++        SettingsStore::update_global(cx, |store, cx| {
++            store
++                .set_user_settings(&json.to_string(), cx)
++                .result()
++                .expect("user settings parse");
++        })
++    });
++    cx.run_until_parked();
++}
++
++fn account_for(key: Option<&str>, cx: &mut TestAppContext) -> Option<String> {
++    cx.update(|cx| {
++        AgentSandboxSettings::get_global(cx)
++            .account_for_key(key)
++            .map(str::to_string)
++    })
++}
++
++#[gpui::test]
++fn no_account_by_default_so_each_project_logs_in_by_itself(cx: &mut TestAppContext) {
++    init(cx);
++    assert_eq!(account_for(None, cx), None);
++    assert_eq!(account_for(Some("/w/app"), cx), None);
++}
++
++#[gpui::test]
++fn a_project_follows_the_default_chooses_its_own_or_opts_out(cx: &mut TestAppContext) {
++    init(cx);
++    set_user_settings(
++        json!({ "agent_sandbox": {
++            "account": " work ",
++            "projects": {
++                "/w/follows": { "enabled": true },
++                "/w/other": { "account": "2" },
++                "/w/own": { "account": "" },
++            },
++        }}),
++        cx,
++    );
++    assert_eq!(account_for(Some("/w/follows"), cx).as_deref(), Some("work"));
++    assert_eq!(account_for(Some("/w/other"), cx).as_deref(), Some("2"));
++    assert_eq!(
++        account_for(Some("/w/own"), cx),
++        None,
++        "an empty project account is its own login, not the default"
++    );
++    assert!(cx.update(|cx| {
++        let sandbox = AgentSandboxSettings::get_global(cx);
++        sandbox.account_set_for_key(Some("/w/own"))
++            && !sandbox.account_set_for_key(Some("/w/follows"))
++    }));
++}
++
++#[gpui::test]
++fn an_empty_default_is_no_default(cx: &mut TestAppContext) {
++    init(cx);
++    set_user_settings(json!({ "agent_sandbox": { "account": "   " } }), cx);
++    assert_eq!(account_for(Some("/w/app"), cx), None);
++}
++
++#[test]
++fn the_list_is_read_by_its_schema_version() {
++    let accounts = parse_list(
++        br#"{"schemaVersion":1,"activeAccountNumber":null,"accounts":[
++            {"number":1,"alias":"work","email":"w@example.invalid","authStatus":"valid","poolStatus":"eligible","deliveries":[]},
++            {"number":2,"email":"h@example.invalid","authStatus":"invalid_grant","poolStatus":"quarantined","deliveries":["/x"]}
++        ]}"#,
++    )
++    .expect("list");
++    assert_eq!(accounts.len(), 2);
++    assert_eq!(
++        accounts[0].reference(),
++        "work",
++        "the alias survives a re-login"
++    );
++    assert_eq!(accounts[1].reference(), "2");
++    assert!(accounts[1].quarantined() && !accounts[0].quarantined());
++    for reference in ["1", "work", "w@example.invalid"] {
++        assert!(accounts[0].answers_to(reference), "{reference}");
++    }
++    assert!(!accounts[0].answers_to("2"));
++
++    assert_eq!(
++        parse_list(br#"{"schemaVersion":2,"accounts":[]}"#),
++        Err(AccountProblem::Unreadable),
++        "a newer contract is not guessed at"
++    );
++    assert_eq!(parse_list(b"1\twork"), Err(AccountProblem::Unreadable));
++}
++
++#[test]
++fn a_delivery_answer_carries_no_token() {
++    let delivered = parse_deliver(
++        br#"{"schemaVersion":1,"delivered":{"account":3,"email":"w@example.invalid","configDir":"/s/claude","expiresAt":"2026-11-28T20:00:00Z"}}"#,
++    )
++    .expect("deliver");
++    assert_eq!(delivered.account, 3);
++    assert_eq!(delivered.expires_at, "2026-11-28T20:00:00Z");
++}
++
++#[test]
++fn exit_three_is_blocked_and_every_other_failure_is_a_failure() {
++    assert_eq!(exit_problem(true, Some(0)), None);
++    assert_eq!(exit_problem(false, Some(3)), Some(AccountProblem::Blocked));
++    assert_eq!(
++        exit_problem(false, Some(2)),
++        Some(AccountProblem::Failed(Some(2)))
++    );
++    assert_eq!(
++        exit_problem(false, None),
++        Some(AccountProblem::Failed(None))
++    );
++}
++
++/// A kyomei that records its arguments and answers as told.
++fn fake_kyomei(dir: &Path, exit: i32, answer: &str) -> PathBuf {
++    let path = dir.join("kyomei");
++    let log = dir.join("args");
++    let body = format!(
++        "#!/bin/sh\nprintf '%s\\n' \"$@\" > '{}'\nprintf '%s' '{answer}'\necho 'kyomei: diagnostics on stderr' >&2\nexit {exit}\n",
++        log.display()
++    );
++    std::fs::write(&path, body).expect("write");
++    std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o755)).expect("chmod");
++    path
++}
++
++#[gpui::test]
++async fn deliver_runs_kyomei_for_the_projects_claude_dir(cx: &mut TestAppContext) {
++    cx.executor().allow_parking();
++    let tmp = tempfile::tempdir().expect("tempdir");
++    let kyomei = fake_kyomei(
++        tmp.path(),
++        0,
++        r#"{"schemaVersion":1,"delivered":{"account":1,"configDir":"/s/claude","expiresAt":"t"}}"#,
++    );
++    let claude_dir = tmp.path().join("state").join("claude");
++    let delivered = deliver(&kyomei, "work", &claude_dir, &cx.executor())
++        .await
++        .expect("deliver");
++    assert_eq!(delivered.account, 1);
++    let args = std::fs::read_to_string(tmp.path().join("args")).expect("args");
++    assert_eq!(
++        args.lines().collect::<Vec<_>>(),
++        [
++            "deliver",
++            "work",
++            "--config-dir",
++            claude_dir.to_str().expect("utf-8"),
++            "--json"
++        ]
++    );
++}
++
++#[gpui::test]
++async fn a_blocked_or_missing_kyomei_is_a_problem_not_a_start(cx: &mut TestAppContext) {
++    cx.executor().allow_parking();
++    let tmp = tempfile::tempdir().expect("tempdir");
++    let blocked = fake_kyomei(tmp.path(), 3, "");
++    assert_eq!(
++        deliver(&blocked, "work", tmp.path(), &cx.executor()).await,
++        Err(AccountProblem::Blocked)
++    );
++    assert_eq!(
++        list(&tmp.path().join("absent"), &cx.executor()).await,
++        Err(AccountProblem::NotInstalled)
++    );
++}
++
++#[gpui::test]
++async fn list_reads_the_accounts(cx: &mut TestAppContext) {
++    cx.executor().allow_parking();
++    let tmp = tempfile::tempdir().expect("tempdir");
++    let kyomei = fake_kyomei(
++        tmp.path(),
++        0,
++        r#"{"schemaVersion":1,"activeAccountNumber":null,"accounts":[{"number":1,"authStatus":"expired","poolStatus":"eligible","deliveries":[]}]}"#,
++    );
++    let accounts: Vec<KyomeiAccount> = list(&kyomei, &cx.executor()).await.expect("list");
++    assert_eq!(accounts.len(), 1);
++    assert_eq!(
++        std::fs::read_to_string(tmp.path().join("args")).expect("args"),
++        "list\n--json\n"
++    );
++}
+diff --git a/crates/agent_sandbox/src/launch.rs b/crates/agent_sandbox/src/launch.rs
+index 2fa5d37..3abb83a 100644
+--- a/crates/agent_sandbox/src/launch.rs
++++ b/crates/agent_sandbox/src/launch.rs
+@@ -25,6 +25,7 @@ use crate::command::{
+ };
+ use crate::cpu_reserve::{self, CpuReservation};
+ use crate::host_view;
++use crate::jail_account;
+ use crate::jail_secrets;
+ use crate::probe::{self, ProbeError};
+ use crate::settings::{
+@@ -273,6 +274,12 @@ pub enum LaunchCause {
+         socket: PathBuf,
+         problem: crate::jail_ssh::SshSocketProblem,
+     },
++    /// The project is bound to a kyomei account and its badge could not be written (§6.65):
++    /// refused rather than started on Claude's login screen with no word of why.
++    Account {
++        account: String,
++        problem: crate::jail_account::AccountProblem,
++    },
+ }
+ 
+ impl LaunchCause {
+@@ -305,6 +312,7 @@ impl LaunchCause {
+             Self::SecretUnavailable { .. } => "secret_unavailable",
+             Self::HostPortsUnsupported => "host_ports_unsupported",
+             Self::SshSocket { .. } => "ssh_socket",
++            Self::Account { .. } => "account",
+         }
+     }
+ }
+@@ -416,6 +424,11 @@ impl fmt::Display for LaunchCause {
+                 socket = socket.display().to_string(),
+                 reason = problem.as_str()
+             )),
++            Self::Account { account, problem } => f.write_str(&t!(
++                "agent-jail-launch-account",
++                account = account.as_str(),
++                reason = problem.as_str()
++            )),
+         }
+     }
+ }
+@@ -719,6 +732,35 @@ impl LocalLaunch {
+                 return self.refuse(Some(root), &policy, cause, version);
+             }
+         };
++        // §6.65: a project bound to a kyomei account gets that account's badge -- the access
++        // token alone -- before every start, so it never asks for a login of its own.
++        if let Some(account) = self.sandbox.account_for_key(key.as_deref()) {
++            let refused = |problem| {
++                let cause = LaunchCause::Account {
++                    account: account.to_string(),
++                    problem,
++                };
++                (cause, Some(checked.version.clone()))
++            };
++            let delivery = match jail_account::locate(self.sandbox.kyomei_path.as_deref()) {
++                Some(kyomei) => {
++                    jail_account::deliver(&kyomei, account, &checked.claude_dir, &self.executor)
++                        .await
++                }
++                None => Err(jail_account::AccountProblem::NotInstalled),
++            };
++            match delivery {
++                Ok(delivered) => log::info!(
++                    "agent_sandbox event=account_delivered account={} expires_at={}",
++                    delivered.account,
++                    delivered.expires_at
++                ),
++                Err(problem) => {
++                    let (cause, version) = refused(problem);
++                    return self.refuse(Some(root), &policy, cause, version);
++                }
++            }
++        }
+         let mut checked = checked;
+         jail_secrets::allow_secret_hosts(&secrets, &mut checked.allow_hosts);
+         let secret_args = jail_secrets::secret_args(&secrets);
+@@ -1401,6 +1443,9 @@ fn settings_fingerprint(
+     sandbox.secrets_for_key(key).hash(&mut hasher);
+     sandbox.ssh_agent_socket.hash(&mut hasher);
+     sandbox.ssh_agent.hash(&mut hasher);
++    // §6.65: the account is delivered at start, so a new choice needs a restart.
++    sandbox.account_for_key(key).hash(&mut hasher);
++    sandbox.kyomei_path.hash(&mut hasher);
+     policy.enabled.hash(&mut hasher);
+     policy.rw_maps.hash(&mut hasher);
+     policy.allow_hosts.hash(&mut hasher);
+diff --git a/crates/agent_sandbox/src/settings.rs b/crates/agent_sandbox/src/settings.rs
+index 7c9ee7a..4247e0e 100644
+--- a/crates/agent_sandbox/src/settings.rs
++++ b/crates/agent_sandbox/src/settings.rs
+@@ -45,6 +45,11 @@ pub struct AgentSandboxSettings {
+     /// Whether Zeo starts the jails' own ssh-agent and hands it to every jail (§6.9, review Z6).
+     pub ssh_agent: bool,
+     pub state_root: String,
++    /// The kyomei binary (§6.65); `None` looks it up on `PATH`.
++    pub kyomei_path: Option<PathBuf>,
++    /// The kyomei account every jailed project logs in with; `None` -- unset or empty -- leaves
++    /// each project its own login.
++    pub account: Option<String>,
+     /// Limits for every jailed project (§6.54).
+     pub limits: SandboxLimits,
+     /// ai-jail's synthetic host view for every jailed project (§6.63). Default: `true` (operator,
+@@ -166,6 +171,8 @@ pub struct AgentSandboxProjectSettings {
+     pub minimal_etc: Option<bool>,
+     /// What the project's jail may use, each `Some` replacing the default (§6.64 step 2).
+     pub capabilities: ProjectCapabilities,
++    /// `None` follows `agent_sandbox.account`; `Some("")` is this project's own login.
++    pub account: Option<String>,
+ }
+ 
+ /// What every jail may use besides its project (§6.64 step 2, `agent_sandbox.capabilities`).
+@@ -337,6 +344,22 @@ impl AgentSandboxSettings {
+             .is_some_and(|own| own.secrets.is_some())
+     }
+ 
++    /// The kyomei account the jail of the project under `key` logs in with (§6.65): the
++    /// project's own choice when it made one -- empty for its own login -- else the default.
++    pub fn account_for_key(&self, key: Option<&str>) -> Option<&str> {
++        key.and_then(|key| self.projects.get(key))
++            .and_then(|entry| entry.account.as_deref())
++            .or(self.account.as_deref())
++            .map(str::trim)
++            .filter(|account| !account.is_empty())
++    }
++
++    /// Whether the project under `key` made its own account choice rather than the default.
++    pub fn account_set_for_key(&self, key: Option<&str>) -> bool {
++        key.and_then(|key| self.projects.get(key))
++            .is_some_and(|entry| entry.account.is_some())
++    }
++
+     /// Whether the project rooted at `root` runs its agent jailed, keyed as [`Self::project_policy`].
+     pub fn effective_enabled(&self, root: &Path) -> bool {
+         lexical_match(self.project_keys(), root)
+@@ -435,6 +458,11 @@ impl Settings for AgentSandboxSettings {
+                 .ssh_agent_socket
+                 .filter(|socket| !socket.trim().is_empty()),
+             ssh_agent: sandbox.ssh_agent.unwrap_or(false),
++            kyomei_path: sandbox.kyomei_path,
++            account: sandbox
++                .account
++                .map(|account| account.trim().to_string())
++                .filter(|account| !account.is_empty()),
+             reserve_cpus: sandbox
+                 .limits
+                 .as_ref()
+@@ -504,6 +532,7 @@ impl Settings for AgentSandboxSettings {
+                                 secrets: own.secrets,
+                             })
+                             .unwrap_or_default(),
++                        account: project.account.map(|account| account.trim().to_string()),
+                     };
+                     (root, project)
+                 })
+diff --git a/crates/settings_content/src/settings_content.rs b/crates/settings_content/src/settings_content.rs
+index 1a4d0de..00c5fb6 100644
+--- a/crates/settings_content/src/settings_content.rs
++++ b/crates/settings_content/src/settings_content.rs
+@@ -410,6 +410,17 @@ pub struct AgentSandboxSettingsContent {
+     ///
+     /// Default: false
+     pub ssh_agent: Option<bool>,
++    /// The kyomei binary that hands jails a Claude account (Zeo next §6.65). Unset looks it up
++    /// on `PATH`.
++    pub kyomei_path: Option<PathBuf>,
++    /// The kyomei account every jailed project logs in with: a slot number, an alias or an
++    /// e-mail, as `kyomei list` shows them. Before each start Zeo runs `kyomei deliver`, which
++    /// writes into the project's Claude config only an access token -- never the refresh token,
++    /// which stays in kyomei's vault -- so a new project needs no login of its own. Unset or
++    /// empty: each project logs in by itself, as before.
++    ///
++    /// Default: none
++    pub account: Option<String>,
+     /// Resource limits for every jailed project.
+     pub limits: Option<AgentSandboxLimitsContent>,
+     /// Whether jailed projects get ai-jail's synthetic host view (`--mask-host`): the CPUs and
+@@ -508,6 +519,9 @@ pub struct AgentSandboxProjectSettingsContent {
+     /// What this project's jail may use, each field replacing the default it names. An empty
+     /// `mcp_servers` here means none, whatever the default.
+     pub capabilities: Option<AgentSandboxCapabilitiesContent>,
++    /// The kyomei account this project's jail logs in with. Unset follows
++    /// `agent_sandbox.account`; empty means this project logs in by itself.
++    pub account: Option<String>,
+ }
+ 
+ /// What a jail may use besides the project.
+diff --git a/crates/settings_ui/Cargo.toml b/crates/settings_ui/Cargo.toml
+index a5ec346..bbe213f 100644
+--- a/crates/settings_ui/Cargo.toml
++++ b/crates/settings_ui/Cargo.toml
+@@ -72,6 +72,7 @@ theme_settings.workspace = true
+ ui.workspace = true
+ url.workspace = true
+ ui_input.workspace = true
++task.workspace = true
+ util.workspace = true
+ workspace.workspace = true
+ zed_actions.workspace = true
+diff --git a/crates/settings_ui/src/pages/agent_jail_account.rs b/crates/settings_ui/src/pages/agent_jail_account.rs
+new file mode 100644
+index 0000000..7b1ba5c
+--- /dev/null
++++ b/crates/settings_ui/src/pages/agent_jail_account.rs
+@@ -0,0 +1,269 @@
++//! The Agent Sandbox page's Claude account block (Zeo next §6.65): which kyomei account this
++//! project's jail logs in with, or its own login as before. A kyomei account is delivered as an
++//! access token alone before each start, so a new project needs no login; "Connect a new
++//! account…" runs `kyomei add` -- a fresh login, never a copy -- in a terminal of the workspace.
++
++use std::path::Path;
++
++use agent_sandbox::AgentSandboxSettings;
++use agent_sandbox::capabilities::set_project_account;
++use agent_sandbox::jail_account::{self, AccountProblem, KyomeiAccount};
++use gpui::{AnyElement, App, Entity, ScrollHandle, WindowHandle};
++use settings::Settings as _;
++use ui::{SwitchField, ToggleState, prelude::*};
++use util::ResultExt as _;
++use workspace::MultiWorkspace;
++use zeo_i18n::t;
++
++use super::agent_jail_capabilities::source_row;
++use super::{JailPageState, reveal};
++
++/// One switch of the block. Exactly one is on: the account the start will use.
++#[derive(Clone, Debug, PartialEq, Eq)]
++pub(crate) struct AccountRow {
++    /// What the setting stores when this switch is turned on; `""` is the project's own login.
++    pub reference: String,
++    pub label: String,
++    pub note: String,
++    pub chosen: bool,
++}
++
++/// The block's rows: the project's own login, every kyomei account, then a chosen reference
++/// kyomei does not answer for. `None` is kyomei still being read; `Err` one that could not be.
++pub(crate) fn account_rows(
++    accounts: Option<&Result<Vec<KyomeiAccount>, AccountProblem>>,
++    chosen: Option<&str>,
++) -> Vec<AccountRow> {
++    let mut rows = vec![AccountRow {
++        reference: String::new(),
++        label: t!("agent-sandbox-account-own"),
++        note: t!("agent-sandbox-account-own-note"),
++        chosen: chosen.is_none(),
++    }];
++    let listed: &[KyomeiAccount] = match accounts {
++        Some(Ok(accounts)) => accounts,
++        _ => &[],
++    };
++    for account in listed {
++        let email = account.email.clone().unwrap_or_default();
++        let label = match (&account.alias, &account.email) {
++            (Some(alias), Some(email)) if !alias.is_empty() => format!("{alias} · {email}"),
++            (_, Some(email)) => email.clone(),
++            (Some(alias), None) => alias.clone(),
++            (None, None) => format!("#{}", account.number),
++        };
++        let note = if account.quarantined() {
++            t!("agent-sandbox-account-quarantined", email = email)
++        } else {
++            format!("#{} · {}", account.number, account.auth_status)
++        };
++        rows.push(AccountRow {
++            reference: account.reference(),
++            label,
++            note,
++            chosen: chosen.is_some_and(|chosen| account.answers_to(chosen)),
++        });
++    }
++    // Only an answer from kyomei can say a choice is gone; while it is read, or unreadable, the
++    // choice is shown as it is.
++    if let Some(chosen) = chosen
++        && !rows.iter().any(|row| row.chosen)
++    {
++        let note = if matches!(accounts, Some(Ok(_))) {
++            t!(
++                "agent-sandbox-account-missing",
++                account = chosen.to_string()
++            )
++        } else {
++            String::new()
++        };
++        rows.push(AccountRow {
++            reference: chosen.to_string(),
++            label: chosen.to_string(),
++            note,
++            chosen: true,
++        });
++    }
++    rows
++}
++
++/// The setting a switch writes when toggled: on picks its account (or the own login), and
++/// turning the chosen account off falls back to the own login rather than to nothing.
++pub(crate) fn account_after_toggle(row: &AccountRow, on: bool) -> Option<String> {
++    Some(if on {
++        row.reference.clone()
++    } else {
++        String::new()
++    })
++}
++
++/// The Claude account block of the project section.
++pub(crate) fn render_account(
++    root: &Path,
++    key: Option<&str>,
++    workspace_window: Option<WindowHandle<MultiWorkspace>>,
++    state: &Entity<JailPageState>,
++    scroll_handle: &ScrollHandle,
++    cx: &mut App,
++) -> AnyElement {
++    let sandbox = AgentSandboxSettings::get_global(cx).clone();
++    let chosen = sandbox.account_for_key(key).map(str::to_string);
++    let accounts = state.read(cx).accounts.clone();
++    let rows = account_rows(accounts.as_ref(), chosen.as_deref());
++
++    let mut switches = Vec::with_capacity(rows.len());
++    for row in rows {
++        let id = format!("agent-jail-account-{}", row.reference);
++        let switch = SwitchField::new(
++            SharedString::from(id.clone()),
++            Some(SharedString::from(row.label.clone())),
++            (!row.note.is_empty()).then(|| row.note.clone().into()),
++            row.chosen,
++            {
++                let root = root.to_path_buf();
++                move |toggle, _, cx| {
++                    let on = *toggle == ToggleState::Selected;
++                    set_project_account(&root, account_after_toggle(&row, on), cx).detach();
++                }
++            },
++        )
++        .tab_index(0);
++        switches.push(reveal(state, id, scroll_handle, switch, cx));
++    }
++
++    let muted = |text: String| Label::new(text).size(LabelSize::Small).color(Color::Muted);
++    let source = source_row(
++        "agent-jail-account-reset",
++        t!("agent-sandbox-account-reset"),
++        sandbox.account_set_for_key(key),
++        {
++            let root = root.to_path_buf();
++            move |cx: &mut App| set_project_account(&root, None, cx).detach()
++        },
++        state,
++        scroll_handle,
++        cx,
++    );
++    let status = match &accounts {
++        Some(Err(problem)) => Some(t!(
++            "agent-sandbox-account-unavailable",
++            reason = problem.as_str()
++        )),
++        Some(Ok(listed)) if listed.is_empty() => Some(t!("agent-sandbox-account-none")),
++        _ => None,
++    };
++
++    let connect = Button::new(
++        "agent-jail-account-connect",
++        t!("agent-sandbox-account-connect"),
++    )
++    .style(ButtonStyle::Outlined)
++    .size(ButtonSize::Medium)
++    .tab_index(0_isize)
++    .disabled(workspace_window.is_none())
++    .on_click({
++        let state = state.clone();
++        let kyomei = sandbox.kyomei_path;
++        move |_, _, cx| connect_account(kyomei.as_deref(), workspace_window, &state, cx)
++    });
++    let refresh = Button::new(
++        "agent-jail-account-refresh",
++        t!("agent-sandbox-account-refresh"),
++    )
++    .style(ButtonStyle::Subtle)
++    .size(ButtonSize::Medium)
++    .tab_index(0_isize)
++    .on_click({
++        let state = state.clone();
++        move |_, _, cx| state.update(cx, |state, cx| state.reload_accounts(cx))
++    });
++
++    // Wrapped like the page's other buttons: without it Tab skips them (Xvfb proof, 2026-11-28).
++    let connect = reveal(
++        state,
++        "agent-jail-account-connect",
++        scroll_handle,
++        connect,
++        cx,
++    );
++    let refresh = reveal(
++        state,
++        "agent-jail-account-refresh",
++        scroll_handle,
++        refresh,
++        cx,
++    );
++    v_flex()
++        .gap_2()
++        .debug_selector(|| "agent-jail-account".into())
++        .child(
++            v_flex()
++                .gap_0p5()
++                .child(Label::new(t!("agent-sandbox-account")).size(LabelSize::Small))
++                .child(muted(t!("agent-sandbox-account-note")))
++                .child(source),
++        )
++        .children(status.map(muted))
++        .children(switches)
++        .child(
++            v_flex()
++                .gap_0p5()
++                .child(h_flex().gap_2().child(connect).child(refresh))
++                .child(muted(t!("agent-sandbox-account-connect-note"))),
++        )
++        .into_any_element()
++}
++
++/// Runs `kyomei add` in a new terminal of the workspace the settings were opened from, then
++/// reads the accounts again so the new one is listed. The login itself -- a browser round trip
++/// and, at times, a pasted code -- needs a terminal, which the settings window has not.
++fn connect_account(
++    configured: Option<&Path>,
++    workspace_window: Option<WindowHandle<MultiWorkspace>>,
++    state: &Entity<JailPageState>,
++    cx: &mut App,
++) {
++    let Some(workspace_window) = workspace_window else {
++        return;
++    };
++    let program = jail_account::locate(configured)
++        .map(|path| path.to_string_lossy().into_owned())
++        .unwrap_or_else(|| "kyomei".to_string());
++    let spawn = task::SpawnInTerminal {
++        id: task::TaskId("zeo-kyomei-add".into()),
++        label: "kyomei add".into(),
++        full_label: "kyomei add".into(),
++        command_label: "kyomei add".into(),
++        use_new_terminal: true,
++        allow_concurrent_runs: false,
++        reveal: task::RevealStrategy::Always,
++        shell: task::Shell::WithArguments {
++            program,
++            args: vec!["add".into()],
++            title_override: None,
++        },
++        ..Default::default()
++    };
++    let run = workspace_window
++        .update(cx, |multi_workspace, window, cx| {
++            multi_workspace.workspace().update(cx, |workspace, cx| {
++                workspace.spawn_in_terminal(spawn, window, cx)
++            })
++        })
++        .log_err();
++    let Some(run) = run else {
++        return;
++    };
++    let state = state.downgrade();
++    cx.spawn(async move |cx| {
++        run.await;
++        state
++            .update(cx, |state, cx| state.reload_accounts(cx))
++            .log_err();
++    })
++    .detach();
++}
++
++#[cfg(test)]
++#[path = "agent_jail_account_tests.rs"]
++mod agent_jail_account_tests;
+diff --git a/crates/settings_ui/src/pages/agent_jail_account_tests.rs b/crates/settings_ui/src/pages/agent_jail_account_tests.rs
+new file mode 100644
+index 0000000..a817288
+--- /dev/null
++++ b/crates/settings_ui/src/pages/agent_jail_account_tests.rs
+@@ -0,0 +1,84 @@
++//! The Claude account block's rows (§6.65): the own login, kyomei's accounts, and a chosen
++//! reference kyomei no longer answers for -- and which one switch is on.
++
++use agent_sandbox::jail_account::{AccountProblem, KyomeiAccount};
++
++use super::{AccountRow, account_after_toggle, account_rows};
++
++fn account(number: u32, alias: Option<&str>, email: &str, status: &str) -> KyomeiAccount {
++    KyomeiAccount {
++        number,
++        alias: alias.map(str::to_string),
++        email: Some(email.to_string()),
++        auth_status: status.to_string(),
++    }
++}
++
++fn listed() -> Result<Vec<KyomeiAccount>, AccountProblem> {
++    Ok(vec![
++        account(1, Some("work"), "w@example.invalid", "valid"),
++        account(2, None, "h@example.invalid", "invalid_grant"),
++    ])
++}
++
++fn chosen(rows: &[AccountRow]) -> Vec<&str> {
++    rows.iter()
++        .filter(|row| row.chosen)
++        .map(|row| row.reference.as_str())
++        .collect()
++}
++
++#[test]
++fn without_a_choice_the_own_login_is_on() {
++    let rows = account_rows(Some(&listed()), None);
++    let references: Vec<&str> = rows.iter().map(|row| row.reference.as_str()).collect();
++    assert_eq!(references, ["", "work", "2"]);
++    assert_eq!(chosen(&rows), [""]);
++}
++
++#[test]
++fn a_choice_by_number_alias_or_email_turns_on_its_account_alone() {
++    for reference in ["1", "work", "w@example.invalid"] {
++        let rows = account_rows(Some(&listed()), Some(reference));
++        assert_eq!(chosen(&rows), ["work"], "{reference}");
++        assert_eq!(rows.len(), 3, "no extra row for a choice kyomei answers");
++    }
++}
++
++#[test]
++fn a_quarantined_account_says_to_connect_it_again() {
++    let rows = account_rows(Some(&listed()), None);
++    assert!(
++        rows[2].note.contains("h@example.invalid"),
++        "{}",
++        rows[2].note
++    );
++    assert!(rows[1].label.contains("work") && rows[1].label.contains("w@example.invalid"));
++}
++
++#[test]
++fn a_choice_kyomei_no_longer_holds_stays_listed_and_on() {
++    let rows = account_rows(Some(&listed()), Some("gone"));
++    assert_eq!(chosen(&rows), ["gone"]);
++    assert!(rows.last().is_some_and(|row| row.note.contains("gone")));
++}
++
++#[test]
++fn while_kyomei_is_read_or_unreadable_the_choice_is_shown_as_it_is() {
++    for accounts in [None, Some(Err(AccountProblem::NotInstalled))] {
++        let rows = account_rows(accounts.as_ref(), Some("work"));
++        assert_eq!(chosen(&rows), ["work"]);
++        assert!(
++            rows.last().is_some_and(|row| row.note.is_empty()),
++            "no 'missing' guess"
++        );
++    }
++}
++
++#[test]
++fn turning_an_account_off_falls_back_to_the_own_login() {
++    let rows = account_rows(Some(&listed()), Some("work"));
++    assert_eq!(account_after_toggle(&rows[1], false), Some(String::new()));
++    assert_eq!(account_after_toggle(&rows[2], true), Some("2".to_string()));
++    assert_eq!(account_after_toggle(&rows[0], true), Some(String::new()));
++}
+diff --git a/crates/settings_ui/src/pages/agent_jail_host_tests.rs b/crates/settings_ui/src/pages/agent_jail_host_tests.rs
+index 6dff107..2df1a39 100644
+--- a/crates/settings_ui/src/pages/agent_jail_host_tests.rs
++++ b/crates/settings_ui/src/pages/agent_jail_host_tests.rs
+@@ -22,6 +22,8 @@ fn sandbox(
+         state_root: "/var/tmp/zeo-jail".to_string(),
+         ssh_agent_socket: None,
+         ssh_agent: false,
++        kyomei_path: None,
++        account: None,
+         limits: Default::default(),
+         mask_host,
+         claude_ai_connectors: false,
+diff --git a/crates/settings_ui/src/pages/agent_jail_page.rs b/crates/settings_ui/src/pages/agent_jail_page.rs
+index c44a018..68ad403 100644
+--- a/crates/settings_ui/src/pages/agent_jail_page.rs
++++ b/crates/settings_ui/src/pages/agent_jail_page.rs
+@@ -12,6 +12,7 @@ use std::sync::{Arc, OnceLock};
+ 
+ use agent_sandbox::command::{self, JailInputs};
+ use agent_sandbox::confirm::{self, non_utf8_root_message, target_project_key};
++use agent_sandbox::jail_account::{AccountProblem, KyomeiAccount};
+ use agent_sandbox::launch::{self, MemoryPort, memory_port_unsupported};
+ use agent_sandbox::memory::{
+     self, MemoryClient, MemoryScope, MemoryStatus, RecentPage, ResolvedBy, display_endpoint,
+@@ -648,6 +649,9 @@ struct JailPageState {
+     /// once per page, since opening the keyring may ask to unlock it.
+     vault: Option<Result<Vec<secret_vault::VaultEntry>, String>>,
+     _vault_task: Task<()>,
++    /// kyomei's accounts for the Claude account block (§6.65): `None` while they are read.
++    accounts: Option<Result<Vec<KyomeiAccount>, AccountProblem>>,
++    accounts_task: Task<()>,
+     controls: RevealOnFocus,
+     refresh_task: Task<()>,
+     _settings_subscription: Subscription,
+@@ -669,6 +673,8 @@ impl JailPageState {
+             state_dir: None,
+             vault: None,
+             _vault_task: Task::ready(()),
++            accounts: None,
++            accounts_task: Task::ready(()),
+             controls: RevealOnFocus::default(),
+             refresh_task: Task::ready(()),
+             _settings_subscription: settings_subscription,
+@@ -688,9 +694,35 @@ impl JailPageState {
+                 .log_err();
+             });
+         }
++        // Unit tests never run the user's kyomei; the rows are tested through
++        // `agent_jail_account::account_rows`.
++        if this.root.is_some() && !cfg!(test) {
++            this.reload_accounts(cx);
++        }
+         this
+     }
+ 
++    /// Reads kyomei's accounts again: on opening the page, after "Connect a new account…" and
++    /// on "Refresh".
++    fn reload_accounts(&mut self, cx: &mut Context<Self>) {
++        let configured = AgentSandboxSettings::get_global(cx).kyomei_path.clone();
++        let executor = cx.background_executor().clone();
++        let list = cx.background_spawn(async move {
++            match agent_sandbox::jail_account::locate(configured.as_deref()) {
++                Some(kyomei) => agent_sandbox::jail_account::list(&kyomei, &executor).await,
++                None => Err(agent_sandbox::jail_account::AccountProblem::NotInstalled),
++            }
++        });
++        self.accounts_task = cx.spawn(async move |this, cx| {
++            let accounts = list.await;
++            this.update(cx, |this, cx| {
++                this.accounts = Some(accounts);
++                cx.notify();
++            })
++            .log_err();
++        });
++    }
++
+     fn refresh(&mut self, cx: &mut Context<Self>) {
+         let sandbox = AgentSandboxSettings::get_global(cx).clone();
+         let root = self.root.clone();
+@@ -967,6 +999,15 @@ pub(crate) fn render_agent_jail_page(
+             );
+             // §6.53 step 3: the vault secrets the jail receives, right under the capabilities.
+             let secrets = agent_jail_secrets::render_secrets(root, key, &state, scroll_handle, cx);
++            // §6.65: the kyomei account the jail logs in with, beside the secrets it receives.
++            let account = agent_jail_account::render_account(
++                root,
++                key,
++                settings_window.original_window(),
++                &state,
++                scroll_handle,
++                cx,
++            );
+             // The R7.3 note is shown once, beside the Memory switch.
+             let memory_notices: Vec<String> = supports_forward_port
+                 .and_then(|supports| forward_port_notice(&memory, supports))
+@@ -1069,6 +1110,7 @@ pub(crate) fn render_agent_jail_page(
+                 .child(limits)
+                 .child(host)
+                 .child(capabilities)
++                .child(account)
+                 .child(secrets)
+                 .child(preview)
+                 .into_any_element()
+@@ -1907,6 +1949,8 @@ fn render_restart_notice(root: &Path) -> AnyElement {
+         .into_any_element()
+ }
+ 
++#[path = "agent_jail_account.rs"]
++mod agent_jail_account;
+ #[path = "agent_jail_capabilities.rs"]
+ mod agent_jail_capabilities;
+ #[path = "agent_jail_secrets.rs"]
+diff --git a/crates/settings_ui/src/pages/agent_jail_page_tests.rs b/crates/settings_ui/src/pages/agent_jail_page_tests.rs
+index 1026c04..7cfdf3e 100644
+--- a/crates/settings_ui/src/pages/agent_jail_page_tests.rs
++++ b/crates/settings_ui/src/pages/agent_jail_page_tests.rs
+@@ -615,6 +615,8 @@ mod page {
+             state_root: "/var/tmp/zeo-jail".to_string(),
+             ssh_agent_socket: None,
+             ssh_agent: false,
++            kyomei_path: None,
++            account: None,
+             limits: Default::default(),
+             mask_host: false,
+             claude_ai_connectors: false,
+diff --git a/crates/settings_ui/src/settings_ui.rs b/crates/settings_ui/src/settings_ui.rs
+index bac92f6..038048b 100644
+--- a/crates/settings_ui/src/settings_ui.rs
++++ b/crates/settings_ui/src/settings_ui.rs
+@@ -4612,6 +4612,12 @@ impl SettingsWindow {
+         }
+     }
+ 
++    /// The workspace window the settings were opened from (§6.65's "Connect a new account…"
++    /// runs its login in a terminal there).
++    pub(crate) fn original_window(&self) -> Option<WindowHandle<MultiWorkspace>> {
++        self.original_window
++    }
++
+     pub(crate) fn active_project(&self, cx: &App) -> Option<Entity<Project>> {
+         let original_window = self.original_window.as_ref()?;
+         let multi_workspace = original_window.read(cx).ok()?;
+diff --git a/crates/zeo_i18n/locales/de/agent-jail.ftl b/crates/zeo_i18n/locales/de/agent-jail.ftl
+index 889b7a3..335e292 100644
+--- a/crates/zeo_i18n/locales/de/agent-jail.ftl
++++ b/crates/zeo_i18n/locales/de/agent-jail.ftl
+@@ -161,3 +161,11 @@ agent-jail-launch-ssh-socket = { $reason ->
+     [agent-failed] Zeo konnte den ssh-agent der Jails unter { $socket } nicht starten; prüfen Sie, ob ssh-agent installiert ist.
+    *[protected] Der ssh-agent-Socket { $socket } liegt in einem Ordner, den der Sandbox nie einbindet; legen Sie ihn in einen eigenen Ordner wie /tmp/zeo-ssh.
+ }
++
++agent-jail-launch-account = { $reason ->
++    [not-installed] Dieses Projekt meldet sich mit dem kyomei-Konto { $account } an, und kyomei wurde nicht gefunden (agent_sandbox.kyomei_path oder PATH).
++    [blocked] kyomei konnte das Konto { $account } nicht übergeben: Eine Claude-Anmeldesperre blieb belegt, oder die Anmeldung des Kontos wurde abgelehnt und muss mit `kyomei add` wiederholt werden.
++    [timed-out] kyomei hat beim Übergeben des Kontos { $account } nicht rechtzeitig geantwortet.
++    [unreadable] kyomei hat in einer Form geantwortet, die dieses Zeo nicht liest; aktualisieren Sie eines von beiden.
++   *[other] kyomei konnte das Konto { $account } nicht übergeben; `kyomei deliver { $account } --config-dir <claude-Ordner dieses Projekts>` in einem Terminal sagt, warum.
++}
+diff --git a/crates/zeo_i18n/locales/de/agent-sandbox.ftl b/crates/zeo_i18n/locales/de/agent-sandbox.ftl
+index 9dd2986..1354e10 100644
+--- a/crates/zeo_i18n/locales/de/agent-sandbox.ftl
++++ b/crates/zeo_i18n/locales/de/agent-sandbox.ftl
+@@ -158,3 +158,16 @@ agent-sandbox-secrets = Geheimnisse
+     .locked = Der Tresor konnte nicht gelesen werden: { $error }
+ agent-sandbox-secret-missing = { $reference } ist nicht im Tresor. Schalten Sie es aus, sonst startet der Jail nicht.
+ agent-sandbox-secret-no-use = { $reference } nennt weder Variable noch Hosts. Legen Sie sie auf der Seite Geheimnisse fest oder schalten Sie es aus; bis dahin startet der Jail nicht.
++
++agent-sandbox-account = Claude-Konto
++agent-sandbox-account-note = Mit einem kyomei-Konto schreibt Zeo vor jedem Start nur ein Zugriffstoken in die Claude-Konfiguration dieses Projekts, und das Projekt braucht keine eigene Anmeldung. Das Aktualisierungstoken verlässt kyomei nie.
++agent-sandbox-account-own = Eigene Anmeldung dieses Projekts
++agent-sandbox-account-own-note = Melden Sie sich im Agent-Panel an, einmal für dieses Projekt.
++agent-sandbox-account-reset = Standardkonto verwenden
++agent-sandbox-account-none = kyomei hat noch kein Konto. Verbinden Sie unten eines.
++agent-sandbox-account-unavailable = kyomei konnte nicht gelesen werden ({ $reason }).
++agent-sandbox-account-missing = { $account }: kyomei hat kein solches Konto; der Start wird verweigert, bis ein anderes gewählt ist.
++agent-sandbox-account-quarantined = { $email }: Die Anmeldung wurde abgelehnt; verbinden Sie es erneut.
++agent-sandbox-account-connect = Neues Konto verbinden…
++agent-sandbox-account-connect-note = Führt `kyomei add` in einem Terminal aus: eine neue Anmeldung im Browser, im Tresor von kyomei aufbewahrt. Eine separate Anmeldung eines Kontos, das Sie hier schon nutzen, ist sicher.
++agent-sandbox-account-refresh = Aktualisieren
+diff --git a/crates/zeo_i18n/locales/en-US/agent-jail.ftl b/crates/zeo_i18n/locales/en-US/agent-jail.ftl
+index d9716c2..3cf5621 100644
+--- a/crates/zeo_i18n/locales/en-US/agent-jail.ftl
++++ b/crates/zeo_i18n/locales/en-US/agent-jail.ftl
+@@ -181,3 +181,11 @@ agent-jail-launch-ssh-socket = { $reason ->
+     [agent-failed] Zeo could not start the jails' ssh-agent at { $socket }; check that ssh-agent is installed.
+    *[protected] The ssh-agent socket { $socket } sits in a folder the sandbox never maps; put it in a folder of its own, such as /tmp/zeo-ssh.
+ }
++
++agent-jail-launch-account = { $reason ->
++    [not-installed] This project logs in with the kyomei account { $account }, and kyomei was not found (agent_sandbox.kyomei_path, or PATH).
++    [blocked] kyomei could not hand over the account { $account }: a Claude credential lock stayed held, or the account's login was refused and must be done again with `kyomei add`.
++    [timed-out] kyomei did not answer in time while handing over the account { $account }.
++    [unreadable] kyomei answered in a form this Zeo does not read; update one of them.
++   *[other] kyomei could not hand over the account { $account }; `kyomei deliver { $account } --config-dir <this project's claude folder>` in a terminal says why.
++}
+diff --git a/crates/zeo_i18n/locales/en-US/agent-sandbox.ftl b/crates/zeo_i18n/locales/en-US/agent-sandbox.ftl
+index 93ba9ce..13e5619 100644
+--- a/crates/zeo_i18n/locales/en-US/agent-sandbox.ftl
++++ b/crates/zeo_i18n/locales/en-US/agent-sandbox.ftl
+@@ -178,3 +178,16 @@ agent-sandbox-secrets = Secrets
+     .locked = The vault could not be read: { $error }
+ agent-sandbox-secret-missing = { $reference } is not in the vault. Turn it off, or the jail will not start.
+ agent-sandbox-secret-no-use = { $reference } declares no variable and hosts. Set them on the Secrets page, or turn it off; until then the jail will not start.
++
++agent-sandbox-account = Claude account
++agent-sandbox-account-note = With a kyomei account, Zeo writes only an access token into this project's Claude config before each start, so the project needs no login of its own. The refresh token never leaves kyomei.
++agent-sandbox-account-own = This project's own login
++agent-sandbox-account-own-note = Log in from the agent panel, once for this project.
++agent-sandbox-account-reset = Use the default account
++agent-sandbox-account-none = kyomei holds no account yet. Connect one below.
++agent-sandbox-account-unavailable = kyomei could not be read ({ $reason }).
++agent-sandbox-account-missing = { $account }: kyomei holds no such account; the start is refused until another is chosen.
++agent-sandbox-account-quarantined = { $email }: the login was refused; connect it again.
++agent-sandbox-account-connect = Connect a new account…
++agent-sandbox-account-connect-note = Runs `kyomei add` in a terminal: a fresh login in the browser, kept in kyomei's vault. A separate login of an account you already use here is safe.
++agent-sandbox-account-refresh = Refresh
+diff --git a/crates/zeo_i18n/locales/es/agent-jail.ftl b/crates/zeo_i18n/locales/es/agent-jail.ftl
+index dd41094..225580f 100644
+--- a/crates/zeo_i18n/locales/es/agent-jail.ftl
++++ b/crates/zeo_i18n/locales/es/agent-jail.ftl
+@@ -160,3 +160,11 @@ agent-jail-launch-ssh-socket = { $reason ->
+     [agent-failed] Zeo no pudo iniciar el ssh-agent de los jails en { $socket }; comprueba que ssh-agent está instalado.
+    *[protected] El socket de ssh-agent { $socket } está en una carpeta que el sandbox nunca monta; ponlo en una carpeta propia, como /tmp/zeo-ssh.
+ }
++
++agent-jail-launch-account = { $reason ->
++    [not-installed] Este proyecto inicia sesión con la cuenta { $account } de kyomei, y no se encontró kyomei (agent_sandbox.kyomei_path, o el PATH).
++    [blocked] kyomei no pudo entregar la cuenta { $account }: un bloqueo de credenciales de Claude siguió tomado, o el inicio de sesión de la cuenta fue rechazado y hay que repetirlo con `kyomei add`.
++    [timed-out] kyomei no respondió a tiempo al entregar la cuenta { $account }.
++    [unreadable] kyomei respondió en un formato que este Zeo no lee; actualice uno de los dos.
++   *[other] kyomei no pudo entregar la cuenta { $account }; `kyomei deliver { $account } --config-dir <carpeta claude de este proyecto>` en un terminal dice por qué.
++}
+diff --git a/crates/zeo_i18n/locales/es/agent-sandbox.ftl b/crates/zeo_i18n/locales/es/agent-sandbox.ftl
+index 9c41b17..07a5bc2 100644
+--- a/crates/zeo_i18n/locales/es/agent-sandbox.ftl
++++ b/crates/zeo_i18n/locales/es/agent-sandbox.ftl
+@@ -157,3 +157,16 @@ agent-sandbox-secrets = Secretos
+     .locked = No se pudo leer la bóveda: { $error }
+ agent-sandbox-secret-missing = { $reference } no está en la bóveda. Desactívalo o el jail no arrancará.
+ agent-sandbox-secret-no-use = { $reference } no declara variable ni hosts. Defínelos en la página Secretos o desactívalo; hasta entonces el jail no arrancará.
++
++agent-sandbox-account = Cuenta de Claude
++agent-sandbox-account-note = Con una cuenta de kyomei, Zeo escribe en la configuración de Claude de este proyecto solo un token de acceso antes de cada inicio, y el proyecto no necesita su propio inicio de sesión. El token de actualización nunca sale de kyomei.
++agent-sandbox-account-own = Inicio de sesión propio de este proyecto
++agent-sandbox-account-own-note = Inicie sesión desde el panel del agente, una vez para este proyecto.
++agent-sandbox-account-reset = Usar la cuenta predeterminada
++agent-sandbox-account-none = kyomei aún no guarda ninguna cuenta. Conecte una abajo.
++agent-sandbox-account-unavailable = No se pudo leer kyomei ({ $reason }).
++agent-sandbox-account-missing = { $account }: kyomei no guarda esa cuenta; el inicio se rechaza hasta elegir otra.
++agent-sandbox-account-quarantined = { $email }: el inicio de sesión fue rechazado; conéctela de nuevo.
++agent-sandbox-account-connect = Conectar una cuenta nueva…
++agent-sandbox-account-connect-note = Ejecuta `kyomei add` en un terminal: un inicio de sesión nuevo en el navegador, guardado en la bóveda de kyomei. Un inicio de sesión aparte de una cuenta que ya usa aquí es seguro.
++agent-sandbox-account-refresh = Actualizar
+diff --git a/crates/zeo_i18n/locales/fr/agent-jail.ftl b/crates/zeo_i18n/locales/fr/agent-jail.ftl
+index 2903370..b7b9a86 100644
+--- a/crates/zeo_i18n/locales/fr/agent-jail.ftl
++++ b/crates/zeo_i18n/locales/fr/agent-jail.ftl
+@@ -153,3 +153,11 @@ agent-jail-launch-ssh-socket = { $reason ->
+     [agent-failed] Zeo n'a pas pu lancer le ssh-agent des jails dans { $socket } ; vérifiez que ssh-agent est installé.
+    *[protected] Le socket ssh-agent { $socket } est dans un dossier que le sandbox ne monte jamais ; placez-le dans un dossier à part, comme /tmp/zeo-ssh.
+ }
++
++agent-jail-launch-account = { $reason ->
++    [not-installed] Ce projet se connecte avec le compte kyomei { $account }, et kyomei est introuvable (agent_sandbox.kyomei_path, ou le PATH).
++    [blocked] kyomei n'a pas pu remettre le compte { $account } : un verrou d'identifiants Claude est resté pris, ou la connexion du compte a été refusée et doit être refaite avec `kyomei add`.
++    [timed-out] kyomei n'a pas répondu à temps en remettant le compte { $account }.
++    [unreadable] kyomei a répondu sous une forme que ce Zeo ne lit pas ; mettez l'un des deux à jour.
++   *[other] kyomei n'a pas pu remettre le compte { $account } ; `kyomei deliver { $account } --config-dir <dossier claude de ce projet>` dans un terminal dit pourquoi.
++}
+diff --git a/crates/zeo_i18n/locales/fr/agent-sandbox.ftl b/crates/zeo_i18n/locales/fr/agent-sandbox.ftl
+index 2eb88c2..ddf649e 100644
+--- a/crates/zeo_i18n/locales/fr/agent-sandbox.ftl
++++ b/crates/zeo_i18n/locales/fr/agent-sandbox.ftl
+@@ -148,3 +148,16 @@ agent-sandbox-secrets = Secrets
+     .locked = Impossible de lire le coffre : { $error }
+ agent-sandbox-secret-missing = { $reference } n’est pas dans le coffre. Désactivez-le, sinon le jail ne démarrera pas.
+ agent-sandbox-secret-no-use = { $reference } ne déclare ni variable ni hôtes. Définissez-les sur la page Secrets ou désactivez-le ; d’ici là le jail ne démarrera pas.
++
++agent-sandbox-account = Compte Claude
++agent-sandbox-account-note = Avec un compte kyomei, Zeo n'écrit dans la configuration Claude de ce projet qu'un jeton d'accès avant chaque démarrage, et le projet n'a pas besoin de sa propre connexion. Le jeton de rafraîchissement ne quitte jamais kyomei.
++agent-sandbox-account-own = Connexion propre à ce projet
++agent-sandbox-account-own-note = Connectez-vous depuis le panneau de l'agent, une fois pour ce projet.
++agent-sandbox-account-reset = Utiliser le compte par défaut
++agent-sandbox-account-none = kyomei ne détient encore aucun compte. Connectez-en un ci-dessous.
++agent-sandbox-account-unavailable = Impossible de lire kyomei ({ $reason }).
++agent-sandbox-account-missing = { $account } : kyomei ne détient pas ce compte ; le démarrage est refusé tant qu'un autre n'est pas choisi.
++agent-sandbox-account-quarantined = { $email } : la connexion a été refusée ; reconnectez-le.
++agent-sandbox-account-connect = Connecter un nouveau compte…
++agent-sandbox-account-connect-note = Lance `kyomei add` dans un terminal : une nouvelle connexion dans le navigateur, gardée dans le coffre de kyomei. Une connexion séparée d'un compte que vous utilisez déjà ici est sûre.
++agent-sandbox-account-refresh = Actualiser
+diff --git a/crates/zeo_i18n/locales/it/agent-jail.ftl b/crates/zeo_i18n/locales/it/agent-jail.ftl
+index a645177..8295c71 100644
+--- a/crates/zeo_i18n/locales/it/agent-jail.ftl
++++ b/crates/zeo_i18n/locales/it/agent-jail.ftl
+@@ -153,3 +153,11 @@ agent-jail-launch-ssh-socket = { $reason ->
+     [agent-failed] Zeo non è riuscito ad avviare lo ssh-agent dei jail in { $socket }; verifica che ssh-agent sia installato.
+    *[protected] Il socket di ssh-agent { $socket } sta in una cartella che il sandbox non monta mai; mettilo in una cartella sua, come /tmp/zeo-ssh.
+ }
++
++agent-jail-launch-account = { $reason ->
++    [not-installed] Questo progetto accede con l'account kyomei { $account }, e kyomei non è stato trovato (agent_sandbox.kyomei_path, o il PATH).
++    [blocked] kyomei non è riuscito a consegnare l'account { $account }: un blocco delle credenziali di Claude è rimasto occupato, oppure l'accesso dell'account è stato rifiutato e va rifatto con `kyomei add`.
++    [timed-out] kyomei non ha risposto in tempo consegnando l'account { $account }.
++    [unreadable] kyomei ha risposto in una forma che questo Zeo non legge; aggiornate uno dei due.
++   *[other] kyomei non è riuscito a consegnare l'account { $account }; `kyomei deliver { $account } --config-dir <cartella claude di questo progetto>` in un terminale dice perché.
++}
+diff --git a/crates/zeo_i18n/locales/it/agent-sandbox.ftl b/crates/zeo_i18n/locales/it/agent-sandbox.ftl
+index fba2ca8..5e2c8b0 100644
+--- a/crates/zeo_i18n/locales/it/agent-sandbox.ftl
++++ b/crates/zeo_i18n/locales/it/agent-sandbox.ftl
+@@ -148,3 +148,16 @@ agent-sandbox-secrets = Segreti
+     .locked = Impossibile leggere la cassaforte: { $error }
+ agent-sandbox-secret-missing = { $reference } non è nella cassaforte. Disattivalo, altrimenti il jail non si avvia.
+ agent-sandbox-secret-no-use = { $reference } non dichiara variabile né host. Impostali nella pagina Segreti o disattivalo; fino ad allora il jail non si avvia.
++
++agent-sandbox-account = Account Claude
++agent-sandbox-account-note = Con un account kyomei, Zeo scrive nella configurazione Claude di questo progetto solo un token di accesso prima di ogni avvio, e il progetto non ha bisogno di un accesso proprio. Il token di aggiornamento non lascia mai kyomei.
++agent-sandbox-account-own = Accesso proprio di questo progetto
++agent-sandbox-account-own-note = Accedete dal pannello dell'agente, una volta per questo progetto.
++agent-sandbox-account-reset = Usa l'account predefinito
++agent-sandbox-account-none = kyomei non conserva ancora alcun account. Collegatene uno qui sotto.
++agent-sandbox-account-unavailable = Impossibile leggere kyomei ({ $reason }).
++agent-sandbox-account-missing = { $account }: kyomei non conserva questo account; l'avvio viene rifiutato finché non se ne sceglie un altro.
++agent-sandbox-account-quarantined = { $email }: l'accesso è stato rifiutato; collegatelo di nuovo.
++agent-sandbox-account-connect = Collega un nuovo account…
++agent-sandbox-account-connect-note = Esegue `kyomei add` in un terminale: un nuovo accesso nel browser, conservato nella cassaforte di kyomei. Un accesso separato di un account che usate già qui è sicuro.
++agent-sandbox-account-refresh = Aggiorna
+diff --git a/crates/zeo_i18n/locales/ja/agent-jail.ftl b/crates/zeo_i18n/locales/ja/agent-jail.ftl
+index 659582a..c314aee 100644
+--- a/crates/zeo_i18n/locales/ja/agent-jail.ftl
++++ b/crates/zeo_i18n/locales/ja/agent-jail.ftl
+@@ -159,3 +159,11 @@ agent-jail-launch-ssh-socket = { $reason ->
+     [agent-failed] Zeo は { $socket } で jail の ssh-agent を起動できませんでした。ssh-agent がインストールされているか確認してください。
+    *[protected] ssh-agent のソケット { $socket } はサンドボックスが決してマウントしないフォルダーにあります。/tmp/zeo-ssh のような専用フォルダーに置いてください。
+ }
++
++agent-jail-launch-account = { $reason ->
++    [not-installed] このプロジェクトは kyomei のアカウント { $account } でログインしますが、kyomei が見つかりません（agent_sandbox.kyomei_path または PATH）。
++    [blocked] kyomei はアカウント { $account } を渡せませんでした。Claude の認証情報ロックが解放されないままか、アカウントのログインが拒否されたため `kyomei add` でやり直す必要があります。
++    [timed-out] アカウント { $account } を渡す間に kyomei が時間内に応答しませんでした。
++    [unreadable] kyomei はこの Zeo が読めない形式で応答しました。どちらかを更新してください。
++   *[other] kyomei はアカウント { $account } を渡せませんでした。ターミナルで `kyomei deliver { $account } --config-dir <このプロジェクトの claude フォルダー>` を実行すると理由がわかります。
++}
+diff --git a/crates/zeo_i18n/locales/ja/agent-sandbox.ftl b/crates/zeo_i18n/locales/ja/agent-sandbox.ftl
+index 7b61843..adfc9b8 100644
+--- a/crates/zeo_i18n/locales/ja/agent-sandbox.ftl
++++ b/crates/zeo_i18n/locales/ja/agent-sandbox.ftl
+@@ -157,3 +157,16 @@ agent-sandbox-secrets = シークレット
+     .locked = 保管庫を読み取れませんでした: { $error }
+ agent-sandbox-secret-missing = { $reference } は保管庫にありません。オフにしないと jail は起動しません。
+ agent-sandbox-secret-no-use = { $reference } は変数もホストも宣言していません。シークレットページで設定するかオフにしてください。それまで jail は起動しません。
++
++agent-sandbox-account = Claude アカウント
++agent-sandbox-account-note = kyomei のアカウントを使うと、Zeo は起動のたびにこのプロジェクトの Claude 設定へアクセストークンだけを書き込み、プロジェクト専用のログインは不要になります。リフレッシュトークンは kyomei の外に出ません。
++agent-sandbox-account-own = このプロジェクト専用のログイン
++agent-sandbox-account-own-note = エージェントパネルからこのプロジェクトで一度ログインします。
++agent-sandbox-account-reset = 既定のアカウントを使う
++agent-sandbox-account-none = kyomei にはまだアカウントがありません。下で接続してください。
++agent-sandbox-account-unavailable = kyomei を読み取れませんでした（{ $reason }）。
++agent-sandbox-account-missing = { $account }：kyomei にそのアカウントはありません。別のものを選ぶまで起動は拒否されます。
++agent-sandbox-account-quarantined = { $email }：ログインが拒否されました。もう一度接続してください。
++agent-sandbox-account-connect = 新しいアカウントを接続…
++agent-sandbox-account-connect-note = ターミナルで `kyomei add` を実行します。ブラウザーで新しくログインし、kyomei の保管庫に保存します。ここで既に使っているアカウントの別ログインでも安全です。
++agent-sandbox-account-refresh = 更新
+diff --git a/crates/zeo_i18n/locales/pt-BR/agent-jail.ftl b/crates/zeo_i18n/locales/pt-BR/agent-jail.ftl
+index c8d4c66..b0ca063 100644
+--- a/crates/zeo_i18n/locales/pt-BR/agent-jail.ftl
++++ b/crates/zeo_i18n/locales/pt-BR/agent-jail.ftl
+@@ -178,3 +178,11 @@ agent-jail-launch-ssh-socket = { $reason ->
+     [agent-failed] O Zeo não conseguiu iniciar o ssh-agent dos jails em { $socket }; confira se o ssh-agent está instalado.
+    *[protected] O socket do ssh-agent { $socket } está numa pasta que o sandbox nunca mapeia; coloque-o numa pasta só dele, como /tmp/zeo-ssh.
+ }
++
++agent-jail-launch-account = { $reason ->
++    [not-installed] Este projeto entra com a conta { $account } do kyomei, e o kyomei não foi encontrado (agent_sandbox.kyomei_path, ou o PATH).
++    [blocked] O kyomei não conseguiu entregar a conta { $account }: um lock de credencial do Claude ficou preso, ou o login da conta foi recusado e precisa ser refeito com `kyomei add`.
++    [timed-out] O kyomei não respondeu a tempo ao entregar a conta { $account }.
++    [unreadable] O kyomei respondeu num formato que este Zeo não lê; atualize um dos dois.
++   *[other] O kyomei não conseguiu entregar a conta { $account }; `kyomei deliver { $account } --config-dir <pasta claude deste projeto>` num terminal diz por quê.
++}
+diff --git a/crates/zeo_i18n/locales/pt-BR/agent-sandbox.ftl b/crates/zeo_i18n/locales/pt-BR/agent-sandbox.ftl
+index 9dee816..73bf42b 100644
+--- a/crates/zeo_i18n/locales/pt-BR/agent-sandbox.ftl
++++ b/crates/zeo_i18n/locales/pt-BR/agent-sandbox.ftl
+@@ -184,3 +184,16 @@ agent-sandbox-secrets = Segredos
+     .locked = Não foi possível ler o cofre: { $error }
+ agent-sandbox-secret-missing = { $reference } não está no cofre. Desligue-o, ou o jail não inicia.
+ agent-sandbox-secret-no-use = { $reference } não declara variável nem hosts. Defina-os na página Segredos ou desligue-o; até lá o jail não inicia.
++
++agent-sandbox-account = Conta Claude
++agent-sandbox-account-note = Com uma conta do kyomei, o Zeo grava na config do Claude deste projeto só um access token antes de cada início, e o projeto não precisa de login próprio. O refresh token nunca sai do kyomei.
++agent-sandbox-account-own = Login próprio deste projeto
++agent-sandbox-account-own-note = Entre pelo painel do agente, uma vez para este projeto.
++agent-sandbox-account-reset = Usar a conta padrão
++agent-sandbox-account-none = O kyomei ainda não guarda nenhuma conta. Conecte uma abaixo.
++agent-sandbox-account-unavailable = Não foi possível ler o kyomei ({ $reason }).
++agent-sandbox-account-missing = { $account }: o kyomei não guarda essa conta; o início é recusado até outra ser escolhida.
++agent-sandbox-account-quarantined = { $email }: o login foi recusado; conecte-a de novo.
++agent-sandbox-account-connect = Conectar uma nova conta…
++agent-sandbox-account-connect-note = Roda `kyomei add` num terminal: um login novo no navegador, guardado no cofre do kyomei. Um login separado de uma conta que você já usa aqui é seguro.
++agent-sandbox-account-refresh = Atualizar
+diff --git a/crates/zeo_i18n/locales/ru/agent-jail.ftl b/crates/zeo_i18n/locales/ru/agent-jail.ftl
+index 48472e8..058ed33 100644
+--- a/crates/zeo_i18n/locales/ru/agent-jail.ftl
++++ b/crates/zeo_i18n/locales/ru/agent-jail.ftl
+@@ -155,3 +155,11 @@ agent-jail-launch-ssh-socket = { $reason ->
+     [agent-failed] Zeo не смог запустить ssh-agent джейлов в { $socket }; проверьте, что ssh-agent установлен.
+    *[protected] Сокет ssh-agent { $socket } лежит в папке, которую песочница никогда не подключает; поместите его в отдельную папку, например /tmp/zeo-ssh.
+ }
++
++agent-jail-launch-account = { $reason ->
++    [not-installed] Этот проект входит под учётной записью kyomei { $account }, а kyomei не найден (agent_sandbox.kyomei_path или PATH).
++    [blocked] kyomei не смог передать учётную запись { $account }: блокировка учётных данных Claude осталась занятой, либо вход в учётную запись был отклонён и его нужно повторить через `kyomei add`.
++    [timed-out] kyomei не ответил вовремя при передаче учётной записи { $account }.
++    [unreadable] kyomei ответил в формате, который этот Zeo не читает; обновите один из них.
++   *[other] kyomei не смог передать учётную запись { $account }; `kyomei deliver { $account } --config-dir <папка claude этого проекта>` в терминале скажет почему.
++}
+diff --git a/crates/zeo_i18n/locales/ru/agent-sandbox.ftl b/crates/zeo_i18n/locales/ru/agent-sandbox.ftl
+index e72af4c..a1dee13 100644
+--- a/crates/zeo_i18n/locales/ru/agent-sandbox.ftl
++++ b/crates/zeo_i18n/locales/ru/agent-sandbox.ftl
+@@ -148,3 +148,16 @@ agent-sandbox-secrets = Секреты
+     .locked = Не удалось прочитать хранилище: { $error }
+ agent-sandbox-secret-missing = { $reference } нет в хранилище. Выключите его, иначе jail не запустится.
+ agent-sandbox-secret-no-use = { $reference } не указывает ни переменную, ни хосты. Задайте их на странице «Секреты» или выключите его; до тех пор jail не запустится.
++
++agent-sandbox-account = Учётная запись Claude
++agent-sandbox-account-note = С учётной записью kyomei Zeo перед каждым запуском записывает в конфигурацию Claude этого проекта только токен доступа, и проекту не нужен собственный вход. Токен обновления никогда не покидает kyomei.
++agent-sandbox-account-own = Собственный вход этого проекта
++agent-sandbox-account-own-note = Войдите через панель агента, один раз для этого проекта.
++agent-sandbox-account-reset = Использовать учётную запись по умолчанию
++agent-sandbox-account-none = В kyomei пока нет учётных записей. Подключите одну ниже.
++agent-sandbox-account-unavailable = Не удалось прочитать kyomei ({ $reason }).
++agent-sandbox-account-missing = { $account }: в kyomei нет такой учётной записи; запуск отклоняется, пока не выбрана другая.
++agent-sandbox-account-quarantined = { $email }: вход был отклонён; подключите её снова.
++agent-sandbox-account-connect = Подключить новую учётную запись…
++agent-sandbox-account-connect-note = Запускает `kyomei add` в терминале: новый вход в браузере, сохраняемый в хранилище kyomei. Отдельный вход в учётную запись, которой вы уже пользуетесь здесь, безопасен.
++agent-sandbox-account-refresh = Обновить
+diff --git a/crates/zeo_i18n/locales/zh-CN/agent-jail.ftl b/crates/zeo_i18n/locales/zh-CN/agent-jail.ftl
+index 19a18a4..9be5390 100644
+--- a/crates/zeo_i18n/locales/zh-CN/agent-jail.ftl
++++ b/crates/zeo_i18n/locales/zh-CN/agent-jail.ftl
+@@ -175,3 +175,11 @@ agent-jail-launch-ssh-socket = { $reason ->
+     [agent-failed] Zeo 无法在 { $socket } 启动 jail 的 ssh-agent；请确认已安装 ssh-agent。
+    *[protected] ssh-agent 套接字 { $socket } 位于沙箱从不挂载的文件夹中；请把它放在专用文件夹里，例如 /tmp/zeo-ssh。
+ }
++
++agent-jail-launch-account = { $reason ->
++    [not-installed] 此项目使用 kyomei 账户 { $account } 登录，但找不到 kyomei（agent_sandbox.kyomei_path 或 PATH）。
++    [blocked] kyomei 无法交付账户 { $account }：Claude 凭据锁一直被占用，或该账户的登录被拒绝，需要用 `kyomei add` 重新登录。
++    [timed-out] kyomei 在交付账户 { $account } 时未及时响应。
++    [unreadable] kyomei 的应答格式此版 Zeo 无法读取；请更新其中之一。
++   *[other] kyomei 无法交付账户 { $account }；在终端运行 `kyomei deliver { $account } --config-dir <此项目的 claude 文件夹>` 可查看原因。
++}
+diff --git a/crates/zeo_i18n/locales/zh-CN/agent-sandbox.ftl b/crates/zeo_i18n/locales/zh-CN/agent-sandbox.ftl
+index f18316b..4628c82 100644
+--- a/crates/zeo_i18n/locales/zh-CN/agent-sandbox.ftl
++++ b/crates/zeo_i18n/locales/zh-CN/agent-sandbox.ftl
+@@ -177,3 +177,16 @@ agent-sandbox-secrets = 密钥
+     .locked = 无法读取保险库：{ $error }
+ agent-sandbox-secret-missing = { $reference } 不在保险库中。请关闭它，否则 jail 无法启动。
+ agent-sandbox-secret-no-use = { $reference } 没有声明变量和主机。请在“密钥”页面设置或关闭它；在此之前 jail 无法启动。
++
++agent-sandbox-account = Claude 账户
++agent-sandbox-account-note = 使用 kyomei 账户时，Zeo 每次启动前只把访问令牌写入此项目的 Claude 配置，项目无需单独登录。刷新令牌永远不会离开 kyomei。
++agent-sandbox-account-own = 此项目自己的登录
++agent-sandbox-account-own-note = 在代理面板中为此项目登录一次。
++agent-sandbox-account-reset = 使用默认账户
++agent-sandbox-account-none = kyomei 还没有任何账户。请在下方连接一个。
++agent-sandbox-account-unavailable = 无法读取 kyomei（{ $reason }）。
++agent-sandbox-account-missing = { $account }：kyomei 中没有此账户；在选择其他账户之前将拒绝启动。
++agent-sandbox-account-quarantined = { $email }：登录被拒绝；请重新连接。
++agent-sandbox-account-connect = 连接新账户…
++agent-sandbox-account-connect-note = 在终端中运行 `kyomei add`：在浏览器中重新登录，保存在 kyomei 的保险库中。对你在这里已使用的账户另行登录是安全的。
++agent-sandbox-account-refresh = 刷新

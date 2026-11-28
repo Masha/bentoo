@@ -2503,6 +2503,10 @@ src_prepare() {
 			# own program in a private dir, the state root leaves /var/tmp, Zeo starts the jails'
 			# ssh-agent, Stop escalates to SIGKILL. On 0215.
 			"${FILESDIR}/0217-agent-sandbox-agent-ui-agent-servers-fixes-from-the-0-31-0-security-review.patch"
+			# 0218 (Zeo next §6.65): a jail logs in with a kyomei account -- kyomei writes an
+			# access-token-only credential into the project's claude/ before each start. kyomei
+			# is optional (app-crypt/kyomei): with no account chosen nothing changes. On 0217.
+			"${FILESDIR}/0218-agent-sandbox-settings-ui-a-jail-logs-in-with-a-kyomei-account.patch"
 		)
 	fi
 
@@ -2906,6 +2910,10 @@ pkg_postinst() {
 		elog "agent panel shows whether the thread you are looking at is jailed."
 		elog "A hand-written \"ai-jail\" entry in agent_servers keeps working, shown as"
 		elog "jailed by its own command."
+		elog ""
+		elog "To skip the login per project, keep the account in app-crypt/kyomei"
+		elog "(kyomei add --alias main) and pick it on the same page, under Claude"
+		elog "account: each start then gets an access token only (patch 0218)."
 	fi
 
 	if use browser-extension; then
