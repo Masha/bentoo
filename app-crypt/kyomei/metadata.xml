@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@protonmail.com</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<upstream>
+		<remote-id type="github">zeo-workspace/kyomei</remote-id>
+		<bugs-to>https://github.com/zeo-workspace/kyomei/issues</bugs-to>
+	</upstream>
+	<longdescription lang="en">
+		kyomei keeps Claude Code's single-use refresh tokens in an encrypted
+		vault and writes into a Claude Code configuration directory only an
+		access token, renewing and rewriting it before it expires. A sandboxed
+		agent (Zeo's ai-jail projects) can then use an account without a login
+		of its own and without being able to renew, leak or destroy it.
+	</longdescription>
+</pkgmetadata>
